@@ -239,7 +239,7 @@ class AppCache(object):
         for model in models:
             # Store as 'name: model' pair in a dictionary
             # in the app_models dictionary
-            model_name = model._meta.object_name.lower()
+            model_name = model._meta.model_name
             model_dict = self.app_models.setdefault(app_label, SortedDict())
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.

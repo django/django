@@ -2,32 +2,33 @@
 #
 # Translators:
 # fasouto <fsoutomoure@gmail.com>, 2011.
+#   <fonzzo@gmail.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:38+0100\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
-"Language-Team: Galician (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2013-01-07 12:00+0000\n"
+"Last-Translator: fonso <fonzzo@gmail.com>\n"
+"Language-Team: Galician (http://www.transifex.com/projects/p/django/language/"
 "gl/)\n"
-"Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
-msgstr ""
+msgstr "primeiro paso"
 
 #: templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
-msgstr ""
+msgstr "paso anterior"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr ""
+msgstr "enviar"
 
 #: wizard/legacy.py:159
 msgid ""

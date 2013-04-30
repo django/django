@@ -11,7 +11,8 @@ import re
 QUERY_TERMS = set([
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
-    'month', 'day', 'week_day', 'isnull', 'search', 'regex', 'iregex',
+    'month', 'day', 'week_day', 'hour', 'minute', 'second', 'isnull', 'search',
+    'regex', 'iregex',
 ])
 
 # Size of each "chunk" for get_iterator calls.
@@ -24,7 +25,7 @@ GET_ITERATOR_CHUNK_SIZE = 100
 # dictionary in the Query class).
 JoinInfo = namedtuple('JoinInfo',
                       'table_name rhs_alias join_type lhs_alias '
-                      'lhs_join_col rhs_join_col nullable join_field')
+                      'join_cols nullable join_field')
 
 # Pairs of column clauses to select, and (possibly None) field for the clause.
 SelectInfo = namedtuple('SelectInfo', 'col field')

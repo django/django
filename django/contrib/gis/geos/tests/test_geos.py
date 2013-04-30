@@ -80,7 +80,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing WKT output."
         for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
-            self.assertEqual(g.ewkt, geom.wkt)
+            if geom.hasz and geos_version_info()['version'] >= '3.3.0':
+                self.assertEqual(g.ewkt, geom.wkt)
 
     def test_hex(self):
         "Testing HEX output."
@@ -661,6 +662,22 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
+    def test_custom_srid(self):
+        """ Test with a srid unknown from GDAL """
+        pnt = Point(111200, 220900, srid=999999)
+        self.assertTrue(pnt.ewkt.startswith("SRID=999999;POINT (111200.0"))
+        self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
+        self.assertIsNone(pnt.srs)
+
+        # Test conversion from custom to a known srid
+        c2w = gdal.CoordTransform(
+            gdal.SpatialReference('+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 +datum=WGS84 +units=m +no_defs'),
+            gdal.SpatialReference(4326))
+        new_pnt = pnt.transform(c2w, clone=True)
+        self.assertEqual(new_pnt.srid, 4326)
+        self.assertAlmostEqual(new_pnt.x, 1, 3)
+        self.assertAlmostEqual(new_pnt.y, 2, 3)
+
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
         ### Testing the mutability of Polygons ###
@@ -688,7 +705,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             for i in range(len(mp)):
                 # Creating a random point.
                 pnt = mp[i]
-                new = Point(random.randint(1, 100), random.randint(1, 100))
+                new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
                 s = str(new) # what was used for the assignment is still accessible
@@ -1063,15 +1080,17 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(mls.interpolate(17), Point(10, 7))
 
     def test_geos_version(self):
-        "Testing the GEOS version regular expression."
+        """Testing the GEOS version regular expression."""
         from django.contrib.gis.geos.libgeos import version_regex
-        versions = [ ('3.0.0rc4-CAPI-1.3.3', '3.0.0'),
-                     ('3.0.0-CAPI-1.4.1', '3.0.0'),
-                     ('3.4.0dev-CAPI-1.8.0', '3.4.0') ]
-        for v, expected in versions:
-            m = version_regex.match(v)
-            self.assertTrue(m)
-            self.assertEqual(m.group('version'), expected)
+        versions = [('3.0.0rc4-CAPI-1.3.3', '3.0.0', '1.3.3'),
+                    ('3.0.0-CAPI-1.4.1', '3.0.0', '1.4.1'),
+                    ('3.4.0dev-CAPI-1.8.0', '3.4.0', '1.8.0'),
+                    ('3.4.0dev-CAPI-1.8.0 r0', '3.4.0', '1.8.0')]
+        for v_init, v_geos, v_capi in versions:
+            m = version_regex.match(v_init)
+            self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
+            self.assertEqual(m.group('version'), v_geos)
+            self.assertEqual(m.group('capi_version'), v_capi)
 
 
 def suite():

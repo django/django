@@ -6,45 +6,46 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Slovenian (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
+"PO-Revision-Date: 2012-10-31 19:45+0000\n"
+"Last-Translator: mateju <>\n"
+"Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
-"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3)\n"
+"%100==4 ? 2 : 3);\n"
 
-#: models.py:7
+#: models.py:9
 msgid "redirect from"
-msgstr "preusmeritev iz"
+msgstr "preusmeri iz"
 
-#: models.py:8
+#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Ta pot mora biti absolutna, brez imena domene. Primer: '/events/search/'."
+"Pot mora biti navedena absolutno in brez imena domene. Primer: '/events/"
+"search/'."
 
-#: models.py:9
+#: models.py:11
 msgid "redirect to"
 msgstr "preusmeri na"
 
-#: models.py:10
+#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"To je lahko absolutna pot (kot zgoraj) ali popoln URL naslov (ki se začne s "
-"'http://')."
+"Pot je lahko navedena absolutno (kot zgoraj) ali pa kot popoln naslov URL, "
+"začet z 'http://'."
 
-#: models.py:13
+#: models.py:15
 msgid "redirect"
-msgstr "preusmeritev"
+msgstr "preusmeri"
 
-#: models.py:14
+#: models.py:16
 msgid "redirects"
 msgstr "preusmeritve"

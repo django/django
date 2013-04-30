@@ -248,8 +248,8 @@ Alternatively you can use plain text and
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any fields in your model, Django
-will automatically add an :class:`IntegerField` to hold the primary key, so you
+If you don't specify ``primary_key=True`` for any field in your model, Django
+will automatically add an :class:`AutoField` to hold the primary key, so you
 don't need to set ``primary_key=True`` on any of your fields unless you want to
 override the default primary-key behavior. For more, see
 :ref:`automatic-primary-key-fields`.
@@ -347,6 +347,22 @@ A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from -9223372036854775808 to 9223372036854775807. The
 default form widget for this field is a :class:`~django.forms.TextInput`.
 
+``BinaryField``
+-------------------
+
+.. class:: BinaryField([**options])
+
+.. versionadded:: 1.6
+
+A field to store raw binary data. It only supports ``bytes`` assignment. Be
+aware that this field has limited functionality. For example, it is not possible
+to filter a queryset on a ``BinaryField`` value.
+
+.. admonition:: Abusing ``BinaryField``
+
+    Although you might think about storing files in the database, consider that
+    it is bad design in 99% of the cases. This field is *not* a replacement for
+    proper :doc`static files </howto/static-files>` handling.
 
 ``BooleanField``
 ----------------
@@ -360,6 +376,11 @@ The default form widget for this field is a
 
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
+
+.. versionchanged:: 1.6
+
+    The default value of ``BooleanField`` was changed from ``False`` to
+    ``None`` when :attr:`Field.default` isn't defined.
 
 ``CharField``
 -------------
@@ -456,7 +477,7 @@ A fixed-precision decimal number, represented in Python by a
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than or equal to ``decimal_places``, if it exists.
+    must be greater than or equal to ``decimal_places``.
 
 .. attribute:: DecimalField.decimal_places
 
@@ -856,8 +877,8 @@ widget for this field is a :class:`~django.forms.NullBooleanSelect`.
 
 .. class:: PositiveIntegerField([**options])
 
-Like an :class:`IntegerField`, but must be either positive or zero (`0`).
-The value `0` is accepted for backward compatibility reasons.
+Like an :class:`IntegerField`, but must be either positive or zero (``0``).
+The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -936,8 +957,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 
 .. versionadded:: 1.5
 
-The current value of the field will be displayed as a clickable link above the
-input widget.
+    The current value of the field will be displayed as a clickable link above the
+    input widget.
 
 
 Relationship fields
@@ -1050,6 +1071,21 @@ define the details of how the relation works.
 
     The field on the related object that the relation is to. By default, Django
     uses the primary key of the related object.
+
+.. attribute:: ForeignKey.db_constraint
+
+    .. versionadded:: 1.6
+
+    Controls whether or not a constraint should be created in the database for
+    this foreign key. The default is ``True``, and that's almost certainly what
+    you want; setting this to ``False`` can be very bad for data integrity.
+    That said, here are some scenarios where you might want to do this:
+
+    * You have legacy data that is not valid.
+    * You're sharding your database.
+
+    If this is set to ``False``, accessing a related object that doesn't exist
+    will raise its ``DoesNotExist`` exception.
 
 .. attribute:: ForeignKey.on_delete
 
@@ -1197,6 +1233,22 @@ that control how the relationship functions.
     is not provided, Django will assume a default name based upon the names of:
     the table for the model defining the relationship and the name of the field
     itself.
+
+.. attribute:: ManyToManyField.db_constraint
+
+    .. versionadded:: 1.6
+
+    Controls whether or not constraints should be created in the database for
+    the foreign keys in the intermediary table. The default is ``True``, and
+    that's almost certainly what you want; setting this to ``False`` can be
+    very bad for data integrity. That said, here are some scenarios where you
+    might want to do this:
+
+    * You have legacy data that is not valid.
+    * You're sharding your database.
+
+    It is an error to pass both ``db_constraint`` and ``through``.
+
 
 .. _ref-onetoone:
 

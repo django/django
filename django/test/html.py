@@ -85,7 +85,8 @@ class Element(object):
             return False
         return True
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash((self.name,) + tuple(a for a in self.attributes))
 
     def __ne__(self, element):
         return not self.__eq__(element)
@@ -221,7 +222,7 @@ def parse_html(html):
     """
     Takes a string that contains *valid* HTML and turns it into a Python object
     structure that can be easily compared against other HTML on semantic
-    equivilance. Syntactical differences like which quotation is used on
+    equivalence. Syntactical differences like which quotation is used on
     arguments will be ignored.
 
     """

@@ -2,22 +2,22 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Ossama Khayat <okhayat@gmail.com>, 2011.
+# Ossama Khayat <okhayat@gmail.com>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"PO-Revision-Date: 2012-11-27 17:05+0000\n"
 "Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
-"Language-Team: Arabic (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
-"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -30,11 +30,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"هذه قائمة %s المتوفرة. يمكنك اختيار بعضها بانتقائها في الصندوق أدناه ثم "
+"الضغط على سهم الـ\"اختيار\" بين الصندوقين."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "اكتب في هذا الصندوق لتصفية قائمة %s المتوفرة."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -47,11 +49,11 @@ msgstr "اختر الكل"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "اضغط لاختيار جميع %s جملة واحدة."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "اختيار"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -68,15 +70,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"هذه قائمة %s المحددة. يمكنك إزالة بعضها باختيارها في الصندوق أدناه ثم اضغط "
+"على سهم الـ\"إزالة\" بين الصندوقين."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "إزالة الكل"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "اضغط لإزالة جميع %s المحددة جملة واحدة."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

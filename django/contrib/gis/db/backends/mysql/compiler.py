@@ -30,3 +30,6 @@ class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
     pass
+
+class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
+    pass

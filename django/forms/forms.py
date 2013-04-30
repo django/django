@@ -5,6 +5,7 @@ Form classes
 from __future__ import absolute_import, unicode_literals
 
 import copy
+import warnings
 
 from django.core.exceptions import ValidationError
 from django.forms.fields import Field, FileField
@@ -32,12 +33,12 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     """
     Create a list of form field instances from the passed in 'attrs', plus any
     similar fields on the base classes (in 'bases'). This is used by both the
-    Form and ModelForm metclasses.
+    Form and ModelForm metaclasses.
 
     If 'with_base_fields' is True, all fields from the bases are used.
     Otherwise, only fields in the 'declared_fields' attribute on the bases are
     used. The distinction is useful in ModelForm subclassing.
-    Also integrates any additional media definitions
+    Also integrates any additional media definitions.
     """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)]
     fields.sort(key=lambda x: x[1].creation_counter)
@@ -344,8 +345,13 @@ class BaseForm(object):
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
-                    initial_value = hidden_widget.value_from_datadict(
-                        self.data, self.files, initial_prefixed_name)
+                    try:
+                        initial_value = field.to_python(hidden_widget.value_from_datadict(
+                            self.data, self.files, initial_prefixed_name))
+                    except ValidationError:
+                        # Always assume data has changed if validation fails.
+                        self._changed_data.append(name)
+                        continue
                 if hasattr(field.widget, '_has_changed'):
                     warnings.warn("The _has_changed method on widgets is deprecated,"
                         " define it at field level instead.",
@@ -513,7 +519,7 @@ class BoundField(object):
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
         """
-        contents = contents or conditional_escape(self.label)
+        contents = contents or self.label
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
@@ -521,6 +527,8 @@ class BoundField(object):
             contents = format_html('<label for="{0}"{1}>{2}</label>',
                                    widget.id_for_label(id_), attrs, contents
                                    )
+        else:
+            contents = conditional_escape(contents)
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):

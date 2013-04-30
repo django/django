@@ -1,72 +1,74 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Nikneshan <ali@nikneshan.com>, 2012.
+# Arash Fazeli <arash_fazeli77@yahoo.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-08-11 08:27+0000\n"
+"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "محتوا"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "فوق داده"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
+msgstr[0] "پرچم دار"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
-msgstr ""
+msgstr "نشان‌گذاری نظرات انتخاب شده"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
+msgstr[0] "تایید شده"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
-msgstr ""
-
-#: admin.py:52
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] ""
-
-#: admin.py:53
-msgid "Remove selected comments"
-msgstr ""
+msgstr "تایید نظرات انتخاب شده"
 
 #: admin.py:65
+msgid "removed"
+msgid_plural "removed"
+msgstr[0] "حذف شده"
+
+#: admin.py:66
+msgid "Remove selected comments"
+msgstr "حذف نظر های انتخاب شده"
+
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
+msgstr[0] "%(count)s کامنت با موفقیت %(action)s شدند."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "نظرات %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "آخرین نظرات در  %(site_name)s"
 
 #: forms.py:96
 msgid "Name"
@@ -99,72 +101,74 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "اگر چیزی در این فیلد وارد کنید، نظر شما به عنوان اسپم شناخته خواهد شد"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "نوع محتوا"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "مشخصهٔ شیء"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "کاربر"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "نام کاربر"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "نشانی پست الکترونیکی کاربر"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "نشانی اینترنتی کاربر"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "نظر"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "تاریخ/زمان فرستاده شد"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "نشانی IP"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "عمومی است"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "تیک این جعبه را بردارید تا نظر به طور کارا از وبگاه ناپدید شود."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "حذف شده است"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
+"اگر نظر نامناسب است این جا علامت بزنید. پیغام \"این نظر حذف شد\" به جای آن "
+"نمایش داده می شود."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
-msgstr ""
+msgstr "نظرات"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr "این نظر توسط یک کاربر ثبت‌شده فرستاده شده و لذا نامش فقط-خواندنی است."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -172,7 +176,7 @@ msgstr ""
 "این نظر توسط یک کاربر ثبت‌شده فرستاده شده و لذا پست الکترونیکی‌اش فقط-خواندنی "
 "است."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -187,105 +191,105 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
-msgstr ""
+msgstr "علامت گذاری "
 
-#: models.py:171
+#: models.py:180
 msgid "date"
-msgstr ""
+msgstr "تاریخ"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
-msgstr ""
+msgstr "علامت گذاری نظر"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
-msgstr ""
+msgstr "علامت گذاری های نظر"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "تایید یک نظر"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "واقعا این نظر به صورت عمومی نمایش داده شود؟"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "تایید"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "ممنون از تایید."
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
+msgstr "ممنون از وقتی که برای افزایش کیفیت بحث در سایت ما گذاشتید."
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "حذف یک نظر"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "واقعا این نظر حذف شود؟"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "حذف"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "ممنون از حذف"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "علامت گذاری این نظر"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "واقعا این نظر علامت گذاری شود؟"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "علامت گذاری "
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "ممنون از علامت گذاری "
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "پست"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "پیش نمایش"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "برای اظهار نظر"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "با تشکر از نظر شما"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "پیش نمایش نظر شما"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
+msgstr[0] "لطفا خطاهای زیر را تصحیح"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "نظر خود را ارسال کنید"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "و یا تغییر ایجاد کنید."

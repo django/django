@@ -1,21 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Ismayilov <ali@ismailov.info>, 2011.
+# Ali Ismayilov <ali@ismailov.info>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"PO-Revision-Date: 2012-05-08 13:33+0000\n"
 "Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
+"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
 "language/az/)\n"
-"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: az\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -28,11 +28,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Bu, mümkün %s siyahısıdır. Onlardan bir neçəsini qarşısındakı xanaya işarə "
+"qoymaq və iki xana arasındakı \"Seç\"i tıqlamaqla seçmək olar."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Bu xanaya yazmaqla mümkün %s siyahısını filtrləyə bilərsiniz."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -45,11 +47,11 @@ msgstr "Hamısını seç"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Bütün %s siyahısını seçmək üçün tıqlayın."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Seç"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -66,15 +68,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Bu, seçilmiş %s siyahısıdır. Onlardan bir neçəsini aşağıdakı xanaya işarə "
+"qoymaq və iki xana arasındakı \"Sil\"i tıqlamaqla silmək olar."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Hamısını sil"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Seçilmiş %s siyahısının hamısını silmək üçün tıqlayın."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

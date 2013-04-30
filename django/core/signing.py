@@ -41,11 +41,10 @@ import time
 import zlib
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 
 
 class BadSignature(Exception):
@@ -76,18 +75,7 @@ def base64_hmac(salt, value, key):
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
-    modpath = settings.SIGNING_BACKEND
-    module, attr = modpath.rsplit('.', 1)
-    try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured(
-            'Error importing cookie signer %s: "%s"' % (modpath, e))
-    try:
-        Signer = getattr(mod, attr)
-    except AttributeError as e:
-        raise ImproperlyConfigured(
-            'Error importing cookie signer %s: "%s"' % (modpath, e))
+    Signer = import_by_path(settings.SIGNING_BACKEND)
     return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
 
 

@@ -263,22 +263,15 @@ def _user_get_all_permissions(user, obj):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            if obj is not None:
-                permissions.update(backend.get_all_permissions(user, obj))
-            else:
-                permissions.update(backend.get_all_permissions(user))
+            permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
 def _user_has_perm(user, perm, obj):
     for backend in auth.get_backends():
         if hasattr(backend, "has_perm"):
-            if obj is not None:
-                if backend.has_perm(user, perm, obj):
-                    return True
-            else:
-                if backend.has_perm(user, perm):
-                    return True
+            if backend.has_perm(user, perm, obj):
+                return True
     return False
 
 
@@ -318,11 +311,7 @@ class PermissionsMixin(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if obj is not None:
-                    permissions.update(backend.get_group_permissions(self,
-                                                                     obj))
-                else:
-                    permissions.update(backend.get_group_permissions(self))
+                permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
     def get_all_permissions(self, obj=None):
@@ -461,7 +450,7 @@ class User(AbstractUser):
 
     Username, password and email are required. Other fields are optional.
     """
-    class Meta:
+    class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
 

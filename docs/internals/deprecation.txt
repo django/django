@@ -111,7 +111,7 @@ See the :doc:`Django 1.3 release notes</releases/1.3>` for more details on
 these changes.
 
 * Starting Django without a :setting:`SECRET_KEY` will result in an exception
-  rather than a `DeprecationWarning`. (This is accelerated from the usual
+  rather than a ``DeprecationWarning``. (This is accelerated from the usual
   deprecation path; see the :doc:`Django 1.4 release notes</releases/1.4>`.)
 
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
@@ -267,7 +267,6 @@ these changes.
   in 1.4. The backward compatibility will be removed --
   ``HttpRequest.raw_post_data`` will no longer work.
 
-
 * The value for the ``post_url_continue`` parameter in
   ``ModelAdmin.response_add()`` will have to be either ``None`` (to redirect
   to the newly created object's edit page) or a pre-formatted url. String
@@ -290,8 +289,14 @@ these changes.
   specified as a plain string instead of a tuple will be removed and raise an
   exception.
 
-* The ``mimetype`` argument to :class:`~django.http.HttpResponse` ``__init__``
-  will be removed (``content_type`` should be used instead).
+* The ``mimetype`` argument to the ``__init__`` methods of
+  :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`, and
+  :class:`~django.template.response.TemplateResponse`, will be removed.
+  ``content_type`` should be used instead. This also applies to the
+  :func:`~django.shortcuts.render_to_response` shortcut and
+  the sitemamp views, :func:`~django.contrib.sitemaps.views.index` and
+  :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
   or when :attr:`~django.http.HttpResponse.content` is set to an iterator,
@@ -308,12 +313,67 @@ these changes.
 * The ``depth`` keyword argument will be removed from
   :meth:`~django.db.models.query.QuerySet.select_related`.
 
+* The undocumented ``get_warnings_state()``/``restore_warnings_state()``
+  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  ``restore_warnings_state()``
+  :ref:`django.test.*TestCase <django-testcase-subclasses>` methods are
+  deprecated. Use the :class:`warnings.catch_warnings` context manager
+  available starting with Python 2.6 instead.
+
+* The undocumented ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` will be removed
+  following an accelerated deprecation. Users subclassing this form should
+  remove calls to this method, and instead ensure that their auth related views
+  are CSRF protected, which ensures that cookies are enabled.
+
 1.8
 ---
+
+* ``django.contrib.comments`` will be removed.
+
+* The following transaction management APIs will be removed:
+
+  - ``TransactionMiddleware``,
+  - the decorators and context managers ``autocommit``, ``commit_on_success``,
+    and ``commit_manually``, defined in ``django.db.transaction``,
+  - the functions ``commit_unless_managed`` and ``rollback_unless_managed``,
+    also defined in ``django.db.transaction``,
+  - the ``TRANSACTIONS_MANAGED`` setting.
+
+  Upgrade paths are described in the :ref:`transaction management docs
+  <transactions-upgrading-from-1.5>`.
+
+* The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
+  arguments. In 1.6 and 1.7, this behavior is provided by the version of these
+  tags in the ``future`` template tag library.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
+* ``Model._meta.module_name`` was renamed to ``model_name``.
+
+* Remove the backward compatible shims introduced to rename ``get_query_set``
+  and similar queryset methods. This affects the following classes:
+  ``BaseModelAdmin``, ``ChangeList``, ``BaseCommentNode``,
+  ``GenericForeignKey``, ``Manager``, ``SingleRelatedObjectDescriptor`` and
+  ``ReverseSingleRelatedObjectDescriptor``.
+
+* Remove the backward compatible shims introduced to rename the attributes
+  ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
+
+* ``django.conf.urls.shortcut`` and ``django.views.defaults.shortcut`` will be
+  removed.
+
+* The following private APIs will be removed:
+
+  - ``django.db.close_connection()``
+  - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
+  - ``django.db.transaction.is_managed()``
+  - ``django.db.transaction.managed()``
+
+* ``django.forms.widgets.RadioInput`` will be removed in favor of
+  ``django.forms.widgets.RadioChoiceInput``.
 
 2.0
 ---

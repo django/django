@@ -205,6 +205,11 @@ Transaction middleware
 
 .. class:: TransactionMiddleware
 
+.. versionchanged:: 1.6
+
+    ``TransactionMiddleware`` is deprecated. The documentation of transactions
+    contains :ref:`upgrade instructions <transactions-upgrading-from-1.5>`.
+
 Binds commit and rollback of the default database to the request/response
 phase. If a view function runs successfully, a commit is done. If it fails with
 an exception, a rollback is done.

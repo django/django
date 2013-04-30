@@ -71,6 +71,7 @@ default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
 .. versionchanged:: 1.5
+
     The :setting:`SESSION_CACHE_ALIAS` setting was added.
 
 Once your cache is configured, you've got two choices for how to store data in
@@ -451,7 +452,10 @@ Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
 .. versionchanged:: 1.5
+
   The session is not saved if the response's status code is 500.
+
+.. _browser-length-vs-persistent-sessions:
 
 Browser-length sessions vs. persistent sessions
 ===============================================
@@ -473,6 +477,16 @@ they open a browser.
 This setting is a global default and can be overwritten at a per-session level
 by explicitly calling the :meth:`~backends.base.SessionBase.set_expiry` method
 of ``request.session`` as described above in `using sessions in views`_.
+
+.. note::
+
+    Some browsers (Chrome, for example) provide settings that allow users to
+    continue browsing sessions after closing and re-opening the browser. In
+    some cases, this can interfere with the
+    :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
+    from expiring on browser close. Please be aware of this while testing
+    Django applications which have the
+    :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
 Clearing the session store
 ==========================

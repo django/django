@@ -147,9 +147,8 @@ You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
 Values enclosed in single (``'``) or double quotes (``"``) are treated as
 string literals, while values without quotes are treated as template variables.
 
-Note that the variables included in the cycle will not be escaped.
-This is because template tags do not escape their content. Any HTML or
-Javascript code contained in the printed variable will be rendered
+Note that currently the variables included in the cycle will not be escaped.
+Any HTML or Javascript code contained in the printed variable will be rendered
 as-is, which could potentially lead to security issues.
 
 For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
@@ -172,12 +171,12 @@ just declare the cycle, but not output the first value, you can add a
 
     {% for obj in some_list %}
         {% cycle 'row1' 'row2' as rowcolors silent %}
-        <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
     {% endfor %}
 
 This will output a list of ``<tr>`` elements with ``class``
 alternating between ``row1`` and ``row2``; the subtemplate will have
-access to ``rowcolors`` in it's context that matches the class of the
+access to ``rowcolors`` in its context that matches the class of the
 ``<tr>`` that encloses it. If the ``silent`` keyword were to be
 omitted, ``row1`` would be emitted as normal text, outside the
 ``<tr>`` element.
@@ -189,6 +188,22 @@ call to ``{% cycle %}`` doesn't specify silent::
 
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
+
+.. versionchanged:: 1.6
+
+    To improve safety, future versions of ``cycle`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``cycle`` from the ``future`` template library::
+
+        {% load cycle from future %}
+
+    When using the ``future`` version, you can disable auto-escaping with::
+
+        {% for o in some_list %}
+            <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
+                ...
+            </tr>
+        {% endfor %}
 
 .. templatetag:: debug
 
@@ -257,27 +272,43 @@ This is equivalent to::
 
     {% if var1 %}
         {{ var1|safe }}
-    {% else %}{% if var2 %}
+    {% elif var2 %}
         {{ var2|safe }}
-    {% else %}{% if var3 %}
+    {% elif var3 %}
         {{ var3|safe }}
-    {% endif %}{% endif %}{% endif %}
+    {% endif %}
 
 You can also use a literal string as a fallback value in case all
 passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that the variables included in the firstof tag will not be
-escaped. This is because template tags do not escape their content.
-Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues. If you
-need to escape the variables in the firstof tag, you must do so
-explicitly::
+Note that currently the variables included in the firstof tag will not be
+escaped. Any HTML or Javascript code contained in the printed variable will be
+rendered as-is, which could potentially lead to security issues. If you need
+to escape the variables in the firstof tag, you must do so explicitly::
 
     {% filter force_escape %}
         {% firstof var1 var2 var3 "fallback value" %}
     {% endfilter %}
+
+.. versionchanged:: 1.6
+
+    To improve safety, future versions of ``firstof`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``firstof`` from the ``future`` template library::
+
+        {% load firstof from future %}
+
+    When using the ``future`` version, you can disable auto-escaping with::
+
+        {% autoescape off %}
+            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+        {% endautoescape %}
+
+    Or if only some variables should be escaped, you can use::
+
+        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
@@ -625,11 +656,6 @@ The arguments can be hard-coded strings, so the following is valid::
     {% ifequal user.username "adrian" %}
         ...
     {% endifequal %}
-
-It is only possible to compare an argument to template variables or strings.
-You cannot check for equality with Python objects such as ``True`` or
-``False``.  If you need to test if something is true or false, use the
-:ttag:`if` tag instead.
 
 An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
 ``==`` operator.
@@ -1034,6 +1060,7 @@ by the context as to the current application.
     Don't forget to put quotes around the function path or pattern name!
 
     .. versionchanged:: 1.5
+
         The first parameter used not to be quoted, which was inconsistent with
         other template tags. Since Django 1.5, it is evaluated according to
         the usual rules: it can be a quoted string or a variable that will be
@@ -1905,7 +1932,7 @@ slice
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-http://diveintopython.net/native_data_types/lists.html#odbchelper.list.slice
+http://www.diveintopython3.net/native-datatypes.html#slicinglists
 for an introduction.
 
 Example::
@@ -2387,8 +2414,10 @@ slightly different call::
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path. Use that instead if you have an advanced use case such as
-    :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
+    given path (rather than simply using :func:`urlparse.urljoin` with the
+    :setting:`STATIC_URL` setting and the given path). Use that instead if you
+    have an advanced use case such as :ref:`using a cloud service to serve
+    static files<staticfiles-from-cdn>`::
 
         {% load static from staticfiles %}
         <img src="{% static "images/hi.jpg" %}" alt="Hi!" />

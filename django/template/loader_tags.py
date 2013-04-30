@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
@@ -15,19 +17,16 @@ class ExtendsError(Exception):
 class BlockContext(object):
     def __init__(self):
         # Dictionary of FIFO queues.
-        self.blocks = {}
+        self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
         for name, block in six.iteritems(blocks):
-            if name in self.blocks:
-                self.blocks[name].insert(0, block)
-            else:
-                self.blocks[name] = [block]
+            self.blocks[name].insert(0, block)
 
     def pop(self, name):
         try:
             return self.blocks[name].pop()
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
     def push(self, name, block):
@@ -36,7 +35,7 @@ class BlockContext(object):
     def get_block(self, name):
         try:
             return self.blocks[name][-1]
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
 class BlockNode(Node):
@@ -175,6 +174,7 @@ def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' tag takes only one argument" % bits[0])

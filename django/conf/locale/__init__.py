@@ -1,32 +1,51 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 # About name_local: capitalize it as if your language name was appearing
 # inside a sentence in your language.
 
 LANG_INFO = {
+    'af': {
+        'bidi': False,
+        'code': 'af',
+        'name': 'Afrikaans',
+        'name_local': 'Afrikaans',
+    },
     'ar': {
         'bidi': True,
         'code': 'ar',
         'name': 'Arabic',
-        'name_local': '\u0627\u0644\u0639\u0631\u0628\u064a\u0651\u0629',
+        'name_local': 'العربيّة',
     },
     'az': {
         'bidi': True,
         'code': 'az',
         'name': 'Azerbaijani',
-        'name_local': 'az\u0259rbaycan dili',
+        'name_local': 'azərbaycan dili',
+    },
+    'be': {
+        'bidi': False,
+        'code': 'be',
+        'name': 'Belarusian',
+        'name_local': 'беларуская',
     },
     'bg': {
         'bidi': False,
         'code': 'bg',
         'name': 'Bulgarian',
-        'name_local': '\u0431\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438',
+        'name_local': 'български',
     },
     'bn': {
         'bidi': False,
         'code': 'bn',
         'name': 'Bengali',
-        'name_local': '\u09ac\u09be\u0982\u09b2\u09be',
+        'name_local': 'বাংলা',
+    },
+    'br': {
+        'bidi': False,
+        'code': 'br',
+        'name': 'Breton',
+        'name_local': 'brezhoneg',
     },
     'bs': {
         'bidi': False,
@@ -38,13 +57,13 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ca',
         'name': 'Catalan',
-        'name_local': 'catal\xe0',
+        'name_local': 'català',
     },
     'cs': {
         'bidi': False,
         'code': 'cs',
         'name': 'Czech',
-        'name_local': '\u010desky',
+        'name_local': 'česky',
     },
     'cy': {
         'bidi': False,
@@ -68,7 +87,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'el',
         'name': 'Greek',
-        'name_local': '\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac',
+        'name_local': 'Ελληνικά',
     },
     'en': {
         'bidi': False,
@@ -92,25 +111,31 @@ LANG_INFO = {
         'bidi': False,
         'code': 'es',
         'name': 'Spanish',
-        'name_local': 'espa\xf1ol',
+        'name_local': 'español',
     },
     'es-ar': {
         'bidi': False,
         'code': 'es-ar',
         'name': 'Argentinian Spanish',
-        'name_local': 'espa\xf1ol de Argentina',
+        'name_local': 'español de Argentina',
     },
     'es-mx': {
         'bidi': False,
         'code': 'es-mx',
         'name': 'Mexican Spanish',
-        'name_local': 'espa\xf1ol de Mexico',
+        'name_local': 'español de Mexico',
     },
     'es-ni': {
         'bidi': False,
         'code': 'es-ni',
         'name': 'Nicaraguan Spanish',
-        'name_local': 'espa\xf1ol de Nicaragua',
+        'name_local': 'español de Nicaragua',
+    },
+    'es-ve': {
+        'bidi': False,
+        'code': 'es-ve',
+        'name': 'Venezuelan Spanish',
+        'name_local': 'español de Venezuela',
     },
     'et': {
         'bidi': False,
@@ -128,7 +153,7 @@ LANG_INFO = {
         'bidi': True,
         'code': 'fa',
         'name': 'Persian',
-        'name_local': '\u0641\u0627\u0631\u0633\u06cc',
+        'name_local': 'فارسی',
     },
     'fi': {
         'bidi': False,
@@ -140,7 +165,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'fr',
         'name': 'French',
-        'name_local': 'fran\xe7ais',
+        'name_local': 'français',
     },
     'fy-nl': {
         'bidi': False,
@@ -164,7 +189,7 @@ LANG_INFO = {
         'bidi': True,
         'code': 'he',
         'name': 'Hebrew',
-        'name_local': '\u05e2\u05d1\u05e8\u05d9\u05ea',
+        'name_local': 'עברית',
     },
     'hi': {
         'bidi': False,
@@ -184,6 +209,12 @@ LANG_INFO = {
         'name': 'Hungarian',
         'name_local': 'Magyar',
     },
+    'ia': {
+        'bidi': False,
+        'code': 'ia',
+        'name': 'Interlingua',
+        'name_local': 'Interlingua',
+    },
     'id': {
         'bidi': False,
         'code': 'id',
@@ -194,7 +225,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'is',
         'name': 'Icelandic',
-        'name_local': '\xcdslenska',
+        'name_local': 'Íslenska',
     },
     'it': {
         'bidi': False,
@@ -206,19 +237,19 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ja',
         'name': 'Japanese',
-        'name_local': '\u65e5\u672c\u8a9e',
+        'name_local': '日本語',
     },
     'ka': {
         'bidi': False,
         'code': 'ka',
         'name': 'Georgian',
-        'name_local': '\u10e5\u10d0\u10e0\u10d7\u10e3\u10da\u10d8',
+        'name_local': 'ქართული',
     },
     'kk': {
         'bidi': False,
         'code': 'kk',
         'name': 'Kazakh',
-        'name_local': '\u049a\u0430\u0437\u0430\u049b',
+        'name_local': 'Қазақ',
     },
     'km': {
         'bidi': False,
@@ -236,7 +267,13 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ko',
         'name': 'Korean',
-        'name_local': '\ud55c\uad6d\uc5b4',
+        'name_local': '한국어',
+    },
+    'lb': {
+        'bidi': False,
+        'code': 'lb',
+        'name': 'Luxembourgish',
+        'name_local': 'Lëtzebuergesch',
     },
     'lt': {
         'bidi': False,
@@ -248,13 +285,13 @@ LANG_INFO = {
         'bidi': False,
         'code': 'lv',
         'name': 'Latvian',
-        'name_local': 'latvie\u0161u',
+        'name_local': 'latviešu',
     },
     'mk': {
         'bidi': False,
         'code': 'mk',
         'name': 'Macedonian',
-        'name_local': '\u041c\u0430\u043a\u0435\u0434\u043e\u043d\u0441\u043a\u0438',
+        'name_local': 'Македонски',
     },
     'ml': {
         'bidi': False,
@@ -268,17 +305,23 @@ LANG_INFO = {
         'name': 'Mongolian',
         'name_local': 'Mongolian',
     },
+    'my': {
+        'bidi': False,
+        'code': 'my',
+        'name': 'Burmese',
+        'name_local': 'မြန်မာဘာသာ',
+    },
     'nb': {
         'bidi': False,
         'code': 'nb',
         'name': 'Norwegian Bokmal',
-        'name_local': 'norsk (bokm\xe5l)',
+        'name_local': 'norsk (bokmål)',
     },
     'ne': {
         'bidi': False,
         'code': 'ne',
         'name': 'Nepali',
-        'name_local': '\u0928\u0947\u092a\u093e\u0932\u0940',
+        'name_local': 'नेपाली',
     },
     'nl': {
         'bidi': False,
@@ -298,6 +341,12 @@ LANG_INFO = {
         'name': 'Norwegian',
         'name_local': 'norsk',
     },
+    'os': {
+        'bidi': False,
+        'code': 'os',
+        'name': 'Ossetic',
+        'name_local': 'Ирон',
+    },
     'pa': {
         'bidi': False,
         'code': 'pa',
@@ -314,37 +363,37 @@ LANG_INFO = {
         'bidi': False,
         'code': 'pt',
         'name': 'Portuguese',
-        'name_local': 'Portugu\xeas',
+        'name_local': 'Português',
     },
     'pt-br': {
         'bidi': False,
         'code': 'pt-br',
         'name': 'Brazilian Portuguese',
-        'name_local': 'Portugu\xeas Brasileiro',
+        'name_local': 'Português Brasileiro',
     },
     'ro': {
         'bidi': False,
         'code': 'ro',
         'name': 'Romanian',
-        'name_local': 'Rom\xe2n\u0103',
+        'name_local': 'Română',
     },
     'ru': {
         'bidi': False,
         'code': 'ru',
         'name': 'Russian',
-        'name_local': '\u0420\u0443\u0441\u0441\u043a\u0438\u0439',
+        'name_local': 'Русский',
     },
     'sk': {
         'bidi': False,
         'code': 'sk',
         'name': 'Slovak',
-        'name_local': 'slovensk\xfd',
+        'name_local': 'slovenský',
     },
     'sl': {
         'bidi': False,
         'code': 'sl',
         'name': 'Slovenian',
-        'name_local': 'Sloven\u0161\u010dina',
+        'name_local': 'Slovenščina',
     },
     'sq': {
         'bidi': False,
@@ -356,7 +405,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sr',
         'name': 'Serbian',
-        'name_local': '\u0441\u0440\u043f\u0441\u043a\u0438',
+        'name_local': 'српски',
     },
     'sr-latn': {
         'bidi': False,
@@ -380,13 +429,13 @@ LANG_INFO = {
         'bidi': False,
         'code': 'ta',
         'name': 'Tamil',
-        'name_local': '\u0ba4\u0bae\u0bbf\u0bb4\u0bcd',
+        'name_local': 'தமிழ்',
     },
     'te': {
         'bidi': False,
         'code': 'te',
         'name': 'Telugu',
-        'name_local': '\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41',
+        'name_local': 'తెలుగు',
     },
     'th': {
         'bidi': False,
@@ -398,25 +447,31 @@ LANG_INFO = {
         'bidi': False,
         'code': 'tr',
         'name': 'Turkish',
-        'name_local': 'T\xfcrk\xe7e',
+        'name_local': 'Türkçe',
     },
     'tt': {
         'bidi': False,
         'code': 'tt',
         'name': 'Tatar',
-        'name_local': '\u0422\u0430\u0442\u0430\u0440\u0447\u0430',
+        'name_local': 'Татарча',
+    },
+    'udm': {
+        'bidi': False,
+        'code': 'udm',
+        'name': 'Udmurt',
+        'name_local': 'Удмурт',
     },
     'uk': {
         'bidi': False,
         'code': 'uk',
         'name': 'Ukrainian',
-        'name_local': '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430',
+        'name_local': 'Українська',
     },
     'ur': {
         'bidi': False,
         'code': 'ur',
         'name': 'Urdu',
-        'name_local': '\u0627\u0631\u062f\u0648',
+        'name_local': 'اردو',
     },
     'vi': {
         'bidi': False,
@@ -428,12 +483,12 @@ LANG_INFO = {
         'bidi': False,
         'code': 'zh-cn',
         'name': 'Simplified Chinese',
-        'name_local': '\u7b80\u4f53\u4e2d\u6587',
+        'name_local': '简体中文',
     },
     'zh-tw': {
         'bidi': False,
         'code': 'zh-tw',
         'name': 'Traditional Chinese',
-        'name_local': '\u7e41\u9ad4\u4e2d\u6587',
+        'name_local': '繁體中文',
     }
 }

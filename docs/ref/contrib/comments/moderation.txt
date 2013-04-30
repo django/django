@@ -5,6 +5,18 @@ Generic comment moderation
 .. module:: django.contrib.comments.moderation
    :synopsis: Support for automatic comment moderation.
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 Django's bundled comments application is extremely useful on its own,
 but the amount of comment spam circulating on the Web today
 essentially makes it necessary to have some sort of automatic

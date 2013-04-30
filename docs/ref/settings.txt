@@ -56,6 +56,42 @@ of (Full name, email address). Example::
 Note that Django will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
 
+.. setting:: ALLOWED_HOSTS
+
+ALLOWED_HOSTS
+-------------
+
+Default: ``[]`` (Empty list)
+
+A list of strings representing the host/domain names that this Django site can
+serve. This is a security measure to prevent an attacker from poisoning caches
+and password reset emails with links to malicious hosts by submitting requests
+with a fake HTTP ``Host`` header, which is possible even under many
+seemingly-safe web server configurations.
+
+Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
+in which case they will be matched against the request's ``Host`` header
+exactly (case-insensitive, not including port). A value beginning with a period
+can be used as a subdomain wildcard: ``'.example.com'`` will match
+``example.com``, ``www.example.com``, and any other subdomain of
+``example.com``. A value of ``'*'`` will match anything; in this case you are
+responsible to provide your own validation of the ``Host`` header (perhaps in a
+middleware; if so this middleware must be listed first in
+:setting:`MIDDLEWARE_CLASSES`).
+
+If the ``Host`` header (or ``X-Forwarded-Host`` if
+:setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
+list, the :meth:`django.http.HttpRequest.get_host()` method will raise
+:exc:`~django.core.exceptions.SuspiciousOperation`.
+
+When :setting:`DEBUG` is ``True`` or when running tests, host validation is
+disabled; any host will be accepted. Thus it's usually only necessary to set it
+in production.
+
+This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+if your code accesses the ``Host`` header directly from ``request.META`` you
+are bypassing this security protection.
+
 .. setting:: ALLOWED_INCLUDE_ROOTS
 
 ALLOWED_INCLUDE_ROOTS
@@ -281,6 +317,19 @@ Please note that the presence of this setting does not imply that Django's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
 :ref:`CSRF limitations <csrf-limitations>` section.
 
+.. setting:: CSRF_COOKIE_HTTPONLY
+
+CSRF_COOKIE_HTTPONLY
+--------------------
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Whether to use HttpOnly flag on the CSRF cookie. If this is set to ``True``,
+client-side JavaScript will not to be able to access the CSRF cookie. See
+:setting:`SESSION_COOKIE_HTTPONLY` for details on HttpOnly.
+
 .. setting:: CSRF_COOKIE_NAME
 
 CSRF_COOKIE_NAME
@@ -359,6 +408,30 @@ SQLite. This can be configured using the following::
 For other database backends, or more complex SQLite configurations, other options
 will be required. The following inner options are available.
 
+.. setting:: DATABASE-ATOMIC_REQUESTS
+
+ATOMIC_REQUESTS
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``False``
+
+Set this to ``True`` to wrap each HTTP request in a transaction on this
+database. See :ref:`tying-transactions-to-http-requests`.
+
+.. setting:: DATABASE-AUTOCOMMIT
+
+AUTOCOMMIT
+~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``True``
+
+Set this to ``False`` if you want to :ref:`disable Django's transaction
+management <deactivate-transaction-management>` and implement your own.
+
 .. setting:: DATABASE-ENGINE
 
 ENGINE
@@ -414,6 +487,19 @@ Default: ``''`` (Empty string)
 The name of the database to use. For SQLite, it's the full path to the database
 file. When specifying the path, always use forward slashes, even on Windows
 (e.g. ``C:/homes/user/mysite/sqlite3.db``).
+
+.. setting:: CONN_MAX_AGE
+
+CONN_MAX_AGE
+~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+Default: ``600``
+
+The lifetime of a database connection, in seconds. Use ``0`` to close database
+connections at the end of each request — Django's historical behavior — and
+``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 
@@ -471,7 +557,7 @@ backend-specific.
 Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
 
 .. setting:: TEST_COLLATION
@@ -636,9 +722,13 @@ DATE_INPUT_FORMATS
 
 Default::
 
-    ('%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', '%b %d %Y',
-    '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
-    '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
+    (
+        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
+        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
+        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
+        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
+        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+    )
 
 A tuple of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
@@ -673,9 +763,20 @@ DATETIME_INPUT_FORMATS
 
 Default::
 
-    ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d',
-    '%m/%d/%Y %H:%M:%S', '%m/%d/%Y %H:%M', '%m/%d/%Y',
-    '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
+    (
+        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+        '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
+        '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+        '%Y-%m-%d',              # '2006-10-25'
+        '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+        '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
+        '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+        '%m/%d/%Y',              # '10/25/2006'
+        '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+        '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
+        '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+        '%m/%d/%y',              # '10/25/06'
+    )
 
 A tuple of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
@@ -1134,9 +1235,12 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be in
-standard :term:`language format<language code>`. For example, U.S. English is
-``"en-us"``. See :doc:`/topics/i18n/index`.
+A string representing the language code for this installation. This should be
+in standard :term:`language format<language code>`. For example, U.S. English
+is ``"en-us"``. See also the `list of language identifiers`_ and
+:doc:`/topics/i18n/index`.
+
+.. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -1161,9 +1265,9 @@ see the current list of translated languages by looking in
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format ``(language code, language
-name)``, the ``language code`` part should be a
-:term:`language name<language code>` -- for example, ``('ja', 'Japanese')``.
+The list is a tuple of two-tuples in the format
+(:term:`language code<language code>`, ``language name``) -- for example,
+``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
@@ -1382,6 +1486,7 @@ randomly-generated ``SECRET_KEY`` to each new project.
     execution vulnerabilities.
 
 .. versionchanged:: 1.5
+
     Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
@@ -1647,7 +1752,13 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 TIME_INPUT_FORMATS
 ------------------
 
-Default: ``('%H:%M:%S', '%H:%M')``
+Default::
+
+    (
+        '%H:%M:%S',     # '14:30:59'
+        '%H:%M:%S.%f',  # '14:30:59.000200'
+        '%H:%M',        # '14:30'
+    )
 
 A tuple of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
@@ -1659,6 +1770,10 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
+.. versionchanged:: 1.6
+
+    Input format with microseconds has been added.
+
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
@@ -1668,12 +1783,14 @@ TIME_ZONE
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation, or
-``None``. `See available choices`_. (Note that list of available
-choices lists more than one on the same line; you'll want to use just
-one of the choices for a given time zone. For instance, one line says
-``'Europe/London GB GB-Eire'``, but you should use the first bit of
-that -- ``'Europe/London'`` -- as your :setting:`TIME_ZONE` setting.)
+A string representing the time zone for this installation, or ``None``. See
+the `list of time zones`_.
+
+.. note::
+    Since Django was first released with the :setting:`TIME_ZONE` set to
+    ``'America/Chicago'``, the global setting (used if nothing is defined in
+    your project's ``settings.py``) remains ``'America/Chicago'`` for backwards
+    compatibility. New project templates default to ``'UTC'``.
 
 Note that this isn't necessarily the time zone of the server. For example, one
 server may serve multiple Django-powered sites, each with a separate time zone
@@ -1706,7 +1823,7 @@ to ensure your processes are running in the correct environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. _pytz: http://pytz.sourceforge.net/
 
@@ -1714,6 +1831,12 @@ to ensure your processes are running in the correct environment.
 
 TRANSACTIONS_MANAGED
 --------------------
+
+.. deprecated:: 1.6
+
+    This setting was deprecated because its name is very misleading. Use the
+    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
+    entries instead.
 
 Default: ``False``
 
@@ -1933,11 +2056,11 @@ decorator, for example.
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGIN_URL
 
@@ -1951,11 +2074,11 @@ The URL where requests are redirected for login, especially when using the
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGOUT_URL
 
@@ -2052,7 +2175,7 @@ Settings for :mod:`django.contrib.messages`.
 MESSAGE_LEVEL
 -------------
 
-Default: `messages.INFO`
+Default: ``messages.INFO``
 
 Sets the minimum message level that will be recorded by the messages
 framework. See :ref:`message levels <message-level>` for more details.
@@ -2165,6 +2288,12 @@ The domain to use for session cookies. Set this to a string such as
 ``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
 
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies will be set to the old
+domain. This may result in them being unable to log in as long as these cookies
+persist.
+
 .. setting:: SESSION_COOKIE_HTTPONLY
 
 SESSION_COOKIE_HTTPONLY
@@ -2244,7 +2373,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE
 Default: ``False``
 
 Whether to expire the session when the user closes his or her browser. See
-"Browser-length sessions vs. persistent sessions" above.
+:ref:`browser-length-vs-persistent-sessions`.
 
 .. setting:: SESSION_FILE_PATH
 
@@ -2309,7 +2438,7 @@ Example: ``"/var/www/example.com/static/"``
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default) the :djadmin:`collectstatic` management command will collect static
 files into this directory. See the howto on :doc:`managing static
-files</howto/static-files>` for more details about usage.
+files</howto/static-files/index>` for more details about usage.
 
 .. warning::
 

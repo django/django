@@ -12,10 +12,9 @@ from django.db import models
 from django.utils import formats
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text
 from django.template import Library
 from django.template.loader import get_template
 from django.template.context import Context
@@ -112,12 +111,13 @@ def result_headers(cl):
                 # Not sortable
                 yield {
                     "text": text,
+                    "class_attrib": format_html(' class="column-{0}"', field_name),
                     "sortable": False,
                 }
                 continue
 
         # OK, it is sortable if we got this far
-        th_classes = ['sortable']
+        th_classes = ['sortable', 'column-{0}'.format(field_name)]
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0
@@ -292,6 +292,8 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
+        field = cl.opts.get_field_by_name(field_name)[0]
+        dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -304,8 +306,8 @@ def date_hierarchy(cl):
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
-            date_range = cl.query_set.aggregate(first=models.Min(field_name),
-                                                last=models.Max(field_name))
+            date_range = cl.queryset.aggregate(first=models.Min(field_name),
+                                               last=models.Max(field_name))
             if date_range['first'] and date_range['last']:
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
@@ -323,7 +325,8 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
+            days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
+            days = getattr(days, dates_or_datetimes)(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -336,11 +339,12 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.query_set.filter(**{year_field: year_lookup}).dates(field_name, 'month')
+            months = cl.queryset.filter(**{year_field: year_lookup})
+            months = getattr(months, dates_or_datetimes)(field_name, 'month')
             return {
-                'show' : True,
+                'show': True,
                 'back': {
-                    'link' : link({}),
+                    'link': link({}),
                     'title': _('All dates')
                 },
                 'choices': [{
@@ -349,7 +353,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = cl.query_set.dates(field_name, 'year')
+            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{

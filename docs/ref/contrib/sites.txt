@@ -246,14 +246,32 @@ To do this, you can use the sites framework. A simple example::
     >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
     'http://example.com/mymodel/objects/3/'
 
+.. _enabling-the-sites-framework:
 
-Default site and ``syncdb``
-===========================
+Enabling the sites framework
+============================
+
+.. versionchanged:: 1.6
+
+    In previous versions, the sites framework was enabled by default.
+
+To enable the sites framework, follow these steps:
+
+1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
+   setting.
+
+2. Define a :setting:`SITE_ID` setting::
+
+    SITE_ID = 1
+
+3. Run :djadmin:`syncdb`.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_syncdb` signal handler which creates a
-default site named ``example.com`` with the domain ``example.com``. For
-example, this site will be created after Django creates the test database.
+default site named ``example.com`` with the domain ``example.com``. This site
+will also be created after Django creates the test database. To set the
+correct name and domain for your project, you can use an :doc:`initial data
+fixture </howto/initial-data>`.
 
 Caching the current ``Site`` object
 ===================================

@@ -172,7 +172,7 @@ context using the lower cased version of the model class' name. This is
 provided in addition to the default ``object_list`` entry, but contains exactly
 the same data, i.e. ``publisher_list``.
 
-If the this still isn't a good match, you can manually set the name of the
+If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
@@ -187,6 +187,8 @@ specifies the context variable to use::
 Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
 
+
+.. _adding-extra-context:
 
 Adding extra context
 --------------------
@@ -228,7 +230,7 @@ more::
     get_context_data on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
-    to super), any children of that class will also need to explictly set it
+    to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 

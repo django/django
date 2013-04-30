@@ -1,78 +1,93 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
+#  <anubhab91@gmail.com>, 2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#   <rafi.tahmid@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bengali (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2013-02-08 15:20+0000\n"
+"Last-Translator: anubhab91 <anubhab91@gmail.com>\n"
+"Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
-"Language: bn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: bn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "ট্যাগঃ"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "ফিল্টারঃ"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "ভিউঃ"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "%r এ্যপটি পাওয়া যায়নি"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "%(app_label)r এ্যপে %(model_name)r মডেলটি পাওয়া যায়নি"
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "`%(app_label)s.%(data_type)s` সম্পর্কিত অবজেক্ট"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "মডেলঃ"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "`%(app_label)s.%(object_name)s` সম্পর্কিত অবজেক্ট সমূহ"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "সকল %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "%s সংখ্যা"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "%s অবজেক্টে ফিল্ডগুলো"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s ইউআরএল -এর মত নয়"
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "নীড়পাতা"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -83,30 +98,18 @@ msgstr "%s ইউআরএল -এর মত নয়"
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "নীড়পাতা"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "সহায়িকা"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "বুকমার্কলেট"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "সহায়িকা বুকমার্কলেট"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -124,60 +127,69 @@ msgstr ""
 "দেখতে হবে (আপনার প্রশাসনের কাছ থেকে জানুন যে আপনার কম্পিউটার \"internal\" কিনা)।"
 "</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "এই পাতার সহায়িকা"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "যেকোন পাতা থেকে ভিউ সহায়িকাতে নিয়ে যান।"
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "অবজেক্ট আইডি দেখান"
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr "কনটেন্ট-টাইপ এবং একক আইডি দেখায়, যা কিনা একটি নির্দিষ্ট অবজেক্টকে বোঝায়।"
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "এই অবজেক্টটি সম্পাদন করুন (বর্তমান উইন্ডো)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "প্রশাসন পাতায় নিয়ে যান, যা কিনা একটি নির্দিষ্ট পাতা অবজেক্টকে বোঝায়।"
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "এই অবজেক্টটি সম্পাদন করুন (নতুন উইন্ডো)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "উপরের মতই, কিন্তু নতুন উইন্ডোতে খুলুন।"
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
-msgstr ""
+msgstr "মডেলগুলো"
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
-msgstr ""
+msgstr "টেমপ্লেটগুলো"
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
-msgstr ""
+msgstr "ফিল্টারগুলো"
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr ""
+msgstr "ট্যাগগুলো"
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
-msgstr ""
+msgstr "ভিউগুলো"
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "বুলিয়ান (হয় True অথবা False)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "ফিল্ডের ধরণ: %(field_type)s"

@@ -147,7 +147,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             # The related object is registered with the same AdminSite
             related_url = reverse('admin:%s_%s_changelist' %
                                     (rel_to._meta.app_label,
-                                    rel_to._meta.module_name),
+                                    rel_to._meta.model_name),
                                     current_app=self.admin_site.name)
 
             params = self.url_parameters()
@@ -247,7 +247,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     def render(self, name, value, *args, **kwargs):
         rel_to = self.rel.to
-        info = (rel_to._meta.app_label, rel_to._meta.object_name.lower())
+        info = (rel_to._meta.app_label, rel_to._meta.model_name)
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:

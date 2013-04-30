@@ -51,7 +51,7 @@ Here's a "Hello World" example::
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
 
         # Create the PDF object, using the response object as its "file."
@@ -120,7 +120,7 @@ Here's the above "Hello World" example rewritten to use :mod:`io`::
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
 
         buffer = BytesIO()

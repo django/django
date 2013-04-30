@@ -949,6 +949,10 @@ __ http://geohash.org/
 
 *Availability*: PostGIS, SpatiaLite
 
+.. versionchanged:: 1.5
+
+    ``geojson`` support for Spatialite > 3.0 has been added.
+
 Attaches a ``geojson`` attribute to every model in the queryset that contains the
 `GeoJSON`__ representation of the geometry.
 

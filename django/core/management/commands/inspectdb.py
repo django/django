@@ -6,7 +6,8 @@ from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
-from django.utils import six
+from django.utils.datastructures import SortedDict
+
 
 class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
@@ -34,13 +35,14 @@ class Command(NoArgsCommand):
         table_name_filter = options.get('table_name_filter')
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
-        strip_prefix = lambda s: s.startswith("u'") and s[1:] or s
+        strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
         yield "# You'll have to do the following manually to clean this up:"
-        yield "#     * Rearrange models' order"
-        yield "#     * Make sure each model has one field with primary_key=True"
+        yield "#   * Rearrange models' order"
+        yield "#   * Make sure each model has one field with primary_key=True"
+        yield "#   * Remove `managed = False` lines for those models you wish to give write DB access"
         yield "# Feel free to rename the models, but don't rename db_table values or field names."
         yield "#"
         yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"
@@ -67,7 +69,7 @@ class Command(NoArgsCommand):
             used_column_names = [] # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
-                extra_params = {}  # Holds Field parameters such as 'db_column'.
+                extra_params = SortedDict()  # Holds Field parameters such as 'db_column'.
                 column_name = row[0]
                 is_relation = i in relations
 
@@ -86,7 +88,7 @@ class Command(NoArgsCommand):
                         extra_params['unique'] = True
 
                 if is_relation:
-                    rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
+                    rel_to = "self" if relations[i][1] == table_name else table2model(relations[i][1])
                     if rel_to in known_models:
                         field_type = 'ForeignKey(%s' % rel_to
                     else:
@@ -108,9 +110,12 @@ class Command(NoArgsCommand):
                 # Add 'null' and 'blank', if the 'null_ok' flag was present in the
                 # table description.
                 if row[6]: # If it's NULL...
-                    extra_params['blank'] = True
-                    if not field_type in ('TextField(', 'CharField('):
-                        extra_params['null'] = True
+                    if field_type == 'BooleanField(':
+                        field_type = 'NullBooleanField('
+                    else:
+                        extra_params['blank'] = True
+                        if not field_type in ('TextField(', 'CharField('):
+                            extra_params['null'] = True
 
                 field_desc = '%s = models.%s' % (att_name, field_type)
                 if extra_params:
@@ -188,7 +193,7 @@ class Command(NoArgsCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = {}
+        field_params = SortedDict()
         field_notes = []
 
         try:
@@ -205,11 +210,18 @@ class Command(NoArgsCommand):
 
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row[3]:
-            field_params['max_length'] = row[3]
+            field_params['max_length'] = int(row[3])
 
         if field_type == 'DecimalField':
-            field_params['max_digits'] = row[4]
-            field_params['decimal_places'] = row[5]
+            if row[4] is None or row[5] is None:
+                field_notes.append(
+                    'max_digits and decimal_places have been guessed, as this '
+                    'database handles decimal fields as float')
+                field_params['max_digits'] = row[4] if row[4] is not None else 10
+                field_params['decimal_places'] = row[5] if row[5] is not None else 5
+            else:
+                field_params['max_digits'] = row[4]
+                field_params['decimal_places'] = row[5]
 
         return field_type, field_params, field_notes
 
@@ -220,5 +232,6 @@ class Command(NoArgsCommand):
         to the given database table name.
         """
         return ["    class Meta:",
+                "        managed = False",
                 "        db_table = '%s'" % table_name,
                 ""]

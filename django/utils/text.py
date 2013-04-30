@@ -24,7 +24,7 @@ capfirst = allow_lazy(capfirst, six.text_type)
 
 # Set up regular expressions
 re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U|re.S)
-re_tag = re.compile(r'<(/)?([^ ]+?)(?: (/)| .*?)?>', re.S)
+re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 
 
 def wrap(text, width):
@@ -356,7 +356,6 @@ def smart_split(text):
     text = force_text(text)
     for bit in smart_split_re.finditer(text):
         yield bit.group(0)
-smart_split = allow_lazy(smart_split, six.text_type)
 
 def _replace_entity(match):
     text = match.group(1)

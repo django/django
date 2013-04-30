@@ -37,6 +37,14 @@ The auth system consists of:
 * Forms and view tools for logging in users, or restricting content
 * A pluggable backend system
 
+The authentication system in Django aims to be very generic and doesn't provide
+some features commonly found in web authentication systems. Solutions for some
+of these common problems have been implemented in third-party packages:
+
+* Password strength checking
+* Throttling of login attempts
+* Authentication against third-parties (OAuth, for example)
+
 Installation
 ============
 
