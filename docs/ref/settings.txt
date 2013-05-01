@@ -79,6 +79,22 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
 
+.. note::
+
+    You must explicitly add another ALLOWED_HOSTS entry that includes a trailing
+    period to also allow the `fully qualified domain name (FQDN)`_. This entry 
+    can be explicit or start with a leading period to be used as a subdomain 
+    wildcard.
+
+    For example::
+
+        ALLOWED_HOSTS = [
+            '.example.com', # Allow domain and subdomains
+            '.example.com.', # Also allow FQDN and subdomains
+        ]
+
+.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name    
+
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
