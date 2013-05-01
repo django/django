@@ -14,7 +14,8 @@ import subprocess
 import sys
 import codecs
 
-from django import conf, bin, get_version
+import django
+from django import conf, get_version
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db import connection
@@ -139,8 +140,8 @@ class AdminScriptTestCase(unittest.TestCase):
         return out, err
 
     def run_django_admin(self, args, settings_file=None):
-        bin_dir = os.path.abspath(os.path.dirname(upath(bin.__file__)))
-        return self.run_test(os.path.join(bin_dir, 'django-admin.py'), args, settings_file)
+        script_dir = os.path.abspath(os.path.join(os.path.dirname(upath(django.__file__)), 'bin'))
+        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
