@@ -29,7 +29,7 @@ class Command(BaseCommand):
     )
     help = ('Runs the test suite for the specified applications, or the '
             'entire site if no apps are specified.')
-    args = '[appname ...]'
+    args = '[appname|appname.tests.TestCase|appname.tests.TestCase.test_method]...'
 
     requires_model_validation = False
 
