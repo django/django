@@ -7,6 +7,8 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.postgresql_psycopg2.compiler"
+
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
@@ -58,6 +60,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
+
+    def fetch_returned_insert_ids(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, returns the
+        list of newly created IDs.
+        """
+        return [item[0] for item in cursor.fetchall()]
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
