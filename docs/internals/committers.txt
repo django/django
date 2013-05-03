@@ -15,7 +15,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 
     He was lead developer at World Online for 2.5 years, during which time
     Django was developed and implemented on World Online's sites. He was the
-    leader and founder of EveryBlock_, a "news feed for your block." He now 
+    leader and founder of EveryBlock_, a "news feed for your block." He now
     develops for Soundslice_.
 
     Adrian lives in Chicago, USA.
@@ -41,7 +41,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
     Web site you're looking at right now, as well as Django's acclaimed admin
-    interface. Wilson was the designer for EveryBlock and Rdio_. He now 
+    interface. Wilson was the designer for EveryBlock and Rdio_. He now
     designs for Facebook.
 
     Wilson lives in San Francisco, USA.
@@ -105,8 +105,8 @@ Malcolm Tredinnick
 .. _russell keith-magee: http://cecinestpasun.com/
 
 Joseph Kocherhans
-    Joseph was the director of lead development at EveryBlock and previously 
-    developed at the Lawrence Journal-World. He is treasurer of the `Django 
+    Joseph was the director of lead development at EveryBlock and previously
+    developed at the Lawrence Journal-World. He is treasurer of the `Django
     Software Foundation`_. He often disappears for several days into the woods,
     attempts to teach himself computational linguistics, and annoys his
     neighbors with his Charango_ playing.
@@ -386,17 +386,17 @@ Florian Apolloner
 .. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
 
 Jeremy Dunck
-    Jeremy was rescued from corporate IT drudgery by Free Software and, in part, 
+    Jeremy was rescued from corporate IT drudgery by Free Software and, in part,
     Django.  Many of Jeremy's interests center around access to information.
 
-    Jeremy was the lead developer of Pegasus News, one of the first uses of 
-    Django outside World Online, and has since joined Votizen, a startup intent 
+    Jeremy was the lead developer of Pegasus News, one of the first uses of
+    Django outside World Online, and has since joined Votizen, a startup intent
     on reducing the influence of money in politics.
 
-    He serves as DSF Secretary, organizes and helps organize sprints, cares 
-    about the health and equity of the Django community.  He has gone an 
+    He serves as DSF Secretary, organizes and helps organize sprints, cares
+    about the health and equity of the Django community.  He has gone an
     embarrassingly long time without a working blog.
-    
+
     Jeremy lives in Mountain View, CA, USA.
 
 `Bryan Veloso`_
@@ -440,6 +440,20 @@ Jeremy Dunck
 .. _Simon Charette: https://github.com/charettes
 .. _Ultimate Frisbee: http://www.montrealultimate.ca
 .. _Reptiletech: http://www.reptiletech.com
+
+`Daniel Lindsley`_
+    Pythonista since 2003, Djangonaut since 2006. Daniel started with Django
+    just after the v0.90 release (back when ``Manipulators`` looked good) & fell
+    in love. Since then, he wrote third-party apps like Haystack & Tastypie
+    & has run the annual Django Dash since 2007. One of the testing faithful,
+    Daniel's contributions include rewriting the ``Forms`` test suite & the
+    addition of ``request.is_ajax``. Daniel currently works as a Python
+    developer at `Amazon Web Services`_ on the ``boto`` library.
+
+    Daniel lives in Seattle, WA, USA.
+
+.. _`Daniel Lindsley`: http://toastdriven.com/
+.. _`Amazon Web Services`: https://aws.amazon.com/
 
 Specialists
 -----------
