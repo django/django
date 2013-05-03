@@ -74,8 +74,17 @@ def language_changed(**kwargs):
         if kwargs['setting'] == 'LOCALE_PATHS':
             trans_real._translations = {}
 
+
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
     if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
+
+
+@receiver(setting_changed)
+def reset_hashers(**kwargs):
+    if kwargs['setting'] == 'PASSWORD_HASHERS':
+        global HASHERS, PREFERRED_HASHER
+        HASHERS = None
+        PREFERRED_HASHER = None
