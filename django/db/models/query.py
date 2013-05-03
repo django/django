@@ -400,7 +400,9 @@ class QuerySet(object):
                     self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
                     fields = [f for f in fields if not isinstance(f, AutoField)]
-                    self._batched_insert(objs_without_pk, fields, batch_size)
+                    ids = self._batched_insert(objs_without_pk, fields, batch_size)
+                    for i in range(len(ids)):
+                        objs_without_pk[i].pk = ids[i]
 
         return objs
 
@@ -928,10 +930,20 @@ class QuerySet(object):
             return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
+        ret = []
         for batch in [objs[i:i + batch_size]
                       for i in range(0, len(objs), batch_size)]:
-            self.model._base_manager._insert(batch, fields=fields,
-                                             using=self.db)
+            if connections[self.db].features.can_return_id_from_insert:
+                if len(objs) > 1:
+                    ret.extend(self.model._base_manager._insert(batch, fields=fields,
+                                                                using=self.db, return_id=True))
+                else:
+                    ret.append(self.model._base_manager._insert(batch, fields=fields,
+                                                                using=self.db, return_id=True))
+            else:
+                self.model._base_manager._insert(batch, fields=fields,
+                                                 using=self.db)
+        return ret
 
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:

@@ -841,10 +841,13 @@ class SQLInsertCompiler(SQLCompiler):
             values = [[self.connection.ops.pk_default_value()] for obj in self.query.objs]
             params = [[]]
             fields = [None]
-        can_bulk = (not any(hasattr(field, "get_placeholder") for field in fields) and
-            not self.return_id and self.connection.features.has_bulk_insert)
-
-        if can_bulk:
+        can_bulk_and_not_return_ids = (not any(hasattr(field, "get_placeholder") for field in fields) and
+                                      not self.return_id and self.connection.features.has_bulk_insert)
+        # If not all of these conditions are met, fall back to doing a bunch of single inserts
+        can_bulk_and_return_ids = self.return_id and self.connection.features.can_return_id_from_insert \
+                                  and (not any(hasattr(field, "get_placeholder") for field in fields)) \
+                                  and self.connection.features.has_bulk_insert
+        if can_bulk_and_not_return_ids or can_bulk_and_return_ids:
             placeholders = [["%s"] * len(fields)]
         else:
             placeholders = [
@@ -853,7 +856,15 @@ class SQLInsertCompiler(SQLCompiler):
             ]
             # Oracle Spatial needs to remove some values due to #10888
             params = self.connection.ops.modify_insert_params(placeholders, params)
-        if self.return_id and self.connection.features.can_return_id_from_insert:
+        if can_bulk_and_return_ids:
+            result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
+            r_fmt, r_params = self.connection.ops.return_insert_id()
+            if r_fmt:
+                col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
+                result.append(r_fmt % col)
+                params += r_params
+            return [(" ".join(result), tuple([v for val in values for v in val]))]
+        elif self.return_id and self.connection.features.can_return_id_from_insert:
             params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
@@ -864,7 +875,7 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(r_fmt % col)
                 params += r_params
             return [(" ".join(result), tuple(params))]
-        if can_bulk:
+        elif can_bulk_and_not_return_ids:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
             return [(" ".join(result), tuple(v for val in values for v in val))]
         else:
@@ -874,14 +885,17 @@ class SQLInsertCompiler(SQLCompiler):
             ]
 
     def execute_sql(self, return_id=False):
-        assert not (return_id and len(self.query.objs) != 1)
+        assert not (return_id and len(self.query.objs) != 1 and
+                    not self.connection.features.can_return_id_from_insert)
         self.return_id = return_id
         cursor = self.connection.cursor()
         for sql, params in self.as_sql():
             cursor.execute(sql, params)
         if not (return_id and cursor):
             return
-        if self.connection.features.can_return_id_from_insert:
+        if self.connection.features.can_return_id_from_insert and len(self.query.objs) > 1:
+            return self.connection.ops.fetch_returned_insert_ids(cursor)
+        if self.connection.features.can_return_id_from_insert and len(self.query.objs) == 1:
             return self.connection.ops.fetch_returned_insert_id(cursor)
         return self.connection.ops.last_insert_id(cursor,
                 self.query.get_meta().db_table, self.query.get_meta().pk.column)

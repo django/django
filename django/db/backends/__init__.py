@@ -835,6 +835,14 @@ class BaseDatabaseOperations(object):
         """
         return cursor.fetchone()[0]
 
+    def fetch_returned_insert_ids(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, returns the
+        list of newly created IDs.
+        """
+        return [item[0] for item in cursor.fetchall()]
+
     def field_cast_sql(self, db_type, internal_type):
         """
         Given a column type (e.g. 'BLOB', 'VARCHAR'), and an internal type
