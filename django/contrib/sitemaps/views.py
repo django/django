@@ -1,4 +1,5 @@
 import warnings
+from functools import wraps
 
 from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
@@ -6,7 +7,6 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils import six
-from django.utils.functional import wraps
 
 def x_robots_tag(func):
     @wraps(func)
