@@ -211,7 +211,7 @@ For example::
 
     from django.db import connection
 
-    def my_custom_sql():
+    def my_custom_sql(self):
         cursor = connection.cursor()
 
         cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
