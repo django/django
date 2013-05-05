@@ -9,7 +9,7 @@ from django.utils import six
 
 from shared_models.models import Author, Book
 
-from .models import Tag, Game, Season, Player, NullableModel
+from .models import Tag, Game, Season, Player, RegexTestModel
 
 
 class LookupTests(TestCase):
@@ -613,9 +613,16 @@ class LookupTests(TestCase):
         '''
         Ensure that a regex lookup does not fail on null/None values
         '''
-        NullableModel.objects.create(name=None)
-        self.assertQuerysetEqual(NullableModel.objects.filter(name__regex=r'^$'), [])
+        RegexTestModel.objects.create(name=None)
+        self.assertQuerysetEqual(RegexTestModel.objects.filter(name__regex=r'^$'), [])
 
+    def test_regex_non_string(self):
+        '''
+        Ensure that a regex lookup does not fail on non string fields
+        '''
+        RegexTestModel.objects.create(name='test', integer=5)
+        self.assertQuerysetEqual(RegexTestModel.objects.filter(integer__regex=r'^5$'),
+            ['<RegexTestModel: test>'])
 
     def test_nonfield_lookups(self):
         """
