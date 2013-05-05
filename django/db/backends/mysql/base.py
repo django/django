@@ -405,8 +405,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'conv': django_conversions,
             'charset': 'utf8',
-            'use_unicode': True,
         }
+        if not six.PY3:
+            kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']

@@ -252,6 +252,15 @@ required for full MySQL support in Django.
 
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 
+Python 3
+--------
+
+At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
+Python 3. In order to use MySQL under Python 3, you'll have to install an
+unofficial fork, such as `MySQL-for-Python-3`_.
+
+.. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+
 Creating your database
 ----------------------
 
@@ -361,8 +370,8 @@ Here's a sample configuration which uses a MySQL option file::
     default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
-``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
-`MySQLdb documentation`_ for more details.
+``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
+more details.
 
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
