@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import os
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
@@ -13,6 +15,7 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import translation
+from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 
@@ -145,6 +148,24 @@ class AuthenticationFormTest(TestCase):
 
         form = CustomAuthenticationForm()
         self.assertEqual(form['username'].label, "Name")
+
+    def test_username_field_label_not_set(self):
+
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = CharField()
+
+        form = CustomAuthenticationForm()
+        UserModel = get_user_model()
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
+
+    def test_username_field_label_empty_string(self):
+
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = CharField(label='')
+
+        form = CustomAuthenticationForm()
+        self.assertEqual(form.fields['username'].label, "")
 
 
 @skipIfCustomUser
