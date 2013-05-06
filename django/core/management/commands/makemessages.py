@@ -324,8 +324,11 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
         for dirpath, file in find_files(".", ignore_patterns, verbosity,
                 stdout, symlinks=symlinks):
-            process_file(file, dirpath, potfile, domain, verbosity, extensions,
-                    wrap, location, stdout)
+            try:
+                process_file(file, dirpath, potfile, domain, verbosity, extensions,
+                        wrap, location, stdout)
+            except UnicodeDecodeError:
+                stdout.write("UnicodeDecodeError: skipped file %s in %s" % (file, dirpath))
 
         if os.path.exists(potfile):
             write_po_file(pofile, potfile, domain, locale, verbosity, stdout,

@@ -27,6 +27,10 @@ class ExtractorTests(TestCase):
             return
         shutil.rmtree(dname)
 
+    def rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
     def tearDown(self):
         os.chdir(self.test_dir)
         try:
@@ -120,12 +124,21 @@ class BasicExtractorTests(ExtractorTests):
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.html.py'))
 
+    def test_unicode_decode_error(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
+                      force_text(stdout.getvalue()))
+
     def test_extraction_warning(self):
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
         stdout = StringIO()
         management.call_command('makemessages', locale=LOCALE, stdout=stdout)
-        os.remove('./code_sample.py')
         self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
 
     def test_template_message_context_extractor(self):
