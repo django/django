@@ -126,6 +126,17 @@ class BasicExtractorTests(ExtractorTests):
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
+    def test_unicode_decode_error(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        os.remove('./not_utf8.txt')
+        # Check that the temporary file was cleaned up
+        self.assertFalse(os.path.exists('./not_utf8.txt.py'))
+        self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
+                      force_text(stdout.getvalue()))
+
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
