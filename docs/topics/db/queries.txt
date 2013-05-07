@@ -1112,15 +1112,6 @@ above example code would look like this::
     >>> b.entries.filter(headline__contains='Lennon')
     >>> b.entries.count()
 
-You cannot access a reverse :class:`~django.db.models.ForeignKey`
-:class:`~django.db.models.Manager` from the class; it must be accessed from an
-instance::
-
-    >>> Blog.entry_set
-    Traceback:
-        ...
-    AttributeError: "Manager must be accessed via instance".
-
 In addition to the :class:`~django.db.models.query.QuerySet` methods defined in
 "Retrieving objects" above, the :class:`~django.db.models.ForeignKey`
 :class:`~django.db.models.Manager` has additional methods used to handle the
