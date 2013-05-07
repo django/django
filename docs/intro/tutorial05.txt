@@ -15,9 +15,9 @@ What are automated tests?
 Tests are simple routines that check the operation of your code.
 
 Testing operates at different levels. Some tests might apply to a tiny detail
-- *does a particular model method return values as expected?*, while others
-examine the overall operation of the software - *does a sequence of user inputs
-on the site produce the desired result?* That's no different from the kind of
+(*does a particular model method return values as expected?*) while others
+examine the overall operation of the software (*does a sequence of user inputs
+on the site produce the desired result?*). That's no different from the kind of
 testing you did earlier in :doc:`Tutorial 1 </intro/tutorial01>`, using the
 shell to examine the behavior of a method, or running the application and
 entering data to check how it behaves.
