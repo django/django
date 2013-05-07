@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.db.models.loading import get_apps, get_app, get_models, get_model, register_models
 from django.db.models.query import Q
@@ -11,7 +13,6 @@ from django.db.models.fields.files import FileField, ImageField
 from django.db.models.fields.related import ForeignKey, ForeignObject, OneToOneField, ManyToManyField, ManyToOneRel, ManyToManyRel, OneToOneRel
 from django.db.models.deletion import CASCADE, PROTECT, SET, SET_NULL, SET_DEFAULT, DO_NOTHING, ProtectedError
 from django.db.models import signals
-from django.utils.decorators import wraps
 
 
 def permalink(func):

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-28 10:04+0100\n"
+"POT-Creation-Date: 2013-05-02 16:17+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -337,7 +337,7 @@ msgstr ""
 msgid "Enter a valid value."
 msgstr ""
 
-#: core/validators.py:53 forms/fields.py:627
+#: core/validators.py:53 forms/fields.py:640
 msgid "Enter a valid URL."
 msgstr ""
 
@@ -408,7 +408,7 @@ msgstr[1] ""
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 
-#: db/models/base.py:905 forms/models.py:590
+#: db/models/base.py:905 forms/models.py:605
 msgid "and"
 msgstr ""
 
@@ -630,46 +630,54 @@ msgstr ""
 msgid "Enter a number."
 msgstr ""
 
-#: forms/fields.py:295
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr ""
-
 #: forms/fields.py:296
 #, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr ""
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
 
-#: forms/fields.py:297
+#: forms/fields.py:300
 #, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr ""
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
 
-#: forms/fields.py:393 forms/fields.py:1045
+#: forms/fields.py:304
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms/fields.py:406 forms/fields.py:1058
 msgid "Enter a valid date."
 msgstr ""
 
-#: forms/fields.py:417 forms/fields.py:1046
+#: forms/fields.py:430 forms/fields.py:1059
 msgid "Enter a valid time."
 msgstr ""
 
-#: forms/fields.py:438
+#: forms/fields.py:451
 msgid "Enter a valid date/time."
 msgstr ""
 
-#: forms/fields.py:512
+#: forms/fields.py:525
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 
-#: forms/fields.py:513
+#: forms/fields.py:526
 msgid "No file was submitted."
 msgstr ""
 
-#: forms/fields.py:514
+#: forms/fields.py:527
 msgid "The submitted file is empty."
 msgstr ""
 
-#: forms/fields.py:516
+#: forms/fields.py:529
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
@@ -677,22 +685,22 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/fields.py:519
+#: forms/fields.py:532
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:580
+#: forms/fields.py:593
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 
-#: forms/fields.py:733 forms/fields.py:811
+#: forms/fields.py:746 forms/fields.py:824 forms/models.py:1042
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: forms/fields.py:812 forms/fields.py:915 forms/models.py:1026
+#: forms/fields.py:825 forms/fields.py:928 forms/models.py:1041
 msgid "Enter a list of values."
 msgstr ""
 
@@ -714,43 +722,38 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: forms/models.py:584
+#: forms/models.py:599
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr ""
 
-#: forms/models.py:588
+#: forms/models.py:603
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: forms/models.py:594
+#: forms/models.py:609
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:602
+#: forms/models.py:617
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: forms/models.py:868
+#: forms/models.py:883
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:932
+#: forms/models.py:947
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1027
+#: forms/models.py:1044
 #, python-format
-msgid "Select a valid choice. %s is not one of the available choices."
-msgstr ""
-
-#: forms/models.py:1029
-#, python-format
-msgid "\"%s\" is not a valid value for a primary key."
+msgid "\"%(pk)s\" is not a valid value for a primary key."
 msgstr ""
 
 #: forms/util.py:84
@@ -760,27 +763,27 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:326
+#: forms/widgets.py:327
 msgid "Currently"
 msgstr ""
 
-#: forms/widgets.py:327
+#: forms/widgets.py:328
 msgid "Change"
 msgstr ""
 
-#: forms/widgets.py:328
+#: forms/widgets.py:329
 msgid "Clear"
 msgstr ""
 
-#: forms/widgets.py:546
+#: forms/widgets.py:547
 msgid "Unknown"
 msgstr ""
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr ""
 
-#: forms/widgets.py:548
+#: forms/widgets.py:549
 msgid "No"
 msgstr ""
 

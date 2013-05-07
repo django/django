@@ -194,7 +194,7 @@ Configure, make and install::
 
 .. note::
 
-   Because GeoDjango has it's own Python interface, the preceding instructions
+   Because GeoDjango has its own Python interface, the preceding instructions
    do not build GDAL's own Python bindings.  The bindings may be built by
    adding the ``--with-python`` flag when running ``configure``.  See
    `GDAL/OGR In Python`__ for more information on GDAL's bindings.

@@ -176,7 +176,7 @@ just declare the cycle, but not output the first value, you can add a
 
 This will output a list of ``<tr>`` elements with ``class``
 alternating between ``row1`` and ``row2``; the subtemplate will have
-access to ``rowcolors`` in it's context that matches the class of the
+access to ``rowcolors`` in its context that matches the class of the
 ``<tr>`` that encloses it. If the ``silent`` keyword were to be
 omitted, ``row1`` would be emitted as normal text, outside the
 ``<tr>`` element.
@@ -656,11 +656,6 @@ The arguments can be hard-coded strings, so the following is valid::
     {% ifequal user.username "adrian" %}
         ...
     {% endifequal %}
-
-It is only possible to compare an argument to template variables or strings.
-You cannot check for equality with Python objects such as ``True`` or
-``False``.  If you need to test if something is true or false, use the
-:ttag:`if` tag instead.
 
 An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
 ``==`` operator.

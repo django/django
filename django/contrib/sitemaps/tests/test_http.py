@@ -144,3 +144,10 @@ class HTTPSitemapTests(SitemapTestsBase):
 </sitemapindex>
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
+    def test_x_robots_sitemap(self):
+        response = self.client.get('/simple/index.xml')
+        self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
+
+        response = self.client.get('/simple/sitemap.xml')
+        self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')

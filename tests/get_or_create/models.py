@@ -24,3 +24,7 @@ class Person(models.Model):
 class ManualPrimaryKeyTest(models.Model):
     id = models.IntegerField(primary_key=True)
     data = models.CharField(max_length=100)
+
+
+class Profile(models.Model):
+    person = models.ForeignKey(Person, primary_key=True)

@@ -163,10 +163,12 @@ environment first. Django provides a convenience method to do this::
     >>> from django.test.utils import setup_test_environment
     >>> setup_test_environment()
 
-This convenience method sets up the test database, and puts other
-Django features into modes that allow for repeatable testing.
+:func:`~django.test.utils.setup_test_environment` puts several Django features
+into modes that allow for repeatable testing, but does not create the test
+databases; :func:`django.test.simple.DjangoTestSuiteRunner.setup_databases`
+takes care of that.
 
-The call to :meth:`~django.test.utils.setup_test_environment` is made
+The call to :func:`~django.test.utils.setup_test_environment` is made
 automatically as part of the setup of ``./manage.py test``. You only
 need to manually invoke this method if you're not using running your
 tests via Django's test runner.
@@ -282,7 +284,9 @@ Methods
 
 .. method:: DjangoTestSuiteRunner.setup_test_environment(**kwargs)
 
-    Sets up the test environment ready for testing.
+    Sets up the test environment by calling
+    :func:`~django.test.utils.setup_test_environment` and setting
+    :setting:`DEBUG` to ``False``.
 
 .. method:: DjangoTestSuiteRunner.build_suite(test_labels, extra_tests=None, **kwargs)
 
@@ -340,6 +344,9 @@ Methods
 Testing utilities
 -----------------
 
+django.test.utils
+~~~~~~~~~~~~~~~~~
+
 .. module:: django.test.utils
    :synopsis: Helpers to write custom test runners.
 
@@ -358,10 +365,13 @@ utility methods in the ``django.test.utils`` module.
     magic hooks into the template system and restoring normal email
     services.
 
+django.db.connection.creation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. currentmodule:: django.db.connection.creation
 
-The creation module of the database backend (``connection.creation``)
-also provides some utilities that can be useful during testing.
+The creation module of the database backend also provides some utilities that
+can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 

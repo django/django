@@ -108,6 +108,8 @@ class ServerHandler(simple_server.ServerHandler, object):
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
+    request_queue_size = 10
+
     def __init__(self, *args, **kwargs):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6

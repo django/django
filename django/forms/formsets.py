@@ -9,7 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
-from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext as _
 
 
 __all__ = ('BaseFormSet', 'all_valid')
@@ -302,7 +302,9 @@ class BaseFormSet(object):
         try:
             if (self.validate_max and self.total_form_count() > self.max_num) or \
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
-                raise ValidationError(_("Please submit %s or fewer forms." % self.max_num))
+                raise ValidationError(ungettext(
+                    "Please submit %d or fewer forms.",
+                    "Please submit %d or fewer forms.", self.max_num) % self.max_num)
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:

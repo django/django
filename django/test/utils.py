@@ -1,5 +1,6 @@
 import re
 import warnings
+from functools import wraps
 from xml.dom.minidom import parseString, Node
 
 from django.conf import settings, UserSettingsHolder
@@ -10,7 +11,6 @@ from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.test.signals import template_rendered, setting_changed
 from django.utils.encoding import force_str
-from django.utils.functional import wraps
 from django.utils import six
 from django.utils.translation import deactivate
 

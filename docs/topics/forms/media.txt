@@ -146,7 +146,7 @@ basic Calendar widget from the example above::
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
-The FancyCalendar widget inherits all the media from it's parent widget. If
+The FancyCalendar widget inherits all the media from its parent widget. If
 you don't want media to be inherited in this way, add an ``extend=False``
 declaration to the media declaration::
 
