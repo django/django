@@ -7,8 +7,8 @@ from django.utils.unittest import skipUnless
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis import admin
-    from django.contrib.gis.geos import GEOSGeometry, Point
-    
+    from django.contrib.gis.geos import Point
+
     from .models import City
 
 
