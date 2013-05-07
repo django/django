@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.validators import RegexValidator
 from django.forms import *
 from django.http import QueryDict
 from django.template import Template, Context
@@ -1791,6 +1792,75 @@ class FormsTestCase(TestCase):
         form = NameForm(data={'name' : ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
+
+    def test_multivalue_optional_subfields(self):
+        class PhoneField(MultiValueField):
+            def __init__(self, *args, **kwargs):
+                fields = (
+                    CharField(label='Country Code', validators=[
+                        RegexValidator(r'^\+\d{1,2}$', message='Enter a valid country code.')]),
+                    CharField(label='Phone Number'),
+                    CharField(label='Extension', error_messages={'incomplete': 'Enter an extension.'}),
+                    CharField(label='Label', required=False, help_text='E.g. home, work.'),
+                )
+                super(PhoneField, self).__init__(fields, *args, **kwargs)
+
+            def compress(self, data_list):
+                if data_list:
+                    return '%s.%s ext. %s (label: %s)' % tuple(data_list)
+                return None
+
+        # An empty value for any field will raise a `required` error on a
+        # required `MultiValueField`.
+        f = PhoneField()
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61'])
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61', '287654321', '123'])
+        self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # Empty values for fields will NOT raise a `required` error on an
+        # optional `MultiValueField`
+        f = PhoneField(required=False)
+        self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(None))
+        self.assertEqual(None, f.clean([]))
+        self.assertEqual('+61. ext.  (label: )', f.clean(['+61']))
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # For a required `MultiValueField` with `require_all_fields=False`, a
+        # `required` error will only be raised if all fields are empty. Fields
+        # can individually be required or optional. An empty value for any
+        # required field will raise an `incomplete` error.
+        f = PhoneField(require_all_fields=False)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        six.assertRaisesRegex(self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # For an optional `MultiValueField` with `require_all_fields=False`, we
+        # don't get any `required` error but we still get `incomplete` errors.
+        f = PhoneField(required=False, require_all_fields=False)
+        self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(None))
+        self.assertEqual(None, f.clean([]))
+        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        six.assertRaisesRegex(self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
 
     def test_custom_empty_values(self):
         """

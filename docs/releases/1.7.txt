@@ -122,6 +122,11 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+* :class:`~django.forms.MultiValueField` allows optional subfields by setting
+  the ``require_all_fields`` argument to ``False``. The ``required`` attribute
+  for each individual field will be respected, and a new ``incomplete``
+  validation error will be raised when any required fields are empty.
+
 Backwards incompatible changes in 1.7
 =====================================
 
