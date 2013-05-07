@@ -156,8 +156,9 @@ Create a test to expose the bug
 What we've just done in the shell to test for the problem is exactly what we
 can do in an automated test, so let's turn that into an automated test.
 
-The best place for an application's tests is in the application's ``tests.py``
-file - the testing system will look there for tests automatically.
+A conventional place for an application's tests is in the application's
+``tests.py`` file; the testing system will automatically find tests in any file
+whose name begins with ``test``.
 
 Put the following in the ``tests.py`` file in the ``polls`` application::
 
