@@ -120,7 +120,7 @@ def setup(verbosity, test_labels):
     from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     if HAS_SPATIAL_DB:
         from django.contrib.gis.tests import geo_apps
-        test_modules.extend(geo_apps(runtests=True))
+        test_modules.extend(geo_apps())
         settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for modpath, module_name in test_modules:

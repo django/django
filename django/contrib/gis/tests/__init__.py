@@ -1,4 +1,4 @@
-def geo_apps(namespace=True, runtests=False):
+def geo_apps():
     """
     Returns a list of GeoDjango test applications that reside in
     `django.contrib.gis.tests` that can be used with the current
@@ -27,10 +27,4 @@ def geo_apps(namespace=True, runtests=False):
         # 3D apps use LayerMapping, which uses GDAL and require GEOS 3.1+.
         if connection.ops.postgis and GEOS_PREPARE:
             apps.append('geo3d')
-    if runtests:
-        return [('django.contrib.gis.tests', app) for app in apps]
-    elif namespace:
-        return ['django.contrib.gis.tests.%s' % app
-                for app in apps]
-    else:
-        return apps
+    return [('django.contrib.gis.tests', app) for app in apps]
