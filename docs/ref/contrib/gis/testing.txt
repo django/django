@@ -141,7 +141,7 @@ file must be using one of the :ref:`spatial database backends
 
 
 Example
-^^^^^^^
+-------
 
 The following is an example bare-bones settings file with spatial backends
 that can be used to run the entire Django test suite, including those
