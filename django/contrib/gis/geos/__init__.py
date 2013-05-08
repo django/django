@@ -6,7 +6,7 @@ for more details:
 try:
     from .libgeos import geos_version, geos_version_info, GEOS_PREPARE
     HAS_GEOS = True
-except:
+except ImportError:
     HAS_GEOS = False
 
 if HAS_GEOS:
