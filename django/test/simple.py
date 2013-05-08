@@ -1,3 +1,4 @@
+import inspect
 import unittest as real_unittest
 
 from django.conf import settings
@@ -95,43 +96,37 @@ def build_test(label):
 
     """
     parts = label.split('.')
-    if len(parts) < 2 or len(parts) > 3:
+    if not 1 < len(parts) < 4:
         raise ValueError("Test label '%s' should be of the form app.TestCase "
                          "or app.TestCase.test_method" % label)
 
-    #
-    # First, look for TestCase instances with a name that matches
-    #
+    # Use *label* to find matching test cases and doc tests from the app's
+    # `models.py` and `tests.py`
+    tests = []
     app_module = get_app(parts[0])
     test_module = get_tests(app_module)
-    TestClass = getattr(app_module, parts[1], None)
 
-    # Couldn't find the test class in models.py; look in tests.py
-    if TestClass is None:
-        if test_module:
-            TestClass = getattr(test_module, parts[1], None)
-
-    try:
-        if issubclass(TestClass, (unittest.TestCase, real_unittest.TestCase)):
-            if len(parts) == 2: # label is app.TestClass
-                try:
-                    return unittest.TestLoader().loadTestsFromTestCase(
-                        TestClass)
-                except TypeError:
-                    raise ValueError(
-                        "Test label '%s' does not refer to a test class"
-                        % label)
-            else: # label is app.TestClass.test_method
-                return TestClass(parts[2])
-    except TypeError:
-        # TestClass isn't a TestClass - it must be a method or normal class
-        pass
-
-    #
-    # If there isn't a TestCase, look for a doctest that matches
-    #
-    tests = []
     for module in app_module, test_module:
+        # Collect test cases
+        TestClass = getattr(module, parts[1], None)
+        # We're only interested in TestCase classes, however it's possible that
+        # the label matched a model or some other variable in the module. If
+        # it's a test case (or method of one), then append it to `tests`.
+        if (inspect.isclass(TestClass) and
+            issubclass(TestClass, (unittest.TestCase,
+                                   real_unittest.TestCase))):
+            if len(parts) == 2:
+                # Label is app.TestClass
+                tests.append(unittest.TestLoader()
+                             .loadTestsFromTestCase(TestClass))
+            else:
+                # Label is app.TestClass.test_method
+                tests.append(TestClass(parts[2]))
+            # We've found a test case, don't bother looking for doc tests in
+            # this module
+            continue
+
+        # Collect doc tests
         try:
             doctests = make_doctest(module)
             # Now iterate over the suite, looking for doctests whose name
