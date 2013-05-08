@@ -627,7 +627,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - SQLite: install pytz_ — conversions are actually performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
-    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES

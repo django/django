@@ -30,6 +30,11 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
 from MySQLdb.converters import conversions, Thing2Literal
 from MySQLdb.constants import FIELD_TYPE, CLIENT
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 from django.conf import settings
 from django.db import utils
 from django.db.backends import *
@@ -120,7 +125,7 @@ class CursorWrapper(object):
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
-            if e[0] in self.codes_for_integrityerror:
+            if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 
@@ -130,7 +135,7 @@ class CursorWrapper(object):
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
-            if e[0] in self.codes_for_integrityerror:
+            if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 
@@ -186,6 +191,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def has_zoneinfo_database(self):
+        # MySQL accepts full time zones names (eg. Africa/Nairobi) but rejects
+        # abbreviations (eg. EAT). When pytz isn't installed and the current
+        # time zone is LocalTimezone (the only sensible value in this
+        # context), the current time zone name will be an abbreviation. As a
+        # consequence, MySQL cannot perform time zone conversions reliably.
+        if pytz is None:
+            return False
+
+        # Test if the time zone definitions are installed.
         cursor = self.connection.cursor()
         cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
         return cursor.fetchone() is not None
@@ -391,8 +405,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'conv': django_conversions,
             'charset': 'utf8',
-            'use_unicode': True,
         }
+        if not six.PY3:
+            kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']
