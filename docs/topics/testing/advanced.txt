@@ -272,7 +272,7 @@ Methods
     Run the test suite.
 
     ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of three forms:
+    label can take one of four forms:
 
     * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
       in a test case.
@@ -280,6 +280,8 @@ Methods
       case.
     * ``path.to.module`` -- Search for and run all tests in the named Python
       package or module.
+    * ``file/path/to/test_something.py`` -- Search for and run all tests in the
+      named test file.
 
     If ``test_labels`` has a value of ``None``, the test runner will search for
     tests in all files below the current directory whose names match its
