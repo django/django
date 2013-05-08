@@ -289,15 +289,16 @@ class DummyBackendTest(unittest.TestCase):
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
-        settings = {'INSTALLED_APPS': '("test_runner_deprecation_app",)',
-                    'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
+        settings = {
+            'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}'
+            }
         self.write_settings('settings.py', sdict=settings)
 
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_runner_deprecation_verbosity_default(self):
-        args = ['test', '--settings=test_project.settings']
+        args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("DeprecationWarning: warning from test", err)
         self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
