@@ -16,10 +16,6 @@ class ValidFields(admin.ModelAdmin):
     form = SongForm
     fields = ['title']
 
-class InvalidFields(admin.ModelAdmin):
-    form = SongForm
-    fields = ['spam']
-
 class ValidFormFieldsets(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         class ExtraFieldForm(SongForm):
@@ -49,10 +45,6 @@ class ValidationTestCase(TestCase):
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
         validate(ValidFields, Song)
-        self.assertRaisesMessage(ImproperlyConfigured,
-            "'InvalidFields.fields' refers to field 'spam' that is missing from the form.",
-            validate,
-            InvalidFields, Song)
 
     def test_custom_get_form_with_fieldsets(self):
         """
