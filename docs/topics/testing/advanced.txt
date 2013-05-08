@@ -248,7 +248,7 @@ set up, execute and tear down the test suite.
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
-    runner, ensure accept and handle the ``**kwargs`` parameter.
+    runner, ensure it accepts ``**kwargs``.
 
     Your test runner may also define additional command-line options.
     If you add an ``option_list`` attribute to a subclassed test runner,
