@@ -26,7 +26,7 @@ from django.test import TestCase
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import curry
-from django.utils.unittest import skipUnless
+from django.utils.unittest import expectedFailure, skipUnless
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
@@ -458,6 +458,11 @@ def serializerTest(format, self):
     # same as the number that was serialized.
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
+
+if connection.vendor == 'mysql' and six.PY3:
+    # Existing MySQL DB-API drivers fail on binary data.
+    serializerTest = expectedFailure(serializerTest)
+
 
 def naturalKeySerializerTest(format, self):
     # Create all the objects defined in the test data
