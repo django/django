@@ -49,6 +49,13 @@ files containing doctests.  There are also many ways to override parts
 of doctest's default behaviors.  See the Library Reference Manual for
 details.
 """
+import warnings
+
+warnings.warn(
+    "The django.test._doctest module is deprecated; "
+    "use the doctest module from the Python standard library instead.",
+    PendingDeprecationWarning)
+
 
 __docformat__ = 'reStructuredText en'
 
