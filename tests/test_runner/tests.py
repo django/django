@@ -9,7 +9,7 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import runner, simple, TransactionTestCase, skipUnlessDBFeature
+from django.test import runner, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
@@ -156,7 +156,7 @@ class ManageCommandTests(unittest.TestCase):
                 testrunner='test_runner.NonExistentRunner')
 
 
-class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
+class CustomOptionsTestRunner(runner.DiscoverRunner):
     option_list = (
         make_option('--option_a','-a', action='store', dest='option_a', default='1'),
         make_option('--option_b','-b', action='store', dest='option_b', default='2'),
