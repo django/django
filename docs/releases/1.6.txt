@@ -282,8 +282,8 @@ support some types of tests that were supported by the previous runner:
 * Doctests will no longer be automatically discovered. To integrate doctests in
   your test suite, follow the `recommendations in the Python documentation`_.
 
-* Tests defined directly in ``tests/__init__.py`` files will no longer be
-  discovered and run. Move them to a file whose name begins with ``test``.
+* Tests in ``tests/__init__.py`` files will no longer be discovered and
+  run. Move them to a file whose name begins with ``test``.
 
 Django bundles a modified version of the :mod:`doctest` module from the Python
 standard library (in ``django.test._doctest``) in order to allow passing in a
