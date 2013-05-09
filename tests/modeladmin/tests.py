@@ -683,27 +683,6 @@ class ValidationTests(unittest.TestCase):
         validate(BandAdmin, Band)
 
         class AdminBandForm(forms.ModelForm):
-            class Meta:
-                model = Band
-
-        class BandAdmin(ModelAdmin):
-            form = AdminBandForm
-
-            fieldsets = (
-                ('Band', {
-                    'fields': ('non_existent_field',)
-                }),
-            )
-
-        six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            "'BandAdmin.fieldsets\[0]\[1\]\['fields'\]' refers to field 'non_existent_field' that is missing from the form.",
-            validate,
-            BandAdmin,
-            Band,
-        )
-
-        class AdminBandForm(forms.ModelForm):
             delete = forms.BooleanField()
 
             class Meta:
