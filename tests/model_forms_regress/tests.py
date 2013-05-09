@@ -536,4 +536,4 @@ class TestTicket19733(TestCase):
 
     def test_modelform_factory_with_all_fields(self):
         form = modelform_factory(Person, fields="__all__")
-        self.assertEqual(form.base_fields.keys(), ["name"])
+        self.assertEqual(list(form.base_fields), ["name"])
