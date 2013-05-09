@@ -16,57 +16,52 @@ __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
 
-class AppCache(object):
+def _initialize():
+    """
+    Returns a dictionary to be used as the initial value of the
+    [shared] state of the app cache.
+    """
+    return dict(
+        # Keys of app_store are the model modules for each application.
+        app_store = SortedDict(),
+
+        # Mapping of installed app_labels to model modules for that app.
+        app_labels = {},
+
+        # Mapping of app_labels to a dictionary of model names to model code.
+        # May contain apps that are not installed.
+        app_models = SortedDict(),
+
+        # Mapping of app_labels to errors raised when trying to import the app.
+        app_errors = {},
+
+        # -- Everything below here is only used when populating the cache --
+        loaded = False,
+        handled = {},
+        postponed = [],
+        nesting_level = 0,
+        _get_models_cache = {},
+    )
+
+
+class BaseAppCache(object):
     """
     A cache that stores installed applications and their models. Used to
     provide reverse-relations and for app introspection (e.g. admin).
+
+    This provides the base (non-Borg) AppCache class - the AppCache
+    subclass adds borg-like behaviour for the few cases where it's needed,
+    and adds the code that auto-loads from INSTALLED_APPS.
     """
 
     def __init__(self):
-        # Keys of app_store are the model modules for each application.
-        self.app_store = SortedDict()
-        # Mapping of installed app_labels to model modules for that app.
-        self.app_labels = {}
-        # Mapping of app_labels to a dictionary of model names to model code.
-        # May contain apps that are not installed.
-        self.app_models = SortedDict()
-        # Mapping of app_labels to errors raised when trying to import the app.
-        self.app_errors = {}
-        # -- Everything below here is only used when populating the cache --
-        self.loaded = False
-        self.handled = {}
-        self.postponed = []
-        self.nesting_level = 0
-        self._get_models_cache = {}
+        self.__dict__ = _initialize()
 
     def _populate(self):
         """
-        Fill in all the cache information. This method is threadsafe, in the
-        sense that every caller will see the same state upon return, and if the
-        cache is already initialised, it does no work.
+        Stub method - this base class does no auto-loading.
         """
-        if self.loaded:
-            return
-        # Note that we want to use the import lock here - the app loading is
-        # in many cases initiated implicitly by importing, and thus it is
-        # possible to end up in deadlock when one thread initiates loading
-        # without holding the importer lock and another thread then tries to
-        # import something which also launches the app loading. For details of
-        # this situation see #18251.
-        imp.acquire_lock()
-        try:
-            if self.loaded:
-                return
-            for app_name in settings.INSTALLED_APPS:
-                if app_name in self.handled:
-                    continue
-                self.load_app(app_name, True)
-            if not self.nesting_level:
-                for app_name in self.postponed:
-                    self.load_app(app_name)
-                self.loaded = True
-        finally:
-            imp.release_lock()
+        self.loaded = True
 
     def _label_for(self, app_mod):
         """
@@ -253,42 +248,58 @@ class AppCache(object):
             self.register_models(app_label, *models.values())
 
 
-class AppCacheWrapper(object):
+class AppCache(BaseAppCache):
     """
-    As AppCache can be changed at runtime, this class wraps it so any
-    imported references to 'cache' are changed along with it.
+    A cache that stores installed applications and their models. Used to
+    provide reverse-relations and for app introspection (e.g. admin).
+
+    Borg version of the BaseAppCache class.
     """
 
-    def __init__(self, cache):
-        self._cache = cache
+    __shared_state = _initialize()
 
-    def set_cache(self, cache):
-        self._cache = cache
+    def __init__(self):
+        self.__dict__ = self.__shared_state
 
-    def __getattr__(self, attr):
-        if attr in ("_cache", "set_cache"):
-            return self.__dict__[attr]
-        return getattr(self._cache, attr)
-
-    def __setattr__(self, attr, value):
-        if attr in ("_cache", "set_cache"):
-            self.__dict__[attr] = value
+    def _populate(self):
+        """
+        Fill in all the cache information. This method is threadsafe, in the
+        sense that every caller will see the same state upon return, and if the
+        cache is already initialised, it does no work.
+        """
+        if self.loaded:
             return
-        return setattr(self._cache, attr, value)
+        # Note that we want to use the import lock here - the app loading is
+        # in many cases initiated implicitly by importing, and thus it is
+        # possible to end up in deadlock when one thread initiates loading
+        # without holding the importer lock and another thread then tries to
+        # import something which also launches the app loading. For details of
+        # this situation see #18251.
+        imp.acquire_lock()
+        try:
+            if self.loaded:
+                return
+            for app_name in settings.INSTALLED_APPS:
+                if app_name in self.handled:
+                    continue
+                self.load_app(app_name, True)
+            if not self.nesting_level:
+                for app_name in self.postponed:
+                    self.load_app(app_name)
+                self.loaded = True
+        finally:
+            imp.release_lock()
 
-
-default_cache = AppCache()
-cache = AppCacheWrapper(default_cache)
+cache = AppCache()
 
 
 # These methods were always module level, so are kept that way for backwards
-# compatibility. These are wrapped with lambdas to stop the attribute
-# access resolving directly to a method on a single cache instance.
-get_apps = lambda *x, **y: cache.get_apps(*x, **y)
-get_app = lambda *x, **y: cache.get_app(*x, **y)
-get_app_errors = lambda *x, **y: cache.get_app_errors(*x, **y)
-get_models = lambda *x, **y: cache.get_models(*x, **y)
-get_model = lambda *x, **y: cache.get_model(*x, **y)
-register_models = lambda *x, **y: cache.register_models(*x, **y)
-load_app = lambda *x, **y: cache.load_app(*x, **y)
-app_cache_ready = lambda *x, **y: cache.app_cache_ready(*x, **y)
+# compatibility.
+get_apps = cache.get_apps
+get_app = cache.get_app
+get_app_errors = cache.get_app_errors
+get_models = cache.get_models
+get_model = cache.get_model
+register_models = cache.register_models
+load_app = cache.load_app
+app_cache_ready = cache.app_cache_ready

@@ -1,6 +1,6 @@
 from django.db.backends.schema import BaseDatabaseSchemaEditor
-from django.db.models.loading import cache, default_cache, AppCache
 from django.db.models.fields.related import ManyToManyField
+from django.db.models.loading import BaseAppCache
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -38,20 +38,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in delete_fields:
             del body[field.name]
             del mapping[field.column]
+        # Work inside a new AppCache
+        app_cache = BaseAppCache()
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
             'unique_together': model._meta.unique_together if override_uniques is None else override_uniques,
+            'app_cache': app_cache,
         }
         meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = model.__module__
-        self.app_cache = AppCache()
-        cache.set_cache(self.app_cache)
-        cache.copy_from(default_cache)
         temp_model = type(model._meta.object_name, model.__bases__, body)
-        cache.set_cache(default_cache)
         # Create a new table with that format
         self.create_model(temp_model)
         # Copy data from the old table
@@ -117,9 +116,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
             raise ValueError("Cannot alter field %s into %s - they are not compatible types (probably means only one is an M2M with implicit through model)" % (
-                    old_field,
-                    new_field,
-                ))
+                old_field,
+                new_field,
+            ))
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 

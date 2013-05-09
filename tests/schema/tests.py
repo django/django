@@ -1,12 +1,10 @@
 from __future__ import absolute_import
-import copy
 import datetime
 from django.test import TransactionTestCase
 from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
-from django.db.models.loading import cache, default_cache, AppCache
 from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest
 
 
@@ -27,14 +25,6 @@ class SchemaTests(TransactionTestCase):
     def setUp(self):
         # Make sure we're in manual transaction mode
         connection.set_autocommit(False)
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self.app_cache = AppCache()
-        cache.set_cache(self.app_cache)
-        cache.copy_from(default_cache)
-        for model in self.models:
-            cache.register_models("schema", model)
-            model._prepare()
 
     def tearDown(self):
         # Delete any tables made for our models
@@ -43,8 +33,6 @@ class SchemaTests(TransactionTestCase):
         # Rollback anything that may have happened
         connection.rollback()
         connection.set_autocommit(True)
-        cache.set_cache(default_cache)
-        cache.app_models['schema'] = {}  # One M2M gets left in the old cache
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"

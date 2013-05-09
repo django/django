@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.loading import get_models, app_cache_ready
+from django.db.models.loading import get_models, app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.datastructures import SortedDict
@@ -21,7 +21,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created', 'index_together', 'auto_register')
+                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created', 'index_together', 'app_cache')
 
 
 @python_2_unicode_compatible
@@ -70,8 +70,8 @@ class Options(object):
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
 
-        # If we should auto-register with the AppCache
-        self.auto_register = True
+        # A custom AppCache to use, if you're making a separate model set.
+        self.app_cache = cache
 
     def contribute_to_class(self, cls, name):
         from django.db import connection

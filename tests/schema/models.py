@@ -1,8 +1,11 @@
 from django.db import models
+from django.db.models.loading import BaseAppCache
 
 # Because we want to test creation and deletion of these as separate things,
-# these models are all marked as unmanaged and only marked as managed while
-# a schema test is running.
+# these models are all inserted into a separate AppCache so the main test
+# runner doesn't syncdb them.
+
+new_app_cache = BaseAppCache()
 
 
 class Author(models.Model):
@@ -10,24 +13,24 @@ class Author(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
 
 
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
 
 
 class Book(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
     pub_date = models.DateTimeField()
-    #tags = models.ManyToManyField("Tag", related_name="books")
+    # tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
 
 
 class BookWithM2M(models.Model):
@@ -37,7 +40,7 @@ class BookWithM2M(models.Model):
     tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
 
 
 class BookWithSlug(models.Model):
@@ -47,7 +50,7 @@ class BookWithSlug(models.Model):
     slug = models.CharField(max_length=20, unique=True)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
         db_table = "schema_book"
 
 
@@ -56,7 +59,7 @@ class Tag(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
 
 
 class TagUniqueRename(models.Model):
@@ -64,7 +67,7 @@ class TagUniqueRename(models.Model):
     slug2 = models.SlugField(unique=True)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
         db_table = "schema_tag"
 
 
@@ -73,5 +76,5 @@ class UniqueTest(models.Model):
     slug = models.SlugField(unique=False)
 
     class Meta:
-        auto_register = False
+        app_cache = new_app_cache
         unique_together = ["year", "slug"]

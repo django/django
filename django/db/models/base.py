@@ -19,7 +19,6 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
@@ -134,7 +133,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name,
+        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                       seed_cache=False, only_installed=False)
         if m is not None:
             return m
@@ -242,16 +241,13 @@ class ModelBase(type):
 
         new_class._prepare()
         
-        if new_class._meta.auto_register:
-            register_models(new_class._meta.app_label, new_class)
-            # Because of the way imports happen (recursively), we may or may not be
-            # the first time this model tries to register with the framework. There
-            # should only be one class for each model, so we always return the
-            # registered version.
-            return get_model(new_class._meta.app_label, name,
-                             seed_cache=False, only_installed=False)
-        else:
-            return new_class
+        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
+        # Because of the way imports happen (recursively), we may or may not be
+        # the first time this model tries to register with the framework. There
+        # should only be one class for each model, so we always return the
+        # registered version.
+        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
+                         seed_cache=False, only_installed=False)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
