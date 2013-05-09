@@ -509,7 +509,7 @@ CONN_MAX_AGE
 
 .. versionadded:: 1.6
 
-Default: ``600``
+Default: ``0``
 
 The lifetime of a database connection, in seconds. Use ``0`` to close database
 connections at the end of each request — Django's historical behavior — and

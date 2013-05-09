@@ -157,6 +157,15 @@ Performance optimizations
 Setting :setting:`DEBUG = False <DEBUG>` disables several features that are
 only useful in development. In addition, you can tune the following settings.
 
+:setting:`CONN_MAX_AGE`
+-----------------------
+
+Enabling `persistent database connections <persistent-database-connections>`_
+can result in a nice speed-up when connecting to the database accounts for a
+significant part of the request processing time.
+
+This helps a lot on virtualized hosts with limited network performance.
+
 :setting:`TEMPLATE_LOADERS`
 ---------------------------
 

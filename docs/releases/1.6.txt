@@ -66,13 +66,8 @@ Persistent database connections
 
 Django now supports reusing the same database connection for several requests.
 This avoids the overhead of re-establishing a connection at the beginning of
-each request.
-
-By default, database connections will kept open for 10 minutes. This behavior
-is controlled by the :setting:`CONN_MAX_AGE` setting. To restore the previous
-behavior of closing the connection at the end of each request, set
-:setting:`CONN_MAX_AGE` to ``0``. See :ref:`persistent-database-connections`
-for details.
+each request. For backwards compatibility, this feature is disabled by
+default. See :ref:`persistent-database-connections` for details.
 
 Time zone aware aggregation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -297,21 +292,6 @@ Django 1.6 introduces ``hour``, ``minute``, and ``second`` lookups on
 :class:`~django.db.models.DateTimeField`. If you had model fields called
 ``hour``, ``minute``, or ``second``, the new lookups will clash with you field
 names. Append an explicit :lookup:`exact` lookup if this is an issue.
-
-Persistent database connections
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Connection setup not repeated for each request
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When Django establishes a connection to the database, it sets up appropriate
-parameters, depending on the backend being used. Since `persistent database
-connections <persistent-database-connections>`_ are enabled by default in
-Django 1.6, this setup isn't repeated at every request any more. If you
-modifiy parameters such as the connection's isolation level or time zone, you
-should either restore Django's defaults at the end of each request, force an
-appropriate value at the beginning of each request, or disable persistent
-connections.
 
 ``BooleanField`` no longer defaults to ``False``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
