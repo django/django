@@ -617,17 +617,6 @@ class ValidationTests(unittest.TestCase):
         )
 
         class ValidationTestModelAdmin(ModelAdmin):
-            fieldsets = (("General", {"fields": ("non_existent_field",)}),)
-
-        six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            "'ValidationTestModelAdmin.fieldsets\[0\]\[1\]\['fields'\]' refers to field 'non_existent_field' that is missing from the form.",
-            validate,
-            ValidationTestModelAdmin,
-            ValidationTestModel,
-        )
-
-        class ValidationTestModelAdmin(ModelAdmin):
             fieldsets = (("General", {"fields": ("name",)}),)
 
         validate(ValidationTestModelAdmin, ValidationTestModel)
@@ -683,22 +672,6 @@ class ValidationTests(unittest.TestCase):
         )
 
     def test_fieldsets_with_custom_form_validation(self):
-
-        class BandAdmin(ModelAdmin):
-
-            fieldsets = (
-                ('Band', {
-                    'fields': ('non_existent_field',)
-                }),
-            )
-
-        six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            "'BandAdmin.fieldsets\[0\]\[1\]\['fields'\]' refers to field 'non_existent_field' that is missing from the form.",
-            validate,
-            BandAdmin,
-            Band,
-        )
 
         class BandAdmin(ModelAdmin):
             fieldsets = (
@@ -1366,21 +1339,6 @@ class ValidationTests(unittest.TestCase):
         six.assertRaisesRegex(self,
             ImproperlyConfigured,
             "'ValidationTestInline.fields' must be a list or tuple.",
-            validate,
-            ValidationTestModelAdmin,
-            ValidationTestModel,
-        )
-
-        class ValidationTestInline(TabularInline):
-            model = ValidationTestInlineModel
-            fields = ("non_existent_field",)
-
-        class ValidationTestModelAdmin(ModelAdmin):
-            inlines = [ValidationTestInline]
-
-        six.assertRaisesRegex(self,
-            ImproperlyConfigured,
-            "'ValidationTestInline.fields' refers to field 'non_existent_field' that is missing from the form.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
