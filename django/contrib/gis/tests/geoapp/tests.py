@@ -297,7 +297,7 @@ class GeoLookupTest(TestCase):
 
     # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
     # http://trac.osgeo.org/postgis/ticket/2035
-    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+    if connection.ops.postgis and (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
         test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
