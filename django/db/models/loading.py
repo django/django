@@ -35,7 +35,11 @@ def _initialize():
         # Mapping of app_labels to errors raised when trying to import the app.
         app_errors = {},
 
+        # Pending lookups for lazy relations
+        pending_lookups = {},
+
         # -- Everything below here is only used when populating the cache --
+        loads_installed = True,
         loaded = False,
         handled = {},
         postponed = [],
@@ -56,12 +60,44 @@ class BaseAppCache(object):
 
     def __init__(self):
         self.__dict__ = _initialize()
+        # This stops _populate loading from INSTALLED_APPS and ignores the
+        # only_installed arguments to get_model[s]
+        self.loads_installed = False
 
     def _populate(self):
         """
         Stub method - this base class does no auto-loading.
         """
-        self.loaded = True
+        """
+        Fill in all the cache information. This method is threadsafe, in the
+        sense that every caller will see the same state upon return, and if the
+        cache is already initialised, it does no work.
+        """
+        if self.loaded:
+            return
+        if not self.loads_installed:
+            self.loaded = True
+            return
+        # Note that we want to use the import lock here - the app loading is
+        # in many cases initiated implicitly by importing, and thus it is
+        # possible to end up in deadlock when one thread initiates loading
+        # without holding the importer lock and another thread then tries to
+        # import something which also launches the app loading. For details of
+        # this situation see #18251.
+        imp.acquire_lock()
+        try:
+            if self.loaded:
+                return
+            for app_name in settings.INSTALLED_APPS:
+                if app_name in self.handled:
+                    continue
+                self.load_app(app_name, True)
+            if not self.nesting_level:
+                for app_name in self.postponed:
+                    self.load_app(app_name)
+                self.loaded = True
+        finally:
+            imp.release_lock()
 
     def _label_for(self, app_mod):
         """
@@ -169,12 +205,15 @@ class BaseAppCache(object):
 
         By default, models that aren't part of installed apps will *not*
         be included in the list of models. However, if you specify
-        only_installed=False, they will be.
+        only_installed=False, they will be. If you're using a non-default
+        AppCache, this argument does nothing - all models will be included.
 
         By default, models that have been swapped out will *not* be
         included in the list of models. However, if you specify
         include_swapped, they will be.
         """
+        if not self.loads_installed:
+            only_installed = False
         cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
         try:
             return self._get_models_cache[cache_key]
@@ -212,6 +251,8 @@ class BaseAppCache(object):
 
         Returns None if no model is found.
         """
+        if not self.loads_installed:
+            only_installed = False
         if seed_cache:
             self._populate()
         if only_installed and app_label not in self.app_labels:
@@ -241,12 +282,6 @@ class BaseAppCache(object):
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
-    def copy_from(self, other):
-        "Registers all models from the other cache into this one"
-        cache._populate()
-        for app_label, models in other.app_models.items():
-            self.register_models(app_label, *models.values())
-
 
 class AppCache(BaseAppCache):
     """
@@ -260,35 +295,6 @@ class AppCache(BaseAppCache):
 
     def __init__(self):
         self.__dict__ = self.__shared_state
-
-    def _populate(self):
-        """
-        Fill in all the cache information. This method is threadsafe, in the
-        sense that every caller will see the same state upon return, and if the
-        cache is already initialised, it does no work.
-        """
-        if self.loaded:
-            return
-        # Note that we want to use the import lock here - the app loading is
-        # in many cases initiated implicitly by importing, and thus it is
-        # possible to end up in deadlock when one thread initiates loading
-        # without holding the importer lock and another thread then tries to
-        # import something which also launches the app loading. For details of
-        # this situation see #18251.
-        imp.acquire_lock()
-        try:
-            if self.loaded:
-                return
-            for app_name in settings.INSTALLED_APPS:
-                if app_name in self.handled:
-                    continue
-                self.load_app(app_name, True)
-            if not self.nesting_level:
-                for app_name in self.postponed:
-                    self.load_app(app_name)
-                self.loaded = True
-        finally:
-            imp.release_lock()
 
 cache = AppCache()
 

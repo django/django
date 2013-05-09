@@ -2,7 +2,7 @@ from operator import attrgetter
 
 from django.db import connection, connections, router
 from django.db.backends import util
-from django.db.models import signals, get_model
+from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject, PathInfo
@@ -17,8 +17,6 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
-
-pending_lookups = {}
 
 
 def add_lazy_relation(cls, field, relation, operation):
@@ -70,14 +68,14 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = get_model(app_label, model_name,
+    model = cls._meta.app_cache.get_model(app_label, model_name,
                       seed_cache=False, only_installed=False)
     if model:
         operation(field, model, cls)
     else:
         key = (app_label, model_name)
         value = (cls, field, operation)
-        pending_lookups.setdefault(key, []).append(value)
+        cls._meta.app_cache.pending_lookups.setdefault(key, []).append(value)
 
 
 def do_pending_lookups(sender, **kwargs):
@@ -85,7 +83,7 @@ def do_pending_lookups(sender, **kwargs):
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
     key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in pending_lookups.pop(key, []):
+    for cls, field, operation in sender._meta.app_cache.pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)
@@ -1330,6 +1328,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'unique_together': (from_, to),
         'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
+        'app_cache': field.model._meta.app_cache,
     })
     # Construct and return the new class.
     return type(str(name), (models.Model,), {
