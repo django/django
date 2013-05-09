@@ -173,13 +173,20 @@ class Collector(object):
             # support cascade-deletes for GenericRelation. It should be
             # removed/fixed when the ORM gains a proper abstraction for virtual
             # or composite fields, and GFKs are reworked to fit into that.
-            for relation in model._meta.many_to_many:
-                if not relation.rel.through:
-                    sub_objs = relation.bulk_related_objects(new_objs, self.using)
-                    self.collect(sub_objs,
-                                 source=model,
-                                 source_attr=relation.rel.related_name,
-                                 nullable=True)
+            
+            # MMF customization: commenting out the below because this code
+            # path is not smart enough to switch to the DB of the model referred
+            # to by the generic FK before trying to access it for deletion. I
+            # believe we have implemented manual deletion for GFKs where it 
+            # matters for us anyway, so just skip this to avoid the problem.
+            #
+            #for relation in model._meta.many_to_many:
+            #    if not relation.rel.through:
+            #        sub_objs = relation.bulk_related_objects(new_objs, self.using)
+            #        self.collect(sub_objs,
+            #                     source=model,
+            #                     source_attr=relation.rel.related_name,
+            #                     nullable=True)
 
     def related_objects(self, related, objs):
         """
