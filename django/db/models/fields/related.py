@@ -958,7 +958,7 @@ class ForeignObject(RelatedField):
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             raise ValueError('Related model %r cannot been resolved' % self.rel.to)
         related_fields = []
         for index in range(len(self.from_fields)):
