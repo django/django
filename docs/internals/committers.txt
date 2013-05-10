@@ -200,7 +200,7 @@ Karen Tracey
 
     He has worked on Django's auth, admin and staticfiles apps as well as
     the form, core, internationalization and test systems. He currently works
-    as the lead engineer at Gidsy_.
+    at Mozilla_.
 
     Jannis lives in Berlin, Germany.
 
@@ -208,7 +208,7 @@ Karen Tracey
 .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
 .. _virtualenv: http://www.virtualenv.org/
 .. _pip: http://www.pip-installer.org/
-.. _Gidsy: http://gidsy.com/
+.. _Mozilla: http://www.mozilla.org/
 
 `James Tauber`_
     James is the lead developer of Pinax_ and the CEO and founder of
