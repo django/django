@@ -44,6 +44,15 @@ class GraphTests(TransactionTestCase):
             graph.backwards_plan(("app_b", "0002")),
             [('app_a', '0004'), ('app_a', '0003'), ('app_b', '0002')],
         )
+        # Test roots and leaves
+        self.assertEqual(
+            graph.root_nodes(),
+            set([('app_a', '0001'), ('app_b', '0001')]),
+        )
+        self.assertEqual(
+            graph.leaf_nodes(),
+            set([('app_a', '0004'), ('app_b', '0002')]),
+        )
 
     def test_complex_graph(self):
         """
@@ -80,6 +89,15 @@ class GraphTests(TransactionTestCase):
         self.assertEqual(
             graph.backwards_plan(("app_b", "0001")),
             [('app_a', '0004'), ('app_c', '0002'), ('app_c', '0001'), ('app_a', '0003'), ('app_b', '0002'), ('app_b', '0001')],
+        )
+        # Test roots and leaves
+        self.assertEqual(
+            graph.root_nodes(),
+            set([('app_a', '0001'), ('app_b', '0001'), ('app_c', '0001')]),
+        )
+        self.assertEqual(
+            graph.leaf_nodes(),
+            set([('app_a', '0004'), ('app_b', '0002'), ('app_c', '0002')]),
         )
 
     def test_circular_graph(self):
