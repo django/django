@@ -11,6 +11,7 @@ from django.contrib.gis.geoip.prototypes import (
     GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
 
 from django.utils import six
+from django.utils.encoding import force_bytes
 
 # Regular expressions for recognizing the GeoIP free database editions.
 free_regex = re.compile(r'^GEO-\d{3}FREE')
@@ -97,18 +98,18 @@ class GeoIP(object):
             # and/or city datasets exist, then try and open them.
             country_db = os.path.join(path, country or GEOIP_SETTINGS.get('GEOIP_COUNTRY', 'GeoIP.dat'))
             if os.path.isfile(country_db):
-                self._country = GeoIP_open(country_db, cache)
+                self._country = GeoIP_open(force_bytes(country_db), cache)
                 self._country_file = country_db
 
             city_db = os.path.join(path, city or GEOIP_SETTINGS.get('GEOIP_CITY', 'GeoLiteCity.dat'))
             if os.path.isfile(city_db):
-                self._city = GeoIP_open(city_db, cache)
+                self._city = GeoIP_open(force_bytes(city_db), cache)
                 self._city_file = city_db
         elif os.path.isfile(path):
             # Otherwise, some detective work will be needed to figure
             # out whether the given database path is for the GeoIP country
             # or city databases.
-            ptr = GeoIP_open(path, cache)
+            ptr = GeoIP_open(force_bytes(path), cache)
             info = GeoIP_database_info(ptr)
             if lite_regex.match(info):
                 # GeoLite City database detected.
