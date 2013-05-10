@@ -247,6 +247,7 @@ class CustomWidget(forms.TextInput):
 class TaggedItemForm(forms.ModelForm):
     class Meta:
         model = TaggedItem
+        fields = '__all__'
         widgets = {'tag': CustomWidget}
 
 class GenericInlineFormsetTest(TestCase):

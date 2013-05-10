@@ -1,3 +1,5 @@
+import warnings
+
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
@@ -95,7 +97,14 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 # Try to get a queryset and extract the model class
                 # from that
                 model = self.get_queryset().model
-            return model_forms.modelform_factory(model)
+
+            fields = getattr(self, 'fields', None)
+            if fields is None:
+                warnings.warn("Using ModelFormMixin (base class of %s) without "
+                              "the 'fields' attribute is deprecated." % self.__class__.__name__,
+                              PendingDeprecationWarning)
+
+            return model_forms.modelform_factory(model, fields=fields)
 
     def get_form_kwargs(self):
         """

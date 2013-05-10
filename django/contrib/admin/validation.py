@@ -246,7 +246,6 @@ def validate_fields_spec(cls, model, opts, flds, label):
                 # readonly_fields will handle the validation of such
                 # things.
                 continue
-            check_formfield(cls, model, opts, label, field)
             try:
                 f = opts.get_field(field)
             except models.FieldDoesNotExist:
@@ -302,14 +301,6 @@ def validate_base(cls, model):
     # exclude
     if cls.exclude: # default value is None
         check_isseq(cls, 'exclude', cls.exclude)
-        for field in cls.exclude:
-            check_formfield(cls, model, opts, 'exclude', field)
-            try:
-                f = opts.get_field(field)
-            except models.FieldDoesNotExist:
-                # If we can't find a field on the model that matches,
-                # it could be an extra field on the form.
-                continue
         if len(cls.exclude) > len(set(cls.exclude)):
             raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
 
@@ -379,23 +370,6 @@ def get_field(cls, model, opts, label, field):
     except models.FieldDoesNotExist:
         raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
                 % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-
-def check_formfield(cls, model, opts, label, field):
-    if getattr(cls.form, 'base_fields', None):
-        try:
-            cls.form.base_fields[field]
-        except KeyError:
-            raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
-                "is missing from the form." % (cls.__name__, label, field))
-    else:
-        get_form_is_overridden = hasattr(cls, 'get_form') and cls.get_form != ModelAdmin.get_form
-        if not get_form_is_overridden:
-            fields = fields_for_model(model)
-            try:
-                fields[field]
-            except KeyError:
-                raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
-                    "is missing from the form." % (cls.__name__, label, field))
 
 def fetch_attr(cls, model, opts, label, field):
     try:

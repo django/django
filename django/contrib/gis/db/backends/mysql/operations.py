@@ -3,7 +3,6 @@ from django.db.backends.mysql.base import DatabaseOperations
 from django.contrib.gis.db.backends.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 
-from django.utils import six
 
 class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
@@ -18,21 +17,21 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
     Adaptor = Adapter # Backwards-compatibility alias.
 
     geometry_functions = {
-        'bbcontains' : 'MBRContains', # For consistency w/PostGIS API
-        'bboverlaps' : 'MBROverlaps', # .. ..
-        'contained' : 'MBRWithin',    # .. ..
-        'contains' : 'MBRContains',
-        'disjoint' : 'MBRDisjoint',
-        'equals' : 'MBREqual',
-        'exact' : 'MBREqual',
-        'intersects' : 'MBRIntersects',
-        'overlaps' : 'MBROverlaps',
-        'same_as' : 'MBREqual',
-        'touches' : 'MBRTouches',
-        'within' : 'MBRWithin',
-        }
+        'bbcontains': 'MBRContains', # For consistency w/PostGIS API
+        'bboverlaps': 'MBROverlaps', # .. ..
+        'contained': 'MBRWithin',    # .. ..
+        'contains': 'MBRContains',
+        'disjoint': 'MBRDisjoint',
+        'equals': 'MBREqual',
+        'exact': 'MBREqual',
+        'intersects': 'MBRIntersects',
+        'overlaps': 'MBROverlaps',
+        'same_as': 'MBREqual',
+        'touches': 'MBRTouches',
+        'within': 'MBRWithin',
+    }
 
-    gis_terms = dict([(term, None) for term in list(geometry_functions) + ['isnull']])
+    gis_terms = set(geometry_functions) | set(['isnull'])
 
     def geo_db_type(self, f):
         return f.geom_type

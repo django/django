@@ -15,6 +15,7 @@ from django.utils._os import upath
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
+        fields = '__all__'
 
 
 UserFormSet = forms.models.modelformset_factory(User, form=UserForm, extra=2)
