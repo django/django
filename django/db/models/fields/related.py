@@ -204,9 +204,6 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
             return rel_obj
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("%s must be accessed via instance" % self.related.opts.object_name)
-
         # The similarity of the code below to the code in
         # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
@@ -310,9 +307,6 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
             return rel_obj
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("%s must be accessed via instance" % self.field.name)
-
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.field.null == False:
@@ -382,9 +376,6 @@ class ForeignRelatedObjectsDescriptor(object):
         return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("Manager must be accessed via instance")
-
         manager = self.__get__(instance)
         # If the foreign key can support nulls, then completely clear the related set.
         # Otherwise, just move the named objects into the set.
@@ -765,9 +756,6 @@ class ManyRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("Manager must be accessed via instance")
-
         if not self.related.field.rel.through._meta.auto_created:
             opts = self.related.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
@@ -822,9 +810,6 @@ class ReverseManyRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("Manager must be accessed via instance")
-
         if not self.field.rel.through._meta.auto_created:
             opts = self.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))

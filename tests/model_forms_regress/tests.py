@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import date
+import warnings
 
 from django import forms
 from django.core.exceptions import FieldError, ValidationError
@@ -43,9 +44,12 @@ class ModelMultipleChoiceFieldTests(TestCase):
         f.clean([p.pk for p in Person.objects.all()[8:9]])
         self.assertTrue(self._validator_run)
 
+
 class TripleForm(forms.ModelForm):
     class Meta:
         model = Triple
+        fields = '__all__'
+
 
 class UniqueTogetherTests(TestCase):
     def test_multiple_field_unique_together(self):
@@ -63,14 +67,17 @@ class UniqueTogetherTests(TestCase):
         form = TripleForm({'left': '1', 'middle': '3', 'right': '1'})
         self.assertTrue(form.is_valid())
 
+
 class TripleFormWithCleanOverride(forms.ModelForm):
     class Meta:
         model = Triple
+        fields = '__all__'
 
     def clean(self):
         if not self.cleaned_data['left'] == self.cleaned_data['right']:
             raise forms.ValidationError('Left and right should be equal')
         return self.cleaned_data
+
 
 class OverrideCleanTests(TestCase):
     def test_override_clean(self):
@@ -84,6 +91,7 @@ class OverrideCleanTests(TestCase):
         # by form.full_clean().
         self.assertEqual(form.instance.left, 1)
 
+
 # Regression test for #12960.
 # Make sure the cleaned_data returned from ModelForm.clean() is applied to the
 # model instance.
@@ -95,6 +103,8 @@ class PublicationForm(forms.ModelForm):
 
     class Meta:
         model = Publication
+        fields = '__all__'
+
 
 class ModelFormCleanTest(TestCase):
     def test_model_form_clean_applies_to_model(self):
@@ -103,9 +113,12 @@ class ModelFormCleanTest(TestCase):
         publication = form.save()
         self.assertEqual(publication.title, 'TEST')
 
+
 class FPForm(forms.ModelForm):
     class Meta:
         model = FilePathModel
+        fields = '__all__'
+
 
 class FilePathFieldTests(TestCase):
     def test_file_path_field_blank(self):
@@ -133,7 +146,8 @@ class ManyToManyCallableInitialTests(TestCase):
         book3 = Publication.objects.create(title="Third Book", date_published=date(2009,1,1))
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
-        ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
+        ModelForm = modelform_factory(Article, fields="__all__",
+                                      formfield_callback=formfield_for_dbfield)
         form = ModelForm()
         self.assertHTMLEqual(form.as_ul(), """<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
 <li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
@@ -143,9 +157,12 @@ class ManyToManyCallableInitialTests(TestCase):
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>"""
             % (book1.pk, book2.pk, book3.pk))
 
+
 class CFFForm(forms.ModelForm):
     class Meta:
         model = CustomFF
+        fields = '__all__'
+
 
 class CustomFieldSaveTests(TestCase):
     def test_save(self):
@@ -168,9 +185,12 @@ class ModelChoiceIteratorTests(TestCase):
         f = Form()
         self.assertEqual(len(f.fields["publications"].choices), 1)
 
+
 class RealPersonForm(forms.ModelForm):
     class Meta:
         model = RealPerson
+        fields = '__all__'
+
 
 class CustomModelFormSaveMethod(TestCase):
     def test_string_message(self):
@@ -230,9 +250,12 @@ class TestTicket11183(TestCase):
         self.assertTrue(field1 is not ModelChoiceForm.base_fields['person'])
         self.assertTrue(field1.widget.choices.field is field1)
 
+
 class HomepageForm(forms.ModelForm):
     class Meta:
         model = Homepage
+        fields = '__all__'
+
 
 class URLFieldTests(TestCase):
     def test_url_on_modelform(self):
@@ -274,6 +297,7 @@ class FormFieldCallbackTests(TestCase):
             class Meta:
                 model = Person
                 widgets = {'name': widget}
+                fields = "__all__"
 
         Form = modelform_factory(Person, form=BaseForm)
         self.assertTrue(Form.base_fields['name'].widget is widget)
@@ -285,11 +309,11 @@ class FormFieldCallbackTests(TestCase):
         widget = forms.Textarea()
 
         # Without a widget should not set the widget to textarea
-        Form = modelform_factory(Person)
+        Form = modelform_factory(Person, fields="__all__")
         self.assertNotEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
         # With a widget should not set the widget to textarea
-        Form = modelform_factory(Person, widgets={'name':widget})
+        Form = modelform_factory(Person, fields="__all__", widgets={'name':widget})
         self.assertEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
     def test_custom_callback(self):
@@ -307,6 +331,7 @@ class FormFieldCallbackTests(TestCase):
             class Meta:
                 model = Person
                 widgets = {'name': widget}
+                fields = "__all__"
 
         _ = modelform_factory(Person, form=BaseForm,
                               formfield_callback=callback)
@@ -317,7 +342,7 @@ class FormFieldCallbackTests(TestCase):
 
     def test_bad_callback(self):
         # A bad callback provided by user still gives an error
-        self.assertRaises(TypeError, modelform_factory, Person,
+        self.assertRaises(TypeError, modelform_factory, Person, fields="__all__",
                           formfield_callback='not a function or callable')
 
 
@@ -362,6 +387,8 @@ class InvalidFieldAndFactory(TestCase):
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
+        fields = '__all__'
+
 
 class FileFieldTests(unittest.TestCase):
     def test_clean_false(self):
@@ -425,6 +452,7 @@ class FileFieldTests(unittest.TestCase):
         self.assertTrue('something.txt' in rendered)
         self.assertTrue('myfile-clear' in rendered)
 
+
 class EditionForm(forms.ModelForm):
     author = forms.ModelChoiceField(queryset=Person.objects.all())
     publication = forms.ModelChoiceField(queryset=Publication.objects.all())
@@ -433,6 +461,8 @@ class EditionForm(forms.ModelForm):
 
     class Meta:
         model = Edition
+        fields = '__all__'
+
 
 class UniqueErrorsTests(TestCase):
     def setUp(self):
@@ -473,7 +503,7 @@ class EmptyFieldsTestCase(TestCase):
 
     def test_empty_fields_to_construct_instance(self):
         "No fields should be set on a model instance if construct_instance receives fields=()"
-        form = modelform_factory(Person)({'name': 'John Doe'})
+        form = modelform_factory(Person, fields="__all__")({'name': 'John Doe'})
         self.assertTrue(form.is_valid())
         instance = construct_instance(form, Person(), fields=())
         self.assertEqual(instance.name, '')
@@ -485,10 +515,25 @@ class CustomMetaclass(ModelFormMetaclass):
         new.base_fields = {}
         return new
 
+
 class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
     pass
 
+
 class CustomMetaclassTestCase(TestCase):
     def test_modelform_factory_metaclass(self):
-        new_cls = modelform_factory(Person, form=CustomMetaclassForm)
+        new_cls = modelform_factory(Person, fields="__all__", form=CustomMetaclassForm)
         self.assertEqual(new_cls.base_fields, {})
+
+
+class TestTicket19733(TestCase):
+    def test_modelform_factory_without_fields(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+            # This should become an error once deprecation cycle is complete.
+            form = modelform_factory(Person)
+        self.assertEqual(w[0].category, PendingDeprecationWarning)
+
+    def test_modelform_factory_with_all_fields(self):
+        form = modelform_factory(Person, fields="__all__")
+        self.assertEqual(list(form.base_fields), ["name"])

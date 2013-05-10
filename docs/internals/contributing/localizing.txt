@@ -62,5 +62,5 @@ Django source tree, as for any code change:
 
 .. _Transifex: https://www.transifex.com/
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
-.. _Django project page: https://www.transifex.com/projects/p/django/
+.. _Django project page: https://www.transifex.com/projects/p/django-core/
 .. _Transifex User Guide: http://help.transifex.com/

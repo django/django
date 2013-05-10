@@ -554,11 +554,13 @@ Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
 particular kind within the contents of the ``QuerySet``.
 
 .. versionchanged:: 1.6
+
     ``dates`` used to return a list of :class:`datetime.datetime` objects.
 
 ``field`` should be the name of a ``DateField`` of your model.
 
 .. versionchanged:: 1.6
+
     ``dates`` used to accept operating on a ``DateTimeField``.
 
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
@@ -625,7 +627,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - SQLite: install pytz_ — conversions are actually performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
-    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
@@ -1121,11 +1124,11 @@ to ``defer()``::
 
 .. versionchanged:: 1.5
 
-Some fields in a model won't be deferred, even if you ask for them. You can
-never defer the loading of the primary key. If you are using
-:meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related
-one, doing so will result in an error.
+    Some fields in a model won't be deferred, even if you ask for them. You can
+    never defer the loading of the primary key. If you are using
+    :meth:`select_related()` to retrieve related models, you shouldn't defer the
+    loading of the field that connects from the primary model to the related
+    one, doing so will result in an error.
 
 .. note::
 
@@ -1193,20 +1196,20 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
-.. versionchanged:: 1.5
-
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options. Also note that using :meth:`only` and omitting a field requested
-using :meth:`select_related` is an error as well.
+options.
 
 .. versionchanged:: 1.5
 
-.. note::
+    Using :meth:`only` and omitting a field requested using
+    :meth:`select_related` is an error as well.
 
-    When calling :meth:`~django.db.models.Model.save()` for instances with
-    deferred fields, only the loaded fields will be saved. See
-    :meth:`~django.db.models.Model.save()` for more details.
+    .. note::
+
+        When calling :meth:`~django.db.models.Model.save()` for instances with
+        deferred fields, only the loaded fields will be saved. See
+        :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1424,6 +1427,7 @@ query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at maximum 999 variables per query is used.
 
 .. versionadded:: 1.5
+
     The ``batch_size`` parameter was added in version 1.5.
 
 count
@@ -1725,7 +1729,8 @@ methods on your models. It does, however, emit the
 (including cascaded deletions).
 
 .. versionadded:: 1.5
-    Allow fast-path deletion of objects
+
+    Allow fast-path deletion of objects.
 
 Django needs to fetch objects into memory to send signals and handle cascades.
 However, if there are no cascades and no signals, then Django may take a

@@ -43,7 +43,7 @@ class TemplateCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--template',
                     action='store', dest='template',
-                    help='The dotted import path to load the template from.'),
+                    help='The path or URL to load the template from.'),
         make_option('--extension', '-e', dest='extensions',
                     action='append', default=['py'],
                     help='The file extension(s) to render (default: "py"). '

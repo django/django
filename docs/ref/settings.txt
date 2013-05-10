@@ -67,7 +67,7 @@ A list of strings representing the host/domain names that this Django site can
 serve. This is a security measure to prevent an attacker from poisoning caches
 and password reset emails with links to malicious hosts by submitting requests
 with a fake HTTP ``Host`` header, which is possible even under many
-seemingly-safe webserver configurations.
+seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
 in which case they will be matched against the request's ``Host`` header
@@ -78,6 +78,20 @@ can be used as a subdomain wildcard: ``'.example.com'`` will match
 responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
+
+.. note::
+
+    If you want to also allow the `fully qualified domain name (FQDN)`_, which
+    some browsers can send in the Host header, you must explicitly add another
+    ALLOWED_HOSTS entry that includes a trailing period. This entry can also be
+    a subdomain wildcard::
+
+        ALLOWED_HOSTS = [
+            '.example.com', # Allow domain and subdomains
+            '.example.com.', # Also allow FQDN and subdomains
+        ]
+
+.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
@@ -495,7 +509,7 @@ CONN_MAX_AGE
 
 .. versionadded:: 1.6
 
-Default: ``600``
+Default: ``0``
 
 The lifetime of a database connection, in seconds. Use ``0`` to close database
 connections at the end of each request — Django's historical behavior — and
@@ -1265,9 +1279,9 @@ see the current list of translated languages by looking in
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format 
-(:term:`language code<language code>`, ``language name``) -- for example, 
-``('ja', 'Japanese')``. 
+The list is a tuple of two-tuples in the format
+(:term:`language code<language code>`, ``language name``) -- for example,
+``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
@@ -1486,6 +1500,7 @@ randomly-generated ``SECRET_KEY`` to each new project.
     execution vulnerabilities.
 
 .. versionchanged:: 1.5
+
     Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
@@ -1771,7 +1786,7 @@ See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
 .. versionchanged:: 1.6
 
-Input format with microseconds has been added.
+    Input format with microseconds has been added.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -2055,11 +2070,11 @@ decorator, for example.
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGIN_URL
 
@@ -2073,11 +2088,11 @@ The URL where requests are redirected for login, especially when using the
 
 .. versionchanged:: 1.5
 
-This setting now also accepts view function names and
-:ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-configuration duplication since you no longer have to define the URL in two
-places (``settings`` and URLconf).
-For backward compatibility reasons the default remains unchanged.
+    This setting now also accepts view function names and
+    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
+    configuration duplication since you no longer have to define the URL in two
+    places (``settings`` and URLconf).
+    For backward compatibility reasons the default remains unchanged.
 
 .. setting:: LOGOUT_URL
 

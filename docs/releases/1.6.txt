@@ -66,13 +66,8 @@ Persistent database connections
 
 Django now supports reusing the same database connection for several requests.
 This avoids the overhead of re-establishing a connection at the beginning of
-each request.
-
-By default, database connections will kept open for 10 minutes. This behavior
-is controlled by the :setting:`CONN_MAX_AGE` setting. To restore the previous
-behavior of closing the connection at the end of each request, set
-:setting:`CONN_MAX_AGE` to ``0``. See :ref:`persistent-database-connections`
-for details.
+each request. For backwards compatibility, this feature is disabled by
+default. See :ref:`persistent-database-connections` for details.
 
 Time zone aware aggregation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -298,21 +293,6 @@ Django 1.6 introduces ``hour``, ``minute``, and ``second`` lookups on
 ``hour``, ``minute``, or ``second``, the new lookups will clash with you field
 names. Append an explicit :lookup:`exact` lookup if this is an issue.
 
-Persistent database connections
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Connection setup not repeated for each request
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When Django establishes a connection to the database, it sets up appropriate
-parameters, depending on the backend being used. Since `persistent database
-connections <persistent-database-connections>`_ are enabled by default in
-Django 1.6, this setup isn't repeated at every request any more. If you
-modifiy parameters such as the connection's isolation level or time zone, you
-should either restore Django's defaults at the end of each request, force an
-appropriate value at the beginning of each request, or disable persistent
-connections.
-
 ``BooleanField`` no longer defaults to ``False``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -422,6 +402,13 @@ Miscellaneous
   should review it as ``type='text'`` widgets might be now output as
   ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
   corresponding field type.
+
+* Form field's :attr:`~django.forms.Field.error_messages` that contain a
+  placeholder should now always use a named placeholder (``"Value '%(value)s' is
+  too big"`` instead of ``"Value '%s' is too big"``). See the corresponding
+  field documentation for details about the names of the placeholders. The
+  changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
+  :class:`~django.forms.ModelMultipleChoiceField`.
 
 Features deprecated in 1.6
 ==========================
@@ -545,3 +532,55 @@ including it in an URLconf, simply replace::
 with::
 
     (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+
+``ModelForm`` without ``fields`` or ``exclude``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if you wanted a :class:`~django.forms.ModelForm` to use all fields on
+the model, you could simply omit the ``Meta.fields`` attribute, and all fields
+would be used.
+
+This can lead to security problems where fields are added to the model and,
+unintentionally, automatically become editable by end users. In some cases,
+particular with boolean fields, it is possible for this problem to be completely
+invisible. This is a form of `Mass assignment vulnerability
+<http://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
+
+For this reason, this behaviour is deprecated, and using the ``Meta.exclude``
+option is strongly discouraged. Instead, all fields that are intended for
+inclusion in the form should be listed explicitly in the ``fields`` attribute.
+
+If this security concern really does not apply in your case, there is a shortcut
+to explicitly indicate that all fields should be used - use the special value
+``"__all__"`` for the fields attribute::
+
+    class MyModelForm(ModelForm):
+        class Meta:
+            fields = "__all__"
+            model = MyModel
+
+If you have custom ``ModelForms`` that only need to be used in the admin, there
+is another option. The admin has its own methods for defining fields
+(``fieldsets`` etc.), and so adding a list of fields to the ``ModelForm`` is
+redundant. Instead, simply omit the ``Meta`` inner class of the ``ModelForm``,
+or omit the ``Meta.model`` attribute. Since the ``ModelAdmin`` subclass knows
+which model it is for, it can add the necessary attributes to derive a
+functioning ``ModelForm``. This behaviour also works for earlier Django
+versions.
+
+``UpdateView`` and ``CreateView`` without explicit fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The generic views :class:`~django.views.generic.edit.CreateView` and
+:class:`~django.views.generic.edit.UpdateView`, and anything else derived from
+:class:`~django.views.generic.edit.ModelFormMixin`, are vulnerable to the
+security problem described in the section above, because they can automatically
+create a ``ModelForm`` that uses all fields for a model.
+
+For this reason, if you use these views for editing models, you must also supply
+the ``fields`` attribute, which is a list of model fields and works in the same
+way as the :class:`~django.forms.ModelForm` ``Meta.fields`` attribute. Alternatively,
+you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
+defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
+subclass to be used with a model but without an explicit list of fields is
+deprecated.

@@ -17,11 +17,13 @@ from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
 class ChoiceFieldForm(ModelForm):
     class Meta:
         model = ChoiceFieldModel
+        fields = '__all__'
 
 
 class OptionalMultiChoiceModelForm(ModelForm):
     class Meta:
         model = OptionalMultiChoiceModel
+        fields = '__all__'
 
 
 class FileForm(Form):
@@ -139,6 +141,7 @@ class FormsModelTestCase(TestCase):
         class BoundaryForm(ModelForm):
             class Meta:
                 model = BoundaryModel
+                fields = '__all__'
 
         f = BoundaryForm({'positive_integer': 100})
         self.assertTrue(f.is_valid())
@@ -154,6 +157,7 @@ class FormsModelTestCase(TestCase):
         class DefaultsForm(ModelForm):
             class Meta:
                 model = Defaults
+                fields = '__all__'
 
         self.assertEqual(DefaultsForm().fields['name'].initial, 'class default value')
         self.assertEqual(DefaultsForm().fields['def_date'].initial, datetime.date(1980, 1, 1))

@@ -312,11 +312,7 @@ class QuerySet(object):
                 if skip:
                     obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
-                    try:
-                        obj = model(*row_data)
-                    except IndexError:
-                        import ipdb; ipdb.set_trace()
-                        pass
+                    obj = model(*row_data)
 
                 # Store the source database of the object
                 obj._state.db = db

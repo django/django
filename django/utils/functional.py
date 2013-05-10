@@ -346,6 +346,7 @@ class SimpleLazyObject(LazyObject):
     # care about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
+    __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
     __bool__ = new_method_proxy(bool)       # Python 3
     __nonzero__ = __bool__                  # Python 2

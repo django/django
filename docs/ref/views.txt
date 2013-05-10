@@ -18,7 +18,7 @@ convenience, you'd like to have Django serve for you in local development.
 The :func:`~django.views.static.serve` view can be used to serve any directory
 you give it. (This view is **not** hardened for production use and should be
 used only as a development aid; you should serve these files in production
-using a real front-end webserver).
+using a real front-end web server).
 
 The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
 ``django.contrib.staticfiles`` is intended for static assets and has no

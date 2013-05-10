@@ -297,8 +297,9 @@ follows this algorithm:
   didn't update anything, Django executes an ``INSERT``.
 
 .. versionchanged:: 1.6
-  Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
-  algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
+
+    Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
+    algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the

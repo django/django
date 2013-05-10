@@ -98,6 +98,7 @@ Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
 
 .. versionchanged:: 1.5
+
     :djadmin:`cleanup` is deprecated. Use :djadmin:`clearsessions` instead.
 
 compilemessages
@@ -122,7 +123,7 @@ Example usage::
 
 .. versionchanged:: 1.6
 
-Added the ability to specify multiple locales.
+    Added the ability to specify multiple locales.
 
 createcachetable
 ----------------
@@ -173,6 +174,7 @@ The :djadminopt:`--all` option may be provided to display all settings, even
 if they have Django's default value. Such settings are prefixed by ``"###"``.
 
 .. versionadded:: 1.6
+
     The :djadminopt:`--all` option was added.
 
 dumpdata <appname appname appname.Model ...>
@@ -307,8 +309,8 @@ database to introspect.
 
 .. versionchanged:: 1.6
 
-The behavior by which introspected models are created as unmanaged ones is new
-in Django 1.6.
+    The behavior by which introspected models are created as unmanaged ones is new
+    in Django 1.6.
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -467,7 +469,7 @@ You can also use commas to separate multiple locales::
 
 .. versionchanged:: 1.6
 
-Added the ability to specify multiple locales.
+    Added the ability to specify multiple locales.
 
 .. django-admin-option:: --domain
 
@@ -778,8 +780,6 @@ use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
 
-.. versionchanged:: 1.5
-
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
 with the ``-i`` or ``--interface`` options like so:
@@ -807,9 +807,13 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
+.. versionadded:: 1.5
+
+    The ``--interface`` option was added in Django 1.5.
+
 .. versionadded:: 1.6
 
-The ``--no-startup`` option was added in Django 1.6.
+    The ``--no-startup`` option was added in Django 1.6.
 
 sql <appname appname ...>
 -------------------------
@@ -1353,6 +1357,7 @@ for any other exception. If you specify ``--traceback``, ``django-admin.py``
 will also output a full stack trace when a ``CommandError`` is raised.
 
 .. versionchanged:: 1.6
+
     Previously, Django didn't show a full stack trace by default for exceptions
     other than ``CommandError``.
 

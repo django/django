@@ -83,9 +83,9 @@ processing at the first positive match.
 
 .. versionadded:: 1.6
 
-If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-exception, authentication will immediately fail. Django won't check the
-backends that follow.
+    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+    exception, authentication will immediately fail. Django won't check the
+    backends that follow.
 
 Writing an authentication backend
 ---------------------------------
@@ -1051,6 +1051,7 @@ code would be required in the app's ``admin.py`` file::
 
         class Meta:
             model = MyUser
+            fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
 
         def clean_password(self):
             # Regardless of what the user provides, return the initial value.

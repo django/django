@@ -322,6 +322,7 @@ class FormsTests(TestCase):
     class ArticleForm(forms.ModelForm):
         class Meta:
             model = Article
+            fields = '__all__'
 
     def test_foreign_object_form(self):
         # A very crude test checking that the non-concrete fields do not get form fields.

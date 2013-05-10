@@ -203,6 +203,21 @@ class MergeDictTests(SimpleTestCase):
                            ('key2', ['value2', 'value3']),
                            ('key4', ['value5', 'value6'])])
 
+    def test_bool_casting(self):
+        empty = MergeDict({}, {}, {})
+        not_empty = MergeDict({}, {}, {"key": "value"})
+        self.assertFalse(empty)
+        self.assertTrue(not_empty)
+
+    def test_key_error(self):
+        """
+        Test that the message of KeyError contains the missing key name.
+        """
+        d1 = MergeDict({'key1': 42})
+        with six.assertRaisesRegex(self, KeyError, 'key2'):
+            d1['key2']
+
+
 class MultiValueDictTests(SimpleTestCase):
 
     def test_multivaluedict(self):

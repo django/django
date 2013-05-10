@@ -152,3 +152,12 @@ class TestUtilsSimpleLazyObject(TestCase):
             SimpleLazyObject(None)
         finally:
             sys.settrace(old_trace_func)
+
+    def test_not_equal(self):
+        lazy1 = SimpleLazyObject(lambda: 2)
+        lazy2 = SimpleLazyObject(lambda: 2)
+        lazy3 = SimpleLazyObject(lambda: 3)
+        self.assertEqual(lazy1, lazy2)
+        self.assertNotEqual(lazy1, lazy3)
+        self.assertTrue(lazy1 != lazy3)
+        self.assertFalse(lazy1 != lazy2)

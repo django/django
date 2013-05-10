@@ -252,7 +252,7 @@ Methods
 
     .. versionchanged:: 1.5
 
-    Raises :exc:`InvalidPage` if next page doesn't exist.
+        Raises :exc:`InvalidPage` if next page doesn't exist.
 
 .. method:: Page.previous_page_number()
 
@@ -260,7 +260,7 @@ Methods
 
     .. versionchanged:: 1.5
 
-    Raises :exc:`InvalidPage` if previous page doesn't exist.
+        Raises :exc:`InvalidPage` if previous page doesn't exist.
 
 .. method:: Page.start_index()
 

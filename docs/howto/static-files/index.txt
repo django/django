@@ -32,7 +32,7 @@ Configuring static files
         {% load staticfiles %}
         <img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
 
-3. Store your static files in a folder called ``static`` in your app. For
+4. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/myimage.jpg``.
 
 Now, if you use ``./manage.py runserver``, all static files should be served
@@ -106,7 +106,7 @@ for gathering static files in a single directory so you can serve them easily.
    This will copy all files from your static folders into the
    :setting:`STATIC_ROOT` directory.
 
-3. Use a webserver of your choice to serve the
+3. Use a web server of your choice to serve the
    files. :doc:`/howto/static-files/deployment` covers some common deployment
    strategies for static files.
 

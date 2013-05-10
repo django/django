@@ -22,6 +22,7 @@ integrity of ORM operations that require multiple queries, especially
 <topics-db-queries-update>` queries.
 
 .. versionchanged:: 1.6
+
     Previous version of Django featured :ref:`a more complicated default
     behavior <transactions-upgrading-from-1.5>`.
 
@@ -73,11 +74,12 @@ To disable this behavior for a specific view, you must set the
 In practice, this feature simply wraps every view function in the :func:`atomic`
 decorator described below.
 
-Note that only the execution of your view in enclosed in the transactions.
-Middleware run outside of the transaction, and so does the rendering of
+Note that only the execution of your view is enclosed in the transactions.
+Middleware runs outside of the transaction, and so does the rendering of
 template responses.
 
 .. versionchanged:: 1.6
+
     Django used to provide this feature via ``TransactionMiddleware``, which is
     now deprecated.
 
@@ -204,6 +206,7 @@ To avoid this, you can :ref:`deactivate the transaction management
 <deactivate-transaction-management>`, but it isn't recommended.
 
 .. versionchanged:: 1.6
+
     Before Django 1.6, autocommit was turned off, and it was emulated by
     forcing a commit after write operations in the ORM.
 
@@ -224,6 +227,7 @@ where you want to run your own transaction-controlling middleware or do
 something really strange.
 
 .. versionchanged:: 1.6
+
     This used to be controlled by the ``TRANSACTIONS_MANAGED`` setting.
 
 Low-level APIs
@@ -312,10 +316,10 @@ rollback that would be performed by ``transaction.rollback()``.
 
 .. versionchanged:: 1.6
 
-When the :func:`atomic` decorator is nested, it creates a savepoint to allow
-partial commit or rollback. You're strongly encouraged to use :func:`atomic`
-rather than the functions described below, but they're still part of the
-public API, and there's no plan to deprecate them.
+    When the :func:`atomic` decorator is nested, it creates a savepoint to allow
+    partial commit or rollback. You're strongly encouraged to use :func:`atomic`
+    rather than the functions described below, but they're still part of the
+    public API, and there's no plan to deprecate them.
 
 Each of these functions takes a ``using`` argument which should be the name of
 a database for which the behavior applies.  If no ``using`` argument is
@@ -354,20 +358,20 @@ The following example demonstrates the use of savepoints::
     @transaction.atomic
     def viewfunc(request):
 
-      a.save()
-      # transaction now contains a.save()
+        a.save()
+        # transaction now contains a.save()
 
-      sid = transaction.savepoint()
+        sid = transaction.savepoint()
 
-      b.save()
-      # transaction now contains a.save() and b.save()
+        b.save()
+        # transaction now contains a.save() and b.save()
 
-      if want_to_keep_b:
-          transaction.savepoint_commit(sid)
-          # open transaction still contains a.save() and b.save()
-      else:
-          transaction.savepoint_rollback(sid)
-          # open transaction now contains only a.save()
+        if want_to_keep_b:
+            transaction.savepoint_commit(sid)
+            # open transaction still contains a.save() and b.save()
+        else:
+            transaction.savepoint_rollback(sid)
+            # open transaction now contains only a.save()
 
 Database-specific notes
 =======================

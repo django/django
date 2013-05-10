@@ -108,7 +108,7 @@ loaded in the bottom right of the screen.
 
 These are the **basics**. For more details on settings and other bits included
 with the framework see
-:doc:`the static files howto </howto/static-files/index>` and the
+:doc:`the static files howto </howto/static-files/index>` and
 :doc:`the staticfiles reference </ref/contrib/staticfiles>`. :doc:`Deploying
 static files </howto/static-files/deployment>` discusses how to use static
 files on a real server.

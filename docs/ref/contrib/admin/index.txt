@@ -18,6 +18,7 @@ The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
 .. versionchanged:: 1.6
+
     In previous versions, the admin wasn't enabled by default.
 
 For reference, here are the requirements:
@@ -333,6 +334,22 @@ subclass::
     :meth:`ModelAdmin.get_form` method.
 
     For an example see the section `Adding custom validation to the admin`_.
+
+    .. admonition:: Note
+
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        since the admin has its own way of defining fields, the ``Meta.fields``
+        attribute will be ignored.
+
+        If the ``ModelForm`` is only going to be used for the admin, the easiest
+        solution is to omit the ``Meta.model`` attribute, since ``ModelAdmin``
+        will provide the correct model to use. Alternatively, you can set
+        ``fields = []`` in the ``Meta`` class to satisfy the validation on the
+        ``ModelForm``.
 
     .. admonition:: Note
 
@@ -1282,12 +1299,23 @@ templates used by the :class:`ModelAdmin` views:
     on the changelist page. To use a custom form, for example::
 
         class MyForm(forms.ModelForm):
-            class Meta:
-                model = MyModel
+            pass
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_changelist_form(self, request, **kwargs):
                 return MyForm
+
+    .. admonition:: Note
+
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        ``ModelAdmin`` ignores this value, overriding it with the
+        :attr:`ModelAdmin.list_editable` attribute. The easiest solution is to
+        omit the ``Meta.model`` attribute, since ``ModelAdmin`` will provide the
+        correct model to use.
 
 .. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
 
@@ -1341,6 +1369,7 @@ templates used by the :class:`ModelAdmin` views:
                 return qs.filter(author=request.user)
 
     .. versionchanged:: 1.6
+
         The ``get_queryset`` method was previously named ``queryset``.
 
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
@@ -1348,7 +1377,9 @@ templates used by the :class:`ModelAdmin` views:
     Sends a message to the user using the :mod:`django.contrib.messages`
     backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
 
-    .. versionadded:: 1.5
+    .. versionchanged:: 1.5
+
+        Keyword arguments were added in Django 1.5.
 
     Keyword arguments allow you to change the message level, add extra CSS
     tags, or fail silently if the ``contrib.messages`` framework is not
@@ -1451,6 +1482,7 @@ in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.6
+
     The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
@@ -1485,9 +1517,6 @@ needed. Now within your form you can add your own custom validation for
 any field::
 
     class MyArticleAdminForm(forms.ModelForm):
-        class Meta:
-            model = Article
-
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]

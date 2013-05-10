@@ -217,5 +217,6 @@ class JavascriptI18nTests(LiveServerTestCase):
     def test_escaping(self):
         extended_apps = list(settings.INSTALLED_APPS) + ['view_tests']
         with self.settings(INSTALLED_APPS=extended_apps):
-            response = self.client.get('%s%s' % (self.live_server_url, '/jsi18n_admin/'))
+            # Force a language via GET otherwise the gettext functions are a noop!
+            response = self.client.get('/jsi18n_admin/?language=de')
             self.assertContains(response, '\\x04')

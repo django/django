@@ -208,23 +208,22 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             # for the geography type.
             self.geography_functions = self.distance_functions.copy()
             self.geography_functions.update({
-                    'coveredby' : self.geometry_functions['coveredby'],
-                    'covers' : self.geometry_functions['covers'],
-                    'intersects' : self.geometry_functions['intersects'],
-                    })
+                'coveredby': self.geometry_functions['coveredby'],
+                'covers': self.geometry_functions['covers'],
+                'intersects': self.geometry_functions['intersects'],
+            })
             self.geography_operators = {
-                'bboverlaps' : PostGISOperator('&&'),
-                }
+                'bboverlaps': PostGISOperator('&&'),
+            }
 
         # Native geometry type support added in PostGIS 2.0.
         if version >= (2, 0, 0):
             self.geometry = True
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
-        gis_terms = ['isnull']
-        gis_terms += list(self.geometry_operators)
-        gis_terms += list(self.geometry_functions)
-        self.gis_terms = dict([(term, None) for term in gis_terms])
+        self.gis_terms = set(['isnull'])
+        self.gis_terms.update(self.geometry_operators)
+        self.gis_terms.update(self.geometry_functions)
 
         self.area = prefix + 'Area'
         self.bounding_circle = BOUNDINGCIRCLE
@@ -247,7 +246,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.makeline = prefix + 'MakeLine'
         self.mem_size = prefix + 'mem_size'
         self.num_geom = prefix + 'NumGeometries'
-        self.num_points =prefix + 'npoints'
+        self.num_points = prefix + 'npoints'
         self.perimeter = prefix + 'Perimeter'
         self.point_on_surface = prefix + 'PointOnSurface'
         self.polygonize = prefix + 'Polygonize'
@@ -324,7 +323,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                 raise NotImplementedError('PostGIS 1.5 supports geography columns '
                                           'only with an SRID of 4326.')
 
-            return 'geography(%s,%d)'% (f.geom_type, f.srid)
+            return 'geography(%s,%d)' % (f.geom_type, f.srid)
         elif self.geometry:
             # Postgis 2.0 supports type-based geometries.
             # TODO: Support 'M' extension.
@@ -565,7 +564,8 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         if not self.check_aggregate_support(agg):
             raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
         agg_name = agg_name.lower()
-        if agg_name == 'union': agg_name += 'agg'
+        if agg_name == 'union':
+            agg_name += 'agg'
         sql_template = '%(function)s(%(field)s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function

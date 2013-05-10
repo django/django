@@ -10,6 +10,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         from django.db import models
         varchar_fields = (models.CharField, models.CommaSeparatedIntegerField,
                 models.SlugField)
-        if isinstance(f, varchar_fields) and f.max_length > 255 and f.unique:
+        if (isinstance(f, varchar_fields) and f.unique
+                and (f.max_length is None or int(f.max_length) > 255)):
             msg = '"%(name)s": %(cls)s cannot have a "max_length" greater than 255 when using "unique=True".'
             errors.add(opts, msg % {'name': f.name, 'cls': f.__class__.__name__})

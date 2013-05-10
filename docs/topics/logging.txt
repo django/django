@@ -169,7 +169,7 @@ issued on the ``project.interesting`` and
 ``project.interesting.stuff`` loggers.
 
 This propagation can be controlled on a per-logger basis. If
-you don't want a particular logger to propagate to it's parents, you
+you don't want a particular logger to propagate to its parents, you
 can turn off this behavior.
 
 Making logging calls
