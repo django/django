@@ -320,7 +320,28 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_custom_request_checker(self):
+        class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
+            ignored_user_agent_patterns = (re.compile(r'Spider.*'),
+                                           re.compile(r'Robot.*'))
+            def is_request_we_should_notify_for(self, request):
+                '''Check user-agent in addition to normal checks.'''
+                assert isinstance(request, HttpRequest)
+                if not super(SubclassedMiddleware, self). \
+                                      is_request_we_should_notify_for(request):
+                    return False
+                user_agent = request.META['HTTP_USER_AGENT']
+                return not any(pattern.search(user_agent) for pattern in
+                               self.ignored_user_agent_patterns)
 
+        self.req.META['HTTP_REFERER'] = '/another/url/'
+        self.req.META['HTTP_USER_AGENT'] = 'Spider machine 3.4'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 0)
+        self.req.META['HTTP_USER_AGENT'] = 'My user agent'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 1)
+    
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'middleware.cond_get_urls'
     def setUp(self):
