@@ -1,7 +1,8 @@
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, TestCase
 from django.db import connection
 from django.db.migrations.graph import MigrationGraph, CircularDependencyError
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.recorder import MigrationRecorder
 
 
 class GraphTests(TransactionTestCase):
@@ -132,4 +133,30 @@ class LoaderTests(TransactionTestCase):
         self.assertEqual(
             graph.forwards_plan(("migrations", "0002_second")),
             [("migrations", "0001_initial"), ("migrations", "0002_second")],
+        )
+
+
+class RecorderTests(TestCase):
+    """
+    Tests the disk and database loader.
+    """
+
+    def test_apply(self):
+        """
+        Tests marking migrations as applied/unapplied.
+        """
+        recorder = MigrationRecorder(connection)
+        self.assertEqual(
+            recorder.applied_migrations(),
+            set(),
+        )
+        recorder.record_applied("myapp", "0432_ponies")
+        self.assertEqual(
+            recorder.applied_migrations(),
+            set([("myapp", "0432_ponies")]),
+        )
+        recorder.record_unapplied("myapp", "0432_ponies")
+        self.assertEqual(
+            recorder.applied_migrations(),
+            set(),
         )
