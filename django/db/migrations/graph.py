@@ -1,7 +1,7 @@
 from django.utils.datastructures import SortedSet
 
 
-class MigrationsGraph(object):
+class MigrationGraph(object):
     """
     Represents the digraph of all migrations in a project.
 
@@ -19,7 +19,7 @@ class MigrationsGraph(object):
     replacing migration, and repoint any dependencies that pointed to the
     replaced migrations to point to the replacing one.
 
-    A node should be a tuple: (applabel, migration_name) - but the code
+    A node should be a tuple: (app_path, migration_name) - but the code
     here doesn't really care.
     """
 
@@ -70,7 +70,7 @@ class MigrationsGraph(object):
                 return cache[(start, get_children)]
             # If we've traversed here before, that's a circular dep
             if start in path:
-                raise CircularDependencyException(path[path.index(start):] + [start])
+                raise CircularDependencyError(path[path.index(start):] + [start])
             # Build our own results list, starting with us
             results = []
             results.append(start)
@@ -88,8 +88,11 @@ class MigrationsGraph(object):
             return results
         return _dfs(start, get_children, [])
 
+    def __str__(self):
+        return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
 
-class CircularDependencyException(Exception):
+
+class CircularDependencyError(Exception):
     """
     Raised when there's an impossible-to-resolve circular dependency.
     """

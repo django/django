@@ -1,5 +1,7 @@
 from django.test import TransactionTestCase
-from django.db.migrations.graph import MigrationsGraph, CircularDependencyException
+from django.db import connection
+from django.db.migrations.graph import MigrationGraph, CircularDependencyError
+from django.db.migrations.loader import MigrationLoader
 
 
 class GraphTests(TransactionTestCase):
@@ -16,7 +18,7 @@ class GraphTests(TransactionTestCase):
         app_b:  0001 <-- 0002 <-/
         """
         # Build graph
-        graph = MigrationsGraph()
+        graph = MigrationGraph()
         graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
@@ -54,7 +56,7 @@ class GraphTests(TransactionTestCase):
         app_c:         \ 0001 <-- 0002 <-
         """
         # Build graph
-        graph = MigrationsGraph()
+        graph = MigrationGraph()
         graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
@@ -85,7 +87,7 @@ class GraphTests(TransactionTestCase):
         Tests a circular dependency graph.
         """
         # Build graph
-        graph = MigrationsGraph()
+        graph = MigrationGraph()
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
         graph.add_dependency(("app_a", "0001"), ("app_b", "0002"))
@@ -93,6 +95,23 @@ class GraphTests(TransactionTestCase):
         graph.add_dependency(("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
         self.assertRaises(
-            CircularDependencyException,
+            CircularDependencyError,
             graph.forwards_plan, ("app_a", "0003"),
+        )
+
+
+class LoaderTests(TransactionTestCase):
+    """
+    Tests the disk and database loader.
+    """
+
+    def test_load(self):
+        """
+        Makes sure the loader can load the migrations for the test apps.
+        """
+        migration_loader = MigrationLoader(connection)
+        graph = migration_loader.build_graph()
+        self.assertEqual(
+            graph.forwards_plan(("migrations", "0002_second")),
+            [("migrations", "0001_initial"), ("migrations", "0002_second")],
         )
