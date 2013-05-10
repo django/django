@@ -137,9 +137,6 @@ class GeoIP(object):
         if not isinstance(query, six.string_types):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
 
-        # GeoIP only takes ASCII-encoded strings.
-        query = query.encode('ascii')
-
         # Extra checks for the existence of country and city databases.
         if city_or_country and not (self._country or self._city):
             raise GeoIPException('Invalid GeoIP country and city data files.')
@@ -148,8 +145,8 @@ class GeoIP(object):
         elif city and not self._city:
             raise GeoIPException('Invalid GeoIP city data file: %s' % self._city_file)
 
-        # Return the query string back to the caller.
-        return query
+        # Return the query string back to the caller. GeoIP only takes bytestrings.
+        return force_bytes(query)
 
     def city(self, query):
         """
@@ -157,33 +154,33 @@ class GeoIP(object):
         Fully Qualified Domain Name (FQDN).  Some information in the dictionary
         may be undefined (None).
         """
-        query = self._check_query(query, city=True)
+        enc_query = self._check_query(query, city=True)
         if ipv4_re.match(query):
             # If an IP address was passed in
-            return GeoIP_record_by_addr(self._city, c_char_p(query))
+            return GeoIP_record_by_addr(self._city, c_char_p(enc_query))
         else:
             # If a FQDN was passed in.
-            return GeoIP_record_by_name(self._city, c_char_p(query))
+            return GeoIP_record_by_name(self._city, c_char_p(enc_query))
 
     def country_code(self, query):
         "Returns the country code for the given IP Address or FQDN."
-        query = self._check_query(query, city_or_country=True)
+        enc_query = self._check_query(query, city_or_country=True)
         if self._country:
             if ipv4_re.match(query):
-                return GeoIP_country_code_by_addr(self._country, query)
+                return GeoIP_country_code_by_addr(self._country, enc_query)
             else:
-                return GeoIP_country_code_by_name(self._country, query)
+                return GeoIP_country_code_by_name(self._country, enc_query)
         else:
             return self.city(query)['country_code']
 
     def country_name(self, query):
         "Returns the country name for the given IP Address or FQDN."
-        query = self._check_query(query, city_or_country=True)
+        enc_query = self._check_query(query, city_or_country=True)
         if self._country:
             if ipv4_re.match(query):
-                return GeoIP_country_name_by_addr(self._country, query)
+                return GeoIP_country_name_by_addr(self._country, enc_query)
             else:
-                return GeoIP_country_name_by_name(self._country, query)
+                return GeoIP_country_name_by_name(self._country, enc_query)
         else:
             return self.city(query)['country_name']
 

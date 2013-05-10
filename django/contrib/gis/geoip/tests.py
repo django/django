@@ -106,12 +106,6 @@ class GeoIPTest(unittest.TestCase):
         d = g.city("www.osnabrueck.de")
         self.assertEqual('Osnabrück', d['city'])
 
-    def test06_unicode_query(self):
-        "Testing that GeoIP accepts unicode string queries, see #17059."
-        g = GeoIP()
-        d = g.country('whitehouse.gov')
-        self.assertEqual('US', d['country_code'])
-
 
 def suite():
     s = unittest.TestSuite()
