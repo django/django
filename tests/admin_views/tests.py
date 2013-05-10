@@ -3612,7 +3612,7 @@ class UserAdminTest(TestCase):
         if connection.vendor == 'oracle':
             expected_queries -= 1
 
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(expected_queries):
             response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
             self.assertEqual(response.status_code, 200)
 
