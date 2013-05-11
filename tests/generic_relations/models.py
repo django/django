@@ -98,3 +98,7 @@ class Gecko(models.Model):
 # To test fix for #11263
 class Rock(Mineral):
     tags = generic.GenericRelation(TaggedItem)
+
+class ManualPK(models.Model):
+    id = models.IntegerField(primary_key=True)
+    tags = generic.GenericRelation(TaggedItem)
