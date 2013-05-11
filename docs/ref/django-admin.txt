@@ -373,7 +373,46 @@ application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 :setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
 
 When fixture files are processed, the data is saved to the database as is.
-Model defined ``save`` methods and ``pre_save`` signals are not called.
+Model defined :meth:`~django.db.models.Model.save` methods are not called, and
+any :data:`~django.db.models.signals.pre_save` or
+:data:`~django.db.models.signals.post_save` signals will be called with
+``raw=True`` since the instance only contains attributes that are local to the
+model. You may, for example, want to disable handlers that access
+related fields that aren't present during fixture loading and would otherwise
+raise an exception::
+
+    from django.db.models.signals import post_save
+    from .models import MyModel
+
+    def my_handler(**kwargs):
+        # disable the handler during fixture loading
+        if kwargs['raw']:
+            return
+        ...
+
+    post_save.connect(my_handler, sender=MyModel)
+
+You could also write a simple decorator to encapsulate this logic::
+
+    from functools import wraps
+
+    def disable_for_loaddata(signal_handler):
+        """
+        Decorator that turns off signal handlers when loading fixture data.
+        """
+        @wraps(signal_handler)
+        def wrapper(*args, **kwargs):
+            if kwargs['raw']:
+                return
+            signal_handler(*args, **kwargs)
+        return wrapper
+
+    @disable_for_loaddata
+    def my_handler(**kwargs):
+        ...
+
+Just be aware that this logic will disable the signals whenever fixtures are
+deserialized, not just during ``loaddata``.
 
 Note that the order in which fixture files are processed is undefined. However,
 all fixture data is installed as a single transaction, so data in
