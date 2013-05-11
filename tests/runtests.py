@@ -167,9 +167,12 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
-    from django.test.runner import DiscoverRunner
+    from django.test.utils import get_runner
+    if not hasattr(settings, 'TEST_RUNNER'):
+        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+    TestRunner = get_runner(settings)
 
-    test_runner = DiscoverRunner(
+    test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
         failfast=failfast,
