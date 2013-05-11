@@ -5,7 +5,7 @@ import re
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.contrib.gis.tests.utils import postgis
 from django.test import TestCase
 from django.utils._os import upath
 from django.utils.unittest import skipUnless
@@ -62,7 +62,7 @@ bbox_data = (
 )
 
 
-@skipUnless(HAS_GEOS and HAS_GDAL and HAS_SPATIAL_DB, "Geos, GDAL and spatial db are required.")
+@skipUnless(HAS_GEOS and HAS_GDAL and postgis, "Geos, GDAL and postgis are required.")
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase

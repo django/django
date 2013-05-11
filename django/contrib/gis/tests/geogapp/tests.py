@@ -8,7 +8,7 @@ import os
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.contrib.gis.tests.utils import postgis
 from django.test import TestCase
 from django.utils._os import upath
 from django.utils.unittest import skipUnless
@@ -17,7 +17,7 @@ if HAS_GEOS:
     from .models import City, County, Zipcode
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeographyTest(TestCase):
 
     def test01_fixture_load(self):
