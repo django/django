@@ -77,8 +77,8 @@ class GeoRegressionTests(TestCase):
         t1 = Truth.objects.create(val=True)
         t2 = Truth.objects.create(val=False)
 
-        val1 = Truth.objects.get(pk=t1).val
-        val2 = Truth.objects.get(pk=t2).val
+        val1 = Truth.objects.get(pk=t1.pk).val
+        val2 = Truth.objects.get(pk=t2.pk).val
         # verify types -- should't be 0/1
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)
