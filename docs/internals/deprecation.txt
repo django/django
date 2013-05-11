@@ -73,7 +73,7 @@ these changes.
   ``django.utils.formats.get_format()`` to get the appropriate
   formats.
 
-* The ability to use a function-based test runners will be removed,
+* The ability to use a function-based test runner will be removed,
   along with the ``django.test.simple.run_tests()`` test runner.
 
 * The ``views.feed()`` view and ``feeds.Feed`` class in
@@ -374,6 +374,15 @@ these changes.
 
 * ``django.forms.widgets.RadioInput`` will be removed in favor of
   ``django.forms.widgets.RadioChoiceInput``.
+
+* The module ``django.test.simple`` and the class
+  ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
+  ``django.test.runner.DiscoverRunner``.
+
+* The module ``django.test._doctest`` and the classes
+  ``django.test.testcases.DocTestRunner`` and
+  ``django.test.testcases.OutputChecker`` will be removed. Instead use the
+  doctest module from the Python standard library.
 
 2.0
 ---

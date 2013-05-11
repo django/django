@@ -1,12 +1,18 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
-from django.contrib.gis import admin
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.utils.unittest import skipUnless
 
-from .models import City
+if HAS_GEOS and HAS_SPATIAL_DB:
+    from django.contrib.gis import admin
+    from django.contrib.gis.geos import Point
+
+    from .models import City
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoAdminTest(TestCase):
     urls = 'django.contrib.gis.tests.geoadmin.urls'
 

@@ -78,7 +78,7 @@ GeoDjango
 The function-based :setting:`TEST_RUNNER` previously used to execute
 the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``,
 was finally deprecated in favor of a class-based test runner,
-:class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`, added in this
+``django.contrib.gis.tests.GeoDjangoTestSuiteRunner``, added in this
 release.
 
 In addition, the GeoDjango test suite is now included when

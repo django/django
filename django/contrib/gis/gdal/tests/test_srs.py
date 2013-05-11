@@ -1,5 +1,9 @@
-from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
+from django.contrib.gis.gdal import HAS_GDAL
 from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+if HAS_GDAL:
+    from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
 
 
 class TestSRS:
@@ -46,6 +50,8 @@ well_known = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",637813
 
 bad_srlist = ('Foobar', 'OOJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',)
 
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class SpatialRefTest(unittest.TestCase):
 
     def test01_wkt(self):
@@ -155,11 +161,3 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertEqual(None, s1['FOOBAR'])
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(SpatialRefTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

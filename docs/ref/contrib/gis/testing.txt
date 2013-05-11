@@ -134,57 +134,14 @@ your settings::
 GeoDjango tests
 ===============
 
-GeoDjango's test suite may be run in one of two ways, either by itself or
-with the rest of :ref:`Django's unit tests <running-unit-tests>`.
+To have the GeoDjango tests executed when :ref:`running the Django test suite
+<running-unit-tests>` with ``runtests.py`` all of the databases in the settings
+file must be using one of the :ref:`spatial database backends
+<spatial-backends>`.
 
-Run only GeoDjango tests
-------------------------
-
-.. class:: django.contrib.gis.tests.GeoDjangoTestSuiteRunner
-
-To run *only* the tests for GeoDjango, the :setting:`TEST_RUNNER`
-setting must be changed to use the
-:class:`~django.contrib.gis.tests.GeoDjangoTestSuiteRunner`::
-
-    TEST_RUNNER = 'django.contrib.gis.tests.GeoDjangoTestSuiteRunner'
 
 Example
-^^^^^^^
-
-First, you'll need a bare-bones settings file, like below, that is
-customized with your spatial database name and user::
-
-    TEST_RUNNER = 'django.contrib.gis.tests.GeoDjangoTestSuiteRunner'
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'a_spatial_database',
-            'USER': 'db_user'
-        }
-    }
-
-Assuming the above is in a file called ``postgis.py`` that is in the
-the same directory as ``manage.py`` of your Django project, then
-you may run the tests with the following command::
-
-    $ python manage.py test --settings=postgis
-
-Run with ``runtests.py``
-------------------------
-
-To have the GeoDjango tests executed when
-:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
-all of the databases in the settings file must be using one of the
-:ref:`spatial database backends <spatial-backends>`.
-
-.. warning::
-
-    Do not change the :setting:`TEST_RUNNER` setting
-    when running the GeoDjango tests with ``runtests.py``.
-
-Example
-^^^^^^^
+-------
 
 The following is an example bare-bones settings file with spatial backends
 that can be used to run the entire Django test suite, including those
@@ -208,3 +165,7 @@ directory as ``runtests.py``, then all Django and GeoDjango tests would
 be performed when executing the command::
 
     $ ./runtests.py --settings=postgis
+
+To run only the GeoDjango test suite, specify ``django.contrib.gis``::
+
+    $ ./runtests.py --settings=postgis django.contrib.gis

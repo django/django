@@ -799,7 +799,7 @@ GeoDjango
 * The function-based :setting:`TEST_RUNNER` previously used to execute
   the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``, was
   deprecated for the class-based runner,
-  :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`.
+  ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner``.
 
 * Previously, calling
   :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would
