@@ -119,10 +119,10 @@ path to a package, module, ``TestCase`` subclass, or test method. For instance::
     # Run just one test method
     $ ./manage.py test animals.tests.AnimalTestCase.test_animals_can_speak
 
-You can also provide a file path to a test module file to run the tests in that
-file::
+You can also provide a path to a directory to discover tests below that
+directory::
 
-    $ ./manage.py test animals/tests.py
+    $ ./manage.py test animals/
 
 You can specify a custom filename pattern match using the ``-p`` (or
 ``--pattern``) option, if your test files are named differently from the

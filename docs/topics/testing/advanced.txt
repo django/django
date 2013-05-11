@@ -280,8 +280,8 @@ Methods
       case.
     * ``path.to.module`` -- Search for and run all tests in the named Python
       package or module.
-    * ``file/path/to/test_something.py`` -- Search for and run all tests in the
-      named test file.
+    * ``path/to/directory`` -- Search for and run all tests below the named
+      directory.
 
     If ``test_labels`` has a value of ``None``, the test runner will search for
     tests in all files below the current directory whose names match its

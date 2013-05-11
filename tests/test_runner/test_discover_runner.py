@@ -59,3 +59,10 @@ class DiscoverRunnerTest(TestCase):
         ).build_suite(["test_discovery_sample"]).countTestCases()
 
         self.assertEqual(count, 1)
+
+    def test_file_path(self):
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample/"],
+        ).countTestCases()
+
+        self.assertEqual(count, 4)

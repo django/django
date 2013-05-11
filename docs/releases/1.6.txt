@@ -84,9 +84,9 @@ discovery features built into unittest2 (the version of unittest in the Python
 be located in any module whose name matches the pattern ``test*.py``.
 
 In addition, the test labels provided to ``./manage.py test`` to nominate
-specific tests to run must now be full Python dotted paths (or file paths),
-rather than ``applabel.TestCase.test_method_name`` pseudo-paths. This allows
-running tests located anywhere in your codebase, rather than only in
+specific tests to run must now be full Python dotted paths (or directory
+paths), rather than ``applabel.TestCase.test_method_name`` pseudo-paths. This
+allows running tests located anywhere in your codebase, rather than only in
 :setting:`INSTALLED_APPS`. For more details, see :doc:`/topics/testing/index`.
 
 This change is backwards-incompatible; see the :ref:`backwards-incompatibility
