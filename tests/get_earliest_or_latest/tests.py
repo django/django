@@ -121,3 +121,27 @@ class EarliestOrLatestTests(TestCase):
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
         self.assertRaises(AssertionError, Person.objects.latest)
         self.assertEqual(Person.objects.latest("birthday"), p2)
+
+    def test_first(self):
+        # Tes that:
+        # 1. By default, first() is ordered by pk
+        # 2. first() respects order_by()
+        # 3. Field name passed as into first() overrides default ordering
+        p1 = Person.objects.create(name="Bob", birthday=datetime(1950, 1, 1))
+        p2 = Person.objects.create(name="Alice", birthday=datetime(1960, 2, 3))
+
+        self.assertEqual(Person.objects.first(), p1)
+        self.assertEqual(Person.objects.order_by('name').first(), p2)
+        self.assertEqual(Person.objects.order_by('pk').first('name'), p2)
+
+    def test_last(self):
+        # Tes that:
+        # 1. By default, last() is ordered by reversed pk
+        # 2. last() respects order_by()
+        # 3. Field name passed as into last() overrides default ordering
+        p1 = Person.objects.create(name="Alice", birthday=datetime(1950, 1, 1))
+        p2 = Person.objects.create(name="Bob", birthday=datetime(1960, 2, 3))
+
+        self.assertEqual(Person.objects.last(), p2)
+        self.assertEqual(Person.objects.order_by('name').last(), p2)
+        self.assertEqual(Person.objects.order_by('pk').last('name'), p2)
