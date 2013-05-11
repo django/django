@@ -123,7 +123,7 @@ class EarliestOrLatestTests(TestCase):
         self.assertEqual(Person.objects.latest("birthday"), p2)
 
     def test_first(self):
-        # Tes that:
+        # Test that:
         # 1. By default, first() is ordered by pk
         # 2. first() respects order_by()
         # 3. Field name passed as into first() overrides default ordering
@@ -135,7 +135,7 @@ class EarliestOrLatestTests(TestCase):
         self.assertEqual(Person.objects.order_by('pk').first('name'), p2)
 
     def test_last(self):
-        # Tes that:
+        # Test that:
         # 1. By default, last() is ordered by reversed pk
         # 2. last() respects order_by()
         # 3. Field name passed as into last() overrides default ordering

@@ -1561,7 +1561,7 @@ Note that ``first()`` is a convenience method, the following code sample is
 equivalent to the above example::
 
     try:
-        p = Article.objects.order_by('pub_date').filter(title__icontains='django')[0]
+        p = Article.objects.order_by('pub_date')[0]
     except IndexError:
         p = None
 
