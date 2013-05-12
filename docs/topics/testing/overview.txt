@@ -280,25 +280,15 @@ If there are test failures, however, you'll see full details about which tests
 failed::
 
     ======================================================================
-    FAIL: Doctest: ellington.core.throttle.models
+    FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/dev/django/test/doctest.py", line 2153, in runTest
-        raise self.failureException(self.format_failure(new.getvalue()))
-    AssertionError: Failed doctest test for myapp.models
-      File "/dev/myapp/models.py", line 0, in models
+      File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
+        self.assertEqual(future_poll.was_published_recently(), False)
+    AssertionError: True != False
 
     ----------------------------------------------------------------------
-    File "/dev/myapp/models.py", line 14, in myapp.models
-    Failed example:
-        throttle.check("actor A", "action one", limit=2, hours=1)
-    Expected:
-        True
-    Got:
-        False
-
-    ----------------------------------------------------------------------
-    Ran 2 tests in 0.048s
+    Ran 1 test in 0.003s
 
     FAILED (failures=1)
 
