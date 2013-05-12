@@ -3,20 +3,24 @@ from __future__ import absolute_import
 import os
 import shutil
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.utils._os import upath
 from django.utils.unittest import skipIf
 
-from .models import Image
+try:
+    from .models import Image
+except ImproperlyConfigured:
+    Image = None
 
 if Image:
     from .models import (Person, PersonWithHeight, PersonWithHeightAndWidth,
         PersonDimensionsFirst, PersonTwoImages, TestImageFieldFile)
     from .models import temp_storage_dir
 else:
-    # PIL not available, create dummy classes (tests will be skipped anyway)
+    # Pillow not available, create dummy classes (tests will be skipped anyway)
     class Person():
         pass
     PersonWithHeight = PersonWithHeightAndWidth = PersonDimensionsFirst = Person

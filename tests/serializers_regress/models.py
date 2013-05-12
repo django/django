@@ -2,7 +2,7 @@
 A test spanning all the capabilities of all the serializers.
 
 This class sets up a model for each model field type
-(except for image types, because of the PIL dependency).
+(except for image types, because of the Pillow/PIL dependency).
 """
 
 from django.db import models

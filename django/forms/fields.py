@@ -602,13 +602,9 @@ class ImageField(FileField):
         if f is None:
             return None
 
-        # Try to import PIL in either of the two ways it can end up installed.
-        try:
-            from PIL import Image
-        except ImportError:
-            import Image
+        from django.utils.image import Image
 
-        # We need to get a file object for PIL. We might have a path or we might
+        # We need to get a file object for Pillow. We might have a path or we might
         # have to read the data into memory.
         if hasattr(data, 'temporary_file_path'):
             file = data.temporary_file_path()
@@ -623,12 +619,8 @@ class ImageField(FileField):
             # image in memory, which is a DoS vector. See #3848 and #18520.
             # verify() must be called immediately after the constructor.
             Image.open(file).verify()
-        except ImportError:
-            # Under PyPy, it is possible to import PIL. However, the underlying
-            # _imaging C module isn't available, so an ImportError will be
-            # raised. Catch and re-raise.
-            raise
-        except Exception: # Python Imaging Library doesn't recognize it as an image
+        except Exception:
+            # Pillow (or PIL) doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(self.error_messages['invalid_image']), sys.exc_info()[2])
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
