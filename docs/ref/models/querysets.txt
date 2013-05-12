@@ -1540,6 +1540,39 @@ earliest
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
+first
+~~~~~
+.. method:: first(order_by=None)
+
+.. versionadded:: 1.6
+
+Returns the first object matching object in the queryset, or ``None`` if there
+is no matching object.
+
+If the ``QuerySet`` has no ordering defined, then the queryset is
+automatically ordered by the primary key. You can pass in a field name as an
+argument into ``first()`` to override queryset's current ordering.
+
+Example::
+
+    p = Article.objects.order_by('pub_date').first()
+
+Note that ``first()`` is a convenience method, the following code sample is
+equivalent to the above example::
+
+    try:
+        p = Article.objects.order_by('pub_date')[0]
+    except IndexError:
+        p = None
+
+last
+~~~~
+.. method:: last(order_by=None)
+
+.. versionadded:: 1.6
+
+Works like  :meth:`first()` except the ordering is reversed.
+
 aggregate
 ~~~~~~~~~
 
