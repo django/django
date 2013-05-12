@@ -100,11 +100,6 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_GET_no_csrf_cookie_request()
 
         # Put tests for CSRF_COOKIE[*] settings here
-        #with self.settings(CSRF_COOKIE['NAME']='myname',
-        #                   CSRF_COOKIE['DOMAIN']='.example.com',
-        #                   CSRF_COOKIE['PATH']='/test/',
-        #                   CSRF_COOKIE['SECURE']=True,
-        #                   CSRF_COOKIE['HTTPONLY']=True):
         with self.settings(CSRF_COOKIE={
                 'NAME': 'myname',
                 'DOMAIN': '.example.com',

@@ -501,7 +501,6 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 class SessionMiddlewareTests(unittest.TestCase):
 
-    #@override_settings(SESSION_COOKIE['SECURE']=True)
     @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, SECURE=True))
     def test_secure_session_cookie(self):
         request = RequestFactory().get('/')
@@ -517,7 +516,6 @@ class SessionMiddlewareTests(unittest.TestCase):
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE['NAME']]['secure'])
 
-    #@override_settings(SESSION_COOKIE['HTTPONLY']=True)
     @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=True))
     def test_httponly_session_cookie(self):
         request = RequestFactory().get('/')
@@ -535,7 +533,6 @@ class SessionMiddlewareTests(unittest.TestCase):
         self.assertIn('httponly',
             str(response.cookies[settings.SESSION_COOKIE['NAME']]))
 
-    #@override_settings(SESSION_COOKIE['HTTPONLY']=False)
     @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=False))
     def test_no_httponly_session_cookie(self):
         request = RequestFactory().get('/')
