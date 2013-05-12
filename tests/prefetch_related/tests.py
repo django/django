@@ -106,6 +106,10 @@ class PrefetchRelatedTests(TestCase):
             qs = Book.objects.prefetch_related('first_time_authors')
             [b.first_time_authors.exists() for b in qs]
 
+    def test_ticket_20242(self):
+        qs = Book.objects.prefetch_related('first_time_authors')
+        self.assertTrue(qs[0] in qs)
+
     def test_clear(self):
         """
         Test that we can clear the behavior by calling prefetch_related()
