@@ -43,7 +43,8 @@ def stored_cookie_messages_count(storage, response):
 
 
 #@override_settings(SESSION_COOKIE['DOMAIN']='.example.com')
-@override_settings(SESSION_COOKIE=settings.SESSION_COOKIE.update({'DOMAIN': '.example.com'}))
+#@override_settings(SESSION_COOKIE=settings.SESSION_COOKIE.update({'DOMAIN': '.example.com'}))
+@override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, DOMAIN='.example.com'))
 class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
