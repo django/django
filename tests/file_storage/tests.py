@@ -462,6 +462,18 @@ class FileStoragePermissions(unittest.TestCase):
         mode = os.stat(self.storage.path(fname))[0] & 0o777
         self.assertEqual(mode, 0o666 & ~self.umask)
 
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
+    def test_file_upload_directory_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o765)
+
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
+    def test_file_upload_directory_default_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o777 & ~self.umask)
+
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()

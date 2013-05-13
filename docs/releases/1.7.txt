@@ -138,6 +138,10 @@ Minor features
 * The :func:`~django.contrib.auth.decorators.permission_required` decorator can
   take a list of permissions as well as a single permission.
 
+* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
+  the file system permissions of directories created during file upload, like
+  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+
 Backwards incompatible changes in 1.7
 =====================================
 
