@@ -500,6 +500,36 @@ class QuerySet(object):
     def latest(self, field_name=None):
         return self._earliest_or_latest(field_name=field_name, direction="-")
 
+    def first(self, *field_names):
+        """
+        Performs the query and returns the first object, ordered by given field
+        names, returns None if no match is found.
+        """
+        if field_names:
+            qs = self.order_by(*field_names)
+        else:
+            qs = self if self.ordered else self.order_by('pk')
+
+        try:
+            return qs[:1][0]
+        except IndexError:
+            return None
+
+    def last(self, *field_names):
+        """
+        Performs the query and returns the last object, ordered by given field
+        names, returns None if no match is found.
+        """
+        if field_names:
+            qs = self.order_by(*field_names).reverse()
+        else:
+            qs = self.reverse() if self.ordered else self.order_by('-pk')
+
+        try:
+            return qs[:1][0]
+        except IndexError:
+            return None
+
     def in_bulk(self, id_list):
         """
         Returns a dictionary mapping each of the given IDs to the object with
