@@ -38,6 +38,9 @@ class Approximate(object):
 
 
 class ContextList(list):
+    def __init__(self, *args, **kwargs):
+        list.__init__(self, *args, **kwargs)
+
     """A wrapper that provides direct key access to context items contained
     in a list of context objects.
     """
@@ -57,6 +60,12 @@ class ContextList(list):
             return False
         return True
 
+    def keys(self):
+        keys = set()
+        for subcontext in self:
+            for dict in subcontext:
+                keys |= set(dict.keys())
+        return keys
 
 def instrumented_test_render(self, context):
     """

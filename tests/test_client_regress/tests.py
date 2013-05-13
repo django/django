@@ -706,6 +706,22 @@ class ContextTests(TestCase):
         except KeyError as e:
             self.assertEqual(e.args[0], 'does-not-exist')
 
+    def test_context_keys_method(self):
+        """It's useful to be able to list all the (flattened) keys of a
+        ContextList, to help you figure out why the variable that's supposed
+        to be there is not."""
+        
+        c1 = Context()
+        c1.update({'hello': 'world', 'goodbye': 'john'})
+        c1.update({'hello': 'dolly', 'dolly': 'parton'})
+        c2 = Context()
+        c2.update({'goodbye': 'world', 'python': 'rocks'})
+        c2.update({'goodbye': 'dolly'})
+        
+        l = ContextList([c1, c2])
+        self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
+            'python', 'dolly']), l.keys())
+
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
