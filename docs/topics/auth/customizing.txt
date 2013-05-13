@@ -95,7 +95,8 @@ An authentication backend is a class that implements two required methods:
 optional permission related :ref:`authorization methods <authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
-database ID or whatever -- and returns a ``User`` object.
+database ID or whatever, but has to be the primary key of your ``User`` object
+-- and returns a ``User`` object.
 
 The ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
