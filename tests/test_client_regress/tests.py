@@ -6,9 +6,8 @@ from __future__ import unicode_literals
 
 import os
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
+from django.template import (TemplateSyntaxError,
     Context, Template, loader)
 import django.template.context
 from django.test import Client, TestCase
@@ -896,6 +895,21 @@ class ContextTests(TestCase):
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError as e:
             self.assertEqual(e.args[0], 'does-not-exist')
+
+    def test_contextlist_keys(self):
+        c1 = Context()
+        c1.update({'hello': 'world', 'goodbye': 'john'})
+        c1.update({'hello': 'dolly', 'dolly': 'parton'})
+        c2 = Context()
+        c2.update({'goodbye': 'world', 'python': 'rocks'})
+        c2.update({'goodbye': 'dolly'})
+
+        l = ContextList([c1, c2])
+        # None, True and False are builtins of BaseContext, and present
+        # in every Context without needing to be added.
+        self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
+                              'python', 'dolly']),
+                         l.keys())
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about

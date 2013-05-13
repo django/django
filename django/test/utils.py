@@ -60,6 +60,16 @@ class ContextList(list):
             return False
         return True
 
+    def keys(self):
+        """
+        Flattened keys of subcontexts.
+        """
+        keys = set()
+        for subcontext in self:
+            for dict in subcontext:
+                keys |= set(dict.keys())
+        return keys
+
 
 def instrumented_test_render(self, context):
     """
