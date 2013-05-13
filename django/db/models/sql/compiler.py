@@ -32,7 +32,7 @@ class SQLCompiler(object):
         # cleaned. We are not using a clone() of the query here.
         """
         if not self.query.tables:
-            self.query.join((None, self.query.model._meta.db_table, None))
+            self.query.join((None, self.query.get_meta().db_table, None))
         if (not self.query.select and self.query.default_cols and not
                 self.query.included_inherited_models):
             self.query.setup_inherited_models()
@@ -260,7 +260,7 @@ class SQLCompiler(object):
         """
         result = []
         if opts is None:
-            opts = self.query.model._meta
+            opts = self.query.get_meta()
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
@@ -309,7 +309,7 @@ class SQLCompiler(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = []
-        opts = self.query.model._meta
+        opts = self.query.get_meta()
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
@@ -338,7 +338,7 @@ class SQLCompiler(object):
             ordering = self.query.order_by
         else:
             ordering = (self.query.order_by
-                        or self.query.model._meta.ordering
+                        or self.query.get_meta().ordering
                         or [])
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
@@ -388,7 +388,7 @@ class SQLCompiler(object):
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 for table, cols, order in self.find_ordering_name(field,
-                        self.query.model._meta, default_order=asc):
+                        self.query.get_meta(), default_order=asc):
                     for col in cols:
                         if (table, col) not in processed_pairs:
                             elt = '%s.%s' % (qn(table), qn2(col))
@@ -556,10 +556,10 @@ class SQLCompiler(object):
             select_cols = self.query.select + self.query.related_select_cols
             # Just the column, not the fields.
             select_cols = [s[0] for s in select_cols]
-            if (len(self.query.model._meta.concrete_fields) == len(self.query.select)
+            if (len(self.query.get_meta().concrete_fields) == len(self.query.select)
                     and self.connection.features.allows_group_by_pk):
                 self.query.group_by = [
-                    (self.query.model._meta.db_table, self.query.model._meta.pk.column)
+                    (self.query.get_meta().db_table, self.query.get_meta().pk.column)
                 ]
                 select_cols = []
             seen = set()
@@ -716,14 +716,14 @@ class SQLCompiler(object):
                         if self.query.select:
                             fields = [f.field for f in self.query.select]
                         else:
-                            fields = self.query.model._meta.concrete_fields
+                            fields = self.query.get_meta().concrete_fields
                         fields = fields + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
                         only_load = self.deferred_to_columns()
                         if only_load:
-                            db_table = self.query.model._meta.db_table
+                            db_table = self.query.get_meta().db_table
                             fields = [f for f in fields if db_table in only_load and
                                       f.column in only_load[db_table]]
                     row = self.resolve_columns(row, fields)
@@ -825,7 +825,7 @@ class SQLInsertCompiler(SQLCompiler):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
         qn = self.connection.ops.quote_name
-        opts = self.query.model._meta
+        opts = self.query.get_meta()
         result = ['INSERT INTO %s' % qn(opts.db_table)]
 
         has_fields = bool(self.query.fields)
@@ -887,7 +887,7 @@ class SQLInsertCompiler(SQLCompiler):
         if self.connection.features.can_return_id_from_insert:
             return self.connection.ops.fetch_returned_insert_id(cursor)
         return self.connection.ops.last_insert_id(cursor,
-                self.query.model._meta.db_table, self.query.model._meta.pk.column)
+                self.query.get_meta().db_table, self.query.get_meta().pk.column)
 
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -992,7 +992,7 @@ class SQLUpdateCompiler(SQLCompiler):
         query.bump_prefix()
         query.extra = {}
         query.select = []
-        query.add_fields([query.model._meta.pk.name])
+        query.add_fields([query.get_meta().pk.name])
         # Recheck the count - it is possible that fiddling with the select
         # fields above removes tables from the query. Refs #18304.
         count = query.count_active_tables()
