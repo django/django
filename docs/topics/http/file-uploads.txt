@@ -132,7 +132,7 @@ upload behavior.
 Changing upload handler behavior
 --------------------------------
 
-Three settings control Django's file upload behavior:
+There are a few settings which control Django's file upload behavior:
 
 :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
     The maximum size, in bytes, for files that will be uploaded into memory.
@@ -166,6 +166,11 @@ Three settings control Django's file upload behavior:
         get totally incorrect behavior.
 
         **Always prefix the mode with a 0.**
+
+:setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`
+    The numeric mode to apply to directories created in the process of
+    uploading files. This value mirrors the functionality and caveats of
+    the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
 
 :setting:`FILE_UPLOAD_HANDLERS`
     The actual handlers for uploaded files. Changing this setting allows
