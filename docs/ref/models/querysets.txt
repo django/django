@@ -328,7 +328,7 @@ Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
 ordering back to the normal direction.
 
-To retrieve the ''last'' five items in a queryset, you could do this::
+To retrieve the "last" five items in a queryset, you could do this::
 
     my_queryset.reverse()[:5]
 
