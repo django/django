@@ -13,5 +13,5 @@ def check_test_runner():
         )
 
 
-def run_check():
+def run_checks():
     check_test_runner()
