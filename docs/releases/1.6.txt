@@ -202,6 +202,13 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* `Pillow`_ is now the preferred image manipulation library to use with Django.
+  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
+  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+.. _`PIL`: https://pypi.python.org/pypi/PIL
+
 Backwards incompatible changes in 1.6
 =====================================
 
