@@ -263,13 +263,13 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     Secure password hashing using the bcrypt algorithm (recommended)
 
     This is considered by many to be the most secure algorithm but you
-    must first install the py-bcrypt library.  Please be warned that
+    must first install the bcrypt library.  Please be warned that
     this library depends on native C code and might cause portability
     issues.
     """
     algorithm = "bcrypt_sha256"
     digest = hashlib.sha256
-    library = ("py-bcrypt", "bcrypt")
+    library = ("bcrypt", "bcrypt")
     rounds = 12
 
     def salt(self):
@@ -329,7 +329,7 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     Secure password hashing using the bcrypt algorithm
 
     This is considered by many to be the most secure algorithm but you
-    must first install the py-bcrypt library.  Please be warned that
+    must first install the bcrypt library.  Please be warned that
     this library depends on native C code and might cause portability
     issues.
 
