@@ -75,8 +75,7 @@ def _detect_image_library():
         except ImportError as err:
             # Neither worked, so it's likely not installed.
             raise ImproperlyConfigured(
-                _(u"Neither Pillow nor PIL could be imported. Please install " +
-                  u"one of them.")
+                _(u"Neither Pillow nor PIL could be imported: %s" % err)
             )
 
     # ``Image.alpha_composite`` was added to Pillow in SHA: e414c6 & is not
@@ -92,14 +91,14 @@ def _detect_image_library():
         # See http://mail.python.org/pipermail//pypy-dev/2011-November/008739.html
         if platform.python_implementation().lower() == u'cpython':
             # We're on CPython (likely 2.x). Since a C compiler is needed to
-            # produce a fully-working PIL & will create a ``_
+            # produce a fully-working PIL & will create a ``_imaging`` module,
+            # we'll attempt to import it to verify their kit works.
             try:
                 import _imaging as PIL_imaging
             except ImportError as err:
                 raise ImproperlyConfigured(
                     _(u"The '_imaging' module for the PIL could not be " +
-                      u"imported. Please reinstall, ensuring a C compiler is " +
-                      u"available.")
+                      u"imported: %s" % err)
                 )
 
     # Try to import ImageFile as well.
@@ -109,9 +108,10 @@ def _detect_image_library():
         import ImageFile as PILImageFile
 
     # Finally, warn about deprecation...
-    if PIL_imaging is False:
+    if PIL_imaging is not False:
         warnings.warn(
-            "Support for the PIL will be removed in Django 1.8.",
+            "Support for the PIL will be removed in Django 1.8. Please " +
+            "uninstall it & install Pillow instead.",
             PendingDeprecationWarning
         )
 
