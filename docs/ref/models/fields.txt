@@ -287,6 +287,9 @@ For example, if you have a field ``title`` that has
 ``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
 records with the same ``title`` and ``pub_date``.
 
+Note that if you set this to point to a :class:`DateTimeField`, only the date
+portion of the field will be considered.
+
 This is enforced by model validation but not at the database level.
 
 ``unique_for_month``
