@@ -215,7 +215,7 @@ Here's a full example template:
     <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
     <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
     {% endif %}
-    <input type="submit" value="{% trans "submit" %}"/>
+    <input type="submit" value="{% trans 'submit' %}"/>
     </form>
     {% endblock %}
 
