@@ -1028,6 +1028,7 @@ class FloatField(Field):
 
 class IntegerField(Field):
     empty_strings_allowed = False
+    empty_values = [None]
     default_error_messages = {
         'invalid': _("'%s' value must be an integer."),
     }

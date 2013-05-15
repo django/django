@@ -78,7 +78,7 @@ class BetterAuthor(Author):
 @python_2_unicode_compatible
 class AuthorProfile(models.Model):
     writer = models.OneToOneField(Author, primary_key=True)
-    age = models.PositiveIntegerField()
+    age = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
         return "%s is %s" % (self.writer, self.age)

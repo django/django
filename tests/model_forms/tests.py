@@ -28,11 +28,11 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
+
     class ImageFileForm(forms.ModelForm):
         class Meta:
             model = ImageFile
             fields = '__all__'
-
 
     class OptionalImageFileForm(forms.ModelForm):
         class Meta:
@@ -83,11 +83,11 @@ class DerivedPostForm(forms.ModelForm):
 
 
 class CustomAuthorForm(forms.ModelForm):
-   name = forms.CharField(required=False)
+    name = forms.CharField(required=False)
 
-   class Meta:
-       model = Author
-       fields = '__all__'
+    class Meta:
+        model = Author
+        fields = '__all__'
 
 
 class FlexDatePostForm(forms.ModelForm):
@@ -117,7 +117,7 @@ class ArticleForm(forms.ModelForm):
 class PartialArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ('headline','pub_date')
+        fields = ('headline', 'pub_date')
 
 
 class RoykoForm(forms.ModelForm):
@@ -212,6 +212,7 @@ class ModelFormWithMedia(forms.ModelForm):
         css = {
             'all': ('/some/form/css',)
         }
+
     class Meta:
         model = TextFile
         fields = '__all__'
@@ -241,7 +242,7 @@ class ModelFormBaseTest(TestCase):
                          ['name', 'slug', 'url'])
 
     def test_missing_fields_attribute(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", PendingDeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
@@ -275,7 +276,7 @@ class ModelFormBaseTest(TestCase):
                 fields = '__all__'
 
         self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+            forms.fields.BooleanField))
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -288,7 +289,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ['url']
 
         self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+            forms.fields.BooleanField))
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -301,7 +302,7 @@ class ModelFormBaseTest(TestCase):
                 fields = [] # url will still appear, since it is explicit above
 
         self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+            forms.fields.BooleanField))
 
     def test_override_field(self):
         class AuthorForm(forms.ModelForm):
@@ -430,11 +431,11 @@ class ModelFormBaseTest(TestCase):
 
     def test_subclassmeta_form(self):
         class SomeCategoryForm(forms.ModelForm):
-             checkbox = forms.BooleanField()
+            checkbox = forms.BooleanField()
 
-             class Meta:
-                 model = Category
-                 fields = '__all__'
+            class Meta:
+                model = Category
+                fields = '__all__'
 
         class SubclassMeta(SomeCategoryForm):
             """ We can also subclass the Meta inner class to change the fields
@@ -485,7 +486,6 @@ class TestWidgetForm(forms.ModelForm):
         }
 
 
-
 class TestWidgets(TestCase):
     def test_base_widgets(self):
         frm = TestWidgetForm()
@@ -514,6 +514,7 @@ class IncompleteCategoryFormWithFields(forms.ModelForm):
         fields = ('name', 'slug')
         model = Category
 
+
 class IncompleteCategoryFormWithExclude(forms.ModelForm):
     """
     A form that replaces the model's url field with a custom one. This should
@@ -540,7 +541,16 @@ class ValidationTest(TestCase):
         assert form.is_valid()
 
 
+class PositiveintegerModelTest(TestCase):
+    def setUp(self):
+        self.author = Author.objects.create(name='Mike Royko')
 
+    def test_full_clean_positiveinteger_emptystring(self):
+        art = AuthorProfile(
+            writer=self.author,
+            age=''
+        )
+        self.assertRaises(ValidationError, art.full_clean)
 
 # unique/unique_together validation
 class UniqueTest(TestCase):
@@ -601,7 +611,7 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
+        DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
             pubdate='2012-12-12 00:00')
         form = DerivedBookForm({'title': 'Other', 'author': self.author.pk, 'isbn': isbn})
         self.assertFalse(form.is_valid())
@@ -611,15 +621,15 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique_together(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
+        DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
             pubdate='2012-12-12 00:00')
         form = DerivedBookForm({
-                    'title': 'Other',
-                    'author': self.author.pk,
-                    'isbn': '9876',
-                    'suffix1': '0',
-                    'suffix2': '0'
-                })
+            'title': 'Other',
+            'author': self.author.pk,
+            'isbn': '9876',
+            'suffix1': '0',
+            'suffix2': '0'
+        })
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'],
@@ -627,7 +637,7 @@ class UniqueTest(TestCase):
 
     def test_explicitpk_unspecified(self):
         """Test for primary_key being in the form and failing validation."""
-        form = ExplicitPKForm({'key': '', 'desc': '' })
+        form = ExplicitPKForm({'key': '', 'desc': ''})
         self.assertFalse(form.is_valid())
 
     def test_explicitpk_unique(self):
@@ -704,12 +714,13 @@ class UniqueTest(TestCase):
             "slug": "Django 1.0"}, instance=p)
         self.assertTrue(form.is_valid())
 
+
 class ModelToDictTests(TestCase):
     """
     Tests for forms.models.model_to_dict
     """
     def test_model_to_dict_many_to_many(self):
-        categories=[
+        categories = [
             Category(name='TestName1', slug='TestName1', url='url1'),
             Category(name='TestName2', slug='TestName2', url='url2'),
             Category(name='TestName3', slug='TestName3', url='url3')
@@ -739,6 +750,7 @@ class ModelToDictTests(TestCase):
             self.assertIn(c.pk, d['categories'])
         #Ensure many-to-many relation appears as a list
         self.assertIsInstance(d['categories'], list)
+
 
 class OldFormForXTests(TestCase):
     def test_base_form(self):
@@ -871,12 +883,12 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="100" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
-                    headline='Test article',
-                    slug='test-article',
-                    pub_date=datetime.date(1988, 1, 4),
-                    writer=w,
-                    article='Hello.'
-                )
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=w,
+            article='Hello.'
+        )
         art.save()
         art_id_1 = art.id
         self.assertEqual(art_id_1 is not None, True)
@@ -958,11 +970,11 @@ class OldFormForXTests(TestCase):
 
         # Initial values can be provided for model forms
         f = TestArticleForm(
-                auto_id=False,
-                initial={
-                    'headline': 'Your headline here',
-                    'categories': [str(c1.id), str(c2.id)]
-                })
+            auto_id=False,
+            initial={
+                'headline': 'Your headline here',
+                'categories': [str(c1.id), str(c2.id)]
+            })
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
@@ -1640,6 +1652,7 @@ class OldFormForXTests(TestCase):
 
         class CategoryForm(forms.ModelForm):
             description = forms.CharField()
+
             class Meta:
                 model = Category
                 fields = ['description', 'url']
@@ -1666,7 +1679,7 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
 
-    def test_iterable_model_m2m(self) :
+    def test_iterable_model_m2m(self):
         colour = Colour.objects.create(name='Blue')
         form = ColourfulItemForm()
         self.maxDiff = 1024
