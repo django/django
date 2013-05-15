@@ -46,20 +46,24 @@ module defines tests using a class-based approach.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
-Here is an example :class:`unittest.TestCase` subclass::
+Here is an example which subclasses from :class:`django.test.TestCase`,
+which is a subclass of :class:`unittest.TestCase` that runs each test inside a
+transaction to provide isolation::
 
-    from django.utils import unittest
+    from django.test import TestCase
     from myapp.models import Animal
 
-    class AnimalTestCase(unittest.TestCase):
+    class AnimalTestCase(TestCase):
         def setUp(self):
-            self.lion = Animal(name="lion", sound="roar")
-            self.cat = Animal(name="cat", sound="meow")
+            Animal.objects.create(name="lion", sound="roar")
+            Animal.objects.create(name="cat", sound="meow")
 
         def test_animals_can_speak(self):
             """Animals that can speak are correctly identified"""
-            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
-            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
+            lion = Animal.objects.get(name="lion")
+            cat = Animal.objects.get(name="cat")
+            self.assertEqual(lion.speak(), 'The lion says "roar"')
+            self.assertEqual(cat.speak(), 'The cat says "meow"')
 
 When you :ref:`run your tests <running-tests>`, the default behavior of the
 test utility is to find all the test cases (that is, subclasses of
@@ -80,11 +84,11 @@ For more details about :mod:`unittest`, see the Python documentation.
     be sure to create your test classes as subclasses of
     :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
 
-    In the example above, we instantiate some models but do not save them to
-    the database. Using :class:`unittest.TestCase` avoids the cost of running
-    each test in a transaction and flushing the database, but for most
-    applications the scope of tests you will be able to write this way will
-    be fairly limited, so it's easiest to use :class:`django.test.TestCase`.
+    Using :class:`unittest.TestCase` avoids the cost of running each test in a
+    transaction and flushing the database, but if your tests interact with
+    the database their behavior will vary based on the order that the test
+    runner executes them. This can lead to unit tests that pass when run in
+    isolation but fail when run in a suite.
 
 .. _running-tests:
 
