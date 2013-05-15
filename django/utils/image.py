@@ -67,6 +67,8 @@ Approach
             * ``ImportError`` - Bad install, toss an exception
 
 """
+from __future__ import unicode_literals
+
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
@@ -100,12 +102,12 @@ def _detect_image_library():
         except ImportError as err:
             # Neither worked, so it's likely not installed.
             raise ImproperlyConfigured(
-                _(u"Neither Pillow nor PIL could be imported: %s" % err)
+                _("Neither Pillow nor PIL could be imported: %s" % err)
             )
 
     # ``Image.alpha_composite`` was added to Pillow in SHA: e414c6 & is not
     # available in any version of the PIL.
-    if hasattr(PILImage, u'alpha_composite'):
+    if hasattr(PILImage, 'alpha_composite'):
         PIL_imaging = False
     else:
         # We're dealing with the PIL. Determine if we're on CPython & if
@@ -114,7 +116,7 @@ def _detect_image_library():
 
         # This is the Alex Approved™ way.
         # See http://mail.python.org/pipermail//pypy-dev/2011-November/008739.html
-        if platform.python_implementation().lower() == u'cpython':
+        if platform.python_implementation().lower() == 'cpython':
             # We're on CPython (likely 2.x). Since a C compiler is needed to
             # produce a fully-working PIL & will create a ``_imaging`` module,
             # we'll attempt to import it to verify their kit works.
@@ -122,8 +124,8 @@ def _detect_image_library():
                 import _imaging as PIL_imaging
             except ImportError as err:
                 raise ImproperlyConfigured(
-                    _(u"The '_imaging' module for the PIL could not be " +
-                      u"imported: %s" % err)
+                    _("The '_imaging' module for the PIL could not be " +
+                      "imported: %s" % err)
                 )
 
     # Try to import ImageFile as well.
