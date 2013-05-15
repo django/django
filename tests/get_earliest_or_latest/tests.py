@@ -132,7 +132,6 @@ class EarliestOrLatestTests(TestCase):
 
         self.assertEqual(Person.objects.first(), p1)
         self.assertEqual(Person.objects.order_by('name').first(), p2)
-        self.assertEqual(Person.objects.order_by('pk').first('name'), p2)
 
     def test_last(self):
         # Test that:
@@ -144,4 +143,3 @@ class EarliestOrLatestTests(TestCase):
 
         self.assertEqual(Person.objects.last(), p2)
         self.assertEqual(Person.objects.order_by('name').last(), p2)
-        self.assertEqual(Person.objects.order_by('pk').last('name'), p2)

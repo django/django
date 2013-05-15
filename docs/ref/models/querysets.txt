@@ -1542,20 +1542,17 @@ the direction is changed.
 
 first
 ~~~~~
-.. method:: first(*field_names)
+.. method:: first()
 
 .. versionadded:: 1.6
 
 Returns the first object matching object in the queryset, or ``None`` if there
-is no matching object.
-
-You can pass one or more field name arguments into ``first()`` to override
-current ordering. If the ``QuerySet`` has no ordering defined, then the
+is no matching object. If the ``QuerySet`` has no ordering defined, then the
 queryset is automatically ordered by the primary key.
 
 Example::
 
-    p = Article.objects.first('title', 'pub_date')
+    p = Article.objects.order_by('title', 'pub_date').first()
 
 Note that ``first()`` is a convenience method, the following code sample is
 equivalent to the above example::
@@ -1567,7 +1564,7 @@ equivalent to the above example::
 
 last
 ~~~~
-.. method:: last(*field_names)
+.. method:: last()
 
 .. versionadded:: 1.6
 
