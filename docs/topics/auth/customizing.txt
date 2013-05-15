@@ -95,7 +95,8 @@ An authentication backend is a class that implements two required methods:
 optional permission related :ref:`authorization methods <authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
-database ID or whatever -- and returns a ``User`` object.
+database ID or whatever, but has to be the primary key of your ``User`` object
+-- and returns a ``User`` object.
 
 The ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
@@ -1051,6 +1052,7 @@ code would be required in the app's ``admin.py`` file::
 
         class Meta:
             model = MyUser
+            fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
 
         def clean_password(self):
             # Regardless of what the user provides, return the initial value.

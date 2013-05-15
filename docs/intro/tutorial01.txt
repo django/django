@@ -598,8 +598,7 @@ for your own sanity when dealing with the interactive prompt, but also because
 objects' representations are used throughout Django's automatically-generated
 admin.
 
-.. admonition:: :meth:`~django.db.models.Model.__unicode__` or
-                :meth:`~django.db.models.Model.__str__`?
+.. admonition:: `__unicode__` or `__str__`?
 
     On Python 3, things are simpler, just use
     :meth:`~django.db.models.Model.__str__` and forget about

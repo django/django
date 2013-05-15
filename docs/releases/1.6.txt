@@ -66,13 +66,31 @@ Persistent database connections
 
 Django now supports reusing the same database connection for several requests.
 This avoids the overhead of re-establishing a connection at the beginning of
-each request.
+each request. For backwards compatibility, this feature is disabled by
+default. See :ref:`persistent-database-connections` for details.
 
-By default, database connections will kept open for 10 minutes. This behavior
-is controlled by the :setting:`CONN_MAX_AGE` setting. To restore the previous
-behavior of closing the connection at the end of each request, set
-:setting:`CONN_MAX_AGE` to ``0``. See :ref:`persistent-database-connections`
-for details.
+Discovery of tests in any test module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 ships with a new test runner that allows more flexibility in the
+location of tests. The previous runner
+(``django.test.simple.DjangoTestSuiteRunner``) found tests only in the
+``models.py`` and ``tests.py`` modules of a Python package in
+:setting:`INSTALLED_APPS`.
+
+The new runner (``django.test.runner.DjangoTestDiscoverRunner``) uses the test
+discovery features built into unittest2 (the version of unittest in the Python
+2.7+ standard library, and bundled with Django). With test discovery, tests can
+be located in any module whose name matches the pattern ``test*.py``.
+
+In addition, the test labels provided to ``./manage.py test`` to nominate
+specific tests to run must now be full Python dotted paths (or directory
+paths), rather than ``applabel.TestCase.test_method_name`` pseudo-paths. This
+allows running tests located anywhere in your codebase, rather than only in
+:setting:`INSTALLED_APPS`. For more details, see :doc:`/topics/testing/index`.
+
+This change is backwards-incompatible; see the :ref:`backwards-incompatibility
+notes<new-test-runner>`.
 
 Time zone aware aggregation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,6 +220,13 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* `Pillow`_ is now the preferred image manipulation library to use with Django.
+  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
+  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+.. _`PIL`: https://pypi.python.org/pypi/PIL
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -242,6 +267,40 @@ Autocommit option for PostgreSQL
 In previous versions, database-level autocommit was only an option for
 PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
 <postgresql-autocommit-mode>` and can be removed.
+
+.. _new-test-runner:
+
+New test runner
+~~~~~~~~~~~~~~~
+
+In order to maintain greater consistency with Python's unittest module, the new
+test runner (``django.test.runner.DiscoverRunner``) does not automatically
+support some types of tests that were supported by the previous runner:
+
+* Tests in ``models.py`` and ``tests/__init__.py`` files will no longer be
+  found and run. Move them to a file whose name begins with ``test``.
+
+* Doctests will no longer be automatically discovered. To integrate doctests in
+  your test suite, follow the `recommendations in the Python documentation`_.
+
+Django bundles a modified version of the :mod:`doctest` module from the Python
+standard library (in ``django.test._doctest``) in order to allow passing in a
+custom ``DocTestRunner`` when instantiating a ``DocTestSuite``, and includes
+some additional doctest utilities (``django.test.testcases.DocTestRunner``
+turns on the ``ELLIPSIS`` option by default, and
+``django.test.testcases.OutputChecker`` provides better matching of XML, JSON,
+and numeric data types).
+
+These utilities are deprecated and will be removed in Django 1.8; doctest
+suites should be updated to work with the standard library's doctest module (or
+converted to unittest-compatible tests).
+
+If you wish to delay updates to your test suite, you can set your
+:setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
+to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is
+deprecated but will not be removed from Django until version 1.8.
+
+.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -297,21 +356,6 @@ Django 1.6 introduces ``hour``, ``minute``, and ``second`` lookups on
 :class:`~django.db.models.DateTimeField`. If you had model fields called
 ``hour``, ``minute``, or ``second``, the new lookups will clash with you field
 names. Append an explicit :lookup:`exact` lookup if this is an issue.
-
-Persistent database connections
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Connection setup not repeated for each request
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When Django establishes a connection to the database, it sets up appropriate
-parameters, depending on the backend being used. Since `persistent database
-connections <persistent-database-connections>`_ are enabled by default in
-Django 1.6, this setup isn't repeated at every request any more. If you
-modifiy parameters such as the connection's isolation level or time zone, you
-should either restore Django's defaults at the end of each request, force an
-appropriate value at the beginning of each request, or disable persistent
-connections.
 
 ``BooleanField`` no longer defaults to ``False``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -552,3 +596,55 @@ including it in an URLconf, simply replace::
 with::
 
     (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+
+``ModelForm`` without ``fields`` or ``exclude``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if you wanted a :class:`~django.forms.ModelForm` to use all fields on
+the model, you could simply omit the ``Meta.fields`` attribute, and all fields
+would be used.
+
+This can lead to security problems where fields are added to the model and,
+unintentionally, automatically become editable by end users. In some cases,
+particular with boolean fields, it is possible for this problem to be completely
+invisible. This is a form of `Mass assignment vulnerability
+<http://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
+
+For this reason, this behaviour is deprecated, and using the ``Meta.exclude``
+option is strongly discouraged. Instead, all fields that are intended for
+inclusion in the form should be listed explicitly in the ``fields`` attribute.
+
+If this security concern really does not apply in your case, there is a shortcut
+to explicitly indicate that all fields should be used - use the special value
+``"__all__"`` for the fields attribute::
+
+    class MyModelForm(ModelForm):
+        class Meta:
+            fields = "__all__"
+            model = MyModel
+
+If you have custom ``ModelForms`` that only need to be used in the admin, there
+is another option. The admin has its own methods for defining fields
+(``fieldsets`` etc.), and so adding a list of fields to the ``ModelForm`` is
+redundant. Instead, simply omit the ``Meta`` inner class of the ``ModelForm``,
+or omit the ``Meta.model`` attribute. Since the ``ModelAdmin`` subclass knows
+which model it is for, it can add the necessary attributes to derive a
+functioning ``ModelForm``. This behaviour also works for earlier Django
+versions.
+
+``UpdateView`` and ``CreateView`` without explicit fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The generic views :class:`~django.views.generic.edit.CreateView` and
+:class:`~django.views.generic.edit.UpdateView`, and anything else derived from
+:class:`~django.views.generic.edit.ModelFormMixin`, are vulnerable to the
+security problem described in the section above, because they can automatically
+create a ``ModelForm`` that uses all fields for a model.
+
+For this reason, if you use these views for editing models, you must also supply
+the ``fields`` attribute, which is a list of model fields and works in the same
+way as the :class:`~django.forms.ModelForm` ``Meta.fields`` attribute. Alternatively,
+you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
+defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
+subclass to be used with a model but without an explicit list of fields is
+deprecated.

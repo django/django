@@ -1,5 +1,10 @@
-import unittest
-from django.contrib.gis.gdal import Driver, OGRException
+from django.contrib.gis.gdal import HAS_GDAL
+from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+if HAS_GDAL:
+    from django.contrib.gis.gdal import Driver, OGRException
+
 
 valid_drivers = ('ESRI Shapefile', 'MapInfo File', 'TIGER', 'S57', 'DGN',
                  'Memory', 'CSV', 'GML', 'KML')
@@ -12,6 +17,8 @@ aliases = {'eSrI' : 'ESRI Shapefile',
            'sHp' : 'ESRI Shapefile',
            }
 
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class DriverTest(unittest.TestCase):
 
     def test01_valid_driver(self):
@@ -30,11 +37,3 @@ class DriverTest(unittest.TestCase):
         for alias, full_name in aliases.items():
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DriverTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

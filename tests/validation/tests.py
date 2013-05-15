@@ -8,12 +8,6 @@ from . import ValidationTestCase
 from .models import (Author, Article, ModelToValidate,
     GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
 
-# Import other tests for this package.
-from .test_custom_messages import CustomMessagesTest
-from .test_error_messages import ValidationMessagesTest
-from .test_unique import GetUniqueCheckTests, PerformUniqueChecksTest
-from .test_validators import TestModelsWithValidators
-
 
 class BaseModelValidationTests(ValidationTestCase):
 

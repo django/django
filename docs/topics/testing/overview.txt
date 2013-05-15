@@ -17,7 +17,7 @@ Writing tests
 =============
 
 Django's unit tests use a Python standard library module: :mod:`unittest`. This
-module defines tests in class-based approach.
+module defines tests using a class-based approach.
 
 .. admonition:: unittest2
 
@@ -25,7 +25,7 @@ module defines tests in class-based approach.
     adding some extremely useful features. To ensure that every Django
     project can benefit from these new features, Django ships with a
     copy of unittest2_, a copy of the Python 2.7 unittest library,
-    backported for Python 2.5 compatibility.
+    backported for Python 2.6 compatibility.
 
     To access this library, Django provides the
     ``django.utils.unittest`` module alias. If you are using Python
@@ -46,46 +46,37 @@ module defines tests in class-based approach.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
-For a given Django application, the test runner looks for unit tests in two
-places:
+Here is an example which subclasses from :class:`django.test.TestCase`,
+which is a subclass of :class:`unittest.TestCase` that runs each test inside a
+transaction to provide isolation::
 
-* The ``models.py`` file. The test runner looks for any subclass of
-  :class:`unittest.TestCase` in this module.
-
-* A file called ``tests.py`` in the application directory -- i.e., the
-  directory that holds ``models.py``. Again, the test runner looks for any
-  subclass of :class:`unittest.TestCase` in this module.
-
-Here is an example :class:`unittest.TestCase` subclass::
-
-    from django.utils import unittest
+    from django.test import TestCase
     from myapp.models import Animal
 
-    class AnimalTestCase(unittest.TestCase):
+    class AnimalTestCase(TestCase):
         def setUp(self):
-            self.lion = Animal(name="lion", sound="roar")
-            self.cat = Animal(name="cat", sound="meow")
+            Animal.objects.create(name="lion", sound="roar")
+            Animal.objects.create(name="cat", sound="meow")
 
         def test_animals_can_speak(self):
             """Animals that can speak are correctly identified"""
-            self.assertEqual(self.lion.speak(), 'The lion says "roar"')
-            self.assertEqual(self.cat.speak(), 'The cat says "meow"')
+            lion = Animal.objects.get(name="lion")
+            cat = Animal.objects.get(name="cat")
+            self.assertEqual(lion.speak(), 'The lion says "roar"')
+            self.assertEqual(cat.speak(), 'The cat says "meow"')
 
-When you :ref:`run your tests <running-tests>`, the default behavior of the test
-utility is to find all the test cases (that is, subclasses of
-:class:`unittest.TestCase`) in ``models.py`` and ``tests.py``, automatically
-build a test suite out of those test cases, and run that suite.
+When you :ref:`run your tests <running-tests>`, the default behavior of the
+test utility is to find all the test cases (that is, subclasses of
+:class:`unittest.TestCase`) in any file whose name begins with ``test``,
+automatically build a test suite out of those test cases, and run that suite.
 
-There is a second way to define the test suite for a module: if you define a
-function called ``suite()`` in either ``models.py`` or ``tests.py``, the
-Django test runner will use that function to construct the test suite for that
-module. This follows the `suggested organization`_ for unit tests. See the
-Python documentation for more details on how to construct a complex test
-suite.
+.. versionchanged:: 1.6
+
+   Previously, Django's default test runner only discovered tests in
+   ``tests.py`` and ``models.py`` files within a Python package listed in
+   :setting:`INSTALLED_APPS`.
 
 For more details about :mod:`unittest`, see the Python documentation.
-
-.. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
 
 .. warning::
 
@@ -93,13 +84,14 @@ For more details about :mod:`unittest`, see the Python documentation.
     be sure to create your test classes as subclasses of
     :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
 
-    In the example above, we instantiate some models but do not save them to
-    the database. Using :class:`unittest.TestCase` avoids the cost of running
-    each test in a transaction and flushing the database, but for most
-    applications the scope of tests you will be able to write this way will
-    be fairly limited, so it's easiest to use :class:`django.test.TestCase`.
+    Using :class:`unittest.TestCase` avoids the cost of running each test in a
+    transaction and flushing the database, but if your tests interact with
+    the database their behavior will vary based on the order that the test
+    runner executes them. This can lead to unit tests that pass when run in
+    isolation but fail when run in a suite.
 
 .. _running-tests:
+
 
 Running tests
 =============
@@ -109,46 +101,47 @@ your project's ``manage.py`` utility::
 
     $ ./manage.py test
 
-By default, this will run every test in every application in
-:setting:`INSTALLED_APPS`. If you only want to run tests for a particular
-application, add the application name to the command line. For example, if your
-:setting:`INSTALLED_APPS` contains ``'myproject.polls'`` and
-``'myproject.animals'``, you can run the ``myproject.animals`` unit tests alone
-with this command::
+Test discovery is based on the unittest module's `built-in test discovery`.  By
+default, this will discover tests in any file named "test*.py" under the
+current working directory.
 
+.. _built-in test discovery: http://docs.python.org/2/library/unittest.html#test-discovery
+
+You can specify particular tests to run by supplying any number of "test
+labels" to ``./manage.py test``. Each test label can be a full Python dotted
+path to a package, module, ``TestCase`` subclass, or test method. For instance::
+
+    # Run all the tests in the animals.tests module
+    $ ./manage.py test animals.tests
+
+    # Run all the tests found within the 'animals' package
     $ ./manage.py test animals
 
-Note that we used ``animals``, not ``myproject.animals``.
+    # Run just one test case
+    $ ./manage.py test animals.tests.AnimalTestCase
 
-You can be even *more* specific by naming an individual test case. To
-run a single test case in an application (for example, the
-``AnimalTestCase`` described in the "Writing unit tests" section), add
-the name of the test case to the label on the command line::
+    # Run just one test method
+    $ ./manage.py test animals.tests.AnimalTestCase.test_animals_can_speak
 
-    $ ./manage.py test animals.AnimalTestCase
+You can also provide a path to a directory to discover tests below that
+directory::
 
-And it gets even more granular than that! To run a *single* test
-method inside a test case, add the name of the test method to the
-label::
+    $ ./manage.py test animals/
 
-    $ ./manage.py test animals.AnimalTestCase.test_animals_can_speak
+You can specify a custom filename pattern match using the ``-p`` (or
+``--pattern``) option, if your test files are named differently from the
+``test*.py`` pattern::
 
-You can use the same rules if you're using doctests. Django will use the
-test label as a path to the test method or class that you want to run.
-If your ``models.py`` or ``tests.py`` has a function with a doctest, or
-class with a class-level doctest, you can invoke that test by appending the
-name of the test method or class to the label::
+    $ ./manage.py test --pattern="tests_*.py"
 
-    $ ./manage.py test animals.classify
+.. versionchanged:: 1.6
 
-If you want to run the doctest for a specific method in a class, add the
-name of the method to the label::
-
-    $ ./manage.py test animals.Classifier.run
-
-If you're using a ``__test__`` dictionary to specify doctests for a
-module, Django will use the label as a key in the ``__test__`` dictionary
-for defined in ``models.py`` and ``tests.py``.
+   Previously, test labels were in the form ``applabel``,
+   ``applabel.TestCase``, or ``applabel.TestCase.test_method``, rather than
+   being true Python dotted paths, and tests could only be found within
+   ``tests.py`` or ``models.py`` files within a Python package listed in
+   :setting:`INSTALLED_APPS`. The ``--pattern`` option and file paths as test
+   labels are new in 1.6.
 
 If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.
@@ -172,6 +165,7 @@ be reported, and any test databases created by the run will not be destroyed.
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
+
 
 .. _the-test-database:
 
@@ -290,25 +284,15 @@ If there are test failures, however, you'll see full details about which tests
 failed::
 
     ======================================================================
-    FAIL: Doctest: ellington.core.throttle.models
+    FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/dev/django/test/doctest.py", line 2153, in runTest
-        raise self.failureException(self.format_failure(new.getvalue()))
-    AssertionError: Failed doctest test for myapp.models
-      File "/dev/myapp/models.py", line 0, in models
+      File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
+        self.assertEqual(future_poll.was_published_recently(), False)
+    AssertionError: True != False
 
     ----------------------------------------------------------------------
-    File "/dev/myapp/models.py", line 14, in myapp.models
-    Failed example:
-        throttle.check("actor A", "action one", limit=2, hours=1)
-    Expected:
-        True
-    Got:
-        False
-
-    ----------------------------------------------------------------------
-    Ran 2 tests in 0.048s
+    Ran 1 test in 0.003s
 
     FAILED (failures=1)
 

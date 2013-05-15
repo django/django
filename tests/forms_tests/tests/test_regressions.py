@@ -139,6 +139,7 @@ class FormsRegressionsTestCase(TestCase):
         class CheeseForm(ModelForm):
             class Meta:
                 model = Cheese
+                fields = '__all__'
 
         form = CheeseForm({
             'name': 'Brie',

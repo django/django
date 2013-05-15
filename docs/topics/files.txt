@@ -94,7 +94,7 @@ The following approach may be used to close files automatically::
     True
 
 Closing files is especially important when accessing file fields in a loop
-over a large number of objects:: If files are not manually closed after
+over a large number of objects. If files are not manually closed after
 accessing them, the risk of running out of file descriptors may arise. This
 may lead to the following error::
 

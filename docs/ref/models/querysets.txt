@@ -328,7 +328,7 @@ Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
 ordering back to the normal direction.
 
-To retrieve the ''last'' five items in a queryset, you could do this::
+To retrieve the "last" five items in a queryset, you could do this::
 
     my_queryset.reverse()[:5]
 
@@ -627,7 +627,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - SQLite: install pytz_ — conversions are actually performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
-    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
@@ -1485,7 +1486,7 @@ internally so that repeated evaluations do not result in additional queries. In
 contrast, ``iterator()`` will read results directly, without doing any caching
 at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
 and caches the return value). For a ``QuerySet`` which returns a large number of
-objects that you only need to access once, this can results in better
+objects that you only need to access once, this can result in better
 performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been

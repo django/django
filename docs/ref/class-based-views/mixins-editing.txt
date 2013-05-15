@@ -116,6 +116,18 @@ ModelFormMixin
         by examining ``self.object`` or
         :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`.
 
+    .. attribute:: fields
+
+        .. versionadded:: 1.6
+
+        A list of names of fields. This is interpreted the same way as the
+        ``Meta.fields`` attribute of :class:`~django.forms.ModelForm`.
+
+        This is a required attribute if you are generating the form class
+        automatically (e.g. using ``model``). Omitting this attribute will
+        result in all fields being used, but this behaviour is deprecated
+        and will be removed in Django 1.8.
+
     .. attribute:: success_url
 
         The URL to redirect to when the form is successfully processed.

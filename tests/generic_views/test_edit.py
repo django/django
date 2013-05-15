@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 
+import warnings
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
 from django.views.generic.base import View
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, CreateView, UpdateView
 
 from . import views
 from .models import Artist, Author
@@ -33,6 +35,7 @@ class ModelFormMixinTests(TestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
         self.assertEqual(form_class._meta.model, Author)
+
 
 class CreateViewTests(TestCase):
     urls = 'generic_views.urls'
@@ -111,6 +114,45 @@ class CreateViewTests(TestCase):
                         {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/accounts/login/?next=/edit/authors/create/restricted/')
+
+    def test_create_view_with_restricted_fields(self):
+
+        class MyCreateView(CreateView):
+            model = Author
+            fields = ['name']
+
+        self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                         ['name'])
+
+    def test_create_view_all_fields(self):
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+
+            class MyCreateView(CreateView):
+                model = Author
+                fields = '__all__'
+
+            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                             ['name', 'slug'])
+        self.assertEqual(len(w), 0)
+
+
+    def test_create_view_without_explicit_fields(self):
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", PendingDeprecationWarning)
+
+            class MyCreateView(CreateView):
+                model = Author
+
+            # Until end of the deprecation cycle, should still create the form
+            # as before:
+            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                             ['name', 'slug'])
+
+        # but with a warning:
+        self.assertEqual(w[0].category, PendingDeprecationWarning)
 
 
 class UpdateViewTests(TestCase):

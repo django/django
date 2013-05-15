@@ -15,9 +15,9 @@ What are automated tests?
 Tests are simple routines that check the operation of your code.
 
 Testing operates at different levels. Some tests might apply to a tiny detail
-- *does a particular model method return values as expected?*, while others
-examine the overall operation of the software - *does a sequence of user inputs
-on the site produce the desired result?* That's no different from the kind of
+(*does a particular model method return values as expected?*) while others
+examine the overall operation of the software (*does a sequence of user inputs
+on the site produce the desired result?*). That's no different from the kind of
 testing you did earlier in :doc:`Tutorial 1 </intro/tutorial01>`, using the
 shell to examine the behavior of a method, or running the application and
 entering data to check how it behaves.
@@ -156,8 +156,9 @@ Create a test to expose the bug
 What we've just done in the shell to test for the problem is exactly what we
 can do in an automated test, so let's turn that into an automated test.
 
-The best place for an application's tests is in the application's ``tests.py``
-file - the testing system will look there for tests automatically.
+A conventional place for an application's tests is in the application's
+``tests.py`` file; the testing system will automatically find tests in any file
+whose name begins with ``test``.
 
 Put the following in the ``tests.py`` file in the ``polls`` application::
 
@@ -326,6 +327,13 @@ in the shell::
     >>> from django.test.utils import setup_test_environment
     >>> setup_test_environment()
 
+:meth:`~django.test.utils.setup_test_environment` installs a template renderer
+which will allow us to examine some additional attributes on responses such as
+``response.context`` that otherwise wouldn't be available. Note that this
+method *does not* setup a test database, so the following will be run against
+the existing database and the output may differ slightly depending on what
+polls you already created.
+
 Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
 this won't be required)::
@@ -370,45 +378,40 @@ Improving our view
 The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
-In :doc:`Tutorial 4 </intro/tutorial04>` we deleted the view functions from
-``views.py`` in favor of a :class:`~django.views.generic.list.ListView` in
-``urls.py``::
+In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
+based on :class:`~django.views.generic.list.ListView`::
 
-    url(r'^$',
-        ListView.as_view(
-            queryset=Poll.objects.order_by('-pub_date')[:5],
-            context_object_name='latest_poll_list',
-            template_name='polls/index.html'),
-        name='index'),
+    class IndexView(generic.ListView):
+        template_name = 'polls/index.html'
+        context_object_name = 'latest_poll_list'
+
+        def get_queryset(self):
+            """Return the last five published polls."""
+            return Poll.objects.order_by('-pub_date')[:5]
 
 ``response.context_data['latest_poll_list']`` extracts the data this view
 places into the context.
 
-We need to amend the line that gives us the ``queryset``::
-
-    queryset=Poll.objects.order_by('-pub_date')[:5],
-
-Let's change the queryset so that it also checks the date by comparing it with
-``timezone.now()``. First we need to add an import::
+We need to amend the ``get_queryset`` method and change it so that it also
+checks the date by comparing it with ``timezone.now()``. First we need to add
+an import::
 
     from django.utils import timezone
 
-and then we must amend the existing ``url`` function to::
+and then we must amend the ``get_queryset`` method like so::
 
-    url(r'^$',
-        ListView.as_view(
-            queryset=Poll.objects.filter(pub_date__lte=timezone.now) \
-                .order_by('-pub_date')[:5],
-            context_object_name='latest_poll_list',
-            template_name='polls/index.html'),
-        name='index'),
+    def get_queryset(self):
+        """
+        Return the last five published polls (not including those set to be
+        published in the future).
+        """
+        return Poll.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
-``Poll.objects.filter(pub_date__lte=timezone.now)`` returns a queryset
+``Poll.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing Polls whose ``pub_date`` is less than or equal to - that is, earlier
-than or equal to - ``timezone.now``. Notice that we use a callable queryset
-argument, ``timezone.now``, which will be evaluated at request time. If we had
-included the parentheses, ``timezone.now()`` would be evaluated just once when
-the web server is started.
+than or equal to - ``timezone.now``.
 
 Testing our new view
 --------------------
@@ -519,20 +522,18 @@ Testing the ``DetailView``
 
 What we have works well; however, even though future polls don't appear in the
 *index*, users can still reach them if they know or guess the right URL. So we
-need similar constraints in the ``DetailViews``, by adding::
+need to add a similar  constraint to ``DetailView``::
 
-    queryset=Poll.objects.filter(pub_date__lte=timezone.now)
 
-to them - for example::
+    class DetailView(generic.DetailView):
+        ...
+        def get_queryset(self):
+            """
+            Excludes any polls that aren't published yet.
+            """
+            return Poll.objects.filter(pub_date__lte=timezone.now())
 
-    url(r'^(?P<pk>\d+)/$',
-        DetailView.as_view(
-            queryset=Poll.objects.filter(pub_date__lte=timezone.now),
-            model=Poll,
-            template_name='polls/detail.html'),
-        name='detail'),
-
-and of course, we will add some tests, to check that a ``Poll`` whose
+And of course, we will add some tests, to check that a ``Poll`` whose
 ``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
 in the future is not::
 
@@ -558,9 +559,9 @@ in the future is not::
 Ideas for more tests
 --------------------
 
-We ought to add similar ``queryset`` arguments to the other ``DetailView``
-URLs, and create a new test class for each view. They'll be very similar to
-what we have just created; in fact there will be a lot of repetition.
+We ought to add a similar ``get_queryset`` method to ``ResultsView`` and
+create a new test class for that view. It'll be very similar to what we have
+just created; in fact there will be a lot of repetition.
 
 We could also improve our application in other ways, adding tests along the
 way. For example, it's silly that ``Polls`` can be published on the site that

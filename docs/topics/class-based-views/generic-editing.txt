@@ -114,9 +114,11 @@ here; we don't have to write any logic ourselves::
 
     class AuthorCreate(CreateView):
         model = Author
+        fields = ['name']
 
     class AuthorUpdate(UpdateView):
         model = Author
+        fields = ['name']
 
     class AuthorDelete(DeleteView):
         model = Author
@@ -125,6 +127,17 @@ here; we don't have to write any logic ourselves::
 .. note::
     We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
     just ``reverse`` as the urls are not loaded when the file is imported.
+
+.. versionchanged:: 1.6
+
+In Django 1.6, the ``fields`` attribute was added, which works the same way as
+the ``fields`` attribute on the inner ``Meta`` class on
+:class:`~django.forms.ModelForm`.
+
+Omitting the fields attribute will work as previously, but is deprecated and
+this attribute will be required from 1.8 (unless you define the form class in
+another way).
+
 
 Finally, we hook these new views into the URLconf::
 
@@ -177,33 +190,17 @@ the foreign key relation to the model::
 
         # ...
 
-Create a custom :class:`~django.forms.ModelForm` in order to exclude the
-``created_by`` field and prevent the user from editing it:
-
-.. code-block:: python
-
-    # forms.py
-    from django import forms
-    from myapp.models import Author
-
-    class AuthorForm(forms.ModelForm):
-        class Meta:
-            model = Author
-            exclude = ('created_by',)
-
-In the view, use the custom
-:attr:`~django.views.generic.edit.FormMixin.form_class` and override
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the
-user::
+In the view, ensure that you exclude ``created_by`` in the list of fields to
+edit, and override
+:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user::
 
     # views.py
     from django.views.generic.edit import CreateView
     from myapp.models import Author
-    from myapp.forms import AuthorForm
 
     class AuthorCreate(CreateView):
-        form_class = AuthorForm
         model = Author
+        fields = ['name']
 
         def form_valid(self, form):
             form.instance.created_by = self.request.user

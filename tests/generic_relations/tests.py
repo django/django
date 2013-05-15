@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-    Vegetable, Mineral, Gecko, Rock)
+    Vegetable, Mineral, Gecko, Rock, ManualPK)
 
 
 class GenericRelationsTests(TestCase):
@@ -75,12 +75,17 @@ class GenericRelationsTests(TestCase):
             "<Animal: Lion>",
             "<Animal: Platypus>"
         ])
+        # Create another fatty tagged instance with different PK to ensure
+        # there is a content type restriction in the generated queries below.
+        mpk = ManualPK.objects.create(id=lion.pk)
+        mpk.tags.create(tag="fatty")
         self.assertQuerysetEqual(Animal.objects.filter(tags__tag='fatty'), [
             "<Animal: Platypus>"
         ])
         self.assertQuerysetEqual(Animal.objects.exclude(tags__tag='fatty'), [
             "<Animal: Lion>"
         ])
+        mpk.delete()
 
         # If you delete an object with an explicit Generic relation, the related
         # objects are deleted when the source object is deleted.
@@ -247,6 +252,7 @@ class CustomWidget(forms.TextInput):
 class TaggedItemForm(forms.ModelForm):
     class Meta:
         model = TaggedItem
+        fields = '__all__'
         widgets = {'tag': CustomWidget}
 
 class GenericInlineFormsetTest(TestCase):

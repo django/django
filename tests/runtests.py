@@ -10,16 +10,23 @@ from django import contrib
 from django.utils._os import upath
 from django.utils import six
 
-CONTRIB_DIR_NAME = 'django.contrib'
+CONTRIB_MODULE_PATH = 'django.contrib'
 
 TEST_TEMPLATE_DIR = 'templates'
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
+
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
-SUBDIRS_TO_SKIP = ['templates']
+SUBDIRS_TO_SKIP = [
+    'templates',
+    'test_discovery_sample',
+    'test_discovery_sample2',
+    'test_runner_deprecation_app',
+    'test_runner_invalid_app',
+]
 
 ALWAYS_INSTALLED_APPS = [
     'shared_models',
@@ -40,17 +47,12 @@ ALWAYS_INSTALLED_APPS = [
     'staticfiles_tests.apps.no_label',
 ]
 
-def geodjango(settings):
-    # All databases must have spatial backends to run GeoDjango tests.
-    spatial_dbs = [name for name, db_dict in settings.DATABASES.items()
-                   if db_dict['ENGINE'].startswith('django.contrib.gis')]
-    return len(spatial_dbs) == len(settings.DATABASES)
 
 def get_test_modules():
     modules = []
-    for loc, dirpath in (
+    for modpath, dirpath in (
         (None, RUNTESTS_DIR),
-        (CONTRIB_DIR_NAME, CONTRIB_DIR)):
+        (CONTRIB_MODULE_PATH, CONTRIB_DIR)):
         for f in os.listdir(dirpath):
             if ('.' in f or
                 # Python 3 byte code dirs (PEP 3147)
@@ -59,8 +61,13 @@ def get_test_modules():
                 os.path.basename(f) in SUBDIRS_TO_SKIP or
                 os.path.isfile(f)):
                 continue
-            modules.append((loc, f))
+            modules.append((modpath, f))
     return modules
+
+def get_installed():
+    from django.db.models.loading import get_apps
+    return [app.__name__.rsplit('.', 1)[0] for app in get_apps()]
+
 
 def setup(verbosity, test_labels):
     from django.conf import settings
@@ -95,25 +102,45 @@ def setup(verbosity, test_labels):
     get_apps()
 
     # Load all the test model apps.
-    test_labels_set = set([label.split('.')[0] for label in test_labels])
     test_modules = get_test_modules()
+
+    # Reduce given test labels to just the app module path
+    test_labels_set = set()
+    for label in test_labels:
+        bits = label.split('.')
+        if bits[:2] == ['django', 'contrib']:
+            bits = bits[:3]
+        else:
+            bits = bits[:1]
+        test_labels_set.add('.'.join(bits))
 
     # If GeoDjango, then we'll want to add in the test applications
     # that are a part of its test suite.
-    if geodjango(settings):
+    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+    if HAS_SPATIAL_DB:
         from django.contrib.gis.tests import geo_apps
-        test_modules.extend(geo_apps(runtests=True))
+        test_modules.extend(geo_apps())
         settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
-    for module_dir, module_name in test_modules:
-        if module_dir:
-            module_label = '.'.join([module_dir, module_name])
+    for modpath, module_name in test_modules:
+        if modpath:
+            module_label = '.'.join([modpath, module_name])
         else:
             module_label = module_name
-        # if the module was named on the command line, or
+        # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
-        # this module and add it to the list to test.
-        if not test_labels or module_name in test_labels_set:
+        # this module and add it to INSTALLED_APPS.
+        if not test_labels:
+            module_found_in_labels = True
+        else:
+            match = lambda label: (
+                module_label == label or # exact match
+                module_label.startswith(label + '.') # ancestor match
+                )
+
+            module_found_in_labels = any(match(l) for l in test_labels_set)
+
+        if module_found_in_labels:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
             mod = load_app(module_label)
@@ -139,21 +166,19 @@ def django_tests(verbosity, interactive, failfast, test_labels):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
-    # If GeoDjango is used, add it's tests that aren't a part of
-    # an application (e.g., GEOS, GDAL, Distance objects).
-    if geodjango(settings) and (not test_labels or 'gis' in test_labels):
-        from django.contrib.gis.tests import geodjango_suite
-        extra_tests.append(geodjango_suite(apps=False))
-
     # Run the test suite, including the extra validation tests.
     from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
-    test_runner = TestRunner(verbosity=verbosity, interactive=interactive,
-        failfast=failfast)
-    failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
+    test_runner = TestRunner(
+        verbosity=verbosity,
+        interactive=interactive,
+        failfast=failfast,
+    )
+    failures = test_runner.run_tests(
+        test_labels or get_installed(), extra_tests=extra_tests)
 
     teardown(state)
     return failures
@@ -162,10 +187,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 def bisect_tests(bisection_label, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
-    if not test_labels:
-        # Get the full list of test labels to use for bisection
-        from django.db.models.loading import get_apps
-        test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
+    test_labels = test_labels or get_installed()
 
     print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
@@ -222,11 +244,7 @@ def bisect_tests(bisection_label, options, test_labels):
 def paired_tests(paired_test, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
-    if not test_labels:
-        print("")
-        # Get the full list of test labels to use for bisection
-        from django.db.models.loading import get_apps
-        test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
+    test_labels = test_labels or get_installed()
 
     print('***** Trying paired execution')
 

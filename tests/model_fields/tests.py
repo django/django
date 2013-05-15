@@ -6,7 +6,7 @@ from decimal import Decimal
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import connection, models, IntegrityError
 from django.db.models.fields.files import FieldFile
 from django.utils import six
 from django.utils import unittest
@@ -14,11 +14,6 @@ from django.utils import unittest
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
-
-from .test_imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-    TwoImageFieldTests, ImageFieldNoDimensionsTests,
-    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-    ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
@@ -454,6 +449,10 @@ class BinaryFieldTests(test.TestCase):
             self.assertEqual(bytes(dm.data), bytes(bdata))
             # Test default value
             self.assertEqual(bytes(dm.short_data), b'\x08')
+
+    if connection.vendor == 'mysql' and six.PY3:
+        # Existing MySQL DB-API drivers fail on binary data.
+        test_set_and_retrieve = unittest.expectedFailure(test_set_and_retrieve)
 
     def test_max_length(self):
         dm = DataModel(short_data=self.binary_data*4)

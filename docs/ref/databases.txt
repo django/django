@@ -22,14 +22,14 @@ Persistent connections
 .. versionadded:: 1.6
 
 Persistent connections avoid the overhead of re-establishing a connection to
-the database in each request. By default, connections are kept open for up 10
-minutes — if not specified, :setting:`CONN_MAX_AGE` defaults to 600 seconds.
+the database in each request. They're controlled by the
+:setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
+connection. It can be set independently for each database.
 
-Django 1.5 and earlier didn't have persistent connections. To restore the
-legacy behavior of closing the connection at the end of every request, set
-:setting:`CONN_MAX_AGE` to ``0``.
-
-For unlimited persistent connections, set :setting:`CONN_MAX_AGE` to ``None``.
+The default value is ``0``, preserving the historical behavior of closing the
+database connection at the end of each request. To enable persistent
+connections, set :setting:`CONN_MAX_AGE` to a positive number of seconds. For
+unlimited persistent connections, set it to ``None``.
 
 Connection management
 ~~~~~~~~~~~~~~~~~~~~~
@@ -64,13 +64,22 @@ least as many simultaneous connections as you have worker threads.
 
 Sometimes a database won't be accessed by the majority of your views, for
 example because it's the database of an external system, or thanks to caching.
-In such cases, you should set :setting:`CONN_MAX_AGE` to a lower value, or
-even ``0``, because it doesn't make sense to maintain a connection that's
-unlikely to be reused. This will help keep the number of simultaneous
-connections to this database small.
+In such cases, you should set :setting:`CONN_MAX_AGE` to a low value or even
+``0``, because it doesn't make sense to maintain a connection that's unlikely
+to be reused. This will help keep the number of simultaneous connections to
+this database small.
 
 The development server creates a new thread for each request it handles,
-negating the effect of persistent connections.
+negating the effect of persistent connections. Don't enable them during
+development.
+
+When Django establishes a connection to the database, it sets up appropriate
+parameters, depending on the backend being used. If you enable persistent
+connections, this setup is no longer repeated every request. If you modify
+parameters such as the connection's isolation level or time zone, you should
+either restore Django's defaults at the end of each request, force an
+appropriate value at the beginning of each request, or disable persistent
+connections.
 
 .. _postgresql-notes:
 
@@ -252,6 +261,18 @@ required for full MySQL support in Django.
 
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 
+Python 3
+--------
+
+At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
+Python 3. In order to use MySQL under Python 3, you'll have to install an
+unofficial fork, such as `MySQL-for-Python-3`_.
+
+This port is still in alpha. In particular, it doesn't support binary data,
+making it impossible to use :class:`django.db.models.BinaryField`.
+
+.. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+
 Creating your database
 ----------------------
 
@@ -361,8 +382,8 @@ Here's a sample configuration which uses a MySQL option file::
     default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
-``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
-`MySQLdb documentation`_ for more details.
+``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
+more details.
 
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/

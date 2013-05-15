@@ -11,3 +11,4 @@ class EventSplitForm(forms.Form):
 class EventModelForm(forms.ModelForm):
     class Meta:
         model = Event
+        fields = '__all__'

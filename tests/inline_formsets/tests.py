@@ -10,7 +10,7 @@ from .models import Poet, Poem, School, Parent, Child
 class DeletionTests(TestCase):
 
     def test_deletion(self):
-        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
+        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True, fields="__all__")
         poet = Poet.objects.create(name='test')
         poem = poet.poem_set.create(name='test poem')
         data = {
@@ -32,7 +32,7 @@ class DeletionTests(TestCase):
         Make sure that an add form that is filled out, but marked for deletion
         doesn't cause validation errors.
         """
-        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
+        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True, fields="__all__")
         poet = Poet.objects.create(name='test')
         data = {
             'poem_set-TOTAL_FORMS': '1',
@@ -60,7 +60,7 @@ class DeletionTests(TestCase):
         Make sure that a change form that is filled out, but marked for deletion
         doesn't cause validation errors.
         """
-        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
+        PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True, fields="__all__")
         poet = Poet.objects.create(name='test')
         poem = poet.poem_set.create(name='test poem')
         data = {
@@ -115,8 +115,8 @@ class InlineFormsetFactoryTest(TestCase):
         """
         These should both work without a problem.
         """
-        inlineformset_factory(Parent, Child, fk_name='mother')
-        inlineformset_factory(Parent, Child, fk_name='father')
+        inlineformset_factory(Parent, Child, fk_name='mother', fields="__all__")
+        inlineformset_factory(Parent, Child, fk_name='father', fields="__all__")
 
     def test_exception_on_unspecified_foreign_key(self):
         """

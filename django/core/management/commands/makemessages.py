@@ -294,7 +294,10 @@ class Command(NoArgsCommand):
             os.unlink(potfile)
 
         for f in file_list:
-            f.process(self, potfile, self.domain, self.keep_pot)
+            try:
+                f.process(self, potfile, self.domain, self.keep_pot)
+            except UnicodeDecodeError:
+                self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
         return potfile
 
     def find_files(self, root):

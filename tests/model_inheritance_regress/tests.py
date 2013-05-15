@@ -418,6 +418,8 @@ class ModelInheritanceTest(TestCase):
         class ProfileForm(forms.ModelForm):
             class Meta:
                 model = Profile
+                fields = '__all__'
+
         User.objects.create(username="user_only")
         p = Profile.objects.create(username="user_with_profile")
         form = ProfileForm({'username': "user_with_profile", 'extra': "hello"},

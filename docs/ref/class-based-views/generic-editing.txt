@@ -110,6 +110,7 @@ CreateView
 
         class AuthorCreate(CreateView):
             model = Author
+            fields = ['name']
 
 UpdateView
 ----------
@@ -152,6 +153,7 @@ UpdateView
 
         class AuthorUpdate(UpdateView):
             model = Author
+            fields = ['name']
 
 DeleteView
 ----------
