@@ -9,6 +9,8 @@ from django.contrib.sessions.backends.base import SessionBase, CreateError, VALI
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.utils import timezone
 
+from django.contrib.sessions.exceptions import InvalidSessionKey
+
 class SessionStore(SessionBase):
     """
     Implements a file based session store.
@@ -48,7 +50,7 @@ class SessionStore(SessionBase):
         # should always be md5s, so they should never contain directory
         # components.
         if not set(session_key).issubset(set(VALID_KEY_CHARS)):
-            raise SuspiciousOperation(
+            raise InvalidSessionKey(
                 "Invalid characters in session key")
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)

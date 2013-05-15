@@ -9,12 +9,13 @@ except ImportError:
 import string
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
 from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+
+from django.contrib.sessions.exceptions import SuspiciousSession
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -94,7 +95,7 @@ class SessionBase(object):
             hash, pickled = encoded_data.split(b':', 1)
             expected_hash = self._hash(pickled)
             if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousOperation("Session data corrupted")
+                raise SuspiciousSession("Session data corrupted")
             else:
                 return pickle.loads(pickled)
         except Exception:
