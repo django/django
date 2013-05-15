@@ -31,8 +31,6 @@ class GeoAdminTest(TestCase):
 
     def test_olmap_WMS_rendering(self):
         geoadmin = admin.GeoModelAdmin(City, admin.site)
-
-        geoadmin = admin.site._registry[City]
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
             ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
