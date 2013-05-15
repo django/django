@@ -1,6 +1,7 @@
 """
 Global Django exception and warning classes.
 """
+import logging
 from functools import reduce
 
 
@@ -20,6 +21,30 @@ class MultipleObjectsReturned(Exception):
 
 class SuspiciousOperation(Exception):
     "The user did something suspicious"
+
+    def __init__(self, message):
+        logger = logging.getLogger('django.security')
+        logger.warning(message, extra={'exception_type': self.__class__})
+        super(SuspiciousOperation, self).__init__(message)
+
+
+class SuspiciousMultipartForm(SuspiciousOperation):
+    "Suspect MIME request in multipart form data"
+    pass
+
+
+class SuspiciousFileOperation(SuspiciousOperation):
+    "A Suspicious filesystem operation was attempted"
+    pass
+
+
+class DisallowedHost(SuspiciousOperation):
+    "HTTP_HOST header contains invalid value"
+    pass
+
+
+class DissallowedRedirect(SuspiciousOperation):
+    "Redirect to scheme not in allowed list"
     pass
 
 
