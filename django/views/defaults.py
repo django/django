@@ -43,6 +43,21 @@ def server_error(request, template_name='500.html'):
     return http.HttpResponseServerError(template.render(Context({})))
 
 
+@requires_csrf_token
+def bad_request(request, template_name='400.html'):
+    """
+    400 error handler.
+
+    Templates: :template:`400.html`
+    Context: None
+    """
+    try:
+        template = loader.get_template(template_name)
+    except TemplateDoesNotExist:
+        return http.HttpResponseBadRequest('<h1>Bad Request (400)</h1>')
+    return http.HttpResponseBadRequest(template.render(Context({})))
+
+
 # This can be called when CsrfViewMiddleware.process_view has not run,
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.

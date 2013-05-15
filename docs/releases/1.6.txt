@@ -270,6 +270,13 @@ Minor features
   stores active language in session if it is not present there. This
   prevents loss of language settings after session flush, e.g. logout.
 
+* :exc:`~django.core.exceptions.SuspiciousOperation` has been differentiated
+  into a number of subclasses, and each will log to a matching named logger
+  under the ``django.security`` logging hierarchy. Along with this change,
+  a ``handler400`` mechanism and default view are used whenever
+  a ``SuspiciousOperation`` reaches the WSGI handler to return an
+  ``HttpResponseBadRequest``.
+
 Backwards incompatible changes in 1.6
 =====================================
 

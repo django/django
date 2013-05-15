@@ -44,9 +44,24 @@ SuspiciousOperation
 -------------------
 .. exception:: SuspiciousOperation
 
-    The :exc:`SuspiciousOperation` exception is raised when a user has performed
-    an operation that should be considered suspicious from a security perspective,
-    such as tampering with a session cookie.
+    The :exc:`SuspiciousOperation` exception is raised when a user has
+    performed an operation that should be considered suspicious from a security
+    perspective, such as tampering with a session cookie. Subclasses of
+    SuspiciousOperation include:
+
+    * DisallowedHost
+    * DisallowedModelAdminLookup
+    * DisallowedRedirect
+    * InvalidSessionKey
+    * SuspiciousFileOperation
+    * SuspiciousMultipartForm
+    * SuspiciousSession
+    * WizardViewCookieModified
+
+    If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
+    logged at the ``Error`` level and results in
+    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    documentation </topics/logging/>` for more information.
 
 PermissionDenied
 ----------------

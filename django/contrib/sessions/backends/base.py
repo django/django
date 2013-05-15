@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 import base64
 from datetime import datetime, timedelta
+import logging
+
 try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
@@ -14,7 +16,9 @@ from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
+
+from django.contrib.sessions.exceptions import SuspiciousSession
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -94,12 +98,16 @@ class SessionBase(object):
             hash, pickled = encoded_data.split(b':', 1)
             expected_hash = self._hash(pickled)
             if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousOperation("Session data corrupted")
+                raise SuspiciousSession("Session data corrupted")
             else:
                 return pickle.loads(pickled)
-        except Exception:
+        except Exception as e:
             # ValueError, SuspiciousOperation, unpickling exceptions. If any of
             # these happen, just return an empty dictionary (an empty session).
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' %
+                        e.__class__.__name__)
+                logger.warning(force_text(e))
             return {}
 
     def update(self, dict_):

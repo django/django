@@ -1,8 +1,10 @@
+import logging
+
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction, router
 from django.utils import timezone
-
+from django.utils.encoding import force_text
 
 class SessionStore(SessionBase):
     """
@@ -18,7 +20,11 @@ class SessionStore(SessionBase):
                 expire_date__gt=timezone.now()
             )
             return self.decode(s.session_data)
-        except (Session.DoesNotExist, SuspiciousOperation):
+        except (Session.DoesNotExist, SuspiciousOperation) as e:
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' %
+                        e.__class__.__name__)
+                logger.warning(force_text(e))
             self.create()
             return {}
 

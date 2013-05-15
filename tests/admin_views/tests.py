@@ -11,7 +11,6 @@ except ImportError:  # Python 2
 
 from django.conf import settings, global_settings
 from django.core import mail
-from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
@@ -30,6 +29,7 @@ from django.db import connection
 from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
+from django.test.utils import patch_logger
 from django.utils import formats, translation, unittest
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
@@ -543,20 +543,21 @@ class AdminViewBasicTest(TestCase):
                 self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        self.assertRaises(SuspiciousOperation,
-            self.client.get, "/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy"
-        )
+        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
 
-        try:
-            self.client.get("/test_admin/admin/admin_views/thing/?color__value__startswith=red")
-            self.client.get("/test_admin/admin/admin_views/thing/?color__value=red")
-        except SuspiciousOperation:
-            self.fail("Filters are allowed if explicitly included in list_filter")
+        # Filters are allowed if explicitly included in list_filter
+        response = self.client.get("/test_admin/admin/admin_views/thing/?color__value__startswith=red")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/test_admin/admin/admin_views/thing/?color__value=red")
+        self.assertEqual(response.status_code, 200)
 
-        try:
-            self.client.get("/test_admin/admin/admin_views/person/?age__gt=30")
-        except SuspiciousOperation:
-            self.fail("Filters should be allowed if they involve a local field without the need to whitelist them in list_filter or date_hierarchy.")
+        # Filters should be allowed if they involve a local field without the
+        # need to whitelist them in list_filter or date_hierarchy.
+        response = self.client.get("/test_admin/admin/admin_views/person/?age__gt=30")
+        self.assertEqual(response.status_code, 200)
 
         e1 = Employee.objects.create(name='Anonymous', gender=1, age=22, alive=True, code='123')
         e2 = Employee.objects.create(name='Visitor', gender=2, age=19, alive=True, code='124')
@@ -574,10 +575,9 @@ class AdminViewBasicTest(TestCase):
         ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
         can break.
         """
-        try:
-            self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
-        except SuspiciousOperation:
-            self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
+        # Filters should be allowed if they are defined on a ForeignKey pointing to this model
+        response = self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
+        self.assertEqual(response.status_code, 200)
 
     def test_hide_change_password(self):
         """

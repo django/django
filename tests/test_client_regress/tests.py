@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 import os
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
     Context, Template, loader)
@@ -20,6 +19,7 @@ from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
 
+from .views import CustomTestException
 
 @override_settings(
     TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates'),)
@@ -619,7 +619,7 @@ class ExceptionTests(TestCase):
         try:
             response = self.client.get("/test_client_regress/staff_only/")
             self.fail("General users should not be able to visit this page")
-        except SuspiciousOperation:
+        except CustomTestException:
             pass
 
         # At this point, an exception has been raised, and should be cleared.
@@ -629,7 +629,7 @@ class ExceptionTests(TestCase):
         self.assertTrue(login, 'Could not log in')
         try:
             self.client.get("/test_client_regress/staff_only/")
-        except SuspiciousOperation:
+        except CustomTestException:
             self.fail("Staff should be able to visit this page")
 
 
