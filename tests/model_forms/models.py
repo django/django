@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import os
 import tempfile
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
@@ -91,14 +92,7 @@ class TextFile(models.Model):
         return self.description
 
 try:
-    # If PIL is available, try testing ImageFields. Checking for the existence
-    # of Image is enough for CPython, but for PyPy, you need to check for the
-    # underlying modules If PIL is not available, ImageField tests are omitted.
-    # Try to import PIL in either of the two ways it can end up installed.
-    try:
-        from PIL import Image, _imaging
-    except ImportError:
-        import Image, _imaging
+    from django.utils.image import Image
 
     test_images = True
 
@@ -137,7 +131,7 @@ try:
 
         def __str__(self):
             return self.description
-except ImportError:
+except ImproperlyConfigured:
     test_images = False
 
 @python_2_unicode_compatible
