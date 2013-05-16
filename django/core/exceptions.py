@@ -24,7 +24,7 @@ class SuspiciousOperation(Exception):
 
     def __init__(self, message):
         logger = logging.getLogger('django.security')
-        logger.warning(message, extra={'exception_type': self.__class__})
+        logger.error(message, extra={'exception_type': self.__class__})
         super(SuspiciousOperation, self).__init__(message)
 
 
