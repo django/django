@@ -137,7 +137,7 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
             'LOCATION': [
                 '172.19.26.240:11211',
-                '172.19.26.242:11211',
+                '172.19.26.242:11212',
                 '172.19.26.244:11213',
             ]
         }
@@ -482,8 +482,6 @@ include the name of the active :term:`language<language code>` -- see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 
-.. versionchanged:: 1.4
-
 Cache keys also include the active :term:`language <language code>` when
 :setting:`USE_L10N` is set to ``True`` and the :ref:`current time zone
 <default-current-time-zone>` when :setting:`USE_TZ` is set to ``True``.
@@ -641,6 +639,23 @@ equivalent:
 This feature is useful in avoiding repetition in templates. You can set the
 timeout in a variable, in one place, and just reuse that value.
 
+.. function:: django.core.cache.utils.make_template_fragment_key(fragment_name, vary_on=None)
+
+If you want to obtain the cache key used for a cached fragment, you can use
+``make_template_fragment_key``. ``fragment_name`` is the same as second argument
+to the ``cache`` template tag; ``vary_on`` is a list of all additional arguments
+passed to the tag. This function can be useful for invalidating or overwriting
+a cached item, for example:
+
+.. code-block:: python
+
+    >>> from django.core.cache import cache
+    >>> from django.core.cache.utils import make_template_fragment_key
+    # cache key for {% cache 500 sidebar username %}
+    >>> key = make_template_fragment_key('sidebar', [username])
+    >>> cache.delete(key) # invalidates cached template fragment
+
+
 The low-level cache API
 =======================
 
@@ -666,6 +681,8 @@ pickling.)
 Accessing the cache
 -------------------
 
+.. function:: django.core.cache.get_cache(backend, **kwargs)
+
 The cache module, ``django.core.cache``, has a ``cache`` object that's
 automatically created from the ``'default'`` entry in the :setting:`CACHES`
 setting::
@@ -678,7 +695,7 @@ If you have multiple caches defined in :setting:`CACHES`, then you can use
     >>> from django.core.cache import get_cache
     >>> cache = get_cache('alternate')
 
-If the named key does not exist, :exc:`InvalidCacheBackendError` will be raised.
+If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
 
 
 Basic usage
@@ -846,7 +863,7 @@ key version to set or get. For example::
     'hello world!'
 
 The version of a specific key can be incremented and decremented using
-the :func:`incr_version()` and :func:`decr_version()` methods. This
+the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
 keys unaffected. Continuing our previous example::
 
@@ -881,7 +898,7 @@ parts), you can provide a custom key function.
 
 The :setting:`KEY_FUNCTION <CACHES-KEY_FUNCTION>` cache setting
 specifies a dotted-path to a function matching the prototype of
-:func:`make_key()` above. If provided, this custom key function will
+``make_key()`` above. If provided, this custom key function will
 be used instead of the default key combining function.
 
 Cache key warnings

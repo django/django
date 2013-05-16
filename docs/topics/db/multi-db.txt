@@ -20,9 +20,7 @@ documentation.
 
 Databases can have any alias you choose. However, the alias
 ``default`` has special significance. Django uses the database with
-the alias of ``default`` when no other database has been selected. If
-you don't have a ``default`` database, you need to be careful to
-always specify the database that you want to use.
+the alias of ``default`` when no other database has been selected.
 
 The following is an example ``settings.py`` snippet defining two
 databases -- a default PostgreSQL database and a MySQL database called
@@ -42,6 +40,29 @@ databases -- a default PostgreSQL database and a MySQL database called
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'priv4te'
+        }
+    }
+
+If the concept of a ``default`` database doesn't make sense in the context
+of your project, you need to be careful to always specify the database
+that you want to use. Django requires that a ``default`` database entry
+be defined, but the parameters dictionary can be left blank if it will not be
+used. The following is an example ``settings.py`` snippet defining two
+non-default databases, with the ``default`` entry intentionally left empty::
+
+    DATABASES = {
+        'default': {},
+        'users': {
+            'NAME': 'user_data',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'superS3cret'
+        },
+        'customers': {
+            'NAME': 'customer_data',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_cust',
+            'PASSWORD': 'veryPriv@ate'
         }
     }
 
@@ -303,7 +324,7 @@ from::
             in the master/slave pool.
             """
             db_list = ('master', 'slave1', 'slave2')
-            if obj1.state.db in db_list and obj2.state.db in db_list:
+            if obj1._state.db in db_list and obj2._state.db in db_list:
                 return True
             return None
 
@@ -485,19 +506,19 @@ solution is to use ``db_manager()``, like this::
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
-Using ``get_query_set()`` with multiple databases
+Using ``get_queryset()`` with multiple databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're overriding ``get_query_set()`` on your manager, be sure to
+If you're overriding ``get_queryset()`` on your manager, be sure to
 either call the method on the parent (using ``super()``) or do the
 appropriate handling of the ``_db`` attribute on the manager (a string
 containing the name of the database to use).
 
 For example, if you want to return a custom ``QuerySet`` class from
-the ``get_query_set`` method, you could do this::
+the ``get_queryset`` method, you could do this::
 
     class MyManager(models.Manager):
-        def get_query_set(self):
+        def get_queryset(self):
             qs = CustomQuerySet(self.model)
             if self._db is not None:
                 qs = qs.using(self._db)
@@ -527,9 +548,9 @@ multiple-database support::
             # Tell Django to delete objects from the 'other' database
             obj.delete(using=self.using)
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for objects on the 'other' database.
-            return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+            return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
@@ -552,9 +573,9 @@ Inlines can be handled in a similar fashion. They require three customized metho
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
-            return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+            return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
@@ -660,6 +681,7 @@ In addition, some objects are automatically created just after
   database).
 
 .. versionchanged:: 1.5
+
     Previously, ``ContentType`` and ``Permission`` instances were created only
     in the default database.
 

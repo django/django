@@ -30,7 +30,7 @@ class KMLSitemap(Sitemap):
                 for field in source._meta.fields:
                     if isinstance(field, GeometryField):
                         kml_sources.append((source._meta.app_label,
-                                            source._meta.module_name,
+                                            source._meta.model_name,
                                             field.name))
             elif isinstance(source, (list, tuple)):
                 if len(source) != 3: 

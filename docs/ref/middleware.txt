@@ -61,13 +61,15 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
-* Sends broken link notification emails to :setting:`MANAGERS` if
-  :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True``.
-
 * Handles ETags based on the :setting:`USE_ETAGS` setting. If
   :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
   for each request by MD5-hashing the page content, and it'll take care of
   sending ``Not Modified`` responses, if appropriate.
+
+.. class:: BrokenLinkEmailsMiddleware
+
+* Sends broken link notification emails to :setting:`MANAGERS` (see
+  :doc:`/howto/error-reporting`).
 
 View metadata middleware
 ------------------------
@@ -111,7 +113,7 @@ It will NOT compress content if any of the following are true:
   not to be performed on certain content types.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.http.gzip_page()` decorator.
+:func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
@@ -124,7 +126,7 @@ Conditional GET middleware
 Handles conditional GET operations. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpNotModified`.
+:class:`~django.http.HttpResponseNotModified`.
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 
@@ -179,8 +181,8 @@ Authentication middleware
 .. class:: AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :doc:`Authentication in Web requests
-</topics/auth>`.
+every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+<auth-web-requests>`.
 
 CSRF protection middleware
 --------------------------
@@ -203,6 +205,11 @@ Transaction middleware
 
 .. class:: TransactionMiddleware
 
+.. versionchanged:: 1.6
+
+    ``TransactionMiddleware`` is deprecated. The documentation of transactions
+    contains :ref:`upgrade instructions <transactions-upgrading-from-1.5>`.
+
 Binds commit and rollback of the default database to the request/response
 phase. If a view function runs successfully, a commit is done. If it fails with
 an exception, a rollback is done.
@@ -221,8 +228,5 @@ X-Frame-Options middleware
    :synopsis: Clickjacking protection
 
 .. class:: XFrameOptionsMiddleware
-
-.. versionadded:: 1.4
-   ``XFrameOptionsMiddleware`` was added.
 
 Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.

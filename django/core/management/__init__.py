@@ -9,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
 from django.utils.importlib import import_module
+from django.utils._os import upath
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
@@ -390,79 +391,9 @@ class ManagementUtility(object):
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
-def setup_environ(settings_mod, original_settings_path=None):
-    """
-    Configures the runtime environment. This can also be used by external
-    scripts wanting to set up a similar environment to manage.py.
-    Returns the project directory (assuming the passed settings module is
-    directly in the project directory).
-
-    The "original_settings_path" parameter is optional, but recommended, since
-    trying to work out the original path from the module can be problematic.
-    """
-    warnings.warn(
-        "The 'setup_environ' function is deprecated, "
-        "you likely need to update your 'manage.py'; "
-        "please see the Django 1.4 release notes "
-        "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
-        DeprecationWarning)
-
-    # Add this project to sys.path so that it's importable in the conventional
-    # way. For example, if this file (manage.py) lives in a directory
-    # "myproject", this code would add "/path/to/myproject" to sys.path.
-    if '__init__.py' in settings_mod.__file__:
-        p = os.path.dirname(settings_mod.__file__)
-    else:
-        p = settings_mod.__file__
-    project_directory, settings_filename = os.path.split(p)
-    if project_directory == os.curdir or not project_directory:
-        project_directory = os.getcwd()
-    project_name = os.path.basename(project_directory)
-
-    # Strip filename suffix to get the module name.
-    settings_name = os.path.splitext(settings_filename)[0]
-
-    # Strip $py for Jython compiled files (like settings$py.class)
-    if settings_name.endswith("$py"):
-        settings_name = settings_name[:-3]
-
-    # Set DJANGO_SETTINGS_MODULE appropriately.
-    if original_settings_path:
-        os.environ['DJANGO_SETTINGS_MODULE'] = original_settings_path
-    else:
-        # If DJANGO_SETTINGS_MODULE is already set, use it.
-        os.environ['DJANGO_SETTINGS_MODULE'] = os.environ.get(
-            'DJANGO_SETTINGS_MODULE',
-            '%s.%s' % (project_name, settings_name)
-        )
-
-    # Import the project module. We add the parent directory to PYTHONPATH to
-    # avoid some of the path errors new users can have.
-    sys.path.append(os.path.join(project_directory, os.pardir))
-    import_module(project_name)
-    sys.path.pop()
-
-    return project_directory
-
 def execute_from_command_line(argv=None):
     """
     A simple method that runs a ManagementUtility.
     """
-    utility = ManagementUtility(argv)
-    utility.execute()
-
-def execute_manager(settings_mod, argv=None):
-    """
-    Like execute_from_command_line(), but for use by manage.py, a
-    project-specific django-admin.py utility.
-    """
-    warnings.warn(
-        "The 'execute_manager' function is deprecated, "
-        "you likely need to update your 'manage.py'; "
-        "please see the Django 1.4 release notes "
-        "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
-        DeprecationWarning)
-
-    setup_environ(settings_mod)
     utility = ManagementUtility(argv)
     utility.execute()

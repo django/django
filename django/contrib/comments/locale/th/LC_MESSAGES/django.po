@@ -9,64 +9,64 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-03-12 06:23+0000\n"
 "Last-Translator: Suteepat Damrongyingsupab <monkeycrew_topza@hotmail.com>\n"
-"Language-Team: Thai (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
-"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "เนื้อหา"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Metadata"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "ถูกแจ้งเตือนแล้ว"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "แจ้งเตือนความคิดเห็นที่เลือก"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "ได้รับการอนุมัติ"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "อนุมัติความคิดเห็นที่เลือกไว้"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "ลบ"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "ลบความคิดเห็นที่เลือกไว้"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s ความคิดเห็นได้ถูก%(action)sเรียบร้อยแล้ว"
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "ความเห็นของ %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "ความเห็นล่าสุดเมื่อ %(site_name)s"
@@ -102,79 +102,79 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "ถ้าคุณใส่ข้อมูลใดๆ ก็ตามในส่วนนี้ มันจะกลายเป็นสแปม"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "content type"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "อ็อบเจ็กต์ไอดี"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "ผู้ใช้"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "ชื่อของผู้ใช้"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "อีเมลของผู้ใช้"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "URL ของผู้ใช้"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "ข้อคิดเห็น"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "วันและเวลาที่ส่งข้อมูล"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "หมายเลขไอพี"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "สาธารณะ"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "เลือกออกเพื่อที่จะทำให้ข้อคิดเห็นนั้นหายไปจากเว็บไซต์"
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "ถอดออกแล้ว"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
 "เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "ความคิดเห็น"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr "ข้อคิดเห็นนี้ได้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ จะถูกอ่านได้เพียงอย่างเดียว"
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr "ข้อคิดเห็นนี้ถูกเขียนไว้โดยผู้ใช้ที่สามารถเชื่อถือได้ ดังนั้นอีเมลนั้นจะถูกอ่านเท่านั้น"
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -189,19 +189,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "ธง"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "วันที่"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "ธงแสดงความเห็น"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "ปักธงแสดงความคิดเห็น"
 

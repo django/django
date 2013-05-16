@@ -3,13 +3,6 @@
 GEOGRAPHY=0
 POSTGIS_SQL=postgis.sql
 
-# For Ubuntu 8.x and 9.x releases.
-if [ -d "/usr/share/postgresql-8.3-postgis" ]
-then
-    POSTGIS_SQL_PATH=/usr/share/postgresql-8.3-postgis
-    POSTGIS_SQL=lwpostgis.sql
-fi
-
 # For Ubuntu 10.04
 if [ -d "/usr/share/postgresql/8.4/contrib" ]
 then

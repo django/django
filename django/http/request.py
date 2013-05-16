@@ -4,7 +4,6 @@ import copy
 import os
 import re
 import sys
-import warnings
 from io import BytesIO
 from pprint import pformat
 try:
@@ -25,6 +24,7 @@ from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
 
 RAISE_ERROR = object()
 absolute_http_url_re = re.compile(r"^https?://", re.I)
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(IOError):
@@ -43,6 +43,7 @@ class HttpRequest(object):
         self.path = ''
         self.path_info = ''
         self.method = None
+        self.resolver_match = None
         self._post_parse_error = False
 
     def __repr__(self):
@@ -63,11 +64,15 @@ class HttpRequest(object):
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
 
-        # Disallow potentially poisoned hostnames.
-        if set(';/?@&=+$,').intersection(host):
-            raise SuspiciousOperation('Invalid HTTP_HOST header: %s' % host)
-
-        return host
+        allowed_hosts = ['*'] if settings.DEBUG else settings.ALLOWED_HOSTS
+        domain, port = split_domain_port(host)
+        if domain and validate_host(domain, allowed_hosts):
+            return host
+        else:
+            msg = "Invalid HTTP_HOST header: %r." % host
+            if domain:
+                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+            raise SuspiciousOperation(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -185,11 +190,6 @@ class HttpRequest(object):
                 six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
-
-    @property
-    def raw_post_data(self):
-        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', DeprecationWarning)
-        return self.body
 
     def _mark_post_parse_error(self):
         self._post = QueryDict('')
@@ -454,3 +454,55 @@ def bytes_to_text(s, encoding):
         return six.text_type(s, encoding, 'replace')
     else:
         return s
+
+
+def split_domain_port(host):
+    """
+    Return a (domain, port) tuple from a given host.
+
+    Returned domain is lower-cased. If the host is invalid, the domain will be
+    empty.
+    """
+    host = host.lower()
+
+    if not host_validation_re.match(host):
+        return '', ''
+
+    if host[-1] == ']':
+        # It's an IPv6 address without a port.
+        return host, ''
+    bits = host.rsplit(':', 1)
+    if len(bits) == 2:
+        return tuple(bits)
+    return bits[0], ''
+
+
+def validate_host(host, allowed_hosts):
+    """
+    Validate the given host for this site.
+
+    Check that the host looks valid and matches a host or host pattern in the
+    given list of ``allowed_hosts``. Any pattern beginning with a period
+    matches a domain and all its subdomains (e.g. ``.example.com`` matches
+    ``example.com`` and any subdomain), ``*`` matches anything, and anything
+    else must match exactly.
+
+    Note: This function assumes that the given host is lower-cased and has
+    already had the port, if any, stripped off.
+
+    Return ``True`` for a valid host, ``False`` otherwise.
+
+    """
+    for pattern in allowed_hosts:
+        pattern = pattern.lower()
+        match = (
+            pattern == '*' or
+            pattern.startswith('.') and (
+                host.endswith(pattern) or host == pattern[1:]
+                ) or
+            pattern == host
+            )
+        if match:
+            return True
+
+    return False

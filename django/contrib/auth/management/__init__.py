@@ -12,12 +12,13 @@ from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import get_models, signals
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
 from django.utils.six.moves import input
 
 
 def _get_permission_codename(action, opts):
-    return '%s_%s' % (action, opts.object_name.lower())
+    return '%s_%s' % (action, opts.model_name)
 
 
 def _get_all_permissions(opts, ctype):
@@ -133,11 +134,8 @@ def get_system_username():
         # (a very restricted chroot environment, for example).
         return ''
     if not six.PY3:
-        default_locale = locale.getdefaultlocale()[1]
-        if not default_locale:
-            return ''
         try:
-            result = result.decode(default_locale)
+            result = result.decode(DEFAULT_LOCALE_ENCODING)
         except UnicodeDecodeError:
             # UnicodeDecodeError - preventive treatment for non-latin Windows.
             return ''
@@ -174,7 +172,7 @@ def get_default_username(check_db=True):
     # Don't return the default username if it is already taken.
     if check_db and default_username:
         try:
-            auth_app.User.objects.get(username=default_username)
+            auth_app.User._default_manager.get(username=default_username)
         except auth_app.User.DoesNotExist:
             pass
         else:

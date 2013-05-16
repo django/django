@@ -36,7 +36,7 @@ A number of features have been added to Django's model layer:
 You can now control whether or not Django creates database tables for a model
 using the :attr:`~Options.managed` model option. This defaults to ``True``,
 meaning that Django will create the appropriate database tables in
-:djadmin:`syncdb` and remove them as part of :djadmin:`reset` command. That
+:djadmin:`syncdb` and remove them as part of ``reset`` command. That
 is, Django *manages* the database table's lifecycle.
 
 If you set this to ``False``, however, no database table creating or deletion
@@ -102,7 +102,7 @@ Testing improvements
 .. currentmodule:: django.test.client
 
 A couple of small but very useful improvements have been made to the
-:doc:`testing framework </topics/testing>`:
+:doc:`testing framework </topics/testing/index>`:
 
 * The test :class:`Client` now can automatically follow redirects with the
   ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This

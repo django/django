@@ -202,7 +202,6 @@ class GeometryField(Field):
 
     def formfield(self, **kwargs):
         defaults = {'form_class' : forms.GeometryField,
-                    'null' : self.null,
                     'geom_type' : self.geom_type,
                     'srid' : self.srid,
                     }

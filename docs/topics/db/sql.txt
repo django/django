@@ -24,9 +24,8 @@ return model instances:
 .. method:: Manager.raw(raw_query, params=None, translations=None)
 
 This method method takes a raw SQL query, executes it, and returns a
-:class:`~django.db.models.query.RawQuerySet` instance. This
-:class:`~django.db.models.query.RawQuerySet` instance can be iterated
-over just like an normal QuerySet to provide object instances.
+``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+can be iterated over just like an normal QuerySet to provide object instances.
 
 This is best illustrated with an example. Suppose you've got the following model::
 
@@ -156,7 +155,7 @@ of people with their ages calculated by the database::
     Jane is 42.
     ...
 
-__ http://www.postgresql.org/docs/8.4/static/functions-datetime.html
+__ http://www.postgresql.org/docs/current/static/functions-datetime.html
 
 Passing parameters into ``raw()``
 ---------------------------------
@@ -202,30 +201,38 @@ perform queries that don't map cleanly to models, or directly execute
 In these cases, you can always access the database directly, routing around
 the model layer entirely.
 
-The object ``django.db.connection`` represents the
-default database connection, and ``django.db.transaction`` represents the
-default database transaction. To use the database connection, call
-``connection.cursor()`` to get a cursor object. Then, call
-``cursor.execute(sql, [params])`` to execute the SQL and ``cursor.fetchone()``
-or ``cursor.fetchall()`` to return the resulting rows. After performing a data
-changing operation, you should then call
-``transaction.commit_unless_managed()`` to ensure your changes are committed
-to the database. If your query is purely a data retrieval operation, no commit
-is required. For example::
+The object ``django.db.connection`` represents the default database
+connection. To use the database connection, call ``connection.cursor()`` to
+get a cursor object. Then, call ``cursor.execute(sql, [params])`` to execute
+the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the
+resulting rows.
 
-    def my_custom_sql():
-        from django.db import connection, transaction
+For example::
+
+    from django.db import connection
+
+    def my_custom_sql(self):
         cursor = connection.cursor()
 
-        # Data modifying operation - commit required
         cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
-        transaction.commit_unless_managed()
 
-        # Data retrieval operation - no commit required
         cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
         row = cursor.fetchone()
 
         return row
+
+.. versionchanged:: 1.6
+
+    In Django 1.5 and earlier, after performing a data changing operation, you
+    had to call ``transaction.commit_unless_managed()`` to ensure your changes
+    were committed to the database. Since Django now defaults to database-level
+    autocommit, this isn't necessary any longer.
+
+Note that if you want to include literal percent signs in the query, you have to
+double them in the case you are passing parameters::
+
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
+     cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
 
 If you are using :doc:`more than one database </topics/db/multi-db>`, you can
 use ``django.db.connections`` to obtain the connection (and cursor) for a
@@ -236,7 +243,6 @@ alias::
     from django.db import connections
     cursor = connections['my_db_alias'].cursor()
     # Your code here...
-    transaction.commit_unless_managed(using='my_db_alias')
 
 By default, the Python DB API will return results without their field
 names, which means you end up with a ``list`` of values, rather than a
@@ -261,27 +267,18 @@ Here is an example of the difference between the two::
     >>> dictfetchall(cursor)
     [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
 
-
-.. _transactions-and-raw-sql:
-
-Transactions and raw SQL
-------------------------
-
-When you make a raw SQL call, Django will automatically mark the
-current transaction as dirty. You must then ensure that the
-transaction containing those calls is closed correctly. See :ref:`the
-notes on the requirements of Django's transaction handling
-<topics-db-transactions-requirements>` for more details.
-
 Connections and cursors
 -----------------------
 
 ``connection`` and ``cursor`` mostly implement the standard Python DB-API
-described in :pep:`249` (except when it comes to :doc:`transaction handling
-</topics/db/transactions>`). If you're not familiar with the Python DB-API, note
-that the SQL statement in ``cursor.execute()`` uses placeholders, ``"%s"``,
-rather than adding parameters directly within the SQL. If you use this
-technique, the underlying database library will automatically add quotes and
-escaping to your parameter(s) as necessary. (Also note that Django expects the
-``"%s"`` placeholder, *not* the ``"?"`` placeholder, which is used by the SQLite
-Python bindings. This is for the sake of consistency and sanity.)
+described in :pep:`249` — except when it comes to :doc:`transaction handling
+</topics/db/transactions>`.
+
+If you're not familiar with the Python DB-API, note that the SQL statement in
+``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding
+parameters directly within the SQL. If you use this technique, the underlying
+database library will automatically escape your parameters as necessary.
+
+Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
+placeholder, which is used by the SQLite Python bindings. This is for the sake
+of consistency and sanity.

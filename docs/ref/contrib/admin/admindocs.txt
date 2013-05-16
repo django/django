@@ -24,7 +24,7 @@ the following:
 
 * Add :mod:`django.contrib.admindocs` to your :setting:`INSTALLED_APPS`.
 * Add ``(r'^admin/doc/', include('django.contrib.admindocs.urls'))`` to
-  your :data:`urlpatterns`. Make sure it's included *before* the
+  your ``urlpatterns``. Make sure it's included *before* the
   ``r'^admin/'`` entry, so that requests to ``/admin/doc/`` don't get
   handled by the latter entry.
 * Install the docutils Python module (http://docutils.sf.net/).

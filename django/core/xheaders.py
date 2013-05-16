@@ -20,5 +20,5 @@ def populate_xheaders(request, response, model, object_id):
     if (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
             or (hasattr(request, 'user') and request.user.is_active
                 and request.user.is_staff)):
-        response['X-Object-Type'] = "%s.%s" % (model._meta.app_label, model._meta.object_name.lower())
+        response['X-Object-Type'] = "%s.%s" % (model._meta.app_label, model._meta.model_name)
         response['X-Object-Id'] = str(object_id)

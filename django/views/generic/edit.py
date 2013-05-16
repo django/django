@@ -1,6 +1,9 @@
+import warnings
+
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
+from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
@@ -50,7 +53,8 @@ class FormMixin(ContextMixin):
         Returns the supplied success URL.
         """
         if self.success_url:
-            url = self.success_url
+            # Forcing possible reverse_lazy evaluation
+            url = force_text(self.success_url)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
@@ -93,7 +97,14 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 # Try to get a queryset and extract the model class
                 # from that
                 model = self.get_queryset().model
-            return model_forms.modelform_factory(model)
+
+            fields = getattr(self, 'fields', None)
+            if fields is None:
+                warnings.warn("Using ModelFormMixin (base class of %s) without "
+                              "the 'fields' attribute is deprecated." % self.__class__.__name__,
+                              PendingDeprecationWarning)
+
+            return model_forms.modelform_factory(model, fields=fields)
 
     def get_form_kwargs(self):
         """
@@ -240,8 +251,9 @@ class DeletionMixin(object):
         redirects to the success URL.
         """
         self.object = self.get_object()
+        success_url = self.get_success_url()
         self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(success_url)
 
     # Add support for browsers which only accept GET and POST for now.
     def post(self, *args, **kwargs):
@@ -249,7 +261,7 @@ class DeletionMixin(object):
 
     def get_success_url(self):
         if self.success_url:
-            return self.success_url
+            return self.success_url % self.object.__dict__
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

@@ -7,15 +7,14 @@ code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-* Models and the database API (``tests/modeltests``),
-* Everything else in core Django code (``tests/regressiontests``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests``).
+* Models, the database API and everything else in core Django core (``tests/``),
+* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications </topics/testing>`
-for an explanation of how to write new tests.
+testing applications. See :doc:`Testing Django applications
+</topics/testing/overview>` for an explanation of how to write new tests.
 
 .. _running-unit-tests:
 
@@ -104,9 +103,9 @@ internationalization, type:
 
     ./runtests.py --settings=path.to.settings generic_relations i18n
 
-How do you find out the names of individual tests? Look in
-``tests/modeltests`` and ``tests/regressiontests`` — each directory name
-there is the name of a test. Contrib app names are also valid test names.
+How do you find out the names of individual tests? Look in ``tests/`` — each
+directory name there is the name of a test. Contrib app names are also valid
+test names.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
@@ -127,13 +126,13 @@ Running the Selenium tests
 
 Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
 real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path.
-
-Then, run the tests normally, for example:
+install the selenium_ package (version > 2.13) into your Python path and run
+the tests with the ``--selenium`` option:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite admin_inlines
+    ./runtests.py --settings=test_sqlite --selenium admin_inlines
+
 
 .. _running-unit-tests-dependencies:
 
@@ -144,9 +143,6 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  PyYAML_
-*  Markdown_
-*  Textile_
-*  Docutils_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
@@ -159,9 +155,6 @@ Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
-.. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
-.. _Textile: http://pypi.python.org/pypi/textile
-.. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
@@ -199,7 +192,7 @@ multiple modules by using a ``tests`` directory in the normal Python way.
 For the tests to be found, a ``models.py`` file must exist, even if it's empty.
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
-To run tests for just one contrib app (e.g. ``markup``), use the same
+To run tests for just one contrib app (e.g. ``auth``), use the same
 method as above::
 
-    ./runtests.py --settings=settings markup
+    ./runtests.py --settings=settings auth

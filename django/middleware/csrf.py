@@ -41,10 +41,10 @@ def _get_new_csrf_key():
 
 def get_token(request):
     """
-    Returns the the CSRF token required for a POST form. The token is an
+    Returns the CSRF token required for a POST form. The token is an
     alphanumeric value.
 
-    A side effect of calling this function is to make the the csrf_protect
+    A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
@@ -210,7 +210,8 @@ class CsrfViewMiddleware(object):
                             max_age = 60 * 60 * 24 * 7 * 52,
                             domain=settings.CSRF_COOKIE_DOMAIN,
                             path=settings.CSRF_COOKIE_PATH,
-                            secure=settings.CSRF_COOKIE_SECURE
+                            secure=settings.CSRF_COOKIE_SECURE,
+                            httponly=settings.CSRF_COOKIE_HTTPONLY
                             )
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))

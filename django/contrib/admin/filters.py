@@ -9,7 +9,7 @@ import datetime
 
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.admin.util import (get_model_from_relation,
@@ -102,7 +102,7 @@ class SimpleListFilter(ListFilter):
         }
         for lookup, title in self.lookup_choices:
             yield {
-                'selected': self.value() == lookup,
+                'selected': self.value() == force_text(lookup),
                 'query_string': cl.get_query_string({
                     self.parameter_name: lookup,
                 }, []),

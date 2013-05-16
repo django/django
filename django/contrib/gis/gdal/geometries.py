@@ -76,7 +76,7 @@ class OGRGeometry(GDALBase):
 
         str_instance = isinstance(geom_input, six.string_types)
 
-        # If HEX, unpack input to to a binary buffer.
+        # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
             geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False

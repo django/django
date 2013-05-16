@@ -6,68 +6,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Finnish (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
 "fi/)\n"
-"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Sisältö"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Metatieto"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "merkitty"
 msgstr[1] "merkitty"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "Merkitse valitut kommentit"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "hyväksytty"
 msgstr[1] "hyväksytty"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "Hyväksy valitut kommentit"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "poistettu"
 msgstr[1] "poistettu"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Poista valitut kommentit"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "1 kommentti %(count)s onnistuneesti."
 msgstr[1] "%(count)s kommenttia %(action)s onnistuneesti."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "Kommentit sivustolle %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Sivuston %(site_name)s viimeisimmät kommentit"
@@ -105,56 +105,56 @@ msgid ""
 msgstr ""
 "Jos syötät tähän kenttään jotain, kommenttisi luokitellaan roskapostiksi"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "sisältötyyppi"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "kohteen tunniste"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "käyttäjä"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "käyttäjän nimi"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "käyttäjän sähköpostiosoite"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "käyttäjän URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "kommentti"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "lähettämishetki"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP-osoite"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "on julkinen"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Piilottaaksesi kommentin näkymästä sivustolta, poista tämä ruksi."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "on poistettu"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -162,11 +162,11 @@ msgstr ""
 "Rastita jos kommentti on asiaankuulumaton. Kommentin tilalla näytetään\n"
 "viesti \"Tämä kommentti on poistettu\"."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "kommentit"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -174,7 +174,7 @@ msgstr ""
 "Kommentin lähettäjän nimeä ei voi muuttaa, koska lähettäjä on kirjautunut "
 "käyttäjä."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -182,7 +182,7 @@ msgstr ""
 "Kommentin lähettäjän sähköpostiosoitetta ei voi muuttaa, koska lähettäjä on "
 "kirjautunut käyttäjä."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -197,19 +197,19 @@ msgstr ""
 " \\n\n"
 " http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "merkintä"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "päivä"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "kommentin merkintä"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "kommenttien merkinnät"
 

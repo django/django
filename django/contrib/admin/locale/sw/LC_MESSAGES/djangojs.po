@@ -6,20 +6,20 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"PO-Revision-Date: 2012-07-06 17:25+0000\n"
 "Last-Translator: machaku <bmachaku@gmail.com>\n"
-"Language-Team: Swahili (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
-"Language: sw\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: sw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
-msgstr ""
+msgstr "vilivyomo: %s"
 
 #: static/admin/js/SelectFilter2.js:46
 #, c-format
@@ -31,7 +31,7 @@ msgstr ""
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Chapisha katika kisanduku hiki ili kuchuja orodha ya %s iliyopo."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -39,16 +39,16 @@ msgstr "Chuja"
 
 #: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr ""
+msgstr "Chagua kila kitu"
 
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Bofya kuchagua kila %s kwa pamoja."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Chagua"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -57,7 +57,7 @@ msgstr "Ondoa"
 #: static/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Chaguo la %s"
 
 #: static/admin/js/SelectFilter2.js:76
 #, c-format
@@ -65,15 +65,18 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Hii ni orodha ya %s uliyochagua. Unaweza kuondoa baadhi vitu kwa kuvichagua "
+"katika kisanduku hapo chini kisha kubofya mshale wa \"Ondoa\" kati ya "
+"visanduku viwili."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr "Onda yote"
+msgstr "Ondoa yote"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Bofya ili kuondoa %s chaguliwa kwa pamoja."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
@@ -86,6 +89,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Umeacha kuhifadhi mabadiliko katika uga zinazoharirika. Ikiwa utafanya tendo "
+"lingine, mabadiliko ambayo hayajahifadhiwa yatapotea."
 
 #: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
@@ -93,6 +98,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Umechagua tendo, lakini bado hujahifadhi mabadiliko yako katika uga husika. "
+"Tafadali bofya Sawa ukitaka kuhifadhi. Utahitajika kufanya upya kitendo "
 
 #: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
@@ -100,6 +107,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Umechagua tendo, lakini bado hujahifadhi mabadiliko yako katika uga husika.  "
+"Inawezekana unatafuta kitufe cha Nenda badala ya Hifadhi"
 
 #: static/admin/js/calendar.js:26
 msgid ""
@@ -141,11 +150,11 @@ msgstr "Usiku wa manane"
 
 #: static/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
-msgstr ""
+msgstr "Saa 12 alfajiri"
 
 #: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
-msgstr "Saa 6 mchana"
+msgstr "Adhuhuri"
 
 #: static/admin/js/admin/DateTimeShortcuts.js:92
 #: static/admin/js/admin/DateTimeShortcuts.js:204

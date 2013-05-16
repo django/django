@@ -16,7 +16,7 @@ class SpatialOperation(object):
         self.extra = kwargs
 
     def as_sql(self, geo_col, geometry='%s'):
-        return self.sql_template % self.params(geo_col, geometry)
+        return self.sql_template % self.params(geo_col, geometry), []
 
     def params(self, geo_col, geometry):
         params = {'function' : self.function,

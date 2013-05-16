@@ -66,6 +66,7 @@ We can't possibly document everything that's new in 1.0, but the documentation
 will be your definitive guide. Anywhere you see something like:
 
 .. versionadded:: 1.0
+
    This feature is new in Django 1.0
 
 You'll know that you're looking at something new or changed.

@@ -1,5 +1,5 @@
 import re
-from django.db.backends import BaseDatabaseIntrospection
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -30,6 +30,7 @@ class FlexibleFieldLookupDict(object):
         'real': 'FloatField',
         'text': 'TextField',
         'char': 'CharField',
+        'blob': 'BinaryField',
         'date': 'DateField',
         'datetime': 'DateTimeField',
         'time': 'TimeField',
@@ -60,7 +61,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
-        return [(info['name'], info['type'], None, info['size'], None, None,
+        return [FieldInfo(info['name'], info['type'], None, info['size'], None, None,
                  info['null_ok']) for info in self._table_info(cursor, table_name)]
 
     def get_relations(self, cursor, table_name):

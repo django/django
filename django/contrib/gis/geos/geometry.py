@@ -11,6 +11,8 @@ from django.contrib.gis import memoryview
 # super-class for mutable list behavior
 from django.contrib.gis.geos.mutable_list import ListMixin
 
+from django.contrib.gis.gdal.error import SRSException
+
 # GEOS-related dependencies.
 from django.contrib.gis.geos.base import GEOSBase, gdal
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
@@ -382,7 +384,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w().write(self).decode()
+        return wkt_w(self.hasz and 3 or 2).write(self).decode()
 
     @property
     def hex(self):
@@ -460,24 +462,26 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def ogr(self):
         "Returns the OGR Geometry for this Geometry."
-        if gdal.HAS_GDAL:
-            if self.srid:
-                return gdal.OGRGeometry(self.wkb, self.srid)
-            else:
-                return gdal.OGRGeometry(self.wkb)
-        else:
+        if not gdal.HAS_GDAL:
             raise GEOSException('GDAL required to convert to an OGRGeometry.')
+        if self.srid:
+            try:
+                return gdal.OGRGeometry(self.wkb, self.srid)
+            except SRSException:
+                pass
+        return gdal.OGRGeometry(self.wkb)
 
     @property
     def srs(self):
         "Returns the OSR SpatialReference for SRID of this Geometry."
-        if gdal.HAS_GDAL:
-            if self.srid:
-                return gdal.SpatialReference(self.srid)
-            else:
-                return None
-        else:
+        if not gdal.HAS_GDAL:
             raise GEOSException('GDAL required to return a SpatialReference object.')
+        if self.srid:
+            try:
+                return gdal.SpatialReference(self.srid)
+            except SRSException:
+                pass
+        return None
 
     @property
     def crs(self):

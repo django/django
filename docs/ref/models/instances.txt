@@ -292,12 +292,14 @@ follows this algorithm:
 
 * If the object's primary key attribute is set to a value that evaluates to
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
-  executes a ``SELECT`` query to determine whether a record with the given
-  primary key already exists.
-* If the record with the given primary key does already exist, Django
-  executes an ``UPDATE`` query.
-* If the object's primary key attribute is *not* set, or if it's set but a
-  record doesn't exist, Django executes an ``INSERT``.
+  executes an ``UPDATE``.
+* If the object's primary key attribute is *not* set or if the ``UPDATE``
+  didn't update anything, Django executes an ``INSERT``.
+
+.. versionchanged:: 1.6
+
+    Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
+    algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
@@ -601,7 +603,7 @@ pattern, it's possible to give a name to a pattern, and then reference the name
 rather than the view function. A named URL pattern is defined by replacing the
 pattern tuple by a call to the ``url`` function)::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url
 
     url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 
@@ -659,7 +661,7 @@ For every :class:`~django.db.models.DateField` and
 <django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-a :exc:`~django.db.DoesNotExist` exception when appropriate.
+a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
 described in :ref:`Field lookups <field-lookups>`.

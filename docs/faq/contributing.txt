@@ -27,7 +27,7 @@ to make it dead easy, even for someone who may not be intimately familiar with
 that area of the code, to understand the problem and verify the fix:
 
 * Are there clear instructions on how to reproduce the bug? If this
-  touches a dependency (such as PIL), a contrib module, or a specific
+  touches a dependency (such as Pillow/PIL), a contrib module, or a specific
   database, are those instructions clear enough even for someone not
   familiar with it?
 

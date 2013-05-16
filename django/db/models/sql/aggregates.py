@@ -1,6 +1,7 @@
 """
 Classes to represent the default SQL aggregate functions
 """
+import copy
 
 from django.db.models.fields import IntegerField, FloatField
 
@@ -62,27 +63,30 @@ class Aggregate(object):
 
         self.field = tmp
 
-    def relabel_aliases(self, change_map):
+    def relabeled_clone(self, change_map):
+        clone = copy.copy(self)
         if isinstance(self.col, (list, tuple)):
-            self.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
+            clone.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
+        return clone
 
     def as_sql(self, qn, connection):
-        "Return the aggregate, rendered as SQL."
+        "Return the aggregate, rendered as SQL with parameters."
+        params = []
 
         if hasattr(self.col, 'as_sql'):
-            field_name = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
             field_name = '.'.join([qn(c) for c in self.col])
         else:
             field_name = self.col
 
-        params = {
+        substitutions = {
             'function': self.sql_function,
             'field': field_name
         }
-        params.update(self.extra)
+        substitutions.update(self.extra)
 
-        return self.sql_template % params
+        return self.sql_template % substitutions, params
 
 
 class Avg(Aggregate):

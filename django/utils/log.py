@@ -117,7 +117,7 @@ class AdminEmailHandler(logging.Handler):
                          connection=self.connection())
 
     def connection(self):
-        return get_connection(backend=self.email_backend)
+        return get_connection(backend=self.email_backend, fail_silently=True)
 
     def format_subject(self, subject):
         """
@@ -152,4 +152,4 @@ class RequireDebugFalse(logging.Filter):
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
-       return settings.DEBUG
+        return settings.DEBUG

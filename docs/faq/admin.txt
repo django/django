@@ -49,7 +49,7 @@ How do I limit admin access so that objects can only be edited by the users who 
 The :class:`~django.contrib.admin.ModelAdmin` class also provides customization
 hooks that allow you to control the visibility and editability of objects in the
 admin. Using the same trick of extracting the user from the request, the
-:meth:`~django.contrib.admin.ModelAdmin.queryset` and
+:meth:`~django.contrib.admin.ModelAdmin.get_queryset` and
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` can be used to
 control the visibility and editability of objects in the admin.
 

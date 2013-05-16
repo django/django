@@ -10,7 +10,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
 .. code-block:: python
 
-    from django.db import models, transaction, IntegrityError
+    from django.db import models
 
     class Place(models.Model):
         name = models.CharField(max_length=50)

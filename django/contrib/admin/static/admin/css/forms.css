@@ -65,6 +65,7 @@ form ul.inline li {
     padding: 3px 10px 0 0;
     float: left;
     width: 8em;
+    word-wrap: break-word;
 }
 
 .aligned ul label {

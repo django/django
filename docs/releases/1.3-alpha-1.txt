@@ -61,19 +61,18 @@ Django 1.3 ships with a new contrib app ``'django.contrib.staticfiles'``
 to help developers handle the static media files (images, CSS, Javascript,
 etc.) that are needed to render a complete web page.
 
-In previous versions of Django, it was common to place static assets in
-:setting:`MEDIA_ROOT` along with user-uploaded files, and serve them both at
-:setting:`MEDIA_URL`. Part of the purpose of introducing the ``staticfiles``
-app is to make it easier to keep static files separate from user-uploaded
-files. For this reason, you will probably want to make your
-:setting:`MEDIA_ROOT` and :setting:`MEDIA_URL` different from your
-:setting:`STATICFILES_ROOT` and :setting:`STATICFILES_URL`. You will need to
-arrange for serving of files in :setting:`MEDIA_ROOT` yourself;
-``staticfiles`` does not deal with user-uploaded media at all.
+In previous versions of Django, it was common to place static assets
+in :setting:`MEDIA_ROOT` along with user-uploaded files, and serve
+them both at :setting:`MEDIA_URL`. Part of the purpose of introducing
+the ``staticfiles`` app is to make it easier to keep static files
+separate from user-uploaded files. Static assets should now go in
+``static/`` subdirectories of your apps or in other static assets
+directories listed in :setting:`STATICFILES_DIRS`, and will be served
+at :setting:`STATIC_URL`.
 
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details or learn how to :doc:`manage static files
-</howto/static-files>`.
+</howto/static-files/index>`.
 
 ``unittest2`` support
 ~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +87,7 @@ To access this library, Django provides the
 ``django.utils.unittest`` module alias. If you are using Python
 2.7, or you have installed unittest2 locally, Django will map the
 alias to the installed version of the unittest library. Otherwise,
-Django will use it's own bundled version of unittest2.
+Django will use its own bundled version of unittest2.
 
 To use this alias, simply use::
 
@@ -106,15 +105,13 @@ you just won't get any of the nice new unittest2 features.
 Transaction context managers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Users of Python 2.5 and above may now use :ref:`transaction management functions
-<transaction-management-functions>` as `context managers`_. For example::
+Users of Python 2.5 and above may now use transaction management functions as
+`context managers`_. For example::
 
     with transaction.autocommit():
         # ...
 
 .. _context managers: http://docs.python.org/glossary.html#term-context-manager
-
-For more information, see :ref:`transaction-management-functions`.
 
 Configurable delete-cascade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,13 +148,13 @@ process has been on adding lots of smaller, long standing feature
 requests. These include:
 
 * Improved tools for accessing and manipulating the current Site via
-  :func:`django.contrib.sites.models.get_current_site`.
+  ``django.contrib.sites.models.get_current_site()``.
 
 * A :class:`~django.test.client.RequestFactory` for mocking
   requests in tests.
 
 * A new test assertion --
-  :meth:`~django.test.client.Client.assertNumQueries` -- making it
+  :meth:`~django.test.TestCase.assertNumQueries` -- making it
   easier to test the database activity associated with a view.
 
 
@@ -280,7 +277,7 @@ over the next few release cycles.
 Code taking advantage of any of the features below will raise a
 ``PendingDeprecationWarning`` in Django 1.3. This warning will be
 silent by default, but may be turned on using Python's :mod:`warnings`
-module, or by running Python with a ``-Wd`` or `-Wall` flag.
+module, or by running Python with a ``-Wd`` or ``-Wall`` flag.
 
 In Django 1.4, these warnings will become a ``DeprecationWarning``,
 which is *not* silent. In Django 1.5 support for these features will
@@ -312,37 +309,35 @@ As a result of the introduction of class-based generic views, the
 function-based generic views provided by Django have been deprecated.
 The following modules and the views they contain have been deprecated:
 
-* :mod:`django.views.generic.create_update`
-* :mod:`django.views.generic.date_based`
-* :mod:`django.views.generic.list_detail`
-* :mod:`django.views.generic.simple`
+* ``django.views.generic.create_update``
+* ``django.views.generic.date_based``
+* ``django.views.generic.list_detail``
+* ``django.views.generic.simple``
 
 Test client response ``template`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django's :ref:`test client <test-client>` returns
 :class:`~django.test.client.Response` objects annotated with extra testing
-information. In Django versions prior to 1.3, this included a
-:attr:`~django.test.client.Response.template` attribute containing information
-about templates rendered in generating the response: either None, a single
-:class:`~django.template.Template` object, or a list of
-:class:`~django.template.Template` objects. This inconsistency in return values
-(sometimes a list, sometimes not) made the attribute difficult to work with.
+information. In Django versions prior to 1.3, this included a ``template``
+attribute containing information about templates rendered in generating the
+response: either None, a single :class:`~django.template.Template` object, or a
+list of :class:`~django.template.Template` objects. This inconsistency in
+return values (sometimes a list, sometimes not) made the attribute difficult
+to work with.
 
-In Django 1.3 the :attr:`~django.test.client.Response.template` attribute is
-deprecated in favor of a new :attr:`~django.test.client.Response.templates`
-attribute, which is always a list, even if it has only a single element or no
-elements.
+In Django 1.3 the ``template`` attribute is deprecated in favor of a new
+:attr:`~django.test.client.Response.templates` attribute, which is always a
+list, even if it has only a single element or no elements.
 
 ``DjangoTestRunner``
 ~~~~~~~~~~~~~~~~~~~~
 
 As a result of the introduction of support for unittest2, the features
-of :class:`django.test.simple.DjangoTestRunner` (including fail-fast
+of ``django.test.simple.DjangoTestRunner`` (including fail-fast
 and Ctrl-C test termination) have been made redundant. In view of this
-redundancy, :class:`~django.test.simple.DjangoTestRunner` has been
-turned into an empty placeholder class, and will be removed entirely
-in Django 1.5.
+redundancy, ``DjangoTestRunner`` has been turned into an empty placeholder
+class, and will be removed entirely in Django 1.5.
 
 The Django 1.3 roadmap
 ======================

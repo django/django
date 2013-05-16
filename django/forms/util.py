@@ -6,6 +6,8 @@ from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
+import sys
 
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
@@ -20,7 +22,7 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    return format_html_join('', ' {0}="{1}"', attrs.items())
+    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
 @python_2_unicode_compatible
 class ErrorDict(dict):
@@ -78,11 +80,12 @@ def from_current_timezone(value):
         try:
             return timezone.make_aware(value, current_timezone)
         except Exception:
-            raise ValidationError(_('%(datetime)s couldn\'t be interpreted '
-                                    'in time zone %(current_timezone)s; it '
-                                    'may be ambiguous or it may not exist.')
-                                  % {'datetime': value,
-                                     'current_timezone': current_timezone})
+            msg = _(
+                '%(datetime)s couldn\'t be interpreted '
+                'in time zone %(current_timezone)s; it '
+                'may be ambiguous or it may not exist.') % {'datetime': value, 'current_timezone':
+                current_timezone}
+            six.reraise(ValidationError, ValidationError(msg), sys.exc_info()[2])
     return value
 
 def to_current_timezone(value):

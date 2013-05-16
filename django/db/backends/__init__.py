@@ -1,19 +1,25 @@
+import datetime
+import time
+
 from django.db.utils import DatabaseError
 
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
+from collections import namedtuple
 from contextlib import contextmanager
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
+from django.db.backends.signals import connection_created
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
+from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils import six
-from django.utils.timezone import is_aware
+from django.utils import timezone
 
 
 class BaseDatabaseWrapper(object):
@@ -34,12 +40,34 @@ class BaseDatabaseWrapper(object):
         self.alias = alias
         self.use_debug_cursor = None
 
-        # Transaction related attributes
-        self.transaction_state = []
+        # Savepoint management related attributes
         self.savepoint_state = 0
-        self._dirty = None
-        self._thread_ident = thread.get_ident()
+
+        # Transaction management related attributes
+        self.autocommit = False
+        self.transaction_state = []
+        # Tracks if the connection is believed to be in transaction. This is
+        # set somewhat aggressively, as the DBAPI doesn't make it easy to
+        # deduce if the connection is in transaction or not.
+        self._dirty = False
+        # Tracks if the connection is in a transaction managed by 'atomic'.
+        self.in_atomic_block = False
+        # List of savepoints created by 'atomic'
+        self.savepoint_ids = []
+        # Tracks if the outermost 'atomic' block should commit on exit,
+        # ie. if autocommit was active on entry.
+        self.commit_on_exit = True
+        # Tracks if the transaction should be rolled back to the next
+        # available savepoint because of an exception in an inner block.
+        self.needs_rollback = False
+
+        # Connection termination related attributes
+        self.close_at = None
+        self.errors_occurred = False
+
+        # Thread-safety related attributes
         self.allow_thread_sharing = allow_thread_sharing
+        self._thread_ident = thread.get_ident()
 
     def __eq__(self, other):
         return self.alias == other.alias
@@ -47,47 +75,196 @@ class BaseDatabaseWrapper(object):
     def __ne__(self, other):
         return not self == other
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(self.alias)
+
+    ##### Backend-specific methods for creating connections and cursors #####
+
+    def get_connection_params(self):
+        """Returns a dict of parameters suitable for get_new_connection."""
+        raise NotImplementedError
+
+    def get_new_connection(self, conn_params):
+        """Opens a connection to the database."""
+        raise NotImplementedError
+
+    def init_connection_state(self):
+        """Initializes the database connection settings."""
+        raise NotImplementedError
+
+    def create_cursor(self):
+        """Creates a cursor. Assumes that a connection is established."""
+        raise NotImplementedError
+
+    ##### Backend-specific methods for creating connections #####
+
+    def connect(self):
+        """Connects to the database. Assumes that the connection is closed."""
+        # In case the previous connection was closed while in an atomic block
+        self.in_atomic_block = False
+        self.savepoint_ids = []
+        # Reset parameters defining when to close the connection
+        max_age = self.settings_dict['CONN_MAX_AGE']
+        self.close_at = None if max_age is None else time.time() + max_age
+        self.errors_occurred = False
+        # Establish the connection
+        conn_params = self.get_connection_params()
+        self.connection = self.get_new_connection(conn_params)
+        self.init_connection_state()
+        if self.settings_dict['AUTOCOMMIT']:
+            self.set_autocommit(True)
+        connection_created.send(sender=self.__class__, connection=self)
+
+    def ensure_connection(self):
+        """
+        Guarantees that a connection to the database is established.
+        """
+        if self.connection is None:
+            with self.wrap_database_errors():
+                self.connect()
+
+    ##### Backend-specific wrappers for PEP-249 connection methods #####
+
+    def _cursor(self):
+        self.ensure_connection()
+        with self.wrap_database_errors():
+            return self.create_cursor()
 
     def _commit(self):
         if self.connection is not None:
-            return self.connection.commit()
+            with self.wrap_database_errors():
+                return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            return self.connection.rollback()
+            with self.wrap_database_errors():
+                return self.connection.rollback()
 
-    def _enter_transaction_management(self, managed):
-        """
-        A hook for backend-specific changes required when entering manual
-        transaction handling.
-        """
-        pass
+    def _close(self):
+        if self.connection is not None:
+            with self.wrap_database_errors():
+                return self.connection.close()
 
-    def _leave_transaction_management(self, managed):
+    ##### Generic wrappers for PEP-249 connection methods #####
+
+    def cursor(self):
         """
-        A hook for backend-specific changes required when leaving manual
-        transaction handling. Will usually be implemented only when
-        _enter_transaction_management() is also required.
+        Creates a cursor, opening a connection if necessary.
         """
-        pass
+        self.validate_thread_sharing()
+        if (self.use_debug_cursor or
+            (self.use_debug_cursor is None and settings.DEBUG)):
+            cursor = self.make_debug_cursor(self._cursor())
+        else:
+            cursor = util.CursorWrapper(self._cursor(), self)
+        return cursor
+
+    def commit(self):
+        """
+        Commits a transaction and resets the dirty flag.
+        """
+        self.validate_thread_sharing()
+        self.validate_no_atomic_block()
+        self._commit()
+        self.set_clean()
+
+    def rollback(self):
+        """
+        Rolls back a transaction and resets the dirty flag.
+        """
+        self.validate_thread_sharing()
+        self.validate_no_atomic_block()
+        self._rollback()
+        self.set_clean()
+
+    def close(self):
+        """
+        Closes the connection to the database.
+        """
+        self.validate_thread_sharing()
+        # Don't call validate_no_atomic_block() to avoid making it difficult
+        # to get rid of a connection in an invalid state. The next connect()
+        # will reset the transaction state anyway.
+        try:
+            self._close()
+        finally:
+            self.connection = None
+        self.set_clean()
+
+    ##### Backend-specific savepoint management methods #####
 
     def _savepoint(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_create_sql(sid))
 
     def _savepoint_rollback(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_rollback_sql(sid))
 
     def _savepoint_commit(self, sid):
-        if not self.features.uses_savepoints:
-            return
         self.cursor().execute(self.ops.savepoint_commit_sql(sid))
 
-    def enter_transaction_management(self, managed=True):
+    def _savepoint_allowed(self):
+        # Savepoints cannot be created outside a transaction
+        return self.features.uses_savepoints and not self.autocommit
+
+    ##### Generic savepoint management methods #####
+
+    def savepoint(self):
+        """
+        Creates a savepoint inside the current transaction. Returns an
+        identifier for the savepoint that will be used for the subsequent
+        rollback or commit. Does nothing if savepoints are not supported.
+        """
+        if not self._savepoint_allowed():
+            return
+
+        thread_ident = thread.get_ident()
+        tid = str(thread_ident).replace('-', '')
+
+        self.savepoint_state += 1
+        sid = "s%s_x%d" % (tid, self.savepoint_state)
+
+        self.validate_thread_sharing()
+        self._savepoint(sid)
+
+        return sid
+
+    def savepoint_rollback(self, sid):
+        """
+        Rolls back to a savepoint. Does nothing if savepoints are not supported.
+        """
+        if not self._savepoint_allowed():
+            return
+
+        self.validate_thread_sharing()
+        self._savepoint_rollback(sid)
+
+    def savepoint_commit(self, sid):
+        """
+        Releases a savepoint. Does nothing if savepoints are not supported.
+        """
+        if not self._savepoint_allowed():
+            return
+
+        self.validate_thread_sharing()
+        self._savepoint_commit(sid)
+
+    def clean_savepoints(self):
+        """
+        Resets the counter used to generate unique savepoint ids in this thread.
+        """
+        self.savepoint_state = 0
+
+    ##### Backend-specific transaction management methods #####
+
+    def _set_autocommit(self, autocommit):
+        """
+        Backend-specific implementation to enable or disable autocommit.
+        """
+        raise NotImplementedError
+
+    ##### Generic transaction management methods #####
+
+    def enter_transaction_management(self, managed=True, forced=False):
         """
         Enters transaction management for a running thread. It must be balanced with
         the appropriate leave_transaction_management call, since the actual state is
@@ -96,15 +273,22 @@ class BaseDatabaseWrapper(object):
         The state and dirty flag are carried over from the surrounding block or
         from the settings, if there is no surrounding block (dirty is always false
         when no current block is running).
-        """
-        if self.transaction_state:
-            self.transaction_state.append(self.transaction_state[-1])
-        else:
-            self.transaction_state.append(settings.TRANSACTIONS_MANAGED)
 
-        if self._dirty is None:
-            self._dirty = False
-        self._enter_transaction_management(managed)
+        If you switch off transaction management and there is a pending
+        commit/rollback, the data will be commited, unless "forced" is True.
+        """
+        self.validate_no_atomic_block()
+
+        self.ensure_connection()
+
+        self.transaction_state.append(managed)
+
+        if not managed and self.is_dirty() and not forced:
+            self.commit()
+            self.set_clean()
+
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
         """
@@ -112,34 +296,57 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
+        self.validate_no_atomic_block()
+
+        self.ensure_connection()
+
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
             raise TransactionManagementError(
                 "This code isn't under transaction management")
-        # We will pass the next status (after leaving the previous state
-        # behind) to subclass hook.
-        self._leave_transaction_management(self.is_managed())
+
+        if self.transaction_state:
+            managed = self.transaction_state[-1]
+        else:
+            managed = not self.settings_dict['AUTOCOMMIT']
+
         if self._dirty:
             self.rollback()
+            if managed == self.autocommit:
+                self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
-        self._dirty = False
 
-    def validate_thread_sharing(self):
+        if managed == self.autocommit:
+            self.set_autocommit(not managed)
+
+    def set_autocommit(self, autocommit):
         """
-        Validates that the connection isn't accessed by another thread than the
-        one which originally created it, unless the connection was explicitly
-        authorized to be shared between threads (via the `allow_thread_sharing`
-        property). Raises an exception if the validation fails.
+        Enable or disable autocommit.
         """
-        if (not self.allow_thread_sharing
-            and self._thread_ident != thread.get_ident()):
-                raise DatabaseError("DatabaseWrapper objects created in a "
-                    "thread can only be used in that same thread. The object "
-                    "with alias '%s' was created in thread id %s and this is "
-                    "thread id %s."
-                    % (self.alias, self._thread_ident, thread.get_ident()))
+        self.validate_no_atomic_block()
+        self.ensure_connection()
+        self._set_autocommit(autocommit)
+        self.autocommit = autocommit
+
+    def validate_no_atomic_block(self):
+        """
+        Raise an error if an atomic block is active.
+        """
+        if self.in_atomic_block:
+            raise TransactionManagementError(
+                "This is forbidden when an 'atomic' block is active.")
+
+    def abort(self):
+        """
+        Roll back any ongoing transaction and clean the transaction state
+        stack.
+        """
+        if self._dirty:
+            self.rollback()
+        while self.transaction_state:
+            self.leave_transaction_management()
 
     def is_dirty(self):
         """
@@ -154,11 +361,8 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        if self._dirty is not None:
+        if not self.autocommit:
             self._dirty = True
-        else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
 
     def set_clean(self):
         """
@@ -166,114 +370,16 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether a commit or rollback
         should happen.
         """
-        if self._dirty is not None:
-            self._dirty = False
-        else:
-            raise TransactionManagementError("This code isn't under transaction management")
+        self._dirty = False
         self.clean_savepoints()
 
-    def clean_savepoints(self):
-        self.savepoint_state = 0
-
-    def is_managed(self):
-        """
-        Checks whether the transaction manager is in manual or in auto state.
-        """
-        if self.transaction_state:
-            return self.transaction_state[-1]
-        # Note that this setting isn't documented, and is only used here, and
-        # in enter_transaction_management()
-        return settings.TRANSACTIONS_MANAGED
-
-    def managed(self, flag=True):
-        """
-        Puts the transaction manager into a manual state: managed transactions have
-        to be committed explicitly by the user. If you switch off transaction
-        management and there is a pending commit/rollback, the data will be
-        commited.
-        """
-        top = self.transaction_state
-        if top:
-            top[-1] = flag
-            if not flag and self.is_dirty():
-                self._commit()
-                self.set_clean()
-        else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
-
-    def commit_unless_managed(self):
-        """
-        Commits changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self._commit()
-            self.clean_savepoints()
-        else:
-            self.set_dirty()
-
-    def rollback_unless_managed(self):
-        """
-        Rolls back changes if the system is not in managed transaction mode.
-        """
-        self.validate_thread_sharing()
-        if not self.is_managed():
-            self._rollback()
-        else:
-            self.set_dirty()
-
-    def commit(self):
-        """
-        Does the commit itself and resets the dirty flag.
-        """
-        self.validate_thread_sharing()
-        self._commit()
-        self.set_clean()
-
-    def rollback(self):
-        """
-        This function does the rollback itself and resets the dirty flag.
-        """
-        self.validate_thread_sharing()
-        self._rollback()
-        self.set_clean()
-
-    def savepoint(self):
-        """
-        Creates a savepoint (if supported and required by the backend) inside the
-        current transaction. Returns an identifier for the savepoint that will be
-        used for the subsequent rollback or commit.
-        """
-        thread_ident = thread.get_ident()
-
-        self.savepoint_state += 1
-
-        tid = str(thread_ident).replace('-', '')
-        sid = "s%s_x%d" % (tid, self.savepoint_state)
-        self._savepoint(sid)
-        return sid
-
-    def savepoint_rollback(self, sid):
-        """
-        Rolls back the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
-        """
-        self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_rollback(sid)
-
-    def savepoint_commit(self, sid):
-        """
-        Commits the most recent savepoint (if one exists). Does nothing if
-        savepoints are not supported.
-        """
-        self.validate_thread_sharing()
-        if self.savepoint_state:
-            self._savepoint_commit(sid)
+    ##### Foreign key constraints checks handling #####
 
     @contextmanager
     def constraint_checks_disabled(self):
+        """
+        Context manager that disables foreign key constraint checking.
+        """
         disabled = self.disable_constraint_checking()
         try:
             yield
@@ -283,41 +389,113 @@ class BaseDatabaseWrapper(object):
 
     def disable_constraint_checking(self):
         """
-        Backends can implement as needed to temporarily disable foreign key constraint
-        checking.
+        Backends can implement as needed to temporarily disable foreign key
+        constraint checking.
         """
         pass
 
     def enable_constraint_checking(self):
         """
-        Backends can implement as needed to re-enable foreign key constraint checking.
+        Backends can implement as needed to re-enable foreign key constraint
+        checking.
         """
         pass
 
     def check_constraints(self, table_names=None):
         """
-        Backends can override this method if they can apply constraint checking (e.g. via "SET CONSTRAINTS
-        ALL IMMEDIATE"). Should raise an IntegrityError if any invalid foreign key references are encountered.
+        Backends can override this method if they can apply constraint
+        checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE"). Should raise an
+        IntegrityError if any invalid foreign key references are encountered.
         """
         pass
 
-    def close(self):
-        self.validate_thread_sharing()
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
+    ##### Connection termination handling #####
 
-    def cursor(self):
-        self.validate_thread_sharing()
-        if (self.use_debug_cursor or
-            (self.use_debug_cursor is None and settings.DEBUG)):
-            cursor = self.make_debug_cursor(self._cursor())
-        else:
-            cursor = util.CursorWrapper(self._cursor(), self)
-        return cursor
+    def is_usable(self):
+        """
+        Tests if the database connection is usable.
+        This function may assume that self.connection is not None.
+        """
+        raise NotImplementedError
+
+    def close_if_unusable_or_obsolete(self):
+        """
+        Closes the current connection if unrecoverable errors have occurred,
+        or if it outlived its maximum age.
+        """
+        if self.connection is not None:
+            # If the application didn't restore the original autocommit setting,
+            # don't take chances, drop the connection.
+            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+                self.close()
+                return
+
+            if self.errors_occurred:
+                if self.is_usable():
+                    self.errors_occurred = False
+                else:
+                    self.close()
+                    return
+
+            if self.close_at is not None and time.time() >= self.close_at:
+                self.close()
+                return
+
+    ##### Thread safety handling #####
+
+    def validate_thread_sharing(self):
+        """
+        Validates that the connection isn't accessed by another thread than the
+        one which originally created it, unless the connection was explicitly
+        authorized to be shared between threads (via the `allow_thread_sharing`
+        property). Raises an exception if the validation fails.
+        """
+        if not (self.allow_thread_sharing
+                or self._thread_ident == thread.get_ident()):
+            raise DatabaseError("DatabaseWrapper objects created in a "
+                "thread can only be used in that same thread. The object "
+                "with alias '%s' was created in thread id %s and this is "
+                "thread id %s."
+                % (self.alias, self._thread_ident, thread.get_ident()))
+
+    ##### Miscellaneous #####
+
+    def wrap_database_errors(self):
+        """
+        Context manager and decorator that re-throws backend-specific database
+        exceptions using Django's common wrappers.
+        """
+        return DatabaseErrorWrapper(self)
 
     def make_debug_cursor(self, cursor):
+        """
+        Creates a cursor that logs all queries in self.queries.
+        """
         return util.CursorDebugWrapper(cursor, self)
+
+    @contextmanager
+    def temporary_connection(self):
+        """
+        Context manager that ensures that a connection is established, and
+        if it opened one, closes it to avoid leaving a dangling connection.
+        This is useful for operations outside of the request-response cycle.
+
+        Provides a cursor: with self.temporary_connection() as cursor: ...
+        """
+        must_close = self.connection is None
+        cursor = self.cursor()
+        try:
+            yield cursor
+        finally:
+            cursor.close()
+            if must_close:
+                self.close()
+
+    def _start_transaction_under_autocommit(self):
+        """
+        Only required when autocommits_when_autocommit_is_off = True.
+        """
+        raise NotImplementedError
 
 
 class BaseDatabaseFeatures(object):
@@ -338,7 +516,6 @@ class BaseDatabaseFeatures(object):
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     has_bulk_insert = False
-    uses_autocommit = False
     uses_savepoints = False
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
@@ -387,6 +564,9 @@ class BaseDatabaseFeatures(object):
     # Can datetimes with timezones be used?
     supports_timezones = True
 
+    # Does the database have a copy of the zoneinfo database?
+    has_zoneinfo_database = True
+
     # When performing a GROUP BY, is an ORDER BY NULL required
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
@@ -419,6 +599,10 @@ class BaseDatabaseFeatures(object):
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
+    # Does the backend decide to commit before SAVEPOINT statements
+    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    autocommits_when_autocommit_is_off = False
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -430,17 +614,15 @@ class BaseDatabaseFeatures(object):
             # otherwise autocommit will cause the confimation to
             # fail.
             self.connection.enter_transaction_management()
-            self.connection.managed(True)
             cursor = self.connection.cursor()
             cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-            self.connection._commit()
+            self.connection.commit()
             cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-            self.connection._rollback()
+            self.connection.rollback()
             cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
             count, = cursor.fetchone()
             cursor.execute('DROP TABLE ROLLBACK_TEST')
-            self.connection._commit()
-            self.connection._dirty = False
+            self.connection.commit()
         finally:
             self.connection.leave_transaction_management()
         return count == 0
@@ -513,7 +695,7 @@ class BaseDatabaseOperations(object):
     def date_trunc_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
-        truncates the given date field field_name to a DATE object with only
+        truncates the given date field field_name to a date object with only
         the given specificity.
         """
         raise NotImplementedError()
@@ -526,6 +708,23 @@ class BaseDatabaseOperations(object):
         This SQL should include a '%s' in place of the field's name.
         """
         return "%s"
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that extracts a value from the given
+        datetime field field_name, and a tuple of parameters.
+        """
+        raise NotImplementedError()
+
+    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+        """
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
+        'second', returns the SQL that truncates the given datetime field
+        field_name to a datetime object with only the given specificity, and
+        a tuple of parameters.
+        """
+        raise NotImplementedError()
 
     def deferrable_sql(self):
         """
@@ -615,11 +814,13 @@ class BaseDatabaseOperations(object):
         # Convert params to contain Unicode values.
         to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
-            u_params = tuple([to_unicode(val) for val in params])
+            u_params = tuple(to_unicode(val) for val in params)
+        elif params is None:
+            u_params = ()
         else:
-            u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
+            u_params = dict((to_unicode(k), to_unicode(v)) for k, v in params.items())
 
-        return force_text(sql) % u_params
+        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -723,19 +924,19 @@ class BaseDatabaseOperations(object):
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
-        raise NotImplementedError
+        return "SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_commit_sql(self, sid):
         """
         Returns the SQL for committing the given savepoint.
         """
-        raise NotImplementedError
+        return "RELEASE SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
         """
         Returns the SQL for rolling back the given savepoint.
         """
-        raise NotImplementedError
+        return "ROLLBACK TO SAVEPOINT %s" % self.quote_name(sid)
 
     def set_time_zone_sql(self):
         """
@@ -786,6 +987,9 @@ class BaseDatabaseOperations(object):
         return "BEGIN;"
 
     def end_transaction_sql(self, success=True):
+        """
+        Returns the SQL statement required to end a transaction.
+        """
         if not success:
             return "ROLLBACK;"
         return "COMMIT;"
@@ -843,7 +1047,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        if is_aware(value):
+        if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
         return six.text_type(value)
 
@@ -856,45 +1060,47 @@ class BaseDatabaseOperations(object):
             return None
         return util.format_number(value, max_digits, decimal_places)
 
-    def year_lookup_bounds(self, value):
-        """
-        Returns a two-elements list with the lower and upper bound to be used
-        with a BETWEEN operator to query a field value using a year lookup
-
-        `value` is an int, containing the looked-up year.
-        """
-        first = '%s-01-01 00:00:00'
-        second = '%s-12-31 23:59:59.999999'
-        return [first % value, second % value]
-
     def year_lookup_bounds_for_date_field(self, value):
         """
         Returns a two-elements list with the lower and upper bound to be used
-        with a BETWEEN operator to query a DateField value using a year lookup
+        with a BETWEEN operator to query a DateField value using a year
+        lookup.
 
         `value` is an int, containing the looked-up year.
-
-        By default, it just calls `self.year_lookup_bounds`. Some backends need
-        this hook because on their DB date fields can't be compared to values
-        which include a time part.
         """
-        return self.year_lookup_bounds(value)
+        first = datetime.date(value, 1, 1)
+        second = datetime.date(value, 12, 31)
+        return [first, second]
+
+    def year_lookup_bounds_for_datetime_field(self, value):
+        """
+        Returns a two-elements list with the lower and upper bound to be used
+        with a BETWEEN operator to query a DateTimeField value using a year
+        lookup.
+
+        `value` is an int, containing the looked-up year.
+        """
+        first = datetime.datetime(value, 1, 1)
+        second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
+        if settings.USE_TZ:
+            tz = timezone.get_current_timezone()
+            first = timezone.make_aware(first, tz)
+            second = timezone.make_aware(second, tz)
+        return [first, second]
 
     def convert_values(self, value, field):
         """
         Coerce the value returned by the database backend into a consistent type
         that is compatible with the field type.
         """
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
+        if value is None:
             return value
-        elif internal_type == 'FloatField':
+        internal_type = field.get_internal_type()
+        if internal_type == 'FloatField':
             return float(value)
         elif (internal_type and (internal_type.endswith('IntegerField')
                                  or internal_type == 'AutoField')):
             return int(value)
-        elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
-            return value
         return value
 
     def check_aggregate_support(self, aggregate_func):
@@ -921,6 +1127,12 @@ class BaseDatabaseOperations(object):
         backend due to #10888.
         """
         return params
+
+
+# Structure returned by the DB-API cursor.description interface (PEP 249)
+FieldInfo = namedtuple('FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok'
+)
 
 class BaseDatabaseIntrospection(object):
     """

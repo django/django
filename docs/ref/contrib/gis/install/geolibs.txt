@@ -88,16 +88,16 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.3.5 from the refractions Web site and untar the source
+First, download GEOS 3.3.8 from the refractions Web site and untar the source
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.3.5.tar.bz2
-    $ tar xjf geos-3.3.5.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
+    $ tar xjf geos-3.3.8.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.3.5
+    $ cd geos-3.3.8
     $ ./configure
     $ make
     $ sudo make install
@@ -181,9 +181,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.9.1.tar.gz
-    $ tar xzf gdal-1.9.1.tar.gz
-    $ cd gdal-1.9.1
+    $ wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
+    $ tar xzf gdal-1.9.2.tar.gz
+    $ cd gdal-1.9.2
 
 Configure, make and install::
 
@@ -194,7 +194,7 @@ Configure, make and install::
 
 .. note::
 
-   Because GeoDjango has it's own Python interface, the preceding instructions
+   Because GeoDjango has its own Python interface, the preceding instructions
    do not build GDAL's own Python bindings.  The bindings may be built by
    adding the ``--with-python`` flag when running ``configure``.  See
    `GDAL/OGR In Python`__ for more information on GDAL's bindings.
@@ -216,7 +216,7 @@ Can't find GDAL library
 When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
 will be false:
 
-.. code-block:: pycon
+.. code-block:: python
 
     >>> from django.contrib.gis import gdal
     >>> gdal.HAS_GDAL

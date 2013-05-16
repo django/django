@@ -70,8 +70,8 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
                 SELECT p.id, p.question, p.poll_date, COUNT(*)
                 FROM polls_opinionpoll p, polls_response r
                 WHERE p.id = r.poll_id
-                GROUP BY 1, 2, 3
-                ORDER BY 3 DESC""")
+                GROUP BY p.id, p.question, p.poll_date
+                ORDER BY p.poll_date DESC""")
             result_list = []
             for row in cursor.fetchall():
                 p = self.model(id=row[0], question=row[1], poll_date=row[2])
@@ -85,7 +85,7 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
         objects = PollManager()
 
     class Response(models.Model):
-        poll = models.ForeignKey(Poll)
+        poll = models.ForeignKey(OpinionPoll)
         person_name = models.CharField(max_length=50)
         response = models.TextField()
 
@@ -108,7 +108,7 @@ example, using this model::
 ...the statement ``Book.objects.all()`` will return all books in the database.
 
 You can override a ``Manager``\'s base ``QuerySet`` by overriding the
-``Manager.get_query_set()`` method. ``get_query_set()`` should return a
+``Manager.get_queryset()`` method. ``get_queryset()`` should return a
 ``QuerySet`` with the properties you require.
 
 For example, the following model has *two* ``Manager``\s -- one that returns
@@ -116,8 +116,8 @@ all objects, and one that returns only the books by Roald Dahl::
 
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
-        def get_query_set(self):
-            return super(DahlBookManager, self).get_query_set().filter(author='Roald Dahl')
+        def get_queryset(self):
+            return super(DahlBookManager, self).get_queryset().filter(author='Roald Dahl')
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
@@ -131,7 +131,7 @@ With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
 Roald Dahl.
 
-Of course, because ``get_query_set()`` returns a ``QuerySet`` object, you can
+Of course, because ``get_queryset()`` returns a ``QuerySet`` object, you can
 use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
 So these statements are all legal::
 
@@ -147,12 +147,12 @@ models.
 For example::
 
     class MaleManager(models.Manager):
-        def get_query_set(self):
-            return super(MaleManager, self).get_query_set().filter(sex='M')
+        def get_queryset(self):
+            return super(MaleManager, self).get_queryset().filter(sex='M')
 
     class FemaleManager(models.Manager):
-        def get_query_set(self):
-            return super(FemaleManager, self).get_query_set().filter(sex='F')
+        def get_queryset(self):
+            return super(FemaleManager, self).get_queryset().filter(sex='F')
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -172,8 +172,12 @@ the "default" ``Manager``, and several parts of Django
 (including :djadmin:`dumpdata`) will use that ``Manager``
 exclusively for that model. As a result, it's a good idea to be careful in
 your choice of default manager in order to avoid a situation where overriding
-``get_query_set()`` results in an inability to retrieve objects you'd like to
+``get_queryset()`` results in an inability to retrieve objects you'd like to
 work with.
+
+.. versionchanged:: 1.6
+
+    The ``get_queryset`` method was previously named ``get_query_set``.
 
 .. _managers-for-related-objects:
 
@@ -188,7 +192,7 @@ by the default manager.
 
 If the normal plain manager class (:class:`django.db.models.Manager`) is not
 appropriate for your circumstances, you can force Django to use the same class
-as the default manager for your model by setting the `use_for_related_fields`
+as the default manager for your model by setting the ``use_for_related_fields``
 attribute on the manager class. This is documented fully below_.
 
 .. _below: manager-types_
@@ -274,6 +278,21 @@ it into the inheritance hierarchy *after* the defaults::
         # Default manager is CustomManager, but OtherManager is
         # also available via the "extra_manager" attribute.
 
+Note that while you can *define* a custom manager on the abstract model, you
+can't *invoke* any methods using the abstract model. That is::
+
+    ClassA.objects.do_something()
+
+is legal, but::
+
+    AbstractBase.objects.do_something()
+
+will raise an exception. This is because managers are intended to encapsulate
+logic for managing collections of objects. Since you can't have a collection of
+abstract objects, it doesn't make sense to be managing them. If you have
+functionality that applies to the abstract model, you should put that functionality
+in a ``staticmethod`` or ``classmethod`` on the abstract model.
+
 Implementation concerns
 -----------------------
 
@@ -351,7 +370,7 @@ it will use :class:`django.db.models.Manager`.
 Writing correct Managers for use in automatic Manager instances
 ---------------------------------------------------------------
 
-As already suggested by the `django.contrib.gis` example, above, the
+As already suggested by the :mod:`django.contrib.gis` example, above, the
 ``use_for_related_fields`` feature is primarily for managers that need to
 return a custom ``QuerySet`` subclass. In providing this functionality in your
 manager, there are a couple of things to remember.
@@ -364,9 +383,9 @@ to from some other model. In those situations, Django has to be able to see
 all the objects for the model it is fetching, so that *anything* which is
 referred to can be retrieved.
 
-If you override the ``get_query_set()`` method and filter out any rows, Django
+If you override the ``get_queryset()`` method and filter out any rows, Django
 will return incorrect results. Don't do that. A manager that filters results
-in ``get_query_set()`` is not appropriate for use as an automatic manager.
+in ``get_queryset()`` is not appropriate for use as an automatic manager.
 
 Set ``use_for_related_fields`` when you define the class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -395,4 +414,3 @@ used in a model, since the attribute's value is processed when the model class
 is created and not subsequently reread. Set the attribute on the manager class
 when it is first defined, as in the initial example of this section and
 everything will work smoothly.
-

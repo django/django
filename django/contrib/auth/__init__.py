@@ -1,8 +1,8 @@
 import re
 
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.utils.module_loading import import_by_path
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -10,19 +10,7 @@ REDIRECT_FIELD_NAME = 'next'
 
 
 def load_backend(path):
-    i = path.rfind('.')
-    module, attr = path[:i], path[i + 1:]
-    try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured('Error importing authentication backend %s: "%s"' % (path, e))
-    except ValueError:
-        raise ImproperlyConfigured('Error importing authentication backends. Is AUTHENTICATION_BACKENDS a correctly defined list or tuple?')
-    try:
-        cls = getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured('Module "%s" does not define a "%s" authentication backend' % (module, attr))
-    return cls()
+    return import_by_path(path)()
 
 
 def get_backends():

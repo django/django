@@ -37,8 +37,8 @@ Other notable new features in Django 1.4 include:
   the ability to `bulk insert <#model-objects-bulk-create-in-the-orm>`_
   large datasets for improved performance, and
   `QuerySet.prefetch_related`_, a method to batch-load related objects
-  in areas where :meth:`~django.db.models.QuerySet.select_related` doesn't
-  work.
+  in areas where :meth:`~django.db.models.query.QuerySet.select_related`
+  doesn't work.
 
 * Some nice security additions, including `improved password hashing`_
   (featuring PBKDF2_ and bcrypt_ support), new `tools for cryptographic
@@ -526,8 +526,8 @@ Extended IPv6 support
 ~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.4 can now better handle IPv6 addresses with the new
-:class:`~django.db.models.fields.GenericIPAddressField` model field,
-:class:`~django.forms.fields.GenericIPAddressField` form field and
+:class:`~django.db.models.GenericIPAddressField` model field,
+:class:`~django.forms.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`.
 
@@ -585,7 +585,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 * In the documentation, a helpful :doc:`security overview </topics/security>`
   page.
 
-* The :func:`django.contrib.auth.models.check_password` function has been moved
+* The ``django.contrib.auth.models.check_password`` function has been moved
   to the :mod:`django.contrib.auth.hashers` module. Importing it from the old
   location will still work, but you should update your imports.
 
@@ -708,7 +708,7 @@ If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
 are configured and your Web server serves those files correctly. The
 development server continues to serve the admin files just like before. Read
-the :doc:`static files howto </howto/static-files>` for more details.
+the :doc:`static files howto </howto/static-files/index>` for more details.
 
 If your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
 ``http://media.example.com/admin/``), make sure to also set your
@@ -888,10 +888,10 @@ object, Django raises an exception.
 ``MySQLdb``-specific exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The MySQL backend historically has raised :class:`MySQLdb.OperationalError`
+The MySQL backend historically has raised ``MySQLdb.OperationalError``
 when a query triggered an exception. We've fixed this bug, and we now raise
-:class:`django.db.utils.DatabaseError` instead. If you were testing for
-:class:`MySQLdb.OperationalError`, you'll need to update your ``except``
+:exc:`django.db.DatabaseError` instead. If you were testing for
+``MySQLdb.OperationalError``, you'll need to update your ``except``
 clauses.
 
 Database connection's thread-locality
@@ -966,11 +966,12 @@ For more details, see the documentation about
 
 Until Django 1.3, it was possible to exclude some URLs from Django's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
-:setting:`IGNORABLE_404_STARTS` and suffixes to :setting:`IGNORABLE_404_ENDS`.
+``IGNORABLE_404_STARTS`` and suffixes to ``IGNORABLE_404_ENDS``.
 
 In Django 1.4, these two settings are superseded by
-:setting:`IGNORABLE_404_URLS`, which is a list of compiled regular expressions.
-Django won't send an email for 404 errors on URLs that match any of them.
+:setting:`IGNORABLE_404_URLS`, which is a list of compiled regular
+expressions. Django won't send an email for 404 errors on URLs that match any
+of them.
 
 Furthermore, the previous settings had some rather arbitrary default values::
 
@@ -980,12 +981,12 @@ Furthermore, the previous settings had some rather arbitrary default values::
 
 It's not Django's role to decide if your website has a legacy ``/cgi-bin/``
 section or a ``favicon.ico``. As a consequence, the default values of
-:setting:`IGNORABLE_404_URLS`, :setting:`IGNORABLE_404_STARTS` and
-:setting:`IGNORABLE_404_ENDS` are all now empty.
+:setting:`IGNORABLE_404_URLS`, ``IGNORABLE_404_STARTS``, and
+``IGNORABLE_404_ENDS`` are all now empty.
 
-If you have customized :setting:`IGNORABLE_404_STARTS` or
-:setting:`IGNORABLE_404_ENDS`, or if you want to keep the old default value,
-you should add the following lines in your settings file::
+If you have customized ``IGNORABLE_404_STARTS`` or ``IGNORABLE_404_ENDS``, or
+if you want to keep the old default value, you should add the following lines
+in your settings file::
 
     import re
     IGNORABLE_404_URLS = (
@@ -1039,7 +1040,7 @@ removed.
 The ``open`` method of the base Storage class used to take an obscure parameter
 ``mixin`` that allowed you to dynamically change the base classes of the
 returned file object. This has been removed. In the rare case you relied on the
-`mixin` parameter, you can easily achieve the same by overriding the `open`
+``mixin`` parameter, you can easily achieve the same by overriding the ``open``
 method, like this::
 
     from django.core.files import File
@@ -1092,8 +1093,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.test.TestCase.assertTemplateUsed` and
-:meth:`~django.test.test.TestCase.assertTemplateNotUsed`. And they
+code with :meth:`~django.test.TestCase.assertTemplateUsed` and
+:meth:`~django.test.TestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):

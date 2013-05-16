@@ -134,7 +134,7 @@ part of Django itself, and so are no longer separately maintained:
   of Django since the 0.95 release.
 
 * ``multi-auth``: A refactoring of :doc:`Django's bundled
-  authentication framework </topics/auth>` which added support for
+  authentication framework </topics/auth/index>` which added support for
   :ref:`authentication backends <authentication-backends>`. This has
   been part of Django since the 0.95 release.
 

@@ -1,6 +1,6 @@
 """SMTP email backend class."""
 import smtplib
-import socket
+import ssl
 import threading
 
 from django.conf import settings
@@ -60,12 +60,15 @@ class EmailBackend(BaseEmailBackend):
 
     def close(self):
         """Closes the connection to the email server."""
+        if self.connection is None:
+            return
         try:
             try:
                 self.connection.quit()
-            except socket.sslerror:
+            except (ssl.SSLError, smtplib.SMTPServerDisconnected):
                 # This happens when calling quit() on a TLS connection
-                # sometimes.
+                # sometimes, or when the connection was already disconnected
+                # by the server.
                 self.connection.close()
             except:
                 if self.fail_silently:

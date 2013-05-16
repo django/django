@@ -251,9 +251,9 @@ class RegexURLResolver(LocaleRegexProvider):
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return force_str('<%s %s (%s:%s) %s>' % (
+        return str('<%s %s (%s:%s) %s>') % (
             self.__class__.__name__, urlconf_repr, self.app_name,
-            self.namespace, self.regex.pattern))
+            self.namespace, self.regex.pattern)
 
     def _populate(self):
         lookups = MultiValueDict()
@@ -375,6 +375,9 @@ class RegexURLResolver(LocaleRegexProvider):
     def _reverse_with_prefix(self, lookup_view, _prefix, *args, **kwargs):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
+        text_args = [force_text(v) for v in args]
+        text_kwargs = dict((k, force_text(v)) for (k, v) in kwargs.items())
+
         try:
             lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
@@ -387,8 +390,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 if args:
                     if len(args) != len(params) + len(prefix_args):
                         continue
-                    unicode_args = [force_text(val) for val in args]
-                    candidate = (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
+                    candidate_subs = dict(zip(prefix_args + params, text_args))
                 else:
                     if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
                         continue
@@ -399,10 +401,16 @@ class RegexURLResolver(LocaleRegexProvider):
                             break
                     if not matches:
                         continue
-                    unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
-                    candidate = (prefix_norm.replace('%', '%%') + result) % unicode_kwargs
-                if re.search('^%s%s' % (prefix_norm, pattern), candidate, re.UNICODE):
-                    return candidate
+                    candidate_subs = text_kwargs
+                # WSGI provides decoded URLs, without %xx escapes, and the URL
+                # resolver operates on such URLs. First substitute arguments
+                # without quoting to build a decoded URL and look for a match.
+                # Then, if we have a match, redo the substitution with quoted
+                # arguments in order to return a properly encoded URL.
+                candidate_pat = prefix_norm.replace('%', '%%') + result
+                if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
+                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
+                    return candidate_pat % candidate_subs
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
         # error messages.
@@ -520,6 +528,15 @@ def get_script_prefix():
     instance is normally going to be a lot cleaner).
     """
     return getattr(_prefixes, "value", '/')
+
+def clear_script_prefix():
+    """
+    Unsets the script prefix for the current thread.
+    """
+    try:
+        del _prefixes.value
+    except AttributeError:
+        pass
 
 def set_urlconf(urlconf_name):
     """

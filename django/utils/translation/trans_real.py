@@ -7,12 +7,15 @@ import re
 import sys
 import gettext as gettext_module
 from threading import local
+import warnings
 
 from django.utils.importlib import import_module
 from django.utils.encoding import force_str, force_text
+from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.translation import TranslatorCommentWarning
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -39,6 +42,7 @@ accept_language_re = re.compile(r'''
         ''', re.VERBOSE)
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+
 
 def to_locale(language, to_lower=False):
     """
@@ -109,7 +113,7 @@ def translation(language):
 
     from django.conf import settings
 
-    globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+    globalpath = os.path.join(os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
 
     def _fetch(lang, fallback=None):
 
@@ -151,7 +155,7 @@ def translation(language):
 
         for appname in reversed(settings.INSTALLED_APPS):
             app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(app.__file__), 'locale')
+            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
@@ -337,7 +341,7 @@ def all_locale_paths():
     """
     from django.conf import settings
     globalpath = os.path.join(
-        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
+        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 def check_for_language(lang_code):
@@ -351,6 +355,20 @@ def check_for_language(lang_code):
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
     return False
+
+def get_supported_language_variant(lang_code, supported=None):
+    """
+    Returns the language-code that's listed in supported languages, possibly
+    selecting a more generic variant. Raises LookupError if nothing found.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    if lang_code and lang_code not in supported:
+        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
+    if lang_code and lang_code in supported and check_for_language(lang_code):
+        return lang_code
+    raise LookupError(lang_code)
 
 def get_language_from_path(path, supported=None):
     """
@@ -392,11 +410,10 @@ def get_language_from_request(request, check_path=False):
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
-    if lang_code and lang_code not in supported:
-        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
-
-    if lang_code and lang_code in supported and check_for_language(lang_code):
-        return lang_code
+    try:
+        return get_supported_language_variant(lang_code, supported)
+    except LookupError:
+        pass
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):
@@ -430,7 +447,10 @@ def get_language_from_request(request, check_path=False):
                     _accepted[normalized] = lang
                     return lang
 
-    return settings.LANGUAGE_CODE
+    try:
+        return get_supported_language_variant(settings.LANGUAGE_CODE, supported)
+    except LookupError:
+        return settings.LANGUAGE_CODE
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
@@ -467,6 +487,9 @@ def templatize(src, origin=None):
     plural = []
     incomment = False
     comment = []
+    lineno_comment_map = {}
+    comment_lineno_cache = None
+
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
@@ -528,7 +551,27 @@ def templatize(src, origin=None):
                     plural.append(contents)
                 else:
                     singular.append(contents)
+
         else:
+            # Handle comment tokens (`{# ... #}`) plus other constructs on
+            # the same line:
+            if comment_lineno_cache is not None:
+                cur_lineno = t.lineno + t.contents.count('\n')
+                if comment_lineno_cache == cur_lineno:
+                    if t.token_type != TOKEN_COMMENT:
+                        for c in lineno_comment_map[comment_lineno_cache]:
+                            filemsg = ''
+                            if origin:
+                                filemsg = 'file %s, ' % origin
+                            warn_msg = ("The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't the last item "
+                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warnings.warn(warn_msg, TranslatorCommentWarning)
+                        lineno_comment_map[comment_lineno_cache] = []
+                else:
+                    out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
+                comment_lineno_cache = None
+
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
@@ -585,7 +628,10 @@ def templatize(src, origin=None):
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(' # %s' % t.contents)
+                if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                    lineno_comment_map.setdefault(t.lineno,
+                                                  []).append(t.contents)
+                    comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
     return force_str(out.getvalue())

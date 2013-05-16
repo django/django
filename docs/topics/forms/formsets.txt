@@ -3,7 +3,9 @@
 Formsets
 ========
 
-A formset is a layer of abstraction to working with multiple forms on the same
+.. class:: django.forms.formset.BaseFormSet
+
+A formset is a layer of abstraction to work with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
 form::
 
@@ -30,14 +32,14 @@ would with a regular form::
 
 As you can see it only displayed one empty form. The number of empty forms
 that is displayed is controlled by the ``extra`` parameter. By default,
-``formset_factory`` defines one extra form; the following example will
-display two blank forms::
+:func:`~django.forms.formsets.formset_factory` defines one extra form; the
+following example will display two blank forms::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
 Iterating over the ``formset`` will render the forms in the order they were
 created. You can change this order by providing an alternate implementation for
-the :meth:`__iter__()` method.
+the ``__iter__()`` method.
 
 Formsets can also be indexed into, which returns the corresponding form. If you
 override ``__iter__``, you will need to also override ``__getitem__`` to have
@@ -82,11 +84,12 @@ list of dictionaries as the initial data.
 Limiting the maximum number of forms
 ------------------------------------
 
-The ``max_num`` parameter to ``formset_factory`` gives you the ability to
-limit the maximum number of empty forms the formset will display::
+The ``max_num`` parameter to :func:`~django.forms.formsets.formset_factory`
+gives you the ability to limit the maximum number of empty forms the formset
+will display::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
-    >>> formset = ArticleFormset()
+    >>> formset = ArticleFormSet()
     >>> for form in formset:
     ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
@@ -96,8 +99,23 @@ If the value of ``max_num`` is greater than the number of existing
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``.
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
+
+If the number of forms in the initial data exceeds ``max_num``, all initial
+data forms will be displayed regardless.  (No extra forms will be displayed.)
+
+By default, ``max_num`` only affects how many forms are displayed and does not
+affect validation.  If ``validate_max=True`` is passed to the
+:func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
+validation.  See :ref:`validate_max`.
+
+.. versionchanged:: 1.6
+
+   The ``validate_max`` parameter was added to
+   :func:`~django.forms.formsets.formset_factory`.  Also, the behavior of
+   ``FormSet`` was brought in line with that of ``ModelFormSet`` so that it
+   displays initial data regardless of ``max_num``.
 
 Formset validation
 ------------------
@@ -139,8 +157,6 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
-.. versionadded:: 1.4
-
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
 
@@ -178,7 +194,10 @@ this management data, an exception will be raised::
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
-in this form as well.
+in this form as well. On the other hand, if you are using JavaScript to allow
+deletion of existing objects, then you need to ensure the ones being removed
+are properly marked for deletion by including ``form-#-DELETE`` in the ``POST``
+data. It is expected that all forms are present in the ``POST`` data regardless.
 
 The management form is available as an attribute of the formset
 itself. When rendering a formset in a template, you can include all
@@ -248,14 +267,60 @@ The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``
 method on the formset.
 
+.. _validate_max:
+
+Validating the number of forms in a formset
+-------------------------------------------
+
+If ``validate_max=True`` is passed to
+:func:`~django.forms.formsets.formset_factory`, validation will also check
+that the number of forms in the data set is less than or equal to ``max_num``.
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, max_num=1, validate_max=True)
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'2',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'1904-06-16',
+    ...     'form-1-title': u'Test 2',
+    ...     'form-1-pub_date': u'1912-06-23',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{}, {}]
+    >>> formset.non_form_errors()
+    [u'Please submit 1 or fewer forms.']
+
+``validate_max=True`` validates against ``max_num`` strictly even if
+``max_num`` was exceeded because the amount of initial data supplied was
+excessive.
+
+Applications which need more customizable validation of the number of forms
+should use custom formset validation.
+
+.. note::
+
+    Regardless of ``validate_max``, if the number of forms in a data set
+    exceeds ``max_num`` by more than 1000, then the form will fail to validate
+    as if ``validate_max`` were set, and additionally only the first 1000
+    forms above ``max_num`` will be validated.  The remainder will be
+    truncated entirely.  This is to protect against memory exhaustion attacks
+    using forged POST requests.
+
+.. versionchanged:: 1.6
+
+   The ``validate_max`` parameter was added to
+   :func:`~django.forms.formsets.formset_factory`.
+
 Dealing with ordering and deletion of forms
 -------------------------------------------
 
-Common use cases with a formset is dealing with ordering and deletion of the
-form instances. This has been dealt with for you. The ``formset_factory``
-provides two optional parameters ``can_order`` and ``can_delete`` that will do
-the extra work of adding the extra fields and providing simpler ways of
-getting to that data.
+The :func:`~django.forms.formsets.formset_factory` provides two optional
+parameters ``can_order`` and ``can_delete`` to help with ordering of forms in
+formsets and deletion of forms from a formset.
 
 ``can_order``
 ~~~~~~~~~~~~~
@@ -273,13 +338,13 @@ Lets you create a formset with the ability to order::
     ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
-    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
+    <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="number" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
     <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" value="Article #2" id="id_form-1-title" /></td></tr>
     <tr><th><label for="id_form-1-pub_date">Pub date:</label></th><td><input type="text" name="form-1-pub_date" value="2008-05-11" id="id_form-1-pub_date" /></td></tr>
-    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="text" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
+    <tr><th><label for="id_form-1-ORDER">Order:</label></th><td><input type="number" name="form-1-ORDER" value="2" id="id_form-1-ORDER" /></td></tr>
     <tr><th><label for="id_form-2-title">Title:</label></th><td><input type="text" name="form-2-title" id="id_form-2-title" /></td></tr>
     <tr><th><label for="id_form-2-pub_date">Pub date:</label></th><td><input type="text" name="form-2-pub_date" id="id_form-2-pub_date" /></td></tr>
-    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="text" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
+    <tr><th><label for="id_form-2-ORDER">Order:</label></th><td><input type="number" name="form-2-ORDER" id="id_form-2-ORDER" /></td></tr>
 
 This adds an additional field to each form. This new field is named ``ORDER``
 and is an ``forms.IntegerField``. For the forms that came from the initial

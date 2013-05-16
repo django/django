@@ -29,7 +29,9 @@ use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
 You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and
+``'django.middleware.locale.LocaleMiddleware'`` from your
+:setting:`MIDDLEWARE_CLASSES` setting.
 
 .. note::
 
@@ -142,14 +144,22 @@ preceding the string, e.g.::
         # Translators: This message appears on the home page only
         output = ugettext("Welcome to my site.")
 
-This also works in templates with the :ttag:`comment` tag:
+The comment will then appear in the resulting ``.po`` file associated with the
+translatable contruct located below it and should also be displayed by most
+translation tools.
 
-.. code-block:: html+django
+.. note:: Just for completeness, this is the corresponding fragment of the
+    resulting ``.po`` file:
 
-    {% comment %}Translators: This is a text of the base template {% endcomment %}
+    .. code-block:: po
 
-The comment will then appear in the resulting ``.po`` file and should also be
-displayed by most translation tools.
+        #. Translators: This message appears on the home page only
+        # path/to/python/file.py:123
+        msgid "Welcome to my site."
+        msgstr ""
+
+This also works in templates. See :ref:`translator-comments-in-templates` for
+more details.
 
 Marking strings as no-op
 ------------------------
@@ -287,8 +297,6 @@ will appear in the ``.po`` file as:
     msgid "May"
     msgstr ""
 
-.. versionadded:: 1.4
-
 Contextual markers are also supported by the :ttag:`trans` and
 :ttag:`blocktrans` template tags.
 
@@ -345,7 +353,7 @@ It is recommended to always provide explicit
 :attr:`~django.db.models.Options.verbose_name` and
 :attr:`~django.db.models.Options.verbose_name_plural` options rather than
 relying on the fallback English-centric and somewhat naïve determination of
-verbose names Django performs bu looking at the model's class name::
+verbose names Django performs by looking at the model's class name::
 
     from django.utils.translation import ugettext_lazy as _
 
@@ -407,6 +415,41 @@ objects elsewhere in your code, you should ensure that you don't accidentally
 convert them to strings, because they should be converted as late as possible
 (so that the correct locale is in effect). This necessitates the use of the
 helper function described next.
+
+.. _lazy-plural-translations:
+
+Lazy translations and plural
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.6
+
+When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
+generally don't know the ``number`` argument at the time of the string
+definition. Therefore, you are authorized to pass a key name instead of an
+integer as the ``number`` argument. Then ``number`` will be looked up in the
+dictionary under that key during string interpolation. Here's example::
+
+    class MyForm(forms.Form):
+        error_message = ungettext_lazy("You only provided %(num)d argument",
+            "You only provided %(num)d arguments", 'num')
+
+        def clean(self):
+            # ...
+            if error:
+                raise forms.ValidationError(self.error_message % {'num': number})
+
+If the string contains exactly one unnamed placeholder, you can interpolate
+directly with the ``number`` argument::
+
+    class MyForm(forms.Form):
+        error_message = ungettext_lazy("You provided %d argument",
+            "You provided %d arguments")
+
+        def clean(self):
+            # ...
+            if error:
+                raise forms.ValidationError(self.error_message % number)
+
 
 Joining strings: string_concat()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -507,7 +550,6 @@ It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
 ``{% blocktrans %}`` instead.
 
-.. versionadded:: 1.4
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
@@ -532,8 +574,6 @@ or should be used as arguments for other template tags or filters::
         {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
     {% endfor %}
     </p>
-
-.. versionadded:: 1.4
 
 ``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
@@ -573,8 +613,6 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 
 .. note:: The previous more verbose format is still supported:
    ``{% blocktrans with book|title as book_t and author|title as author_t %}``
-
-.. versionchanged:: 1.4
 
 If resolving one of the block arguments fails, blocktrans will fall back to
 the default language by deactivating the currently active language
@@ -620,14 +658,69 @@ be retrieved (and stored) beforehand::
     This is a URL: {{ the_url }}
     {% endblocktrans %}
 
-.. versionadded:: 1.4
-
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
 .. code-block:: html+django
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
+
+.. _translator-comments-in-templates:
+
+Comments for translators in templates
+-------------------------------------
+
+Just like with :ref:`Python code <translator-comments>`, these notes for
+translators can be specified using comments, either with the :ttag:`comment`
+tag:
+
+.. code-block:: html+django
+
+    {% comment %}Translators: View verb{% endcomment %}
+    {% trans "View" %}
+
+    {% comment %}Translators: Short intro blurb{% endcomment %}
+    <p>{% blocktrans %}A multiline translatable
+    literal.{% endblocktrans %}</p>
+
+or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
+
+.. code-block:: html+django
+
+    {# Translators: Label of a button that triggers search{% endcomment #}
+    <button type="submit">{% trans "Go" %}</button>
+
+    {# Translators: This is a text of the base template #}
+    {% blocktrans %}Ambiguous translatable block of text{% endblocktrans %}
+
+.. note:: Just for completeness, these are the corresponding fragments of the
+    resulting ``.po`` file:
+
+    .. code-block:: po
+
+        #. Translators: View verb
+        # path/to/template/file.html:10
+        msgid "View"
+        msgstr ""
+
+        #. Translators: Short intro blurb
+        # path/to/template/file.html:13
+        msgid ""
+        "A multiline translatable"
+        "literal."
+        msgstr ""
+
+        # ...
+
+        #. Translators: Label of a button that triggers search
+        # path/to/template/file.html:100
+        msgid "Go"
+        msgstr ""
+
+        #. Translators:
+        # path/to/template/file.html:103
+        msgid "Ambiguous translatable block of text"
+        msgstr ""
 
 .. _template-translation-vars:
 
@@ -853,6 +946,52 @@ This isn't as fast as string interpolation in Python, so keep it to those
 cases where you really need it (for example, in conjunction with ``ngettext``
 to produce proper pluralizations).
 
+Note on performance
+-------------------
+
+The :func:`~django.views.i18n.javascript_catalog` view generates the catalog
+from ``.mo`` files on every request. Since its output is constant — at least
+for a given version of a site — it's a good candidate for caching.
+
+Server-side caching will reduce CPU load. It's easily implemented with the
+:func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
+invalidation when your translations change, provide a version-dependant key
+prefix, as shown in the example below, or map the view at a version-dependant
+URL.
+
+.. code-block:: python
+
+    from django.views.decorators.cache import cache_page
+    from django.views.i18n import javascript_catalog
+
+    # The value returned by get_version() must change when translations change.
+    @cache_page(86400, key_prefix='js18n-%s' % get_version())
+    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+        return javascript_catalog(request, domain, packages)
+
+Client-side caching will save bandwidth and make your site load faster. If
+you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
+covered. Otherwise, you can apply :ref:`conditional decorators
+<conditional-decorators>`. In the following example, the cache is invalidated
+whenever your restart your application server.
+
+.. code-block:: python
+
+    from django.utils import timezone
+    from django.views.decorators.http import last_modified
+    from django.views.i18n import javascript_catalog
+
+    last_modified_date = timezone.now()
+    @last_modified(lambda req, **kw: last_modified_date)
+    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+        return javascript_catalog(request, domain, packages)
+
+You can even pre-generate the javascript catalog as part of your deployment
+procedure and serve it as a static file. This radical technique is implemented
+in django-statici18n_.
+
+.. _django-statici18n: http://django-statici18n.readthedocs.org/en/latest/
+
 .. _url-internationalization:
 
 Internationalization: in URL patterns
@@ -891,11 +1030,11 @@ prepend the current active language code to all url patterns defined within
     from django.conf.urls import patterns, include, url
     from django.conf.urls.i18n import i18n_patterns
 
-    urlpatterns = patterns(''
+    urlpatterns = patterns('',
         url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
     )
 
-    news_patterns = patterns(''
+    news_patterns = patterns('',
         url(r'^$', 'news.views.index', name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
         url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
@@ -928,7 +1067,7 @@ function. Example::
 
     :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
     URLconf. Using it within an included URLconf will throw an
-    :exc:`ImproperlyConfigured` exception.
+    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 .. warning::
 
@@ -1248,6 +1387,8 @@ The ``set_language`` redirect view
 
 .. highlightlang:: python
 
+.. currentmodule:: django.views.i18n
+
 .. function:: set_language(request)
 
 As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
@@ -1296,7 +1437,9 @@ Here's example HTML template code:
     <select name="language">
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
-    <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+    <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
+        {{ language.name_local }} ({{ language.code }})
+    </option>
     {% endfor %}
     </select>
     <input type="submit" value="Go" />
@@ -1383,9 +1526,15 @@ If you want to let each individual user specify which language he or she
 prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
 selection based on data from the request. It customizes content for each user.
 
-To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
-to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
-matters, you should follow these guidelines:
+``LocaleMiddleware`` is enabled in the default settings file: the
+:setting:`MIDDLEWARE_CLASSES` setting contains
+``'django.middleware.locale.LocaleMiddleware'``.
+
+.. versionchanged:: 1.6
+
+    In previous versions, ``LocaleMiddleware``  wasn't enabled by default.
+
+Because middleware order matters, you should follow these guidelines:
 
 * Make sure it's one of the first middlewares installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
@@ -1407,8 +1556,6 @@ For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
 ``LocaleMiddleware`` tries to determine the user's language preference by
 following this algorithm:
-
-.. versionchanged:: 1.4
 
 * First, it looks for the language prefix in the requested URL.  This is
   only performed when you are using the ``i18n_patterns`` function in your

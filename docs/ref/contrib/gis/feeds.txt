@@ -27,7 +27,7 @@ API Reference
 .. class:: Feed
 
    In addition to methods provided by
-   the :class:`django.contrib.syndication.feeds.Feed`
+   the :class:`django.contrib.syndication.views.Feed`
    base class, GeoDjango's ``Feed`` class provides
    the following overrides.  Note that these overrides may be done in multiple ways::
 
@@ -71,11 +71,11 @@ API Reference
    can be a ``GEOSGeometry`` instance, or a tuple that represents a
    point coordinate or bounding box.  For example::
 
-       class ZipcodeFeed(Feed):
+        class ZipcodeFeed(Feed):
 
-           def item_geometry(self, obj):
-	       # Returns the polygon.
-               return obj.poly
+            def item_geometry(self, obj):
+                # Returns the polygon.
+                return obj.poly
 
 ``SyndicationFeed`` Subclasses
 ------------------------------

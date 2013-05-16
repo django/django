@@ -48,6 +48,12 @@ ensure that is to run this command from the same directory as your
 Using Gunicorn's Django integration
 ===================================
 
+.. note::
+
+    If you are using Django 1.4 or newer, it’s highly recommended to simply run
+    your application with the WSGI interface using the ``gunicorn`` command
+    as described above.
+
 To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
 :setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
 

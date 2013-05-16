@@ -27,6 +27,8 @@ use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
 Configuration
 =============
 
+.. class:: django.contrib.auth.middleware.RemoteUserMiddleware
+
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
 :setting:`MIDDLEWARE_CLASSES` setting **after** the

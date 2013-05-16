@@ -328,7 +328,7 @@ Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
 ordering back to the normal direction.
 
-To retrieve the ''last'' five items in a queryset, you could do this::
+To retrieve the "last" five items in a queryset, you could do this::
 
     my_queryset.reverse()[:5]
 
@@ -378,16 +378,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-.. versionadded:: 1.4
-
-As of Django 1.4, you can pass positional arguments (``*fields``) in order to
-specify the names of fields to which the ``DISTINCT`` should apply. This
-translates to a ``SELECT DISTINCT ON`` SQL query.
-
-Here's the difference. For a normal ``distinct()`` call, the database compares
-*each* field in each row when determining which rows are distinct. For a
-``distinct()`` call with specified field names, the database will only compare
-the specified field names.
+You can pass positional arguments (``*fields``) in order to specify the names
+of fields to which the ``DISTINCT`` should apply. This translates to a
+``SELECT DISTINCT ON`` SQL query. Here's the difference. For a normal
+``distinct()`` call, the database compares *each* field in each row when
+determining which rows are distinct. For a ``distinct()`` call with specified
+field names, the database will only compare the specified field names.
 
 .. note::
     This ability to specify field names is only available in PostgreSQL.
@@ -554,14 +550,21 @@ dates
 .. method:: dates(field, kind, order='ASC')
 
 Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
-``datetime.datetime`` objects representing all available dates of a particular
-kind within the contents of the ``QuerySet``.
+:class:`datetime.date` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
 
-``field`` should be the name of a ``DateField`` or ``DateTimeField`` of your
-model.
+.. versionchanged:: 1.6
+
+    ``dates`` used to return a list of :class:`datetime.datetime` objects.
+
+``field`` should be the name of a ``DateField`` of your model.
+
+.. versionchanged:: 1.6
+
+    ``dates`` used to accept operating on a ``DateTimeField``.
 
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.datetime`` object in the result list is "truncated" to the given
+``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
 
 * ``"year"`` returns a list of all distinct year values for the field.
@@ -576,36 +579,78 @@ model.
 Examples::
 
     >>> Entry.objects.dates('pub_date', 'year')
-    [datetime.datetime(2005, 1, 1)]
+    [datetime.date(2005, 1, 1)]
     >>> Entry.objects.dates('pub_date', 'month')
-    [datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]
+    [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
     >>> Entry.objects.dates('pub_date', 'day')
-    [datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
     >>> Entry.objects.dates('pub_date', 'day', order='DESC')
-    [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
+    [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
-    [datetime.datetime(2005, 3, 20)]
+    [datetime.date(2005, 3, 20)]
 
-.. warning::
+datetimes
+~~~~~~~~~
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the aggregation is
-    performed in UTC. This is a known limitation of the current implementation.
+.. versionadded:: 1.6
+
+.. method:: datetimes(field, kind, order='ASC', tzinfo=None)
+
+Returns a ``DateTimeQuerySet`` — a ``QuerySet`` that evaluates to a list of
+:class:`datetime.datetime` objects representing all available dates of a
+particular kind within the contents of the ``QuerySet``.
+
+``field`` should be the name of a ``DateTimeField`` of your model.
+
+``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
+``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
+list is "truncated" to the given ``type``.
+
+``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
+``'DESC'``. This specifies how to order the results.
+
+``tzinfo`` defines the time zone to which datetimes are converted prior to
+truncation. Indeed, a given datetime has different representations depending
+on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
+object. If it's ``None``, Django uses the :ref:`current time zone
+<default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
+``False``.
+
+.. _database-time-zone-definitions:
+
+.. note::
+
+    This function performs time zone conversions directly in the database.
+    As a consequence, your database must be able to interpret the value of
+    ``tzinfo.tzname(None)``. This translates into the following requirements:
+
+    - SQLite: install pytz_ — conversions are actually performed in Python.
+    - PostgreSQL: no requirements (see `Time Zones`_).
+    - Oracle: no requirements (see `Choosing a Time Zone File`_).
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
+
+    .. _pytz: http://pytz.sourceforge.net/
+    .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
+    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
+    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
 
 .. method:: none()
 
-Returns an ``EmptyQuerySet`` — a ``QuerySet`` subclass that always evaluates to
-an empty list. This can be used in cases where you know that you should return
-an empty result set and your caller is expecting a ``QuerySet`` object (instead
-of returning an empty list, for example.)
+Calling none() will create a queryset that never returns any objects and no
+query will be executed when accessing the results. A qs.none() queryset
+is an instance of ``EmptyQuerySet``.
 
 Examples::
 
     >>> Entry.objects.none()
     []
+    >>> from django.db.models.query import EmptyQuerySet
+    >>> isinstance(Entry.objects.none(), EmptyQuerySet)
+    True
 
 all
 ~~~
@@ -739,8 +784,6 @@ prefetch_related
 ~~~~~~~~~~~~~~~~
 
 .. method:: prefetch_related(*lookups)
-
-.. versionadded:: 1.4
 
 Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
 related objects for each of the specified lookups.
@@ -1081,11 +1124,11 @@ to ``defer()``::
 
 .. versionchanged:: 1.5
 
-Some fields in a model won't be deferred, even if you ask for them. You can
-never defer the loading of the primary key. If you are using
-:meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related
-one, doing so will result in an error.
+    Some fields in a model won't be deferred, even if you ask for them. You can
+    never defer the loading of the primary key. If you are using
+    :meth:`select_related()` to retrieve related models, you shouldn't defer the
+    loading of the field that connects from the primary model to the related
+    one, doing so will result in an error.
 
 .. note::
 
@@ -1112,9 +1155,9 @@ one, doing so will result in an error.
 
 .. note::
 
-    When calling :meth:`~Model.save()` for instances with deferred fields,
-    only the loaded fields will be saved. See :meth:`~Model.save()` for more
-    details.
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 
 only
@@ -1153,20 +1196,20 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
-.. versionchanged:: 1.5
-
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options. Also note that using :meth:`only` and omitting a field requested
-using :meth:`select_related` is an error as well.
+options.
 
 .. versionchanged:: 1.5
 
-.. note::
+    Using :meth:`only` and omitting a field requested using
+    :meth:`select_related` is an error as well.
 
-    When calling :meth:`~Model.save()` for instances with deferred fields,
-    only the loaded fields will be saved. See :meth:`~Model.save()` for more
-    details.
+    .. note::
+
+        When calling :meth:`~django.db.models.Model.save()` for instances with
+        deferred fields, only the loaded fields will be saved. See
+        :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1191,8 +1234,6 @@ select_for_update
 
 .. method:: select_for_update(nowait=False)
 
-.. versionadded:: 1.4
-
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
@@ -1210,11 +1251,6 @@ not the behavior you want, call ``select_for_update(nowait=True)``. This will
 make the call non-blocking. If a conflicting lock is already acquired by
 another transaction, :exc:`~django.db.DatabaseError` will be raised when the
 queryset is evaluated.
-
-Note that using ``select_for_update()`` will cause the current transaction to be
-considered dirty, if under transaction management. This is to ensure that
-Django issues a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the
-``SELECT FOR UPDATE``.
 
 Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL has no support for the
@@ -1248,7 +1284,7 @@ the format described in `Field lookups`_.
 
 ``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
 than one object was found. The
-:exc:`~django.core.excpetions.MultipleObjectsReturned` exception is an
+:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
 ``get()`` raises a :exc:`~django.core.exceptions.DoesNotExist` exception if an
@@ -1368,8 +1404,6 @@ bulk_create
 
 .. method:: bulk_create(objs, batch_size=None)
 
-.. versionadded:: 1.4
-
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
 are)::
@@ -1393,6 +1427,7 @@ query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at maximum 999 variables per query is used.
 
 .. versionadded:: 1.5
+
     The ``batch_size`` parameter was added in version 1.5.
 
 count
@@ -1451,7 +1486,7 @@ internally so that repeated evaluations do not result in additional queries. In
 contrast, ``iterator()`` will read results directly, without doing any caching
 at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
 and caches the return value). For a ``QuerySet`` which returns a large number of
-objects that you only need to access once, this can results in better
+objects that you only need to access once, this can result in better
 performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
@@ -1485,14 +1520,25 @@ This example returns the latest ``Entry`` in the table, according to the
 
 If your model's :ref:`Meta <meta-options>` specifies
 :attr:`~django.db.models.Options.get_latest_by`, you can leave off the
-``field_name`` argument to ``latest()``. Django will use the field specified
-in :attr:`~django.db.models.Options.get_latest_by` by default.
+``field_name`` argument to ``earliest()`` or ``latest()``. Django will use the
+field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
 
-Like :meth:`get()`, ``latest()`` raises
-:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the given
-parameters.
+Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
+:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the
+given parameters.
 
-Note ``latest()`` exists purely for convenience and readability.
+Note that ``earliest()`` and ``latest()`` exist purely for convenience and
+readability.
+
+earliest
+~~~~~~~~
+
+.. method:: earliest(field_name=None)
+
+.. versionadded:: 1.6
+
+Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
+the direction is changed.
 
 aggregate
 ~~~~~~~~~
@@ -1544,32 +1590,32 @@ The most efficient method of finding whether a model with a unique field
 (e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
 
     entry = Entry.objects.get(pk=123)
-    if some_query_set.filter(pk=entry.pk).exists():
+    if some_queryset.filter(pk=entry.pk).exists():
         print("Entry contained in queryset")
 
 Which will be faster than the following which requires evaluating and iterating
 through the entire queryset::
 
-    if entry in some_query_set:
+    if entry in some_queryset:
        print("Entry contained in QuerySet")
 
 And to find whether a queryset contains any items::
 
-    if some_query_set.exists():
-        print("There is at least one object in some_query_set")
+    if some_queryset.exists():
+        print("There is at least one object in some_queryset")
 
 Which will be faster than::
 
-    if some_query_set:
-        print("There is at least one object in some_query_set")
+    if some_queryset:
+        print("There is at least one object in some_queryset")
 
 ... but not by a large degree (hence needing a large queryset for efficiency
 gains).
 
-Additionally, if a ``some_query_set`` has not yet been evaluated, but you know
-that it will be at some point, then using ``some_query_set.exists()`` will do
+Additionally, if a ``some_queryset`` has not yet been evaluated, but you know
+that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
-retrieve the results) than simply using ``bool(some_query_set)``, which
+retrieve the results) than simply using ``bool(some_queryset)``, which
 retrieves the results and then checks if any were returned.
 
 update
@@ -1637,7 +1683,7 @@ Finally, realize that ``update()`` does an update at the SQL level and, thus,
 does not call any ``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
-calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
+calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
 update a bunch of records for a model that has a custom
 :meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
@@ -1683,7 +1729,8 @@ methods on your models. It does, however, emit the
 (including cascaded deletions).
 
 .. versionadded:: 1.5
-    Allow fast-path deletion of objects
+
+    Allow fast-path deletion of objects.
 
 Django needs to fetch objects into memory to send signals and handle cascades.
 However, if there are no cascades and no signals, then Django may take a
@@ -2017,7 +2064,7 @@ numbers and even characters.
 year
 ~~~~
 
-For date/datetime fields, exact year match. Takes a four-digit year.
+For date and datetime fields, an exact year match. Takes an integer year.
 
 Example::
 
@@ -2028,6 +2075,9 @@ SQL equivalent::
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';
 
 (The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
 .. fieldlookup:: month
 
@@ -2047,12 +2097,15 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
+
 .. fieldlookup:: day
 
 day
 ~~~
 
-For date and datetime fields, an exact day match.
+For date and datetime fields, an exact day match. Takes an integer day.
 
 Example::
 
@@ -2066,6 +2119,9 @@ SQL equivalent::
 
 Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
 .. fieldlookup:: week_day
 
@@ -2088,12 +2144,74 @@ Note this will match any record with a ``pub_date`` that falls on a Monday (day
 2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
-.. warning::
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
 
-    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
-    uses UTC in the database connection, which means the ``year``, ``month``,
-    ``day`` and ``week_day`` lookups are performed in UTC. This is a known
-    limitation of the current implementation.
+.. fieldlookup:: hour
+
+hour
+~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact hour match. Takes an integer between 0 and 23.
+
+Example::
+
+    Event.objects.filter(timestamp__hour=23)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('hour' FROM timestamp) = '23';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: minute
+
+minute
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact minute match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__minute=29)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('minute' FROM timestamp) = '29';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
+
+.. fieldlookup:: second
+
+second
+~~~~~~
+
+.. versionadded:: 1.6
+
+For datetime fields, an exact second match. Takes an integer between 0 and 59.
+
+Example::
+
+    Event.objects.filter(timestamp__second=31)
+
+SQL equivalent::
+
+    SELECT ... WHERE EXTRACT('second' FROM timestamp) = '31';
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, values are converted to the current time
+zone before filtering.
 
 .. fieldlookup:: isnull
 
@@ -2195,6 +2313,14 @@ Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
 aggregate functions, see
 :doc:`the topic guide on aggregation </topics/db/aggregation>`.
+
+.. warning::
+
+    SQLite can't handle aggregation on date/time fields out of the box.
+    This is because there are no native date/time fields in SQLite and Django
+    currently emulates these features using a text field. Attempts to use
+    aggregation on date/time fields in SQLite will raise
+    ``NotImplementedError``.
 
 Avg
 ~~~

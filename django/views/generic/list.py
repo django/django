@@ -97,7 +97,7 @@ class MultipleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return '%s_list' % object_list.model._meta.object_name.lower()
+            return '%s_list' % object_list.model._meta.model_name
         else:
             return None
 
@@ -177,7 +177,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # generated ones.
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
-            names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
+            names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
 
         return names
 

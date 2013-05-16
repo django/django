@@ -28,6 +28,7 @@ For example::
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
     ...         model = Article
+    ...         fields = ['pub_date', 'headline', 'content', 'reporter']
 
     # Creating a form to add an article.
     >>> form = ArticleForm()
@@ -39,11 +40,13 @@ For example::
 Field types
 -----------
 
-The generated ``Form`` class will have a form field for every model field. Each
-model field has a corresponding default form field. For example, a
-``CharField`` on a model is represented as a ``CharField`` on a form. A
-model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
-the full list of conversions:
+The generated ``Form`` class will have a form field for every model field
+specified, in the order specified in the ``fields`` attribute.
+
+Each model field has a corresponding default form field. For example, a
+``CharField`` on a model is represented as a ``CharField`` on a form. A model
+``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is the
+full list of conversions:
 
 ===============================  ========================================
 Model field                      Form field
@@ -89,9 +92,6 @@ Model field                      Form field
                                  below)
 
 ``NullBooleanField``             ``CharField``
-
-``PhoneNumberField``             ``USPhoneNumberField``
-                                 (from ``django.contrib.localflavor.us``)
 
 ``PositiveIntegerField``         ``IntegerField``
 
@@ -171,10 +171,13 @@ Consider this set of models::
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
+            fields = ['name', 'title', 'birth_date']
 
     class BookForm(ModelForm):
         class Meta:
             model = Book
+            fields = ['name', 'authors']
+
 
 With these models, the ``ModelForm`` subclasses above would be roughly
 equivalent to this (the only difference being the ``save()`` method, which
@@ -224,11 +227,6 @@ supplied, ``save()`` will update that instance. If it's not supplied,
 
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
-
-    # Create a form to edit an existing Article.
-    >>> a = Article.objects.get(pk=1)
-    >>> f = ArticleForm(instance=a)
-    >>> f.save()
 
     # Create a form to edit an existing Article, but use
     # POST data to populate the form.
@@ -296,47 +294,66 @@ method is used to determine whether a form requires multipart file upload (and
 hence whether ``request.FILES`` must be passed to the form), etc. See
 :ref:`binding-uploaded-files` for more information.
 
-Using a subset of fields on the form
-------------------------------------
+.. _modelforms-selecting-fields:
 
-In some cases, you may not want all the model fields to appear on the generated
-form. There are three ways of telling ``ModelForm`` to use only a subset of the
-model fields:
+Selecting the fields to use
+---------------------------
 
-1. Set ``editable=False`` on the model field. As a result, *any* form
-   created from the model via ``ModelForm`` will not include that
-   field.
+It is strongly recommended that you explicitly set all fields that should be
+edited in the form using the ``fields`` attribute. Failure to do so can easily
+lead to security problems when a form unexpectedly allows a user to set certain
+fields, especially when new fields are added to a model. Depending on how the
+form is rendered, the problem may not even be visible on the web page.
 
-2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to include in the form. The order in which the fields names are specified
-   in that list is respected when the form renders them.
+The alternative approach would be to include all fields automatically, or
+blacklist only some. This fundamental approach is known to be much less secure
+and has led to serious exploits on major websites (e.g. `GitHub
+<https://github.com/blog/1068-public-key-security-vulnerability-and-mitigation>`_).
 
-3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to exclude from the form.
+There are, however, two shortcuts available for cases where you can guarantee
+these security concerns do not apply to you:
 
-For example, if you want a form for the ``Author`` model (defined
-above) that includes only the ``name`` and ``birth_date`` fields, you would
-specify ``fields`` or ``exclude`` like this::
+1. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
+   that all fields in the model should be used. For example::
 
-    class PartialAuthorForm(ModelForm):
-        class Meta:
-            model = Author
-            fields = ('name', 'birth_date')
+       class AuthorForm(ModelForm):
+           class Meta:
+               model = Author
+               fields = '__all__'
 
-    class PartialAuthorForm(ModelForm):
-        class Meta:
-            model = Author
-            exclude = ('title',)
+2. Set the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class to
+   a list of fields to be excluded from the form.
 
-Since the Author model has only 3 fields, 'name', 'title', and
-'birth_date', the forms above will contain exactly the same fields.
+   For example::
+
+       class PartialAuthorForm(ModelForm):
+           class Meta:
+               model = Author
+               exclude = ['title']
+
+   Since the ``Author`` model has the 3 fields ``name``, ``title`` and
+   ``birth_date``, this will result in the fields ``name`` and ``birth_date``
+   being present on the form.
+
+If either of these are used, the order the fields appear in the form will be the
+order the fields are defined in the model, with ``ManyToManyField`` instances
+appearing last.
+
+In addition, Django applies the following rule: if you set ``editable=False`` on
+the model field, *any* form created from the model via ``ModelForm`` will not
+include that field.
+
+.. versionchanged:: 1.6
+
+    Before version 1.6, the ``'__all__'`` shortcut did not exist, but omitting
+    the ``fields`` attribute had the same effect. Omitting both ``fields`` and
+    ``exclude`` is now deprecated, but will continue to work as before until
+    version 1.8
+
 
 .. note::
 
-    If you specify ``fields`` or ``exclude`` when creating a form with
-    ``ModelForm``, then the fields that are not in the resulting form
+    Any fields not included in a form by the above logic
     will not be set by the form's ``save()`` method. Also, if you
     manually add the excluded fields back to the form, they will not
     be initialized from the model instance.
@@ -409,15 +426,19 @@ field, you could do the following::
 
         class Meta:
             model = Article
+            fields = ['pub_date', 'headline', 'content', 'reporter']
+
 
 If you want to override a field's default label, then specify the ``label``
 parameter when declaring the form field::
 
-   >>> class ArticleForm(ModelForm):
-   ...     pub_date = DateField(label='Publication date')
-   ...
-   ...     class Meta:
-   ...         model = Article
+    class ArticleForm(ModelForm):
+        pub_date = DateField(label='Publication date')
+
+        class Meta:
+            model = Article
+            fields = ['pub_date', 'headline', 'content', 'reporter']
+
 
 .. note::
 
@@ -444,6 +465,7 @@ parameter when declaring the form field::
 
             class Meta:
                 model = Article
+                fields = ['headline', 'content']
 
     You must ensure that the type of the form field can be used to set the
     contents of the corresponding model field. When they are not compatible,
@@ -451,30 +473,6 @@ parameter when declaring the form field::
 
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
-
-Changing the order of fields
-----------------------------
-
-By default, a ``ModelForm`` will render fields in the same order that they are
-defined on the model, with ``ManyToManyField`` instances appearing last. If
-you want to change the order in which fields are rendered, you can use the
-``fields`` attribute on the ``Meta`` class.
-
-The ``fields`` attribute defines the subset of model fields that will be
-rendered, and the order in which they will be rendered. For example given this
-model::
-
-    class Book(models.Model):
-        author = models.ForeignKey(Author)
-        title = models.CharField(max_length=100)
-
-the ``author`` field would be rendered first. If we wanted the title field
-to be rendered first, we could specify the following ``ModelForm``::
-
-    >>> class BookForm(ModelForm):
-    ...     class Meta:
-    ...         model = Book
-    ...         fields = ('title', 'author')
 
 .. _overriding-modelform-clean-method:
 
@@ -547,10 +545,37 @@ for more on how field cleaning and validation work. Also, your model's
 :ref:`Validating objects <validating-objects>` for more information on the
 model's ``clean()`` hook.
 
+.. _modelforms-factory:
+
+ModelForm factory function
+--------------------------
+
+You can create forms from a given model using the standalone function
+:func:`~django.forms.models.modelform_factory`, instead of using a class
+definition. This may be more convenient if you do not have many customizations
+to make::
+
+    >>> from django.forms.models import modelform_factory
+    >>> BookForm = modelform_factory(Book, fields=("author", "title"))
+
+This can also be used to make simple modifications to existing forms, for
+example by specifying the widgets to be used for a given field::
+
+    >>> from django.forms import Textarea
+    >>> Form = modelform_factory(Book, form=BookForm,
+                                 widgets={"title": Textarea()})
+
+The fields to include can be specified using the ``fields`` and ``exclude``
+keyword arguments, or the corresponding attributes on the ``ModelForm`` inner
+``Meta`` class. Please see the ``ModelForm`` :ref:`modelforms-selecting-fields`
+documentation.
+
 .. _model-formsets:
 
 Model formsets
 ==============
+
+.. class:: models.BaseModelFormSet
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes that make it easy to work with Django models. Let's
@@ -575,9 +600,11 @@ with the ``Author`` model. It works just like a regular formset::
     <tr><th><label for="id_form-0-birth_date">Birth date:</label></th><td><input type="text" name="form-0-birth_date" id="id_form-0-birth_date" /><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
 
 .. note::
-    ``modelformset_factory`` uses ``formset_factory`` to generate formsets.
-    This means that a model formset is just an extension of a basic formset
-    that knows how to interact with a particular model.
+
+    :func:`~django.forms.models.modelformset_factory` uses
+    :func:`~django.forms.formsets.formset_factory` to generate formsets. This
+    means that a model formset is just an extension of a basic formset that
+    knows how to interact with a particular model.
 
 Changing the queryset
 ---------------------
@@ -623,16 +650,28 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Specifying widgets to use in the form with ``widgets``
+------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``widgets`` parameter, you can specify a dictionary of values to
+customize the ``ModelForm``'s widget class for a particular field. This
+works the same way as the ``widgets`` dictionary on the inner ``Meta``
+class of a ``ModelForm`` works::
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
+
 Providing initial values
 ------------------------
-
-.. versionadded:: 1.4
 
 As with regular formsets, it's possible to :ref:`specify initial data
 <formsets-initial-data>` for forms in the formset by specifying an ``initial``
 parameter when instantiating the model formset class returned by
-``modelformset_factory``. However, with model formsets, the initial values only
-apply to extra forms, those that aren't bound to an existing object instance.
+:func:`~django.forms.models.modelformset_factory`. However, with model
+formsets, the initial values only apply to extra forms, those that aren't bound
+to an existing object instance.
 
 .. _saving-objects-in-the-formset:
 
@@ -653,11 +692,10 @@ database. If a given instance's data didn't change in the bound data, the
 instance won't be saved to the database and won't be included in the return
 value (``instances``, in the above example).
 
-When fields are missing from the form (for example because they have
-been excluded), these fields will not be set by the ``save()``
-method. You can find more information about this restriction, which
-also holds for regular ``ModelForms``, in `Using a subset of fields on
-the form`_.
+When fields are missing from the form (for example because they have been
+excluded), these fields will not be set by the ``save()`` method. You can find
+more information about this restriction, which also holds for regular
+``ModelForms``, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances::
 
@@ -678,7 +716,8 @@ Limiting the number of editable objects
 ---------------------------------------
 
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
-to ``modelformset_factory`` to limit the number of extra forms displayed.
+to :func:`~django.forms.models.modelformset_factory` to limit the number of
+extra forms displayed.
 
 ``max_num`` does not prevent existing objects from being displayed::
 
@@ -703,8 +742,8 @@ so long as the total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
 
-A ``max_num`` value of ``None`` (the default) puts no limit on the number of
-forms displayed.
+A ``max_num`` value of ``None`` (the default) puts a high limit on the number
+of forms displayed (1000). In practice this is equivalent to no limit.
 
 Using a model formset in a view
 -------------------------------
@@ -830,6 +869,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 
 .. highlight:: python
 
+.. _inline-formsets:
+
 Inline formsets
 ===============
 
@@ -853,7 +894,9 @@ a particular author, you could do this::
     >>> formset = BookFormSet(instance=author)
 
 .. note::
-    ``inlineformset_factory`` uses ``modelformset_factory`` and marks
+
+    :func:`~django.forms.models.inlineformset_factory` uses
+    :func:`~django.forms.models.modelformset_factory` and marks
     ``can_delete=True``.
 
 .. seealso::
@@ -872,7 +915,8 @@ the following model::
         to_friend = models.ForeignKey(Friend)
         length_in_months = models.IntegerField()
 
-To resolve this, you can use ``fk_name`` to ``inlineformset_factory``::
+To resolve this, you can use ``fk_name`` to
+:func:`~django.forms.models.inlineformset_factory`::
 
     >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name="from_friend")
 
@@ -898,3 +942,13 @@ of a model. Here's how you can do that::
         })
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
+
+Specifying widgets to use in the inline form
+--------------------------------------------
+
+.. versionadded:: 1.6
+
+``inlineformset_factory`` uses ``modelformset_factory`` and passes most
+of its arguments to ``modelformset_factory``. This means you can use
+the ``widgets`` parameter in much the same way as passing it to
+``modelformset_factory``. See `Specifying widgets to use in the form with widgets`_ above.

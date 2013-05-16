@@ -2,6 +2,24 @@
 Django 1.6 release notes - UNDER DEVELOPMENT
 ============================================
 
+.. note::
+
+    Dedicated to Malcolm Tredinnick
+
+    On March 17, 2013, the Django project and the free software community lost
+    a very dear friend and developer.
+
+    Malcolm was a long-time contributor to Django, a model community member, a
+    brilliant mind, and a friend. His contributions to Django — and to many other
+    open source projects — are nearly impossible to enumerate. Many on the core
+    Django team had their first patches reviewed by him; his mentorship enriched
+    us. His consideration, patience, and dedication will always be an inspiration
+    to us.
+
+    This release of Django is for Malcolm.
+
+    -- The Django Developers
+
 Welcome to Django 1.6!
 
 These release notes cover the `new features`_, as well as some `backwards
@@ -17,11 +35,197 @@ deprecation process for some features`_.
 What's new in Django 1.6
 ========================
 
+Simplified default project and app templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default templates used by :djadmin:`startproject` and :djadmin:`startapp`
+have been simplified and modernized. The :doc:`admin
+</ref/contrib/admin/index>` is now enabled by default in new projects; the
+:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`Language
+detection <how-django-discovers-language-preference>` and :ref:`clickjacking
+prevention <clickjacking-prevention>` are turned on.
+
+If the default templates don't suit your tastes, you can use :ref:`custom
+project and app templates <custom-app-and-project-templates>`.
+
+Improved transaction management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's transaction management was overhauled. Database-level autocommit is
+now turned on by default. This makes transaction handling more explicit and
+should improve performance. The existing APIs were deprecated, and new APIs
+were introduced, as described in the :doc:`transaction management docs
+</topics/db/transactions>`.
+
+Please review carefully the list of :ref:`known backwards-incompatibilities
+<transactions-upgrading-from-1.5>` to determine if you need to make changes in
+your code.
+
+Persistent database connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now supports reusing the same database connection for several requests.
+This avoids the overhead of re-establishing a connection at the beginning of
+each request. For backwards compatibility, this feature is disabled by
+default. See :ref:`persistent-database-connections` for details.
+
+Discovery of tests in any test module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 ships with a new test runner that allows more flexibility in the
+location of tests. The previous runner
+(``django.test.simple.DjangoTestSuiteRunner``) found tests only in the
+``models.py`` and ``tests.py`` modules of a Python package in
+:setting:`INSTALLED_APPS`.
+
+The new runner (``django.test.runner.DjangoTestDiscoverRunner``) uses the test
+discovery features built into unittest2 (the version of unittest in the Python
+2.7+ standard library, and bundled with Django). With test discovery, tests can
+be located in any module whose name matches the pattern ``test*.py``.
+
+In addition, the test labels provided to ``./manage.py test`` to nominate
+specific tests to run must now be full Python dotted paths (or directory
+paths), rather than ``applabel.TestCase.test_method_name`` pseudo-paths. This
+allows running tests located anywhere in your codebase, rather than only in
+:setting:`INSTALLED_APPS`. For more details, see :doc:`/topics/testing/index`.
+
+This change is backwards-incompatible; see the :ref:`backwards-incompatibility
+notes<new-test-runner>`.
+
+Time zone aware aggregation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The support for :doc:`time zones </topics/i18n/timezones>` introduced in
+Django 1.4 didn't work well with :meth:`QuerySet.dates()
+<django.db.models.query.QuerySet.dates>`: aggregation was always performed in
+UTC. This limitation was lifted in Django 1.6. Use :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` to perform time zone aware
+aggregation on a :class:`~django.db.models.DateTimeField`.
+
+Support for savepoints in SQLite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
+<savepoints-in-sqlite>`.
+
+``BinaryField`` model field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new :class:`django.db.models.BinaryField` model field allows to store raw
+binary data in the database.
+
 Minor features
 ~~~~~~~~~~~~~~
 
 * Authentication backends can raise ``PermissionDenied`` to immediately fail
   the authentication chain.
+
+* The HttpOnly flag can be set on the CSRF cookie with
+  :setting:`CSRF_COOKIE_HTTPONLY`.
+
+* The ``assertQuerysetEqual()`` now checks for undefined order and raises
+  ``ValueError`` if undefined order is spotted. The order is seen as
+  undefined if the given ``QuerySet`` isn't ordered and there are more than
+  one ordered values to compare against.
+
+* Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
+  :meth:`~django.db.models.query.QuerySet.latest`.
+
+* In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
+  now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
+
+* Django now wraps all PEP-249 exceptions.
+
+* The default widgets for :class:`~django.forms.EmailField`,
+  :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
+  :class:`~django.forms.FloatField` and :class:`~django.forms.DecimalField` use
+  the new type attributes available in HTML5 (type='email', type='url',
+  type='number'). Note that due to erratic support of the ``number`` input type
+  with localized numbers in current browsers, Django only uses it when numeric
+  fields are not localized.
+
+* The ``number`` argument for :ref:`lazy plural translations
+  <lazy-plural-translations>` can be provided at translation time rather than
+  at definition time.
+
+* For custom management commands: Verification of the presence of valid
+  settings in commands that ask for it by using the
+  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  option is now performed independently from handling of the locale that
+  should be active during the execution of the command. The latter can now be
+  influenced by the new
+  :attr:`~django.core.management.BaseCommand.leave_locale_alone` internal
+  option. See :ref:`management-commands-and-locales` for more details.
+
+* The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
+  :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
+  its ``object``\'s ``__dict__``.
+
+* :class:`~django.http.HttpResponseRedirect` and
+  :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
+  attribute (equivalent to the URL the response will redirect to).
+
+* The ``MemcachedCache`` cache backend now uses the latest :mod:`pickle`
+  protocol available.
+
+* Added :class:`~django.contrib.messages.views.SuccessMessageMixin` which
+  provides a ``success_message`` attribute for
+  :class:`~django.views.generic.edit.FormView` based classes.
+
+* Added the :attr:`django.db.models.ForeignKey.db_constraint` and
+  :attr:`django.db.models.ManyToManyField.db_constraint` options.
+
+* The jQuery library embedded in the admin has been upgraded to version 1.9.1.
+
+* Syndication feeds (:mod:`django.contrib.syndication`) can now pass extra
+  context through to feed templates using a new `Feed.get_context_data()`
+  callback.
+
+* The admin list columns have a ``column-<field_name>`` class in the HTML
+  so the columns header can be styled with CSS, e.g. to set a column width.
+
+* The isolation level can be customized under PostgreSQL.
+
+* The :ttag:`blocktrans` template tag now respects
+  :setting:`TEMPLATE_STRING_IF_INVALID` for variables not present in the
+  context, just like other template constructs.
+
+* SimpleLazyObjects will now present more helpful representations in shell
+  debugging situations.
+
+* Generic :class:`~django.contrib.gis.db.models.GeometryField` is now editable
+  with the OpenLayers widget in the admin.
+
+* The :meth:`Model.save() <django.db.models.Model.save()>` will do
+  ``UPDATE`` - if not updated - ``INSERT`` instead of ``SELECT`` - if not
+  found ``INSERT`` else ``UPDATE`` in case the model's primary key is set.
+
+* The documentation contains a :doc:`deployment checklist
+  </howto/deployment/checklist>`.
+
+* The :djadmin:`diffsettings` comand gained a ``--all`` option.
+
+* ``django.forms.fields.Field.__init__`` now calls ``super()``, allowing
+  field mixins to implement ``__init__()`` methods that will reliably be
+  called.
+
+* The ``validate_max`` parameter was added to ``BaseFormSet`` and
+  :func:`~django.forms.formsets.formset_factory`, and ``ModelForm`` and inline
+  versions of the same.  The behavior of validation for formsets with
+  ``max_num`` was clarified.  The previously undocumented behavior that
+  hardened formsets against memory exhaustion attacks was documented,
+  and the undocumented limit of the higher of 1000 or ``max_num`` forms
+  was changed so it is always 1000 more than ``max_num``.
+
+* Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
+  with bcrypt.
+
+* `Pillow`_ is now the preferred image manipulation library to use with Django.
+  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
+  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+.. _`PIL`: https://pypi.python.org/pypi/PIL
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -34,5 +238,413 @@ Backwards incompatible changes in 1.6
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+New transaction management model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Behavior changes
+^^^^^^^^^^^^^^^^
+
+Database-level autocommit is enabled by default in Django 1.6. While this
+doesn't change the general spirit of Django's transaction management, there
+are a few known backwards-incompatibities, described in the :ref:`transaction
+management docs <transactions-upgrading-from-1.5>`. You should review your
+code to determine if you're affected.
+
+Savepoints and ``assertNumQueries``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The changes in transaction management may result in additional statements to
+create, release or rollback savepoints. This is more likely to happen with
+SQLite, since it didn't support savepoints until this release.
+
+If tests using :meth:`~django.test.TestCase.assertNumQueries` fail because of
+a higher number of queries than expected, check that the extra queries are
+related to savepoints, and adjust the expected number of queries accordingly.
+
+Autocommit option for PostgreSQL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In previous versions, database-level autocommit was only an option for
+PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
+<postgresql-autocommit-mode>` and can be removed.
+
+.. _new-test-runner:
+
+New test runner
+~~~~~~~~~~~~~~~
+
+In order to maintain greater consistency with Python's unittest module, the new
+test runner (``django.test.runner.DiscoverRunner``) does not automatically
+support some types of tests that were supported by the previous runner:
+
+* Tests in ``models.py`` and ``tests/__init__.py`` files will no longer be
+  found and run. Move them to a file whose name begins with ``test``.
+
+* Doctests will no longer be automatically discovered. To integrate doctests in
+  your test suite, follow the `recommendations in the Python documentation`_.
+
+Django bundles a modified version of the :mod:`doctest` module from the Python
+standard library (in ``django.test._doctest``) in order to allow passing in a
+custom ``DocTestRunner`` when instantiating a ``DocTestSuite``, and includes
+some additional doctest utilities (``django.test.testcases.DocTestRunner``
+turns on the ``ELLIPSIS`` option by default, and
+``django.test.testcases.OutputChecker`` provides better matching of XML, JSON,
+and numeric data types).
+
+These utilities are deprecated and will be removed in Django 1.8; doctest
+suites should be updated to work with the standard library's doctest module (or
+converted to unittest-compatible tests).
+
+If you wish to delay updates to your test suite, you can set your
+:setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
+to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is
+deprecated but will not be removed from Django until version 1.8.
+
+.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+
+Addition of ``QuerySet.datetimes()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the :doc:`time zone support </topics/i18n/timezones>` added in Django 1.4
+was active, :meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>`
+lookups returned unexpected results, because the aggregation was performed in
+UTC. To fix this, Django 1.6 introduces a new API, :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>`. This requires a few changes in
+your code.
+
+``QuerySet.dates()`` returns ``date`` objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` now returns a
+list of :class:`~datetime.date`. It used to return a list of
+:class:`~datetime.datetime`.
+
+:meth:`QuerySet.datetimes() <django.db.models.query.QuerySet.datetimes>`
+returns a list of :class:`~datetime.datetime`.
+
+``QuerySet.dates()`` no longer usable on ``DateTimeField``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:meth:`QuerySet.dates() <django.db.models.query.QuerySet.dates>` raises an
+error if it's used on :class:`~django.db.models.DateTimeField` when time
+zone support is active. Use :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` instead.
+
+``date_hierarchy`` requires time zone definitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :attr:`~django.contrib.admin.ModelAdmin.date_hierarchy` feature of the
+admin now relies on :meth:`QuerySet.datetimes()
+<django.db.models.query.QuerySet.datetimes>` when it's used on a
+:class:`~django.db.models.DateTimeField`.
+
+This requires time zone definitions in the database when :setting:`USE_TZ` is
+``True``. :ref:`Learn more <database-time-zone-definitions>`.
+
+``date_list`` in generic views requires time zone definitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the same reason, accessing ``date_list`` in the context of a date-based
+generic view requires time zone definitions in the database when the view is
+based on a :class:`~django.db.models.DateTimeField` and :setting:`USE_TZ` is
+``True``. :ref:`Learn more <database-time-zone-definitions>`.
+
+New lookups may clash with model fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 introduces ``hour``, ``minute``, and ``second`` lookups on
+:class:`~django.db.models.DateTimeField`. If you had model fields called
+``hour``, ``minute``, or ``second``, the new lookups will clash with you field
+names. Append an explicit :lookup:`exact` lookup if this is an issue.
+
+``BooleanField`` no longer defaults to ``False``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a :class:`~django.db.models.BooleanField` doesn't have an explicit
+:attr:`~django.db.models.Field.default`, the implicit default value is
+``None``. In previous version of Django, it was ``False``, but that didn't
+represent accurately the lack of a value.
+
+Code that relies on the default value being ``False`` may raise an exception
+when saving new model instances to the database, because ``None`` isn't an
+acceptable value for a :class:`~django.db.models.BooleanField`. You should
+either specify ``default=False`` in the field definition, or ensure the field
+is set to ``True`` or ``False`` before saving the object.
+
+Translations and comments in templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Extraction of translations after comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Extraction of translatable literals from templates with the
+:djadmin:`makemessages` command now correctly detects i18n constructs when
+they are located after a ``{#`` / ``#}``-type comment on the same line. E.g.:
+
+.. code-block:: html+django
+
+    {# A comment #}{% trans "This literal was incorrectly ignored. Not anymore" %}
+
+Location of translator comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Validation of the placement of :ref:`translator-comments-in-templates`
+specified using ``{#`` / ``#}`` is now stricter. All translator comments not
+located at the end of their respective lines in a template are ignored and a
+warning is generated by :djadmin:`makemessages` when it finds them. E.g.:
+
+.. code-block:: html+django
+
+    {# Translators: This is ignored #}{% trans "Translate me" %}
+    {{ title }}{# Translators: Extracted and associated with 'Welcome' below #}
+    <h1>{% trans "Welcome" %}</h1>
+
+Quoting in :func:`~django.core.urlresolvers.reverse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When reversing URLs, Django didn't apply :func:`~django.utils.http.urlquote`
+to arguments before interpolating them in URL patterns. This bug is fixed in
+Django 1.6. If you worked around this bug by applying URL quoting before
+passing arguments to :func:`~django.core.urlresolvers.reverse`, this may
+result in double-quoting. If this happens, simply remove the URL quoting from
+your code.
+
+Storage of IP addresses in the comments app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :doc:`comments </ref/contrib/comments/index>` app now uses a
+``GenericIPAddressField`` for storing commenters' IP addresses, to support
+comments submitted from IPv6 addresses. Until now, it stored them in an
+``IPAddressField``, which is only meant to support IPv4. When saving a comment
+made from an IPv6 address, the address would be silently truncated on MySQL
+databases, and raise an exception on Oracle. You will need to change the
+column type in your database to benefit from this change.
+
+For MySQL, execute this query on your project's database:
+
+.. code-block:: sql
+
+    ALTER TABLE django_comments MODIFY ip_address VARCHAR(39);
+
+For Oracle, execute this query:
+
+.. code-block:: sql
+
+    ALTER TABLE DJANGO_COMMENTS MODIFY (ip_address VARCHAR2(39));
+
+If you do not apply this change, the behaviour is unchanged: on MySQL, IPv6
+addresses are silently truncated; on Oracle, an exception is generated. No
+database change is needed for SQLite or PostgreSQL databases.
+
+Percent literals in ``cursor.execute`` queries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you are running raw SQL queries through the
+:ref:`cursor.execute <executing-custom-sql>` method, the rule about doubling
+percent literals (``%``) inside the query has been unified. Past behavior
+depended on the database backend. Now, across all backends, you only need to
+double literal percent characters if you are also providing replacement
+parameters. For example::
+
+    # No parameters, no percent doubling
+    cursor.execute("SELECT foo FROM bar WHERE baz = '30%'")
+
+    # Parameters passed, non-placeholders have to be doubled
+    cursor.execute("SELECT foo FROM bar WHERE baz = '30%%' and id = %s", [self.id])
+
+``SQLite`` users need to check and update such queries.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The ``django.db.models.query.EmptyQuerySet`` can't be instantiated any more -
+  it is only usable as a marker class for checking if
+  :meth:`~django.db.models.query.QuerySet.none` has been called:
+  ``isinstance(qs.none(), EmptyQuerySet)``
+
+* If your CSS/Javascript code used to access HTML input widgets by type, you
+  should review it as ``type='text'`` widgets might be now output as
+  ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
+  corresponding field type.
+
+* Form field's :attr:`~django.forms.Field.error_messages` that contain a
+  placeholder should now always use a named placeholder (``"Value '%(value)s' is
+  too big"`` instead of ``"Value '%s' is too big"``). See the corresponding
+  field documentation for details about the names of the placeholders. The
+  changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
+  :class:`~django.forms.ModelMultipleChoiceField`.
+
 Features deprecated in 1.6
 ==========================
+
+Transaction management APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transaction management was completely overhauled in Django 1.6, and the
+current APIs are deprecated:
+
+- ``django.middleware.transaction.TransactionMiddleware``
+- ``django.db.transaction.autocommit``
+- ``django.db.transaction.commit_on_success``
+- ``django.db.transaction.commit_manually``
+- the ``TRANSACTIONS_MANAGED`` setting
+
+The reasons for this change and the upgrade path are described in the
+:ref:`transactions documentation <transactions-upgrading-from-1.5>`.
+
+``django.contrib.comments``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's comment framework has been deprecated and is no longer supported. It
+will be available in Django 1.6 and 1.7, and removed in Django 1.8. Most users
+will be better served with a custom solution, or a hosted product like Disqus__.
+
+The code formerly known as ``django.contrib.comments`` is `still available
+in an external repository`__.
+
+__ https://disqus.com/
+__ https://github.com/django/django-contrib-comments
+
+Support for PostgreSQL versions older than 8.4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in December 2011 for
+PostgreSQL 8.2 and in February 2013 for 8.3. As a consequence, Django 1.6 sets
+8.4 as the minimum PostgreSQL version it officially supports.
+
+You're strongly encouraged to use the most recent version of PostgreSQL
+available, because of performance improvements and to take advantage of the
+native streaming replication available in PostgreSQL 9.x.
+
+Changes to :ttag:`cycle` and :ttag:`firstof`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The template system generally escapes all variables to avoid XSS attacks.
+However, due to an accident of history, the :ttag:`cycle` and :ttag:`firstof`
+tags render their arguments as-is.
+
+Django 1.6 starts a process to correct this inconsistency. The ``future``
+template library provides alternate implementations of :ttag:`cycle` and
+:ttag:`firstof` that autoescape their inputs. If you're using these tags,
+you're encourage to include the following line at the top of your templates to
+enable the new behavior::
+
+    {% load cycle from future %}
+
+or::
+
+    {% load firstof from future %}
+
+The tags implementing the old behavior have been deprecated, and in Django
+1.8, the old behavior will be replaced with the new behavior. To ensure
+compatibility with future versions of Django, existing templates should be
+modified to use the ``future`` versions.
+
+If necessary, you can temporarily disable auto-escaping with
+:func:`~django.utils.safestring.mark_safe` or :ttag:`{% autoescape off %}
+<autoescape>`.
+
+``SEND_BROKEN_LINK_EMAILS`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.middleware.common.CommonMiddleware` used to provide basic
+reporting of broken links by email when ``SEND_BROKEN_LINK_EMAILS`` is set to
+``True``.
+
+Because of intractable ordering problems between
+:class:`~django.middleware.common.CommonMiddleware` and
+:class:`~django.middleware.locale.LocaleMiddleware`, this feature was split
+out into a new middleware:
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware`.
+
+If you're relying on this feature, you should add
+``'django.middleware.common.BrokenLinkEmailsMiddleware'`` to your
+:setting:`MIDDLEWARE_CLASSES` setting and remove ``SEND_BROKEN_LINK_EMAILS``
+from your settings.
+
+``_has_changed`` method on widgets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you defined your own form widgets and defined the ``_has_changed`` method
+on a widget, you should now define this method on the form field itself.
+
+``module_name`` model meta attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Model._meta.module_name`` was renamed to ``model_name``. Despite being a
+private API, it will go through a regular deprecation path.
+
+``get_query_set`` and similar methods renamed to ``get_queryset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
+``ModelAdmin.queryset`` have been renamed to ``get_queryset``.
+
+``shortcut`` view and URLconf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``shortcut`` view was moved from ``django.views.defaults`` to
+``django.contrib.contenttypes.views`` shortly after the 1.0 release, but the
+old location was never deprecated. This oversight was corrected in Django 1.6
+and you should now use the new location.
+
+The URLconf ``django.conf.urls.shortcut`` was also deprecated. If you're
+including it in an URLconf, simply replace::
+
+    (r'^prefix/', include('django.conf.urls.shortcut')),
+
+with::
+
+    (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+
+``ModelForm`` without ``fields`` or ``exclude``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if you wanted a :class:`~django.forms.ModelForm` to use all fields on
+the model, you could simply omit the ``Meta.fields`` attribute, and all fields
+would be used.
+
+This can lead to security problems where fields are added to the model and,
+unintentionally, automatically become editable by end users. In some cases,
+particular with boolean fields, it is possible for this problem to be completely
+invisible. This is a form of `Mass assignment vulnerability
+<http://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
+
+For this reason, this behaviour is deprecated, and using the ``Meta.exclude``
+option is strongly discouraged. Instead, all fields that are intended for
+inclusion in the form should be listed explicitly in the ``fields`` attribute.
+
+If this security concern really does not apply in your case, there is a shortcut
+to explicitly indicate that all fields should be used - use the special value
+``"__all__"`` for the fields attribute::
+
+    class MyModelForm(ModelForm):
+        class Meta:
+            fields = "__all__"
+            model = MyModel
+
+If you have custom ``ModelForms`` that only need to be used in the admin, there
+is another option. The admin has its own methods for defining fields
+(``fieldsets`` etc.), and so adding a list of fields to the ``ModelForm`` is
+redundant. Instead, simply omit the ``Meta`` inner class of the ``ModelForm``,
+or omit the ``Meta.model`` attribute. Since the ``ModelAdmin`` subclass knows
+which model it is for, it can add the necessary attributes to derive a
+functioning ``ModelForm``. This behaviour also works for earlier Django
+versions.
+
+``UpdateView`` and ``CreateView`` without explicit fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The generic views :class:`~django.views.generic.edit.CreateView` and
+:class:`~django.views.generic.edit.UpdateView`, and anything else derived from
+:class:`~django.views.generic.edit.ModelFormMixin`, are vulnerable to the
+security problem described in the section above, because they can automatically
+create a ``ModelForm`` that uses all fields for a model.
+
+For this reason, if you use these views for editing models, you must also supply
+the ``fields`` attribute, which is a list of model fields and works in the same
+way as the :class:`~django.forms.ModelForm` ``Meta.fields`` attribute. Alternatively,
+you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
+defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
+subclass to be used with a model but without an explicit list of fields is
+deprecated.

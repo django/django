@@ -201,7 +201,7 @@ corresponding :class:`~django.db.models.FileField` when calling
                 return HttpResponseRedirect('/success/url/')
         else:
             form = ModelFormWithFileField()
-        return render('upload.html', {'form': form})
+        return render(request, 'upload.html', {'form': form})
 
 If you are constructing an object manually, you can simply assign the file
 object from :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file
@@ -221,14 +221,14 @@ field in the model::
                 return HttpResponseRedirect('/success/url/')
         else:
             form = UploadFileForm()
-        return render('upload.html', {'form': form})
+        return render(request, 'upload.html', {'form': form})
 
 
 ``UploadedFile`` objects
 ========================
 
-In addition to those inherited from :class:`File`, all ``UploadedFile`` objects
-define the following methods/attributes:
+In addition to those inherited from :class:`~django.core.files.File`, all
+``UploadedFile`` objects define the following methods/attributes:
 
 .. attribute:: UploadedFile.content_type
 

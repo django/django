@@ -1,6 +1,7 @@
 from django.forms import ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
+from django.utils import six
 from django.utils import unittest
 
 
@@ -37,15 +38,13 @@ class GeometryFieldTest(unittest.TestCase):
         "Testing GeometryField's handling of null (None) geometries."
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
-        self.assertRaises(forms.ValidationError, fld.clean, None)
-
-        # Still not allowed if `null=False`.
-        fld = forms.GeometryField(required=False, null=False)
-        self.assertRaises(forms.ValidationError, fld.clean, None)
+        with six.assertRaisesRegex(self, forms.ValidationError,
+                "No geometry value provided."):
+            fld.clean(None)
 
         # This will clean None as a geometry (See #10660).
         fld = forms.GeometryField(required=False)
-        self.assertEqual(None, fld.clean(None))
+        self.assertIsNone(fld.clean(None))
 
     def test03_geom_type(self):
         "Testing GeometryField's handling of different geometry types."

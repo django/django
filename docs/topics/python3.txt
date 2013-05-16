@@ -78,8 +78,8 @@ wherever possible and avoid the ``b`` prefixes.
 String handling
 ---------------
 
-Python 2's :class:`unicode` type was renamed :class:`str` in Python 3,
-:class:`str` was renamed :class:`bytes`, and :class:`basestring` disappeared.
+Python 2's :func:`unicode` type was renamed :func:`str` in Python 3,
+:func:`str` was renamed ``bytes()``, and :func:`basestring` disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
@@ -131,35 +131,36 @@ and ``SafeText`` respectively.
 
 For forwards compatibility, the new names work as of Django 1.4.2.
 
-:meth:`__str__` and :meth:`__unicode__` methods
------------------------------------------------
+:meth:`~object.__str__` and :meth:`~object.__unicode__` methods
+---------------------------------------------------------------
 
-In Python 2, the object model specifies :meth:`__str__` and
-:meth:`__unicode__` methods. If these methods exist, they must return
-:class:`str` (bytes) and :class:`unicode` (text) respectively.
+In Python 2, the object model specifies :meth:`~object.__str__` and
+:meth:`~object.__unicode__` methods. If these methods exist, they must return
+``str`` (bytes) and ``unicode`` (text) respectively.
 
-The ``print`` statement and the :func:`str` built-in call :meth:`__str__` to
-determine the human-readable representation of an object. The :func:`unicode`
-built-in calls :meth:`__unicode__` if it exists, and otherwise falls back to
-:meth:`__str__` and decodes the result with the system encoding. Conversely,
-the :class:`~django.db.models.Model` base class automatically derives
-:meth:`__str__` from :meth:`__unicode__` by encoding to UTF-8.
+The ``print`` statement and the :func:`str` built-in call
+:meth:`~object.__str__` to determine the human-readable representation of an
+object. The :func:`unicode` built-in calls :meth:`~object.__unicode__` if it
+exists, and otherwise falls back to :meth:`~object.__str__` and decodes the
+result with the system encoding. Conversely, the
+:class:`~django.db.models.Model` base class automatically derives
+:meth:`~object.__str__` from :meth:`~object.__unicode__` by encoding to UTF-8.
 
-In Python 3, there's simply :meth:`__str__`, which must return :class:`str`
+In Python 3, there's simply :meth:`~object.__str__`, which must return ``str``
 (text).
 
-(It is also possible to define :meth:`__bytes__`, but Django application have
+(It is also possible to define ``__bytes__()``, but Django application have
 little use for that method, because they hardly ever deal with
-:class:`bytes`.)
+``bytes``.)
 
-Django provides a simple way to define :meth:`__str__` and :meth:`__unicode__`
-methods that work on Python 2 and 3: you must define a :meth:`__str__` method
-returning text and to apply the
+Django provides a simple way to define :meth:`~object.__str__` and
+:meth:`~object.__unicode__` methods that work on Python 2 and 3: you must
+define a :meth:`~object.__str__` method returning text and to apply the
 :func:`~django.utils.encoding.python_2_unicode_compatible` decorator.
 
 On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
-:meth:`__unicode__` and :meth:`__str__` methods (replacing the original
-:meth:`__str__` method in the process). Here's an example::
+:meth:`~object.__unicode__` and :meth:`~object.__str__` methods (replacing the
+original :meth:`~object.__str__` method in the process). Here's an example::
 
     from __future__ import unicode_literals
     from django.utils.encoding import python_2_unicode_compatible
@@ -173,8 +174,8 @@ This technique is the best match for Django's porting philosophy.
 
 For forwards compatibility, this decorator is available as of Django 1.4.2.
 
-Finally, note that :meth:`__repr__` must return a :class:`str` on all versions
-of Python.
+Finally, note that :meth:`~object.__repr__` must return a ``str`` on all
+versions of Python.
 
 :class:`dict` and :class:`dict`-like classes
 --------------------------------------------
@@ -186,20 +187,20 @@ behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
 :func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
-Django's bundled version adds :func:`~django.utils.six.iterlists` for
-:class:`~django.utils.datastructures.MultiValueDict` and its subclasses.
+It also contains an undocumented ``iterlists`` function that works well for
+``django.utils.datastructures.MultiValueDict`` and its subclasses.
 
 :class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
 --------------------------------------------------------------------------------
 
 According to :pep:`3333`:
 
-- headers are always :class:`str` objects,
-- input and output streams are always :class:`bytes` objects.
+- headers are always ``str`` objects,
+- input and output streams are always ``bytes`` objects.
 
 Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
-contains :class:`bytes`, which may become an issue if you compare it with a
-:class:`str` in your tests. The preferred solution is to rely on
+contains ``bytes``, which may become an issue if you compare it with a
+``str`` in your tests. The preferred solution is to rely on
 :meth:`~django.test.TestCase.assertContains` and
 :meth:`~django.test.TestCase.assertNotContains`. These methods accept a
 response and a unicode string as arguments.
@@ -236,11 +237,10 @@ under Python 3, use the :func:`str` builtin::
 
     str('my string')
 
-In Python 3, there aren't any automatic conversions between :class:`str` and
-:class:`bytes`, and the :mod:`codecs` module became more strict.
-:meth:`str.decode` always returns :class:`bytes`, and :meth:`bytes.decode`
-always returns :class:`str`. As a consequence, the following pattern is
-sometimes necessary::
+In Python 3, there aren't any automatic conversions between ``str`` and
+``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.encode`
+always returns ``bytes``, and ``bytes.decode`` always returns ``str``. As a
+consequence, the following pattern is sometimes necessary::
 
     value = value.encode('ascii', 'ignore').decode('ascii')
 
@@ -317,6 +317,9 @@ Division
         def __idiv__(self, other):  # Python 2 compatibility
             return type(self).__itruediv__(self, other)
 
+Special methods are looked up on the class and not on the instance to reflect
+the behavior of the Python interpreter.
+
 .. module: django.utils.six
 
 Writing compatible code with six
@@ -343,7 +346,7 @@ meaning of ``str`` changed. To test these types, use the following idioms::
     isinstance(myvalue, bytes)                  # replacement for str
 
 Python ≥ 2.6 provides ``bytes`` as an alias for ``str``, so you don't need
-:attr:`six.binary_type`.
+:data:`six.binary_type`.
 
 ``long``
 ~~~~~~~~
@@ -356,7 +359,7 @@ The ``long`` type no longer exists in Python 3. ``1L`` is a syntax error. Use
 ``xrange``
 ~~~~~~~~~~
 
-Import :func:`six.moves.xrange` wherever you use ``xrange``.
+Import ``six.moves.xrange`` wherever you use ``xrange``.
 
 Moved modules
 ~~~~~~~~~~~~~
@@ -391,21 +394,19 @@ function.
 Customizations of six
 ---------------------
 
-The version of six bundled with Django includes one extra function:
-
-.. function:: iterlists(MultiValueDict)
-
-    Returns an iterator over the lists of values of a
-    :class:`~django.utils.datastructures.MultiValueDict`. This replaces
-    :meth:`~django.utils.datastructures.MultiValueDict.iterlists()` on Python
-    2 and :meth:`~django.utils.datastructures.MultiValueDict.lists()` on
-    Python 3.
+The version of six bundled with Django includes a few extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
 
     This replaces ``testcase.assertRaisesRegexp`` on Python 2, and
     ``testcase.assertRaisesRegex`` on Python 3. ``assertRaisesRegexp`` still
-    exists in current Python3 versions, but issues a warning.
+    exists in current Python 3 versions, but issues a warning.
+
+.. function:: assertRegex(testcase, *args, **kwargs)
+
+    This replaces ``testcase.assertRegexpMatches`` on Python 2, and
+    ``testcase.assertRegex`` on Python 3. ``assertRegexpMatches`` still
+    exists in current Python 3 versions, but issues a warning.
 
 
 In addition to six' defaults moves, Django's version provides ``thread`` as

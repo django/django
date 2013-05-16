@@ -181,7 +181,7 @@ protecting the CSRF token from being sent to other domains.
     correctly on that version. Make sure you are running at least jQuery 1.5.1.
 
 You can use `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in
-jQuery 1.5 and newer in order to replace the `sameOrigin` logic above:
+jQuery 1.5 and newer in order to replace the ``sameOrigin`` logic above:
 
 .. code-block:: javascript
 
@@ -410,8 +410,6 @@ Utilities
 
 .. function:: ensure_csrf_cookie(view)
 
-    .. versionadded:: 1.4
-
     This decorator forces a view to send the CSRF cookie.
 
 Scenarios
@@ -490,64 +488,11 @@ developers of other reusable apps that want the same guarantees also use the
 Settings
 ========
 
-A number of settings can be used to control Django's CSRF behavior.
+A number of settings can be used to control Django's CSRF behavior:
 
-CSRF_COOKIE_DOMAIN
-------------------
-
-Default: ``None``
-
-The domain to be used when setting the CSRF cookie.  This can be useful for
-easily allowing cross-subdomain requests to be excluded from the normal cross
-site request forgery protection.  It should be set to a string such as
-``".example.com"`` to allow a POST request from a form on one subdomain to be
-accepted by a view served from another subdomain.
-
-Please note that, with or without use of this setting, this CSRF protection
-mechanism is not safe against cross-subdomain attacks -- see `Limitations`_.
-
-CSRF_COOKIE_NAME
-----------------
-
-Default: ``'csrftoken'``
-
-The name of the cookie to use for the CSRF authentication token. This can be
-whatever you want.
-
-CSRF_COOKIE_PATH
-----------------
-
-.. versionadded:: 1.4
-
-Default: ``'/'``
-
-The path set on the CSRF cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
-
-This is useful if you have multiple Django instances running under the same
-hostname. They can use different cookie paths, and each instance will only see
-its own CSRF cookie.
-
-CSRF_COOKIE_SECURE
-------------------
-
-.. versionadded:: 1.4
-
-Default: ``False``
-
-Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
-the cookie will be marked as "secure," which means browsers may ensure that the
-cookie is only sent under an HTTPS connection.
-
-CSRF_FAILURE_VIEW
------------------
-
-Default: ``'django.views.csrf.csrf_failure'``
-
-A dotted path to the view function to be used when an incoming request
-is rejected by the CSRF protection.  The function should have this signature::
-
-  def csrf_failure(request, reason="")
-
-where ``reason`` is a short message (intended for developers or logging, not for
-end users) indicating the reason the request was rejected.
+* :setting:`CSRF_COOKIE_DOMAIN`
+* :setting:`CSRF_COOKIE_HTTPONLY`
+* :setting:`CSRF_COOKIE_NAME`
+* :setting:`CSRF_COOKIE_PATH`
+* :setting:`CSRF_COOKIE_SECURE`
+* :setting:`CSRF_FAILURE_VIEW`

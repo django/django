@@ -82,14 +82,13 @@ Related objects reference
             >>> e = Entry.objects.get(id=234)
             >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
-        In order to prevent database inconsistency, this method only exists on
-        :class:`~django.db.models.ForeignKey` objects where ``null=True``. If
-        the related field can't be set to ``None`` (``NULL``), then an object
-        can't be removed from a relation without being added to another. In the
-        above example, removing ``e`` from ``b.entry_set()`` is equivalent to
-        doing ``e.blog = None``, and because the ``blog``
-        :class:`~django.db.models.ForeignKey` doesn't have ``null=True``, this
-        is invalid.
+        For :class:`~django.db.models.ForeignKey` objects, this method only
+        exists if ``null=True``. If the related field can't be set to ``None``
+        (``NULL``), then an object can't be removed from a relation without
+        being added to another. In the above example, removing ``e`` from
+        ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
+        the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
+        ``null=True``, this is invalid.
 
     .. method:: clear()
 

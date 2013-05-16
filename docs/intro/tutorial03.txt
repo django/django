@@ -39,7 +39,24 @@ In our poll application, we'll have the following four views:
 * Vote action -- handles voting for a particular choice in a particular
   poll.
 
-In Django, each view is represented by a simple Python function.
+In Django, web pages and other content are delivered by views. Each view is
+represented by a simple Python function (or method, in the case of class-based
+views). Django will choose a view by examining the URL that's requested (to be
+precise, the part of the URL after the domain name).
+
+Now in your time on the web you may have come across such beauties as
+"ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
+You will be pleased to know that Django allows us much more elegant
+*URL patterns* than that.
+
+A URL pattern is simply the general form of a URL - for example:
+``/newsarchive/<year>/<month>/``.
+
+To get from a URL to a view, Django uses what are known as 'URLconfs'. A
+URLconf maps URL patterns (described as regular expressions) to views.
+
+This tutorial provides basic instruction in the use of URLconfs, and you can
+refer to :mod:`django.core.urlresolvers` for more information.
 
 Write your first view
 =====================
@@ -52,19 +69,8 @@ and put the following Python code in it::
     def index(request):
         return HttpResponse("Hello, world. You're at the poll index.")
 
-This is the simplest view possible in Django. Now we have a problem, how does
-this view get called? For that we need to map it to a URL, in Django this is
-done in a configuration file called a URLconf.
-
-.. admonition:: What is a URLconf?
-
-    In Django, web pages and other content are delivered by views and
-    determining which view is called is done by Python modules informally
-    titled 'URLconfs'. These modules are pure Python code and are a simple
-    mapping between URL patterns (as simple regular expressions) to Python
-    callback functions (your views). This tutorial provides basic instruction
-    in their use, and you can refer to :mod:`django.core.urlresolvers` for
-    more information.
+This is the simplest view possible in Django. To call the view, we need to map
+it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the polls directory, create a file called ``urls.py``.
 Your app directory should now look like::
@@ -101,7 +107,7 @@ with::
         url(r'^admin/', include(admin.site.urls)),
     )
 
-You have now wired an `index` view into the URLconf. Go to
+You have now wired an ``index`` view into the URLconf. Go to
 http://localhost:8000/polls/ in your browser, and you should see the text
 "*Hello, world. You're at the poll index.*", which you defined in the
 ``index`` view.
@@ -113,7 +119,7 @@ At this point, it's worth reviewing what these arguments are for.
 :func:`~django.conf.urls.url` argument: regex
 ---------------------------------------------
 
-The term `regex` is a commonly used short form meaning `regular expression`,
+The term "regex" is a commonly used short form meaning "regular expression",
 which is a syntax for matching patterns in strings, or in this case, url
 patterns. Django starts at the first regular expression and makes its way down
 the list,  comparing the requested URL against each regular expression until it
@@ -235,11 +241,11 @@ be used to identify the matched pattern; and ``\d+`` is a regular expression to
 match a sequence of digits (i.e., a number).
 
 Because the URL patterns are regular expressions, there really is no limit on
-what you can do with them. And there's no need to add URL cruft such as ``.php``
--- unless you have a sick sense of humor, in which case you can do something
-like this::
+what you can do with them. And there's no need to add URL cruft such as
+``.html`` -- unless you want to, in which case you can do something like
+this::
 
-    (r'^polls/latest\.php$', 'polls.views.index'),
+    (r'^polls/latest\.html$', 'polls.views.index'),
 
 But, don't do that. It's silly.
 
@@ -274,10 +280,48 @@ commas, according to publication date::
 
 There's a problem here, though: the page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
-So let's use Django's template system to separate the design from Python.
+So let's use Django's template system to separate the design from Python by
+creating a template that the view can use.
 
-First, create a directory ``polls`` in your template directory you specified
-in setting:`TEMPLATE_DIRS`. Within that, create a file called ``index.html``.
+First, create a directory called ``templates`` in your ``polls`` directory.
+Django will look for templates in there.
+
+Django's :setting:`TEMPLATE_LOADERS` setting contains a list of callables that
+know how to import templates from various sources. One of the defaults is
+:class:`django.template.loaders.app_directories.Loader` which looks for a
+"templates" subdirectory in each of the :setting:`INSTALLED_APPS` - this is how
+Django knows to find the polls templates even though we didn't modify
+:setting:`TEMPLATE_DIRS`, as we did in :ref:`Tutorial 2
+<ref-customizing-your-projects-templates>`.
+
+.. admonition:: Organizing templates
+
+    We *could* have all our templates together, in one big templates directory,
+    and it would work perfectly well. However, this template belongs to the
+    polls application, so unlike the admin template we created in the previous
+    tutorial, we'll put this one in the application's template directory
+    (``polls/templates``) rather than the project's (``templates``). We'll
+    discuss in more detail in the :doc:`reusable apps tutorial
+    </intro/reusable-apps>` *why* we do this.
+
+Within the ``templates`` directory you have just created, create another
+directory called ``polls``, and within that create a file called
+``index.html``. In other words, your template should be at
+``polls/templates/polls/index.html``. Because of how the ``app_directories``
+template loader works as described above, you can refer to this template within
+Django simply as ``polls/index.html``.
+
+.. admonition:: Template namespacing
+
+    Now we *might* be able to get away with putting our templates directly in
+    ``polls/templates`` (rather than creating another ``polls`` subdirectory),
+    but it would actually be a bad idea. Django will choose the first template
+    it finds whose name matches, and if you had a template with the same name
+    in a *different* application, Django would be unable to distinguish between
+    them. We need to be able to point Django at the right one, and the easiest
+    way to ensure this is by *namespacing* them. That is, by putting those
+    templates inside *another* directory named for the application itself.
+
 Put the following code in that template:
 
 .. code-block:: html+django
@@ -311,15 +355,9 @@ That code loads the template called  ``polls/index.html`` and passes it a
 context. The context is a dictionary mapping template variable names to Python
 objects.
 
-Load the page in your Web browser, and you should see a bulleted-list
-containing the "What's up" poll from Tutorial 1. The link points to the poll's
-detail page.
-
-.. admonition:: Organizing Templates
-
-    Rather than one big templates directory, you can also store templates
-    within each app. We'll discuss this in more detail in the :doc:`reusable
-    apps tutorial</intro/reusable-apps>`.
+Load the page by pointing your browser at "/polls/", and you should see a
+bulleted-list containing the "What's up" poll from Tutorial 1. The link points
+to the poll's detail page.
 
 A shortcut: :func:`~django.shortcuts.render`
 --------------------------------------------
@@ -367,7 +405,8 @@ The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a poll with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
-later, but if you'd like to quickly get the above example working, just::
+later, but if you'd like to quickly get the above example working, a file
+containing just::
 
     {{ poll }}
 
@@ -536,8 +575,9 @@ view, and so might an app on the same project that is for a blog. How does one
 make it so that Django knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
-The answer is to add namespaces to your root URLconf. In the
-``mysite/urls.py`` file, go ahead and change it to include namespacing::
+The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
+file (the project's ``urls.py``, not the application's), go ahead and change
+it to include namespacing::
 
     from django.conf.urls import patterns, include, url
 

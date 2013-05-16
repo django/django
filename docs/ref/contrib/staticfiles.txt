@@ -12,115 +12,22 @@ can easily be served in production.
 .. seealso::
 
     For an introduction to the static files app and some usage examples, see
-    :doc:`/howto/static-files`.
+    :doc:`/howto/static-files/index`. For guidelines on deploying static files,
+    see :doc:`/howto/static-files/deployment`.
 
 .. _staticfiles-settings:
 
 Settings
 ========
 
-.. highlight:: python
+See :ref:`staticfiles settings <settings-staticfiles>` for details on the
+following settings:
 
-.. note::
-
-    The following settings control the behavior of the staticfiles app.
-
-.. setting:: STATICFILES_DIRS
-
-STATICFILES_DIRS
-----------------
-
-Default: ``[]``
-
-This setting defines the additional locations the staticfiles app will traverse
-if the :class:`FileSystemFinder` finder is enabled, e.g. if you use the
-:djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
-static file serving view.
-
-This should be set to a list or tuple of strings that contain full paths to
-your additional files directory(ies) e.g.::
-
-    STATICFILES_DIRS = (
-        "/home/special.polls.com/polls/static",
-        "/home/polls.com/polls/static",
-        "/opt/webfiles/common",
-    )
-
-Prefixes (optional)
-"""""""""""""""""""
-
-In case you want to refer to files in one of the locations with an additional
-namespace, you can **optionally** provide a prefix as ``(prefix, path)``
-tuples, e.g.::
-
-    STATICFILES_DIRS = (
-        # ...
-        ("downloads", "/opt/webfiles/stats"),
-    )
-
-Example:
-
-Assuming you have :setting:`STATIC_URL` set ``'/static/'``, the
-:djadmin:`collectstatic` management command would collect the "stats" files
-in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
-
-This would allow you to refer to the local file
-``'/opt/webfiles/stats/polls_20101022.tar.gz'`` with
-``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.:
-
-.. code-block:: html+django
-
-    <a href="{{ STATIC_URL }}downloads/polls_20101022.tar.gz">
-
-.. setting:: STATICFILES_STORAGE
-
-STATICFILES_STORAGE
--------------------
-
-Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
-
-The file storage engine to use when collecting static files with the
-:djadmin:`collectstatic` management command.
-
-.. versionadded:: 1.4
-
-A ready-to-use instance of the storage backend defined in this setting
-can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
-
-For an example, see :ref:`staticfiles-from-cdn`.
-
-.. setting:: STATICFILES_FINDERS
-
-STATICFILES_FINDERS
--------------------
-
-Default::
-
-    ("django.contrib.staticfiles.finders.FileSystemFinder",
-     "django.contrib.staticfiles.finders.AppDirectoriesFinder")
-
-The list of finder backends that know how to find static files in
-various locations.
-
-The default will find files stored in the :setting:`STATICFILES_DIRS` setting
-(using :class:`django.contrib.staticfiles.finders.FileSystemFinder`) and in a
-``static`` subdirectory of each app (using
-:class:`django.contrib.staticfiles.finders.AppDirectoriesFinder`)
-
-One finder is disabled by default:
-:class:`django.contrib.staticfiles.finders.DefaultStorageFinder`. If added to
-your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
-the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
-setting.
-
-.. note::
-
-    When using the :class:`AppDirectoriesFinder` finder, make sure your apps
-    can be found by staticfiles. Simply add the app to the
-    :setting:`INSTALLED_APPS` setting of your site.
-
-Static file finders are currently considered a private interface, and this
-interface is thus undocumented.
+* :setting:`STATIC_ROOT`
+* :setting:`STATIC_URL`
+* :setting:`STATICFILES_DIRS`
+* :setting:`STATICFILES_STORAGE`
+* :setting:`STATICFILES_FINDERS`
 
 Management Commands
 ===================
@@ -145,8 +52,6 @@ Files are searched by using the :setting:`enabled finders
 <STATICFILES_FINDERS>`. The default is to look in all locations defined in
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
 specified by the :setting:`INSTALLED_APPS` setting.
-
-.. versionadded:: 1.4
 
 The :djadmin:`collectstatic` management command calls the
 :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
@@ -176,8 +81,6 @@ Some commonly used options are:
 .. django-admin-option:: -c
 .. django-admin-option:: --clear
 
-    .. versionadded:: 1.4
-
     Clear the existing files before trying to copy or link the original file.
 
 .. django-admin-option:: -l
@@ -186,8 +89,6 @@ Some commonly used options are:
     Create a symbolic link to each file instead of copying.
 
 .. django-admin-option:: --no-post-process
-
-    .. versionadded:: 1.4
 
     Don't call the
     :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
@@ -212,18 +113,28 @@ Searches for one or more relative paths with the enabled finders.
 For example::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
-   /home/special.polls.com/core/static/css/base.css
-   /home/polls.com/core/static/css/base.css
-   /home/polls.com/src/django/contrib/admin/media/js/core.js
+   Found 'css/base.css' here:
+     /home/special.polls.com/core/static/css/base.css
+     /home/polls.com/core/static/css/base.css
+   Found 'admin/js/core.js' here:
+     /home/polls.com/src/django/contrib/admin/media/js/core.js
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
 
    $ python manage.py findstatic css/base.css --first
-   /home/special.polls.com/core/static/css/base.css
+   Found 'css/base.css' here:
+     /home/special.polls.com/core/static/css/base.css
 
 This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
+
+By setting the :djadminopt:`--verbosity` flag to 0, you can suppress the extra
+output and just get the path names::
+
+   $ python manage.py findstatic css/base.css --verbosity 0
+   /home/special.polls.com/core/static/css/base.css
+   /home/polls.com/core/static/css/base.css
 
 .. _staticfiles-runserver:
 
@@ -276,8 +187,6 @@ StaticFilesStorage
 
     .. method:: post_process(paths, **options)
 
-    .. versionadded:: 1.4
-
     This method is called by the :djadmin:`collectstatic` management command
     after each run and gets passed the local storages and paths of found
     files as a dictionary, as well as the command line options.
@@ -290,8 +199,6 @@ CachedStaticFilesStorage
 ------------------------
 
 .. class:: storage.CachedStaticFilesStorage
-
-    .. versionadded:: 1.4
 
     A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
     storage backend which caches the files it saves by appending the MD5 hash
@@ -370,8 +277,6 @@ static
 
 .. templatetag:: staticfiles-static
 
-.. versionadded:: 1.4
-
 Uses the configured :setting:`STATICFILES_STORAGE` storage to create the
 full URL for the given relative path, e.g.:
 
@@ -422,9 +327,18 @@ files:
 Static file development view
 ----------------------------
 
+.. currentmodule:: django.contrib.staticfiles
+
+The static files tools are mostly designed to help with getting static files
+successfully deployed into production. This usually means a separate,
+dedicated static file server, which is a lot of overhead to mess with when
+developing locally. Thus, the ``staticfiles`` app ships with a
+**quick and dirty helper view** that you can use to serve files locally in
+development.
+
 .. highlight:: python
 
-.. function:: django.contrib.staticfiles.views.serve(request, path)
+.. function:: views.serve(request, path)
 
 This view function serves static files in development.
 
@@ -435,6 +349,16 @@ This view function serves static files in development.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
+
+.. note::
+
+    To guess the served files' content types, this view relies on the
+    :py:mod:`mimetypes` module from the Python standard library, which itself
+    relies on the underlying platform's map files. If you find that this view
+    doesn't return proper content types for certain files, it is most likely
+    that the platform's map files need to be updated. This can be achieved, for
+    example, by installing or updating the ``mailcap`` package on a Red Hat
+    distribution, or ``mime-support`` on a Debian distribution.
 
 This view is automatically enabled by :djadmin:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different
@@ -451,9 +375,10 @@ primary URL configuration::
 Note, the beginning of the pattern (``r'^static/'``) should be your
 :setting:`STATIC_URL` setting.
 
-Since this is a bit finicky, there's also a helper function that'll do this for you:
+Since this is a bit finicky, there's also a helper function that'll do this for
+you:
 
-.. function:: django.contrib.staticfiles.urls.staticfiles_urlpatterns()
+.. function:: urls.staticfiles_urlpatterns()
 
 This will return the proper URL pattern for serving static files to your
 already defined pattern list. Use it like this::
@@ -464,8 +389,18 @@ already defined pattern list. Use it like this::
 
    urlpatterns += staticfiles_urlpatterns()
 
+This will inspect your :setting:`STATIC_URL` setting and wire up the view
+to serve static files accordingly. Don't forget to set the
+:setting:`STATICFILES_DIRS` setting appropriately to let
+``django.contrib.staticfiles`` know where to look for files in addition to
+files in app directories.
+
 .. warning::
 
     This helper function will only work if :setting:`DEBUG` is ``True``
     and your :setting:`STATIC_URL` setting is neither empty nor a full
     URL such as ``http://static.example.com/``.
+
+    That's because this view is **grossly inefficient** and probably
+    **insecure**. This is only intended for local development, and should
+    **never be used in production**.

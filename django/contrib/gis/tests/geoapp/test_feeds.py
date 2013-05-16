@@ -4,11 +4,16 @@ from xml.dom import minidom
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
-from .models import City
+if HAS_GEOS:
+    from .models import City
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoFeedTest(TestCase):
 
     urls = 'django.contrib.gis.tests.geoapp.urls'
@@ -22,7 +27,7 @@ class GeoFeedTest(TestCase):
         Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
-        "Taken from regressiontests/syndication/tests.py."
+        "Taken from syndication/tests.py."
         actual = set([n.nodeName for n in elem.childNodes])
         expected = set(expected)
         self.assertEqual(actual, expected)

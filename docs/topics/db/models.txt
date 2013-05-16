@@ -66,13 +66,13 @@ those models. Do this by editing your settings file and changing the
 your ``models.py``.
 
 For example, if the models for your application live in the module
-``mysite.myapp.models`` (the package structure that is created for an
+``myapp.models`` (the package structure that is created for an
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = (
         #...
-        'mysite.myapp',
+        'myapp',
         #...
     )
 
@@ -660,15 +660,13 @@ model.
 
 For example, this model has a few custom methods::
 
-    from django.contrib.localflavor.us.models import USStateField
-
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
         address = models.CharField(max_length=100)
         city = models.CharField(max_length=50)
-        state = USStateField() # Yes, this is America-centric...
+        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
@@ -1063,52 +1061,46 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the standard
-:class:`~django.contrib.auth.models.User` model that will be used in your
-templates. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model described
+above. You can do it like this::
 
-    from django.contrib.auth.models import User
-
-    class MyUser(User):
+    class MyPerson(Person):
         class Meta:
             proxy = True
 
         def do_something(self):
             ...
 
-The ``MyUser`` class operates on the same database table as its parent
-:class:`~django.contrib.auth.models.User` class. In particular, any new
-instances of :class:`~django.contrib.auth.models.User` will also be accessible
-through ``MyUser``, and vice-versa::
+The ``MyPerson`` class operates on the same database table as its parent
+``Person`` class. In particular, any new instances of ``Person`` will also be
+accessible through ``MyPerson``, and vice-versa::
 
-    >>> u = User.objects.create(username="foobar")
-    >>> MyUser.objects.get(username="foobar")
-    <MyUser: foobar>
+    >>> p = Person.objects.create(first_name="foobar")
+    >>> MyPerson.objects.get(first_name="foobar")
+    <MyPerson: foobar>
 
-You could also use a proxy model to define a different default ordering on a
-model. The standard :class:`~django.contrib.auth.models.User` model has no
-ordering defined on it (intentionally; sorting is expensive and we don't want
-to do it all the time when we fetch users). You might want to regularly order
-by the ``username`` attribute when you use the proxy. This is easy::
+You could also use a proxy model to define a different default ordering on
+a model. You might not always want to order the ``Person`` model, but regularly
+order by the ``last_name`` attribute when you use the proxy. This is easy::
 
-    class OrderedUser(User):
+    class OrderedPerson(Person):
         class Meta:
-            ordering = ["username"]
+            ordering = ["last_name"]
             proxy = True
 
-Now normal :class:`~django.contrib.auth.models.User` queries will be unordered
-and ``OrderedUser`` queries will be ordered by ``username``.
+Now normal ``Person`` queries will be unordered
+and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
 QuerySets still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is no way to have Django return, say, a ``MyUser`` object whenever you
-query for :class:`~django.contrib.auth.models.User` objects. A queryset for
-``User`` objects will return those types of objects. The whole point of proxy
-objects is that code relying on the original ``User`` will use those and your
-own code can use the extensions you included (that no other code is relying on
-anyway). It is not a way to replace the ``User`` (or any other) model
-everywhere with something of your own creation.
+There is no way to have Django return, say, a ``MyPerson`` object whenever you
+query for ``Person`` objects. A queryset for ``Person`` objects will return
+those types of objects. The whole point of proxy objects is that code relying
+on the original ``Person`` will use those and your own code can use the
+extensions you included (that no other code is relying on anyway). It is not
+a way to replace the ``Person`` (or any other) model everywhere with something
+of your own creation.
 
 Base class restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1131,12 +1123,12 @@ it will become the default, although any managers defined on the parent
 classes will still be available.
 
 Continuing our example from above, you could change the default manager used
-when you query the ``User`` model like this::
+when you query the ``Person`` model like this::
 
     class NewManager(models.Manager):
         ...
 
-    class MyUser(User):
+    class MyPerson(Person):
         objects = NewManager()
 
         class Meta:
@@ -1154,7 +1146,7 @@ containing the new managers and inherit that after the primary base class::
         class Meta:
             abstract = True
 
-    class MyUser(User, ExtraManagers):
+    class MyPerson(Person, ExtraManagers):
         class Meta:
             proxy = True
 

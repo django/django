@@ -13,6 +13,7 @@ from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_apps
 from django.utils.encoding import force_text
+from django.utils._os import upath
 from itertools import product
 
 try:
@@ -40,8 +41,6 @@ class Command(BaseCommand):
         self.ignore = options.get('ignore')
         self.using = options.get('database')
 
-        connection = connections[self.using]
-
         if not len(fixture_labels):
             raise CommandError(
                 "No database fixture specified. Please provide the path of at "
@@ -50,31 +49,24 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity'))
 
-        # commit is a stealth option - it isn't really useful as
-        # a command line option, but it can be useful when invoking
-        # loaddata from within another script.
-        # If commit=True, loaddata will use its own transaction;
-        # if commit=False, the data load SQL will become part of
-        # the transaction in place when loaddata was invoked.
-        commit = options.get('commit', True)
+        with transaction.commit_on_success_unless_managed(using=self.using):
+            self.loaddata(fixture_labels)
+
+        # Close the DB connection -- unless we're still in a transaction. This
+        # is required as a workaround for an  edge case in MySQL: if the same
+        # connection is used to create tables, load data, and query, the query
+        # can return incorrect results. See Django #7572, MySQL #37735.
+        if transaction.get_autocommit(self.using):
+            connections[self.using].close()
+
+    def loaddata(self, fixture_labels):
+        connection = connections[self.using]
 
         # Keep a count of the installed objects and fixtures
         self.fixture_count = 0
         self.loaded_object_count = 0
         self.fixture_object_count = 0
         self.models = set()
-
-        # Get a cursor (even though we don't need one yet). This has
-        # the side effect of initializing the test database (if
-        # it isn't already initialized).
-        cursor = connection.cursor()
-
-        # Start transaction management. All fixtures are installed in a
-        # single transaction to ensure that all references are resolved.
-        if commit:
-            transaction.commit_unless_managed(using=self.using)
-            transaction.enter_transaction_management(using=self.using)
-            transaction.managed(True, using=self.using)
 
         class SingleZipReader(zipfile.ZipFile):
             def __init__(self, *args, **kwargs):
@@ -97,33 +89,24 @@ class Command(BaseCommand):
             if hasattr(app, '__path__'):
                 # It's a 'models/' subpackage
                 for path in app.__path__:
-                    app_module_paths.append(path)
+                    app_module_paths.append(upath(path))
             else:
                 # It's a models.py module
-                app_module_paths.append(app.__file__)
+                app_module_paths.append(upath(app.__file__))
 
         app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
 
+        with connection.constraint_checks_disabled():
+            for fixture_label in fixture_labels:
+                self.load_label(fixture_label, app_fixtures)
+
+        # Since we disabled constraint checks, we must manually check for
+        # any invalid keys that might have been added
+        table_names = [model._meta.db_table for model in self.models]
         try:
-            with connection.constraint_checks_disabled():
-                for fixture_label in fixture_labels:
-                    self.load_label(fixture_label, app_fixtures)
-
-            # Since we disabled constraint checks, we must manually check for
-            # any invalid keys that might have been added
-            table_names = [model._meta.db_table for model in self.models]
-            try:
-                connection.check_constraints(table_names=table_names)
-            except Exception as e:
-                e.args = ("Problem installing fixtures: %s" % e,)
-                raise
-
-        except (SystemExit, KeyboardInterrupt):
-            raise
+            connection.check_constraints(table_names=table_names)
         except Exception as e:
-            if commit:
-                transaction.rollback(using=self.using)
-                transaction.leave_transaction_management(using=self.using)
+            e.args = ("Problem installing fixtures: %s" % e,)
             raise
 
         # If we found even one object in a fixture, we need to reset the
@@ -133,12 +116,10 @@ class Command(BaseCommand):
             if sequence_sql:
                 if self.verbosity >= 2:
                     self.stdout.write("Resetting sequences\n")
+                cursor = connection.cursor()
                 for line in sequence_sql:
                     cursor.execute(line)
-
-        if commit:
-            transaction.commit(using=self.using)
-            transaction.leave_transaction_management(using=self.using)
+                cursor.close()
 
         if self.verbosity >= 1:
             if self.fixture_object_count == self.loaded_object_count:
@@ -147,13 +128,6 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" % (
                     self.loaded_object_count, self.fixture_object_count, self.fixture_count))
-
-        # Close the DB connection. This is required as a workaround for an
-        # edge case in MySQL: if the same connection is used to
-        # create tables, load data, and query, the query can return
-        # incorrect results. See Django #7572, MySQL #37735.
-        if commit:
-            connection.close()
 
     def load_label(self, fixture_label, app_fixtures):
 

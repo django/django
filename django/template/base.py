@@ -250,7 +250,11 @@ class Parser(object):
             elif token.token_type == 1: # TOKEN_VAR
                 if not token.contents:
                     self.empty_variable(token)
-                filter_expression = self.compile_filter(token.contents)
+                try:
+                    filter_expression = self.compile_filter(token.contents)
+                except TemplateSyntaxError as e:
+                    if not self.compile_filter_error(token, e):
+                        raise
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
             elif token.token_type == 2: # TOKEN_BLOCK
@@ -329,6 +333,9 @@ class Parser(object):
 
     def unclosed_block_tag(self, parse_until):
         raise self.error(None, "Unclosed tags: %s " % ', '.join(parse_until))
+
+    def compile_filter_error(self, token, e):
+        pass
 
     def compile_function_error(self, token, e):
         pass
@@ -756,7 +763,7 @@ class Variable(object):
             for bit in self.lookups:
                 try:  # dictionary lookup
                     current = current[bit]
-                except (TypeError, AttributeError, KeyError):
+                except (TypeError, AttributeError, KeyError, ValueError):
                     try:  # attribute lookup
                         current = getattr(current, bit)
                     except (TypeError, AttributeError):
@@ -854,7 +861,7 @@ class TextNode(Node):
     def render(self, context):
         return self.s
 
-def _render_value_in_context(value, context):
+def render_value_in_context(value, context):
     """
     Converts any value to a string to become part of a rendered template. This
     means escaping, if required, and conversion to a unicode object. If value
@@ -884,7 +891,7 @@ class VariableNode(Node):
             # control (e.g. exception rendering). In that case, we fail
             # quietly.
             return ''
-        return _render_value_in_context(output, context)
+        return render_value_in_context(output, context)
 
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")

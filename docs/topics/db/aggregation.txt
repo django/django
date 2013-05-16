@@ -21,14 +21,12 @@ used to track the inventory for a series of online bookstores:
     class Author(models.Model):
        name = models.CharField(max_length=100)
        age = models.IntegerField()
-       friends = models.ManyToManyField('self', blank=True)
 
     class Publisher(models.Model):
        name = models.CharField(max_length=300)
        num_awards = models.IntegerField()
 
     class Book(models.Model):
-       isbn = models.CharField(max_length=9)
        name = models.CharField(max_length=300)
        pages = models.IntegerField()
        price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -40,11 +38,14 @@ used to track the inventory for a series of online bookstores:
     class Store(models.Model):
        name = models.CharField(max_length=300)
        books = models.ManyToManyField(Book)
+       registered_users = models.PositiveIntegerField()
 
 Cheat sheet
 ===========
 
-In a hurry? Here's how to do common aggregate queries, assuming the models above::
+In a hurry? Here's how to do common aggregate queries, assuming the models above:
+
+.. code-block:: python
 
     # Total number of books.
     >>> Book.objects.count()
@@ -64,6 +65,9 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
 
+    # All the following queries involve traversing the Book<->Publisher
+    # many-to-many relationship backward
+
     # Each publisher, each with a count of books as a "num_books" attribute.
     >>> from django.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
@@ -73,7 +77,6 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     73
 
     # The top 5 publishers, in order by number of books.
-    >>> from django.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
     >>> pubs[0].num_books
     1323
@@ -139,8 +142,10 @@ will be annotated with the specified values.
 
 The syntax for these annotations is identical to that used for the
 ``aggregate()`` clause. Each argument to ``annotate()`` describes an
-aggregate that is to be calculated. For example, to annotate Books with
-the number of authors::
+aggregate that is to be calculated. For example, to annotate books with
+the number of authors:
+
+.. code-block:: python
 
     # Build an annotated queryset
     >>> q = Book.objects.annotate(Count('authors'))
@@ -169,7 +174,7 @@ specify the annotation::
 Unlike ``aggregate()``, ``annotate()`` is *not* a terminal clause. The output
 of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
-``order_by``, or even additional calls to ``annotate()``.
+``order_by()``, or even additional calls to ``annotate()``.
 
 Joins and aggregates
 ====================
@@ -189,8 +194,8 @@ you could use the annotation::
 
     >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
 
-This tells Django to retrieve the Store model, join (through the
-many-to-many relationship) with the Book model, and aggregate on the
+This tells Django to retrieve the ``Store`` model, join (through the
+many-to-many relationship) with the ``Book`` model, and aggregate on the
 price field of the book model to produce a minimum and maximum value.
 
 The same rules apply to the ``aggregate()`` clause. If you wanted to
@@ -204,6 +209,50 @@ age of the youngest author of any book available for sale, you could
 issue the query::
 
     >>> Store.objects.aggregate(youngest_age=Min('books__authors__age'))
+
+Following relationships backwards
+---------------------------------
+
+In a way similar to :ref:`lookups-that-span-relationships`, aggregations and
+annotations on fields of models or models that are related to the one you are
+querying can include traversing "reverse" relationships. The lowercase name
+of related models and double-underscores are used here too.
+
+For example, we can ask for all publishers, annotated with their respective
+total book stock counters (note how we use ``'book'`` to specify the
+``Publisher`` -> ``Book`` reverse foreign key hop)::
+
+    >>> from django.db.models import Count, Min, Sum, Max, Avg
+    >>> Publisher.objects.annotate(Count('book'))
+
+(Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
+called ``book__count``.)
+
+We can also ask for the oldest book of any of those managed by every publisher::
+
+    >>> Publisher.objects.aggregate(oldest_pubdate=Min('book__pubdate'))
+
+(The resulting dictionary will have a key called ``'oldest_pubdate'``. If no
+such alias were specified, it would be the rather long ``'book__pubdate__min'``.)
+
+This doesn't apply just to foreign keys. It also works with many-to-many
+relations. For example, we can ask for every author, annotated with the total
+number of pages considering all the books he/she has (co-)authored (note how we
+use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop)::
+
+    >>> Author.objects.annotate(total_pages=Sum('book__pages'))
+
+(Every ``Author`` in the resulting ``QuerySet`` will have an extra attribute
+called ``total_pages``. If no such alias were specified, it would be the rather
+long ``book__pages__sum``.)
+
+Or ask for the average rating of all the books written by author(s) we have on
+file::
+
+    >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
+
+(The resulting dictionary will have a key called ``'average__rating'``. If no
+such alias were specified, it would be the rather long ``'book__rating__avg'``.)
 
 Aggregations and other QuerySet clauses
 =======================================
@@ -263,7 +312,7 @@ and the query::
 
     >>> Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
 
-Both queries will return a list of Publishers that have at least one good
+Both queries will return a list of publishers that have at least one good
 book (i.e., a book with a rating exceeding 3.0). However, the annotation in
 the first query will provide the total number of all books published by the
 publisher; the second query will only include good books in the annotated

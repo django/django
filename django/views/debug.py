@@ -13,8 +13,8 @@ from django.http import (HttpResponse, HttpResponseServerError,
 from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
-from django.utils.importlib import import_module
 from django.utils.encoding import force_bytes, smart_text
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
@@ -76,17 +76,8 @@ def get_exception_reporter_filter(request):
     global default_exception_reporter_filter
     if default_exception_reporter_filter is None:
         # Load the default filter for the first time and cache it.
-        modpath = settings.DEFAULT_EXCEPTION_REPORTER_FILTER
-        modname, classname = modpath.rsplit('.', 1)
-        try:
-            mod = import_module(modname)
-        except ImportError as e:
-            raise ImproperlyConfigured(
-            'Error importing default exception reporter filter %s: "%s"' % (modpath, e))
-        try:
-            default_exception_reporter_filter = getattr(mod, classname)()
-        except AttributeError:
-            raise ImproperlyConfigured('Default exception reporter filter module "%s" does not define a "%s" class' % (modname, classname))
+        default_exception_reporter_filter = import_by_path(
+            settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
     if request:
         return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)
     else:
@@ -172,13 +163,12 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 break
             current_frame = current_frame.f_back
 
-        cleansed = []
+        cleansed = {}
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
                 for name, value in tb_frame.f_locals.items():
-                    cleansed.append((name, CLEANSED_SUBSTITUTE))
-                return cleansed
+                    cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables
                 for name, value in tb_frame.f_locals.items():
@@ -187,16 +177,25 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                     elif isinstance(value, HttpRequest):
                         # Cleanse the request's POST parameters.
                         value = self.get_request_repr(value)
-                    cleansed.append((name, value))
-                return cleansed
+                    cleansed[name] = value
         else:
             # Potentially cleanse only the request if it's one of the frame variables.
             for name, value in tb_frame.f_locals.items():
                 if isinstance(value, HttpRequest):
                     # Cleanse the request's POST parameters.
                     value = self.get_request_repr(value)
-                cleansed.append((name, value))
-            return cleansed
+                cleansed[name] = value
+
+        if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
+            and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+            # For good measure, obfuscate the decorated function's arguments in
+            # the sensitive_variables decorator's frame, in case the variables
+            # associated with those arguments were meant to be obfuscated from
+            # the decorated function's frame.
+            cleansed['func_args'] = CLEANSED_SUBSTITUTE
+            cleansed['func_kwargs'] = CLEANSED_SUBSTITUTE
+
+        return cleansed.items()
 
 class ExceptionReporter(object):
     """
@@ -430,9 +429,12 @@ def technical_404_response(request, exception):
     except (IndexError, TypeError, KeyError):
         tried = []
     else:
-        if not tried:
-            # tried exists but is an empty list. The URLconf must've been empty.
-            return empty_urlconf(request)
+        if (not tried                           # empty URLconf
+            or (request.path == '/'
+                and len(tried) == 1             # default URLconf
+                and len(tried[0]) == 1
+                and tried[0][0].app_name == tried[0][0].namespace == 'admin')):
+            return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
     if isinstance(urlconf, types.ModuleType):
@@ -450,12 +452,10 @@ def technical_404_response(request, exception):
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
-def empty_urlconf(request):
+def default_urlconf(request):
     "Create an empty URLconf 404 error response."
-    t = Template(EMPTY_URLCONF_TEMPLATE, name='Empty URLConf template')
-    c = Context({
-        'project_name': settings.SETTINGS_MODULE.split('.')[0]
-    })
+    t = Template(DEFAULT_URLCONF_TEMPLATE, name='Default URLconf template')
+    c = Context({})
     return HttpResponse(t.render(c), content_type='text/html')
 
 #
@@ -926,7 +926,7 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """
 
-TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = """{% load firstof from future %}{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
@@ -1059,7 +1059,7 @@ TECHNICAL_404_TEMPLATE = """
 </html>
 """
 
-EMPTY_URLCONF_TEMPLATE = """
+DEFAULT_URLCONF_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en"><head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -1079,7 +1079,6 @@ EMPTY_URLCONF_TEMPLATE = """
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th { padding:1px 6px 1px 3px; background:#fefefe; text-align:left; font-weight:normal; font-size:11px; border:1px solid #ddd; }
     tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
-    ul { margin-left: 2em; margin-top: 1em; }
     #summary { background: #e0ebff; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
@@ -1095,11 +1094,10 @@ EMPTY_URLCONF_TEMPLATE = """
 </div>
 
 <div id="instructions">
-  <p>Of course, you haven't actually done any work yet. Here's what to do next:</p>
-  <ul>
-    <li>If you plan to use a database, edit the <code>DATABASES</code> setting in <code>{{ project_name }}/settings.py</code>.</li>
-    <li>Start your first app by running <code>python manage.py startapp [appname]</code>.</li>
-  </ul>
+  <p>
+    Of course, you haven't actually done any work yet.
+    Next, start your first app by running <code>python manage.py startapp [appname]</code>.
+  </p>
 </div>
 
 <div id="explanation">

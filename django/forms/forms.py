@@ -5,6 +5,7 @@ Form classes
 from __future__ import absolute_import, unicode_literals
 
 import copy
+import warnings
 
 from django.core.exceptions import ValidationError
 from django.forms.fields import Field, FileField
@@ -14,6 +15,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 from django.utils import six
 
 
@@ -31,12 +33,12 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     """
     Create a list of form field instances from the passed in 'attrs', plus any
     similar fields on the base classes (in 'bases'). This is used by both the
-    Form and ModelForm metclasses.
+    Form and ModelForm metaclasses.
 
     If 'with_base_fields' is True, all fields from the bases are used.
     Otherwise, only fields in the 'declared_fields' attribute on the bases are
     used. The distinction is useful in ModelForm subclassing.
-    Also integrates any additional media definitions
+    Also integrates any additional media definitions.
     """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)]
     fields.sort(key=lambda x: x[1].creation_counter)
@@ -111,12 +113,12 @@ class BaseForm(object):
             raise KeyError('Key %r not found in Form' % name)
         return BoundField(self, field, name)
 
-    def _get_errors(self):
+    @property
+    def errors(self):
         "Returns an ErrorDict for the data provided for the form"
         if self._errors is None:
             self.full_clean()
         return self._errors
-    errors = property(_get_errors)
 
     def is_valid(self):
         """
@@ -148,10 +150,13 @@ class BaseForm(object):
         for name, field in self.fields.items():
             html_class_attr = ''
             bf = self[name]
-            bf_errors = self.error_class([conditional_escape(error) for error in bf.errors]) # Escape and cache in local variable.
+            # Escape and cache in local variable.
+            bf_errors = self.error_class([conditional_escape(error) for error in bf.errors])
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, force_text(e)) for e in bf_errors])
+                    top_errors.extend(
+                        [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
+                         for e in bf_errors])
                 hidden_fields.append(six.text_type(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
@@ -322,7 +327,8 @@ class BaseForm(object):
         """
         return bool(self.changed_data)
 
-    def _get_changed_data(self):
+    @property
+    def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
             # XXX: For now we're asking the individual widgets whether or not the
@@ -339,14 +345,25 @@ class BaseForm(object):
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
-                    initial_value = hidden_widget.value_from_datadict(
-                        self.data, self.files, initial_prefixed_name)
-                if field.widget._has_changed(initial_value, data_value):
+                    try:
+                        initial_value = field.to_python(hidden_widget.value_from_datadict(
+                            self.data, self.files, initial_prefixed_name))
+                    except ValidationError:
+                        # Always assume data has changed if validation fails.
+                        self._changed_data.append(name)
+                        continue
+                if hasattr(field.widget, '_has_changed'):
+                    warnings.warn("The _has_changed method on widgets is deprecated,"
+                        " define it at field level instead.",
+                        PendingDeprecationWarning, stacklevel=2)
+                    if field.widget._has_changed(initial_value, data_value):
+                        self._changed_data.append(name)
+                elif field._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
-    changed_data = property(_get_changed_data)
 
-    def _get_media(self):
+    @property
+    def media(self):
         """
         Provide a description of all media required to render the widgets on this form
         """
@@ -354,7 +371,6 @@ class BaseForm(object):
         for field in self.fields.values():
             media = media + field.widget.media
         return media
-    media = property(_get_media)
 
     def is_multipart(self):
         """
@@ -426,13 +442,13 @@ class BoundField(object):
     def __getitem__(self, idx):
         return list(self.__iter__())[idx]
 
-    def _errors(self):
+    @property
+    def errors(self):
         """
         Returns an ErrorList for this field. Returns an empty ErrorList
         if there are none.
         """
         return self.form.errors.get(self.name, self.form.error_class())
-    errors = property(_errors)
 
     def as_widget(self, widget=None, attrs=None, only_initial=False):
         """
@@ -473,12 +489,12 @@ class BoundField(object):
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
-    def _data(self):
+    @property
+    def data(self):
         """
         Returns the data for this BoundField, or None if it wasn't given.
         """
         return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
-    data = property(_data)
 
     def value(self):
         """
@@ -503,7 +519,7 @@ class BoundField(object):
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
         """
-        contents = contents or conditional_escape(self.label)
+        contents = contents or self.label
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
@@ -511,6 +527,8 @@ class BoundField(object):
             contents = format_html('<label for="{0}"{1}>{2}</label>',
                                    widget.id_for_label(id_), attrs, contents
                                    )
+        else:
+            contents = conditional_escape(contents)
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):
@@ -526,12 +544,13 @@ class BoundField(object):
             extra_classes.add(self.form.required_css_class)
         return ' '.join(extra_classes)
 
-    def _is_hidden(self):
+    @property
+    def is_hidden(self):
         "Returns True if this BoundField's widget is hidden."
         return self.field.widget.is_hidden
-    is_hidden = property(_is_hidden)
 
-    def _auto_id(self):
+    @property
+    def auto_id(self):
         """
         Calculates and returns the ID attribute for this BoundField, if the
         associated Form has specified auto_id. Returns an empty string otherwise.
@@ -542,9 +561,9 @@ class BoundField(object):
         elif auto_id:
             return self.html_name
         return ''
-    auto_id = property(_auto_id)
 
-    def _id_for_label(self):
+    @property
+    def id_for_label(self):
         """
         Wrapper around the field widget's `id_for_label` method.
         Useful, for example, for focusing on this field regardless of whether
@@ -553,4 +572,3 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
-    id_for_label = property(_id_for_label)

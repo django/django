@@ -2,11 +2,15 @@
 
 from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 
+from django.utils import six
+
+
 class classonlymethod(classmethod):
     def __get__(self, instance, owner):
         if instance is not None:
             raise AttributeError("This method is available only on the view class.")
         return super(classonlymethod, self).__get__(instance, owner)
+
 
 def method_decorator(decorator):
     """
@@ -68,9 +72,13 @@ def decorator_from_middleware(middleware_class):
 def available_attrs(fn):
     """
     Return the list of functools-wrappable attributes on a callable.
-    This is required as a workaround for http://bugs.python.org/issue3445.
+    This is required as a workaround for http://bugs.python.org/issue3445
+    under Python 2.
     """
-    return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+    if six.PY3:
+        return WRAPPER_ASSIGNMENTS
+    else:
+        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
 
 
 def make_middleware_decorator(middleware_class):

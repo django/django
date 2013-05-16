@@ -182,7 +182,7 @@ The ``ContentTypeManager``
 
         Clears an internal cache used by
         :class:`~django.contrib.contenttypes.models.ContentType` to keep track
-        of which models for which it has created
+        of models for which it has created
         :class:`~django.contrib.contenttypes.models.ContentType` instances. You
         probably won't ever need to call this method yourself; Django will call
         it automatically when it's needed.
@@ -234,16 +234,18 @@ lookup::
 
 .. versionadded:: 1.5
 
-Prior to Django 1.5 :meth:`~ContentTypeManager.get_for_model()` and
-:meth:`~ContentTypeManager.get_for_models()` always returned the
-:class:`~django.contrib.contenttypes.models.ContentType` associated with the
-concrete model of the specified one(s). That means there was no way to retreive
-the :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
-using those methods. As of Django 1.5 you can now pass a boolean flag –
-respectively ``for_concrete_model`` and ``for_concrete_models`` – to specify
-wether or not you want to retreive the
-:class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
-direct model.
+    Prior to Django 1.5,
+    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model` and
+    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
+    always returned the :class:`~django.contrib.contenttypes.models.ContentType`
+    associated with the concrete model of the specified one(s). That means there
+    was no way to retrieve the
+    :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
+    using those methods. As of Django 1.5 you can now pass a boolean flag –
+    ``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
+    wether or not you want to retrieve the
+    :class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
+    direct model.
 
 Generic relations
 =================
@@ -275,7 +277,7 @@ A normal :class:`~django.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
 :class:`~django.db.models.ForeignKey` it would have to
 choose one and only one model to store tags for. The contenttypes
-application provides a special field type which
+application provides a special field type (``GenericForeignKey``) which
 works around this and allows the relationship to be with any
 model:
 
@@ -285,7 +287,8 @@ model:
     :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
 
     1. Give your model a :class:`~django.db.models.ForeignKey`
-       to :class:`~django.contrib.contenttypes.models.ContentType`.
+       to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
+       name for this field is "content_type".
 
     2. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
@@ -450,14 +453,18 @@ need to calculate them without using the aggregation API.
 Generic relations in forms and admin
 ------------------------------------
 
-The :mod:`django.contrib.contenttypes.generic` module provides
-:class:`~django.contrib.contenttypes.generic.BaseGenericInlineFormSet`,
-:class:`~django.contrib.contenttypes.generic.GenericTabularInline`
-and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
-(the last two are subclasses of
-:class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`).
-This enables the use of generic relations in forms and the admin. See the
-:doc:`model formset </topics/forms/modelforms>` and
+The :mod:`django.contrib.contenttypes.generic` module provides:
+
+* ``BaseGenericInlineFormSet``
+* :class:`~django.contrib.contenttypes.generic.GenericTabularInline`
+  and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
+  (subclasses of
+  :class:`~django.contrib.contenttypes.generic.GenericInlineModelAdmin`)
+* A formset factory, :func:`generic_inlineformset_factory`, for use with
+  :class:`GenericForeignKey`
+
+These classes and functions enable the use of generic relations in forms
+and the admin. See the :doc:`model formset </topics/forms/modelforms>` and
 :ref:`admin <using-generic-relations-as-an-inline>` documentation for more
 information.
 
@@ -478,3 +485,20 @@ information.
 
         The name of the integer field that represents the ID of the related
         object. Defaults to ``object_id``.
+
+.. class:: GenericTabularInline
+.. class:: GenericStackedInline
+
+    Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
+    layouts, respectively.
+
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False)
+
+    Returns a ``GenericInlineFormSet`` using
+    :func:`~django.forms.models.modelformset_factory`.
+
+    You must provide ``ct_field`` and ``object_id`` if they different from the
+    defaults, ``content_type`` and ``object_id`` respectively. Other parameters
+    are similar to those documented in
+    :func:`~django.forms.models.modelformset_factory` and
+    :func:`~django.forms.models.inlineformset_factory`.

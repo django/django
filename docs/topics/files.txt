@@ -2,7 +2,10 @@
 Managing files
 ==============
 
-This document describes Django's file access APIs.
+This document describes Django's file access APIs for files such as those
+uploaded by a user. The lower level APIs are general enough that you could use
+them for other purposes. If you want to handle "static files" (JS, CSS, etc),
+see :doc:`/howto/static-files/index`.
 
 By default, Django stores files locally, using the :setting:`MEDIA_ROOT` and
 :setting:`MEDIA_URL` settings. The examples below assume that you're using these
@@ -91,9 +94,9 @@ The following approach may be used to close files automatically::
     True
 
 Closing files is especially important when accessing file fields in a loop
-over a large number of objects:: If files are not manually closed after
+over a large number of objects. If files are not manually closed after
 accessing them, the risk of running out of file descriptors may arise. This
-may lead to the following error:
+may lead to the following error::
 
     IOError: [Errno 24] Too many open files
 

@@ -9,6 +9,8 @@ class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--plain', action='store_true', dest='plain',
             help='Tells Django to use plain Python, not IPython or bpython.'),
+        make_option('--no-startup', action='store_true', dest='no_startup',
+            help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.'),
         make_option('-i', '--interface', action='store', type='choice', choices=shells,
                     dest='interface',
             help='Specify an interactive interpreter interface. Available options: "ipython" and "bpython"'),
@@ -19,8 +21,10 @@ class Command(NoArgsCommand):
 
     def ipython(self):
         try:
-            from IPython import embed
-            embed()
+            from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+            app = TerminalIPythonApp.instance()
+            app.initialize(argv=[])
+            app.start()
         except ImportError:
             # IPython < 0.11
             # Explicitly pass an empty list as arguments, because otherwise
@@ -54,6 +58,7 @@ class Command(NoArgsCommand):
         get_models()
 
         use_plain = options.get('plain', False)
+        no_startup = options.get('no_startup', False)
         interface = options.get('interface', None)
 
         try:
@@ -81,13 +86,16 @@ class Command(NoArgsCommand):
 
             # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
             # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
-            if not use_plain:
-                for pythonrc in (os.environ.get("PYTHONSTARTUP"),
-                                 os.path.expanduser('~/.pythonrc.py')):
-                    if pythonrc and os.path.isfile(pythonrc):
-                        try:
-                            with open(pythonrc) as handle:
-                                exec(compile(handle.read(), pythonrc, 'exec'))
-                        except NameError:
-                            pass
+            if not no_startup:
+                for pythonrc in (os.environ.get("PYTHONSTARTUP"), '~/.pythonrc.py'):
+                    if not pythonrc:
+                        continue
+                    pythonrc = os.path.expanduser(pythonrc)
+                    if not os.path.isfile(pythonrc):
+                        continue
+                    try:
+                        with open(pythonrc) as handle:
+                            exec(compile(handle.read(), pythonrc, 'exec'), imported_objects)
+                    except NameError:
+                        pass
             code.interact(local=imported_objects)

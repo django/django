@@ -144,7 +144,7 @@ def parse_http_date(date):
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception:
-        raise ValueError("%r is not a valid date" % date)
+        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
 
 def parse_http_date_safe(date):
     """
@@ -217,7 +217,7 @@ def parse_etags(etag_str):
 
 def quote_etag(etag):
     """
-    Wraps a string in double quotes escaping contents as necesary.
+    Wraps a string in double quotes escaping contents as necessary.
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
@@ -227,3 +227,15 @@ def same_origin(url1, url2):
     """
     p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
     return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+
+def is_safe_url(url, host=None):
+    """
+    Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
+    a different host).
+
+    Always returns ``False`` on an empty url.
+    """
+    if not url:
+        return False
+    netloc = urllib_parse.urlparse(url)[1]
+    return not netloc or netloc == host

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 from datetime import date, datetime
+from decimal import Decimal
 
 from django import template
 from django.conf import settings
@@ -35,7 +36,7 @@ def intcomma(value, use_l10n=True):
     """
     if settings.USE_L10N and use_l10n:
         try:
-            if not isinstance(value, float):
+            if not isinstance(value, (float, Decimal)):
                 value = int(value)
         except (TypeError, ValueError):
             return intcomma(value, False)

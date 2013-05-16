@@ -46,8 +46,8 @@ how to install.
 
 Spatial database
 ----------------
-PostgreSQL (with PostGIS), MySQL, Oracle, and SQLite (with SpatiaLite) are
-the spatial databases currently supported.
+PostgreSQL (with PostGIS), MySQL (mostly with MyISAM engine), Oracle, and SQLite
+(with SpatiaLite) are the spatial databases currently supported.
 
 .. note::
 
@@ -61,8 +61,8 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, PROJ.4, PostGIS           8.2+                Requires PostGIS.
-MySQL               GEOS                            5.x                 Not OGC-compliant; limited functionality.
+PostgreSQL          GEOS, PROJ.4, PostGIS           8.4+                Requires PostGIS.
+MySQL               GEOS                            5.x                 Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
 ==================  ==============================  ==================  =========================================
@@ -330,7 +330,7 @@ described above, ``psycopg2`` may be installed using the following command::
 
 .. note::
 
-    If you don't have ``pip``, follow the the :ref:`installation instructions
+    If you don't have ``pip``, follow the :ref:`installation instructions
     <installing-official-release>` to install it.
 
 .. _fink:
@@ -392,7 +392,7 @@ GeoDjango on Windows.
 .. note::
 
     These instructions assume that you are using 32-bit versions of
-    all programs.  While 64-bit versions of Python and PostgreSQL 9.0
+    all programs.  While 64-bit versions of Python and PostgreSQL 9.x
     are available, 64-bit versions of spatial libraries, like
     GEOS and GDAL, are not yet provided by the :ref:`OSGeo4W` installer.
 
@@ -415,7 +415,7 @@ __ http://python.org/download/
 PostgreSQL
 ^^^^^^^^^^
 
-First, download the latest `PostgreSQL 9.0 installer`__ from the
+First, download the latest `PostgreSQL 9.x installer`__ from the
 `EnterpriseDB`__ Web site.  After downloading, simply run the installer,
 follow the on-screen directions, and keep the default options unless
 you know the consequences of changing them.
@@ -435,7 +435,7 @@ install :ref:`postgisasb`.
 
     If installed successfully, the PostgreSQL server will run in the
     background each time the system as started as a Windows service.
-    A :menuselection:`PostgreSQL 9.0` start menu group will created
+    A :menuselection:`PostgreSQL 9.x` start menu group will created
     and contains shortcuts for the ASB as well as the 'SQL Shell',
     which will launch a ``psql`` command window.
 
@@ -448,10 +448,10 @@ PostGIS
 ^^^^^^^
 
 From within the Application Stack Builder (to run outside of the installer,
-:menuselection:`Start --> Programs --> PostgreSQL 9.0`), select
-:menuselection:`PostgreSQL Database Server 9.0 on port 5432` from the drop down
+:menuselection:`Start --> Programs --> PostgreSQL 9.x`), select
+:menuselection:`PostgreSQL Database Server 9.x on port 5432` from the drop down
 menu.  Next, expand the :menuselection:`Categories --> Spatial Extensions` menu
-tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.0`.
+tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.x`.
 
 After clicking next, you will be prompted to select your mirror, PostGIS
 will be downloaded, and the PostGIS installer will begin.  Select only the
@@ -530,6 +530,6 @@ Finally, :ref:`install Django <installing-official-release>` on your system.
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
-       :mod:`ctypes.util` to locate shared libraries.
+       ``ctypes.util`` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.

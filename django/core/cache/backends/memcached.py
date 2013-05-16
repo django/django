@@ -1,6 +1,7 @@
 "Memcached cache backend"
 
 import time
+import pickle
 from threading import local
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
@@ -138,23 +139,6 @@ class BaseMemcachedCache(BaseCache):
     def clear(self):
         self._cache.flush_all()
 
-class CacheClass(BaseMemcachedCache):
-    def __init__(self, server, params):
-        import warnings
-        warnings.warn(
-            "memcached.CacheClass has been split into memcached.MemcachedCache and memcached.PyLibMCCache. Please update your cache backend setting.",
-            DeprecationWarning
-        )
-        try:
-            import memcache
-        except ImportError:
-            raise InvalidCacheBackendError(
-                "Memcached cache backend requires either the 'memcache' or 'cmemcache' library"
-                )
-        super(CacheClass, self).__init__(server, params,
-                                         library=memcache,
-                                         value_not_found_exception=ValueError)
-
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
@@ -162,6 +146,12 @@ class MemcachedCache(BaseMemcachedCache):
         super(MemcachedCache, self).__init__(server, params,
                                              library=memcache,
                                              value_not_found_exception=ValueError)
+
+    @property
+    def _cache(self):
+        if getattr(self, '_client', None) is None:
+            self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
+        return self._client
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"

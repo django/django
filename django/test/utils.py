@@ -1,15 +1,18 @@
 import re
 import warnings
+from functools import wraps
 from xml.dom.minidom import parseString, Node
 
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
-from django.test.signals import template_rendered, setting_changed
+from django.core.signals import request_started
+from django.db import reset_queries
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
-from django.utils.translation import deactivate
-from django.utils.functional import wraps
+from django.test.signals import template_rendered, setting_changed
+from django.utils.encoding import force_str
 from django.utils import six
+from django.utils.translation import deactivate
 
 
 __all__ = (
@@ -77,6 +80,9 @@ def setup_test_environment():
     mail.original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
+    settings._original_allowed_hosts = settings.ALLOWED_HOSTS
+    settings.ALLOWED_HOSTS = ['*']
+
     mail.outbox = []
 
     deactivate()
@@ -95,7 +101,15 @@ def teardown_test_environment():
     settings.EMAIL_BACKEND = mail.original_email_backend
     del mail.original_email_backend
 
+    settings.ALLOWED_HOSTS = settings._original_allowed_hosts
+    del settings._original_allowed_hosts
+
     del mail.outbox
+
+
+warn_txt = ("get_warnings_state/restore_warnings_state functions from "
+    "django.test.utils are deprecated. Use Python's warnings.catch_warnings() "
+    "context manager instead.")
 
 
 def get_warnings_state():
@@ -105,6 +119,7 @@ def get_warnings_state():
     # There is no public interface for doing this, but this implementation of
     # get_warnings_state and restore_warnings_state appears to work on Python
     # 2.4 to 2.7.
+    warnings.warn(warn_txt, DeprecationWarning, stacklevel=2)
     return warnings.filters[:]
 
 
@@ -113,6 +128,7 @@ def restore_warnings_state(state):
     Restores the state of the warnings module when passed an object that was
     returned by get_warnings_state()
     """
+    warnings.warn(warn_txt, DeprecationWarning, stacklevel=2)
     warnings.filters = state[:]
 
 
@@ -126,7 +142,7 @@ def get_runner(settings, test_runner_class=None):
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, {}, {}, test_path[-1])
+    test_module = __import__(test_module_name, {}, {}, force_str(test_path[-1]))
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
 
@@ -325,5 +341,42 @@ def strip_quotes(want, got):
         got = got.strip()[2:-1]
     return want, got
 
+
 def str_prefix(s):
     return s % {'_': '' if six.PY3 else 'u'}
+
+
+class CaptureQueriesContext(object):
+    """
+    Context manager that captures queries executed by the specified connection.
+    """
+    def __init__(self, connection):
+        self.connection = connection
+
+    def __iter__(self):
+        return iter(self.captured_queries)
+
+    def __getitem__(self, index):
+        return self.captured_queries[index]
+
+    def __len__(self):
+        return len(self.captured_queries)
+
+    @property
+    def captured_queries(self):
+        return self.connection.queries[self.initial_queries:self.final_queries]
+
+    def __enter__(self):
+        self.use_debug_cursor = self.connection.use_debug_cursor
+        self.connection.use_debug_cursor = True
+        self.initial_queries = len(self.connection.queries)
+        self.final_queries = None
+        request_started.disconnect(reset_queries)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.connection.use_debug_cursor = self.use_debug_cursor
+        request_started.connect(reset_queries)
+        if exc_type is not None:
+            return
+        self.final_queries = len(self.connection.queries)
