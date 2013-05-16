@@ -360,6 +360,9 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
+    def resolve400(self):
+        return self._resolve_special('400')
+
     def resolve403(self):
         return self._resolve_special('403')
 

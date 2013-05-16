@@ -8,7 +8,7 @@ from django import http
 from django.conf import settings
 from django.core import urlresolvers
 from django.core import signals
-from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
+from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
@@ -162,6 +162,22 @@ class BaseHandler(object):
                 })
             try:
                 callback, param_dict = resolver.resolve403()
+                response = callback(request, **param_dict)
+            except:
+                signals.got_request_exception.send(
+                        sender=self.__class__, request=request)
+                response = self.handle_uncaught_exception(request,
+                        resolver, sys.exc_info())
+
+        except SuspiciousOperation as e:
+            logger.warning(
+                    'Suspicious operation: %s', e,
+                    extra={
+                        'status_code': 400,
+                        'request': request,
+                        'exception': e})
+            try:
+                callback, param_dict = resolver.resolve400()
                 response = callback(request, **param_dict)
             except:
                 signals.got_request_exception.send(
