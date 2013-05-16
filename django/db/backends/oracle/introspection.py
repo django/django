@@ -1,4 +1,5 @@
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 import cx_Oracle
 import re
 
@@ -48,7 +49,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            description.append(FieldInfo(*((desc[0].lower(),) + desc[1:])))
+            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
+            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 
     def table_name_converter(self, name):
