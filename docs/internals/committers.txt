@@ -453,9 +453,6 @@ Jeremy Dunck
 .. _`Daniel Lindsley`: http://toastdriven.com/
 .. _`Amazon Web Services`: https://aws.amazon.com/
 
-Specialists
------------
-
 `James Bennett`_
     James is Django's release manager, and also contributes to the
     documentation and provide the occasional bugfix.
