@@ -30,13 +30,10 @@ Journal-World`_ of Lawrence, Kansas, USA.
     Simon lives in Brighton, England.
 
 `Jacob Kaplan-Moss`_
-    Jacob is a partner at `Revolution Systems`_ which provides support services
-    around Django and related open source technologies. A good deal of Jacob's
-    work time is devoted to working on Django. Jacob previously worked at World
-    Online, where Django was invented, where he was the lead developer of
-    Ellington, a commercial Web publishing platform for media companies.
-
-    Jacob lives in Lawrence, Kansas, USA.
+    Jacob is Director of Platform Security at Heroku_. He worked at World
+    Online for four years, where he helped open source Django and found
+    the Django Software Foundation. Jacob lives on a hobby farm outside of
+    Lawrence where he spends his weekends playing with dirt and power tools.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He designed the
@@ -55,6 +52,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _jacob kaplan-moss: http://jacobian.org/
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
+.. _heroku: http://heroku.com/
 
 Current developers
 ==================
