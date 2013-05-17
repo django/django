@@ -939,9 +939,14 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A form used in the admin interface to change a user's password.
 
+    Takes the ``user`` as the first positional argument.
+
 .. class:: AuthenticationForm
 
     A form for logging a user in.
+
+    Takes ``request`` as its first positional argument, which is stored on the
+    form instance for use by sub-classes.
 
 .. class:: PasswordChangeForm
 
