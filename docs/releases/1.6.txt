@@ -238,6 +238,9 @@ Minor features
   Meta option: ``localized_fields``. Fields included in this list will be localized
   (by setting ``localize`` on the form field).
 
+* The ``choices`` argument to model fields now accepts an iterable of iterables
+  instead of requiring an iterable of lists or tuples.
+
 Backwards incompatible changes in 1.6
 =====================================
 
