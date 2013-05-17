@@ -515,6 +515,18 @@ Marc Tamlyn
 .. _CCBV: http://ccbv.co.uk/
 .. _Incuna Ltd: http://incuna.com/
 
+Donald Stufft
+    Donald found Python and Django in 2007 while trying to find a language,
+    and web framework that he really enjoyed using after many years of PHP. He
+    fell in love with the beauty of Python and the way Django made tasks simple
+    and easy. His contributions to Django focus primarily on ensuring that it
+    is and remains a secure web framework.
+
+    Donald currently works at `Nebula Inc`_ as a Software Engineer for their
+    security team and lives in the Greater Philadelphia Area.
+
+.. _Nebula Inc: https://www.nebula.com/
+
 Developers Emeritus
 ===================
 
