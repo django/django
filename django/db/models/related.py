@@ -27,7 +27,7 @@ class RelatedObject(object):
         Analogue of django.db.models.fields.Field.get_choices, provided
         initially for utilisation by RelatedFieldListFilter.
         """
-        first_choice = include_blank and blank_choice or []
+        first_choice = blank_choice if include_blank else []
         queryset = self.model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(

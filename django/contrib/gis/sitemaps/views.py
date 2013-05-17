@@ -20,7 +20,7 @@ def index(request, sitemaps):
     """
     current_site = get_current_site(request)
     sites = []
-    protocol = request.is_secure() and 'https' or 'http'
+    protocol = 'https' if request.is_secure() else 'http'
     for section, site in sitemaps.items():
         if callable(site):
             pages = site().paginator.num_pages

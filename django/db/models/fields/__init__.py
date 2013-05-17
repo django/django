@@ -448,7 +448,7 @@ class Field(object):
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
-        first_choice = include_blank and blank_choice or []
+        first_choice = blank_choice if include_blank else []
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
@@ -471,7 +471,7 @@ class Field(object):
         """
         Returns flattened choices with a default blank choice included.
         """
-        first_choice = include_blank and blank_choice or []
+        first_choice = blank_choice if include_blank else []
         return first_choice + list(self.flatchoices)
 
     def _get_val_from_obj(self, obj):

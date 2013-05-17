@@ -347,7 +347,7 @@ class Options(object):
         """
         Returns the requested field by name. Raises FieldDoesNotExist on error.
         """
-        to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
+        to_search = (self.fields + self.many_to_many) if many_to_many else self.fields
         for f in to_search:
             if f.name == name:
                 return f

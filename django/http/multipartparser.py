@@ -292,7 +292,7 @@ class LazyStream(six.Iterator):
 
     def read(self, size=None):
         def parts():
-            remaining = (size is not None and [size] or [self._remaining])[0]
+            remaining = self._remaining if size is None else size
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
                 yield b''.join(self)
