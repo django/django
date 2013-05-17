@@ -509,10 +509,11 @@ Marc Tamlyn
     documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
     additional class based view reference tool.
 
-    Marc currently works at Incuna Ltd, a digital healthcare agency in Oxford,
-    UK.
+    Marc currently works at `Incuna Ltd`_, a digital healthcare agency in
+    Oxford, UK.
 
 .. _CCBV: http://ccbv.co.uk/
+.. _Incuna Ltd: http://incuna.com/
 
 Developers Emeritus
 ===================
