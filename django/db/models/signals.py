@@ -12,6 +12,7 @@ post_save = Signal(providing_args=["instance", "raw", "created", "using", "updat
 pre_delete = Signal(providing_args=["instance", "using"], use_caching=True)
 post_delete = Signal(providing_args=["instance", "using"], use_caching=True)
 
+pre_syncdb = Signal(providing_args=["app", "create_models", "verbosity", "interactive", "db"])
 post_syncdb = Signal(providing_args=["class", "app", "created_models", "verbosity", "interactive", "db"], use_caching=True)
 
 m2m_changed = Signal(providing_args=["action", "instance", "reverse", "model", "pk_set", "using"], use_caching=True)
