@@ -503,6 +503,17 @@ Tim Graham
 
     Tim works as a software engineer and lives in Philadelphia, PA, USA.
 
+Marc Tamlyn
+    Marc started life on the web using Django 1.2 back in 2010, and has never
+    looked back. He was involved with rewriting the class based view
+    documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
+    additional class based view reference tool.
+
+    Marc currently works at Incuna Ltd, a digital healthcare agency in Oxford,
+    UK.
+
+.. _CCBV: http://ccbv.co.uk/
+
 Developers Emeritus
 ===================
 
