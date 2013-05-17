@@ -63,7 +63,7 @@ def find_management_module(app_name):
 
     while parts:
         part = parts.pop()
-        f, path, descr = imp.find_module(part, path and [path] or None)
+        f, path, descr = imp.find_module(part, [path] if path else None)
         if f:
             f.close()
     return path

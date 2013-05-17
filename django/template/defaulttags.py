@@ -127,7 +127,7 @@ class ForNode(Node):
             self.nodelist_empty = nodelist_empty
 
     def __repr__(self):
-        reversed_text = self.is_reversed and ' reversed' or ''
+        reversed_text = ' reversed' if self.is_reversed else ''
         return "<For Node: for %s in %s, tail_len: %d%s>" % \
             (', '.join(self.loopvars), self.sequence, len(self.nodelist_loop),
              reversed_text)
@@ -788,7 +788,7 @@ def do_for(parser, token):
                                   " words: %s" % token.contents)
 
     is_reversed = bits[-1] == 'reversed'
-    in_index = is_reversed and -3 or -2
+    in_index = -3 if is_reversed else -2
     if bits[in_index] != 'in':
         raise TemplateSyntaxError("'for' statements should use the format"
                                   " 'for x in y': %s" % token.contents)

@@ -37,7 +37,7 @@ from django.utils.encoding import force_text
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
-get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
+get_ul_class = lambda x: 'radiolist%s' % (' inline' if x == HORIZONTAL else '')
 
 
 class IncorrectLookupParameters(Exception):
@@ -189,7 +189,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
                 'class': get_ul_class(self.radio_fields[db_field.name]),
             })
-            kwargs['empty_label'] = db_field.blank and _('None') or None
+            kwargs['empty_label'] = _('None') if db_field.blank else None
 
         queryset = self.get_field_queryset(db, db_field, request)
         if queryset is not None:
