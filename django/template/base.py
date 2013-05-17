@@ -641,7 +641,7 @@ class FilterExpression(object):
                                       (name, len(nondefs), plen))
 
         # Defaults can be overridden.
-        defaults = defaults and list(defaults) or []
+        defaults = list(defaults) if defaults else []
         try:
             for parg in provided:
                 defaults.pop(0)

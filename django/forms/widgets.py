@@ -775,7 +775,7 @@ class MultiWidget(Widget):
     You'll probably want to use this class with MultiValueField.
     """
     def __init__(self, widgets, attrs=None):
-        self.widgets = [isinstance(w, type) and w() or w for w in widgets]
+        self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super(MultiWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):

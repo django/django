@@ -523,7 +523,7 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
-            attrs = attrs and flatatt(attrs) or ''
+            attrs = flatatt(attrs) if attrs else ''
             contents = format_html('<label for="{0}"{1}>{2}</label>',
                                    widget.id_for_label(id_), attrs, contents
                                    )

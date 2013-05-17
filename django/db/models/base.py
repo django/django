@@ -631,7 +631,7 @@ class Model(six.with_metaclass(ModelBase)):
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
         if pk_set and not force_insert:
             base_qs = cls._base_manager.using(using)
-            values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False)))
+            values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
             if not values:
                 # We can end up here when saving a model in inheritance chain where
@@ -698,8 +698,8 @@ class Model(six.with_metaclass(ModelBase)):
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
-        op = is_next and 'gt' or 'lt'
-        order = not is_next and '-' or ''
+        op = 'gt' if is_next else 'lt'
+        order = '' if is_next else '-'
         param = force_text(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
@@ -712,8 +712,8 @@ class Model(six.with_metaclass(ModelBase)):
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
-            op = is_next and 'gt' or 'lt'
-            order = not is_next and '-_order' or '_order'
+            op = 'gt' if is_next else 'lt'
+            order = '_order' if is_next else '-_order'
             order_field = self._meta.order_with_respect_to
             obj = self._default_manager.filter(**{
                 order_field.name: getattr(self, order_field.attname)

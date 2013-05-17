@@ -37,7 +37,7 @@ def next_redirect(request, fallback, **get_kwargs):
         else:
             anchor = ''
 
-        joiner = ('?' in next) and '&' or '?'
+        joiner = '&' if '?' in next else '?'
         next += joiner + urlencode(get_kwargs) + anchor
     return HttpResponseRedirect(next)
 

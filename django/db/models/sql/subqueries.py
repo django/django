@@ -245,7 +245,7 @@ class DateQuery(Query):
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]
         self.distinct = True
-        self.order_by = order == 'ASC' and [1] or [-1]
+        self.order_by = [1] if order == 'ASC' else [-1]
 
         if field.null:
             self.add_filter(("%s__isnull" % field_name, False))

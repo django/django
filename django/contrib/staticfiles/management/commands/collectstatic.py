@@ -174,7 +174,7 @@ Type 'yes' to continue, or 'no' to cancel: """
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
+                'identifier': 'static file' + ('' if modified_count == 1 else 's'),
                 'action': self.symlink and 'symlinked' or 'copied',
                 'destination': (destination_path and " to '%s'"
                                 % destination_path or ''),

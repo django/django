@@ -512,7 +512,7 @@ class SQLCompiler(object):
                 # Extra tables can end up in self.tables, but not in the
                 # alias_map if they aren't in a join. That's OK. We skip them.
                 continue
-            alias_str = (alias != name and ' %s' % alias or '')
+            alias_str = '' if alias == name else (' %s' % alias)
             if join_type and not first:
                 extra_cond = join_field.get_extra_restriction(
                     self.query.where_class, alias, lhs)
@@ -532,7 +532,7 @@ class SQLCompiler(object):
                     (qn(lhs), qn2(lhs_col), qn(alias), qn2(rhs_col)))
                 result.append('%s)' % extra_sql)
             else:
-                connector = not first and ', ' or ''
+                connector = '' if first else ', '
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
             first = False
         for t in self.query.extra_tables:
@@ -541,7 +541,7 @@ class SQLCompiler(object):
             # calls increments the refcount, so an alias refcount of one means
             # this is the only reference.
             if alias not in self.query.alias_map or self.query.alias_refcount[alias] == 1:
-                connector = not first and ', ' or ''
+                connector = '' if first else ', '
                 result.append('%s%s' % (connector, qn(alias)))
                 first = False
         return result, from_params
@@ -959,7 +959,7 @@ class SQLUpdateCompiler(SQLCompiler):
         related queries are not available.
         """
         cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
-        rows = cursor and cursor.rowcount or 0
+        rows = cursor.rowcount if cursor else 0
         is_empty = cursor is None
         del cursor
         for query in self.query.get_related_updates():
