@@ -1,8 +1,7 @@
-from django.views.generic.edit import FormMixin
 from django.contrib import messages
 
 
-class SuccessMessageMixin(FormMixin):
+class SuccessMessageMixin(object):
     """
     Adds a success message on successful form submission.
     """
