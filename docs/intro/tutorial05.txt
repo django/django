@@ -503,8 +503,8 @@ of the process of creating polls.
 message: "No polls are available." and verifies the ``latest_poll_list`` is
 empty. Note that the :class:`django.test.TestCase` class provides some
 additional assertion methods. In these examples, we use
-:meth:`~django.test.TestCase.assertContains()` and
-:meth:`~django.test.TestCase.assertQuerysetEqual()`.
+:meth:`~django.test.SimpleTestCase.assertContains()` and
+:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
 
 In ``test_index_view_with_a_past_poll``, we create a poll and verify that it
 appears in the list.

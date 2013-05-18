@@ -201,8 +201,8 @@ According to :pep:`3333`:
 Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
 contains ``bytes``, which may become an issue if you compare it with a
 ``str`` in your tests. The preferred solution is to rely on
-:meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains`. These methods accept a
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.SimpleTestCase.assertNotContains`. These methods accept a
 response and a unicode string as arguments.
 
 Coding guidelines

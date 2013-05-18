@@ -271,9 +271,10 @@ The changes in transaction management may result in additional statements to
 create, release or rollback savepoints. This is more likely to happen with
 SQLite, since it didn't support savepoints until this release.
 
-If tests using :meth:`~django.test.TestCase.assertNumQueries` fail because of
-a higher number of queries than expected, check that the extra queries are
-related to savepoints, and adjust the expected number of queries accordingly.
+If tests using :meth:`~django.test.TransactionTestCase.assertNumQueries` fail
+because of a higher number of queries than expected, check that the extra
+queries are related to savepoints, and adjust the expected number of queries
+accordingly.
 
 Autocommit option for PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
