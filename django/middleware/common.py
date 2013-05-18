@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail import mail_managers
 from django.core import urlresolvers
 from django import http
+from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
 
@@ -140,7 +141,7 @@ class BrokenLinkEmailsMiddleware(object):
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = request.META.get('HTTP_REFERER', '')
+            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
             is_internal = self.is_internal_request(domain, referer)
             is_not_search_engine = '?' not in referer
             is_ignorable = self.is_ignorable_404(path)

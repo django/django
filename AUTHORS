@@ -12,18 +12,25 @@ The PRIMARY AUTHORS are (and/or have been):
     * Luke Plant
     * Russell Keith-Magee
     * Robert Wittams
+    * James Bennett
     * Gary Wilson
+    * Matt Boersma
+    * Ian Kelly
+    * Joseph Kocherhans
     * Brian Rosner
     * Justin Bronn
     * Karen Tracey
     * Jannis Leidel
     * James Tauber
     * Alex Gaynor
+    * Simon Meers
     * Andrew Godwin
     * Carl Meyer
     * Ramiro Morales
+    * Gabriel Hurley
     * Chris Beaven
     * Honza Král
+    * Tim Graham
     * Idan Gazit
     * Paul McMillan
     * Julien Phalip
@@ -36,6 +43,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Preston Holmes
     * Simon Charette
     * Donald Stufft
+    * Daniel Lindsley
     * Marc Tamlyn
 
 More information on the main contributors to Django can be found in
@@ -91,7 +99,6 @@ answer newbie questions, and generally made Django that much better:
     Shannon -jj Behrens <http://jjinux.blogspot.com/>
     Esdras Beleza <linux@esdrasbeleza.com>
     Chris Bennett <chrisrbennett@yahoo.com>
-    James Bennett
     Danilo Bargen
     Shai Berger <shai@platonix.com>
     berto
@@ -104,7 +111,6 @@ answer newbie questions, and generally made Django that much better:
     Simon Blanchard
     Craig Blaszczyk <masterjakul@gmail.com>
     David Blewett <david@dawninglight.net>
-    Matt Boersma <matt@sprout.org>
     Artem Gnilov <boobsd@gmail.com>
     Matías Bordese
     Nate Bragg <jonathan.bragg@alum.rpi.edu>
@@ -278,7 +284,6 @@ answer newbie questions, and generally made Django that much better:
     Rob Hudson <http://rob.cogit8.org/>
     Jason Huggins <http://www.jrandolph.com/blog/>
     Jeff Hui <jeffkhui@gmail.com>
-    Gabriel Hurley <gabriel@strikeawe.com>
     Hyun Mi Ae
     Ibon <ibonso@gmail.com>
     Tom Insam
@@ -327,7 +332,6 @@ answer newbie questions, and generally made Django that much better:
     Meir Kriheli <http://mksoft.co.il/>
     Bruce Kroeze <http://coderseye.com/>
     krzysiek.pawlik@silvermedia.pl
-    Joseph Kocherhans
     konrad@gwu.edu
     knox <christobzr@gmail.com>
     David Krauth
@@ -360,7 +364,6 @@ answer newbie questions, and generally made Django that much better:
     limodou
     Philip Lindborg <philip.lindborg@gmail.com>
     Simon Litchfield <simon@quo.com.au>
-    Daniel Lindsley <daniel@toastdriven.com>
     Trey Long <trey@ktrl.com>
     Laurent Luce <http://www.laurentluce.com>
     Martin Mahner <http://www.mahner.org/>

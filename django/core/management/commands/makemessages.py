@@ -309,10 +309,9 @@ class Command(NoArgsCommand):
             """
             Check if the given path should be ignored or not.
             """
-            for pattern in ignore_patterns:
-                if fnmatch.fnmatchcase(path, pattern):
-                    return True
-            return False
+            filename = os.path.basename(path)
+            ignore = lambda pattern: fnmatch.fnmatchcase(filename, pattern)
+            return any(ignore(pattern) for pattern in ignore_patterns)
 
         dir_suffix = '%s*' % os.sep
         norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in self.ignore_patterns]
