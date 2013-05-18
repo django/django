@@ -125,6 +125,17 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
+    **If the :setting:`SECRET_KEY` is not kept secret, this can lead to
+    arbitrary remote code execution.**
+
+    An attacker in possession of the :setting:`SECRET_KEY` can not only
+    generate falsified session data, which your site will trust, but also
+    remotely execute arbitrary code, as the data is serialized using pickle.
+
+    If you use cookie-based sessions, pay extra care that your secret key is
+    always kept completely secret, for any system which might be remotely
+    accessible.
+
     **The session data is signed but not encrypted**
 
     When using the cookies backend the session data can be read by the client.
