@@ -193,19 +193,21 @@ def naturaltime(value):
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
-            # NOTE: \xa0 is used to avoic wrapping for units
             return ungettext(
-                'a second ago', '%(count)s\xa0seconds ago', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second ago', '%(count)s\u00a0seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute ago', '%(count)s\xa0minutes ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute ago', '%(count)s\u00a0minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour ago', '%(count)s\xa0hours ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour ago', '%(count)s\u00a0hours ago', count
             ) % {'count': count}
     else:
         delta = value - now
@@ -217,15 +219,18 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                'a second from now', '%(count)s\xa0seconds from now', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second from now', '%(count)s\u00a0seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute from now', '%(count)s\xa0minutes from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute from now', '%(count)s\u00a0minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour from now', '%(count)s\xa0hours from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour from now', '%(count)s\u00a0hours from now', count
             ) % {'count': count}
