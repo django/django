@@ -665,3 +665,23 @@ you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
 defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
 subclass to be used with a model but without an explicit list of fields is
 deprecated.
+
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.middleware.cache.CacheMiddleware` used to provide a way to
+cache requests if they weren't made by a logged-in user. This mechanism was
+largely ineffective because the middleware correctly takes into account the
+``Vary: Cookie`` HTTP header. This header is being set on a variety of
+occasions, such as:
+
+* accessing the session,
+
+* using a client-side library which sets cookies (like `Google Analytics`__),
+
+* or using CSRF protection, which is turned on by default.
+
+This makes the cache work on a per-session basis regardless of the
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting.
+
+__ http://www.google.com/analytics/

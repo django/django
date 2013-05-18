@@ -27,12 +27,6 @@ account has :attr:`~django.contrib.auth.models.User.is_active` and
 :attr:`~django.contrib.auth.models.User.is_staff` set to True. The admin site
 only allows access to users with those two fields both set to True.
 
-How can I prevent the cache middleware from caching the admin site?
--------------------------------------------------------------------
-
-Set the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY` setting to ``True``. See the
-:doc:`cache documentation </topics/cache>` for more information.
-
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
