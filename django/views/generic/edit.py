@@ -138,14 +138,9 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
     def get_context_data(self, **kwargs):
         """
-        If an object has been supplied, inject it into the context with the
-        supplied context_object_name name.
+        Returns context data.
         """
-        context = {}
-        if self.object:
-            context['object'] = self.object
-        context.update(kwargs)
-        return super(ModelFormMixin, self).get_context_data(**context)
+        return super(ModelFormMixin, self).get_context_data(**{}.update(kwargs))
 
 
 class ProcessFormView(View):
