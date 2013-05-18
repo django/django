@@ -167,12 +167,12 @@ class MultiPartParser(object):
                     else:
                         data = field_stream.read()
 
-                    self._post.appendlist(field_name,
-                                          force_text(data, encoding, errors='replace'))
+                    field_text = force_text(data, encoding, errors='replace')
+                    self._post.appendlist(field_name, field_text)
                     
                     for handler in handlers:
-                        try :
-                            handler.variable_complete(field_name, force_text(data, encoding, errors='replace'))
+                        try:
+                            handler.variable_complete(field_name, field_text)
                         except StopFutureHandlers:
                             break
 

@@ -84,12 +84,6 @@ class FileUploadHandler(object):
         """
         pass
 
-    def variable_complete(self, variable_name, variable_value):
-        """
-        Signal that a new variable has been parsed from the multipart request.
-        """
-        pass
-
     def new_file(self, field_name, file_name, content_type, content_length, charset=None):
         """
         Signal that a new file has been started.
@@ -118,6 +112,15 @@ class FileUploadHandler(object):
         Subclasses should return a valid ``UploadedFile`` object.
         """
         raise NotImplementedError()
+
+    def variable_complete(self, variable_name, variable_value):
+        """
+        Signal that a new variable has been parsed from the multipart request.
+
+        :param variable_name: name of the variable
+        :param variable_value: value of the multipart variable
+        """
+        pass
 
     def upload_complete(self):
         """

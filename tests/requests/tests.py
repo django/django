@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
 import time
 import warnings
 from datetime import datetime, timedelta
@@ -658,6 +659,106 @@ class RequestsTests(SimpleTestCase):
 
         with self.assertRaises(UnreadablePostError):
             request.body
+
+    def test_POST_new_variable_signal_in_multipart(self):
+        """
+        Multi part POST requests should allow reading variables even before
+        parsing whole files. This can be done by overloading file upload
+        handlers' ``new_variable`` method.
+        """
+        collected_variables_memory_handler = []
+        collected_variables_temporary_handler = []
+
+        def get_var_collector(handler):
+            """Retrieve variable collector for specific handler"""
+            def _collect_variable(self, variable_name, variable_value):
+                """Store variable in external list, to check it later"""
+                if handler == 'memory':
+                    collected_variables_memory_handler.append(
+                        (variable_name, variable_value),
+                    )
+                elif handler == 'temporary':
+                    collected_variables_temporary_handler.append(
+                        (variable_name, variable_value),
+                    )
+                else:
+                    raise NotImplementedError(
+                        'Collector for %s not implemented' % (handler,),
+                    )
+            return _collect_variable
+
+        @contextmanager
+        def override_upload_handler_methods():
+            """Override parser method temporarily"""
+            from django.core.files.uploadhandler import (
+                MemoryFileUploadHandler, TemporaryFileUploadHandler,
+            )
+            old_method_memory = MemoryFileUploadHandler.variable_complete
+            old_method_temporary = TemporaryFileUploadHandler.variable_complete
+
+            # Override handler method:
+            MemoryFileUploadHandler.variable_complete = get_var_collector(
+                'memory',
+            )
+            TemporaryFileUploadHandler.variable_complete = get_var_collector(
+                'temporary',
+            )
+            yield
+            # Recover previous state:
+            MemoryFileUploadHandler.new_variable = old_method_memory
+            TemporaryFileUploadHandler.new_variable = old_method_temporary
+
+        payload = FakePayload(
+            "\r\n".join([
+                '--boundary',
+                'Content-Disposition: form-data; name="n1"',
+                '',
+                'value',
+                '--boundary',
+                'Content-Disposition: form-data; name="n2"; filename="f.txt"',
+                'Content-Type: text/plain',
+                '',
+                '... contents of file1.txt ...',
+                'value',
+                '--boundary--',
+                'Content-Disposition: form-data; name="n3"',
+                '',
+                'value',
+                '--boundary--',
+                '']))
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload})
+
+        # Use specific upload handlers
+        upload_handlers = (
+            'django.core.files.uploadhandler.MemoryFileUploadHandler',
+            'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+        )
+        with override_upload_handler_methods(), self.settings(
+                FILE_UPLOAD_HANDLERS=upload_handlers,
+        ):
+            self.assertEqual(
+                request.POST,
+                {
+                    'n1': ['value'],
+                    'n3': ['value'],
+                },
+            )
+            self.assertEqual(len(request.FILES), 1)
+            self.assertIn('n2', request.FILES)
+
+            # Confirm the variables have been collected:
+            self.assertEqual(
+                collected_variables_memory_handler,
+                [('n1', 'value'), ('n3', 'value')],
+            )
+            self.assertEqual(
+                collected_variables_temporary_handler,
+                [('n1', 'value'), ('n3', 'value')],
+            )
 
 
 @skipIf(connection.vendor == 'sqlite'

@@ -425,6 +425,21 @@ attributes:
 ``FileUploadHandler.upload_complete(self)``
     Callback signaling that the entire upload (all files) has completed.
 
+``FileUploadHandler.variable_complete(self, variable_name, variable_value)``
+    Callback signaling that a new variable has been parsed. This is called
+    before new file is parsed.
+
+    ``variable_name`` is a string name of the non-file ``<input>`` field.
+
+    ``variable_value`` is the value (text) provided in the field by browser.
+
+    This method may raise a ``StopFutureHandlers`` exception to prevent
+    future handlers from handling this variable.
+
+.. versionadded:: 1.6
+
+    The ``variable_complete`` method was added in Django 1.6.
+
 ``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
     Allows the handler to completely override the parsing of the raw
     HTTP input.
