@@ -553,7 +553,8 @@ This signal is sent when the value of a setting is changed through the
 :func:`django.test.utils.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
-original value is restored ("teardown").
+original value is restored ("teardown"). Use the ``enter`` argument to
+distinguish between the two.
 
 Arguments sent with this signal:
 
@@ -566,6 +567,11 @@ Arguments sent with this signal:
 ``value``
     The value of the setting after the change. For settings that initially
     don't exist, in the "teardown" phase, ``value`` is ``None``.
+
+``enter``
+    .. versionadded:: 1.7
+
+        A boolean; ``True`` if the setting is applied, ``False`` if restored.
 
 template_rendered
 -----------------

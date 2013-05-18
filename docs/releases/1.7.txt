@@ -38,6 +38,9 @@ Minor features
   contains extra parameters passed to the ``content-type`` header on a file
   upload.
 
+* The ``enter`` argument was added to the
+  :data:`~django.test.signals.setting_changed` signal.
+
 Backwards incompatible changes in 1.7
 =====================================
 
