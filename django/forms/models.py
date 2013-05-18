@@ -136,7 +136,7 @@ def model_to_dict(instance, fields=None, exclude=None):
             data[f.name] = f.value_from_object(instance)
     return data
 
-def fields_for_model(model, fields=None, exclude=None, widgets=None, localized_fields=None, formfield_callback=None):
+def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=None, localized_fields=None):
     """
     Returns a ``SortedDict`` containing form fields for the given model.
 
@@ -246,7 +246,7 @@ class ModelFormMetaclass(type):
                 opts.fields = None
 
             fields = fields_for_model(opts.model, opts.fields, opts.exclude,
-                                      opts.widgets, opts.localized_fields, formfield_callback)
+                                      opts.widgets, formfield_callback, opts.localized_fields)
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in six.iteritems(fields) if not v]
@@ -413,7 +413,7 @@ class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
     pass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
-                      localized_fields=None, widgets=None, formfield_callback=None):
+                      formfield_callback=None, widgets=None, localized_fields=None):
     """
     Returns a ModelForm containing form fields for the given model.
 
