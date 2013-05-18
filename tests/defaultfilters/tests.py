@@ -529,22 +529,22 @@ class DefaultFiltersTests(TestCase):
         # real testing is done in timesince.py, where we can provide our own 'now'
         self.assertEqual(
             timesince_filter(datetime.datetime.now() - datetime.timedelta(1)),
-            '1 day')
+            '1\xa0day')
 
         self.assertEqual(
             timesince_filter(datetime.datetime(2005, 12, 29),
                              datetime.datetime(2005, 12, 30)),
-            '1 day')
+            '1\xa0day')
 
     def test_timeuntil(self):
         self.assertEqual(
             timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1, 1)),
-            '1 day')
+            '1\xa0day')
 
         self.assertEqual(
             timeuntil_filter(datetime.datetime(2005, 12, 30),
                              datetime.datetime(2005, 12, 29)),
-            '1 day')
+            '1\xa0day')
 
     def test_default(self):
         self.assertEqual(default("val", "default"), 'val')
