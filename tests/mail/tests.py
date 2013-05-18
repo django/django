@@ -9,6 +9,8 @@ import smtpd
 import sys
 import tempfile
 import threading
+from smtplib import SMTPException
+from ssl import SSLError
 
 from django.core import mail
 from django.core.mail import (EmailMessage, mail_admins, mail_managers,
@@ -20,10 +22,6 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_str, force_text
 from django.utils.six import PY3, StringIO
 from django.utils.translation import ugettext_lazy
-
-from smtplib import SMTPException
-from ssl import SSLError
-
 
 
 class MailTests(TestCase):
@@ -775,19 +773,11 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
-        try:
-            backend.open()
-            self.fail('SMTPException STARTTLS not raised.')
-        except SMTPException, e:
-            self.assertNotEqual(-1, str(e).find('STARTTLS'), "SMTPException wasn't for STARTTLS")
+        self.assertRaisesMessage(SMTPException,
+            'STARTTLS extension not supported by server.', backend.open)
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
-        try:
-            backend.open()
-            self.fail('SSLError not raised.')
-        except SSLError, e:
-            pass
-
+        self.assertRaises(SSLError, backend.open)
