@@ -347,7 +347,7 @@ class ExceptionReporter(object):
         if source is None:
             try:
                 with open(filename, 'rb') as fp:
-                    source = fp.readlines()
+                    source = fp.read().splitlines()
             except (OSError, IOError):
                 pass
         if source is None:
@@ -370,9 +370,9 @@ class ExceptionReporter(object):
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
 
-        pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
-        context_line = source[lineno].strip('\n')
-        post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
+        pre_context = source[lower_bound:lineno]
+        context_line = source[lineno]
+        post_context = source[lineno+1:upper_bound]
 
         return lower_bound, pre_context, context_line, post_context
 
