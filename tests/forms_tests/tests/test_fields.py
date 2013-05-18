@@ -125,6 +125,16 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_6(self):
+        f = CharField(placeholder='This is a random placeholder')
+        self.assertEqual('This is a random placeholder', f.placeholder)
+        self.assertEqual('This is a random placeholder', f.widget.attrs['placeholder'])
+
+    def test_charfield_7(self):
+        f = CharField(placeholder='This is another placeholder', widget=Textarea)
+        self.assertEqual('This is another placeholder', f.placeholder)
+        self.assertEqual('This is another placeholder', f.widget.attrs['placeholder'])
+
     def test_charfield_widget_attrs(self):
         """
         Ensure that CharField.widget_attrs() always returns a dictionary.

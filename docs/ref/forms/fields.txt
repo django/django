@@ -318,13 +318,15 @@ For each field, we describe the default widget used if you don't specify
       Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
 
-    Has two optional arguments for validation:
+    Has three optional arguments for validation:
 
     .. attribute:: max_length
     .. attribute:: min_length
+    .. attribute:: placeholder
 
-    If provided, these arguments ensure that the string is at most or at least
-    the given length.
+    If provided, max_length and min_length ensure that the string is at most or at least
+    the given length. If provided, placeholder will show a placeholder attribute
+    in the html element, if it's an input box or a textarea.
 
 ``ChoiceField``
 ~~~~~~~~~~~~~~~

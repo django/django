@@ -20,7 +20,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
 from django.forms.widgets import (
-    TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
+    Input, Textarea, TextInput, NumberInput, EmailInput, URLInput, HiddenInput,
     MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
     NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION
@@ -199,8 +199,10 @@ class Field(object):
         return result
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
+    def __init__(self, max_length=None, min_length=None, placeholder=None,
+                 *args, **kwargs):
+        self.max_length, self.min_length, self.placeholder = (
+            max_length, min_length, placeholder)
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(min_length))
@@ -218,6 +220,8 @@ class CharField(Field):
         if self.max_length is not None and isinstance(widget, TextInput):
             # The HTML attribute is maxlength, not max_length.
             attrs.update({'maxlength': str(self.max_length)})
+        if self.placeholder and isinstance(widget, (Input, Textarea)):
+            attrs.update({'placeholder': self.placeholder})
         return attrs
 
 class IntegerField(Field):
