@@ -722,6 +722,31 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
         msgid "Ambiguous translatable block of text"
         msgstr ""
 
+.. templatetag:: language
+
+Switching language in templates
+-------------------------------
+
+If you want to select a language within a template, you can use the
+``language`` template tag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    <!-- Current language: {{ LANGUAGE_CODE }} -->
+    <p>{% trans "Welcome to our page" %}</p>
+
+    {% language 'en' %}
+        {% get_current_language as LANGUAGE_CODE %}
+        <!-- Current language: {{ LANGUAGE_CODE }} -->
+        <p>{% trans "Welcome to our page" %}</p>
+    {% endlanguage %}
+
+While the first occurrence of "Welcome to our page" uses the current language,
+the second will always be in English.
+
 .. _template-translation-vars:
 
 Other tags
@@ -1126,13 +1151,11 @@ active language. Example::
 
 .. _reversing_in_templates:
 
-.. templatetag:: language
-
 Reversing in templates
 ----------------------
 
 If localized URLs get reversed in templates they always use the current
-language. To link to a URL in another language use the ``language``
+language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
 .. code-block:: html+django

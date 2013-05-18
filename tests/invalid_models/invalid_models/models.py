@@ -375,8 +375,8 @@ invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits
 invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
-invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
-invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
 invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.

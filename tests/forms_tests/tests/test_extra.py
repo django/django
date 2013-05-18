@@ -569,6 +569,14 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         f = GenericIPAddressField(unpack_ipv4=True)
         self.assertEqual(f.clean(' ::ffff:0a0a:0a0a'), '10.10.10.10')
 
+    def test_slugfield_normalization(self):
+        f = SlugField()
+        self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    def test_urlfield_normalization(self):
+        f = URLField()
+        self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
+
     def test_smart_text(self):
         class Test:
             if six.PY3:
