@@ -287,4 +287,4 @@ def avoid_wrapping(value):
     Avoid text wrapping in the middle of a phrase by adding non-breaking
     spaces were there previously where normal spaces.
     """
-    return value.replace(" ", u"\xa0")
+    return value.replace(" ", "\xa0")
