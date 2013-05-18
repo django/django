@@ -135,34 +135,35 @@ def translation(language):
 
         res = _translation(globalpath)
 
-        # We want to ensure that, for example,  "en-gb" and "en-us" don't share
-        # the same translation object (thus, merging en-us with a local update
-        # doesn't affect en-gb), even though they will both use the core "en"
-        # translation. So we have to subvert Python's internal gettext caching.
-        base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in _translations]:
-            res._info = res._info.copy()
-            res._catalog = res._catalog.copy()
-
-        def _merge(path):
-            t = _translation(path)
-            if t is not None:
-                if res is None:
-                    return t
-                else:
-                    res.merge(t)
-            return res
-
-        for appname in reversed(settings.INSTALLED_APPS):
-            app = import_module(appname)
-            apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
-
-            if os.path.isdir(apppath):
-                res = _merge(apppath)
-
-        for localepath in reversed(settings.LOCALE_PATHS):
-            if os.path.isdir(localepath):
-                res = _merge(localepath)
+        if res is not None:
+            # We want to ensure that, for example,  "en-gb" and "en-us" don't share
+            # the same translation object (thus, merging en-us with a local update
+            # doesn't affect en-gb), even though they will both use the core "en"
+            # translation. So we have to subvert Python's internal gettext caching.
+            base_lang = lambda x: x.split('-', 1)[0]
+            if base_lang(lang) in [base_lang(trans) for trans in _translations]:
+                res._info = res._info.copy()
+                res._catalog = res._catalog.copy()
+    
+            def _merge(path):
+                t = _translation(path)
+                if t is not None:
+                    if res is None:
+                        return t
+                    else:
+                        res.merge(t)
+                return res
+    
+            for appname in reversed(settings.INSTALLED_APPS):
+                app = import_module(appname)
+                apppath = os.path.join(os.path.dirname(upath(app.__file__)), 'locale')
+    
+                if os.path.isdir(apppath):
+                    res = _merge(apppath)
+    
+            for localepath in reversed(settings.LOCALE_PATHS):
+                if os.path.isdir(localepath):
+                    res = _merge(localepath)
 
         if res is None:
             if fallback is not None:
