@@ -1002,13 +1002,14 @@ class ModelChoiceField(ChoiceField):
                             ' the available choices.'),
     }
 
-    def __init__(self, queryset, empty_label="---------", cache_choices=False,
+    def __init__(self, queryset, empty_label=False, cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
                  help_text='', to_field_name=None, *args, **kwargs):
         if required and (initial is not None):
             self.empty_label = None
         else:
-            self.empty_label = empty_label
+            from django.db.models.fields import VERBOSE_BLANK_CHOICE_DASH
+            self.empty_label = empty_label if empty_label is not False else VERBOSE_BLANK_CHOICE_DASH
         self.cache_choices = cache_choices
 
         # Call Field instead of ChoiceField __init__() because we don't need
