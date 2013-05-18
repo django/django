@@ -154,6 +154,9 @@ class Manager(six.with_metaclass(RenameManagerMethods)):
     def get_or_create(self, **kwargs):
         return self.get_queryset().get_or_create(**kwargs)
 
+    def update_or_create(self, **kwargs):
+        return self.get_queryset().update_or_create(**kwargs)
+
     def create(self, **kwargs):
         return self.get_queryset().create(**kwargs)
 

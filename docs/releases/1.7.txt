@@ -38,6 +38,9 @@ Minor features
   contains extra parameters passed to the ``content-type`` header on a file
   upload.
 
+* The :meth:`QuerySet.update_or_create
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
 Backwards incompatible changes in 1.7
 =====================================
 
