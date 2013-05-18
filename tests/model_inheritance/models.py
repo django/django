@@ -30,6 +30,7 @@ class CommonInfo(models.Model):
     class Meta:
         abstract = True
         ordering = ['name']
+        permissions = (('view_%(class)s', 'View %(class)s'),)
 
     def __str__(self):
         return '%s %s' % (self.__class__.__name__, self.name)
@@ -43,8 +44,16 @@ class Student(CommonInfo):
     school_class = models.CharField(max_length=10)
 
     class Meta:
-        pass
+        permissions = (('enroll_%(class)s', 'Enroll %(class)s'),)
+        inherit_permissions = True
 
+
+class Teacher(CommonInfo):
+    school_class = models.CharField(max_length=10)
+
+    class Meta:
+        permissions = (('can_teach', 'Can teach'),)
+        inherit_permissions = False
 
 #
 # Abstract base classes with related models

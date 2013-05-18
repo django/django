@@ -86,6 +86,14 @@ class ModelBase(type):
             meta = getattr(new_class, 'Meta', None)
         else:
             meta = attr_meta
+            # Append any inherited permissions to any explicitly declared ones.
+            if hasattr(meta, 'permissions') and getattr(meta, 'inherit_permissions', True):
+                all_perms = set(meta.permissions)
+                for parent in parents:
+                    if hasattr(parent, 'Meta') and hasattr(parent.Meta, 'permissions'):
+                        # De-dupe inherited permission in case the Meta class also inherited from another Meta
+                        all_perms.update(parent.Meta.permissions)
+                meta.permissions = list(all_perms)
         base_meta = getattr(new_class, '_meta', None)
 
         app_label = None
