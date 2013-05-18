@@ -1480,6 +1480,19 @@ class Queries4Tests(BaseQuerysetTest):
         self.assertEqual(qs.count(), 2)
         self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
 
+    # This test should succeed when ticket #16731 has been fixed.
+    @unittest.expectedFailure
+    def test_ticket16731(self):
+        last_note = Note.objects.latest('id')
+
+        n0 = Note.objects.create(note='monty', misc='python')
+        n1 = Note.objects.create(note='foo', misc='foobar')
+
+        qs = Note.objects.filter(id__gt=last_note.id)
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(qs.get(misc__startswith=F('note')).misc, 'foobar')
+        self.assertEqual(qs.filter(note__startswith=F('misc')).count(), 0)
+
 
 class Queries5Tests(TestCase):
     def setUp(self):
