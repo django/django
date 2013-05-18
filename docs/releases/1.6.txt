@@ -491,6 +491,11 @@ Miscellaneous
   memcache backend no longer uses the default timeout, and now will
   set-and-expire-immediately the value.
 
+* The ``django.contrib.flatpages`` app used to set custom HTTP headers for
+  debugging purposes. This functionality was not documented and made caching
+  ineffective so it has been removed, along with its generic implementation,
+  previously available in ``django.core.xheaders``.
+
 Features deprecated in 1.6
 ==========================
 
