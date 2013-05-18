@@ -1444,6 +1444,48 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
   because ``title`` field should be unique.
 
 
+create_or_update
+~~~~~~~~~~~~~~~~
+
+.. method:: create_or_update(**kwargs)
+
+A convenience method for updating an object with the given kwargs, creating
+new one if necessary.
+
+Returns a tuple of ``(object, created)``, where ``object`` is the created or
+updated object and ``created`` is a boolean specifying whether a new object was
+created.
+
+The ``create_or_update`` method tries to fetch object from database based on passed
+keywords arguments, and then update fields passed in ``defaults`` dict on kwargs.
+
+For example::
+
+        Person.objects.create(
+            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
+        )
+        person, created = Person.objects.create_or_update(
+            first_name="John", last_name="Lennon", defaults={
+                "birthday": date(1940, 10, 10)
+            }
+        )
+
+After executing above code, created will be False, and person object would have updated
+value of their birthday.
+
+Second case is::
+
+        person, created = Person.create_or_update(
+            first_name="Django", second_name="Pony", defaults={
+                "birthday": date(1990, 10, 10)
+            }
+        )
+
+New person object will be created with values form both plain kwargs and defaults.
+
+For detailed description how names passed in kwargs are resolved see ``get_or_create`` documentation.
+
+
 bulk_create
 ~~~~~~~~~~~
 
@@ -1584,36 +1626,6 @@ earliest
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
-
-first
-~~~~~
-.. method:: first()
-
-.. versionadded:: 1.6
-
-Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key.
-
-Example::
-
-    p = Article.objects.order_by('title', 'pub_date').first()
-
-Note that ``first()`` is a convenience method, the following code sample is
-equivalent to the above example::
-
-    try:
-        p = Article.objects.order_by('title', 'pub_date')[0]
-    except IndexError:
-        p = None
-
-last
-~~~~
-.. method:: last()
-
-.. versionadded:: 1.6
-
-Works like  :meth:`first()`, but returns the last object in the queryset.
 
 aggregate
 ~~~~~~~~~
