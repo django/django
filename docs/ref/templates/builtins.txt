@@ -712,6 +712,11 @@ no variables at all), use the ``only`` option::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
+If the included template does not exist, a template error is raised. If
+you want to suppress this error, use the ``quiet`` option:"
+
+    {% include category_snippet quiet %}
+
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this

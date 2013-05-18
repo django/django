@@ -3,6 +3,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
+from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -122,52 +123,44 @@ class ExtendsNode(Node):
         # the same.
         return compiled_parent._render(context)
 
-class BaseIncludeNode(Node):
-    def __init__(self, *args, **kwargs):
-        self.extra_context = kwargs.pop('extra_context', {})
-        self.isolated_context = kwargs.pop('isolated_context', False)
-        super(BaseIncludeNode, self).__init__(*args, **kwargs)
+
+class IncludeNode(Node):
+
+    def __init__(self, template_name, resolve=False, **kwargs):
+        self.template_name = template_name
+        self.resolve = resolve
+        self.with_context = kwargs.pop("with", {})
+        self.isolate = kwargs.pop("only", False)
+        self.quiet = kwargs.pop("quiet", False)
+
+    def render(self, context):
+        template_name = self.template_name
+
+        if self.resolve:
+            template_name = template_name.resolve(context)
+
+        try:
+            template = get_template(template_name)
+        except TemplateDoesNotExist:
+            if self.quiet:
+                return ""
+            else:
+                raise
+
+        return self.render_template(template, context)
 
     def render_template(self, template, context):
         values = dict([(name, var.resolve(context)) for name, var
-                       in six.iteritems(self.extra_context)])
-        if self.isolated_context:
+           in self.with_context.iteritems()])
+
+        if self.isolate:
             return template.render(context.new(values))
+
         context.update(values)
         output = template.render(context)
         context.pop()
         return output
 
-class ConstantIncludeNode(BaseIncludeNode):
-    def __init__(self, template_path, *args, **kwargs):
-        super(ConstantIncludeNode, self).__init__(*args, **kwargs)
-        try:
-            t = get_template(template_path)
-            self.template = t
-        except:
-            if settings.TEMPLATE_DEBUG:
-                raise
-            self.template = None
-
-    def render(self, context):
-        if not self.template:
-            return ''
-        return self.render_template(self.template, context)
-
-class IncludeNode(BaseIncludeNode):
-    def __init__(self, template_name, *args, **kwargs):
-        super(IncludeNode, self).__init__(*args, **kwargs)
-        self.template_name = template_name
-
-    def render(self, context):
-        try:
-            template_name = self.template_name.resolve(context)
-            template = get_template(template_name)
-            return self.render_template(template, context)
-        except:
-            if settings.TEMPLATE_DEBUG:
-                raise
-            return ''
 
 @register.tag('block')
 def do_block(parser, token):
@@ -217,7 +210,7 @@ def do_extends(parser, token):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
     return ExtendsNode(nodelist, parent_name)
 
-@register.tag('include')
+@register.tag("include")
 def do_include(parser, token):
     """
     Loads a template and renders it with the current context. You can pass
@@ -236,30 +229,45 @@ def do_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("%r tag takes at least one argument: the name of the template to be included." % bits[0])
+        raise TemplateSyntaxError(
+            "%r tag takes at least one argument: the name of the template to be included." % bits[0]
+        )
+
     options = {}
     remaining_bits = bits[2:]
     while remaining_bits:
         option = remaining_bits.pop(0)
         if option in options:
-            raise TemplateSyntaxError('The %r option was specified more '
-                                      'than once.' % option)
-        if option == 'with':
+            raise TemplateSyntaxError(
+                "The %r option was specified more than once." % option
+            )
+
+        if option == "with":
             value = token_kwargs(remaining_bits, parser, support_legacy=False)
             if not value:
-                raise TemplateSyntaxError('"with" in %r tag needs at least '
-                                          'one keyword argument.' % bits[0])
-        elif option == 'only':
+                raise TemplateSyntaxError('"with" in %r tag needs at least one keyword argument.' % bits[0])
+        elif option == "only":
+            value = True
+        elif option == "quiet":
             value = True
         else:
-            raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
-                                      (bits[0], option))
-        options[option] = value
-    isolated_context = options.get('only', False)
-    namemap = options.get('with', {})
-    path = bits[1]
-    if path[0] in ('"', "'") and path[-1] == path[0]:
-        return ConstantIncludeNode(path[1:-1], extra_context=namemap,
-                                   isolated_context=isolated_context)
-    return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
-                       isolated_context=isolated_context)
+            raise TemplateSyntaxError("Unknown argument for %r tag: %r." % (bits[0], option))
+        options[str(option)] = value
+
+    options.setdefault("only", False)
+    options.setdefault("quiet", False)
+    options.setdefault("with", {})
+
+    template_name = bits[1]
+    if is_quoted(template_name):
+        resolve = False
+        template_name = template_name[1:-1]
+    else:
+        resolve = True
+        template_name = parser.compile_filter(template_name)
+
+    return IncludeNode(template_name, resolve=resolve, **options)
+
+
+def is_quoted(value):
+    return value[0] in ('"', "'") and value[-1] == value[0]

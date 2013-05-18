@@ -1107,44 +1107,6 @@ class Templates(TestCase):
             'ifnotequal03': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
             'ifnotequal04': ("{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"),
 
-            ## INCLUDE TAG ###########################################################
-            'include01': ('{% include "basic-syntax01" %}', {}, "something cool"),
-            'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
-            'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
-            'include04': ('a{% include "nonexistent" %}b', {}, ("ab", "ab", template.TemplateDoesNotExist)),
-            'include 05': ('template with a space', {}, 'template with a space'),
-            'include06': ('{% include "include 05"%}', {}, 'template with a space'),
-
-            # extra inline context
-            'include07': ('{% include "basic-syntax02" with headline="Inline" %}', {'headline': 'Included'}, 'Inline'),
-            'include08': ('{% include headline with headline="Dynamic" %}', {'headline': 'basic-syntax02'}, 'Dynamic'),
-            'include09': ('{{ first }}--{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}--{{ second }}', {'first': 'Ul', 'second': 'lU'}, 'Ul--LU --- UL--lU'),
-
-            # isolated context
-            'include10': ('{% include "basic-syntax03" only %}', {'first': '1'}, (' --- ', 'INVALID --- INVALID')),
-            'include11': ('{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, (' --- 2', 'INVALID --- 2')),
-            'include12': ('{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, ('1 --- ', '1 --- INVALID')),
-
-            # autoescape context
-            'include13': ('{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ('& --- ', '& --- INVALID')),
-            'include14': ('{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ('& --- ', '& --- INVALID')),
-
-            'include-error01': ('{% include "basic-syntax01" with %}', {}, template.TemplateSyntaxError),
-            'include-error02': ('{% include "basic-syntax01" with "no key" %}', {}, template.TemplateSyntaxError),
-            'include-error03': ('{% include "basic-syntax01" with dotted.arg="error" %}', {}, template.TemplateSyntaxError),
-            'include-error04': ('{% include "basic-syntax01" something_random %}', {}, template.TemplateSyntaxError),
-            'include-error05': ('{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, template.TemplateSyntaxError),
-            'include-error06': ('{% include "basic-syntax01" only only %}', {}, template.TemplateSyntaxError),
-
-            ### INCLUSION ERROR REPORTING #############################################
-            'include-fail1': ('{% load bad_tag %}{% badtag %}', {}, RuntimeError),
-            'include-fail2': ('{% load broken_tag %}', {}, template.TemplateSyntaxError),
-            'include-error07': ('{% include "include-fail1" %}', {}, ('', '', RuntimeError)),
-            'include-error08': ('{% include "include-fail2" %}', {}, ('', '', template.TemplateSyntaxError)),
-            'include-error09': ('{% include failed_include %}', {'failed_include': 'include-fail1'}, ('', '', RuntimeError)),
-            'include-error10': ('{% include failed_include %}', {'failed_include': 'include-fail2'}, ('', '', template.TemplateSyntaxError)),
-
-
             ### NAMED ENDBLOCKS #######################################################
 
             # Basic test
@@ -1815,3 +1777,179 @@ class RequestContextTests(unittest.TestCase):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
+
+
+class IncludeTagTest(TestCase):
+
+    def setUp(self):
+        setup_test_template_loader({
+            "basic.html": "Basic",
+            "headline.html": "{{ headline }}",
+            "has space.html": "Spaced",
+            "onetwo.html": "{{ first }}-{{ second }}",
+            "recursive.html": "{% for item in items %}{{ item.label }}{% if not item.children|length_is:0 %}{% with item.children as items %}({% include 'recursive.html' %}){% endwith %}{% endif %}{% endfor %}",
+            "badtag.html": "{% load bad_tag %}{% badtag %}",
+            "brokentag.html": "{% load broken_tag %}",
+        })
+
+    def tearDown(self):
+        restore_template_loaders()
+
+    def test_include(self):
+        t = Template("{% include 'basic.html' %}")
+        c = Context()
+        output = t.render(c)
+        self.assertEqual(output, "Basic")
+
+    def test_context(self):
+        t = Template("{% include 'headline.html' %}")
+        c = Context(dict(headline="Headline"))
+        output = t.render(c)
+        self.assertEqual(output, "Headline")
+
+    def test_include_variable(self):
+        t = Template("{% include template_name %}")
+        c = Context(dict(template_name="basic.html"))
+        output = t.render(c)
+        self.assertEqual(output, "Basic")
+
+    def test_does_not_exist(self):
+        t = Template("{% include 'the-ether.html' %}")
+        c = Context()
+        with self.assertRaises(template.TemplateDoesNotExist):
+            t.render(c)
+
+    def test_suppress_does_not_exist(self):
+        t = Template("{% include 'the-ether.html' quiet %}")
+        c = Context()
+        output = t.render(c)
+        self.assertEqual(output, "")
+
+    def test_assign_quiet(self):
+        t = Template("{% include 'the-ether.html' with quiet='2' quiet%}")
+        c = Context()
+        output = t.render(c)
+        self.assertEqual(output, "")
+
+    def test_does_not_exist_not_run(self):
+        t = Template("{% if false %}{% include 'the-ether.html' %}{% endif %}")
+        c = Context(dict(false=False))
+        self.assertEqual(t.render(c), "")
+
+    def test_recursive_include(self):
+        t = loader.get_template("recursive.html")
+        c = Context({
+            'items': [ 
+                {'label': 1, 'children': [ 
+                    {'label': 2, 'children': [ 
+                        {'label': 3, 'children': []}, 
+                        {'label': 4, 'children': []}, 
+                    ]}, 
+                ]},
+            ]}
+        )
+        self.assertEqual(t.render(c), "1(2(34))")
+
+    def test_with_space(self):
+        t = Template("{% include 'has space.html' %}")
+        c = Context()
+        output = t.render(c)
+        self.assertEqual(output, "Spaced")
+
+    def test_inline_context(self):
+        t = Template("{% include 'headline.html' with headline='Inline' %}")
+        c = Context()
+        output = t.render(c)
+        self.assertEqual(output, "Inline")
+
+        t = Template("{% include headline with headline='Dynamic' %}")
+        c = Context(dict(headline="headline.html"))
+        output = t.render(c)
+        self.assertEqual(output, "Dynamic")
+
+        t = Template("{{ headline }} {% include 'headline.html' with headline=headline|upper %}")
+        c = Context(dict(headline="Headline"))
+        output = t.render(c)
+        self.assertEqual(output, "Headline HEADLINE")
+
+    def test_isolated_context(self):
+        t = Template("{% include 'headline.html' only %}")
+        c = Context(dict(headline="Headline"))
+        output = t.render(c)
+        self.assertEqual(output, "")
+
+        t = Template("{% include 'onetwo.html' only with first='Inline' %}")
+        c = Context(dict(
+            first="First",
+            second="Second",
+        ))
+        output = t.render(c)
+        self.assertEqual(output, "Inline-")
+
+        t = Template("{% include 'onetwo.html' with first='Inline' only %}")
+        c = Context(dict(
+            first="First",
+            second="Second",
+        ))
+        output = t.render(c)
+        self.assertEqual(output, "Inline-")
+
+    def test_autoescape_context(self):
+        t = Template("{% autoescape off %}{% include 'onetwo.html' %}{% endautoescape %}")
+        c = Context(dict(
+            first="&",
+        ))
+        output = t.render(c)
+        self.assertEqual(output, "&-")
+
+        t = Template("{% autoescape off %}{% include 'onetwo.html' with first=var1 only %}{% endautoescape %}")
+        c = Context(dict(var1="&"))
+        output = t.render(c)
+        self.assertEqual(output, "&-")
+
+    def test_errors(self):
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+            '"with" in u*\'include\' tag needs at least one keyword argument.'):
+            Template("{% include 'onetwo.html' with %}")
+
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+            '"with" in u*\'include\' tag needs at least one keyword argument.'):
+            Template("{% include 'onetwo.html' with 'no key' %}")
+
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+            '"with" in u*\'include\' tag needs at least one keyword argument.'):
+            Template("{% include 'onetwo.html' with dotted.arg='error' %}")
+
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+            '"with" in u*\'include\' tag needs at least one keyword argument.'):
+            Template("{% include 'onetwo.html' with something_random %}")
+
+    def test_duplicate_args(self):
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+                'The u*\'only\' option was specified more than once.'):
+            Template("{% include 'onetwo.html' with x=1 only only %}")
+
+        with self.assertRaisesRegexp(template.TemplateSyntaxError,
+                'The u*\'quiet\' option was specified more than once.'):
+            Template("{% include 'onetwo.html' with x=1 quiet quiet %}")
+
+    def test_bad_tags(self):
+        with self.assertRaises(RuntimeError):
+            t = Template("{% include 'badtag.html' %}")
+            t.render(Context({}))
+
+        with self.assertRaises(RuntimeError):
+            t = Template("{% include badtag %}")
+            t.render(Context(dict(
+                badtag="badtag.html",
+            )))
+
+        with self.assertRaises(template.TemplateSyntaxError):
+            t = Template("{% include 'brokentag.html' %}")
+            t.render(Context({}))
+
+        with self.assertRaises(template.TemplateSyntaxError):
+            t = Template("{% include brokentag %}")
+            t.render(Context(dict(
+                brokentag="brokentag.html",
+            )))
