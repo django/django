@@ -44,9 +44,9 @@ class TimesinceTests(unittest.TestCase):
     def test_multiple_units(self):
         """ Test multiple units. """
         self.assertEqual(timesince(self.t,
-            self.t+2*self.oneday+6*self.onehour), '2 days, 6 hours')
+            self.t+2*self.oneday+6*self.onehour), '2\xa0days, 6\xa0hours')
         self.assertEqual(timesince(self.t,
-            self.t+2*self.oneweek+2*self.oneday), '2 weeks, 2 days')
+            self.t+2*self.oneweek+2*self.oneday), '2\xa0weeks, 2\xa0days')
 
     def test_display_first_unit(self):
         """
