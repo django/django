@@ -1233,8 +1233,8 @@ def is_library_missing(name):
     Non-existing condition is checked recursively for each subpackage in cases
     like <appdir>/templatetags/subpackage/package/module.py.
     """
-    # Don't bother to check if '.' is in name since any name will be prefixed
-    # with some template root.
+    if not '.' in name:
+        return True
     path, module = name.rsplit('.', 1)
     try:
         package = import_module(path)
@@ -1261,12 +1261,8 @@ def import_library(taglib_module):
         else:
             raise InvalidTemplateLibrary("ImportError raised loading %s: %s" %
                                          (taglib_module, e))
-    try:
+    if hasattr(mod, 'register'):
         return mod.register
-    except AttributeError:
-        raise InvalidTemplateLibrary("Template library %s does not have "
-                                     "a variable named 'register'" %
-                                     taglib_module)
 
 templatetags_modules = []
 
@@ -1305,22 +1301,28 @@ def get_library(library_name):
     the cached module from libraries.
     """
     lib = libraries.get(library_name, None)
-    if not lib:
-        templatetags_modules = get_templatetags_modules()
-        tried_modules = []
-        for module in templatetags_modules:
-            taglib_module = '%s.%s' % (module, library_name)
-            tried_modules.append(taglib_module)
-            lib = import_library(taglib_module)
-            if lib:
-                libraries[library_name] = lib
-                break
-        if not lib:
-            raise InvalidTemplateLibrary("Template library %s not found, "
-                                         "tried %s" %
-                                         (library_name,
-                                          ','.join(tried_modules)))
-    return lib
+    if lib:
+        return lib
+    tried_modules = []
+    # first try the fully qualified module path
+    tried_modules.append(library_name)
+    lib = import_library(library_name)
+    if lib:
+        libraries[library_name] = lib
+        return lib
+    # then search inside installed apps
+    templatetags_modules = get_templatetags_modules()
+    for module in templatetags_modules:
+        taglib_module = '%s.%s' % (module, library_name)
+        tried_modules.append(taglib_module)
+        lib = import_library(taglib_module)
+        if lib:
+            libraries[library_name] = lib
+            return lib
+    raise InvalidTemplateLibrary("Template library %s not found, "
+                                 "tried %s" %
+                                 (library_name,
+                                  ','.join(tried_modules)))
 
 
 def add_to_builtins(module):
