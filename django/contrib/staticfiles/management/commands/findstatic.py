@@ -20,6 +20,18 @@ class Command(LabelCommand):
         verbosity = int(options.get('verbosity', 1))
         result = finders.find(path, all=options['all'])
         path = force_text(path)
+        locations = []
+
+        if isinstance(result, dict):
+            locations = result.pop('locations')
+            result = result.pop('matches')
+
+        if verbosity == 2:
+            if locations:
+                locations_paths = "\n  ".join(locations)
+                locations_msg = "Looking in following locations:\n  {0}".format(
+                    locations_paths)
+                self.stdout.write(locations_msg)
         if result:
             if not isinstance(result, (list, tuple)):
                 result = [result]
