@@ -145,21 +145,21 @@ class ModelTest(TestCase):
         # lookup matches more than one object
         six.assertRaisesRegex(self,
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
+            "get\(\) returned more than one Article!",
             Article.objects.get,
             headline__startswith='Area',
         )
 
         six.assertRaisesRegex(self,
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
+            "get\(\) returned more than one Article!",
             Article.objects.get,
             pub_date__year=2005,
         )
 
         six.assertRaisesRegex(self,
             MultipleObjectsReturned,
-            "get\(\) returned more than one Article -- it returned 2!",
+            "get\(\) returned more than one Article!",
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=7,
