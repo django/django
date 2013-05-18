@@ -92,6 +92,41 @@ class OverrideCleanTests(TestCase):
         self.assertEqual(form.instance.left, 1)
 
 
+
+class PartiallyLocalizedTripleForm(forms.ModelForm):
+    class Meta:
+        model = Triple
+        localized_fields = ('left', 'right',)
+
+
+class FullyLocalizedTripleForm(forms.ModelForm):
+    class Meta:
+        model = Triple
+        localized_fields = "__all__"
+
+class LocalizedModelFormTest(TestCase):
+    def test_model_form_applies_localize_to_some_fields(self):
+        f = PartiallyLocalizedTripleForm({'left': 10, 'middle': 10, 'right': 10})
+        self.assertTrue(f.is_valid())
+        self.assertTrue(f.fields['left'].localize)
+        self.assertFalse(f.fields['middle'].localize)
+        self.assertTrue(f.fields['right'].localize)
+
+    def test_model_form_applies_localize_to_all_fields(self):
+        f = FullyLocalizedTripleForm({'left': 10, 'middle': 10, 'right': 10})
+        self.assertTrue(f.is_valid())
+        self.assertTrue(f.fields['left'].localize)
+        self.assertTrue(f.fields['middle'].localize)
+        self.assertTrue(f.fields['right'].localize)
+
+    def test_model_form_refuses_arbitrary_string(self):
+        with self.assertRaises(TypeError):
+            class BrokenLocalizedTripleForm(forms.ModelForm):
+                class Meta:
+                    model = Triple
+                    localized_fields = "foo"
+
+
 # Regression test for #12960.
 # Make sure the cleaned_data returned from ModelForm.clean() is applied to the
 # model instance.
