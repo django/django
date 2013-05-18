@@ -22,6 +22,8 @@ __all__ = (
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 
+WARN_OVERRIDE_SETTINGS = {'DATABASES', 'CACHES'}
+
 
 class Approximate(object):
     def __init__(self, val, places=7):
@@ -195,6 +197,10 @@ class override_settings(object):
     def __init__(self, **kwargs):
         self.options = kwargs
         self.wrapped = settings._wrapped
+
+        warn_settings = WARN_OVERRIDE_SETTINGS.intersection(self.options.keys())
+        if warn_settings:
+            warnings.warn("Overriding setting %s can lead to unexpected behaviour." % ', '.join(warn_settings))
 
     def __enter__(self):
         self.enable()
