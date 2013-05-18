@@ -136,12 +136,6 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        """
-        Returns context data.
-        """
-        return super(ModelFormMixin, self).get_context_data(**{}.update(kwargs))
-
 
 class ProcessFormView(View):
     """
