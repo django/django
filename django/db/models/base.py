@@ -419,11 +419,8 @@ class Model(six.with_metaclass(ModelBase)):
         signals.post_init.send(sender=self.__class__, instance=self)
 
     def __repr__(self):
-        try:
-            u = six.text_type(self)
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            u = '[Bad Unicode data]'
-        return force_str('<%s: %s>' % (self.__class__.__name__, u))
+        return force_str('%s(%s=%r)' % (
+            self.__class__.__name__, self._meta.pk.attname, self._get_pk_val()))
 
     def __str__(self):
         if not six.PY3 and hasattr(self, '__unicode__'):
