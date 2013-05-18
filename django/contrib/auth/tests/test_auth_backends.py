@@ -2,12 +2,14 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.test_custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
+from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -402,3 +404,52 @@ class PermissionDeniedBackendTest(TestCase):
             settings.AUTHENTICATION_BACKENDS) + (backend, ))
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
+
+class NewModelBackend(ModelBackend):
+    pass
+
+
+@skipIfCustomUser
+class ChangedBackendSettingsTest(TestCase):
+    """
+    Tests for changes in the settings.AUTHENTICATION_BACKENDS
+    """
+    backend = 'django.contrib.auth.tests.test_auth_backends.NewModelBackend'
+
+    TEST_USERNAME = 'test_user'
+    TEST_PASSWORD = 'test_password'
+    TEST_EMAIL = 'test@example.com'
+
+    def setUp(self):
+        User.objects.create_user(self.TEST_USERNAME,
+                                 self.TEST_EMAIL,
+                                 self.TEST_PASSWORD)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    def test_changed_backend_settings(self):
+        """
+        Tests that removing a backend configured in AUTHENTICATION_BACKENDS
+        make already logged-in users disconnect.
+        """
+
+        # Get a session for the test user
+        self.assertTrue(self.client.login(
+            username=self.TEST_USERNAME,
+            password=self.TEST_PASSWORD)
+        )
+
+        # Prepare a request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        # Remove NewModelBackend
+        with self.settings(AUTHENTICATION_BACKENDS=(
+                'django.contrib.auth.backends.ModelBackend',)):
+            # Get the user from the request
+            user = get_user(request)
+
+            # Assert that the user retrieval is successful and the user is
+            # anonymous as the backend is not longer available.
+            self.assertIsNotNone(user)
+            self.assertTrue(user.is_anonymous())

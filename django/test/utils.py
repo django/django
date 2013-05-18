@@ -1,4 +1,5 @@
 import re
+import sys
 import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
@@ -380,3 +381,23 @@ class CaptureQueriesContext(object):
         if exc_type is not None:
             return
         self.final_queries = len(self.connection.queries)
+
+
+class IgnoreDeprecationWarningsMixin(object):
+
+    warning_class = DeprecationWarning
+
+    def setUp(self):
+        super(IgnoreDeprecationWarningsMixin, self).setUp()
+        self.catch_warnings = warnings.catch_warnings()
+        self.catch_warnings.__enter__()
+        warnings.filterwarnings("ignore", category=self.warning_class)
+
+    def tearDown(self):
+        self.catch_warnings.__exit__(*sys.exc_info())
+        super(IgnoreDeprecationWarningsMixin, self).tearDown()
+
+
+class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
+
+        warning_class = PendingDeprecationWarning

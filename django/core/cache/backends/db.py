@@ -9,7 +9,7 @@ except ImportError:
     import pickle
 
 from django.conf import settings
-from django.core.cache.backends.base import BaseCache
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.db import connections, transaction, router, DatabaseError
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
@@ -65,6 +65,7 @@ class DatabaseCache(BaseDatabaseCache):
         if row is None:
             return default
         now = timezone.now()
+
         if row[2] < now:
             db = router.db_for_write(self.cache_model_class)
             cursor = connections[db].cursor()
@@ -74,18 +75,18 @@ class DatabaseCache(BaseDatabaseCache):
         value = connections[db].ops.process_clob(row[1])
         return pickle.loads(base64.b64decode(force_bytes(value)))
 
-    def set(self, key, value, timeout=None, version=None):
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         self._base_set('set', key, value, timeout)
 
-    def add(self, key, value, timeout=None, version=None):
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         return self._base_set('add', key, value, timeout)
 
-    def _base_set(self, mode, key, value, timeout=None):
-        if timeout is None:
+    def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
+        if timeout == DEFAULT_TIMEOUT:
             timeout = self.default_timeout
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
@@ -95,7 +96,9 @@ class DatabaseCache(BaseDatabaseCache):
         num = cursor.fetchone()[0]
         now = timezone.now()
         now = now.replace(microsecond=0)
-        if settings.USE_TZ:
+        if timeout is None:
+            exp = datetime.max
+        elif settings.USE_TZ:
             exp = datetime.utcfromtimestamp(time.time() + timeout)
         else:
             exp = datetime.fromtimestamp(time.time() + timeout)

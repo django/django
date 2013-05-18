@@ -234,11 +234,14 @@ Minor features
 .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 .. _`PIL`: https://pypi.python.org/pypi/PIL
 
+* :doc:`ModelForm </topics/forms/modelforms/>` accepts a new
+  Meta option: ``localized_fields``. Fields included in this list will be localized
+  (by setting ``localize`` on the form field).
+
 * ``truncatechars_html`` template filter. This new filter truncates a string
   to be no longer than the specified number of characters, taking HTML into
   account. Truncated strings end with a translatable ellipsis sequence ("...").
   See the documentation for :tfilter:`truncatechars_html` for more details.
-
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -486,6 +489,12 @@ Miscellaneous
   field documentation for details about the names of the placeholders. The
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
+
+* There have been changes in the way timeouts are handled in cache backends.
+  Explicitly passing in ``timeout=None`` no longer results in using the
+  default timeout. It will now set a non-expiring timeout. Passing 0 into the
+  memcache backend no longer uses the default timeout, and now will
+  set-and-expire-immediately the value.
 
 Features deprecated in 1.6
 ==========================
