@@ -200,6 +200,10 @@ class Field(object):
 
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        if min_length is not None:
+            min_length = int(min_length)
+        if max_length is not None:
+            max_length = int(max_length)
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:

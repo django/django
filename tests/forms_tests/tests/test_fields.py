@@ -125,6 +125,20 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_min_length_not_int(self):
+        """
+        Ensure that CharField.min_length always returns an integer.
+        Refs #20440
+        """
+        self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'a'", CharField, min_length='a')
+
+    def test_charfield_max_length_not_int(self):
+        """
+        Ensure that CharField.max_length always returns an integer.
+        Refs #20440
+        """
+        self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'a'", CharField, max_length='a')
+
     def test_charfield_widget_attrs(self):
         """
         Ensure that CharField.widget_attrs() always returns a dictionary.
