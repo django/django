@@ -30,6 +30,12 @@ class ProjectState(object):
                 model.render(self.app_cache)
         return self.app_cache
 
+    @classmethod
+    def from_app_cache(cls, app_cache):
+        "Takes in an AppCache and returns a ProjectState matching it"
+        for model in app_cache.get_models():
+            print model
+
 
 class ModelState(object):
     """

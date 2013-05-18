@@ -61,38 +61,19 @@ class BaseDatabaseSchemaEditor(object):
 
     # State-managing methods
 
-    def start(self):
-        """
-        Marks the start of a schema-altering run.
-        """
-        self.deferred_sql = []
-        atomic(self.connection.alias).__enter__()
-
-    def commit(self):
-        """
-        Finishes a schema-altering run.
-        """
-        for sql in self.deferred_sql:
-            self.execute(sql)
-        atomic(self.connection.alias).__exit__(None, None, None)
-
-    def rollback(self):
-        """
-        Tries to roll back a schema-altering run. Call instead of commit().
-        """
-        if not self.connection.features.can_rollback_ddl:
-            raise RuntimeError("Cannot rollback schema changes on this backend")
-        atomic(self.connection.alias).__exit__(*sys.exc_info())
-
     def __enter__(self):
-        self.start()
+        self.deferred_sql = []
+        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__enter__()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
-            self.commit()
+            for sql in self.deferred_sql:
+                self.execute(sql)
+            atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(None, None, None)
         else:
-            self.rollback()
+            # Continue propagating exception
+            return None
 
     # Core utility functions
 
