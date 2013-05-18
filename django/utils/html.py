@@ -285,6 +285,6 @@ clean_html = allow_lazy(clean_html, six.text_type)
 def avoid_wrapping(value):
     """
     Avoid text wrapping in the middle of a phrase by adding non-breaking
-    spaces were there previously where normal spaces.
+    spaces where there previously were normal spaces.
     """
     return value.replace(" ", "\xa0")
