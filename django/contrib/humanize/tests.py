@@ -45,7 +45,7 @@ class HumanizeTests(TestCase):
             self.assertEqual(rendered, escape(result),
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
 
-    def test_ordinal(self):
+    def test_ordinal_en(self):
         test_list = ('1', '2', '3', '4', '11', '12',
                      '13', '101', '102', '103', '111',
                      'something else', None)
@@ -54,6 +54,15 @@ class HumanizeTests(TestCase):
                        '111th', 'something else', None)
 
         with translation.override('en'):
+            self.humanize_tester(test_list, result_list, 'ordinal')
+
+    def test_ordinal_sv(self):
+        test_list = ('1', '2', '3', '4', '11', '12', '101',
+                     'something else', None)
+        result_list = ('1:a', '2:a', '3:e', '4:e', '11:e', '12:e', '101:a',
+                       'something else', None)
+
+        with translation.override('sv'):
             self.humanize_tester(test_list, result_list, 'ordinal')
 
     def test_intcomma(self):
