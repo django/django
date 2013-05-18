@@ -843,13 +843,17 @@ class TestCase(TransactionTestCase):
 
         for db in self._databases_names(include_mirrors=False):
             if hasattr(self, 'fixtures'):
-                call_command('loaddata', *self.fixtures,
-                             **{
-                                'verbosity': 0,
-                                'commit': False,
-                                'database': db,
-                                'skip_validation': True,
-                             })
+                try:
+                    call_command('loaddata', *self.fixtures,
+                                 **{
+                                    'verbosity': 0,
+                                    'commit': False,
+                                    'database': db,
+                                    'skip_validation': True,
+                                 })
+                except Exception:
+                    self._fixture_teardown()
+                    raise
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
