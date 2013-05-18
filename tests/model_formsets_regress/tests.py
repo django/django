@@ -273,6 +273,7 @@ class UserSiteForm(forms.ModelForm):
             'id': CustomWidget,
             'data': CustomWidget,
         }
+        localized_fields = ('data',)
 
 
 class Callback(object):
@@ -297,19 +298,23 @@ class FormfieldCallbackTests(TestCase):
         form = Formset().forms[0]
         self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
+        self.assertFalse(form.fields['id'].localize)
+        self.assertTrue(form.fields['data'].localize)
 
     def test_modelformset_factory_default(self):
         Formset = modelformset_factory(UserSite, form=UserSiteForm)
         form = Formset().forms[0]
         self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
         self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
+        self.assertFalse(form.fields['id'].localize)
+        self.assertTrue(form.fields['data'].localize)
 
     def assertCallbackCalled(self, callback):
         id_field, user_field, data_field = UserSite._meta.fields
         expected_log = [
             (id_field, {'widget': CustomWidget}),
             (user_field, {}),
-            (data_field, {'widget': CustomWidget}),
+            (data_field, {'widget': CustomWidget, 'localize': True}),
         ]
         self.assertEqual(callback.log, expected_log)
 
