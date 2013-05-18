@@ -532,13 +532,13 @@ class RequestsTests(SimpleTestCase):
         # There are cases in which the multipart data is related instead of
         # being a binary upload, in which case it should still be accessible
         # via body.
-        payload_data = "\r\n".join([
-                '--boundary',
-                'Content-ID: id; name="name"',
-                '',
-                'value',
-                '--boundary--'
-                ''])
+        payload_data = b"\r\n".join([
+                b'--boundary',
+                b'Content-ID: id; name="name"',
+                b'',
+                b'value',
+                b'--boundary--'
+                b''])
         payload = FakePayload(payload_data)
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/related; boundary=boundary',
