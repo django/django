@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import logging
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -353,3 +354,32 @@ class CsrfViewMiddlewareTest(TestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
+
+    def test_ensures_csrf_cookie_no_logging(self):
+        """
+        Tests to make sure that no logging output is generated using
+        the decorator. See ticket #19436.
+        """
+        class TestHandler(logging.Handler):
+            def __init__(self, *args, **kwargs):
+                self.has_logged = False
+                super(TestHandler, self).__init__(*args, **kwargs)
+
+            def emit(self, record):
+                self.has_logged = True
+
+        logger = logging.getLogger('django.request')
+        prev_log_level = logger.level
+        logger.setLevel(logging.WARNING)
+        test_handler = TestHandler()
+        logger.addHandler(test_handler)
+
+        @ensure_csrf_cookie
+        def view(request):
+            # Doesn't insert a token or anything
+            return HttpResponse(content="")
+
+        req = self._get_GET_no_csrf_cookie_request()
+        resp = view(req)
+        logger.setLevel(prev_log_level)
+        self.assertFalse(test_handler.has_logged)
