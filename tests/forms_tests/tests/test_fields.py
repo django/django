@@ -130,14 +130,14 @@ class FieldsTests(SimpleTestCase):
         Ensure that setting min_length to something that is not a number returns an exception.
         Refs #20440
         """
-        self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'a'", CharField, min_length='a')
+        self.assertRaises(ValueError, CharField, min_length='a')
 
     def test_charfield_max_length_not_int(self):
         """
         Ensure that setting max_length to something that is not a number returns an exception.
         Refs #20440
         """
-        self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'a'", CharField, max_length='a')
+        self.assertRaises(ValueError, CharField, max_length='a')
 
     def test_charfield_widget_attrs(self):
         """
