@@ -200,17 +200,17 @@ class HumanizeTests(TestCase):
             '2 minutes ago',
             'an hour ago',
             '23 hours ago',
-            '1\xa0day ago',
-            '1\xa0year, 4\xa0months ago',
+            '1 day ago',
+            '1 year, 4 months ago',
             'a second from now',
             '30 seconds from now',
             'a minute from now',
             '2 minutes from now',
             'an hour from now',
             '23 hours from now',
-            '1\xa0day from now',
-            '2\xa0days, 6\xa0hours from now',
-            '1\xa0year, 4\xa0months from now',
+            '1 day from now',
+            '2 days, 6 hours from now',
+            '1 year, 4 months from now',
             'now',
             'now',
         ]
@@ -218,8 +218,8 @@ class HumanizeTests(TestCase):
         # date in naive arithmetic is only 2 days and 5 hours after in
         # aware arithmetic.
         result_list_with_tz_support = result_list[:]
-        assert result_list_with_tz_support[-4] == '2\xa0days, 6\xa0hours from now'
-        result_list_with_tz_support[-4] == '2\xa0days, 5\xa0hours from now'
+        assert result_list_with_tz_support[-4] == '2 days, 6 hours from now'
+        result_list_with_tz_support[-4] == '2 days, 5 hours from now'
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
