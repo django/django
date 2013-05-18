@@ -36,7 +36,7 @@ class FileBasedCache(BaseCache):
             with open(fname, 'rb') as f:
                 exp = pickle.load(f)
                 now = time.time()
-                if 0 <= exp < now:
+                if exp is not None and exp < now:
                     self._delete(fname)
                 else:
                     return pickle.load(f)
@@ -63,7 +63,7 @@ class FileBasedCache(BaseCache):
             with open(fname, 'wb') as f:
                 now = time.time()
                 if timeout is None:
-                    pickle.dump(timeout, f, pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(None, f, pickle.HIGHEST_PROTOCOL)
                 else:
                     pickle.dump(now + timeout, f, pickle.HIGHEST_PROTOCOL)
 
