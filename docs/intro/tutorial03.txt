@@ -393,6 +393,9 @@ Now, let's tackle the poll detail view -- the page that displays the question
 for a given poll. Here's the view::
 
     from django.http import Http404
+    from django.shortcuts import render
+
+    from polls.models import Poll
     # ...
     def detail(request, poll_id):
         try:
@@ -420,6 +423,8 @@ and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
 provides a shortcut. Here's the ``detail()`` view, rewritten::
 
     from django.shortcuts import render, get_object_or_404
+
+    from polls.models import Poll
     # ...
     def detail(request, poll_id):
         poll = get_object_or_404(Poll, pk=poll_id)
