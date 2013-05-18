@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.utils.html import avoid_wrapping
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import ugettext, ungettext_lazy
 
@@ -40,18 +41,18 @@ def timesince(d, now=None, reversed=False):
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
-        return ugettext('0 minutes')
+        return avoid_wrapping(ugettext('0 minutes'))
     for i, (seconds, name) in enumerate(chunks):
         count = since // seconds
         if count != 0:
             break
-    result = name % count
+    result = avoid_wrapping(name % count)
     if i + 1 < len(chunks):
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
         count2 = (since - (seconds * count)) // seconds2
         if count2 != 0:
-            result += ugettext(', ') + name2 % count2
+            result += ugettext(', ') + avoid_wrapping(name2 % count2)
     return result
 
 def timeuntil(d, now=None):
