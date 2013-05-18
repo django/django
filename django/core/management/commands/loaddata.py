@@ -162,9 +162,14 @@ class Command(BaseCommand):
         else:
             fixture_dirs = app_fixtures + list(settings.FIXTURE_DIRS) + ['']
 
+        label_found = False
         for fixture_dir in fixture_dirs:
-            self.process_dir(fixture_dir, fixture_name, compression_formats,
-                             formats)
+            found = self.process_dir(fixture_dir, fixture_name,
+                compression_formats, formats)
+            label_found = label_found or found
+
+        if fixture_name != 'initial_data' and not label_found:
+            raise CommandError("No fixture named '%s' found." % fixture_name)
 
     def process_dir(self, fixture_dir, fixture_name, compression_formats,
                     serialization_formats):
@@ -242,3 +247,5 @@ class Command(BaseCommand):
                     raise CommandError(
                         "No fixture data found for '%s'. (File format may be invalid.)" %
                             (fixture_name))
+
+        return label_found

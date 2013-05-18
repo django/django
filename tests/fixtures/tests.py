@@ -137,8 +137,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Book: Music for all ages by Artist formerly known as "Prince" and Django Reinhardt>'
         ])
 
-        # Load a fixture that doesn't exist
-        management.call_command('loaddata', 'unknown.json', verbosity=0, commit=False)
+        # Loading a fixture that doesn't exist results in an error
+        with self.assertRaises(management.CommandError):
+            management.call_command('loaddata', 'unknown.json', verbosity=0,
+                commit=False)
+
+        # An attempt to load a nonexistent 'initial_data' fixture isn't an error
+        management.call_command('loaddata', 'initial_data.json', verbosity=0,
+            commit=False)
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -273,10 +279,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
-        self.assertQuerysetEqual(Article.objects.all(), [])
+        with self.assertRaises(management.CommandError):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
 
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
+        with self.assertRaises(management.CommandError):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):
