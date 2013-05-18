@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site, get_current_site
 from django.http import HttpRequest, Http404
@@ -14,6 +15,17 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class ConcreteModel(models.Model):
     name = models.CharField(max_length=10)
+
+
+class ContentZero(models.Model):
+    name = models.CharField(max_length=10)    
+
+
+class GenericItem(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey()
+
 
 class ProxyModel(ConcreteModel):
     class Meta:
@@ -274,3 +286,20 @@ class ContentTypesTests(TestCase):
             model = 'OldModel',
         )
         self.assertEqual(six.text_type(ct), 'Old model')
+
+    def test_content_type_zero(self):
+        """
+        GenericForeignKey should work with ContentType ID 0 (see #13137)
+        Update ContentZero to be content type ID 0...
+        """
+
+        ContentType.objects.filter(app_label='contenttypes', model='contentzero').update(id=0)
+        ContentType.objects.clear_cache()
+        content_zero_ct = ContentType.objects.get_for_model(ContentZero)
+        self.assertEqual(content_zero_ct.id, 0)
+
+        # Make sure we can get there through a generic relationship...
+        object_zero = ContentZero.objects.create(name="zero")
+        generic_item = GenericItem.objects.create(content_object=object_zero)
+        fetch_item = GenericItem.objects.get(id=generic_item.id)
+        self.assertEqual(fetch_item.content_object, object_zero)
