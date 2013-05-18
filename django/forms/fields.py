@@ -670,6 +670,10 @@ class URLField(CharField):
             value = urlunsplit(url_fields)
         return value
 
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(URLField, self).clean(value)
+
 
 class BooleanField(Field):
     widget = CheckboxInput
@@ -1105,3 +1109,7 @@ class GenericIPAddressField(CharField):
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
+
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(SlugField, self).clean(value)
