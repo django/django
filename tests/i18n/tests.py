@@ -30,7 +30,8 @@ from django.utils.translation import (activate, deactivate,
     ngettext, ngettext_lazy,
     ungettext, ungettext_lazy,
     pgettext, pgettext_lazy,
-    npgettext, npgettext_lazy)
+    npgettext, npgettext_lazy,
+    check_for_language)
 
 from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
 if can_run_extraction_tests:
@@ -1114,3 +1115,40 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Oui/Non")
         response = self.client.get('/en/streaming/')
         self.assertContains(response, "Yes/No")
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=(
+        ('bg', 'Bulgarian'),
+        ('en-us', 'English'),
+    ),
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ),
+)
+class CountrySpecificLanguageTests(TestCase):
+
+    urls = 'i18n.urls'
+
+    def setUp(self):
+        trans_real._accepted = {}
+        self.rf = RequestFactory()
+
+    def test_check_for_language(self):
+        self.assertTrue(check_for_language('en'))
+        self.assertTrue(check_for_language('en-us'))
+        self.assertTrue(check_for_language('en-US'))
+
+
+    def test_get_language_from_request(self):
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('en-us', lang)
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('bg', lang)
