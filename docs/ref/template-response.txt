@@ -215,6 +215,7 @@ re-rendered, you can re-evaluate the rendered content, and assign
 the content of the response manually::
 
     # Set up a rendered TemplateResponse
+    >>> from django.template.response import TemplateResponse
     >>> t = TemplateResponse(request, 'original.html', {})
     >>> t.render()
     >>> print(t.content)
@@ -255,6 +256,8 @@ rendered content will be available.
 To define a post-render callback, just define a function that takes
 a single argument -- response -- and register that function with
 the template response::
+
+    from django.template.response import TemplateResponse
 
     def my_render_callback(response):
         # Do content-sensitive processing

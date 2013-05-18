@@ -27,6 +27,8 @@ to deal with that file.
 Consider the following model, using an :class:`~django.db.models.ImageField` to
 store a photo::
 
+    from django.db import models
+
     class Car(models.Model):
         name = models.CharField(max_length=255)
         price = models.DecimalField(max_digits=5, decimal_places=2)

@@ -258,6 +258,7 @@ mixin.
 We can hook this into our URLs easily enough::
 
     # urls.py
+    from django.conf.urls import patterns, url
     from books.views import RecordInterest
 
     urlpatterns = patterns('',
@@ -440,6 +441,7 @@ Our new ``AuthorDetail`` looks like this::
     from django.core.urlresolvers import reverse
     from django.views.generic import DetailView
     from django.views.generic.edit import FormMixin
+    from books.models import Author
 
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
@@ -546,6 +548,8 @@ template as ``AuthorDisplay`` is using on ``GET``.
 
 .. code-block:: python
 
+    from django.core.urlresolvers import reverse
+    from django.http import HttpResponseForbidden
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
 
@@ -657,6 +661,8 @@ own version of :class:`~django.views.generic.detail.DetailView` by mixing
 :class:`~django.views.generic.detail.DetailView` before template
 rendering behavior has been mixed in)::
 
+    from django.views.generic.detail import BaseDetailView
+
     class JSONDetailView(JSONResponseMixin, BaseDetailView):
         pass
 
@@ -674,6 +680,8 @@ and override the implementation of
 :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 to defer to the appropriate subclass depending on the type of response that the
 user requested::
+
+    from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
     class HybridDetailView(JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView):
         def render_to_response(self, context):
