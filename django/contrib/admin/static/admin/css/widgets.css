@@ -25,9 +25,20 @@
     border: 1px solid #ccc;
 }
 
-.selector .selector-available h2 {
+.selector h2 span.help-tooltip {
+    display: inline-block;
+    padding-right: 16px;
+    background: url(../img/icon-unknown.gif) 100% 50% no-repeat transparent;
+}
+
+.selector .selector-available h2,
+.selector .selector-available h2 span {
     background: white url(../img/nav-bg.gif) bottom left repeat-x;
     color: #666;
+}
+
+.selector .selector-chosen h2 span {
+    color: white;
 }
 
 .selector .selector-filter {
@@ -44,7 +55,22 @@
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
     width: 16px;
+    height: 14px;
     padding: 2px;
+}
+
+.selector-filter label {
+    width: 16px;
+    overflow: hidden;
+    background: url(../img/icon_searchbox.png) 0% 50% no-repeat;
+    margin: 2px 2px 0 0;
+    float: left;
+}
+
+.selector-filter label span {
+    text-indent: 1000px;
+    white-space: nowrap;
+    display: block;
 }
 
 .selector .selector-available input {
@@ -576,3 +602,34 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
     border-top: 1px solid #ddd;
 }
 
+/* FOREIGN KEY */
+
+a.related-lookup {
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    background: url(../img/icon_searchbox.png) 0% 50% no-repeat;
+    margin: 0 5px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+a.add-another {
+    background: url(../img/icon_addlink.gif) 50% 50% no-repeat;
+    width: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin: 0 5px;
+    display: inline-block;
+}
+
+.field-groups a.add-another {
+    margin-top: 5px;
+}
+
+a.add-another span,
+a.related-lookup span {
+    text-indent: 100%;
+    white-space: nowrap;
+    display: block;
+}

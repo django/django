@@ -508,7 +508,7 @@ class AdminViewBasicTest(TestCase):
         # against the 'admin2' custom admin (which doesn't have the
         # Post model).
         response = self.client.get("/test_admin/admin/admin_views/post/")
-        self.assertContains(response, 'icon-unknown.gif')
+        self.assertContains(response, 'icon-boolean-unknown')
 
     def testI18NLanguageNonEnglishDefault(self):
         """

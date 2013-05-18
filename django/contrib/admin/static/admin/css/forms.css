@@ -362,3 +362,9 @@ body.popup .submit-row {
 .empty-form {
     display: none;
 }
+
+th span.help-tooltip {
+    display: inline-block;
+    padding-right: 16px;
+    background: url(../img/icon-unknown.gif) 100% 50% no-repeat transparent;
+}

@@ -100,8 +100,18 @@
     padding: 2px;
 }
 
-#changelist #changelist-search img {
-    vertical-align: middle;
+#changelist #changelist-search label {
+    width: 16px;
+    height: 24px;
+    margin-right: 2px;
+    overflow: hidden;
+    float: left;
+    background: url(../img/icon_searchbox.png) 50% 50% no-repeat;
+}
+
+#changelist #changelist-search label span {
+    text-indent: 5000px;
+    display: block;
 }
 
 /* FILTER COLUMN */
@@ -290,4 +300,31 @@
 #changelist .actions .button {
     font-size: 11px;
     padding: 1px 2px;
+}
+
+#changelist .icon-boolean-yes,
+#changelist .icon-boolean-no,
+#changelist .icon-booolean-unknown {
+    float: left;
+    width: 16px;
+    height: 16px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    vertical-align: middle;
+}
+#changelist .icon-boolean-yes span,
+#changelist .icon-boolean-no span,
+#changelist .icon-booolean-unknown span {
+    text-indent: 5000px;
+    display: block;
+}
+#changelist .icon-boolean-yes {
+    background-image: url(../img/icon-yes.gif);
+}
+#changelist .icon-boolean-no {
+    background-image: url(../img/icon-no.gif);
+}
+#changelist .icon-boolean-unknown {
+    background-image: url(../img/icon-unknown.gif);
 }

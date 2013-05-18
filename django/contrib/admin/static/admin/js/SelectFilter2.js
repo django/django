@@ -42,15 +42,16 @@ window.SelectFilter = {
         // <div class="selector-available">
         var selector_available = quickElement('div', selector_div, '');
         selector_available.className = 'selector-available';
-        var title_available = quickElement('h2', selector_available, interpolate(gettext('Available %s') + ' ', [field_name]));
-        quickElement('img', title_available, '', 'src', admin_static_prefix + 'img/icon-unknown.gif', 'width', '10', 'height', '10', 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of available %s. You may choose some by selecting them in the box below and then clicking the "Choose" arrow between the two boxes.'), [field_name]));
+        var title_available = quickElement('h2', selector_available, '');
+        quickElement('span', title_available, interpolate(gettext('Available %s') + ' ', [field_name]), 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of available %s. You may choose some by selecting them in the box below and then clicking the "Choose" arrow between the two boxes.'), [field_name]))
 
         var filter_p = quickElement('p', selector_available, '', 'id', field_id + '_filter');
         filter_p.className = 'selector-filter';
 
         var search_filter_label = quickElement('label', filter_p, '', 'for', field_id + "_input");
 
-        var search_selector_img = quickElement('img', search_filter_label, '', 'src', admin_static_prefix + 'img/selector-search.gif', 'class', 'help-tooltip', 'alt', '', 'title', interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name]));
+        var search_filter_label_text = interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name]);
+        quickElement('span', search_filter_label, search_filter_label_text, 'title', search_filter_label_text, 'class', 'help-tooltip');
 
         filter_p.appendChild(document.createTextNode(' '));
 
@@ -72,8 +73,9 @@ window.SelectFilter = {
         // <div class="selector-chosen">
         var selector_chosen = quickElement('div', selector_div, '');
         selector_chosen.className = 'selector-chosen';
-        var title_chosen = quickElement('h2', selector_chosen, interpolate(gettext('Chosen %s') + ' ', [field_name]));
-        quickElement('img', title_chosen, '', 'src', admin_static_prefix + 'img/icon-unknown.gif', 'width', '10', 'height', '10', 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the "Remove" arrow between the two boxes.'), [field_name]));
+        var title_chosen_tooltip = interpolate(gettext('This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the "Remove" arrow between the two boxes.'), [field_name]);
+        var title_chosen = quickElement('h2', selector_chosen, '');
+        quickElement('span', title_chosen, interpolate(gettext('Chosen %s') + ' ', [field_name]), 'title', title_chosen_tooltip, 'class', 'help help-tooltip');
 
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
