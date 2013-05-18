@@ -42,7 +42,7 @@ Configuring static files
 
     During development, this will be done automatically if you use :djadmin:`runserver`
     and :setting:`DEBUG` is set to ``True`` (see
-    :class:`django.contrib.staticfiles.views.serve`). 
+    :func:`django.contrib.staticfiles.views.serve`). 
 
     This method is **grossly inefficient** and probably **insecure**,
     so it is **unsuitable for production**. 
