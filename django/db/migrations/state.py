@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.loading import BaseAppCache
+from django.utils.module_loading import import_by_path
 
 
 class ProjectState(object):
@@ -15,12 +16,9 @@ class ProjectState(object):
 
     def clone(self):
         "Returns an exact copy of this ProjectState"
-        ps = ProjectState(
+        return ProjectState(
             models = dict((k, v.copy()) for k, v in self.models.items())
         )
-        for model in ps.models.values():
-            model.project_state = ps
-        return ps
 
     def render(self):
         "Turns the project state into actual models in a new AppCache"
@@ -33,8 +31,11 @@ class ProjectState(object):
     @classmethod
     def from_app_cache(cls, app_cache):
         "Takes in an AppCache and returns a ProjectState matching it"
+        models = {}
         for model in app_cache.get_models():
-            print model
+            model_state = ModelState.from_model(model)
+            models[(model_state.app_label, model_state.name.lower())] = model_state
+        return cls(models)
 
 
 class ModelState(object):
@@ -44,18 +45,36 @@ class ModelState(object):
     mutate this one and then render it into a Model as required.
     """
 
-    def __init__(self, project_state, app_label, name, fields=None, options=None, bases=None):
-        self.project_state = project_state
+    def __init__(self, app_label, name, fields=None, options=None, bases=None):
         self.app_label = app_label
         self.name = name
         self.fields = fields or []
         self.options = options or {}
-        self.bases = bases or None
+        self.bases = bases or (models.Model, )
+
+    @classmethod
+    def from_model(cls, model):
+        """
+        Feed me a model, get a ModelState representing it out.
+        """
+        # Deconstruct the fields
+        fields = []
+        for field in model._meta.local_fields:
+            name, path, args, kwargs = field.deconstruct()
+            field_class = import_by_path(path)
+            fields.append((name, field_class(*args, **kwargs)))
+        # Make our record
+        return cls(
+            model._meta.app_label,
+            model._meta.object_name,
+            fields,
+            {},
+            None,
+        )
 
     def clone(self):
         "Returns an exact copy of this ModelState"
         return self.__class__(
-            project_state = self.project_state,
             app_label = self.app_label,
             name = self.name,
             fields = self.fields,
