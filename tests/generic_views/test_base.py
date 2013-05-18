@@ -412,6 +412,19 @@ class GetContextDataTest(unittest.TestCase):
         context = test_view.get_context_data(test_name='test_value')
         self.assertEqual(context['test_name'], 'test_value')
 
+    def test_object_at_custom_name_in_context_data(self):
+        # Checks 'pony' key presence in dict returned by get_context_date
+        test_view = views.CustomSingleObjectView()
+        test_view.context_object_name = 'pony'
+        context = test_view.get_context_data()
+        self.assertTrue(context['pony'] == test_view.object)
+
+    def test_object_in_get_context_data(self):
+        # Checks 'object' key presence in dict returned by get_context_date #20234
+        test_view = views.CustomSingleObjectView()
+        context = test_view.get_context_data()
+        self.assertTrue(context['object'] == test_view.object)
+
 
 class UseMultipleObjectMixinTest(unittest.TestCase):
     rf = RequestFactory()
@@ -431,3 +444,6 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
         # Overwrite the view's queryset with queryset from kwarg
         context = test_view.get_context_data(object_list=queryset)
         self.assertEqual(context['object_list'], queryset)
+
+
+
