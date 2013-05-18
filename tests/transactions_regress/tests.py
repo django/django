@@ -4,10 +4,8 @@ from django.db import (connection, connections, transaction, DEFAULT_DB_ALIAS, D
                        IntegrityError)
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import override_settings
+from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
 from django.utils.unittest import skipIf, skipUnless
-
-from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Mod, M2mA, M2mB, SubMod
 
