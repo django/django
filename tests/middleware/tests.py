@@ -9,6 +9,7 @@ import warnings
 
 from django.conf import settings
 from django.core import mail
+from django.core.handlers.wsgi import WSGIRequest
 from django.db import (transaction, connections, DEFAULT_DB_ALIAS,
                        IntegrityError)
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
@@ -16,6 +17,7 @@ from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
+from django.middleware.routing_args import RoutingArgsMiddleware
 from django.middleware.transaction import TransactionMiddleware
 from django.test import TransactionTestCase, TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -27,6 +29,9 @@ from django.utils.unittest import expectedFailure, skipIf
 from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Band
+
+
+_FAKE_VIEW = lambda request: None
 
 
 class CommonMiddlewareTest(TestCase):
@@ -742,3 +747,56 @@ class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, Transacti
             self.assertFalse(transaction.is_managed())
         finally:
             del connections[DEFAULT_DB_ALIAS].commit
+
+
+class TestRoutingArgs(TestCase):
+    
+    def setUp(self):
+        super(TestRoutingArgs, self).setUp()
+        
+        environ = {'REQUEST_METHOD': 'GET', 'wsgi.input': BytesIO(b'')}
+        self.request = WSGIRequest(environ)
+        
+        self.mw = RoutingArgsMiddleware()
+    
+    def test_arguments_are_stored(self):
+        """The positional and named arguments should be stored in the environ"""
+        args = ("foo", "bar")
+        kwargs = {'arg': "value"}
+        self.mw.process_view(self.request, _FAKE_VIEW, args, kwargs)
+        
+        self.assertEqual(self.request.POSITIONAL_PATH_ARGS, args)
+        self.assertEqual(
+            self.request.environ['wsgiorg.routing_args'][1],
+            kwargs,
+            )
+        
+        self.assertTrue("wsgiorg.routing_args" in self.request.environ)
+        self.assertEqual(len(self.request.environ['wsgiorg.routing_args']), 2)
+        self.assertEqual(self.request.environ['wsgiorg.routing_args'][0], args)
+        self.assertEqual(
+            self.request.environ['wsgiorg.routing_args'][1],
+            kwargs,
+            )
+    
+    def test_named_arguments_are_copied(self):
+        """
+        The named arguments must be copied, not passed by reference.
+        
+        Because Django will pass them on without inspecting the arguments for
+        the view.
+        
+        """
+        kwargs = {'arg': "value"}
+        self.mw.process_view(self.request, _FAKE_VIEW, ("foo", "bar"), kwargs)
+        self.request.environ['wsgiorg.routing_args'][1]['new_arg'] = "new_value"
+        # The original dictionary must have not been modified:
+        self.assertEqual(len(kwargs), 1)
+        self.assertTrue("arg" in kwargs)
+    
+    def test_response(self):
+        """A response should never be returned."""
+        args = ("foo", "bar")
+        kwargs = {'arg': "value"}
+        result = self.mw.process_view(self.request, _FAKE_VIEW, args, kwargs)
+        self.assertTrue(result is None)

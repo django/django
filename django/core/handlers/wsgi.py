@@ -158,6 +158,7 @@ class WSGIRequest(http.HttpRequest):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
+        self.environ.setdefault('wsgiorg.routing_args', ((), {}))
 
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
@@ -211,12 +212,36 @@ class WSGIRequest(http.HttpRequest):
         if not hasattr(self, '_files'):
             self._load_post_and_files()
         return self._files
+    
+    def _get_positional_args(self):
+        routing_args = self.environ['wsgiorg.routing_args']
+        positional_args = routing_args[0]
+        return positional_args
+
+    def _set_positional_args(self, new_positional_args):
+        routing_args = self.environ['wsgiorg.routing_args']
+        named_args = routing_args[1]
+        new_routing_args = (new_positional_args, named_args)
+        self.environ['wsgiorg.routing_args'] = new_routing_args
+    
+    def _get_named_args(self):
+        routing_args = self.environ['wsgiorg.routing_args']
+        named_args = routing_args[1]
+        return named_args
+
+    def _set_named_args(self, new_named_args):
+        routing_args = self.environ['wsgiorg.routing_args']
+        positional_args = routing_args[0]
+        new_routing_args = (positional_args, new_named_args)
+        self.environ['wsgiorg.routing_args'] = new_routing_args
 
     GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
     COOKIES = property(_get_cookies, _set_cookies)
     FILES = property(_get_files)
     REQUEST = property(_get_request)
+    POSITIONAL_PATH_ARGS = property(_get_positional_args, _set_positional_args)
+    NAMED_PATH_ARGS = property(_get_named_args, _set_named_args)
 
 
 class WSGIHandler(base.BaseHandler):
