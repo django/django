@@ -5,7 +5,7 @@ Model Form Functions
 .. module:: django.forms.models
    :synopsis: Django's functions for building model forms and formsets.
 
-.. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None,  widgets=None)
+.. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None,  widgets=None, localized_fields=None)
 
     Returns a :class:`~django.forms.ModelForm` class for the given ``model``.
     You can optionally pass a ``form`` argument to use as a starting point for
@@ -20,6 +20,8 @@ Model Form Functions
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
+    ``localized_fields`` is a list of names of fields which should be localized.
+
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
 
@@ -33,12 +35,14 @@ Model Form Functions
     information. Omitting any definition of the fields to use will result in all
     fields being used, but this behaviour is deprecated.
 
-.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False)
+    The ``localized_fields`` parameter was added.
+
+.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None)
 
     Returns a ``FormSet`` class for the given ``model`` class.
 
     Arguments ``model``, ``form``, ``fields``, ``exclude``,
-    ``formfield_callback`` and ``widgets`` are all passed through to
+    ``formfield_callback``, ``widgets`` and ``localized_fields`` are all passed through to
     :func:`~django.forms.models.modelform_factory`.
 
     Arguments ``formset``, ``extra``, ``max_num``, ``can_order``,
@@ -50,9 +54,9 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-        The ``widgets`` and the ``validate_max`` parameters were added.
+        The ``widgets``, ``validate_max`` and ``localized_fields`` parameters were added.
 
-.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False)
+.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
     defaults of ``formset=BaseInlineFormSet``, ``can_delete=True``, and
@@ -65,4 +69,4 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-        The ``widgets`` and the ``validate_max`` parameters were added.
+        The ``widgets``, ``validate_max`` and ``localized_fields`` parameters were added.

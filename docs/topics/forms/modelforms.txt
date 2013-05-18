@@ -474,6 +474,24 @@ parameter when declaring the form field::
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
+
+Enabling localization of fields
+-------------------------------
+
+.. versionadded:: 1.6
+
+By default, the fields in a ``ModelForm`` will not localize their data. To
+enable localization for fields, you can use the ``localized_fields``
+attribute on the ``Meta`` class.
+
+    >>> class AuthorForm(ModelForm):
+    ...     class Meta:
+    ...         model = Author
+    ...         localized_fields = ('birth_date',)
+
+If ``localized_fields`` is set to the special value ``'__all__'``, all fields
+will be localized.
+
 .. _overriding-modelform-clean-method:
 
 Overriding the clean() method
@@ -570,6 +588,10 @@ keyword arguments, or the corresponding attributes on the ``ModelForm`` inner
 ``Meta`` class. Please see the ``ModelForm`` :ref:`modelforms-selecting-fields`
 documentation.
 
+... or enable localization for specific fields::
+
+    >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=("birth_date",))
+
 .. _model-formsets:
 
 Model formsets
@@ -662,6 +684,20 @@ class of a ``ModelForm`` works::
 
     >>> AuthorFormSet = modelformset_factory(
     ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
+
+Enabling localization for fields with ``localized_fields``
+----------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``localized_fields`` parameter, you can enable localization for
+fields in the form.
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, localized_fields=('value',))
+
+If ``localized_fields`` is set to the special value ``'__all__'``, all fields
+will be localized.
 
 Providing initial values
 ------------------------
