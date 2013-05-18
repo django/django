@@ -62,7 +62,6 @@ Here's an example command to start a uWSGI server::
         --processes=5 \                 # number of worker processes
         --uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
         --harakiri=20 \                 # respawn processes taking more than 20 seconds
-        --limit-as=128 \                # limit the project to 128 MB
         --max-requests=5000 \           # respawn processes after serving 5000 requests
         --vacuum \                      # clear environment on exit
         --home=/path/to/virtual/env \   # optional path to a virtualenv
