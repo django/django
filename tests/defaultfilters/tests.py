@@ -574,43 +574,43 @@ class DefaultFiltersTests(TestCase):
                           'get out of town')
 
     def test_filesizeformat(self):
-        self.assertEqual(filesizeformat(1023), '1023 bytes')
-        self.assertEqual(filesizeformat(1024), '1.0 KB')
-        self.assertEqual(filesizeformat(10*1024), '10.0 KB')
-        self.assertEqual(filesizeformat(1024*1024-1), '1024.0 KB')
-        self.assertEqual(filesizeformat(1024*1024), '1.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*50), '50.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024), '1.0 GB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0 TB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0 PB')
+        self.assertEqual(filesizeformat(1023), '1023\xa0bytes')
+        self.assertEqual(filesizeformat(1024), '1.0\xa0KB')
+        self.assertEqual(filesizeformat(10*1024), '10.0\xa0KB')
+        self.assertEqual(filesizeformat(1024*1024-1), '1024.0\xa0KB')
+        self.assertEqual(filesizeformat(1024*1024), '1.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*50), '50.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*1024), '1.0\xa0GB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0\xa0TB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0\xa0PB')
         self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                          '2000.0 PB')
-        self.assertEqual(filesizeformat(complex(1,-1)), '0 bytes')
-        self.assertEqual(filesizeformat(""), '0 bytes')
+                          '2000.0\xa0PB')
+        self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0bytes')
+        self.assertEqual(filesizeformat(""), '0\xa0bytes')
         self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                          '0 bytes')
+                          '0\xa0bytes')
 
     def test_localized_filesizeformat(self):
         with self.settings(USE_L10N=True):
             with translation.override('de', deactivate=True):
-                self.assertEqual(filesizeformat(1023), '1023 Bytes')
-                self.assertEqual(filesizeformat(1024), '1,0 KB')
-                self.assertEqual(filesizeformat(10*1024), '10,0 KB')
-                self.assertEqual(filesizeformat(1024*1024-1), '1024,0 KB')
-                self.assertEqual(filesizeformat(1024*1024), '1,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*50), '50,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024), '1,0 GB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0 TB')
+                self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
+                self.assertEqual(filesizeformat(1024), '1,0\xa0KB')
+                self.assertEqual(filesizeformat(10*1024), '10,0\xa0KB')
+                self.assertEqual(filesizeformat(1024*1024-1), '1024,0\xa0KB')
+                self.assertEqual(filesizeformat(1024*1024), '1,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*50), '50,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*1024), '1,0\xa0GB')
+                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0\xa0TB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
-                                  '1,0 PB')
+                                  '1,0\xa0PB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                                  '2000,0 PB')
-                self.assertEqual(filesizeformat(complex(1,-1)), '0 Bytes')
-                self.assertEqual(filesizeformat(""), '0 Bytes')
+                                  '2000,0\xa0PB')
+                self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0Bytes')
+                self.assertEqual(filesizeformat(""), '0\xa0Bytes')
                 self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                                  '0 Bytes')
+                                  '0\xa0Bytes')
 
     def test_pluralize(self):
         self.assertEqual(pluralize(1), '')
