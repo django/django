@@ -416,6 +416,7 @@ class ChangedBackendSettingsTest(TestCase):
     Tests for changes in the settings.AUTHENTICATION_BACKENDS
     """
     backend = 'django.contrib.auth.tests.test_auth_backends.NewModelBackend'
+    old_backend = 'django.contrib.auth.backends.ModelBackend'
 
     TEST_USERNAME = 'test_user'
     TEST_PASSWORD = 'test_password'
@@ -454,3 +455,31 @@ class ChangedBackendSettingsTest(TestCase):
         # anonymous as the backend is not longer available.
         self.assertIsNotNone(user)
         self.assertTrue(user.is_anonymous())
+
+    @override_settings(AUTHENTICATION_BACKENDS=(old_backend, ))
+    def test_changed_backend_settings(self):
+        """
+        Tests that removing a backend from AUTHENTICATION_BACKENDS make
+        already logged in users disconnect.
+        """
+
+        # Get a session for the test user
+        self.assertTrue(self.client.login(
+            username=self.TEST_USERNAME,
+            password=self.TEST_PASSWORD)
+        )
+
+        # Prepare a request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        # Remove backend_a from AUTHENTICATION_BACKENDS
+        with self.settings(AUTHENTICATION_BACKENDS=(self.backend, )):
+
+            # Get the user from the request
+            user = get_user(request)
+
+            # Assert that the user retrieval is successful and the user is
+            # anonymous as the backend is not longer available.
+            self.assertIsNotNone(user)
+            self.assertTrue(user.is_anonymous())
