@@ -107,6 +107,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         validator.validate(cls, model)
 
     def __init__(self):
+        self._orig_formfield_overrides = self.formfield_overrides
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
@@ -123,6 +124,9 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
+            # see #19303 for an explanation of self._orig_formfield_overrides
+            if db_field.__class__ in self._orig_formfield_overrides:
+                kwargs = dict(self._orig_formfield_overrides[db_field.__class__], **kwargs)
             return self.formfield_for_choice_field(db_field, request, **kwargs)
 
         # ForeignKey or ManyToManyFields
