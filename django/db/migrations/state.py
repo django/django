@@ -14,6 +14,9 @@ class ProjectState(object):
         self.models = models or {}
         self.app_cache = None
 
+    def add_model_state(self, model_state):
+        self.models[(model_state.app_label, model_state.name.lower())] = model_state
+
     def clone(self):
         "Returns an exact copy of this ProjectState"
         return ProjectState(
@@ -24,7 +27,7 @@ class ProjectState(object):
         "Turns the project state into actual models in a new AppCache"
         if self.app_cache is None:
             self.app_cache = BaseAppCache()
-            for model in self.model.values:
+            for model in self.models.values():
                 model.render(self.app_cache)
         return self.app_cache
 
@@ -90,10 +93,6 @@ class ModelState(object):
         meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
         # TODO: Use the actual bases
-        if self.bases:
-            raise NotImplementedError("Custom bases not quite done yet!")
-        else:
-            bases = [models.Model]
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)
         body['Meta'] = meta
@@ -101,6 +100,6 @@ class ModelState(object):
         # Then, make a Model object
         return type(
             self.name,
-            tuple(bases),
+            tuple(self.bases),
             body,
         )
