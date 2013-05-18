@@ -35,6 +35,7 @@ def get_filter_tests():
     now_tz_i = datetime.now(FixedOffset((3 * 60) + 15)) # imaginary time zone
     today = date.today()
 
+    # NOTE: \xa0 avoids wrapping between value and unit
     return {
         # Default compare with datetime.now()
         'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1\xa0minute'),

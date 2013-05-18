@@ -527,6 +527,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_timesince(self):
         # real testing is done in timesince.py, where we can provide our own 'now'
+        # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(
             timesince_filter(datetime.datetime.now() - datetime.timedelta(1)),
             '1\xa0day')
@@ -537,6 +538,7 @@ class DefaultFiltersTests(TestCase):
             '1\xa0day')
 
     def test_timeuntil(self):
+        # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(
             timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1, 1)),
             '1\xa0day')
@@ -574,6 +576,7 @@ class DefaultFiltersTests(TestCase):
                           'get out of town')
 
     def test_filesizeformat(self):
+        # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(filesizeformat(1023), '1023\xa0bytes')
         self.assertEqual(filesizeformat(1024), '1.0\xa0KB')
         self.assertEqual(filesizeformat(10*1024), '10.0\xa0KB')
@@ -592,6 +595,7 @@ class DefaultFiltersTests(TestCase):
                           '0\xa0bytes')
 
     def test_localized_filesizeformat(self):
+        # NOTE: \xa0 avoids wrapping between value and unit
         with self.settings(USE_L10N=True):
             with translation.override('de', deactivate=True):
                 self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
