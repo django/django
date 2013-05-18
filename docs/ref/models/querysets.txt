@@ -1330,7 +1330,7 @@ prepared to handle the exception if you are using manual primary keys.
 get_or_create
 ~~~~~~~~~~~~~
 
-.. method:: get_or_create(**kwargs)
+.. method:: get_or_create(defaults=None, **kwargs)
 
 A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
@@ -1366,7 +1366,6 @@ found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
-    defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
     params.update(defaults)
     obj = self.model(**params)
@@ -1447,6 +1446,49 @@ in the HTTP spec.
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+update_or_create
+~~~~~~~~~~~~~~~~
+
+.. method:: update_or_create(defaults=None, **kwargs)
+
+.. versionadded:: 1.7
+
+A convenience method for updating an object with the given ``kwargs``, creating
+a new one if necessary. The ``defaults`` is a dictionary of (field, value)
+pairs used to update the object.
+
+Returns a tuple of ``(object, created)``, where ``object`` is the created or
+updated object and ``created`` is a boolean specifying whether a new object was
+created.
+
+The ``update_or_create`` method tries to fetch an object from database based on
+the given ``kwargs``. If a match is found, it updates the fields passed in the
+``defaults`` dictionary.
+
+This is meant as a shortcut to boilerplatish code. For example::
+
+    try:
+        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        for key, value in updated_values.iteritems():
+            setattr(obj, key, value)
+        obj.save()
+    except Person.DoesNotExist:
+        updated_values.update({'first_name': 'John', 'last_name': 'Lennon'})
+        obj = Person(**updated_values)
+        obj.save()
+
+This pattern gets quite unwieldy as the number of fields in a model goes up.
+The above example can be rewritten using ``update_or_create()`` like so::
+
+    obj, created = Person.objects.update_or_create(
+        first_name='John', last_name='Lennon', defaults=updated_values)
+
+For detailed description how names passed in ``kwargs`` are resolved see
+:meth:`get_or_create`.
+
+As described above in :meth:`get_or_create`, this method is prone to a
+race-condition which can result in multiple rows being inserted simultaneously
+if uniqueness is not enforced at the database level.
 
 bulk_create
 ~~~~~~~~~~~

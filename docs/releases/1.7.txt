@@ -41,6 +41,9 @@ Minor features
 * The ``enter`` argument was added to the
   :data:`~django.test.signals.setting_changed` signal.
 
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
 Backwards incompatible changes in 1.7
 =====================================
 
