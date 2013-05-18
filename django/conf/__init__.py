@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import time     # Needed for Windows
+import traceback
 import warnings
 
 from django.conf import global_settings
@@ -127,7 +128,11 @@ class Settings(BaseSettings):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError as e:
-            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
+            exc_traceback = traceback.extract_tb(sys.exc_info()[2])
+            (tb_file, tb_lineno, tb_function, tb_line) = exc_traceback[-1]
+            msg = "Could not import settings '%s' (Is it on sys.path?): %s in %s:%d" % \
+                  (self.SETTINGS_MODULE, e, tb_file, tb_lineno)
+            raise ImportError(msg)
 
         # Settings that should be converted into tuples if they're mistakenly entered
         # as strings.
