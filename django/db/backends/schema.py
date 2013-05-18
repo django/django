@@ -1,8 +1,10 @@
+import sys
 import hashlib
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 from django.utils.log import getLogger
 from django.db.models.fields.related import ManyToManyField
+from django.db.transaction import atomic
 
 logger = getLogger('django.db.backends.schema')
 
@@ -64,9 +66,7 @@ class BaseDatabaseSchemaEditor(object):
         Marks the start of a schema-altering run.
         """
         self.deferred_sql = []
-        self.old_autocommit = self.connection.autocommit
-        if self.connection.autocommit:
-            self.connection.set_autocommit(False)
+        atomic(self.connection.alias).__enter__()
 
     def commit(self):
         """
@@ -74,8 +74,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         for sql in self.deferred_sql:
             self.execute(sql)
-        self.connection.commit()
-        self.connection.set_autocommit(self.old_autocommit)
+        atomic(self.connection.alias).__exit__(None, None, None)
 
     def rollback(self):
         """
@@ -83,8 +82,17 @@ class BaseDatabaseSchemaEditor(object):
         """
         if not self.connection.features.can_rollback_ddl:
             raise RuntimeError("Cannot rollback schema changes on this backend")
-        self.connection.rollback()
-        self.connection.set_autocommit(self.old_autocommit)
+        atomic(self.connection.alias).__exit__(*sys.exc_info())
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            self.commit()
+        else:
+            self.rollback()
 
     # Core utility functions
 

@@ -37,10 +37,8 @@ class MigrationRecorder(object):
         if self.Migration._meta.db_table in self.connection.introspection.get_table_list(self.connection.cursor()):
             return
         # Make the table
-        editor = self.connection.schema_editor()
-        editor.start()
-        editor.create_model(self.Migration)
-        editor.commit()
+        with self.connection.schema_editor() as editor:
+            editor.create_model(self.Migration)
 
     def applied_migrations(self):
         """
