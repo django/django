@@ -544,6 +544,11 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+Note that this method returns a ``ValuesListQuerySet``. This class behaves
+like a list. Most of the time this is enough, but if you require an actual
+Python list object, you can simply call ``list()`` on it, which will evaluate
+the queryset.
+
 dates
 ~~~~~
 
