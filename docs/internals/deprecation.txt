@@ -390,6 +390,8 @@ these changes.
   ``django.test.testcases.OutputChecker`` will be removed. Instead use the
   doctest module from the Python standard library.
 
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
+
 2.0
 ---
 
