@@ -126,6 +126,6 @@ def get_user(request):
         backend_path = request.session[BACKEND_SESSION_KEY]
         backend = load_backend(backend_path)
         user = backend.get_user(user_id) or AnonymousUser()
-    except KeyError:
+    except (KeyError, ImproperlyConfigured):
         user = AnonymousUser()
     return user
