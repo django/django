@@ -334,6 +334,36 @@ class TranslationTests(TestCase):
             self.assertEqual(rendered, 'My other name is James.')
 
 
+class TranslationThreadSafetyTests(TestCase):
+    def setUp(self):
+        self._old_language = get_language()
+        self._translations = trans_real._translations
+
+        # here we rely on .split() being called inside the _fetch()
+        # in trans_real.translation()
+        class sideeffect_str(str):
+            def split(self, *args, **kwargs):
+                res = str.split(self, *args, **kwargs)
+                trans_real._translations['en-YY'] = None
+                return res
+
+        trans_real._translations = {sideeffect_str('en-XX'): None}
+
+    def tearDown(self):
+        trans_real._translations = self._translations
+        activate(self._old_language)
+
+    def test_bug14894_translation_activate_thread_safety(self):
+        translation_count = len(trans_real._translations)
+        try:
+            translation.activate('pl')
+        except RuntimeError:
+            self.fail('translation.activate() is not thread-safe')
+
+        # make sure sideeffect_str actually added a new translation
+        self.assertLess(translation_count, len(trans_real._translations))
+
+
 @override_settings(USE_L10N=True)
 class FormattingTests(TestCase):
 
