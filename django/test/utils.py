@@ -38,9 +38,6 @@ class Approximate(object):
 
 
 class ContextList(list):
-    def __init__(self, *args, **kwargs):
-        list.__init__(self, *args, **kwargs)
-
     """A wrapper that provides direct key access to context items contained
     in a list of context objects.
     """
