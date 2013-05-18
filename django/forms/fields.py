@@ -198,6 +198,7 @@ class Field(object):
         result.validators = self.validators[:]
         return result
 
+
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         if min_length is not None:
@@ -223,6 +224,7 @@ class CharField(Field):
             # The HTML attribute is maxlength, not max_length.
             attrs.update({'maxlength': str(self.max_length)})
         return attrs
+
 
 class IntegerField(Field):
     default_error_messages = {
@@ -448,6 +450,7 @@ class TimeField(BaseTemporalField):
     def strptime(self, value, format):
         return datetime.datetime.strptime(force_str(value), format).time()
 
+
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
     input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
@@ -486,6 +489,7 @@ class DateTimeField(BaseTemporalField):
     def strptime(self, value, format):
         return datetime.datetime.strptime(force_str(value), format)
 
+
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
         """
@@ -515,6 +519,7 @@ class RegexField(CharField):
 
     regex = property(_get_regex, _set_regex)
 
+
 class EmailField(CharField):
     widget = EmailInput
     default_validators = [validators.validate_email]
@@ -522,6 +527,7 @@ class EmailField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(EmailField, self).clean(value)
+
 
 class FileField(Field):
     widget = ClearableFileInput
@@ -629,6 +635,7 @@ class ImageField(FileField):
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f
+
 
 class URLField(CharField):
     widget = URLInput
@@ -792,6 +799,7 @@ class ChoiceField(Field):
                     return True
         return False
 
+
 class TypedChoiceField(ChoiceField):
     def __init__(self, *args, **kwargs):
         self.coerce = kwargs.pop('coerce', lambda val: val)
@@ -902,6 +910,7 @@ class ComboField(Field):
         for field in self.fields:
             value = field.clean(value)
         return value
+
 
 class MultiValueField(Field):
     """
@@ -1046,6 +1055,7 @@ class FilePathField(ChoiceField):
                 pass
 
         self.widget.choices = self.choices
+
 
 class SplitDateTimeField(MultiValueField):
     widget = SplitDateTimeWidget
