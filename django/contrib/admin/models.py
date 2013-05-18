@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.util import quote
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.encoding import smart_text
 from django.utils.encoding import python_2_unicode_compatible
@@ -62,6 +63,14 @@ class LogEntry(models.Model):
 
     def is_deletion(self):
         return self.action_flag == DELETION
+
+    def object_exists(self):
+        "Check whether object still exists in the database"
+        try:
+            self.get_edited_object()
+        except ObjectDoesNotExist:
+            return False
+        return True
 
     def get_edited_object(self):
         "Returns the edited object represented by this log entry"

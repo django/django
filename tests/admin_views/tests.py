@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 # Register auth models with the admin.
 from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.models import LogEntry, DELETION, ADDITION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
@@ -1042,6 +1042,9 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(Article.objects.all().count(), 4)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
+        article_ct = ContentType.objects.get_for_model(Article)
+        logged = LogEntry.objects.get(content_type=article_ct, action_flag=ADDITION)
+        self.assertTrue(logged.object_exists())
         self.client.get('/test_admin/admin/logout/')
 
         # Super can add too, but is redirected to the change list view
@@ -1261,7 +1264,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.deleteuser_login)
         response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
-         # test response contains link to related Article
+        # test response contains link to related Article
         self.assertContains(response, "admin_views/article/1/")
 
         response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
@@ -1274,6 +1277,7 @@ class AdminViewPermissionsTest(TestCase):
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.assertEqual(logged.object_id, '1')
+        self.assertFalse(logged.object_exists())
         self.client.get('/test_admin/admin/logout/')
 
     def testDisabledPermissionsWhenLoggedIn(self):
