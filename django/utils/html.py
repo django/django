@@ -281,3 +281,10 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
+def avoid_wrapping(value):
+    """
+    Avoid text wrapping in the middle of a phrase by adding non-breaking
+    spaces where there previously were normal spaces.
+    """
+    return value.replace(" ", "\xa0")
