@@ -15,7 +15,7 @@ using the decorator multiple times, is harmless and efficient.
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
     # We need this to behave just like the CsrfViewMiddleware, but not reject
-    # requests.
+    # requests or log warnings.
     def _reject(self, request, reason):
         return None
 
