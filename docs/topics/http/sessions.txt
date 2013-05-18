@@ -116,7 +116,9 @@ Using cookie-based sessions
 To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
 ``"django.contrib.sessions.backends.signed_cookies"``. The session data will be
 stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
-and the :setting:`SECRET_KEY` setting.
+and the :setting:`SECRET_KEY` setting. When using cookies-based sessions
+:mod:`django.contrib.sessions` can be removed from :setting:`INSTALLED_APPS`
+setting.
 
 .. note::
 
