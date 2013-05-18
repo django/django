@@ -9,7 +9,7 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import simple, TransactionTestCase, skipUnlessDBFeature
+from django.test import runner, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
@@ -20,7 +20,7 @@ from .models import Person
 
 
 TEST_APP_OK = 'test_runner.valid_app.models'
-TEST_APP_ERROR = 'test_runner.invalid_app.models'
+TEST_APP_ERROR = 'test_runner_invalid_app.models'
 
 
 class DependencyOrderingTests(unittest.TestCase):
@@ -36,7 +36,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -56,7 +56,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'bravo': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,value in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -83,7 +83,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'delta': ['charlie'],
         }
 
-        ordered = simple.dependency_ordered(raw, dependencies=dependencies)
+        ordered = runner.dependency_ordered(raw, dependencies=dependencies)
         ordered_sigs = [sig for sig,aliases in ordered]
 
         self.assertIn('s1', ordered_sigs)
@@ -110,7 +110,7 @@ class DependencyOrderingTests(unittest.TestCase):
             'alpha': ['bravo'],
         }
 
-        self.assertRaises(ImproperlyConfigured, simple.dependency_ordered, raw, dependencies=dependencies)
+        self.assertRaises(ImproperlyConfigured, runner.dependency_ordered, raw, dependencies=dependencies)
 
     def test_own_alias_dependency(self):
         raw = [
@@ -121,7 +121,7 @@ class DependencyOrderingTests(unittest.TestCase):
         }
 
         with self.assertRaises(ImproperlyConfigured):
-            simple.dependency_ordered(raw, dependencies=dependencies)
+            runner.dependency_ordered(raw, dependencies=dependencies)
 
         # reordering aliases shouldn't matter
         raw = [
@@ -129,7 +129,7 @@ class DependencyOrderingTests(unittest.TestCase):
         ]
 
         with self.assertRaises(ImproperlyConfigured):
-            simple.dependency_ordered(raw, dependencies=dependencies)
+            runner.dependency_ordered(raw, dependencies=dependencies)
 
 
 class MockTestRunner(object):
@@ -156,7 +156,7 @@ class ManageCommandTests(unittest.TestCase):
                 testrunner='test_runner.NonExistentRunner')
 
 
-class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
+class CustomOptionsTestRunner(runner.DiscoverRunner):
     option_list = (
         make_option('--option_a','-a', action='store', dest='option_a', default='1'),
         make_option('--option_b','-b', action='store', dest='option_b', default='2'),
@@ -289,15 +289,16 @@ class DummyBackendTest(unittest.TestCase):
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
-        settings = {'INSTALLED_APPS': '("test_runner.deprecation_app",)',
-                    'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}' }
+        settings = {
+            'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}'
+            }
         self.write_settings('settings.py', sdict=settings)
 
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_runner_deprecation_verbosity_default(self):
-        args = ['test', '--settings=test_project.settings']
+        args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("DeprecationWarning: warning from test", err)
         self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)

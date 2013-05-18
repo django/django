@@ -36,6 +36,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Preston Holmes
     * Simon Charette
     * Donald Stufft
+    * Marc Tamlyn
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -121,6 +122,7 @@ answer newbie questions, and generally made Django that much better:
     Chris Cahoon <chris.cahoon@gmail.com>
     Juan Manuel Caicedo <juan.manuel.caicedo@gmail.com>
     Trevor Caira <trevor@caira.com>
+    Aaron Cannon <cannona@fireantproductions.com>
     Brett Cannon <brett@python.org>
     Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail.com>
     Jeremy Carbaugh <jcarbaugh@gmail.com>
@@ -539,7 +541,6 @@ answer newbie questions, and generally made Django that much better:
     Aaron Swartz <http://www.aaronsw.com/>
     Ville Säävuori <http://www.unessa.net/>
     Mart Sõmermaa <http://mrts.pri.ee/>
-    Marc Tamlyn
     Christian Tanzer <tanzer@swing.co.at>
     Tyler Tarabula <tyler.tarabula@gmail.com>
     Tyson Tate <tyson@fallingbullets.com>

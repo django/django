@@ -185,8 +185,7 @@ testing of Django applications:
 * **Testing:**
   :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
-  :doc:`Advanced topics <topics/testing/advanced>` |
-  :doc:`Doctests <topics/testing/doctests>`
+  :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |

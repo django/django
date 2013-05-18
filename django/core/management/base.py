@@ -60,7 +60,7 @@ class OutputWrapper(object):
         return getattr(self._out, name)
 
     def write(self, msg, style_func=None, ending=None):
-        ending = ending is None and self.ending or ending
+        ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = [f for f in (style_func, self.style_func, lambda x:x)
@@ -311,7 +311,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, num_errors != 1 and 's' or ''))
+            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
 
     def handle(self, *args, **options):
         """

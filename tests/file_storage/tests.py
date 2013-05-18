@@ -29,16 +29,10 @@ from django.utils._os import upath
 from django.test.utils import override_settings
 from servers.tests import LiveServerBase
 
-# Try to import PIL in either of the two ways it can end up installed.
-# Checking for the existence of Image is enough for CPython, but
-# for PyPy, you need to check for the underlying modules
 try:
-    from PIL import Image, _imaging
-except ImportError:
-    try:
-        import Image, _imaging
-    except ImportError:
-        Image = None
+    from django.utils.image import Image
+except ImproperlyConfigured:
+    Image = None
 
 
 class GetStorageClassTests(SimpleTestCase):
@@ -494,7 +488,7 @@ class DimensionClosingBug(unittest.TestCase):
     """
     Test that get_image_dimensions() properly closes files (#8817)
     """
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_not_closing_of_files(self):
         """
         Open files passed into get_image_dimensions() should stay opened.
@@ -505,7 +499,7 @@ class DimensionClosingBug(unittest.TestCase):
         finally:
             self.assertTrue(not empty_io.closed)
 
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_closing_of_filenames(self):
         """
         get_image_dimensions() called with a filename should closed the file.
@@ -542,7 +536,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     Test that get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_multiple_calls(self):
         """
         Multiple calls of get_image_dimensions() should return the same size.
@@ -556,7 +550,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_bug_19457(self):
         """
         Regression test for #19457

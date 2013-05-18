@@ -119,7 +119,7 @@ class BaseFormSet(object):
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
             # Use the length of the initial data if it's there, 0 otherwise.
-            initial_forms = self.initial and len(self.initial) or 0
+            initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
     def _construct_forms(self):

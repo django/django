@@ -20,7 +20,7 @@ class Node(object):
         Constructs a new Node. If no connector is given, the default will be
         used.
         """
-        self.children = children and children[:] or []
+        self.children = children[:] if children else []
         self.connector = connector or self.default
         self.negated = negated
 

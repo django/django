@@ -15,11 +15,6 @@ from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
 
-from .test_imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-    TwoImageFieldTests, ImageFieldNoDimensionsTests,
-    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-    ImageFieldUsingFileTests)
-
 
 class BasicFieldTests(test.TestCase):
     def test_show_hidden_initial(self):

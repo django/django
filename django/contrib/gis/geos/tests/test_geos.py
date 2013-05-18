@@ -6,20 +6,28 @@ import random
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 
+from django.contrib.gis.gdal import HAS_GDAL
+
 from django.contrib.gis import memoryview
-from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
-    GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
-    LineString, MultiLineString, fromfile, fromstr, geos_version_info)
-from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
-from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
 from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
 from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+from .. import HAS_GEOS
+
+if HAS_GEOS:
+    from .. import (GEOSException, GEOSIndexError, GEOSGeometry,
+        GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
+        LineString, MultiLineString, fromfile, fromstr, geos_version_info,
+        GEOS_PREPARE)
+    from ..base import gdal, numpy, GEOSBase
 
 
+@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(unittest.TestCase, TestDataMixin):
 
     @property
@@ -198,7 +206,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(srid, poly.shell.srid)
                 self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_json(self):
         "Testing GeoJSON input/output (via GDAL)."
         for g in self.geometries.json_geoms:
@@ -662,6 +670,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_custom_srid(self):
         """ Test with a srid unknown from GDAL """
         pnt = Point(111200, 220900, srid=999999)
@@ -851,7 +860,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # And, they should be equal.
         self.assertEqual(gc1, gc2)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."
         g1 = fromstr('POINT(5 23)')
@@ -878,7 +887,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertNotEqual(poly._ptr, cpy1._ptr)
         self.assertNotEqual(poly._ptr, cpy2._ptr)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
+    @skipUnless(HAS_GDAL, "GDAL is required to transform geometries")
     def test_transform(self):
         "Testing `transform` method."
         orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
@@ -903,7 +912,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
+    @skipUnless(HAS_GDAL, "GDAL is required to transform geometries")
     def test_transform_3d(self):
         p3d = GEOSGeometry('POINT (5 23 100)', 4326)
         p3d.transform(2774)
@@ -912,6 +921,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         else:
             self.assertIsNone(p3d.z)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_noop(self):
         """ Testing `transform` method (SRID match) """
         # transform() should no-op if source & dest SRIDs match,
@@ -962,6 +972,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
         self.assertRaises(GEOSException, g.transform, 2774, clone=True)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_nogdal(self):
         """ Testing `transform` method (GDAL not available) """
         old_has_gdal = gdal.HAS_GDAL
@@ -1016,7 +1027,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(geom, tmpg)
                 if not no_srid: self.assertEqual(geom.srid, tmpg.srid)
 
-    @unittest.skipUnless(GEOS_PREPARE, "geos >= 3.1.0 is required")
+    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_prepared(self):
         "Testing PreparedGeometry support."
         # Creating a simple multipolygon and getting a prepared version.
@@ -1043,7 +1054,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for geom, merged in zip(ref_geoms, ref_merged):
             self.assertEqual(merged, geom.merged)
 
-    @unittest.skipUnless(GEOS_PREPARE, "geos >= 3.1.0 is required")
+    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_valid_reason(self):
         "Testing IsValidReason support"
 
@@ -1058,7 +1069,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
-    @unittest.skipUnless(geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
+    @skipUnless(HAS_GEOS and geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
     def test_linearref(self):
         "Testing linear referencing"
 
@@ -1091,12 +1102,3 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

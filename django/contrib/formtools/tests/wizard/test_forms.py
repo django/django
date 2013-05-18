@@ -17,7 +17,7 @@ from django.contrib.formtools.wizard.views import (WizardView,
 class DummyRequest(http.HttpRequest):
     def __init__(self, POST=None):
         super(DummyRequest, self).__init__()
-        self.method = POST and "POST" or "GET"
+        self.method = "POST" if POST else "GET"
         if POST is not None:
             self.POST.update(POST)
         self.session = {}

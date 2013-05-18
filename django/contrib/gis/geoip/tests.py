@@ -3,16 +3,28 @@ from __future__ import unicode_literals
 
 import os
 from django.conf import settings
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.geoip import GeoIP, GeoIPException
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geoip import HAS_GEOIP
 from django.utils import unittest
+from django.utils.unittest import skipUnless
 
 from django.utils import six
+
+if HAS_GEOIP:
+    from . import GeoIP, GeoIPException
+
+if HAS_GEOS:
+    from ..geos import GEOSGeometry
+
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
 # should contain links or the actual database files 'GeoIP.dat' and
 # 'GeoLiteCity.dat'.
+
+
+@skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
+    "GeoIP is required along with the GEOIP_DATA setting.")
 class GeoIPTest(unittest.TestCase):
 
     def test01_init(self):
@@ -70,6 +82,7 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
                              g.country(query))
 
+    @skipUnless(HAS_GEOS, "Geos is required")
     def test04_city(self):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
@@ -105,12 +118,3 @@ class GeoIPTest(unittest.TestCase):
         g = GeoIP()
         d = g.city("www.osnabrueck.de")
         self.assertEqual('Osnabrück', d['city'])
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GeoIPTest))
-    return s
-
-def run(verbosity=1):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

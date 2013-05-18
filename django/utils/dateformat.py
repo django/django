@@ -234,7 +234,7 @@ class DateFormat(TimeFormat):
 
     def T(self):
         "Time zone of this machine; e.g. 'EST' or 'MDT'"
-        name = self.timezone and self.timezone.tzname(self.data) or None
+        name = self.timezone.tzname(self.data) if self.timezone else None
         if name is None:
             name = self.format('O')
         return six.text_type(name)

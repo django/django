@@ -4,13 +4,19 @@ import os
 
 from django.db import connections
 from django.test import TestCase
-from django.contrib.gis.gdal import Driver
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TEST_DATA
-from django.contrib.gis.utils.ogrinspect import ogrinspect
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.utils.unittest import skipUnless
 
-from .models import AllOGRFields
+if HAS_GDAL:
+    from django.contrib.gis.gdal import Driver
+    from django.contrib.gis.utils.ogrinspect import ogrinspect
+
+    from .models import AllOGRFields
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class OGRInspectTest(TestCase):
     maxDiff = 1024
 

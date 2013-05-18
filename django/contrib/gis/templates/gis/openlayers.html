@@ -1,0 +1,34 @@
+<style type="text/css">{% block map_css %}
+    #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
+    #{{ id }}_map .aligned label { float: inherit; }
+    #{{ id }}_div_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
+    {% if not display_wkt %}#{{ id }} { display: none; }{% endif %}
+    .olControlEditingToolbar .olControlModifyFeatureItemActive {
+        background-image: url("{{ STATIC_URL }}admin/img/gis/move_vertex_on.png");
+        background-repeat: no-repeat;
+    }
+    .olControlEditingToolbar .olControlModifyFeatureItemInactive {
+        background-image: url("{{ STATIC_URL }}admin/img/gis/move_vertex_off.png");
+        background-repeat: no-repeat;
+    }{% endblock %}
+</style>
+
+<div id="{{ id }}_div_map">
+    <div id="{{ id }}_map"></div>
+    <span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">Delete all Features</a></span>
+    {% if display_wkt %}<p> WKT debugging window:</p>{% endif %}
+    <textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ name }}">{{ wkt }}</textarea>
+    <script type="text/javascript">
+        {% block map_options %}var map_options = {};{% endblock %}
+        {% block options %}var options = {
+            geom_name: '{{ geom_type }}',
+            id: '{{ id }}',
+            map_id: '{{ id }}_map',
+            map_options: map_options,
+            map_srid: {{ map_srid }},
+            name: '{{ name }}'
+        };
+        {% endblock %}
+        var {{ module }} = new MapWidget(options);
+    </script>
+</div>

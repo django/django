@@ -41,12 +41,12 @@ class DeleteQuery(Query):
         lot of values in pk_list.
         """
         if not field:
-            field = self.model._meta.pk
+            field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
                        pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
-            self.do_query(self.model._meta.db_table, where, using=using)
+            self.do_query(self.get_meta().db_table, where, using=using)
 
     def delete_qs(self, query, using):
         """
@@ -112,7 +112,7 @@ class UpdateQuery(Query):
                 related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
-        pk_field = self.model._meta.pk
+        pk_field = self.get_meta().pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
@@ -129,7 +129,7 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.model._meta.get_field_by_name(name)
+            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
             if model:
@@ -236,7 +236,7 @@ class DateQuery(Query):
             )
         except FieldError:
             raise FieldDoesNotExist("%s has no field named '%s'" % (
-                self.model._meta.object_name, field_name
+                self.get_meta().object_name, field_name
             ))
         field = result[0]
         self._check_field(field)                # overridden in DateTimeQuery
@@ -245,7 +245,7 @@ class DateQuery(Query):
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]
         self.distinct = True
-        self.order_by = order == 'ASC' and [1] or [-1]
+        self.order_by = [1] if order == 'ASC' else [-1]
 
         if field.null:
             self.add_filter(("%s__isnull" % field_name, False))

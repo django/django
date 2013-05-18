@@ -44,7 +44,7 @@ class Command(LabelCommand):
             elif f.unique:
                 field_output.append("UNIQUE")
             if f.db_index:
-                unique = f.unique and "UNIQUE " or ""
+                unique = "UNIQUE " if f.unique else ""
                 index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
                     (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
                     qn(f.name)))

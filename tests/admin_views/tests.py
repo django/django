@@ -26,6 +26,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
+from django.db import connection
 from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
@@ -3605,7 +3606,13 @@ class UserAdminTest(TestCase):
 
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(10):
+
+        expected_queries = 10
+        # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
+        if connection.vendor == 'oracle':
+            expected_queries -= 1
+
+        with self.assertNumQueries(expected_queries):
             response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
             self.assertEqual(response.status_code, 200)
 
@@ -3643,7 +3650,12 @@ class GroupAdminTest(TestCase):
     def test_group_permission_performance(self):
         g = Group.objects.create(name="test_group")
 
-        with self.assertNumQueries(8):  # instead of 259!
+        expected_queries = 8
+        # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
+        if connection.vendor == 'oracle':
+            expected_queries -= 1
+
+        with self.assertNumQueries(expected_queries):
             response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
             self.assertEqual(response.status_code, 200)
 

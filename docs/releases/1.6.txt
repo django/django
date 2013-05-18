@@ -69,6 +69,29 @@ This avoids the overhead of re-establishing a connection at the beginning of
 each request. For backwards compatibility, this feature is disabled by
 default. See :ref:`persistent-database-connections` for details.
 
+Discovery of tests in any test module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 ships with a new test runner that allows more flexibility in the
+location of tests. The previous runner
+(``django.test.simple.DjangoTestSuiteRunner``) found tests only in the
+``models.py`` and ``tests.py`` modules of a Python package in
+:setting:`INSTALLED_APPS`.
+
+The new runner (``django.test.runner.DjangoTestDiscoverRunner``) uses the test
+discovery features built into unittest2 (the version of unittest in the Python
+2.7+ standard library, and bundled with Django). With test discovery, tests can
+be located in any module whose name matches the pattern ``test*.py``.
+
+In addition, the test labels provided to ``./manage.py test`` to nominate
+specific tests to run must now be full Python dotted paths (or directory
+paths), rather than ``applabel.TestCase.test_method_name`` pseudo-paths. This
+allows running tests located anywhere in your codebase, rather than only in
+:setting:`INSTALLED_APPS`. For more details, see :doc:`/topics/testing/index`.
+
+This change is backwards-incompatible; see the :ref:`backwards-incompatibility
+notes<new-test-runner>`.
+
 Time zone aware aggregation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -90,6 +113,13 @@ Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
 
 A new :class:`django.db.models.BinaryField` model field allows to store raw
 binary data in the database.
+
+GeoDjango form widgets
+~~~~~~~~~~~~~~~~~~~~~~
+
+GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
+its geo-specialized fields. They are OpenLayers-based by default, but they can
+be customized to use any other JS framework.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -197,6 +227,13 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* `Pillow`_ is now the preferred image manipulation library to use with Django.
+  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
+  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+.. _`PIL`: https://pypi.python.org/pypi/PIL
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -237,6 +274,40 @@ Autocommit option for PostgreSQL
 In previous versions, database-level autocommit was only an option for
 PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
 <postgresql-autocommit-mode>` and can be removed.
+
+.. _new-test-runner:
+
+New test runner
+~~~~~~~~~~~~~~~
+
+In order to maintain greater consistency with Python's unittest module, the new
+test runner (``django.test.runner.DiscoverRunner``) does not automatically
+support some types of tests that were supported by the previous runner:
+
+* Tests in ``models.py`` and ``tests/__init__.py`` files will no longer be
+  found and run. Move them to a file whose name begins with ``test``.
+
+* Doctests will no longer be automatically discovered. To integrate doctests in
+  your test suite, follow the `recommendations in the Python documentation`_.
+
+Django bundles a modified version of the :mod:`doctest` module from the Python
+standard library (in ``django.test._doctest``) in order to allow passing in a
+custom ``DocTestRunner`` when instantiating a ``DocTestSuite``, and includes
+some additional doctest utilities (``django.test.testcases.DocTestRunner``
+turns on the ``ELLIPSIS`` option by default, and
+``django.test.testcases.OutputChecker`` provides better matching of XML, JSON,
+and numeric data types).
+
+These utilities are deprecated and will be removed in Django 1.8; doctest
+suites should be updated to work with the standard library's doctest module (or
+converted to unittest-compatible tests).
+
+If you wish to delay updates to your test suite, you can set your
+:setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
+to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is
+deprecated but will not be removed from Django until version 1.8.
+
+.. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

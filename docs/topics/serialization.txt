@@ -203,7 +203,7 @@ Foreign keys and other relational fields are treated a little bit differently::
         <!-- ... -->
     </object>
 
-In this example we specify that the auth.Permission object with the PK 24 has
+In this example we specify that the auth.Permission object with the PK 27 has
 a foreign key to the contenttypes.ContentType instance with the PK 9.
 
 ManyToMany-relations are exported for the model that binds them. For instance,

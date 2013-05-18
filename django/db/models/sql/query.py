@@ -532,7 +532,7 @@ class Query(object):
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
-        self.order_by = rhs.order_by and rhs.order_by[:] or self.order_by
+        self.order_by = rhs.order_by[:] if rhs.order_by else self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
     def deferred_to_data(self, target, callback):
@@ -552,7 +552,7 @@ class Query(object):
         field_names, defer = self.deferred_loading
         if not field_names:
             return
-        orig_opts = self.model._meta
+        orig_opts = self.get_meta()
         seen = {}
         must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
         for field_name in field_names:
@@ -818,7 +818,7 @@ class Query(object):
             alias = self.tables[0]
             self.ref_alias(alias)
         else:
-            alias = self.join((None, self.model._meta.db_table, None))
+            alias = self.join((None, self.get_meta().db_table, None))
         return alias
 
     def count_active_tables(self):
@@ -906,7 +906,7 @@ class Query(object):
         whereas column determination is a later part, and side-effect, of
         as_sql()).
         """
-        opts = self.model._meta
+        opts = self.get_meta()
         root_alias = self.tables[0]
         seen = {None: root_alias}
 
@@ -1624,7 +1624,7 @@ class Query(object):
                         "Cannot add count col with multiple cols in 'select': %r" % self.select
                 count = self.aggregates_module.Count(self.select[0].col)
         else:
-            opts = self.model._meta
+            opts = self.get_meta()
             if not self.select:
                 count = self.aggregates_module.Count(
                     (self.join((None, opts.db_table, None)), opts.pk.column),
@@ -1732,7 +1732,7 @@ class Query(object):
         field_names = set(field_names)
         if 'pk' in field_names:
             field_names.remove('pk')
-            field_names.add(self.model._meta.pk.name)
+            field_names.add(self.get_meta().pk.name)
 
         if defer:
             # Remove any existing deferred names from the current set before

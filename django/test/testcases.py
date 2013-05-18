@@ -97,6 +97,12 @@ def assert_and_parse_html(self, html, user_msg, msg):
 
 
 class OutputChecker(doctest.OutputChecker):
+    def __init__(self):
+        warnings.warn(
+            "The django.test.testcases.OutputChecker class is deprecated; "
+            "use the doctest module from the Python standard library instead.",
+            PendingDeprecationWarning)
+
     def check_output(self, want, got, optionflags):
         """
         The entry method for doctest output checking. Defers to a sequence of
@@ -151,6 +157,10 @@ class OutputChecker(doctest.OutputChecker):
 
 class DocTestRunner(doctest.DocTestRunner):
     def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "The django.test.testcases.DocTestRunner class is deprecated; "
+            "use the doctest module from the Python standard library instead.",
+            PendingDeprecationWarning)
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
         self.optionflags = doctest.ELLIPSIS
 

@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
 from django.contrib.gis.geos import GEOSException, GEOSGeometry, fromstr
+from .widgets import OpenLayersWidget
 
 
 class GeometryField(forms.Field):
@@ -17,7 +18,8 @@ class GeometryField(forms.Field):
     accepted by GEOSGeometry is accepted by this form.  By default,
     this includes WKT, HEXEWKB, WKB (in a buffer), and GeoJSON.
     """
-    widget = forms.Textarea
+    widget = OpenLayersWidget
+    geom_type = 'GEOMETRY'
 
     default_error_messages = {
         'required' : _('No geometry value provided.'),
@@ -31,12 +33,13 @@ class GeometryField(forms.Field):
         # Pop out attributes from the database field, or use sensible
         # defaults (e.g., allow None).
         self.srid = kwargs.pop('srid', None)
-        self.geom_type = kwargs.pop('geom_type', 'GEOMETRY')
+        self.geom_type = kwargs.pop('geom_type', self.geom_type)
         if 'null' in kwargs:
             kwargs.pop('null', True)
             warnings.warn("Passing 'null' keyword argument to GeometryField is deprecated.",
                 DeprecationWarning, stacklevel=2)
         super(GeometryField, self).__init__(**kwargs)
+        self.widget.attrs['geom_type'] = self.geom_type
 
     def to_python(self, value):
         """
@@ -98,3 +101,31 @@ class GeometryField(forms.Field):
         else:
             # Check for change of state of existence
             return bool(initial) != bool(data)
+
+
+class GeometryCollectionField(GeometryField):
+    geom_type = 'GEOMETRYCOLLECTION'
+
+
+class PointField(GeometryField):
+    geom_type = 'POINT'
+
+
+class MultiPointField(GeometryField):
+    geom_type = 'MULTIPOINT'
+
+
+class LineStringField(GeometryField):
+    geom_type = 'LINESTRING'
+
+
+class MultiLineStringField(GeometryField):
+    geom_type = 'MULTILINESTRING'
+
+
+class PolygonField(GeometryField):
+    geom_type = 'POLYGON'
+
+
+class MultiPolygonField(GeometryField):
+    geom_type = 'MULTIPOLYGON'

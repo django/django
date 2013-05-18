@@ -9,7 +9,7 @@ required for projects, in which case there are Mixins and Generic class-based
 views.
 
 Many of Django's built-in class-based views inherit from other class-based
-views or various mixins. Because this inheritence chain is very important, the
+views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 

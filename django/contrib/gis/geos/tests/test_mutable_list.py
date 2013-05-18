@@ -395,15 +395,3 @@ class ListMixinTest(unittest.TestCase):
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(ListMixinTest))
-    s.addTest(unittest.makeSuite(ListMixinTestSingle))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-if __name__ == '__main__':
-    run()

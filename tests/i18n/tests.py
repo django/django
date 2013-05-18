@@ -43,14 +43,8 @@ if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
         CompilationErrorHandling)
-from .contenttypes.tests import ContentTypeTests
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
-from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
-    URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase,
-    URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests,
-    URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests,
-    URLVaryAcceptLanguageTests)
 
 
 here = os.path.dirname(os.path.abspath(upath(__file__)))
