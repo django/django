@@ -19,4 +19,4 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        return '\n'.join(sql_all(app, self.style, connections[options.get('database')]))
+        return '\n'.join(sql_all(app, self.style, connections[options.get('database')], options.get('database')))

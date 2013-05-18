@@ -6,12 +6,12 @@ import re
 
 from django.conf import settings
 from django.core.management.base import CommandError
-from django.db import models
+from django.db import models, router
 from django.db.models import get_models
 from django.utils._os import upath
 
 
-def sql_create(app, style, connection):
+def sql_create(app, style, connection, db='default'):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
@@ -32,6 +32,8 @@ def sql_create(app, style, connection):
     pending_references = {}
 
     for model in app_models:
+        if not router.allow_syncdb(db, model):
+            continue
         output, references = connection.creation.sql_create_model(model, style, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
@@ -118,22 +120,26 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True):
     return statements
 
 
-def sql_custom(app, style, connection):
+def sql_custom(app, style, connection, db='default'):
     "Returns a list of the custom table modifying SQL statements for the given app."
     output = []
 
     app_models = get_models(app)
 
     for model in app_models:
+        if not router.allow_syncdb(db, model):
+            continue
         output.extend(custom_sql_for_model(model, style, connection))
 
     return output
 
 
-def sql_indexes(app, style, connection):
+def sql_indexes(app, style, connection, db='default'):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
     for model in models.get_models(app):
+        if not router.allow_syncdb(db, model):
+            continue
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
@@ -145,9 +151,9 @@ def sql_destroy_indexes(app, style, connection):
     return output
 
 
-def sql_all(app, style, connection):
+def sql_all(app, style, connection, db='default'):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
+    return sql_create(app, style, connection, db) + sql_custom(app, style, connection, db) + sql_indexes(app, style, connection, db)
 
 
 def _split_statements(content):
