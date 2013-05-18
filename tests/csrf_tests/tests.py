@@ -284,6 +284,19 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertEqual(403, req2.status_code)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_https_malformed_referer(self):
+        """
+        Test that a POST HTTPS request with a bad referer is rejected
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'http://http://www.example.com/'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertNotEqual(None, req2)
+        self.assertEqual(403, req2.status_code)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
         """
         Test that a POST HTTPS request with a good referer is accepted
