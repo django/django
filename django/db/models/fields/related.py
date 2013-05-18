@@ -1146,6 +1146,27 @@ class ForeignKey(ForeignObject):
         )
         super(ForeignKey, self).__init__(to, ['self'], [to_field], **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(ForeignKey, self).deconstruct()
+        # Handle the simpler arguments
+        if self.db_index:
+            del kwargs['db_index']
+        else:
+            kwargs['db_index'] = False
+        if self.db_constraint is not True:
+            kwargs['db_constraint'] = self.db_constraint
+        if self.rel.on_delete is not CASCADE:
+            kwargs['on_delete'] = self.rel.on_delete
+        # Rel needs more work.
+        rel = self.rel
+        if self.rel.field_name:
+            kwargs['to_field'] = self.rel.field_name
+        if isinstance(self.rel.to, basestring):
+            kwargs['to'] = self.rel.to
+        else:
+            kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        return name, path, args, kwargs
+
     @property
     def related_field(self):
         return self.foreign_related_fields[0]
@@ -1263,6 +1284,12 @@ class OneToOneField(ForeignKey):
         kwargs['unique'] = True
         super(OneToOneField, self).__init__(to, to_field, OneToOneRel, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(OneToOneField, self).deconstruct()
+        if "unique" in kwargs:
+            del kwargs['unique']
+        return name, path, args, kwargs
+
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(),
                 SingleRelatedObjectDescriptor(related))
@@ -1354,6 +1381,20 @@ class ManyToManyField(RelatedField):
 
         msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
+        # Handle the simpler arguments
+        if self.rel.db_constraint is not True:
+            kwargs['db_constraint'] = self.db_constraint
+        del kwargs['help_text']
+        # Rel needs more work.
+        rel = self.rel
+        if isinstance(self.rel.to, basestring):
+            kwargs['to'] = self.rel.to
+        else:
+            kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
+        return name, path, args, kwargs
 
     def _get_path_info(self, direct=False):
         """
