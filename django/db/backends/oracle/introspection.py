@@ -1,5 +1,5 @@
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
-from django.utils import six
+from django.utils.encoding import force_text
 import cx_Oracle
 import re
 
@@ -49,7 +49,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            name = desc[0] if six.PY3 else unicode(desc[0],'utf-8') # cx_Oracle always returns a 'str'...
+            name = force_text(desc[0]) # cx_Oracle always returns a 'str', which is bytes in Python 2
             description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 
