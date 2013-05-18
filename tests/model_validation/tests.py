@@ -1,7 +1,6 @@
-import io
-
 from django.core import management
 from django.test import TestCase
+from django.utils import six
 
 
 class ModelValidationTest(TestCase):
@@ -11,4 +10,4 @@ class ModelValidationTest(TestCase):
         # Validation Tests:
         #   * choices= Iterable of Iterables
         #       See: https://code.djangoproject.com/ticket/20430
-        management.call_command("validate", stdout=io.BytesIO())
+        management.call_command("validate", stdout=six.StringIO())
