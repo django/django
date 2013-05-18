@@ -54,10 +54,10 @@ your :setting:`INSTALLED_APPS`.
 
 .. versionchanged:: 1.6
 
-    Django did not allow fully qualified paths in version 1.5 and earlier.
+    Prior to version 1.6 Django did not allow fully qualified module names.
     Starting with version 1.6 adding the application to `INSTALLED_APPS` is no
     longer a requirement if you only intend to use the fully qualified module
-    name which is useful for packages consisting of just template tags.
+    name.
 
 There's no limit on how many modules you put in the ``templatetags`` package.
 Just keep in mind that a :ttag:`{% load %}<load>` statement will load
