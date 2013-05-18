@@ -485,6 +485,13 @@ Miscellaneous
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
 
+* There have been changes in the way timeouts are handled in the cache backend.
+  Explicitly passing in None as a timeout into the cache backend no longer
+  results in using the default timeout. It will now set a non-expiring
+  timeout. Passing 0 into the memcache backends no longer use the default
+  timeout, and now will set-and-expire the value. See the section in the
+  cache docs for full timeout handling information.
+
 Features deprecated in 1.6
 ==========================
 
