@@ -527,24 +527,26 @@ class DefaultFiltersTests(TestCase):
 
     def test_timesince(self):
         # real testing is done in timesince.py, where we can provide our own 'now'
+        # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(
             timesince_filter(datetime.datetime.now() - datetime.timedelta(1)),
-            '1 day')
+            '1\xa0day')
 
         self.assertEqual(
             timesince_filter(datetime.datetime(2005, 12, 29),
                              datetime.datetime(2005, 12, 30)),
-            '1 day')
+            '1\xa0day')
 
     def test_timeuntil(self):
+        # NOTE: \xa0 avoids wrapping between value and unit
         self.assertEqual(
             timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1, 1)),
-            '1 day')
+            '1\xa0day')
 
         self.assertEqual(
             timeuntil_filter(datetime.datetime(2005, 12, 30),
                              datetime.datetime(2005, 12, 29)),
-            '1 day')
+            '1\xa0day')
 
     def test_default(self):
         self.assertEqual(default("val", "default"), 'val')
@@ -574,43 +576,45 @@ class DefaultFiltersTests(TestCase):
                           'get out of town')
 
     def test_filesizeformat(self):
-        self.assertEqual(filesizeformat(1023), '1023 bytes')
-        self.assertEqual(filesizeformat(1024), '1.0 KB')
-        self.assertEqual(filesizeformat(10*1024), '10.0 KB')
-        self.assertEqual(filesizeformat(1024*1024-1), '1024.0 KB')
-        self.assertEqual(filesizeformat(1024*1024), '1.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*50), '50.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0 MB')
-        self.assertEqual(filesizeformat(1024*1024*1024), '1.0 GB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0 TB')
-        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0 PB')
+        # NOTE: \xa0 avoids wrapping between value and unit
+        self.assertEqual(filesizeformat(1023), '1023\xa0bytes')
+        self.assertEqual(filesizeformat(1024), '1.0\xa0KB')
+        self.assertEqual(filesizeformat(10*1024), '10.0\xa0KB')
+        self.assertEqual(filesizeformat(1024*1024-1), '1024.0\xa0KB')
+        self.assertEqual(filesizeformat(1024*1024), '1.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*50), '50.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*1024-1), '1024.0\xa0MB')
+        self.assertEqual(filesizeformat(1024*1024*1024), '1.0\xa0GB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024), '1.0\xa0TB')
+        self.assertEqual(filesizeformat(1024*1024*1024*1024*1024), '1.0\xa0PB')
         self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                          '2000.0 PB')
-        self.assertEqual(filesizeformat(complex(1,-1)), '0 bytes')
-        self.assertEqual(filesizeformat(""), '0 bytes')
+                          '2000.0\xa0PB')
+        self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0bytes')
+        self.assertEqual(filesizeformat(""), '0\xa0bytes')
         self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                          '0 bytes')
+                          '0\xa0bytes')
 
     def test_localized_filesizeformat(self):
+        # NOTE: \xa0 avoids wrapping between value and unit
         with self.settings(USE_L10N=True):
             with translation.override('de', deactivate=True):
-                self.assertEqual(filesizeformat(1023), '1023 Bytes')
-                self.assertEqual(filesizeformat(1024), '1,0 KB')
-                self.assertEqual(filesizeformat(10*1024), '10,0 KB')
-                self.assertEqual(filesizeformat(1024*1024-1), '1024,0 KB')
-                self.assertEqual(filesizeformat(1024*1024), '1,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*50), '50,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0 MB')
-                self.assertEqual(filesizeformat(1024*1024*1024), '1,0 GB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0 TB')
+                self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
+                self.assertEqual(filesizeformat(1024), '1,0\xa0KB')
+                self.assertEqual(filesizeformat(10*1024), '10,0\xa0KB')
+                self.assertEqual(filesizeformat(1024*1024-1), '1024,0\xa0KB')
+                self.assertEqual(filesizeformat(1024*1024), '1,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*50), '50,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0\xa0MB')
+                self.assertEqual(filesizeformat(1024*1024*1024), '1,0\xa0GB')
+                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0\xa0TB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
-                                  '1,0 PB')
+                                  '1,0\xa0PB')
                 self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                                  '2000,0 PB')
-                self.assertEqual(filesizeformat(complex(1,-1)), '0 Bytes')
-                self.assertEqual(filesizeformat(""), '0 Bytes')
+                                  '2000,0\xa0PB')
+                self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0Bytes')
+                self.assertEqual(filesizeformat(""), '0\xa0Bytes')
                 self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                                  '0 Bytes')
+                                  '0\xa0Bytes')
 
     def test_pluralize(self):
         self.assertEqual(pluralize(1), '')

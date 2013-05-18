@@ -14,7 +14,7 @@ from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
-    escape, urlize as urlize_impl, linebreaks, strip_tags)
+    escape, urlize as urlize_impl, linebreaks, strip_tags, avoid_wrapping)
 from django.utils.http import urlquote
 from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
@@ -810,7 +810,8 @@ def filesizeformat(bytes):
     try:
         bytes = float(bytes)
     except (TypeError,ValueError,UnicodeDecodeError):
-        return ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        return avoid_wrapping(value)
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
@@ -821,16 +822,19 @@ def filesizeformat(bytes):
     PB = 1<<50
 
     if bytes < KB:
-        return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    if bytes < MB:
-        return ugettext("%s KB") % filesize_number_format(bytes / KB)
-    if bytes < GB:
-        return ugettext("%s MB") % filesize_number_format(bytes / MB)
-    if bytes < TB:
-        return ugettext("%s GB") % filesize_number_format(bytes / GB)
-    if bytes < PB:
-        return ugettext("%s TB") % filesize_number_format(bytes / TB)
-    return ugettext("%s PB") % filesize_number_format(bytes / PB)
+        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
+    elif bytes < MB:
+        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
+    elif bytes < GB:
+        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
+    elif bytes < TB:
+        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
+    elif bytes < PB:
+        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
+    else:
+        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+
+    return avoid_wrapping(value)
 
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
