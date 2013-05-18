@@ -9,7 +9,7 @@ import warnings
 
 from django.core.exceptions import ValidationError
 from django.forms.fields import Field, FileField
-from django.forms.util import flatatt, ErrorDict, ErrorList
+from django.forms.util import flatatt, ErrorDict, ErrorList, WarningDict, WarningList
 from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape, format_html
@@ -77,8 +77,8 @@ class BaseForm(object):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False):
+                 initial=None, error_class=ErrorList, warning_class=WarningList,
+                 label_suffix=':', empty_permitted=False):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -86,9 +86,11 @@ class BaseForm(object):
         self.prefix = prefix
         self.initial = initial or {}
         self.error_class = error_class
+        self.warning_class = warning_class
         self.label_suffix = label_suffix
         self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
+        self._warnings = None
         self._changed_data = None
 
         # The base_fields class attribute is the *class-wide* definition of
@@ -120,11 +122,20 @@ class BaseForm(object):
             self.full_clean()
         return self._errors
 
-    def is_valid(self):
+    def _get_warnings(self):
+        "Returns a WarningDict for the data provided for the form"
+        if self._warnings is None:
+            self.full_clean()
+        return self._warnings
+    warnings = property(_get_warnings)
+
+    def is_valid(self, require_no_warnings=False):
         """
         Returns True if the form has no errors. Otherwise, False. If errors are
         being ignored, returns False.
         """
+        if require_no_warnings:
+            return self.is_bound and not bool(self.errors) and not bool(self.warnings)
         return self.is_bound and not bool(self.errors)
 
     def add_prefix(self, field_name):
@@ -142,16 +153,26 @@ class BaseForm(object):
         """
         return 'initial-%s' % self.add_prefix(field_name)
 
+    def add_warning(self, field_name, message):
+        if field_name in self._warnings:
+            self._warnings[field_name].append(message)
+        else:
+            self._warnings[field_name] = WarningList([message])
+
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
+        top_warnings = self.non_field_warnings()
         output, hidden_fields = [], []
 
         for name, field in self.fields.items():
             html_class_attr = ''
             bf = self[name]
+
             # Escape and cache in local variable.
             bf_errors = self.error_class([conditional_escape(error) for error in bf.errors])
+            bf_warnings = self.warning_class([conditional_escape(warning) for warning in bf.warnings])
+
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(
@@ -167,6 +188,9 @@ class BaseForm(object):
 
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % force_text(bf_errors))
+
+                if errors_on_separate_row and bf_warnings:
+                    output.append(error_row % force_text(bf_warnings))
 
                 if bf.label:
                     label = conditional_escape(force_text(bf.label))
@@ -194,6 +218,9 @@ class BaseForm(object):
 
         if top_errors:
             output.insert(0, error_row % force_text(top_errors))
+
+        if top_warnings:
+            output.insert(0, error_row % force_text(top_warnings))
 
         if hidden_fields: # Insert any hidden fields in the last row.
             str_hidden = ''.join(hidden_fields)
@@ -252,6 +279,14 @@ class BaseForm(object):
         """
         return self.errors.get(NON_FIELD_ERRORS, self.error_class())
 
+    def non_field_warnings(self):
+        """
+        Returns an WarningList of warnings that aren't associated with a particular
+        field -- i.e., from Form.clean(). Returns an empty WarningList if there
+        are none.
+        """
+        return self.warnings.get(NON_FIELD_ERRORS, self.warning_class())
+
     def _raw_value(self, fieldname):
         """
         Returns the raw_value for a particular field name. This is just a
@@ -263,10 +298,11 @@ class BaseForm(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors and
+        Cleans all of self.data and populates self._errors, self._warnings and
         self.cleaned_data.
         """
         self._errors = ErrorDict()
+        self._warnings = WarningDict()
         if not self.is_bound: # Stop further processing.
             return
         self.cleaned_data = {}
@@ -287,12 +323,21 @@ class BaseForm(object):
             try:
                 if isinstance(field, FileField):
                     initial = self.initial.get(name, field.initial)
-                    value = field.clean(value, initial)
+                    try:
+                        value = field.clean(value, initial)
+                    except TypeError:
+                        value = field.clean(value, initial, lambda m: self.add_warning(name, m))
                 else:
-                    value = field.clean(value)
+                    try:
+                        value = field.clean(value)
+                    except TypeError:
+                        value = field.clean(value, lambda m: self.add_warning(name, m))
                 self.cleaned_data[name] = value
                 if hasattr(self, 'clean_%s' % name):
-                    value = getattr(self, 'clean_%s' % name)()
+                    try:
+                        value = getattr(self, 'clean_%s' % name)(lambda m: self.add_warning(name, m))
+                    except TypeError:
+                        value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError as e:
                 self._errors[name] = self.error_class(e.messages)
@@ -301,7 +346,10 @@ class BaseForm(object):
 
     def _clean_form(self):
         try:
-            self.cleaned_data = self.clean()
+            try:
+                self.cleaned_data = self.clean(lambda m: self.add_warning(name, m))
+            except TypeError:
+                self.cleaned_data = self.clean()
         except ValidationError as e:
             self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
 
@@ -449,6 +497,10 @@ class BoundField(object):
         if there are none.
         """
         return self.form.errors.get(self.name, self.form.error_class())
+
+    def _warnings(self):
+        return self.form.warnings.get(self.name, self.form.warning_class())
+    warnings = property(_warnings)
 
     def as_widget(self, widget=None, attrs=None, only_initial=False):
         """

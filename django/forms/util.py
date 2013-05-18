@@ -68,6 +68,31 @@ class ErrorList(list):
     def __repr__(self):
         return repr([force_text(e) for e in self])
 
+class WarningDict(ErrorDict):
+    """
+    A collection of warnings that knows how to display itself in various formats.
+
+    The dictionary keys are the field names, and the values are the warnings.
+    """
+    def as_ul(self):
+        if not self: return ''
+        return format_html('<ul class="warninglist">{0}</ul>',
+                           format_html_join('', '<li>{0}</li>',
+                                            ((k, force_text(v))
+                                             for k, v in self.items())
+                           ))
+
+class WarningList(ErrorList):
+    """
+    A collection of warnings that knows how to display itself in various formats.
+    """
+    def as_ul(self):
+        if not self: return ''
+        return format_html('<ul class="warninglist">{0}</ul>',
+                           format_html_join('', '<li>{0}</li>',
+                                            ((force_text(e),) for e in self)
+                           ))
+
 # Utilities for time zone support in DateTimeField et al.
 
 def from_current_timezone(value):
