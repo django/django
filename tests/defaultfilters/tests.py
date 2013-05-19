@@ -312,7 +312,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('see test[at[example.com'),
             'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
         self.assertEqual(urlize('[http://168.192.0.1](http://168.192.0.1)'),
-                         u'[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">http://168.192.0.1](http://168.192.0.1)</a>')
+            '[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">http://168.192.0.1](http://168.192.0.1)</a>')
 
         # Check urlize works with IPv4/IPv6 addresses
         self.assertEqual(urlize('http://192.168.0.15/api/9'),
