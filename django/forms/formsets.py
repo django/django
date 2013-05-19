@@ -250,9 +250,9 @@ class BaseFormSet(object):
         form -- i.e., from formset.clean(). Returns an empty ErrorList if there
         are none.
         """
-        if self._non_form_errors is not None:
-            return self._non_form_errors
-        return self.error_class()
+        if self._non_form_errors is None:
+            self.full_clean()
+        return self._non_form_errors
 
     @property
     def errors(self):
@@ -291,9 +291,12 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors.
+        Cleans all of self.data and populates self._errors and
+        self._non_form_errors.
         """
         self._errors = []
+        self._non_form_errors = self.error_class()
+
         if not self.is_bound: # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
