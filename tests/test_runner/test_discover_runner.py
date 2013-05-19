@@ -1,3 +1,6 @@
+from contextlib import contextmanager
+import os
+
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
@@ -61,8 +64,19 @@ class DiscoverRunnerTest(TestCase):
         self.assertEqual(count, 1)
 
     def test_file_path(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample/"],
-        ).countTestCases()
+        @contextmanager
+        def change_cwd_to_tests():
+            """Change CWD to tests directory (one level up from this file)"""
+            current_dir = os.path.abspath(os.path.dirname(__file__))
+            tests_dir = os.path.join(current_dir, '..')
+            old_cwd = os.getcwd()
+            os.chdir(tests_dir)
+            yield
+            os.chdir(old_cwd)
+
+        with change_cwd_to_tests():
+            count = DiscoverRunner().build_suite(
+                ["test_discovery_sample/"],
+            ).countTestCases()
 
         self.assertEqual(count, 4)
