@@ -1157,6 +1157,7 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
     LANGUAGES=(
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
+        ('pt-br', 'Portugese (Brazil)'),
     ),
     MIDDLEWARE_CLASSES=(
         'django.middleware.locale.LocaleMiddleware',
@@ -1176,7 +1177,6 @@ class CountrySpecificLanguageTests(TransRealMixin, TestCase):
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
 
-
     def test_get_language_from_request(self):
         # issue 19919
         r = self.rf.get('/')
@@ -1189,3 +1189,16 @@ class CountrySpecificLanguageTests(TransRealMixin, TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('bg', lang)
+
+    def test_specific_language_codes(self):
+        # issue 11915
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)
