@@ -306,13 +306,13 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
             '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
 
-        # Check urlize doesn't crash when square bracket is appended to url (#19070)
+        # Check urlize handles brackets properly (#19070)
         self.assertEqual(urlize('[see www.example.com]'),
             '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
-
-        # Check urlize doesn't crash when square bracket is prepended to url (#19070)
         self.assertEqual(urlize('see test[at[example.com'),
             'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
+        self.assertEqual(urlize('[http://168.192.0.1](http://168.192.0.1)'),
+                         u'[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">http://168.192.0.1](http://168.192.0.1)</a>')
 
         # Check urlize works with IPv4/IPv6 addresses
         self.assertEqual(urlize('http://192.168.0.15/api/9'),
