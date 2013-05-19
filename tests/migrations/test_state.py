@@ -23,6 +23,7 @@ class StateTests(TestCase):
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache
+                unique_together = ["name", "bio"]
 
         class Book(models.Model):
             title = models.CharField(max_length=1000)
@@ -30,6 +31,8 @@ class StateTests(TestCase):
             class Meta:
                 app_label = "migrations"
                 app_cache = new_app_cache
+                verbose_name = "tome"
+                db_table = "test_tome"
 
         project_state = ProjectState.from_app_cache(new_app_cache)
         author_state = project_state.models['migrations', 'author']
@@ -41,6 +44,7 @@ class StateTests(TestCase):
         self.assertEqual(author_state.fields[1][1].max_length, 255)
         self.assertEqual(author_state.fields[2][1].null, False)
         self.assertEqual(author_state.fields[3][1].null, True)
+        self.assertEqual(author_state.options, {"unique_together": ["name", "bio"]})
         self.assertEqual(author_state.bases, (models.Model, ))
         
         self.assertEqual(book_state.app_label, "migrations")
@@ -48,6 +52,7 @@ class StateTests(TestCase):
         self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author"])
         self.assertEqual(book_state.fields[1][1].max_length, 1000)
         self.assertEqual(book_state.fields[2][1].null, False)
+        self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome"})
         self.assertEqual(book_state.bases, (models.Model, ))
 
     def test_render(self):

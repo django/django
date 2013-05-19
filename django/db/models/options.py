@@ -85,6 +85,10 @@ class Options(object):
         self.model_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
 
+        # Store the original user-defined values for each option,
+        # for use when serializing the model definition
+        self.original_attrs = {}
+
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__.copy()
@@ -97,8 +101,10 @@ class Options(object):
             for attr_name in DEFAULT_NAMES:
                 if attr_name in meta_attrs:
                     setattr(self, attr_name, meta_attrs.pop(attr_name))
+                    self.original_attrs[attr_name] = getattr(self, attr_name)
                 elif hasattr(self.meta, attr_name):
                     setattr(self, attr_name, getattr(self.meta, attr_name))
+                    self.original_attrs[attr_name] = getattr(self, attr_name)
 
             # unique_together can be either a tuple of tuples, or a single
             # tuple of two strings. Normalize it to a tuple of tuples, so that

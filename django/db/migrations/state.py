@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.loading import BaseAppCache
+from django.db.models.options import DEFAULT_NAMES
 from django.utils.module_loading import import_by_path
 
 
@@ -66,13 +67,21 @@ class ModelState(object):
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
             fields.append((name, field_class(*args, **kwargs)))
+        # Extract the options
+        options = {}
+        for name in DEFAULT_NAMES:
+            # Ignore some special options
+            if name in ["app_cache", "app_label"]:
+                continue
+            if name in model._meta.original_attrs:
+                options[name] = model._meta.original_attrs[name]
         # Make our record
         return cls(
             model._meta.app_label,
             model._meta.object_name,
             fields,
-            {},
-            None,
+            options,
+            model.__bases__,
         )
 
     def clone(self):
