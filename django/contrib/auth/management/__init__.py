@@ -80,7 +80,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
         for perm in _get_all_permissions(klass._meta, ctype):
             searched_perms.append((ctype, perm))
 
-    # Find all the Permissions that have a context_type for a model we're
+    # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
     all_perms = set(auth_app.Permission.objects.using(db).filter(
