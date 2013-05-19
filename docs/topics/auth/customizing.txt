@@ -1092,7 +1092,7 @@ code would be required in the app's ``admin.py`` file::
     # unregister the Group model from admin.
     admin.site.unregister(Group)
 
-Finally specify the custom model as the default user model for your project using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
+Finally, specify the custom model as the default user model for your project
+using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = 'customauth.MyUser'
-    
