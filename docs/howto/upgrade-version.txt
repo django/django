@@ -1,0 +1,82 @@
+=========================== 
+Upgrading Django to a newer version
+===========================
+
+While it can be a complex process at times, upgrading to the latest Django
+version has various advantages:
+
+* New features and improvements become available as Django is developed. 
+* Bugs and other problems are fixed. 
+* Continuous upgrades make future upgrades less painful by keeping your code base
+  up to date. 
+* Upgrading ensures your Django version is still maintained.
+
+The following are some things to consider to make your upgrade process as smooth
+as possible.
+
+Release Notes & Getting Ready
+=================
+
+If it is your first time doing an upgrade, it is useful to read the :doc:`guide on the
+different release processes </internals/release-process>`. 
+
+Afterwards before diving in you should familiarize with the changes that were
+made in the new Django version:
+
+* Read all the :doc:`release notes </releases/index>` since the version your upgrading from.
+* Look at the :doc:`deprecation timeline</internals/deprecation>`.
+
+Pay particular attention to backwards incompatible changes to get a clear idea
+of what will be needed for a successful upgrade. 
+
+Dependencies
+=================
+
+A very important subject are dependencies. In most cases it will be necessary to
+upgrade to the latest version of your dependencies as well. 
+If the Django version just came out or some of your dependencies are not 
+well-maintained, they may not yet support the new Django version.
+
+In these cases you might have to wait until new versions of your dependencies 
+are released that support the Django version you want to upgrade to. 
+
+Installation
+=================
+
+Once you're ready, it is time to :doc:`install the new Django version </topics/install>`.
+If you are using virtualenv_ and it is a major upgrade, you might want to set up
+a new environment will all the dependencies first. 
+
+Which steps you need to take depends on the installation process which you use. 
+The most convenient way is to use pip_: 
+
+.. code-block:: bash
+
+   pip install Django
+
+pip_ also automatically uninstalls the previous version of Django. 
+
+If you install Django manually or use some other installation process, you 
+might have to manually :ref:`uninstall the old Django version<removing-old-versions-of-django>` and should look at the
+complete installation instructions. 
+
+.. _pip: http://www.pip-installer.org/
+.. _virtualenv: http://www.virtualenv.org/
+
+Testing
+=================
+
+When the environment is set up, :doc:`run the full test suite </topics/testing/overview>`. In Python 2.7 all
+deprecation warnings are silenced by default. It is useful to turn the warnings
+on for these tests so they are shown in the development server output:
+
+.. code-block:: bash
+
+    python -Wall manage.py test
+
+After you have run the tests, fix and refactor your code until they all pass.
+
+Deployment
+=================
+
+With all the tests passing, you're ready to go ahead and :doc:`deploy </howto/deployment>` your upgraded Django project. 
