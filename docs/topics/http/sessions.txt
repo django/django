@@ -124,8 +124,8 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the :setting:`SECRET_KEY` is not kept secret, this can lead to
-    arbitrary remote code execution.**
+    **If the SECRET_KEY is not kept secret, this can lead to arbitrary remote
+    code execution.**
 
     An attacker in possession of the :setting:`SECRET_KEY` can not only
     generate falsified session data, which your site will trust, but also
