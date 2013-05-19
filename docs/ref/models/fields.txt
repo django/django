@@ -98,6 +98,8 @@ second element is the human-readable name. For example::
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
 
+    from django.db import models
+
     class Student(models.Model):
         FRESHMAN = 'FR'
         SOPHOMORE = 'SO'
@@ -997,12 +999,15 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
+    from django.db import models
+
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
         # ...
 
     class Manufacturer(models.Model):
         # ...
+        pass
 
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
@@ -1135,6 +1140,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     necessary to avoid executing queries at the time your models.py is
     imported::
 
+        from django.db import models
+        from django.contrib.auth.models import User
+
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
 
@@ -1206,6 +1214,8 @@ that control how the relationship functions.
 
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
+
+        from django.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")

@@ -62,6 +62,8 @@ For example, this custom ``Manager`` offers a method ``with_counts()``, which
 returns a list of all ``OpinionPoll`` objects, each with an extra
 ``num_responses`` attribute that is the result of an aggregate query::
 
+    from django.db import models
+
     class PollManager(models.Manager):
         def with_counts(self):
             from django.db import connection
@@ -100,6 +102,8 @@ Modifying initial Manager QuerySets
 
 A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
+
+    from django.db import models
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
@@ -236,7 +240,7 @@ class, but still customize the default manager. For example, suppose you have
 this base class::
 
     class AbstractBase(models.Model):
-        ...
+        # ...
         objects = CustomManager()
 
         class Meta:
@@ -246,14 +250,15 @@ If you use this directly in a subclass, ``objects`` will be the default
 manager if you declare no managers in the base class::
 
     class ChildA(AbstractBase):
-        ...
+        # ...
         # This class has CustomManager as the default manager.
+        pass
 
 If you want to inherit from ``AbstractBase``, but provide a different default
 manager, you can provide the default manager on the child class::
 
     class ChildB(AbstractBase):
-        ...
+        # ...
         # An explicit default manager.
         default_manager = OtherManager()
 
@@ -274,9 +279,10 @@ it into the inheritance hierarchy *after* the defaults::
             abstract = True
 
     class ChildC(AbstractBase, ExtraManager):
-        ...
+        # ...
         # Default manager is CustomManager, but OtherManager is
         # also available via the "extra_manager" attribute.
+        pass
 
 Note that while you can *define* a custom manager on the abstract model, you
 can't *invoke* any methods using the abstract model. That is::
@@ -349,8 +355,7 @@ the manager class::
 
     class MyManager(models.Manager):
         use_for_related_fields = True
-
-        ...
+        # ...
 
 If this attribute is set on the *default* manager for a model (only the
 default manager is considered in these situations), Django will use that class
@@ -396,7 +401,8 @@ it, whereas the following will not work::
 
     # BAD: Incorrect code
     class MyManager(models.Manager):
-        ...
+        # ...
+        pass
 
     # Sets the attribute on an instance of MyManager. Django will
     # ignore this setting.
@@ -404,7 +410,7 @@ it, whereas the following will not work::
     mgr.use_for_related_fields = True
 
     class MyModel(models.Model):
-        ...
+        # ...
         objects = mgr
 
     # End of incorrect code.

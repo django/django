@@ -136,6 +136,8 @@ object. For more on :class:`~django.http.HttpRequest` objects, see the
 After somebody votes in a poll, the ``vote()`` view redirects to the results
 page for the poll. Let's write that view::
 
+    from django.shortcuts import get_object_or_404, render
+
     def results(request, poll_id):
         poll = get_object_or_404(Poll, pk=poll_id)
         return render(request, 'polls/results.html', {'poll': poll})
