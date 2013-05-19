@@ -13,7 +13,7 @@ from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_o
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-from django.core.exceptions import PermissionDenied, ValidationError, FieldError
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError, ImproperlyConfigured
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -1467,6 +1467,14 @@ class InlineModelAdmin(BaseModelAdmin):
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
+    def get_extra(self, request, obj=None, **kwargs):
+        """Get the number of extra inline forms needed"""
+        # extra = 3
+        if not isinstance(self.extra, int):
+            raise ImproperlyConfigured("'%s.extra' should be a integer."
+                                       % self.__class__.__name__)
+        return self.extra
+
     def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
         if self.declared_fieldsets:
@@ -1493,7 +1501,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "fields": fields,
             "exclude": exclude,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "extra": self.extra,
+            "extra": self.get_extra(request, obj, *kwargs),
             "max_num": self.max_num,
             "can_delete": can_delete,
         }
