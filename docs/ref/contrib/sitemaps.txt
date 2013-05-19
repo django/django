@@ -280,6 +280,46 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
 .. _URLconf: ../url_dispatch/
 
+Sitemap for static views
+========================
+
+Often you want the search engine crawlers to index views which are neither
+object detail pages nor flatpages. The solution is to explicitly list URL
+names for these views in ``items`` and call
+:func:`~django.core.urlresolvers.reverse` in the ``location`` method of
+the sitemap. For example::
+
+    # sitemaps.py
+    from django.contrib import sitemaps
+    from django.core.urlresolvers import reverse
+
+    class StaticViewSitemap(sitemaps.Sitemap):
+        priority = 0.5
+        changefreq = 'daily'
+
+        def items(self):
+            return ['main', 'about', 'license']
+
+        def location(self, item):
+            return reverse(item)
+
+    # urls.py
+    from django.conf.urls import patterns, url
+    from .sitemaps import StaticViewSitemap
+
+    sitemaps = {
+        'static': StaticViewSitemap,
+    }
+
+    urlpatterns = patterns('',
+        url(r'^$', 'views.main', name='main'),
+        url(r'^about/$', 'views.about', name='about'),
+        url(r'^license/$', 'views.license', name='license'),
+        # ...
+        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+    )
+
+
 Creating a sitemap index
 ========================
 

@@ -578,20 +578,20 @@ streaming response if (and only if) no middleware accesses the
     instantiated with an iterator. Django will consume and save the content of
     the iterator on first access.
 
-Setting headers
-~~~~~~~~~~~~~~~
+Setting header fields
+~~~~~~~~~~~~~~~~~~~~~
 
-To set or remove a header in your response, treat it like a dictionary::
+To set or remove a header field in your response, treat it like a dictionary::
 
     >>> response = HttpResponse()
     >>> response['Cache-Control'] = 'no-cache'
     >>> del response['Cache-Control']
 
 Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
-doesn't exist.
+field doesn't exist.
 
-HTTP headers cannot contain newlines. An attempt to set a header containing a
-newline character (CR or LF) will raise ``BadHeaderError``
+HTTP header fields cannot contain newlines. An attempt to set a header field
+containing a newline character (CR or LF) will raise ``BadHeaderError``
 
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
