@@ -100,7 +100,10 @@ class FixtureTestCase(TestCase):
         )
 
         # Load a fixture that doesn't exist
-        management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
+        import warnings
+        with warnings.catch_warnings(record=True):
+            management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
+
         self.assertQuerysetEqual(
             Article.objects.all(), [
                 "Django conquers world!",

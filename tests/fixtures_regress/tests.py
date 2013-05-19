@@ -441,7 +441,8 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_existant_fixture_file(self):
         stdout_output = StringIO()
-        with self.assertRaises(management.CommandError):
+        import warnings
+        with warnings.catch_warnings(record=True):
             management.call_command(
                 'loaddata',
                 'this_fixture_doesnt_exist',

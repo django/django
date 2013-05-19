@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import warnings
+
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
@@ -137,14 +139,18 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Book: Music for all ages by Artist formerly known as "Prince" and Django Reinhardt>'
         ])
 
-        # Loading a fixture that doesn't exist results in an error
-        with self.assertRaises(management.CommandError):
+        # Loading a fixture that doesn't exist emits a warning
+        with warnings.catch_warnings(record=True) as w:
             management.call_command('loaddata', 'unknown.json', verbosity=0,
                 commit=False)
+        self.assertEqual(len(w), 1)
+        self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
 
         # An attempt to load a nonexistent 'initial_data' fixture isn't an error
-        management.call_command('loaddata', 'initial_data.json', verbosity=0,
-            commit=False)
+        with warnings.catch_warnings(record=True) as w:
+            management.call_command('loaddata', 'initial_data.json', verbosity=0,
+                commit=False)
+        self.assertEqual(len(w), 0)
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -279,10 +285,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        with self.assertRaises(management.CommandError):
+        with warnings.catch_warnings(record=True):
             management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
 
-        with self.assertRaises(management.CommandError):
+        with warnings.catch_warnings(record=True):
             management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
         self.assertQuerysetEqual(Article.objects.all(), [])
 
