@@ -254,7 +254,7 @@ WHEN (new.%(col_name)s IS NULL)
     def fetch_returned_insert_id(self, cursor):
         return int(cursor._insert_id_var.getvalue())
 
-    def field_cast_sql(self, db_type):
+    def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
         else:
