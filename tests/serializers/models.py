@@ -35,6 +35,9 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def age(self):
+        return 42
 
 @python_2_unicode_compatible
 class Article(models.Model):

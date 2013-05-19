@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
 from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -81,6 +81,14 @@ class Serializer(base.Serializer):
         else:
             self.xml.addQuickElement("None")
 
+        self.xml.endElement("field")
+
+    def handle_extra_attr(self, obj, field):
+        self.indent(2)
+        self.xml.startElement("field", {
+            "name": field,
+        })
+        self.xml.characters(force_text(getattr(obj, field)))
         self.xml.endElement("field")
 
     def handle_fk_field(self, obj, field):
