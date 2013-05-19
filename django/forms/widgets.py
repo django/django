@@ -851,8 +851,11 @@ class SplitDateTimeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
-            value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
+            try:
+                value = to_current_timezone(value)
+                return [value.date(), value.time().replace(microsecond=0)]
+            except AttributeError:
+                pass
         return [None, None]
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):

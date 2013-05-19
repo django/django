@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime, date
 from functools import update_wrapper, partial
 
 from django import forms
@@ -29,6 +30,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.formats import ISO_INPUT_FORMATS
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
@@ -1045,6 +1047,24 @@ class ModelAdmin(BaseModelAdmin):
                     continue
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
+                elif isinstance(f, models.DateTimeField):
+                    datetime_input_formats = ISO_INPUT_FORMATS.get(
+                        'DATETIME_INPUT_FORMATS', ())
+                    for format in datetime_input_formats:
+                        try:
+                            initial[k] = datetime.strptime(initial[k], format)
+                            break
+                        except ValueError:
+                            continue
+                elif isinstance(f, models.DateField):
+                    date_input_formats = ISO_INPUT_FORMATS.get(
+                        'DATE_INPUT_FORMATS', ())
+                    for format in date_input_formats:
+                        try:
+                            initial[k] = datetime.strptime(initial[k], format).date()
+                            break
+                        except ValueError:
+                            continue
             form = ModelForm(initial=initial)
             prefixes = {}
             for FormSet, inline in zip(self.get_formsets(request), inline_instances):
