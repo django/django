@@ -591,6 +591,12 @@ class ComplexSortedPerson(models.Model):
     age = models.PositiveIntegerField()
     is_employee = models.NullBooleanField()
 
+
+class PluggableSearchPerson(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
+
+
 class PrePopulatedPostLargeSlug(models.Model):
     """
     Regression test for #15938: a large max_length for the slugfield must not
