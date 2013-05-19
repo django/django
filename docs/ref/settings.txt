@@ -1362,6 +1362,40 @@ See :ref:`how-django-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
+.. setting:: LANGUAGE_COOKIE_AGE
+
+LANGUAGE_COOKIE_AGE
+-------------------
+
+.. versionadded:: 1.7
+
+Default: ``None`` (expires at browser close)
+
+The age of the language cookie, in seconds.
+
+.. setting:: LANGUAGE_COOKIE_DOMAIN
+
+LANGUAGE_COOKIE_DOMAIN
+----------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The domain to use for the language cookie. Set this to a string such as
+``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
+``None`` for a standard domain cookie.
+
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies that have the old domain
+will not be updated. This will result in site users being unable to switch
+the language as long as these cookies persist. The only safe and reliable
+option to perform the switch is to change the language cookie name
+permanently (via the :setting:`SESSION_COOKIE_NAME` setting) and to add
+a middleware that copies the value from the old cookie to a new one and then
+deletes the old one.
+
 .. setting:: LANGUAGE_COOKIE_NAME
 
 LANGUAGE_COOKIE_NAME
@@ -1372,6 +1406,31 @@ Default: ``'django_language'``
 The name of the cookie to use for the language cookie. This can be whatever
 you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
 :doc:`/topics/i18n/index`.
+
+.. setting:: LANGUAGE_COOKIE_PATH
+
+LANGUAGE_COOKIE_PATH
+--------------------
+
+.. versionadded:: 1.7
+
+Default: ``/``
+
+The path set on the language cookie. This should either match the URL path of your
+Django installation or be a parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths and each instance will only see
+its own language cookie.
+
+Be cautious when updating this setting on a production site. If you update this
+setting to use a deeper path than it previously used, existing user cookies that
+have the old path will not be updated. This will result in site users being
+unable to switch the language as long as these cookies persist. The only safe
+and reliable option to perform the switch is to change the language cookie name
+permanently (via the :setting:`SESSION_COOKIE_NAME` setting), and to add
+a middleware that copies the value from the old cookie to a new one and then
+deletes the one.
 
 .. setting:: LANGUAGES
 
@@ -2801,7 +2860,10 @@ Globalization (i18n/l10n)
 * :setting:`FIRST_DAY_OF_WEEK`
 * :setting:`FORMAT_MODULE_PATH`
 * :setting:`LANGUAGE_CODE`
+* :setting:`LANGUAGE_COOKIE_AGE`
+* :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_NAME`
+* :setting:`LANGUAGE_COOKIE_PATH`
 * :setting:`LANGUAGES`
 * :setting:`LOCALE_PATHS`
 * :setting:`MONTH_DAY_FORMAT`
