@@ -10,6 +10,8 @@ from django.utils._os import upath
 from django.utils import six
 from django.utils import translation
 
+from i18n import TransRealMixin
+
 
 @override_settings(
     USE_I18N=True,
@@ -22,7 +24,7 @@ from django.utils import translation
         ('fr', 'French'),
     ),
 )
-class ContentTypeTests(TestCase):
+class ContentTypeTests(TransRealMixin, TestCase):
     def test_verbose_name(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')
         with translation.override('en'):
