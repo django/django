@@ -1225,7 +1225,7 @@ class ForeignKey(ForeignObject):
                              (self.name, self.rel.to))
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
+            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to).distinct(),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)
@@ -1499,7 +1499,7 @@ class ManyToManyField(RelatedField):
         db = kwargs.pop('using', None)
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to)
+            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
         }
         defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the
