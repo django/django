@@ -72,6 +72,8 @@ following:
 
     For more information on the :ttag:`load` tag, read its documentation.
 
+.. _howto-writing-custom-template-filters:
+
 Writing custom template filters
 -------------------------------
 
