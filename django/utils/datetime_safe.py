@@ -51,7 +51,7 @@ def _findall(text, substr):
         if j == -1:
             break
         sites.append(j)
-        i=j+1
+        i = j + 1
     return sites
 
 def strftime(dt, fmt):
@@ -74,8 +74,8 @@ def strftime(dt, fmt):
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
 
-    s2 = time.strftime(fmt, (year+28,) + timetuple[1:])
-    sites2 = _findall(s2, str(year+28))
+    s2 = time.strftime(fmt, (year + 28,) + timetuple[1:])
+    sites2 = _findall(s2, str(year + 28))
 
     sites = []
     for site in sites1:

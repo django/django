@@ -180,7 +180,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     leading punctuation (opening parens) and it'll still do the right thing.
 
     If trim_url_limit is not None, the URLs in link text longer than this limit
-    will truncated to trim_url_limit-3 characters and appended with an elipsis.
+    will truncated to trim_url_limit-3 characters and appended with an ellipsis.
 
     If nofollow is True, the URLs in link text will get a rel="nofollow"
     attribute.
