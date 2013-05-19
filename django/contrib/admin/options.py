@@ -30,6 +30,7 @@ from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
+from django.forms.widgets import SelectMultiple, CheckboxSelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
@@ -41,6 +42,7 @@ from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
+from django.utils.translation import string_concat
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.utils.safestring import mark_safe
@@ -280,7 +282,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             if queryset is not None:
                 kwargs['queryset'] = queryset
 
-        return db_field.formfield(**kwargs)
+        form_field = db_field.formfield(**kwargs)
+        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
+            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            help_text = form_field.help_text
+            form_field.help_text = string_concat(help_text, ' ', msg) if help_text else msg
+        return form_field
 
     def get_view_on_site_url(self, obj=None):
         if obj is None or not self.view_on_site:
