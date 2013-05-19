@@ -184,6 +184,20 @@ Minor features
 
 * The jQuery library embedded in the admin has been upgraded to version 1.9.1.
 
+* ``InlineModelAdmin`` can override ``get_extra`` method to programmatically
+  determine the number of extra inline forms.
+
+* :class:`~django.contrib.admin.InlineModelAdmin` can override
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_extra` method
+  to programmatically determine the number of extra inline forms.
+
+* ``InlineModelAdmin`` can override ``get_max_num`` method to programmatically
+  determine the maximum number of extra inline forms.
+
+* :class:`~django.contrib.admin.InlineModelAdmin` can override
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num` method
+  to programmatically determine the maximum number of extra inline forms.
+
 * Syndication feeds (:mod:`django.contrib.syndication`) can now pass extra
   context through to feed templates using a new `Feed.get_context_data()`
   callback.

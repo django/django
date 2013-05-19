@@ -12,7 +12,7 @@ from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Title, Novel, Chapter, FootNote)
+    Sighting, Title, Novel, Chapter, FootNote, BinaryTree)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -192,6 +192,20 @@ class TestInline(TestCase):
         response = self.client.post('/admin/admin_inlines/extraterrestrial/add/', data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Sighting.objects.filter(et__name='Martian').count(), 1)
+
+    def test_custom_get_extra_form(self):
+        bt_head = BinaryTree(name="Tree Head")
+        bt_head.save()
+        bt_child = BinaryTree(name="First Child", parent=bt_head)
+        bt_child.save()
+
+        # The total number of forms will remain the same in any case
+        total_forms_hidden = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertContains(response, total_forms_hidden)
+
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, total_forms_hidden)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
