@@ -25,14 +25,15 @@ class TestCaseFixtureLoadingTests(TestCase):
 class DumpDataAssertMixin(object):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
-                         use_base_manager=False, exclude_list=[]):
+                         use_base_manager=False, exclude_list=[], primary_keys=[]):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
                                                       'use_natural_keys': natural_keys,
                                                       'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list})
+                                                      'exclude': exclude_list,
+                                                      'primary_keys': primary_keys})
         command_output = new_io.getvalue().strip()
         if format == "json":
             self.assertJSONEqual(command_output, output)
@@ -210,6 +211,39 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Dump using Django's base manager. Should return all objects,
         # even those normally filtered by the manager
         self._dumpdata_assert(['fixtures.Spy'], '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": true}}, {"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % (spy2.pk, spy1.pk), use_base_manager=True)
+
+    def test_dumpdata_with_pks(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture2.json', verbosity=0, commit=False)
+        self._dumpdata_assert(
+            ['fixtures.Article'],
+            '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+            primary_keys='2,3'
+        )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                ['fixtures'],
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                '',
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                ['fixtures.Article', 'fixtures.category'],
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
