@@ -241,6 +241,10 @@ Minor features
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
 
+* The ``dumpdata`` manage.py command now has a --pks option which will
+  allow users to specify the primary keys of objects they want to dump.
+  This option can only be used with one model.
+
 Backwards incompatible changes in 1.6
 =====================================
 
