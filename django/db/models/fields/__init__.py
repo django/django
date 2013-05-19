@@ -254,6 +254,13 @@ class Field(object):
         self.run_validators(value)
         return value
 
+    def _internal_to_db_type(self, internal_type, connection):
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.creation.data_types[internal_type] % data
+        except KeyError:
+            return None
+
     def db_type(self, connection):
         """
         Returns the database column data type for this field, for the provided
@@ -274,12 +281,14 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
-        try:
-            return (connection.creation.data_types[self.get_internal_type()]
-                    % data)
-        except KeyError:
-            return None
+        return self._internal_to_db_type(self.get_internal_type(), connection)
+
+    def rel_db_type(self, connection):
+        """
+        Returns the database column data type for related field referencing
+        to this.
+        """
+        return self.db_type(connection)
 
     @property
     def unique(self):
@@ -572,14 +581,20 @@ class AutoField(Field):
         'invalid': _("'%s' value must be an integer."),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, verbose_name=None, name=None, unsigned=False, **kwargs):
         assert kwargs.get('primary_key', False) is True, \
                "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
-        Field.__init__(self, *args, **kwargs)
+        self.unsigned = unsigned
+        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_internal_type(self):
-        return "AutoField"
+        return 'AutoField' if not self.unsigned else 'UnsignedAutoField'
+
+    def rel_db_type(self, connection):
+        db_type = 'IntegerField' if not self.unsigned \
+                else 'PositiveIntegerField'
+        return self._internal_to_db_type(db_type, connection)
 
     def to_python(self, value):
         if value is None:
@@ -1192,6 +1207,11 @@ class PositiveIntegerField(IntegerField):
     def get_internal_type(self):
         return "PositiveIntegerField"
 
+    def rel_db_type(self, connection):
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        return self._internal_to_db_type('IntegerField', connection)
+
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}
         defaults.update(kwargs)
@@ -1202,6 +1222,11 @@ class PositiveSmallIntegerField(IntegerField):
 
     def get_internal_type(self):
         return "PositiveSmallIntegerField"
+
+    def rel_db_type(self, connection):
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        return self._internal_to_db_type('IntegerField', connection)
 
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}

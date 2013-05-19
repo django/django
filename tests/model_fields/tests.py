@@ -104,7 +104,7 @@ class DecimalFieldTests(test.TestCase):
         """
         We should be able to filter decimal fields using strings (#8023)
         """
-        Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
+        Foo.objects.create(pk=1, a='abc', d=Decimal("12.34"))
         self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
@@ -128,7 +128,7 @@ class DecimalFieldTests(test.TestCase):
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
-        a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
+        a = Foo.objects.create(pk=1, a='abc', d=Decimal("12.34"))
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
 
@@ -457,3 +457,36 @@ class BinaryFieldTests(test.TestCase):
     def test_max_length(self):
         dm = DataModel(short_data=self.binary_data*4)
         self.assertRaises(ValidationError, dm.full_clean)
+
+class UnsignedPrimaryKeyTests(test.TestCase):
+    def test_primary_key_type(self):
+        foo_pk = Foo._meta.get_field('c')
+        self.assertEqual(connection.creation.data_types['UnsignedAutoField'],
+            foo_pk.db_type(connection=connection))
+        self.assertEqual(connection.creation.data_types['PositiveIntegerField'],
+            foo_pk.rel_db_type(connection=connection))
+
+        bar_fk = Bar._meta.get_field('a')
+        self.assertEqual(connection.creation.data_types['PositiveIntegerField'],
+            bar_fk.db_type(connection=connection))
+
+        if connection.vendor == 'mysql':
+            self.assertEqual('integer UNSIGNED AUTO_INCREMENT',
+                foo_pk.db_type(connection=connection))
+            self.assertEqual('integer UNSIGNED',
+                foo_pk.rel_db_type(connection=connection))
+            self.assertEqual('integer UNSIGNED',
+                bar_fk.db_type(connection=connection))
+
+    def test_can_use_large_primary_keys(self):
+        pk = 3123456789
+        self.assertTrue(pk > 1<<31, "The PK that we chose must be larger "
+            "than 1<<31 to exercise this feature")
+        foo = Foo(pk=pk, d=2.718, a="Arrrrrrg!")
+        foo.save()
+        bar = Bar(a=foo)
+        bar.save()
+        foo2 = Foo.objects.get(pk=pk)
+        self.assertEqual(foo, foo2, "Should have got the same object back")
+        bar2 = Bar.objects.filter(a=foo)[0]
+        self.assertEqual(bar, bar2, "Should have got the same object back")

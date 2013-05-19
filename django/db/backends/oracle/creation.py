@@ -16,6 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # output (the "qn_" prefix is stripped before the lookup is performed.
 
     data_types = {
+        'UnsignedAutoField':            'NUMBER(11)',
         'AutoField':                    'NUMBER(11)',
         'BinaryField':                  'BLOB',
         'BooleanField':                 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
