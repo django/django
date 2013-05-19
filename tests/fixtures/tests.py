@@ -221,6 +221,12 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             primary_keys='2,3'
         )
 
+        self._dumpdata_assert(
+            ['fixtures.Article'],
+            '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}]',
+            primary_keys='2'
+        )
+
         with six.assertRaisesRegex(self, management.CommandError,
                 "You can only use --pks option with one model"):
             self._dumpdata_assert(
