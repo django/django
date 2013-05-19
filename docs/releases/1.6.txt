@@ -241,6 +241,12 @@ Minor features
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
 
+* When giving the URL of the next page for :func:`~django.contrib.auth.views.logout`,
+  :func:`~django.contrib.auth.views.password_reset`,
+  :func:`~django.contrib.auth.views.password_reset_confirm`,
+  and :func:`~django.contrib.auth.views.password_change`, you can now pass
+  URL names and they will be resolved.
+
 Backwards incompatible changes in 1.6
 =====================================
 
