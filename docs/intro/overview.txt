@@ -16,8 +16,10 @@ Design your model
 =================
 
 Although you can use Django without a database, it comes with an
-object-relational mapper in which you describe your database layout in Python
+`object-relational mapper`_ in which you describe your database layout in Python
 code.
+
+.. _object-relational mapper: http://en.wikipedia.org/wiki/Object-relational_mapping
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving two years' worth of
@@ -174,8 +176,10 @@ in URLs, like ``.php`` or ``.asp``.
 
 To design URLs for an app, you create a Python module called a :doc:`URLconf
 </topics/http/urls>`. A table of contents for your app, it contains a simple mapping
-between URL patterns and Python callback functions. URLconfs also serve to
+between URL patterns and `Python callback functions`_. URLconfs also serve to
 decouple URLs from Python code.
+
+.. _Python callback functions: http://docs.python.org/2/library/ctypes.html#callback-functions
 
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
@@ -188,13 +192,15 @@ example above::
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
     )
 
-The code above maps URLs, as simple regular expressions, to the location of
+The code above maps URLs, as simple `regular expressions`_, to the location of
 Python callback functions ("views"). The regular expressions use parenthesis to
 "capture" values from the URLs. When a user requests a page, Django runs
 through each pattern, in order, and stops at the first one that matches the
 requested URL. (If none of them matches, Django calls a special-case 404 view.)
 This is blazingly fast, because the regular expressions are compiled at load
 time.
+
+.. _regular expressions: http://docs.python.org/2/howto/regex.html
 
 Once one of the regexes matches, Django imports and calls the given view, which
 is a simple Python function. Each view gets passed a request object --
@@ -233,8 +239,8 @@ The code above loads the ``news/year_archive.html`` template.
 
 Django has a template search path, which allows you to minimize redundancy among
 templates. In your Django settings, you specify a list of directories to check
-for templates. If a template doesn't exist in the first directory, it checks the
-second, and so on.
+for templates with the :setting:`TEMPLATE_DIRS` variable. If a template doesn't
+exist in the first directory, it checks the second, and so on.
 
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
@@ -265,9 +271,10 @@ character). This is called a template filter, and it's a way to filter the value
 of a variable. In this case, the date filter formats a Python datetime object in
 the given format (as found in PHP's date function).
 
-You can chain together as many filters as you'd like. You can write custom
-filters. You can write custom template tags, which run custom Python code behind
-the scenes.
+You can chain together as many filters as you'd like. You can write :ref:`custom
+template filters <howto-writing-custom-template-filters>`. You can write
+:doc:`custom template tags </howto/custom-template-tags>`, which run custom Python
+code behind the scenes.
 
 Finally, Django uses the concept of "template inheritance": That's what the
 ``{% extends "base.html" %}`` does. It means "First load the template called
