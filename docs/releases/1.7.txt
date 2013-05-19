@@ -559,6 +559,10 @@ Internationalization
   app or project message file. See :ref:`how-to-create-language-files` for
   details.
 
+* The following settings to adjust the language cookie options were introduced:
+  :setting:`LANGUAGE_COOKIE_AGE`, :setting:`LANGUAGE_COOKIE_DOMAIN`
+  and :setting:`LANGUAGE_COOKIE_PATH`.
+
 * Added :ref:`format definitions <format-localization>` for Esperanto.
 
 Management Commands

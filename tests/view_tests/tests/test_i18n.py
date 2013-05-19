@@ -51,6 +51,25 @@ class I18NTests(TestCase):
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/i18n/setlang/')
 
+    def test_setlang_cookie(self):
+        # we force saving language to a cookie rather than a session
+        # by excluding session middleware and those which do require it
+        test_settings = dict(
+            MIDDLEWARE_CLASSES=('django.middleware.common.CommonMiddleware',),
+            LANGUAGE_COOKIE_NAME='mylanguage',
+            LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
+            LANGUAGE_COOKIE_DOMAIN='.example.com',
+            LANGUAGE_COOKIE_PATH='/test/',
+        )
+        with self.settings(**test_settings):
+            post_data = dict(language='pl', next='/views/')
+            response = self.client.post('/i18n/setlang/', data=post_data)
+            language_cookie = response.cookies.get('mylanguage')
+            self.assertEqual(language_cookie.value, 'pl')
+            self.assertEqual(language_cookie['domain'], '.example.com')
+            self.assertEqual(language_cookie['path'], '/test/')
+            self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
+
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:

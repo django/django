@@ -1575,6 +1575,20 @@ which returns the language used in the current thread,
 for the current thread, and ``django.utils.translation.check_for_language()``
 which checks if the given language is supported by Django.
 
+Language cookie
+---------------
+
+A number of settings can be used to adjust language cookie options:
+
+* :setting:`LANGUAGE_COOKIE_NAME`
+
+.. versionadded:: 1.7
+
+* :setting:`LANGUAGE_COOKIE_AGE`
+* :setting:`LANGUAGE_COOKIE_DOMAIN`
+* :setting:`LANGUAGE_COOKIE_PATH`
+
+
 Implementation notes
 ====================
 
