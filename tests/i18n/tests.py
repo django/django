@@ -44,6 +44,7 @@ if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
         CompilationErrorHandling)
+from . import TransRealMixin
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
 
@@ -53,7 +54,8 @@ extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
 
-class TranslationTests(TestCase):
+
+class TranslationTests(TransRealMixin, TestCase):
 
     def test_override(self):
         activate('de')
@@ -335,6 +337,8 @@ class TranslationTests(TestCase):
 
 
 class TranslationThreadSafetyTests(TestCase):
+    """Specifically not using TransRealMixin here to test threading."""
+
     def setUp(self):
         self._old_language = get_language()
         self._translations = trans_real._translations
@@ -365,9 +369,10 @@ class TranslationThreadSafetyTests(TestCase):
 
 
 @override_settings(USE_L10N=True)
-class FormattingTests(TestCase):
+class FormattingTests(TransRealMixin, TestCase):
 
     def setUp(self):
+        super(FormattingTests, self).setUp()
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -769,9 +774,10 @@ class FormattingTests(TestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
-class MiscTests(TestCase):
+class MiscTests(TransRealMixin, TestCase):
 
     def setUp(self):
+        super(MiscTests, self).setUp()
         self.rf = RequestFactory()
 
     def test_parse_spec_http_header(self):
@@ -915,17 +921,15 @@ class MiscTests(TestCase):
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
 
 
-class ResolutionOrderI18NTests(TestCase):
+class ResolutionOrderI18NTests(TransRealMixin, TestCase):
 
     def setUp(self):
-        # Okay, this is brutal, but we have no other choice to fully reset
-        # the translation framework
-        trans_real._active = local()
-        trans_real._translations = {}
+        super(ResolutionOrderI18NTests, self).setUp()
         activate('de')
 
     def tearDown(self):
         deactivate()
+        super(ResolutionOrderI18NTests, self).tearDown()
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
@@ -998,15 +1002,17 @@ class TestLanguageInfo(TestCase):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
 
-class MultipleLocaleActivationTests(TestCase):
+class MultipleLocaleActivationTests(TransRealMixin, TestCase):
     """
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
     """
     def setUp(self):
+        super(MultipleLocaleActivationTests, self).setUp()
         self._old_language = get_language()
 
     def tearDown(self):
+        super(MultipleLocaleActivationTests, self).tearDown()
         activate(self._old_language)
 
     def test_single_locale_activation(self):
@@ -1135,7 +1141,7 @@ class MultipleLocaleActivationTests(TestCase):
         'django.middleware.common.CommonMiddleware',
     ),
 )
-class LocaleMiddlewareTests(TestCase):
+class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
     urls = 'i18n.urls'
 
@@ -1157,12 +1163,12 @@ class LocaleMiddlewareTests(TestCase):
         'django.middleware.common.CommonMiddleware',
     ),
 )
-class CountrySpecificLanguageTests(TestCase):
+class CountrySpecificLanguageTests(TransRealMixin, TestCase):
 
     urls = 'i18n.urls'
 
     def setUp(self):
-        trans_real._accepted = {}
+        super(CountrySpecificLanguageTests, self).setUp()
         self.rf = RequestFactory()
 
     def test_check_for_language(self):
@@ -1172,6 +1178,7 @@ class CountrySpecificLanguageTests(TestCase):
 
 
     def test_get_language_from_request(self):
+        # issue 19919
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
