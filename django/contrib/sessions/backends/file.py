@@ -86,7 +86,7 @@ class SessionStore(SessionBase):
                     session_data = {}
                     self.delete()
                     self.create()
-        except IOError:
+        except (IOError, SuspiciousOperation):
             self.create()
         return session_data
 

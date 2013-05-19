@@ -403,14 +403,21 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, self.backend)
 
     def test_invalid_key_backslash(self):
-        # Ensure we don't allow directory-traversal
+        # This key should be refused and a new session should be created
+        self.assertTrue(self.backend("a\\b\\c").load())
+
+    def test_invalid_key_backslash(self):
+        # Ensure we don't allow directory-traversal.
+        # This is tested directly on _key_to_file, as load() will swallow
+        # a SuspiciousOperation in the same way as an IOError - by creating
+        # a new session, making it unclear whether the slashes were detected.
         self.assertRaises(SuspiciousOperation,
-                          self.backend("a\\b\\c").load)
+                          self.backend()._key_to_file, "a\\b\\c")
 
     def test_invalid_key_forwardslash(self):
         # Ensure we don't allow directory-traversal
         self.assertRaises(SuspiciousOperation,
-                          self.backend("a/b/c").load)
+                          self.backend()._key_to_file, "a/b/c")
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
     def test_clearsessions_command(self):
