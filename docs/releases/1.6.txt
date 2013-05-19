@@ -241,6 +241,8 @@ Minor features
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
 
+* The reason phrase can be customized in HTTP responses.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -499,6 +501,10 @@ Miscellaneous
   debugging purposes. This functionality was not documented and made caching
   ineffective so it has been removed, along with its generic implementation,
   previously available in ``django.core.xheaders``.
+
+* The ``XViewMiddleware`` has been moved from ``django.middleware.doc`` to
+  ``django.contrib.admindocs.middleware`` because it is an implementation
+  detail of admindocs, proven not to be reusable in general.
 
 Features deprecated in 1.6
 ==========================

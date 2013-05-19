@@ -31,7 +31,7 @@ the following:
 * **Optional:** Linking to templates requires the :setting:`ADMIN_FOR`
   setting to be configured.
 * **Optional:** Using the admindocs bookmarklets requires the
-  :mod:`XViewMiddleware<django.middleware.doc>` to be installed.
+  :mod:`XViewMiddleware<django.contrib.admindocs.middleware>` to be installed.
 
 Once those steps are complete, you can start browsing the documentation by
 going to your admin interface and clicking the "Documentation" link in the
@@ -156,7 +156,7 @@ Edit this object
 Using these bookmarklets requires that you are either logged into the
 :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or
-that the :mod:`django.middleware.doc` middleware and
-:mod:`XViewMiddleware <django.middleware.doc>` are installed and you
-are accessing the site from an IP address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or that the
+:mod:`XViewMiddleware <django.contrib.admindocs.middleware>` is installed and
+you are accessing the site from an IP address listed in
+:setting:`INTERNAL_IPS`.
