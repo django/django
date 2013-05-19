@@ -2,15 +2,20 @@ from __future__ import absolute_import
 
 from datetime import date
 
-from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
-from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.tests.utils import mysql, oracle, no_mysql, no_oracle, no_spatialite
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, oracle, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
-from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+if HAS_GEOS:
+    from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
+    from django.contrib.gis.geometry.backend import Geometry
+    from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
+
+    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class RelatedGeoModelTest(TestCase):
 
     def test02_select_related(self):

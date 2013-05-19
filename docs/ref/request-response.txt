@@ -34,11 +34,6 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.body
 
-    .. versionchanged:: 1.4
-
-    Before Django 1.4, ``HttpRequest.body`` was named
-    ``HttpRequest.raw_post_data``.
-
     The raw HTTP request body as a byte string. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
@@ -55,12 +50,12 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.path_info
 
-    Under some Web server configurations, the portion of the URL after the host
-    name is split up into a script prefix portion and a path info portion.
-    The ``path_info`` attribute always contains the path info portion of the
-    path, no matter what Web server is being used. Using this instead of
-    attr:`~HttpRequest.path` can make your code much easier to move between test
-    and deployment servers.
+    Under some Web server configurations, the portion of the URL after the
+    host name is split up into a script prefix portion and a path info
+    portion. The ``path_info`` attribute always contains the path info portion
+    of the path, no matter what Web server is being used. Using this instead
+    of :attr:`~HttpRequest.path` can make your code easier to move between
+    test and deployment servers.
 
     For example, if the ``WSGIScriptAlias`` for your application is set to
     ``"/minfo"``, then ``path`` might be ``"/minfo/music/bands/the_beatles/"``
@@ -99,6 +94,7 @@ All attributes should be considered read-only, unless stated otherwise below.
     :attr:`HttpRequest.body` attribute instead.
 
     .. versionchanged:: 1.5
+
         Before Django 1.5, HttpRequest.POST contained non-form data.
 
     It's possible that a request can come in via POST with an empty ``POST``
@@ -181,7 +177,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     ``user`` is only available if your Django installation has the
     ``AuthenticationMiddleware`` activated. For more, see
-    :doc:`/topics/auth`.
+    :doc:`/topics/auth/index`.
 
 .. attribute:: HttpRequest.session
 
@@ -267,10 +263,8 @@ Methods
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
-   .. versionadded:: 1.4
-
    Returns a cookie value for a signed cookie, or raises a
-   :class:`~django.core.signing.BadSignature` exception if the signature is
+   ``django.core.signing.BadSignature`` exception if the signature is
    no longer valid. If you provide the ``default`` argument the exception
    will be suppressed and that default value will be returned instead.
 
@@ -478,9 +472,6 @@ In addition, ``QueryDict`` has the following methods:
     It's guaranteed to return a list of some sort unless the default value
     was no list.
 
-    .. versionchanged:: 1.4
-        The ``default`` parameter was added.
-
 .. method:: QueryDict.setlist(key, list_)
 
     Sets the given key to ``list_`` (unlike ``__setitem__()``).
@@ -504,8 +495,6 @@ In addition, ``QueryDict`` has the following methods:
         [(u'a', [u'1', u'2', u'3'])]
 
 .. method:: QueryDict.dict()
-
-    .. versionadded:: 1.4
 
     Returns ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
@@ -575,19 +564,19 @@ streaming response if (and only if) no middleware accesses the
 
 .. versionchanged:: 1.5
 
-This technique is fragile and was deprecated in Django 1.5. If you need the
-response to be streamed from the iterator to the client, you should use the
-:class:`StreamingHttpResponse` class instead.
+    This technique is fragile and was deprecated in Django 1.5. If you need the
+    response to be streamed from the iterator to the client, you should use the
+    :class:`StreamingHttpResponse` class instead.
 
-As of Django 1.7, when :class:`HttpResponse` is instantiated with an
-iterator, it will consume it immediately, store the response content as a
-string, and discard the iterator.
+    As of Django 1.7, when :class:`HttpResponse` is instantiated with an
+    iterator, it will consume it immediately, store the response content as a
+    string, and discard the iterator.
 
 .. versionchanged:: 1.5
 
-You can now use :class:`HttpResponse` as a file-like object even if it was
-instantiated with an iterator. Django will consume and save the content of
-the iterator on first access.
+    You can now use :class:`HttpResponse` as a file-like object even if it was
+    instantiated with an iterator. Django will consume and save the content of
+    the iterator on first access.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -708,9 +697,7 @@ Methods
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
-.. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
-
-    .. versionadded:: 1.4
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
@@ -760,6 +747,13 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
     constructor arguments. Note that this returns an HTTP status code 302.
 
+    .. attribute:: HttpResponseRedirect.url
+
+        .. versionadded:: 1.6
+
+        This read-only attribute represents the URL the response will redirect
+        to (equivalent to the ``Location`` response header).
+
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
@@ -804,6 +798,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
+.. _httpresponse-streaming:
+
 StreamingHttpResponse objects
 =============================
 
@@ -819,8 +815,8 @@ generating large CSV files.
 .. admonition:: Performance considerations
 
     Django is designed for short-lived requests. Streaming responses will tie
-    a worker process and keep a database connection idle in transaction for
-    the entire duration of the response. This may result in poor performance.
+    a worker process for the entire duration of the response. This may result
+    in poor performance.
 
     Generally speaking, you should perform expensive tasks outside of the
     request-response cycle, rather than resorting to a streamed response.

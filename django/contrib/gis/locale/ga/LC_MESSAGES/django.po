@@ -7,74 +7,74 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:39+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-03-16 13:13+0000\n"
 "Last-Translator: Michael Thornhill <michael@maithu.com>\n"
-"Language-Team: Irish (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
-"Language: ga\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ga\n"
 "Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
-"4)\n"
+"4);\n"
 
-#: views.py:7
+#: views.py:9
 msgid "No feeds are registered."
 msgstr "Níl fothaí cláraithe."
 
-#: views.py:17
+#: views.py:19
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Níl slug %r cláraithe."
 
-#: db/models/fields.py:50
+#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "GIS an bonn réimse - léarscáileanna chun an Sonraíocht OpenGIS cineál "
 "Céimseata."
 
-#: db/models/fields.py:270
+#: db/models/fields.py:271
 msgid "Point"
 msgstr "Pointe"
 
-#: db/models/fields.py:274
+#: db/models/fields.py:275
 msgid "Line string"
 msgstr "Líne teaghrán"
 
-#: db/models/fields.py:278
+#: db/models/fields.py:279
 msgid "Polygon"
 msgstr "Polagán"
 
-#: db/models/fields.py:282
+#: db/models/fields.py:283
 msgid "Multi-point"
 msgstr "Il-phointe"
 
-#: db/models/fields.py:286
+#: db/models/fields.py:287
 msgid "Multi-line string"
 msgstr "Il-líne teaghrán"
 
-#: db/models/fields.py:290
+#: db/models/fields.py:291
 msgid "Multi polygon"
 msgstr "Il polagán"
 
-#: db/models/fields.py:294
+#: db/models/fields.py:295
 msgid "Geometry collection"
 msgstr "Céimseata bhailiú"
 
-#: forms/fields.py:17
+#: forms/fields.py:19
 msgid "No geometry value provided."
 msgstr "Ní soláthair méid geoiméadracht"
 
-#: forms/fields.py:18
+#: forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr "Méid geoiméadracht neamhbhailí"
 
-#: forms/fields.py:19
+#: forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr "Tíopa geoiméadracht neamhbhailí"
 
-#: forms/fields.py:20
+#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -82,17 +82,17 @@ msgstr ""
 "Tharla earráid ag claochlú an geoiméadracht go dtí SRID an réimse fhoirm "
 "geoiméadracht."
 
-#: sitemaps/views.py:44
+#: sitemaps/views.py:46
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "Níl léarscáil an tSuoímh ar fáil le haghaidh roinn: %r"
 
-#: sitemaps/views.py:58
+#: sitemaps/views.py:60
 #, python-format
 msgid "Page %s empty"
 msgstr "Leathanach %s folamh"
 
-#: sitemaps/views.py:60
+#: sitemaps/views.py:62
 #, python-format
 msgid "No page '%s'"
 msgstr "Níl leathanach '%s'"

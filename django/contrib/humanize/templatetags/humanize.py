@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 from datetime import date, datetime
+from decimal import Decimal
 
 from django import template
 from django.conf import settings
@@ -35,7 +36,7 @@ def intcomma(value, use_l10n=True):
     """
     if settings.USE_L10N and use_l10n:
         try:
-            if not isinstance(value, float):
+            if not isinstance(value, (float, Decimal)):
                 value = int(value)
         except (TypeError, ValueError):
             return intcomma(value, False)
@@ -193,17 +194,20 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                'a second ago', '%(count)s seconds ago', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second ago', '%(count)s\u00a0seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute ago', '%(count)s minutes ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute ago', '%(count)s\u00a0minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour ago', '%(count)s hours ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour ago', '%(count)s\u00a0hours ago', count
             ) % {'count': count}
     else:
         delta = value - now
@@ -215,15 +219,18 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                'a second from now', '%(count)s seconds from now', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second from now', '%(count)s\u00a0seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute from now', '%(count)s minutes from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute from now', '%(count)s\u00a0minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour from now', '%(count)s hours from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour from now', '%(count)s\u00a0hours from now', count
             ) % {'count': count}

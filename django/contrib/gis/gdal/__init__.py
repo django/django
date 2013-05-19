@@ -31,6 +31,9 @@
  to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
+from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+
 # Attempting to import objects that depend on the GDAL library.  The
 # HAS_GDAL flag will be set to True if the library is present on
 # the system.
@@ -41,7 +44,7 @@ try:
     from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
     from django.contrib.gis.gdal.geometries import OGRGeometry
     HAS_GDAL = True
-except Exception:
+except OGRException:
     HAS_GDAL = False
 
 try:
@@ -50,5 +53,3 @@ except ImportError:
     # No ctypes, but don't raise an exception.
     pass
 
-from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException
-from django.contrib.gis.gdal.geomtype import OGRGeomType

@@ -124,16 +124,18 @@ database bindings are installed.
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
 
-If you plan to use Django's ``manage.py syncdb`` command to
-automatically create database tables for your models, you'll need to
-ensure that Django has permission to create and alter tables in the
-database you're using; if you plan to manually create the tables, you
-can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. On some databases, Django will need
-``ALTER TABLE`` privileges during ``syncdb`` but won't issue
-``ALTER TABLE`` statements on a table once ``syncdb`` has created it.
+If you plan to use Django's ``manage.py syncdb`` command to automatically
+create database tables for your models (after first installing Django and
+creating a project), you'll need to ensure that Django has permission to create
+and alter tables in the database you're using; if you plan to manually create
+the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
+``DELETE`` permissions. On some databases, Django will need ``ALTER TABLE``
+privileges during ``syncdb`` but won't issue ``ALTER TABLE`` statements on a
+table once ``syncdb`` has created it. After creating a database user with these
+permissions, you'll specify the details in your project's settings file,
+see :setting:`DATABASES` for details.
 
-If you're using Django's :doc:`testing framework</topics/testing>` to test
+If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
@@ -146,7 +148,7 @@ database queries, Django will need permission to create a test database.
 .. _Oracle: http://www.oracle.com/
 .. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Microsoft SQL Server 2005: https://bitbucket.org/Manfre/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
 .. _ODBC: http://code.google.com/p/django-pyodbc/
 .. _removing-old-versions-of-django:

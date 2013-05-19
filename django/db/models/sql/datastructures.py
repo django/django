@@ -12,8 +12,10 @@ class MultiJoin(Exception):
     multi-valued join was attempted (if the caller wants to treat that
     exceptionally).
     """
-    def __init__(self, level):
-        self.level = level
+    def __init__(self, names_pos, path_with_names):
+        self.level = names_pos
+        # The path travelled, this includes the path to the multijoin.
+        self.names_with_path = path_with_names
 
 class Empty(object):
     pass
@@ -30,14 +32,31 @@ class Date(object):
         self.col = col
         self.lookup_type = lookup_type
 
-    def relabel_aliases(self, change_map):
-        c = self.col
-        if isinstance(c, (list, tuple)):
-            self.col = (change_map.get(c[0], c[0]), c[1])
+    def relabeled_clone(self, change_map):
+        return self.__class__((change_map.get(self.col[0], self.col[0]), self.col[1]))
 
     def as_sql(self, qn, connection):
         if isinstance(self.col, (list, tuple)):
             col = '%s.%s' % tuple([qn(c) for c in self.col])
         else:
             col = self.col
-        return connection.ops.date_trunc_sql(self.lookup_type, col)
+        return connection.ops.date_trunc_sql(self.lookup_type, col), []
+
+class DateTime(object):
+    """
+    Add a datetime selection column.
+    """
+    def __init__(self, col, lookup_type, tzname):
+        self.col = col
+        self.lookup_type = lookup_type
+        self.tzname = tzname
+
+    def relabeled_clone(self, change_map):
+        return self.__class__((change_map.get(self.col[0], self.col[0]), self.col[1]))
+
+    def as_sql(self, qn, connection):
+        if isinstance(self.col, (list, tuple)):
+            col = '%s.%s' % tuple([qn(c) for c in self.col])
+        else:
+            col = self.col
+        return connection.ops.datetime_trunc_sql(self.lookup_type, col, self.tzname)

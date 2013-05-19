@@ -44,7 +44,9 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 1 <intro/tutorial01>` |
   :doc:`Part 2 <intro/tutorial02>` |
   :doc:`Part 3 <intro/tutorial03>` |
-  :doc:`Part 4 <intro/tutorial04>`
+  :doc:`Part 4 <intro/tutorial04>` |
+  :doc:`Part 5 <intro/tutorial05>` |
+  :doc:`Part 6 <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -97,6 +99,7 @@ to know about views via the links below:
   :doc:`Decorators <topics/http/decorators>`
 
 * **Reference:**
+  :doc:`Built-in Views <ref/views>` |
   :doc:`Request/response objects <ref/request-response>` |
   :doc:`TemplateResponse objects <ref/template-response>`
 
@@ -179,13 +182,16 @@ testing of Django applications:
   :doc:`Overview <ref/django-admin>` |
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
-* **Testing:**  :doc:`Overview <topics/testing>`
+* **Testing:**
+  :doc:`Introduction <topics/testing/index>` |
+  :doc:`Writing and running tests <topics/testing/overview>` |
+  :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
-  :doc:`Handling static files <howto/static-files>` |
+  :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
 The admin
@@ -216,8 +222,11 @@ Django offers a robust internationalization and localization framework to
 assist you in the development of applications for multiple languages and world
 regions:
 
-* :doc:`Internationalization <topics/i18n/index>`
-* :doc:`"Local flavor" <ref/contrib/localflavor>`
+* :doc:`Overview <topics/i18n/index>` |
+  :doc:`Internationalization <topics/i18n/translation>` |
+  :ref:`Localization <how-to-create-language-files>`
+* :doc:`"Local flavor" <topics/localflavor>`
+* :doc:`Time zones </topics/i18n/timezones>`
 
 Python compatibility
 ====================
@@ -241,12 +250,11 @@ Common Web application tools
 Django offers multiple tools commonly needed in the development of Web
 applications:
 
-* :doc:`Authentication <topics/auth>`
+* :doc:`Authentication <topics/auth/index>`
 * :doc:`Caching <topics/cache>`
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`
 * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
-* :doc:`Comments <ref/contrib/comments/index>`, :doc:`comment moderation <ref/contrib/comments/moderation>` and :doc:`custom comments <ref/contrib/comments/custom>`
 * :doc:`Pagination <topics/pagination>`
 * :doc:`Messages framework <ref/contrib/messages>`
 * :doc:`Serialization <topics/serialization>`
@@ -262,7 +270,6 @@ Learn about some other core functionalities of the Django framework:
 
 * :doc:`Conditional content processing <topics/conditional-view-processing>`
 * :doc:`Content types and generic relations <ref/contrib/contenttypes>`
-* :doc:`Databrowse <ref/contrib/databrowse>`
 * :doc:`Flatpages <ref/contrib/flatpages>`
 * :doc:`Redirects <ref/contrib/redirects>`
 * :doc:`Signals <topics/signals>`

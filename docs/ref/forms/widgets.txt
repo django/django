@@ -49,8 +49,8 @@ Setting arguments for widgets
 
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
-:attr:`~SelectDateWidget.years` attribute is set for a
-:class:`~django.forms.extras.widgets.SelectDateWidget`::
+:attr:`~django.forms.extras.widgets.SelectDateWidget.years` attribute is set
+for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
 
     from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
     from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
@@ -139,7 +139,7 @@ provided for each widget will be rendered exactly the same::
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
     <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 On a real Web page, you probably don't want every widget to look the same. You
@@ -160,7 +160,7 @@ Django will then include the extra attributes in the rendered output:
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
     <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
 
 .. _styling-widget-classes:
@@ -222,7 +222,7 @@ foundation for custom widgets.
 .. class:: MultiWidget(widgets, attrs=None)
 
     A widget that is composed of multiple widgets.
-    :class:`~django.forms.widgets.MultiWidget` works hand in hand with the
+    :class:`~django.forms.MultiWidget` works hand in hand with the
     :class:`~django.forms.MultiValueField`.
 
     :class:`MultiWidget` has one required argument:
@@ -246,8 +246,8 @@ foundation for custom widgets.
         the combined value of the form field into the values for each widget.
 
         An example of this is how :class:`SplitDateTimeWidget` turns a
-        :class:`datetime` value into a list with date and time split into two
-        separate values::
+        :class:`~datetime.datetime` value into a list with date and time split
+        into two separate values::
 
             class SplitDateTimeWidget(MultiWidget):
 
@@ -279,15 +279,10 @@ foundation for custom widgets.
         * A single value (e.g., a string) that is the "compressed" representation
           of a ``list`` of values.
 
-        If `value` is a list, output of :meth:`~MultiWidget.render` will be a
-        concatenation of rendered child widgets. If `value` is not a list, it
-        will be first processed by the method :meth:`~MultiWidget.decompress()`
-        to create the list and then processed as above.
-
-        In the second case -- i.e., if the value is *not* a list --
-        ``render()`` will first decompress the value into a ``list`` before
-        rendering it. It does so by calling the ``decompress()`` method, which
-        :class:`MultiWidget`'s subclasses must implement (see above).
+        If ``value`` is a list, the output of :meth:`~MultiWidget.render` will
+        be a concatenation of rendered child widgets. If ``value`` is not a
+        list, it will first be processed by the method
+        :meth:`~MultiWidget.decompress()` to create the list and then rendered.
 
         When ``render()`` executes its HTML rendering, each value in the list
         is rendered with the corresponding widget -- the first value is
@@ -392,7 +387,38 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: TextInput
 
-    Text input: ``<input type='text' ...>``
+    Text input: ``<input type="text" ...>``
+
+``NumberInput``
+~~~~~~~~~~~~~~~
+
+.. class:: NumberInput
+
+    .. versionadded:: 1.6
+
+    Text input: ``<input type="number" ...>``
+
+    Beware that not all browsers support entering localized numbers in
+    ``number`` input types. Django itself avoids using them for fields having
+    their :attr:`~django.forms.Field.localize` property to ``True``.
+
+``EmailInput``
+~~~~~~~~~~~~~~
+
+.. class:: EmailInput
+
+    .. versionadded:: 1.6
+
+    Text input: ``<input type="email" ...>``
+
+``URLInput``
+~~~~~~~~~~~~
+
+.. class:: URLInput
+
+    .. versionadded:: 1.6
+
+    Text input: ``<input type="url" ...>``
 
 ``PasswordInput``
 ~~~~~~~~~~~~~~~~~
@@ -496,6 +522,7 @@ Selector and checkbox widgets
         ``True`` if the checkbox should be checked for that value.
 
         .. versionchanged:: 1.5
+
             Exceptions from ``check_test`` used to be silenced by its caller,
             this is no longer the case, they will propagate upwards.
 
@@ -508,9 +535,9 @@ Selector and checkbox widgets
 
     .. attribute:: Select.choices
 
-        This attribute is optional when the field does not have a
-        :attr:`~Field.choices` attribute. If it does, it will override anything
-        you set here when the attribute is updated on the :class:`Field`.
+        This attribute is optional when the form field does not have a
+        ``choices`` attribute. If it does, it will override anything you set
+        here when the attribute is updated on the :class:`Field`.
 
 ``NullBooleanSelect``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -541,8 +568,6 @@ Selector and checkbox widgets
           <li><input type='radio' ...></li>
           ...
         </ul>
-
-    .. versionadded:: 1.4
 
     For more granular control over the generated markup, you can loop over the
     radio buttons in the template. Assuming a form ``myform`` with a field
@@ -609,6 +634,11 @@ Selector and checkbox widgets
     If you decide not to loop over the radio buttons -- e.g., if your template simply includes
     ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with ``<li>`` tags, as above.
 
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -623,6 +653,14 @@ Selector and checkbox widgets
           <li><input type='checkbox' ...></li>
           ...
         </ul>
+
+.. versionchanged:: 1.6
+
+The outer ``<ul>`` container will now receive the ``id`` attribute defined on
+the widget.
+
+Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
+up the lists. See the documentation of :class:`RadioSelect` for more details.
 
 .. _file-upload-widgets:
 
@@ -662,9 +700,9 @@ Composite widgets
 
     .. attribute:: MultipleHiddenInput.choices
 
-        This attribute is optional when the field does not have a
-        :attr:`~Field.choices` attribute. If it does, it will override anything
-        you set here when the attribute is updated on the :class:`Field`.
+        This attribute is optional when the form field does not have a
+        ``choices`` attribute. If it does, it will override anything you set
+        here when the attribute is updated on the :class:`Field`.
 
 ``SplitDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~

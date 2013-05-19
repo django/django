@@ -6,6 +6,7 @@ except ImportError:     # Python 2
     from urlparse import urlparse
 
 from django.conf import settings
+from django.core.handlers.base import get_path_info
 from django.core.handlers.wsgi import WSGIHandler
 
 from django.contrib.staticfiles import utils
@@ -67,6 +68,6 @@ class StaticFilesHandler(WSGIHandler):
         return super(StaticFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):
-        if not self._should_handle(environ['PATH_INFO']):
+        if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
         return super(StaticFilesHandler, self).__call__(environ, start_response)

@@ -136,14 +136,17 @@ Model style
   * ``def get_absolute_url()``
   * Any custom methods
 
-* If ``choices`` is defined for a given model field, define the choices as
-  a tuple of tuples, with an all-uppercase name, either near the top of
-  the model module or just above the model class. Example::
+* If ``choices`` is defined for a given model field, define each choice as
+  a tuple of tuples, with an all-uppercase name as a class attribute on the
+  model. Example::
 
-      DIRECTION_CHOICES = (
-          ('U', 'Up'),
-          ('D', 'Down'),
-      )
+    class MyModel(models.Model):
+        DIRECTION_UP = 'U'
+        DIRECTION_DOWN = 'D'
+        DIRECTION_CHOICES = (
+            (DIRECTION_UP, 'Up'),
+            (DIRECTION_DOWN, 'Down'),
+        )
 
 Use of ``django.conf.settings``
 -------------------------------
@@ -177,9 +180,9 @@ That means that the ability for third parties to import the module at the top
 level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
-Instead of the above code, a level of laziness or indirection must be used, such
-as :class:`django.utils.functional.LazyObject`,
-:func:`django.utils.functional.lazy` or ``lambda``.
+Instead of the above code, a level of laziness or indirection must be used,
+such as ``django.utils.functional.LazyObject``,
+``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
 -------------

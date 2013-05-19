@@ -1,14 +1,16 @@
+import datetime
 try:
     from itertools import zip_longest
 except ImportError:
     from itertools import izip_longest as zip_longest
 
-from django.utils.six.moves import zip
-
-from django.db.backends.util import truncate_name, typecast_timestamp
+from django.conf import settings
+from django.db.backends.util import truncate_name, typecast_date, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six
+from django.utils.six.moves import zip
+from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -31,6 +33,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
+        params = []
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -61,7 +64,9 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    result.append(col.as_sql(qn, self.connection))
+                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    result.append(col_sql)
+                    params.extend(col_params)
 
                     if hasattr(col, 'alias'):
                         aliases.add(col.alias)
@@ -74,15 +79,13 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        result.extend([
-                '%s%s' % (
-                    self.get_extra_select_format(alias) % aggregate.as_sql(qn, self.connection),
-                    alias is not None
-                        and ' AS %s' % qn(truncate_name(alias, max_name_length))
-                        or ''
-                    )
-                for alias, aggregate in self.query.aggregate_select.items()
-        ])
+        for alias, aggregate in self.query.aggregate_select.items():
+            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            if alias is None:
+                result.append(agg_sql)
+            else:
+                result.append('%s AS %s' % (agg_sql, qn(truncate_name(alias, max_name_length))))
+            params.extend(agg_params)
 
         # This loop customized for GeoQuery.
         for (table, col), field in self.query.related_select_cols:
@@ -98,7 +101,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 col_aliases.add(col)
 
         self._select_aliases = aliases
-        return result
+        return result, params
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
             start_alias=None, opts=None, as_pairs=False, from_parent=None):
@@ -118,30 +121,17 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         """
         result = []
         if opts is None:
-            opts = self.query.model._meta
-        # Skip all proxy to the root proxied model
-        opts = opts.concrete_model._meta
+            opts = self.query.get_meta()
         aliases = set()
         only_load = self.deferred_to_columns()
-
+        seen = self.query.included_inherited_models.copy()
         if start_alias:
-            seen = {None: start_alias}
+            seen[None] = start_alias
         for field, model in opts.get_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
+                # Avoid loading data for already loaded parents.
                 continue
-            if start_alias:
-                try:
-                    alias = seen[model]
-                except KeyError:
-                    link_field = opts.get_ancestor_link(model)
-                    alias = self.query.join((start_alias, model._meta.db_table,
-                            link_field.column, model._meta.pk.column))
-                    seen[model] = alias
-            else:
-                # If we're starting from the base model of the queryset, the
-                # aliases will have already been set up in pre_sql_setup(), so
-                # we can save time here.
-                alias = self.query.included_inherited_models[model]
+            alias = self.query.join_parent_model(opts, model, start_alias, seen)
             table = self.query.alias_map[alias].table_name
             if table in only_load and field.column not in only_load[table]:
                 continue
@@ -257,7 +247,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         used.  If `column` is specified, it will be used instead of the value
         in `field.column`.
         """
-        if table_alias is None: table_alias = self.query.model._meta.db_table
+        if table_alias is None: table_alias = self.query.get_meta().db_table
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
 
@@ -293,5 +283,35 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
                 if self.connection.ops.oracle:
                     date = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
-                    date = typecast_timestamp(str(date))
+                    date = typecast_date(str(date))
+                if isinstance(date, datetime.datetime):
+                    date = date.date()
                 yield date
+
+class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
+    """
+    This is overridden for GeoDjango to properly cast date columns, since
+    `GeoQuery.resolve_columns` is used for spatial values.
+    See #14648, #16757.
+    """
+    def results_iter(self):
+        if self.connection.ops.oracle:
+            from django.db.models.fields import DateTimeField
+            fields = [DateTimeField()]
+        else:
+            needs_string_cast = self.connection.features.needs_datetime_string_cast
+
+        offset = len(self.query.extra_select)
+        for rows in self.execute_sql(MULTI):
+            for row in rows:
+                datetime = row[offset]
+                if self.connection.ops.oracle:
+                    datetime = self.resolve_columns(row, fields)[offset]
+                elif needs_string_cast:
+                    datetime = typecast_timestamp(str(datetime))
+                # Datetimes are artifically returned in UTC on databases that
+                # don't support time zone. Restore the zone used in the query.
+                if settings.USE_TZ:
+                    datetime = datetime.replace(tzinfo=None)
+                    datetime = timezone.make_aware(datetime, self.query.tzinfo)
+                yield datetime

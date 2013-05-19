@@ -29,11 +29,6 @@ More details about how the caching works:
   of the response's "Cache-Control" header, falling back to the
   CACHE_MIDDLEWARE_SECONDS setting if the section was not found.
 
-* If CACHE_MIDDLEWARE_ANONYMOUS_ONLY is set to True, only anonymous requests
-  (i.e., those not made by a logged-in user) will be cached. This is a simple
-  and effective way of avoiding the caching of the Django admin (and any other
-  user-specific content).
-
 * This middleware expects that a HEAD request is answered with the same response
   headers exactly like the corresponding GET request.
 
@@ -47,6 +42,8 @@ More details about how the caching works:
   headers on the response object.
 
 """
+
+import warnings
 
 from django.conf import settings
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
@@ -93,7 +90,7 @@ class UpdateCacheMiddleware(object):
         if not self._should_update_cache(request, response):
             # We don't need to update the cache, just return.
             return response
-        if not response.status_code == 200:
+        if response.streaming or response.status_code != 200:
             return response
         # Try to get the timeout from the "max-age" section of the "Cache-
         # Control" header before reverting to using the default cache_timeout
@@ -199,6 +196,10 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
             self.cache_anonymous_only = getattr(settings, 'CACHE_MIDDLEWARE_ANONYMOUS_ONLY', False)
         else:
             self.cache_anonymous_only = cache_anonymous_only
+
+        if self.cache_anonymous_only:
+            msg = "CACHE_MIDDLEWARE_ANONYMOUS_ONLY has been deprecated and will be removed in Django 1.8."
+            warnings.warn(msg, PendingDeprecationWarning, stacklevel=1)
 
         self.cache = get_cache(self.cache_alias, **cache_kwargs)
         self.cache_timeout = self.cache.default_timeout

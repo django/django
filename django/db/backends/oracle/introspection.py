@@ -1,4 +1,5 @@
-from django.db.backends import BaseDatabaseIntrospection
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 import cx_Oracle
 import re
 
@@ -7,6 +8,7 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type objects to Django Field types.
     data_types_reverse = {
+        cx_Oracle.BLOB: 'BinaryField',
         cx_Oracle.CLOB: 'TextField',
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
@@ -47,7 +49,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            description.append((desc[0].lower(),) + desc[1:])
+            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
+            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 
     def table_name_converter(self, name):

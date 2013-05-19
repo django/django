@@ -24,6 +24,8 @@ representing your models -- so far, it's been solving two years' worth of
 database-schema problems. Here's a quick example, which might be saved in
 the file ``mysite/news/models.py``::
 
+    from django.db import models 
+
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
@@ -56,7 +58,9 @@ Enjoy the free API
 ==================
 
 With that, you've got a free, and rich, :doc:`Python API </topics/db/queries>` to
-access your data. The API is created on the fly, no code generation necessary::
+access your data. The API is created on the fly, no code generation necessary:
+
+.. code-block:: python
 
     # Import the models we created from our "news" app
     >>> from news.models import Reporter, Article
@@ -176,7 +180,7 @@ decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
 
     urlpatterns = patterns('',
         (r'^articles/(\d{4})/$', 'news.views.year_archive'),
@@ -211,6 +215,8 @@ The rest is up to you.
 Generally, a view retrieves data according to the parameters, loads a template
 and renders the template with the retrieved data. Here's an example view for
 ``year_archive`` from above::
+
+    from django.shortcuts import render_to_response 
 
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
@@ -257,8 +263,7 @@ lookup and function calls.
 Note ``{{ article.pub_date|date:"F j, Y" }}`` uses a Unix-style "pipe" (the "|"
 character). This is called a template filter, and it's a way to filter the value
 of a variable. In this case, the date filter formats a Python datetime object in
-the given format (as found in PHP's date function; yes, there is one good idea
-in PHP).
+the given format (as found in PHP's date function).
 
 You can chain together as many filters as you'd like. You can write custom
 filters. You can write custom template tags, which run custom Python code behind
@@ -270,16 +275,18 @@ Finally, Django uses the concept of "template inheritance": That's what the
 following blocks." In short, that lets you dramatically cut down on redundancy
 in templates: each template has to define only what's unique to that template.
 
-Here's what the "base.html" template might look like:
+Here's what the "base.html" template, including the use of :doc:`static files
+</howto/static-files/index>`, might look like:
 
 .. code-block:: html+django
 
+    {% load staticfiles %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="sitelogo.png" alt="Logo" />
+        <img src="{% static "images/sitelogo.png" %}" alt="Logo" />
         {% block content %}{% endblock %}
     </body>
     </html>

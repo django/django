@@ -35,7 +35,7 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
     if request.method == "POST":
-        form = authentication_form(data=request.POST)
+        form = authentication_form(request, data=request.POST)
         if form.is_valid():
 
             # Ensure the user-originating redirection url is safe.
@@ -45,14 +45,9 @@ def login(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
-
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
-
-    request.session.set_test_cookie()
 
     current_site = get_current_site(request)
 
@@ -200,7 +195,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
         uid_int = base36_to_int(uidb36)
-        user = UserModel.objects.get(pk=uid_int)
+        user = UserModel._default_manager.get(pk=uid_int)
     except (ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
 

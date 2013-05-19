@@ -8,68 +8,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
-"Language-Team: Greek (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
-"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Περιεχόμενο"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Μεταδεδομένα"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "επισημασμένο"
 msgstr[1] "επισημασμένα"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "Επισημανση των επιλεγμένων σχολίων"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "εγκρίθηκε"
 msgstr[1] "εγκρίθηκαν"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "Έγκριση των συγκεκριμένων σχολίων"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "αφαιρέθηκε"
 msgstr[1] "αφαιρέθηκαν"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Αφαίρεση των επιλεγμένων σχολίων"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] "Πραγματοποιήθκε επιτυχημένα %(action)s στα %(count)s σχόλια."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "Σχόλια στο %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Τελευταία σχόλια στο %(site_name)s"
@@ -108,57 +108,57 @@ msgstr ""
 "Αφήστε αυτό το πεδίο κενό. Αν εισάγετε κάτι τότε το σχόλιο θα θεωρηθεί spam "
 "και δεν θα εμφανιστεί."
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "τύπος περιεχομένου"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "ID αντικειμένου"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "χρήστης"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "όνομα χρήστη"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "ηλεκτρονική διεύθυνση χρήστη"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "διεύθυνση ιστοτόπου χρήστη"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "σχόλιο"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "ημερομηνία/ώρα υποβολής"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "διεύθυνση IP"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "είναι δημόσιο"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 "Απεπιλέξτε αυτή την επιλογή για να κάνετε το σχόλιο να μην εμφανίζεται."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "είναι διαγραμμένο"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -166,11 +166,11 @@ msgstr ""
 "Επιλέξτε αυτή την επιλογή εάν το σχόλιο είναι ανάρμοστο. Ένα μήνυμα \"Αυτό "
 "το σχόλιο διαγράφηκε\" θα εμφανιστεί στη θέση του."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "σχόλια"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -178,7 +178,7 @@ msgstr ""
 "Αυτό το σχόλιο πραγματοποιήθκε από πιστοποιημένο χρήστη και για τον λόγο "
 "αυτό δεν είναι είναι δυνατή η επεξεργασία του ονόματός του."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -187,7 +187,7 @@ msgstr ""
 "αυτό δεν είναι είναι δυνατή η επεξεργασία της διεύθυνσης του ηλεκτρονικού "
 "του ταχυδρομείου."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -202,19 +202,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "επισήμανση"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "ημερομηνία"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "επισήμανση σχολίου"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "επισημάνσεις σχολίου"
 

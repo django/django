@@ -97,7 +97,7 @@ class MultipleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return '%s_list' % object_list.model._meta.object_name.lower()
+            return '%s_list' % object_list.model._meta.model_name
         else:
             return None
 
@@ -105,7 +105,7 @@ class MultipleObjectMixin(ContextMixin):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list')
+        queryset = kwargs.pop('object_list', self.object_list)
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
@@ -149,7 +149,7 @@ class BaseListView(MultipleObjectMixin, View):
             if is_empty:
                 raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
                         % {'class_name': self.__class__.__name__})
-        context = self.get_context_data(object_list=self.object_list)
+        context = self.get_context_data()
         return self.render_to_response(context)
 
 
@@ -177,7 +177,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # generated ones.
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
-            names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
+            names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
 
         return names
 

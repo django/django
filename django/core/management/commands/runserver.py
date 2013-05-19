@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 elif self.use_ipv6 and not _fqdn:
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
-            self.addr = self.use_ipv6 and '::1' or '127.0.0.1'
+            self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
             self._raw_ipv6 = bool(self.use_ipv6)
         self.run(*args, **options)
 
@@ -86,14 +86,14 @@ class Command(BaseCommand):
 
         threading = options.get('use_threading')
         shutdown_message = options.get('shutdown_message', '')
-        quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
+        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
         self.stdout.write("Validating models...\n\n")
         self.validate(display_num_errors=True)
         self.stdout.write((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"
-            "Development server is running at http://%(addr)s:%(port)s/\n"
+            "Starting development server at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "started_at": datetime.now().strftime('%B %d, %Y - %X'),

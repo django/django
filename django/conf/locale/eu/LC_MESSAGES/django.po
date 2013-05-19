@@ -1,367 +1,387 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aitzol Naberan <anaberan@codesyntax.com>, 2011, 2012.
+# Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # jazpillaga <jazpillaga@codesyntax.com>, 2011.
 # julen <julenx@gmail.com>, 2011.
+#   <julenx@gmail.com>, 2012.
+#   <totorika93@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:30+0100\n"
-"PO-Revision-Date: 2012-03-09 09:34+0000\n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-05 11:27+0000\n"
 "Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Basque (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
-"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: conf/global_settings.py:48
+msgid "Afrikaans"
+msgstr "Afrikarrak"
+
+#: conf/global_settings.py:49
 msgid "Arabic"
 msgstr "Arabiera"
 
-#: conf/global_settings.py:49
-msgid "Azerbaijani"
-msgstr "Azebaianera"
-
 #: conf/global_settings.py:50
+msgid "Azerbaijani"
+msgstr "Azerbaianera"
+
+#: conf/global_settings.py:51
 msgid "Bulgarian"
 msgstr "Bulgariera"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
+msgid "Belarusian"
+msgstr "Belarusiera"
+
+#: conf/global_settings.py:53
 msgid "Bengali"
 msgstr "Bengalera"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:54
+msgid "Breton"
+msgstr "Bretoia"
+
+#: conf/global_settings.py:55
 msgid "Bosnian"
 msgstr "Bosniera"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:56
 msgid "Catalan"
 msgstr "Katalana"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:57
 msgid "Czech"
 msgstr "Txekiera"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:58
 msgid "Welsh"
 msgstr "Gales"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:59
 msgid "Danish"
 msgstr "Daniera"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:60
 msgid "German"
 msgstr "Alemaniera"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:61
 msgid "Greek"
 msgstr "Greziera"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:62
 msgid "English"
 msgstr "Ingelesa"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:63
 msgid "British English"
 msgstr "Ingelesa"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:64
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperantoa"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:65
 msgid "Spanish"
 msgstr "Espainola"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:66
 msgid "Argentinian Spanish"
 msgstr "Espainola (Argentina)"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:67
 msgid "Mexican Spanish"
 msgstr "Espainola (Mexiko)"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:68
 msgid "Nicaraguan Spanish"
 msgstr "Espainola (Nikaragua)"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:69
+msgid "Venezuelan Spanish"
+msgstr "Venezuelako gaztelera"
+
+#: conf/global_settings.py:70
 msgid "Estonian"
 msgstr "Estoniera"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:71
 msgid "Basque"
 msgstr "Euskara"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:72
 msgid "Persian"
 msgstr "Persiera"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:73
 msgid "Finnish"
 msgstr "Finlandiera"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:74
 msgid "French"
 msgstr "Frantzesa"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Frisian"
 msgstr "Frisiera"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Irish"
 msgstr "Irlandako gaelera"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:77
 msgid "Galician"
 msgstr "Galiziera"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Hebrew"
 msgstr "Hebreera"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:80
 msgid "Croatian"
 msgstr "Kroaziarra"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:81
 msgid "Hungarian"
 msgstr "Hungariera"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:82
+msgid "Interlingua"
+msgstr "Interlingua"
+
+#: conf/global_settings.py:83
 msgid "Indonesian"
 msgstr "Indonesiera"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:84
 msgid "Icelandic"
 msgstr "Islandiera"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:85
 msgid "Italian"
 msgstr "Italiera"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:86
 msgid "Japanese"
 msgstr "Japoniera"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:87
 msgid "Georgian"
 msgstr "Georgiera"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:88
 msgid "Kazakh"
-msgstr ""
+msgstr "Kazakhera"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:89
 msgid "Khmer"
 msgstr "Khemerera"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:90
 msgid "Kannada"
 msgstr "Kanadiera"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:91
 msgid "Korean"
 msgstr "Koreera"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:92
+msgid "Luxembourgish"
+msgstr "Luxenburgera"
+
+#: conf/global_settings.py:93
 msgid "Lithuanian"
 msgstr "Lituaniera"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:94
 msgid "Latvian"
 msgstr "Letoniera"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:95
 msgid "Macedonian"
 msgstr "Mazedoniera"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:96
 msgid "Malayalam"
 msgstr "Malabarera"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:97
 msgid "Mongolian"
 msgstr "Mongoliera"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:98
 msgid "Norwegian Bokmal"
 msgstr "Bokmal"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:99
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalera"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:100
 msgid "Dutch"
 msgstr "Holandera"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:101
 msgid "Norwegian Nynorsk"
 msgstr "Nynorsk"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:102
 msgid "Punjabi"
 msgstr "Punjabera"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:103
 msgid "Polish"
 msgstr "Poloniera"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:104
 msgid "Portuguese"
 msgstr "Portugalera"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:105
 msgid "Brazilian Portuguese"
 msgstr "Portugalera (Brazil)"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:106
 msgid "Romanian"
 msgstr "Errumaniera"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:107
 msgid "Russian"
 msgstr "Errusiera"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:108
 msgid "Slovak"
 msgstr "Eslovakiera"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:109
 msgid "Slovenian"
 msgstr "Esloveniera"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:110
 msgid "Albanian"
 msgstr "Albaniera"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:111
 msgid "Serbian"
 msgstr "Serbiera"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:112
 msgid "Serbian Latin"
 msgstr "Serbiera"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:113
 msgid "Swedish"
 msgstr "Suediera"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:114
 msgid "Swahili"
-msgstr ""
+msgstr "Swahilia"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:115
 msgid "Tamil"
 msgstr "Tamilera"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:116
 msgid "Telugu"
 msgstr "Telegu hizkuntza"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:117
 msgid "Thai"
 msgstr "Thailandiera"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:118
 msgid "Turkish"
 msgstr "Turkiera"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:119
 msgid "Tatar"
-msgstr ""
+msgstr "Tatarera"
 
-#: conf/global_settings.py:114
+#: conf/global_settings.py:120
+msgid "Udmurt"
+msgstr "Udmurt"
+
+#: conf/global_settings.py:121
 msgid "Ukrainian"
 msgstr "Ukrainera"
 
-#: conf/global_settings.py:115
+#: conf/global_settings.py:122
 msgid "Urdu"
 msgstr "Urdua"
 
-#: conf/global_settings.py:116
+#: conf/global_settings.py:123
 msgid "Vietnamese"
 msgstr "Vietnamamera"
 
-#: conf/global_settings.py:117
+#: conf/global_settings.py:124
 msgid "Simplified Chinese"
 msgstr "Txinera (sinpletua)"
 
-#: conf/global_settings.py:118
+#: conf/global_settings.py:125
 msgid "Traditional Chinese"
 msgstr "Txinera (tradizionala)"
 
-#: core/validators.py:24 forms/fields.py:51
+#: core/validators.py:21 forms/fields.py:52
 msgid "Enter a valid value."
 msgstr "Idatzi balio zuzena."
 
-#: core/validators.py:99 forms/fields.py:601
-msgid "This URL appears to be a broken link."
-msgstr "URL hau ez dago ondo."
+#: core/validators.py:104 forms/fields.py:464
+msgid "Enter a valid email address."
+msgstr "Gehitu baleko email helbide bat"
 
-#: core/validators.py:131 forms/fields.py:600
-msgid "Enter a valid URL."
-msgstr "URL zuzen bat idatzi."
-
-#: core/validators.py:165 forms/fields.py:474
-msgid "Enter a valid e-mail address."
-msgstr "e-mail helbide zuzena idatzi."
-
-#: core/validators.py:168 forms/fields.py:1023
+#: core/validators.py:107 forms/fields.py:1013
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Hizki, zenbaki, azpimarra edo marratxoz osatutako baleko 'slug' bat sartu."
+"Idatzi hizki, zenbaki, azpimarra edo marratxoz osatutako baleko 'slug' bat."
 
-#: core/validators.py:171 core/validators.py:188 forms/fields.py:997
+#: core/validators.py:110 core/validators.py:129 forms/fields.py:987
 msgid "Enter a valid IPv4 address."
 msgstr "Sartu IPv4 helbide zuzena."
 
-#: core/validators.py:175 core/validators.py:189
+#: core/validators.py:115 core/validators.py:130
 msgid "Enter a valid IPv6 address."
 msgstr "Sartu IPv6 helbide zuzena"
 
-#: core/validators.py:184 core/validators.py:187
+#: core/validators.py:125 core/validators.py:128
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "Sartu IPv4 edo IPv6 helbide zuzena."
 
-#: core/validators.py:209 db/models/fields/__init__.py:638
+#: core/validators.py:151 db/models/fields/__init__.py:655
 msgid "Enter only digits separated by commas."
-msgstr "Komaz bereiztutako digitoak bakarrik idatzi."
+msgstr "Idatzi komaz bereizitako digitoak soilik."
 
-#: core/validators.py:215
+#: core/validators.py:157
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Ziurtatu balioak %(limit_value)s karraktere dituela gutxienez  (orain "
+"Ziurtatu balioak %(limit_value)s gutxienez karaktere dituela  (orain "
 "%(show_value)s dauzka)."
 
-#: core/validators.py:233 forms/fields.py:209 forms/fields.py:262
+#: core/validators.py:176 forms/fields.py:210 forms/fields.py:263
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr ""
-"Ziurta zaitez balio hau %(limit_value)s baino txikiago edo berdina dela."
+msgstr "Ziurtatu balio hau %(limit_value)s baino txikiagoa edo berdina dela."
 
-#: core/validators.py:238 forms/fields.py:210 forms/fields.py:263
+#: core/validators.py:182 forms/fields.py:211 forms/fields.py:264
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr ""
-"Ziurta zaitez balio hau %(limit_value)s baino handiago edo berdina dela."
+msgstr "Ziurtatu balio hau %(limit_value)s baino handiagoa edo berdina dela."
 
-#: core/validators.py:244
+#: core/validators.py:189
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has "
@@ -370,7 +390,7 @@ msgstr ""
 "Ziurtatu gutxienez %(limit_value)d karaktere dauzkala (orain %(show_value)d "
 "dauzka)."
 
-#: core/validators.py:250
+#: core/validators.py:196
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has "
@@ -378,85 +398,85 @@ msgid ""
 msgstr ""
 "Ziurtatu gehienez %(limit_value)d dauzkala (orain %(show_value)d dauzka)."
 
-#: db/models/base.py:764
+#: db/models/base.py:857
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "%(date_field)s eremuan %(lookup)s egiteko %(field_name)s bakarra izan behar "
 "da."
 
-#: db/models/base.py:787 forms/models.py:577
+#: db/models/base.py:880 forms/models.py:573
 msgid "and"
 msgstr "eta"
 
-#: db/models/base.py:788 db/models/fields/__init__.py:65
+#: db/models/base.py:881 db/models/fields/__init__.py:70
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s hori daukan %(model_name)s dagoeneko existitzen da."
 
-#: db/models/fields/__init__.py:62
+#: db/models/fields/__init__.py:67
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr "%r balioa ez da balekoa"
+msgstr "%r balioa ez da baliozkoa."
 
-#: db/models/fields/__init__.py:63
+#: db/models/fields/__init__.py:68
 msgid "This field cannot be null."
 msgstr "Eremu hau ezin daiteke hutsa izan (null)."
 
-#: db/models/fields/__init__.py:64
+#: db/models/fields/__init__.py:69
 msgid "This field cannot be blank."
 msgstr "Eremu hau ezin da hutsik egon."
 
-#: db/models/fields/__init__.py:71
+#: db/models/fields/__init__.py:76
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Eremuaren mota: %(field_type)s"
 
-#: db/models/fields/__init__.py:506 db/models/fields/__init__.py:961
+#: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
 msgid "Integer"
 msgstr "Zenbaki osoa"
 
-#: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
+#: db/models/fields/__init__.py:521 db/models/fields/__init__.py:983
 #, python-format
 msgid "'%s' value must be an integer."
 msgstr "'%s' osoko zenbakia izan behar da."
 
-#: db/models/fields/__init__.py:552
+#: db/models/fields/__init__.py:569
 #, python-format
 msgid "'%s' value must be either True or False."
 msgstr "'%s' balioa True edo False izan behar da."
 
-#: db/models/fields/__init__.py:554
+#: db/models/fields/__init__.py:571
 msgid "Boolean (Either True or False)"
 msgstr "Boolearra (egia ala gezurra)"
 
-#: db/models/fields/__init__.py:605
+#: db/models/fields/__init__.py:622
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Katea (%(max_length)s gehienez)"
 
-#: db/models/fields/__init__.py:633
+#: db/models/fields/__init__.py:650
 msgid "Comma-separated integers"
 msgstr "Komaz bereiztutako zenbaki osoak"
 
-#: db/models/fields/__init__.py:647
+#: db/models/fields/__init__.py:664
 #, python-format
 msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
 msgstr ""
 "'%s' balioak ez dauka data formatu zuzena. Formatu zuzena UUUU-HH-EE da."
 
-#: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
+#: db/models/fields/__init__.py:666 db/models/fields/__init__.py:754
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
 msgstr ""
 "'%s' balioak formatu zuzena (UUUU-HH-EE) dauka, baina ez da data zuzen bat."
 
-#: db/models/fields/__init__.py:652
+#: db/models/fields/__init__.py:669
 msgid "Date (without time)"
 msgstr "Data (ordurik gabe)"
 
-#: db/models/fields/__init__.py:732
+#: db/models/fields/__init__.py:752
 #, python-format
 msgid ""
 "'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -465,7 +485,7 @@ msgstr ""
 "'%s' balioak ez dauka formatu zuzena. Formatu zuzena UUUU-HH-EE .\n"
 "OO:MM[:ss[.uuuuuu]][TZ] da."
 
-#: db/models/fields/__init__.py:736
+#: db/models/fields/__init__.py:756
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
@@ -474,79 +494,79 @@ msgstr ""
 "'%s' balioak formatu zuzena dauka (UUUU-HH-EE OO:MM[:ss[.uuuuuu]][TZ]),\n"
 "baina ez da data/ordu zuzena."
 
-#: db/models/fields/__init__.py:740
+#: db/models/fields/__init__.py:760
 msgid "Date (with time)"
 msgstr "Data (orduarekin)"
 
-#: db/models/fields/__init__.py:831
+#: db/models/fields/__init__.py:849
 #, python-format
 msgid "'%s' value must be a decimal number."
 msgstr "'%s' balioa hamartarra izan behar da."
 
-#: db/models/fields/__init__.py:833
+#: db/models/fields/__init__.py:851
 msgid "Decimal number"
 msgstr "Zenbaki hamartarra"
 
-#: db/models/fields/__init__.py:890
-msgid "E-mail address"
-msgstr "E-mail helbidea"
+#: db/models/fields/__init__.py:908
+msgid "Email address"
+msgstr "Eposta helbidea"
 
-#: db/models/fields/__init__.py:906
+#: db/models/fields/__init__.py:927
 msgid "File path"
-msgstr "Fitxegi bidea"
+msgstr "Fitxategiaren bidea"
 
-#: db/models/fields/__init__.py:930
+#: db/models/fields/__init__.py:954
 #, python-format
 msgid "'%s' value must be a float."
 msgstr "'%s' balioa koma higikorreko zenbaki bat izan behar da."
 
-#: db/models/fields/__init__.py:932
+#: db/models/fields/__init__.py:956
 msgid "Floating point number"
 msgstr "Koma higikorreko zenbakia (float)"
 
-#: db/models/fields/__init__.py:993
+#: db/models/fields/__init__.py:1017
 msgid "Big (8 byte) integer"
-msgstr "Zenbaki osoa (handia 8 byte)."
+msgstr "Zenbaki osoa (handia 8 byte)"
 
-#: db/models/fields/__init__.py:1007
+#: db/models/fields/__init__.py:1031
 msgid "IPv4 address"
 msgstr "IPv4 helbidea"
 
-#: db/models/fields/__init__.py:1023
+#: db/models/fields/__init__.py:1047
 msgid "IP address"
 msgstr "IP helbidea"
 
-#: db/models/fields/__init__.py:1065
+#: db/models/fields/__init__.py:1090
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr "'%s' balioa None, True edo False izan behar da."
+msgstr "'%s' balioak None, True edo False izan behar du."
 
-#: db/models/fields/__init__.py:1067
+#: db/models/fields/__init__.py:1092
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolearra (egia, gezurra edo hutsa[None])"
 
-#: db/models/fields/__init__.py:1116
+#: db/models/fields/__init__.py:1141
 msgid "Positive integer"
 msgstr "Osoko positiboa"
 
-#: db/models/fields/__init__.py:1127
+#: db/models/fields/__init__.py:1152
 msgid "Positive small integer"
 msgstr "Osoko positibo txikia"
 
-#: db/models/fields/__init__.py:1138
+#: db/models/fields/__init__.py:1163
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr "Slug (gehienez %(max_length)s)"
 
-#: db/models/fields/__init__.py:1156
+#: db/models/fields/__init__.py:1181
 msgid "Small integer"
 msgstr "Osoko txikia"
 
-#: db/models/fields/__init__.py:1162
+#: db/models/fields/__init__.py:1187
 msgid "Text"
-msgstr "Textua"
+msgstr "Testua"
 
-#: db/models/fields/__init__.py:1180
+#: db/models/fields/__init__.py:1205
 #, python-format
 msgid ""
 "'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
@@ -554,7 +574,7 @@ msgstr ""
 "'%s' balioak ez dauka formatu zuzena. OO:MM[:ss[.uuuuuu]] fotmatuan egon "
 "behar da."
 
-#: db/models/fields/__init__.py:1182
+#: db/models/fields/__init__.py:1207
 #, python-format
 msgid ""
 "'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
@@ -563,100 +583,99 @@ msgstr ""
 "'%s' balioak formatu zuzena dauka (OO:MM[:ss[.uuuuuu]]) baina ez da ordu \n"
 "zuzena"
 
-#: db/models/fields/__init__.py:1185
+#: db/models/fields/__init__.py:1210
 msgid "Time"
 msgstr "Ordua"
 
-#: db/models/fields/__init__.py:1249
+#: db/models/fields/__init__.py:1272
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/files.py:214
+#: db/models/fields/files.py:216
 msgid "File"
 msgstr "Fitxategia"
 
-#: db/models/fields/files.py:321
+#: db/models/fields/files.py:323
 msgid "Image"
 msgstr "Irudia"
 
-#: db/models/fields/related.py:903
+#: db/models/fields/related.py:979
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr "%(pk)r pk duen %(model)s modeloa ez da existitzen."
+msgstr "Ez dago %(pk)r pk duen %(model)s modelorik."
 
-#: db/models/fields/related.py:905
+#: db/models/fields/related.py:981
 msgid "Foreign Key (type determined by related field)"
-msgstr "1-N (mota lotutako eremuaren arabera)"
+msgstr "1-N (mota erlazionatutako eremuaren arabera)"
 
-#: db/models/fields/related.py:1033
+#: db/models/fields/related.py:1111
 msgid "One-to-one relationship"
 msgstr "Bat-bat erlazioa"
 
-#: db/models/fields/related.py:1096
+#: db/models/fields/related.py:1178
 msgid "Many-to-many relationship"
 msgstr "M:N erlazioa"
 
-#: db/models/fields/related.py:1120
+#: db/models/fields/related.py:1203
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Zapaldu \"Control\" karakterea edo \"Command\" Mac batean, bat baino gehiago "
-"aukeratzeko."
+"Bat baino gehiago hautatzeko, sakatu \"Kontrol\" tekla edo \"Command\" Mac "
+"batean."
 
-#: forms/fields.py:50
+#: forms/fields.py:51
 msgid "This field is required."
 msgstr "Eremu hau beharrezkoa da."
 
-#: forms/fields.py:208
+#: forms/fields.py:209
 msgid "Enter a whole number."
-msgstr "Zenbaki bat idatzi."
+msgstr "Idatzi zenbaki oso bat."
 
-#: forms/fields.py:240 forms/fields.py:261
+#: forms/fields.py:241 forms/fields.py:262
 msgid "Enter a number."
 msgstr "Idatzi zenbaki bat."
 
-#: forms/fields.py:264
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr "Ziurta zaitez %s baino digito gehiago ez dagoela."
-
 #: forms/fields.py:265
 #, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr "Ziurta zaitez %s baino hamartar gehiago ez dagoela."
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Ziurtatu ez daudela %s baino digitu gehiago."
 
 #: forms/fields.py:266
 #, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Ziurtatu ez daudela %s baino hamartar gehiago."
+
+#: forms/fields.py:267
+#, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
-"Ziurta zaitez %s digitu baino gehiago ez dagoela puntu hamartarraren "
-"aurretik."
+"Ziurtatu ez daudela %s digitu baino gehiago puntu hamartarraren aurretik."
 
-#: forms/fields.py:365 forms/fields.py:963
+#: forms/fields.py:355 forms/fields.py:953
 msgid "Enter a valid date."
-msgstr "Data zuzen bat idatzi."
+msgstr "Idatzi baliozko data bat."
 
-#: forms/fields.py:388 forms/fields.py:964
+#: forms/fields.py:378 forms/fields.py:954
 msgid "Enter a valid time."
-msgstr "Ordu zuzen bat idatzi."
+msgstr "Idatzi baliozko ordu bat."
 
-#: forms/fields.py:409
+#: forms/fields.py:399
 msgid "Enter a valid date/time."
-msgstr "Data/Ordu zuzen bat idatzi."
+msgstr "Idatzi baliozko data/ordua."
 
-#: forms/fields.py:485
+#: forms/fields.py:475
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Ez da fitxategirik bidali. Baiztatu ezazu formularioren kodeketa."
+msgstr "Ez da fitxategirik bidali. Egiaztatu inprimakiaren kodeketa-mota."
 
-#: forms/fields.py:486
+#: forms/fields.py:476
 msgid "No file was submitted."
 msgstr "Ez da fitxategirik bidali."
 
-#: forms/fields.py:487
+#: forms/fields.py:477
 msgid "The submitted file is empty."
 msgstr "Bidalitako fitxategia hutsik dago."
 
-#: forms/fields.py:488
+#: forms/fields.py:478
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -664,78 +683,81 @@ msgstr ""
 "Ziurtatu fitxategiaren izenak gehienez %(max)d karaktere dituela (%(length)d "
 "dauzka)."
 
-#: forms/fields.py:489
+#: forms/fields.py:479
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "Mesedez, igo fitxategi bat edo klikatu garbitu botoia, ez biak."
+msgstr "Mesedez, igo fitxategi bat edo egin klik garbitu botoian, ez biak."
 
-#: forms/fields.py:544
+#: forms/fields.py:534
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Bidali irudi zuzena. Zuk bidalitako fitxategia ez da irudi motako edo akatsa "
+"Bidali baliozko irudia. Zuk bidalitako fitxategia ez da irudia edo akatsa "
 "dauka."
 
-#: forms/fields.py:689 forms/fields.py:769
+#: forms/fields.py:580
+msgid "Enter a valid URL."
+msgstr "Idatzi baliozko URL bat."
+
+#: forms/fields.py:666 forms/fields.py:746
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Aukeratu aukera zuzen bat. %(value)s ez da zuzena."
+msgstr "Hautatu baliozko aukera bat. %(value)s ez dago erabilgarri."
 
-#: forms/fields.py:770 forms/fields.py:858 forms/models.py:999
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
 msgid "Enter a list of values."
-msgstr "Balio zerrenda bat idatzi ezazu."
+msgstr "Idatzi balio-zerrenda bat."
 
-#: forms/formsets.py:317 forms/formsets.py:319
+#: forms/formsets.py:324 forms/formsets.py:326
 msgid "Order"
 msgstr "Ordena"
 
-#: forms/formsets.py:321
+#: forms/formsets.py:328
 msgid "Delete"
 msgstr "Ezabatu"
 
-#: forms/models.py:571
+#: forms/models.py:567
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Mesedez zuzendu bikoiztketa %(field)s eremuan."
+msgstr "Zuzendu bikoiztketa %(field)s eremuan."
 
-#: forms/models.py:575
+#: forms/models.py:571
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr "Mesedez zuzendu bikoizketa %(field)s eremuan. Bakarra izan behar da."
+msgstr "Zuzendu bikoizketa %(field)s eremuan. Bakarra izan behar da."
 
-#: forms/models.py:581
+#: forms/models.py:577
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Mesedez zuzendu bakarra izan behar den%(field_name)s eramuarentzako "
-"bikoiztutako data\n"
-"%(lookup)s egiteko %(date_field)s eremuan"
+"Zuzendu bakarra izan behar den%(field_name)s eremuarentzako bikoiztutako "
+"data %(lookup)s egiteko %(date_field)s eremuan"
 
-#: forms/models.py:589
+#: forms/models.py:585
 msgid "Please correct the duplicate values below."
-msgstr "Mesedez zuzendu hurrengo balio bikoiztuak."
+msgstr "Zuzendu hurrengo balio bikoiztuak."
 
-#: forms/models.py:849
+#: forms/models.py:852
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Barneko gakoa eta gurasoaren gakoa ez datoz bat."
 
-#: forms/models.py:910
+#: forms/models.py:913
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Aukera zuzen bat aukeratu. Aukeratutakoa ez da zuzena."
+msgstr "Hautatu aukera zuzen bat. Hautatutakoa ez da zuzena."
 
-#: forms/models.py:1000
+#: forms/models.py:1003
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Aukera zuzena aukeratu. %s ez da aukeretako bat."
+msgstr "Hautatu aukera zuzena. %s ez da aukeretako bat."
 
-#: forms/models.py:1002
+#: forms/models.py:1005
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" ez da balekoa gako nagusi gisa."
 
-#: forms/util.py:70
+#: forms/util.py:81
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
@@ -744,87 +766,87 @@ msgstr ""
 "%(datetime)s ezin da interpretatu %(current_timezone)s ordu-eremuan;\n"
 "baliteke ez existitzea edo anbiguoa izatea"
 
-#: forms/widgets.py:325
+#: forms/widgets.py:336
 msgid "Currently"
 msgstr "Orain"
 
-#: forms/widgets.py:326
+#: forms/widgets.py:337
 msgid "Change"
 msgstr "Aldatu"
 
-#: forms/widgets.py:327
+#: forms/widgets.py:338
 msgid "Clear"
 msgstr "Garbitu"
 
-#: forms/widgets.py:582
+#: forms/widgets.py:594
 msgid "Unknown"
 msgstr "Ezezaguna"
 
-#: forms/widgets.py:583
+#: forms/widgets.py:595
 msgid "Yes"
 msgstr "Bai"
 
-#: forms/widgets.py:584
+#: forms/widgets.py:596
 msgid "No"
 msgstr "Ez"
 
-#: template/defaultfilters.py:797
+#: template/defaultfilters.py:794
 msgid "yes,no,maybe"
 msgstr "bai,ez,agian"
 
-#: template/defaultfilters.py:825 template/defaultfilters.py:830
+#: template/defaultfilters.py:822 template/defaultfilters.py:833
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "byte %(size)d "
 msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:832
+#: template/defaultfilters.py:835
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:834
+#: template/defaultfilters.py:837
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:836
+#: template/defaultfilters.py:839
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:838
+#: template/defaultfilters.py:841
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:839
+#: template/defaultfilters.py:842
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:45
+#: utils/dateformat.py:47
 msgid "p.m."
 msgstr "p.m."
 
-#: utils/dateformat.py:46
+#: utils/dateformat.py:48
 msgid "a.m."
 msgstr "a.m."
 
-#: utils/dateformat.py:51
+#: utils/dateformat.py:53
 msgid "PM"
 msgstr "PM"
 
-#: utils/dateformat.py:52
+#: utils/dateformat.py:54
 msgid "AM"
 msgstr "AM"
 
-#: utils/dateformat.py:101
+#: utils/dateformat.py:103
 msgid "midnight"
 msgstr "gauerdia"
 
-#: utils/dateformat.py:103
+#: utils/dateformat.py:105
 msgid "noon"
 msgstr "eguerdia"
 
@@ -1100,122 +1122,107 @@ msgctxt "alt. month"
 msgid "December"
 msgstr "Abendua"
 
-#: utils/text.py:65
+#: utils/text.py:70
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
 msgstr "%(truncated_text)s..."
 
-#: utils/text.py:234
+#: utils/text.py:239
 msgid "or"
 msgstr "edo"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:251
+#: utils/text.py:256
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:20
+#: utils/timesince.py:22
 msgid "year"
 msgid_plural "years"
 msgstr[0] "urtea"
 msgstr[1] "urteak"
 
-#: utils/timesince.py:21
+#: utils/timesince.py:23
 msgid "month"
 msgid_plural "months"
 msgstr[0] "hilabetea"
 msgstr[1] "hilabeteak"
 
-#: utils/timesince.py:22
+#: utils/timesince.py:24
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "astea"
 msgstr[1] "asteak"
 
-#: utils/timesince.py:23
+#: utils/timesince.py:25
 msgid "day"
 msgid_plural "days"
 msgstr[0] "eguna"
 msgstr[1] "egunak"
 
-#: utils/timesince.py:24
+#: utils/timesince.py:26
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "ordua"
 msgstr[1] "orduak"
 
-#: utils/timesince.py:25
+#: utils/timesince.py:27
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minutu"
 msgstr[1] "minutuak"
 
-#: utils/timesince.py:41
+#: utils/timesince.py:43
 msgid "minutes"
 msgstr "minutuak"
 
-#: utils/timesince.py:46
+#: utils/timesince.py:48
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:52
+#: utils/timesince.py:54
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: views/static.py:52
+#: views/static.py:56
 msgid "Directory indexes are not allowed here."
 msgstr "Direktorio zerrendak ez daude baimenduak."
 
-#: views/static.py:54
+#: views/static.py:58
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr "\"%(path)s\" ez da existitzen"
 
-#: views/static.py:95
+#: views/static.py:98
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s zerrenda"
 
-#: views/generic/create_update.py:121
-#, python-format
-msgid "The %(verbose_name)s was created successfully."
-msgstr "%(verbose_name)s arazorik gabe sortu da"
-
-#: views/generic/create_update.py:164
-#, python-format
-msgid "The %(verbose_name)s was updated successfully."
-msgstr "%(verbose_name)s arazorik gabe eguneratu da."
-
-#: views/generic/create_update.py:207
-#, python-format
-msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)s ezabatu da."
-
-#: views/generic/dates.py:33
+#: views/generic/dates.py:42
 msgid "No year specified"
 msgstr "Ez da urterik zehaztu"
 
-#: views/generic/dates.py:58
+#: views/generic/dates.py:98
 msgid "No month specified"
 msgstr "Ez da hilabeterik zehaztu"
 
-#: views/generic/dates.py:99
+#: views/generic/dates.py:157
 msgid "No day specified"
 msgstr "Ez da egunik zehaztu"
 
-#: views/generic/dates.py:138
+#: views/generic/dates.py:213
 msgid "No week specified"
 msgstr "Ez da asterik zehaztu"
 
-#: views/generic/dates.py:198 views/generic/dates.py:215
+#: views/generic/dates.py:368 views/generic/dates.py:393
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "Ez dago %(verbose_name_plural)s"
 
-#: views/generic/dates.py:467
+#: views/generic/dates.py:646
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1224,26 +1231,26 @@ msgstr ""
 "Etorkizuneko %(verbose_name_plural)s ez dago aukeran \n"
 "%(class_name)s.alloe_future False delako"
 
-#: views/generic/dates.py:501
+#: views/generic/dates.py:678
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "%(datestr)s data string okerra '%(format)s' formaturako"
 
-#: views/generic/detail.py:51
+#: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Bilaketarekin bat datorren %(verbose_name)s-rik ez dago"
 
-#: views/generic/list.py:45
+#: views/generic/list.py:51
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "Orria ez da azkena, hortaz ezin da osokora (int) biurtu."
 
-#: views/generic/list.py:50
+#: views/generic/list.py:56
 #, python-format
-msgid "Invalid page (%(page_number)s)"
-msgstr "Orri okerra (%(page_number)s)"
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Orri baliogabea (%(page_number)s):%(message)s"
 
-#: views/generic/list.py:117
+#: views/generic/list.py:137
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "Zerrenda hutsa eta '%(class_name)s.allow_empty' False da"

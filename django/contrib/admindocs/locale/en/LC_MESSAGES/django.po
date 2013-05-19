@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,59 +13,59 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views.py:58 views.py:60 views.py:62
+#: views.py:59 views.py:61 views.py:63
 msgid "tag:"
 msgstr ""
 
-#: views.py:93 views.py:95 views.py:97
+#: views.py:94 views.py:96 views.py:98
 msgid "filter:"
 msgstr ""
 
-#: views.py:156 views.py:158 views.py:160
+#: views.py:157 views.py:159 views.py:161
 msgid "view:"
 msgstr ""
 
-#: views.py:188
+#: views.py:189
 #, python-format
 msgid "App %r not found"
 msgstr ""
 
-#: views.py:195
+#: views.py:196
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 
-#: views.py:207
+#: views.py:208
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr ""
 
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
+#: views.py:208 views.py:227 views.py:232 views.py:246 views.py:260
+#: views.py:265
 msgid "model:"
 msgstr ""
 
-#: views.py:222 views.py:254
+#: views.py:223 views.py:255
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr ""
 
-#: views.py:226 views.py:259
+#: views.py:227 views.py:260
 #, python-format
 msgid "all %s"
 msgstr ""
 
-#: views.py:231 views.py:264
+#: views.py:232 views.py:265
 #, python-format
 msgid "number of %s"
 msgstr ""
 
-#: views.py:269
+#: views.py:270
 #, python-format
 msgid "Fields on %s objects"
 msgstr ""
 
-#: views.py:361
+#: views.py:362
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr ""
@@ -171,11 +171,11 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: tests/__init__.py:23
+#: tests/test_fields.py:29
 msgid "Boolean (Either True or False)"
 msgstr ""
 
-#: tests/__init__.py:33
+#: tests/test_fields.py:39
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr ""

@@ -6,73 +6,85 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-22 08:46+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Kannada (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Kannada (http://www.transifex.com/projects/p/django/language/"
 "kn/)\n"
-"Language: kn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "ಟ್ಯಾಗ್:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "ಸೋಸಕ:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "ನೋಟ:"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "%r ಅನ್ವಯಾಂಶ ಸಿಗಲಿಲ್ಲ"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr ""
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "ಮಾಡೆಲ್:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr ""
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "ಎಲ್ಲಾ %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "%s ಗಳ ಸಂಖ್ಯೆ"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "%s ವಸ್ತುಗಳ ಅಂಶಗಳು"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s  URL ಸ್ವರೂಪದ್ದಾಗಿ ತೋರುವದಿಲ್ಲ."
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -83,30 +95,18 @@ msgstr "%s  URL ಸ್ವರೂಪದ್ದಾಗಿ ತೋರುವದಿಲ್
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "ವಿವರಮಾಹಿತಿ"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "ಮಾಹಿತಿಯ ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -126,62 +126,71 @@ msgstr ""
 "(  ನಿಮ್ಮ ಗಣಕವು \"internal\" ಹೌದೇ ಅಲ್ಲವೇ ಎಂದು ಗೊತ್ತಿಲ್ಲದಿದ್ದರೆ , ಗಣಕದ ಆಡಳಿತಗಾರರನ್ನು "
 "ಕೇಳಿರಿ).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "ಈ ಪುಟದ ಬಗೆಗಿನ ಮಾಹಿತಿ"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "ನಿಮ್ಮನ್ನು ಯಾವುದೇ ಪುಟದಿಂದ ಆ ಪುಟವನ್ನು ಸೃಷ್ಟಿಸುವ ನೋಟದ ಮಾಹಿತಿಪುಟಕ್ಕೆ ಕೊಂಡೊಯ್ಯುವದು"
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "ವಸ್ತುವಿನ ಐಡಿ ತೋರಿಸಿ"
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳ ವಿಶಿಷ್ಠ ಐಡಿ ಮತ್ತು ಒಳವಿಷಯಬಗೆಯನ್ನು ತೋರಿಸುತ್ತದೆ."
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಈಗಿನ ಕಿಟಕಿಯಲ್ಲಿ)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳಿಗಾಗಿ ಆಡಳಿತಪುಟಕ್ಕೆ ಒಯ್ಯುತ್ತದೆ"
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "ಮೇಲಿನಂತೆ, ಆದರೆ ಆಡಳಿತಪುಟವನ್ನು ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ ತೆರೆಯುವದು."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
 msgstr ""
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr ""
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr ""
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr ""
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
 msgstr ""
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "ಬೂಲಿಯನ್ (ಹೌದು ಅಥವ ಅಲ್ಲ)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "ಕ್ಷೇತ್ರದ ಬಗೆ: %(field_type)s"

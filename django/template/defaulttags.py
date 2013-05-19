@@ -5,13 +5,15 @@ import sys
 import re
 from datetime import datetime
 from itertools import groupby, cycle as itertools_cycle
+import warnings
 
 from django.conf import settings
 from django.template.base import (Node, NodeList, Template, Context, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
-    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
+    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re,
+    render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_text
@@ -54,15 +56,15 @@ class CsrfTokenNode(Node):
             # misconfiguration, so we raise a warning
             from django.conf import settings
             if settings.DEBUG:
-                import warnings
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars, variable_name=None, silent=False):
+    def __init__(self, cyclevars, variable_name=None, silent=False, escape=False):
         self.cyclevars = cyclevars
         self.variable_name = variable_name
         self.silent = silent
+        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         if self not in context.render_context:
@@ -74,7 +76,9 @@ class CycleNode(Node):
             context[self.variable_name] = value
         if self.silent:
             return ''
-        return value
+        if not self.escape:
+            value = mark_safe(value)
+        return render_value_in_context(value, context)
 
 class DebugNode(Node):
     def render(self, context):
@@ -97,14 +101,17 @@ class FilterNode(Node):
         return filtered
 
 class FirstOfNode(Node):
-    def __init__(self, vars):
-        self.vars = vars
+    def __init__(self, variables, escape=False):
+        self.vars = variables
+        self.escape = escape        # only while the "future" version exists
 
     def render(self, context):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return smart_text(value)
+                if not self.escape:
+                    value = mark_safe(value)
+                return render_value_in_context(value, context)
         return ''
 
 class ForNode(Node):
@@ -120,7 +127,7 @@ class ForNode(Node):
             self.nodelist_empty = nodelist_empty
 
     def __repr__(self):
-        reversed_text = self.is_reversed and ' reversed' or ''
+        reversed_text = ' reversed' if self.is_reversed else ''
         return "<For Node: for %s in %s, tail_len: %d%s>" % \
             (', '.join(self.loopvars), self.sequence, len(self.nodelist_loop),
              reversed_text)
@@ -208,31 +215,44 @@ class IfChangedNode(Node):
 
     def __init__(self, nodelist_true, nodelist_false, *varlist):
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
-        self._last_seen = None
         self._varlist = varlist
-        self._id = str(id(self))
 
     def render(self, context):
-        if 'forloop' in context and self._id not in context['forloop']:
-            self._last_seen = None
-            context['forloop'][self._id] = 1
+        # Init state storage
+        state_frame = self._get_context_stack_frame(context)
+        if self not in state_frame:
+            state_frame[self] = None
+
+        nodelist_true_output = None
         try:
             if self._varlist:
                 # Consider multiple parameters.  This automatically behaves
                 # like an OR evaluation of the multiple variables.
                 compare_to = [var.resolve(context, True) for var in self._varlist]
             else:
-                compare_to = self.nodelist_true.render(context)
+                # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
+                compare_to = nodelist_true_output = self.nodelist_true.render(context)
         except VariableDoesNotExist:
             compare_to = None
 
-        if compare_to != self._last_seen:
-            self._last_seen = compare_to
-            content = self.nodelist_true.render(context)
-            return content
+        if compare_to != state_frame[self]:
+            state_frame[self] = compare_to
+            return nodelist_true_output or self.nodelist_true.render(context)  # render true block if not already rendered
         elif self.nodelist_false:
             return self.nodelist_false.render(context)
         return ''
+
+    def _get_context_stack_frame(self, context):
+        # The Context object behaves like a stack where each template tag can create a new scope.
+        # Find the place where to store the state to detect changes.
+        if 'forloop' in context:
+            # Ifchanged is bound to the local for loop.
+            # When there is a loop-in-loop, the state is bound to the inner loop,
+            # so it resets when the outer loop continues.
+            return context['forloop']
+        else:
+            # Using ifchanged outside loops. Effectively this is a no-op because the state is associated with 'self'.
+            return context.render_context
 
 class IfEqualNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
@@ -409,7 +429,8 @@ class URLNode(Node):
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
-        except NoReverseMatch as e:
+        except NoReverseMatch:
+            exc_info = sys.exc_info()
             if settings.SETTINGS_MODULE:
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
@@ -421,10 +442,10 @@ class URLNode(Node):
                         # Re-raise the original exception, not the one with
                         # the path relative to the project. This makes a
                         # better error message.
-                        raise e
+                        six.reraise(*exc_info)
             else:
                 if self.asvar is None:
-                    raise e
+                    raise
 
         if self.asvar:
             context[self.asvar] = url
@@ -453,7 +474,7 @@ class WidthRatioNode(Node):
         except VariableDoesNotExist:
             return ''
         except (ValueError, TypeError):
-            raise TemplateSyntaxError("widthratio final argument must be an number")
+            raise TemplateSyntaxError("widthratio final argument must be a number")
         try:
             value = float(value)
             max_value = float(max_value)
@@ -489,6 +510,7 @@ def autoescape(parser, token):
     """
     Force autoescape behavior for this block.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     args = token.contents.split()
     if len(args) != 2:
         raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
@@ -508,7 +530,7 @@ def comment(parser, token):
     return CommentNode()
 
 @register.tag
-def cycle(parser, token):
+def cycle(parser, token, escape=False):
     """
     Cycles among the given strings each time this tag is encountered.
 
@@ -541,6 +563,12 @@ def cycle(parser, token):
         {% endfor %}
 
     """
+    if not escape:
+        warnings.warn(
+            "'The `cycle` template tag is changing to escape its arguments; "
+            "the non-autoescaping version is deprecated. Load it "
+            "from the `future` tag library to start using the new behavior.",
+            PendingDeprecationWarning, stacklevel=2)
 
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -588,13 +616,13 @@ def cycle(parser, token):
     if as_form:
         name = args[-1]
         values = [parser.compile_filter(arg) for arg in args[1:-2]]
-        node = CycleNode(values, name, silent=silent)
+        node = CycleNode(values, name, silent=silent, escape=escape)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
         parser._namedCycleNodes[name] = node
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
-        node = CycleNode(values)
+        node = CycleNode(values, escape=escape)
     return node
 
 @register.tag
@@ -633,6 +661,7 @@ def do_filter(parser, token):
     Instead, use the ``autoescape`` tag to manage autoescaping for blocks of
     template code.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
     for func, unused in filter_expr.filters:
@@ -643,7 +672,7 @@ def do_filter(parser, token):
     return FilterNode(filter_expr, nodelist)
 
 @register.tag
-def firstof(parser, token):
+def firstof(parser, token, escape=False):
     """
     Outputs the first variable passed that is not False, without escaping.
 
@@ -657,11 +686,11 @@ def firstof(parser, token):
 
         {% if var1 %}
             {{ var1|safe }}
-        {% else %}{% if var2 %}
+        {% elif var2 %}
             {{ var2|safe }}
-        {% else %}{% if var3 %}
+        {% elif var3 %}
             {{ var3|safe }}
-        {% endif %}{% endif %}{% endif %}
+        {% endif %}
 
     but obviously much cleaner!
 
@@ -677,10 +706,17 @@ def firstof(parser, token):
         {% endfilter %}
 
     """
+    if not escape:
+        warnings.warn(
+            "'The `firstof` template tag is changing to escape its arguments; "
+            "the non-autoescaping version is deprecated. Load it "
+            "from the `future` tag library to start using the new behavior.",
+            PendingDeprecationWarning, stacklevel=2)
+
     bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits])
+    return FirstOfNode([parser.compile_filter(bit) for bit in bits], escape=escape)
 
 @register.tag('for')
 def do_for(parser, token):
@@ -746,13 +782,13 @@ def do_for(parser, token):
         ==========================  ================================================
 
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) < 4:
         raise TemplateSyntaxError("'for' statements should have at least four"
                                   " words: %s" % token.contents)
 
     is_reversed = bits[-1] == 'reversed'
-    in_index = is_reversed and -3 or -2
+    in_index = -3 if is_reversed else -2
     if bits[in_index] != 'in':
         raise TemplateSyntaxError("'for' statements should use the format"
                                   " 'for x in y': %s" % token.contents)
@@ -954,7 +990,7 @@ def ifchanged(parser, token):
                 {% endifchanged %}
             {% endfor %}
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     nodelist_true = parser.parse(('else', 'endifchanged'))
     token = parser.next_token()
     if token.contents == 'else':
@@ -1011,6 +1047,7 @@ def load(parser, token):
         {% load byline from news %}
 
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) >= 4 and bits[-2] == "from":
         try:
@@ -1109,17 +1146,16 @@ def regroup(parser, token):
         {% regroup people|dictsort:"gender" by gender as grouped %}
 
     """
-    firstbits = token.contents.split(None, 3)
-    if len(firstbits) != 4:
+    bits = token.split_contents()
+    if len(bits) != 6:
         raise TemplateSyntaxError("'regroup' tag takes five arguments")
-    target = parser.compile_filter(firstbits[1])
-    if firstbits[2] != 'by':
+    target = parser.compile_filter(bits[1])
+    if bits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
-    lastbits_reversed = firstbits[3][::-1].split(None, 2)
-    if lastbits_reversed[1][::-1] != 'as':
+    if bits[4] != 'as':
         raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
                                   " be 'as'")
-    var_name = lastbits_reversed[0][::-1]
+    var_name = bits[5]
     # RegroupNode will take each item in 'target', put it in the context under
     # 'var_name', evaluate 'var_name'.'expression' in the current context, and
     # group by the resulting value. After all items are processed, it will
@@ -1128,7 +1164,7 @@ def regroup(parser, token):
     # doesn't provide a context-aware equivalent of Python's getattr.
     expression = parser.compile_filter(var_name +
                                        VARIABLE_ATTRIBUTE_SEPARATOR +
-                                       lastbits_reversed[2][::-1])
+                                       bits[3])
     return RegroupNode(target, expression, var_name)
 
 @register.tag
@@ -1184,6 +1220,7 @@ def templatetag(parser, token):
         ``closecomment``    ``#}``
         ==================  =======
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'templatetag' statement takes one argument")
@@ -1319,13 +1356,13 @@ def widthratio(parser, token):
 
     For example::
 
-        <img src='bar.gif' height='10' width='{% widthratio this_value max_value 100 %}' />
+        <img src='bar.gif' height='10' width='{% widthratio this_value max_value max_width %}' />
 
-    Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in
-    the above example will be 88 pixels wide (because 175/200 = .875;
-    .875 * 100 = 87.5 which is rounded up to 88).
+    If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
+    the image in the above example will be 88 pixels wide
+    (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     if len(bits) != 4:
         raise TemplateSyntaxError("widthratio takes three arguments")
     tag, this_value_expr, max_value_expr, max_width = bits

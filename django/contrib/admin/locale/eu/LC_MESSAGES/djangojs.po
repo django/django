@@ -1,22 +1,25 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+#  <julenx@gmail.com>, 2013.
+#   <julenx@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 14:15+0000\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Basque (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2013-03-12 13:40+0000\n"
+"Last-Translator: julen <julenx@gmail.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
-"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -29,14 +32,14 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Hau da aukeran dauden %s zerrenda. Hauetako zenbait aukeratu ditzazkezu "
+"Hau da aukeran dauden %s zerrenda. Hauetako zenbait aukera ditzakezu "
 "azpiko \n"
-"kaxan klik egin eta kutxen artean dagoen \"aukeratu\" gezian klik eginez"
+"kaxan hautatu eta kutxen artean dagoen \"Aukeratu\" gezian klik eginez."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Idatzi kutxa honetan, aukeran %s objektuak iragazteko."
+msgstr "Idatzi kutxa honetan erabilgarri dauden %s objektuak iragazteko."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -49,7 +52,7 @@ msgstr "Denak aukeratu"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr "Klik egin %s guztiak batera aukeratzeko"
+msgstr "Egin klik %s guztiak batera aukeratzeko."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
@@ -57,7 +60,7 @@ msgstr "Aukeratu"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
-msgstr "Ezabatu"
+msgstr "Kendu"
 
 #: static/admin/js/SelectFilter2.js:75
 #, c-format
@@ -70,18 +73,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Hau da aukeratutako %s zerrenda. Hauetazko zenbait ezabatu ditzazkezu azpiko "
-"kutxan\n"
-"klik egin eta kutxen artean dagoen \"Ezabatu\" gezian klik eginez"
+"Hau da aukeratutako %s zerrenda. Hauetako zenbait ezaba ditzakezu azpiko "
+"kutxan hautatu eta bi kutxen artean dagoen \"Ezabatu\" gezian klik eginez."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr "Ezabatu guztiak"
+msgstr "Kendu guztiak"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Klik egin aukeratuako %s guztiak ezabatzeko."
+msgstr "Egin klik aukeratutako %s guztiak kentzeko."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
@@ -103,8 +105,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Ekintza bat aukeratu duzu, baina oraindik ez duzu eremuetako aldaketak "
-"gorde. Mesedez, sakatu OK gordetzeko. Ekintza berriro exekutatu beharko duzu."
+"Ekintza bat hautatu duzu, baina oraindik ez duzu eremuetako aldaketak gorde. "
+"Mesedez, sakatu OK gordetzeko. Ekintza berriro exekutatu beharko duzu."
 
 #: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
@@ -112,7 +114,7 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ekintza bat aukeratu duzu, baina ez duzu inongo aldaketarik egin eremuetan. "
+"Ekintza bat hautatu duzu, baina ez duzu inongo aldaketarik egin eremuetan. "
 "Litekeena da, Gorde botoia beharrean Aurrera botoiaren bila aritzea."
 
 #: static/admin/js/calendar.js:26

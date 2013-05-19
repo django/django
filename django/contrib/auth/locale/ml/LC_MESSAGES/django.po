@@ -1,21 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+#   <david.forgoz@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-08 12:07+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Malayalam (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-12-15 23:27+0100\n"
+"PO-Revision-Date: 2012-12-16 08:51+0000\n"
+"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
-"Language: ml\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:41
 msgid "Personal info"
@@ -29,252 +31,263 @@ msgstr "അനുമതികള്‍"
 msgid "Important dates"
 msgstr "പ്രധാന തീയതികള്‍"
 
-#: admin.py:125
+#: admin.py:126
 msgid "Password changed successfully."
 msgstr "പാസ് വേര്‍ഡ് മാറ്റിയിരിക്കുന്നു."
 
-#: admin.py:135
+#: admin.py:136
 #, python-format
 msgid "Change password: %s"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റുക: %s"
 
-#: forms.py:62
+#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+msgid "No password set."
+msgstr "രഹസ്യവാക്ക് ക്രമീകരിച്ചിട്ടില്ല"
+
+#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+
+#: forms.py:67
 msgid "A user with that username already exists."
 msgstr "ആ പേരുള്ള ഒരു ഉപയോക്താവ് നിലവിലുണ്ട്."
 
-#: forms.py:63 forms.py:251 forms.py:308
+#: forms.py:68 forms.py:269 forms.py:329
 msgid "The two password fields didn't match."
-msgstr "പാസ് വേര്‍ഡ് നല്കിയ കള്ളികള്‍ രണ്ടും തമ്മില്‍ സാമ്യമില്ല."
+msgstr "പാസ്‌വേര്‍ഡ് നല്കിയ കള്ളികള്‍ രണ്ടും തമ്മില്‍ സാമ്യമില്ല."
 
-#: forms.py:65 forms.py:110 forms.py:139
+#: forms.py:70 forms.py:115
 msgid "Username"
 msgstr "യൂസര്‍ നാമം (ഉപയോക്ത്രു നാമം)"
 
-#: forms.py:67 forms.py:111
+#: forms.py:72 forms.py:116
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "നിര്‍ബന്ധം. 30 ഓ അതില്‍ കുറവോ ചിഹ്നങ്ങള്‍. അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും "
 "മാത്രം."
 
-#: forms.py:70 forms.py:114
+#: forms.py:75 forms.py:119
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും മാത്രം."
 
-#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
+#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
 msgid "Password"
-msgstr "പാസ് വേര്‍ഡ്"
+msgstr "പാസ്‌വേര്‍ഡ്"
 
-#: forms.py:74
+#: forms.py:79
 msgid "Password confirmation"
-msgstr "പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
+msgstr "പാസ്‌വേര്‍ഡ് ഉറപ്പാക്കല്‍"
 
-#: forms.py:76
+#: forms.py:81
 msgid "Enter the same password as above, for verification."
-msgstr "പാസ് വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
+msgstr "പാസ്‌വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
 
-#: forms.py:117
+#: forms.py:122
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"പാസ്‌വേര്‍ഡുകള്‍ അതേപടി സൂക്ഷിച്ചു വെക്കാത്തതുകൊണ്ട്  ഈ യൂസറുടെ പാസ്‌വേര്‍ഡ് കാണാന്‍ കഴിയില്ല, പകരം <a "
+"href=\"password/\">ഈ ഫോമു</a>പയോഗിച്ച് നിലവിലുള്ള പാസ്‌വേര്‍ഡ് മാറ്റാവുന്നതാണ്."
 
-#: forms.py:143
+#: forms.py:151
+#, python-format
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
 msgstr ""
-"ദയവായി ശരിയായ യൂസര്‍നാമവും പാസ്വേര്ഡും നല്കുക. ഇംഗ്ളീഷ് അക്ഷരങ്ങള്‍ വല്യക്ഷരമാണോ അല്ലയോ എന്നത് "
-"ശ്രദ്ധിക്കണം"
 
-#: forms.py:145
+#: forms.py:153
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"നിങ്ങളുടെ വെബ്-ബ്രൗസറിലെ കുക്കീസൊന്നും പ്രവര്‍ത്തിക്കുന്നില്ല. ഇതിലേക്ക് പ്രവേശിക്കാന്‍ അവ ആവശ്യമാണ്."
+"നിങ്ങളുടെ വെബ്-ബ്രൗസറിലെ കുക്കീസൊന്നും പ്രവര്‍ത്തിക്കുന്നില്ല. ഇതിലേക്ക് പ്രവേശിക്കാന്‍ കുക്കീസ് "
+"ആവശ്യമാണ്."
 
-#: forms.py:147
+#: forms.py:155
 msgid "This account is inactive."
 msgstr "ഈ അക്കൗണ്ട് മരവിപ്പിച്ചതാണ്."
 
-#: forms.py:191
+#: forms.py:206
 msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
+"That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"ആ ഇ-മെയിലുമായി ബന്ധപ്പെട്ട യൂസര് അക്കൗണ്ടൊന്നും നിലവിലില്ല. രജിസ്റ്റര്‍ ചെയ്തെന്നു തീര്‍ച്ചയാണോ?"
 
-#: forms.py:193
+#: forms.py:208 tests/forms.py:374
 msgid ""
-"The user account associated with this e-mail address cannot reset the "
+"The user account associated with this email address cannot reset the "
 "password."
 msgstr ""
 
-#: forms.py:196
-msgid "E-mail"
-msgstr "ഇ-മെയില്‍"
+#: forms.py:211
+msgid "Email"
+msgstr "ഈമെയിൽ"
 
-#: forms.py:253
+#: forms.py:271
 msgid "New password"
-msgstr "പുതിയ പാസ് വേര്‍ഡ്"
+msgstr "പുതിയ പാസ്‌വേര്‍ഡ്"
 
-#: forms.py:255
+#: forms.py:273
 msgid "New password confirmation"
-msgstr "പുതിയ പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
+msgstr "പുതിയ പാസ്‌വേര്‍ഡ് ഉറപ്പാക്കല്‍"
 
-#: forms.py:284
+#: forms.py:302
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് തെറ്റായാണ് നല്കിയത്. തിരുത്തുക."
+msgstr "നിങ്ങളുടെ പഴയ പാസ്‌വേര്‍ഡ് തെറ്റായാണ് നല്കിയത്. തിരുത്തുക."
 
-#: forms.py:287
+#: forms.py:305
 msgid "Old password"
-msgstr "പഴയ പാസ് വേര്‍ഡ്"
+msgstr "പഴയ പാസ്‌വേര്‍ഡ്"
 
-#: forms.py:312
+#: forms.py:333
 msgid "Password (again)"
-msgstr "പാസ് വേര്‍ഡ് (വീണ്ടും)"
+msgstr "പാസ്‌വേര്‍ഡ് (വീണ്ടും)"
 
-#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
-#: hashers.py:389
+#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
+#: hashers.py:412
 msgid "algorithm"
-msgstr ""
+msgstr "അല്‍ഗോരിതം"
 
-#: hashers.py:219
+#: hashers.py:242
 msgid "iterations"
-msgstr ""
+msgstr "പുനരാവൃത്തികള്‍"
 
-#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
 msgid "salt"
-msgstr ""
+msgstr "സോള്‍ട്ട്"
 
-#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
 msgid "hash"
-msgstr ""
+msgstr "ഹാഷ്"
 
-#: hashers.py:270
+#: hashers.py:293
 msgid "work factor"
-msgstr ""
+msgstr "വര്‍ക്ക് ഫാക്ടര്‍"
 
-#: hashers.py:272
+#: hashers.py:295
 msgid "checksum"
-msgstr ""
+msgstr "ചെക്‍സം"
 
-#: models.py:66 models.py:113
+#: models.py:72 models.py:121
 msgid "name"
 msgstr "പേര്"
 
-#: models.py:68
+#: models.py:74
 msgid "codename"
 msgstr "കോഡ്-നാമം"
 
-#: models.py:72
+#: models.py:78
 msgid "permission"
 msgstr "അനുമതി"
 
-#: models.py:73 models.py:115
+#: models.py:79 models.py:123
 msgid "permissions"
 msgstr "അനുമതികള്‍"
 
-#: models.py:120
+#: models.py:128
 msgid "group"
 msgstr "ഗ്രൂപ്പ്"
 
-#: models.py:121 models.py:250
+#: models.py:129 models.py:301
 msgid "groups"
 msgstr "ഗ്രൂപ്പുകള്‍"
 
-#: models.py:232
+#: models.py:200
+msgid "password"
+msgstr "പാസ്‌വേര്‍ഡ്"
+
+#: models.py:201
+msgid "last login"
+msgstr "അവസാനമായി ലോഗിന്‍ ചെയ്തതു"
+
+#: models.py:298
+msgid "superuser status"
+msgstr "സൂപ്പര്‍-യൂസര്‍ പദവി"
+
+#: models.py:299
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "ഈ ഉപയോക്താവിന് എടുത്തു പറയാതെ തന്നെ എല്ലാ അനുമതികളും ലഭിക്കുന്നതാണെന്ന് വ്യക്തമാക്കുന്നു"
+
+#: models.py:302
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+"ഈ യൂസര്‍ ഉള്‍പ്പെടുന്ന ഗ്രൂപ്പുകള്‍. ഒരു യൂസര്‍ക്ക് അയാളുടെ/അവരുടെ ഓരോ ഗ്രൂപ്പിന്റേയും മുഴുവന്‍ അനുമതികളും "
+"ലഭിക്കും."
+
+#: models.py:306
+msgid "user permissions"
+msgstr "യൂസര്‍ (ഉപയോക്താവ്)നുള്ള അനുമതികള്‍"
+
+#: models.py:377
 msgid "username"
 msgstr "യൂസര്‍ നാമം (ഉപയോക്ത്രു നാമം)"
 
-#: models.py:233
+#: models.py:378
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "നിര്‍ബന്ധം. 30 ഓ അതില്‍ കുറവോ ചിഹ്നങ്ങള്‍. അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും "
 "മാത്രം."
 
-#: models.py:235
+#: models.py:381
+msgid "Enter a valid username."
+msgstr "തെറ്റായ ഉപഭോക്തൃ നാമം"
+
+#: models.py:383
 msgid "first name"
 msgstr "പേര് - ആദ്യഭാഗം"
 
-#: models.py:236
+#: models.py:384
 msgid "last name"
 msgstr "പേര് - അന്ത്യഭാഗം"
 
-#: models.py:237
-msgid "e-mail address"
-msgstr "ഇ-മെയില്‍ വിലാസം"
+#: models.py:385
+msgid "email address"
+msgstr "ഈമെയിൽ വിലാസം"
 
-#: models.py:238
-msgid "password"
-msgstr "പാസ് വേര്‍ഡ്"
-
-#: models.py:239
+#: models.py:386
 msgid "staff status"
 msgstr "സ്റ്റാഫ് പദവി"
 
-#: models.py:240
+#: models.py:387
 msgid "Designates whether the user can log into this admin site."
-msgstr "ഈ യൂസര്‍ക്ക് ഈ അഡ്മിന് സൈറ്റിലേക്ക് പ്രവേശിക്കാമോ എന്നു വ്യക്തമാക്കാന്‍"
+msgstr "ഈ യൂസര്‍ക്ക് ഈ അഡ്മിന്‍ സൈറ്റിലേക്ക് പ്രവേശിക്കാമോ എന്നു വ്യക്തമാക്കാന്‍"
 
-#: models.py:242
+#: models.py:389
 msgid "active"
 msgstr "സജീവം"
 
-#: models.py:243
+#: models.py:390
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 "ഈ യൂസര്‍ സജീവമാണോയെന്ന് വ്യക്തമാക്കുന്നു. അക്കൗണ്ട് ഡിലീറ്റ് ചെയ്യുന്നതിനു പകരം ഇത് ഒഴിവാക്കുക."
 
-#: models.py:245
-msgid "superuser status"
-msgstr "സൂപ്പര്‍-യൂസര്‍ പദവി"
-
-#: models.py:246
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "ഈ ഉപയോക്താവിന് എടുത്തു പറയാതെ തന്നെ എല്ലാ അനുമതികളും ലഭിക്കുന്നതാണെന്ന് വ്യക്തമാക്കുന്നു"
-
-#: models.py:248
-msgid "last login"
-msgstr "അവസാനമായി ലോഗിന്‍ ചെയ്തതു"
-
-#: models.py:249
+#: models.py:392
 msgid "date joined"
 msgstr "ചേര്‍ന്ന തീയതി"
 
-#: models.py:251
-msgid ""
-"The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
-msgstr ""
-
-#: models.py:255
-msgid "user permissions"
-msgstr "യൂസര്‍ (ഉപയോക്താവ്)നുള്ള അനുമതികള്‍"
-
-#: models.py:260
+#: models.py:400
 msgid "user"
 msgstr "യൂസര്‍ (ഉപയോക്താവ്)"
 
-#: models.py:261
+#: models.py:401
 msgid "users"
 msgstr "യൂസേര്‍സ് (ഉപയോക്താക്കള്‍)"
 
-#: views.py:93
+#: views.py:94
 msgid "Logged out"
 msgstr "ലോഗ്-ഔട്ട് ചെയ്തു (പുറത്തിറങ്ങി)"
-
-#: management/commands/createsuperuser.py:27
-msgid "Enter a valid e-mail address."
-msgstr "ശരിയായ ഇ-മെയില്‍ വിലാസം നല്കുക."
 
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "%(site_name)s ലെ പാസ്‌വേര്‍ഡ് മാറ്റിയിരിക്കുന്നു"

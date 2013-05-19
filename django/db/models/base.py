@@ -9,9 +9,8 @@ import django.db.models.manager  # Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import (ManyToOneRel,
+from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
@@ -58,12 +57,21 @@ class ModelBase(type):
     """
     def __new__(cls, name, bases, attrs):
         super_new = super(ModelBase, cls).__new__
+
         # six.with_metaclass() inserts an extra class called 'NewBase' in the
-        # inheritance tree: Model -> NewBase -> object. Ignore this class.
+        # inheritance tree: Model -> NewBase -> object. But the initialization
+        # should be executed only once for a given model class.
+
+        # attrs will never be empty for classes declared in the standard way
+        # (ie. with the `class` keyword). This is quite robust.
+        if name == 'NewBase' and attrs == {}:
+            return super_new(cls, name, bases, attrs)
+
+        # Also ensure initialization is only performed for subclasses of Model
+        # (excluding Model class itself).
         parents = [b for b in bases if isinstance(b, ModelBase) and
                 not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
         if not parents:
-            # If this isn't a subclass of Model, don't do anything special.
             return super_new(cls, name, bases, attrs)
 
         # Create the class.
@@ -155,7 +163,7 @@ class ModelBase(type):
                 else:
                     base = parent
             if base is None:
-                    raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
+                raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             if (new_class._meta.local_fields or
                     new_class._meta.local_many_to_many):
                 raise FieldError("Proxy model '%s' contains model fields." % name)
@@ -191,7 +199,7 @@ class ModelBase(type):
                 if base in o2o_map:
                     field = o2o_map[base]
                 elif not is_proxy:
-                    attr_name = '%s_ptr' % base._meta.module_name
+                    attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
                             auto_created=True, parent_link=True)
                     new_class.add_to_class(attr_name, field)
@@ -311,7 +319,7 @@ class ModelState(object):
         self.adding = True
 
 
-class Model(six.with_metaclass(ModelBase, object)):
+class Model(six.with_metaclass(ModelBase)):
     _deferred = False
 
     def __init__(self, *args, **kwargs):
@@ -325,12 +333,12 @@ class Model(six.with_metaclass(ModelBase, object)):
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and instantiation for iteration is 33% faster.
         args_len = len(args)
-        if args_len > len(self._meta.fields):
+        if args_len > len(self._meta.concrete_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
-        fields_iter = iter(self._meta.fields)
         if not kwargs:
+            fields_iter = iter(self._meta.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
@@ -339,6 +347,7 @@ class Model(six.with_metaclass(ModelBase, object)):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
+            fields_iter = iter(self._meta.fields)
             for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
@@ -355,11 +364,12 @@ class Model(six.with_metaclass(ModelBase, object)):
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
             if (field.attname not in kwargs and
-                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
+                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
+                     or field.column is None)):
                 # This field will be populated on request.
                 continue
             if kwargs:
-                if isinstance(field.rel, ManyToOneRel):
+                if isinstance(field.rel, ForeignObjectRel):
                     try:
                         # Assume object instance was passed in.
                         rel_obj = kwargs.pop(field.name)
@@ -386,6 +396,7 @@ class Model(six.with_metaclass(ModelBase, object)):
                         val = field.get_default()
             else:
                 val = field.get_default()
+
             if is_related_object:
                 # If we are passed a related instance, set it using the
                 # field.name instead of field.attname (e.g. "user" instead of
@@ -520,7 +531,7 @@ class Model(six.with_metaclass(ModelBase, object)):
         # automatically do a "update_fields" save on the loaded fields.
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set()
-            for field in self._meta.fields:
+            for field in self._meta.concrete_fields:
                 if not field.primary_key and not hasattr(field, 'through'):
                     field_names.add(field.attname)
             deferred_fields = [
@@ -537,115 +548,138 @@ class Model(six.with_metaclass(ModelBase, object)):
                        force_update=force_update, update_fields=update_fields)
     save.alters_data = True
 
-    def save_base(self, raw=False, cls=None, origin=None, force_insert=False,
+    def save_base(self, raw=False, force_insert=False,
                   force_update=False, using=None, update_fields=None):
         """
-        Does the heavy-lifting involved in saving. Subclasses shouldn't need to
-        override this method. It's separate from save() in order to hide the
-        need for overrides of save() to pass around internal-only parameters
-        ('raw', 'cls', and 'origin').
+        Handles the parts of saving which should be done only once per save,
+        yet need to be done in raw saves, too. This includes some sanity
+        checks and signal sending.
+
+        The 'raw' argument is telling save_base not to save any parent
+        models and not to do any changes to the values before save. This
+        is used by fixture loading.
         """
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or len(update_fields) > 0
-        if cls is None:
-            cls = self.__class__
-            meta = cls._meta
-            if not meta.proxy:
-                origin = cls
-        else:
-            meta = cls._meta
-
-        if origin and not meta.auto_created:
+        cls = origin = self.__class__
+        # Skip proxies, but keep the origin as the proxy model.
+        if cls._meta.proxy:
+            cls = cls._meta.concrete_model
+        meta = cls._meta
+        if not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
                                   update_fields=update_fields)
-
-        # If we are in a raw save, save the object exactly as presented.
-        # That means that we don't try to be smart about saving attributes
-        # that might have come from the parent class - we just save the
-        # attributes we have been given to the class we have been given.
-        # We also go through this process to defer the save of proxy objects
-        # to their actual underlying model.
-        if not raw or meta.proxy:
-            if meta.proxy:
-                org = cls
-            else:
-                org = None
-            for parent, field in meta.parents.items():
-                # At this point, parent's primary key field may be unknown
-                # (for example, from administration form which doesn't fill
-                # this field). If so, fill it.
-                if field and getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
-                    setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-
-                self.save_base(cls=parent, origin=org, using=using,
-                               update_fields=update_fields)
-
-                if field:
-                    setattr(self, field.attname, self._get_pk_val(parent._meta))
-            if meta.proxy:
-                return
-
-        if not meta.proxy:
-            non_pks = [f for f in meta.local_fields if not f.primary_key]
-
-            if update_fields:
-                non_pks = [f for f in non_pks if f.name in update_fields or f.attname in update_fields]
-
-            # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-            pk_val = self._get_pk_val(meta)
-            pk_set = pk_val is not None
-            record_exists = True
-            manager = cls._base_manager
-            if pk_set:
-                # Determine if we should do an update (pk already exists, forced update,
-                # no force_insert)
-                if ((force_update or update_fields) or (not force_insert and
-                        manager.using(using).filter(pk=pk_val).exists())):
-                    if force_update or non_pks:
-                        values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
-                        if values:
-                            rows = manager.using(using).filter(pk=pk_val)._update(values)
-                            if force_update and not rows:
-                                raise DatabaseError("Forced update did not affect any rows.")
-                            if update_fields and not rows:
-                                raise DatabaseError("Save with update_fields did not affect any rows.")
-                else:
-                    record_exists = False
-            if not pk_set or not record_exists:
-                if meta.order_with_respect_to:
-                    # If this is a model with an order_with_respect_to
-                    # autopopulate the _order field
-                    field = meta.order_with_respect_to
-                    order_value = manager.using(using).filter(**{field.name: getattr(self, field.attname)}).count()
-                    self._order = order_value
-
-                fields = meta.local_fields
-                if not pk_set:
-                    if force_update or update_fields:
-                        raise ValueError("Cannot force an update in save() with no primary key.")
-                    fields = [f for f in fields if not isinstance(f, AutoField)]
-
-                record_exists = False
-
-                update_pk = bool(meta.has_auto_field and not pk_set)
-                result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
-
-                if update_pk:
-                    setattr(self, meta.pk.attname, result)
-            transaction.commit_unless_managed(using=using)
-
+        with transaction.commit_on_success_unless_managed(using=using, savepoint=False):
+            if not raw:
+                self._save_parents(cls, using, update_fields)
+            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
         # Store the database on which the object was saved
         self._state.db = using
         # Once saved, this is no longer a to-be-added instance.
         self._state.adding = False
 
         # Signal that the save is complete
-        if origin and not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self, created=(not record_exists),
+        if not meta.auto_created:
+            signals.post_save.send(sender=origin, instance=self, created=(not updated),
                                    update_fields=update_fields, raw=raw, using=using)
 
     save_base.alters_data = True
+
+    def _save_parents(self, cls, using, update_fields):
+        """
+        Saves all the parents of cls using values from self.
+        """
+        meta = cls._meta
+        for parent, field in meta.parents.items():
+            # Make sure the link fields are synced between parent and self.
+            if (field and getattr(self, parent._meta.pk.attname) is None
+                    and getattr(self, field.attname) is not None):
+                setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
+            self._save_parents(cls=parent, using=using, update_fields=update_fields)
+            self._save_table(cls=parent, using=using, update_fields=update_fields)
+            # Set the parent's PK value to self.
+            if field:
+                setattr(self, field.attname, self._get_pk_val(parent._meta))
+                # Since we didn't have an instance of the parent handy set
+                # attname directly, bypassing the descriptor. Invalidate
+                # the related object cache, in case it's been accidentally
+                # populated. A fresh instance will be re-built from the
+                # database if necessary.
+                cache_name = field.get_cache_name()
+                if hasattr(self, cache_name):
+                    delattr(self, cache_name)
+
+    def _save_table(self, raw=False, cls=None, force_insert=False,
+                    force_update=False, using=None, update_fields=None):
+        """
+        Does the heavy-lifting involved in saving. Updates or inserts the data
+        for a single table.
+        """
+        meta = cls._meta
+        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+
+        if update_fields:
+            non_pks = [f for f in non_pks
+                       if f.name in update_fields or f.attname in update_fields]
+
+        pk_val = self._get_pk_val(meta)
+        pk_set = pk_val is not None
+        if not pk_set and (force_update or update_fields):
+            raise ValueError("Cannot force an update in save() with no primary key.")
+        updated = False
+        # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
+        if pk_set and not force_insert:
+            base_qs = cls._base_manager.using(using)
+            values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
+                      for f in non_pks]
+            if not values:
+                # We can end up here when saving a model in inheritance chain where
+                # update_fields doesn't target any field in current model. In that
+                # case we just say the update succeeded. Another case ending up here
+                # is a model with just PK - in that case check that the PK still
+                # exists.
+                updated = update_fields is not None or base_qs.filter(pk=pk_val).exists()
+            else:
+                updated = self._do_update(base_qs, using, pk_val, values)
+            if force_update and not updated:
+                raise DatabaseError("Forced update did not affect any rows.")
+            if update_fields and not updated:
+                raise DatabaseError("Save with update_fields did not affect any rows.")
+        if not updated:
+            if meta.order_with_respect_to:
+                # If this is a model with an order_with_respect_to
+                # autopopulate the _order field
+                field = meta.order_with_respect_to
+                order_value = cls._base_manager.using(using).filter(
+                    **{field.name: getattr(self, field.attname)}).count()
+                self._order = order_value
+
+            fields = meta.local_concrete_fields
+            if not pk_set:
+                fields = [f for f in fields if not isinstance(f, AutoField)]
+
+            update_pk = bool(meta.has_auto_field and not pk_set)
+            result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+            if update_pk:
+                setattr(self, meta.pk.attname, result)
+        return updated
+
+    def _do_update(self, base_qs, using, pk_val, values):
+        """
+        This method will try to update the model. If the model was updated (in
+        the sense that an update query was done and a matching row was found
+        from the DB) the method will return True.
+        """
+        return base_qs.filter(pk=pk_val)._update(values) > 0
+
+    def _do_insert(self, manager, using, fields, update_pk, raw):
+        """
+        Do an INSERT. If update_pk is defined then this method should return
+        the new pk for the model.
+        """
+        return manager._insert([self], fields=fields, return_id=update_pk,
+                               using=using, raw=raw)
 
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -664,8 +698,8 @@ class Model(six.with_metaclass(ModelBase, object)):
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         if not self.pk:
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
-        op = is_next and 'gt' or 'lt'
-        order = not is_next and '-' or ''
+        op = 'gt' if is_next else 'lt'
+        order = '' if is_next else '-'
         param = force_text(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
@@ -678,8 +712,8 @@ class Model(six.with_metaclass(ModelBase, object)):
     def _get_next_or_previous_in_order(self, is_next):
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
-            op = is_next and 'gt' or 'lt'
-            order = not is_next and '-_order' or '_order'
+            op = 'gt' if is_next else 'lt'
+            order = '_order' if is_next else '-_order'
             order_field = self._meta.order_with_respect_to
             obj = self._default_manager.filter(**{
                 order_field.name: getattr(self, order_field.attname)
@@ -877,7 +911,7 @@ class Model(six.with_metaclass(ModelBase, object)):
     def full_clean(self, exclude=None):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
-        and raises a ``ValidationError`` for any errors that occured.
+        and raises a ``ValidationError`` for any errors that occurred.
         """
         errors = {}
         if exclude is None:
@@ -922,7 +956,7 @@ class Model(six.with_metaclass(ModelBase, object)):
             # Skip validation for empty fields with blank=True. The developer
             # is responsible for making sure they have a valid value.
             raw_value = getattr(self, f.attname)
-            if f.blank and raw_value in validators.EMPTY_VALUES:
+            if f.blank and raw_value in f.empty_values:
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
@@ -946,9 +980,9 @@ def method_set_order(ordered_obj, self, id_list, using=None):
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
-    for i, j in enumerate(id_list):
-        ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
-    transaction.commit_unless_managed(using=using)
+    with transaction.commit_on_success_unless_managed(using=using):
+        for i, j in enumerate(id_list):
+            ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
 
 
 def method_get_order(ordered_obj, self):
@@ -964,7 +998,7 @@ def method_get_order(ordered_obj, self):
 ##############################################
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
+    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.model_name), func)(self, *args, **kwargs)
 
 
 ########

@@ -7,6 +7,7 @@ import re
 import sys
 import gettext as gettext_module
 from threading import local
+import warnings
 
 from django.utils.importlib import import_module
 from django.utils.encoding import force_str, force_text
@@ -14,6 +15,7 @@ from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.translation import TranslatorCommentWarning
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -40,6 +42,7 @@ accept_language_re = re.compile(r'''
         ''', re.VERBOSE)
 
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+
 
 def to_locale(language, to_lower=False):
     """
@@ -137,7 +140,7 @@ def translation(language):
         # doesn't affect en-gb), even though they will both use the core "en"
         # translation. So we have to subvert Python's internal gettext caching.
         base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in _translations]:
+        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
             res._info = res._info.copy()
             res._catalog = res._catalog.copy()
 
@@ -353,6 +356,24 @@ def check_for_language(lang_code):
             return True
     return False
 
+def get_supported_language_variant(lang_code, supported=None):
+    """
+    Returns the language-code that's listed in supported languages, possibly
+    selecting a more generic variant. Raises LookupError if nothing found.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    if lang_code:
+        # e.g. if fr-CA is not supported, try fr-ca;
+        #      if that fails, fallback to fr.
+        variants = (lang_code, lang_code.lower(), lang_code.split('-')[0],
+                    lang_code.lower().split('-')[0])
+        for code in variants:
+            if code in supported and check_for_language(code):
+                return code
+    raise LookupError(lang_code)
+
 def get_language_from_path(path, supported=None):
     """
     Returns the language-code if there is a valid language-code
@@ -393,11 +414,10 @@ def get_language_from_request(request, check_path=False):
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
-    if lang_code and lang_code not in supported:
-        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
-
-    if lang_code and lang_code in supported and check_for_language(lang_code):
-        return lang_code
+    try:
+        return get_supported_language_variant(lang_code, supported)
+    except LookupError:
+        pass
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):
@@ -422,16 +442,18 @@ def get_language_from_request(request, check_path=False):
             # need to check again.
             return _accepted[normalized]
 
-        for lang, dirname in ((accept_lang, normalized),
-                (accept_lang.split('-')[0], normalized.split('_')[0])):
-            if lang.lower() not in supported:
-                continue
-            for path in all_locale_paths():
-                if os.path.exists(os.path.join(path, dirname, 'LC_MESSAGES', 'django.mo')):
-                    _accepted[normalized] = lang
-                    return lang
+        try:
+            accept_lang = get_supported_language_variant(accept_lang, supported)
+        except LookupError:
+            continue
+        else:
+            _accepted[normalized] = accept_lang
+            return accept_lang
 
-    return settings.LANGUAGE_CODE
+    try:
+        return get_supported_language_variant(settings.LANGUAGE_CODE, supported)
+    except LookupError:
+        return settings.LANGUAGE_CODE
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
@@ -468,6 +490,9 @@ def templatize(src, origin=None):
     plural = []
     incomment = False
     comment = []
+    lineno_comment_map = {}
+    comment_lineno_cache = None
+
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
@@ -529,7 +554,27 @@ def templatize(src, origin=None):
                     plural.append(contents)
                 else:
                     singular.append(contents)
+
         else:
+            # Handle comment tokens (`{# ... #}`) plus other constructs on
+            # the same line:
+            if comment_lineno_cache is not None:
+                cur_lineno = t.lineno + t.contents.count('\n')
+                if comment_lineno_cache == cur_lineno:
+                    if t.token_type != TOKEN_COMMENT:
+                        for c in lineno_comment_map[comment_lineno_cache]:
+                            filemsg = ''
+                            if origin:
+                                filemsg = 'file %s, ' % origin
+                            warn_msg = ("The translator-targeted comment '%s' "
+                                "(%sline %d) was ignored, because it wasn't the last item "
+                                "on the line.") % (c, filemsg, comment_lineno_cache)
+                            warnings.warn(warn_msg, TranslatorCommentWarning)
+                        lineno_comment_map[comment_lineno_cache] = []
+                else:
+                    out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
+                comment_lineno_cache = None
+
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
@@ -586,7 +631,10 @@ def templatize(src, origin=None):
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(' # %s' % t.contents)
+                if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
+                    lineno_comment_map.setdefault(t.lineno,
+                                                  []).append(t.contents)
+                    comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
     return force_str(out.getvalue())
@@ -606,7 +654,10 @@ def parse_accept_lang_header(lang_string):
         first, lang, priority = pieces[i : i + 3]
         if first:
             return []
-        priority = priority and float(priority) or 1.0
+        if priority:
+            priority = float(priority)
+        if not priority:        # if priority is 0.0 at this point make it 1.0
+             priority = 1.0
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return result

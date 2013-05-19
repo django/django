@@ -63,10 +63,10 @@ reverse order, from the bottom up. Three hooks are available:
 * :meth:`process_template_response` (only for template responses)
 * :meth:`process_response`
 
-.. image:: _images/middleware.svg
+.. image:: _images/middleware.*
    :alt: middleware application order
-   :width: 480
-   :height: 408
+   :width: 481
+   :height: 409
 
 If you prefer, you can also think of it like an onion: each middleware class
 is a "layer" that wraps the view.
@@ -204,6 +204,7 @@ Dealing with streaming responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. versionchanged:: 1.5
+
     ``response`` may also be an :class:`~django.http.StreamingHttpResponse`
     object.
 

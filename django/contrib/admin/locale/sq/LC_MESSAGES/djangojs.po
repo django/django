@@ -2,20 +2,21 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011.
+#   <besnik@programeshqip.org>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Albanian (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2012-12-02 11:31+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
-"Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -28,15 +29,18 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Kjo është lista e %s të passhme. Mund të zgjidhni disa duke i përzgjedhur te "
+"kutiza më poshtë e mandej duke klikuar mbi shigjetën \"Zgjidhe\" mes dy "
+"kutizave."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Shkruani brenda kutizës që të filtrohet lista e %s të passhme."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
-msgstr "Filtër"
+msgstr "Filtro"
 
 #: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
@@ -45,11 +49,11 @@ msgstr "Zgjidheni krejt"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Klikoni që të zgjidhen krejt %s njëherësh."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Zgjidhni"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -66,15 +70,18 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Kjo është lista e %s të passhme. Mund të hiqni disa duke i përzgjedhur te "
+"kutiza më poshtë e mandej duke klikuar mbi shigjetën \"Hiqe\" mes dy "
+"kutizave."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Hiqi krejt"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Klikoni që të hiqen krejt %s e zgjedhura njëherësh."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
@@ -106,11 +113,9 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button.Keni përzgjedhur një veprim, dhe nuk keni bërë ndonjë ndryshim te "
-"fusha individuale. Ndoshta po kërkonit për butonin Shko, në vend se të "
-"butonit Ruaje."
+".Keni përzgjedhur një veprim, dhe nuk keni bërë ndonjë ndryshim te fusha "
+"individuale. Ndoshta po kërkonit për butonin Shko, në vend se të butonit "
+"Ruaje."
 
 #: static/admin/js/calendar.js:26
 msgid ""

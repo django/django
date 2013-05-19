@@ -111,13 +111,13 @@ class AdminEmailHandler(logging.Handler):
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
-        html_message = self.include_html and reporter.get_traceback_html() or None
+        html_message = reporter.get_traceback_html() if self.include_html else None
         mail.mail_admins(subject, message, fail_silently=True,
                          html_message=html_message,
                          connection=self.connection())
 
     def connection(self):
-        return get_connection(backend=self.email_backend)
+        return get_connection(backend=self.email_backend, fail_silently=True)
 
     def format_subject(self, subject):
         """
@@ -152,4 +152,4 @@ class RequireDebugFalse(logging.Filter):
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
-       return settings.DEBUG
+        return settings.DEBUG

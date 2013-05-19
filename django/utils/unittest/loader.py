@@ -89,7 +89,7 @@ class TestLoader(unittest.TestLoader):
         if use_load_tests and load_tests is not None:
             try:
                 return load_tests(self, tests, None)
-            except Exception, e:
+            except Exception as e:
                 return _make_failed_load_tests(module.__name__, e,
                                                self.suiteClass)
         return tests
@@ -125,7 +125,7 @@ class TestLoader(unittest.TestLoader):
             return self.loadTestsFromTestCase(obj)
         elif (isinstance(obj, types.UnboundMethodType) and
               isinstance(parent, type) and
-              issubclass(parent, case.TestCase)):
+              issubclass(parent, unittest.TestCase)):
             return self.suiteClass([parent(obj.__name__)])
         elif isinstance(obj, unittest.TestSuite):
             return obj
@@ -295,7 +295,7 @@ class TestLoader(unittest.TestLoader):
                 else:
                     try:
                         yield load_tests(self, tests, pattern)
-                    except Exception, e:
+                    except Exception as e:
                         yield _make_failed_load_tests(package.__name__, e,
                                                       self.suiteClass)
 

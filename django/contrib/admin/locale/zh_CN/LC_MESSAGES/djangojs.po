@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Kevin Shi <leiarix@gmail.com>, 2012.
 # Lele Long <schemacs@gmail.com>, 2011.
 # slene <vslene@gmail.com>, 2011.
 # Ziang Song <songziang@gmail.com>, 2012.
@@ -9,16 +10,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-08 19:18+0000\n"
-"Last-Translator: Ziang Song <songziang@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-07-20 01:51+0000\n"
+"Last-Translator: 磊 施 <leiarix@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
-"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -31,11 +32,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"这是可用的%s列表。你可以在选择框下面进行选择，然后点击两选框之间的“选择”箭"
+"头。"
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "在此框中键入以过滤可用的%s列表"
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"

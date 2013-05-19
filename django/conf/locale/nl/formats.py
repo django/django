@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
+from __future__ import unicode_literals
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
@@ -23,7 +24,9 @@ DATE_INPUT_FORMATS = (
 # Kept ISO formats as one is in first position
 TIME_INPUT_FORMATS = (
     '%H:%M:%S',                         # '15:23:35'
+    '%H:%M:%S.%f',                      # '15:23:35.000200'
     '%H.%M:%S',                         # '15.23:35'
+    '%H.%M:%S.%f',                      # '15.23:35.000200'
     '%H.%M',                            # '15.23'
     '%H:%M',                            # '15:23'
 )
@@ -32,10 +35,14 @@ DATETIME_INPUT_FORMATS = (
     '%d-%m-%Y %H:%M:%S', '%d-%m-%y %H:%M:%S', '%Y-%m-%d %H:%M:%S',  # '20-01-2009 15:23:35', '20-01-09 15:23:35', '2009-01-20 15:23:35'
     # '%d %b %Y %H:%M:%S', '%d %b %y %H:%M:%S',   # '20 jan 2009 15:23:35', '20 jan 09 15:23:35'
     # '%d %B %Y %H:%M:%S', '%d %B %y %H:%M:%S',   # '20 januari 2009 15:23:35', '20 januari 2009 15:23:35'
+    # With time in %H:%M:%S.%f :
+    '%d-%m-%Y %H:%M:%S.%f', '%d-%m-%y %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S.%f',  # '20-01-2009 15:23:35.000200', '20-01-09 15:23:35.000200', '2009-01-20 15:23:35.000200'
     # With time in %H.%M:%S :
     '%d-%m-%Y %H.%M:%S', '%d-%m-%y %H.%M:%S',   # '20-01-2009 15.23:35', '20-01-09 15.23:35'
     # '%d %b %Y %H.%M:%S', '%d %b %y %H.%M:%S',   # '20 jan 2009 15.23:35', '20 jan 09 15.23:35'
     # '%d %B %Y %H.%M:%S', '%d %B %y %H.%M:%S',   # '20 januari 2009 15.23:35', '20 januari 2009 15.23:35'
+    # With time in %H.%M:%S.%f :
+    '%d-%m-%Y %H.%M:%S.%f', '%d-%m-%y %H.%M:%S.%f',   # '20-01-2009 15.23:35.000200', '20-01-09 15.23:35.000200'
     # With time in %H:%M :
     '%d-%m-%Y %H:%M', '%d-%m-%y %H:%M', '%Y-%m-%d %H:%M',   # '20-01-2009 15:23', '20-01-09 15:23', '2009-01-20 15:23'
     # '%d %b %Y %H:%M', '%d %b %y %H:%M',         # '20 jan 2009 15:23', '20 jan 09 15:23'

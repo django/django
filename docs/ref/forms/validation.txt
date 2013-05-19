@@ -181,24 +181,20 @@ the field's ``validators`` argument, or defined on the Field class itself with
 the ``default_validators`` attribute.
 
 Simple validators can be used to validate values inside the field, let's have
-a look at Django's ``EmailField``::
+a look at Django's ``SlugField``::
 
-    class EmailField(CharField):
-        default_error_messages = {
-            'invalid': _('Enter a valid email address.'),
-        }
-        default_validators = [validators.validate_email]
+    class SlugField(CharField):
+        default_validators = [validators.validate_slug]
 
-As you can see, ``EmailField`` is just a ``CharField`` with customized error
-message and a validator that validates email addresses. This can also be done
-on field definition so::
+As you can see, ``SlugField`` is just a ``CharField`` with a customized
+validator that validates that submitted text obeys to some character rules.
+This can also be done on field definition so::
 
-    email = forms.EmailField()
+    slug = forms.SlugField()
 
 is equivalent to::
 
-    email = forms.CharField(validators=[validators.validate_email],
-            error_messages={'invalid': _('Enter a valid email address.')})
+    slug = forms.CharField(validators=[validators.validate_slug])
 
 
 Form field default cleaning
@@ -363,7 +359,7 @@ considering aren't valid, we must remember to remove them from the
 
 .. versionchanged:: 1.5
 
-Django used to remove the ``cleaned_data`` attribute entirely if there were
-any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
-the form doesn't validate, but it contains only field values that did
-validate.
+    Django used to remove the ``cleaned_data`` attribute entirely if there were
+    any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
+    the form doesn't validate, but it contains only field values that did
+    validate.

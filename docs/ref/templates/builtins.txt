@@ -147,9 +147,8 @@ You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
 Values enclosed in single (``'``) or double quotes (``"``) are treated as
 string literals, while values without quotes are treated as template variables.
 
-Note that the variables included in the cycle will not be escaped.
-This is because template tags do not escape their content. Any HTML or
-Javascript code contained in the printed variable will be rendered
+Note that currently the variables included in the cycle will not be escaped.
+Any HTML or Javascript code contained in the printed variable will be rendered
 as-is, which could potentially lead to security issues.
 
 For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
@@ -172,12 +171,12 @@ just declare the cycle, but not output the first value, you can add a
 
     {% for obj in some_list %}
         {% cycle 'row1' 'row2' as rowcolors silent %}
-        <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
     {% endfor %}
 
 This will output a list of ``<tr>`` elements with ``class``
 alternating between ``row1`` and ``row2``; the subtemplate will have
-access to ``rowcolors`` in it's context that matches the class of the
+access to ``rowcolors`` in its context that matches the class of the
 ``<tr>`` that encloses it. If the ``silent`` keyword were to be
 omitted, ``row1`` would be emitted as normal text, outside the
 ``<tr>`` element.
@@ -189,6 +188,22 @@ call to ``{% cycle %}`` doesn't specify silent::
 
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
+
+.. versionchanged:: 1.6
+
+    To improve safety, future versions of ``cycle`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``cycle`` from the ``future`` template library::
+
+        {% load cycle from future %}
+
+    When using the ``future`` version, you can disable auto-escaping with::
+
+        {% for o in some_list %}
+            <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
+                ...
+            </tr>
+        {% endfor %}
 
 .. templatetag:: debug
 
@@ -257,27 +272,43 @@ This is equivalent to::
 
     {% if var1 %}
         {{ var1|safe }}
-    {% else %}{% if var2 %}
+    {% elif var2 %}
         {{ var2|safe }}
-    {% else %}{% if var3 %}
+    {% elif var3 %}
         {{ var3|safe }}
-    {% endif %}{% endif %}{% endif %}
+    {% endif %}
 
 You can also use a literal string as a fallback value in case all
 passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that the variables included in the firstof tag will not be
-escaped. This is because template tags do not escape their content.
-Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues. If you
-need to escape the variables in the firstof tag, you must do so
-explicitly::
+Note that currently the variables included in the firstof tag will not be
+escaped. Any HTML or Javascript code contained in the printed variable will be
+rendered as-is, which could potentially lead to security issues. If you need
+to escape the variables in the firstof tag, you must do so explicitly::
 
     {% filter force_escape %}
         {% firstof var1 var2 var3 "fallback value" %}
     {% endfilter %}
+
+.. versionchanged:: 1.6
+
+    To improve safety, future versions of ``firstof`` will automatically escape
+    their output. You're encouraged to activate this behavior by loading
+    ``firstof`` from the ``future`` template library::
+
+        {% load firstof from future %}
+
+    When using the ``future`` version, you can disable auto-escaping with::
+
+        {% autoescape off %}
+            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+        {% endautoescape %}
+
+    Or if only some variables should be escaped, you can use::
+
+        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
@@ -377,13 +408,9 @@ block are output::
 In the above, if ``athlete_list`` is not empty, the number of athletes will be
 displayed by the ``{{ athlete_list|length }}`` variable.
 
-As you can see, the ``if`` tag may take one or several `` {% elif %}``
+As you can see, the ``if`` tag may take one or several ``{% elif %}``
 clauses, as well as an ``{% else %}`` clause that will be displayed if all
 previous conditions fail. These clauses are optional.
-
-.. versionadded:: 1.4
-
-The ``if`` tag now supports ``{% elif %}`` clauses.
 
 Boolean operators
 ^^^^^^^^^^^^^^^^^
@@ -630,11 +657,6 @@ The arguments can be hard-coded strings, so the following is valid::
         ...
     {% endifequal %}
 
-It is only possible to compare an argument to template variables or strings.
-You cannot check for equality with Python objects such as ``True`` or
-``False``.  If you need to test if something is true or false, use the
-:ttag:`if` tag instead.
-
 An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
 ``==`` operator.
 
@@ -742,8 +764,6 @@ escaped, because it's not a format character::
     It is the {% now "jS o\f F" %}
 
 This would display as "It is the 4th of September".
-
-.. versionchanged:: 1.4
 
 .. note::
 
@@ -864,7 +884,7 @@ an attribute "description," you could use::
     {% regroup cities by country.description as country_list %}
 
 Or, if ``country`` is a field with ``choices``, it will have a
-:meth:`^django.db.models.Model.get_FOO_display` method available as an
+:meth:`~django.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key::
 
@@ -1040,6 +1060,7 @@ by the context as to the current application.
     Don't forget to put quotes around the function path or pattern name!
 
     .. versionchanged:: 1.5
+
         The first parameter used not to be quoted, which was inconsistent with
         other template tags. Since Django 1.5, it is evaluated according to
         the usual rules: it can be a quoted string or a variable that will be
@@ -1079,11 +1100,11 @@ value to a maximum value, and then applies that ratio to a constant.
 For example::
 
     <img src="bar.png" alt="Bar"
-         height="10" width="{% widthratio this_value max_value 100 %}" />
+         height="10" width="{% widthratio this_value max_value max_width %}" />
 
-Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in the
-above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
-which is rounded up to 88).
+If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
+image in the above example will be 88 pixels wide
+(because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
 .. templatetag:: with
 
@@ -1288,10 +1309,6 @@ Z                 Time zone offset in seconds. The          ``-43200`` to ``4320
                   always negative, and for those east of
                   UTC is always positive.
 ================  ========================================  =====================
-
-.. versionadded:: 1.4
-
-The ``e`` and ``o`` format specification characters were added in Django 1.4.
 
 For example::
 
@@ -1915,7 +1932,7 @@ slice
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-http://diveintopython.net/native_data_types/lists.html#odbchelper.list.slice
+http://www.diveintopython3.net/native-datatypes.html#slicinglists
 for an introduction.
 
 Example::
@@ -2069,8 +2086,6 @@ If ``value`` is ``"my first post"``, the output will be ``"My First Post"``.
 truncatechars
 ^^^^^^^^^^^^^
 
-.. versionadded:: 1.4
-
 Truncates a string if it is longer than the specified number of characters.
 Truncated strings will end with a translatable ellipsis sequence ("...").
 
@@ -2199,11 +2214,6 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
-
-.. versionchanged:: 1.4
-
-Until Django 1.4, only the ``.com``, ``.net`` and ``.org`` suffixes were
-supported for domain-only links.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2334,8 +2344,6 @@ See :ref:`topic-l10n-templates`.
 tz
 ^^
 
-.. versionadded:: 1.4
-
 This library provides control over time zone conversions in templates.
 Like ``l10n``, you only need to load the library using ``{% load tz %}``,
 but you'll usually also set :setting:`USE_TZ` to ``True`` so that conversion
@@ -2356,16 +2364,6 @@ django.contrib.humanize
 A set of Django template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
-django.contrib.markup
-^^^^^^^^^^^^^^^^^^^^^
-
-A collection of template filters that implement these common markup languages:
-
-* Textile
-* Markdown
-* reST (reStructuredText)
-
-See the :doc:`markup documentation </ref/contrib/markup>`.
 
 django.contrib.webdesign
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2416,8 +2414,10 @@ slightly different call::
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path. Use that instead if you have an advanced use case such as
-    :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
+    given path (rather than simply using :func:`urlparse.urljoin` with the
+    :setting:`STATIC_URL` setting and the given path). Use that instead if you
+    have an advanced use case such as :ref:`using a cloud service to serve
+    static files<staticfiles-from-cdn>`::
 
         {% load static from staticfiles %}
         <img src="{% static "images/hi.jpg" %}" alt="Hi!" />

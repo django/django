@@ -2,6 +2,8 @@
 Writing custom django-admin commands
 ====================================
 
+.. module:: django.core.management
+
 Applications can register their own actions with ``manage.py``. For example,
 you might want to add a ``manage.py`` action for a Django app that you're
 distributing. In this document, we will be building a custom ``closepoll``
@@ -63,12 +65,18 @@ look like this:
 
                 self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
+.. _management-commands-output:
+
 .. note::
     When you are using management commands and wish to provide console
     output, you should write to ``self.stdout`` and ``self.stderr``,
     instead of printing to ``stdout`` and ``stderr`` directly. By
     using these proxies, it becomes much easier to test your custom
-    command.
+    command. Note also that you don't need to end messages with a newline
+    character, it will be added automatically, unless you specify the ``ending``
+    parameter::
+
+        self.stdout.write("Unterminated line", ending='')
 
 The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
@@ -110,54 +118,61 @@ In addition to being able to add custom command line options, all
 :doc:`management commands</ref/django-admin>` can accept some
 default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
-.. admonition:: Management commands and locales
+.. _management-commands-and-locales:
 
-    The :meth:`BaseCommand.execute` method sets the hardcoded ``en-us`` locale
-    because the commands shipped with Django perform several tasks
-    (for example, user-facing content rendering and database population) that
-    require a system-neutral string language (for which we use ``en-us``).
+Management commands and locales
+===============================
 
-    If your custom management command uses another locale, you should manually
-    activate and deactivate it in your :meth:`~BaseCommand.handle` or
-    :meth:`~NoArgsCommand.handle_noargs` method using the functions provided by
-    the I18N support code:
+By default, the :meth:`BaseCommand.execute` method sets the hardcoded 'en-us'
+locale because some commands shipped with Django perform several tasks
+(for example, user-facing content rendering and database population) that
+require a system-neutral string language (for which we use 'en-us').
 
-    .. code-block:: python
+If, for some reason, your custom management command needs to use a fixed locale
+different from 'en-us', you should manually activate and deactivate it in your
+:meth:`~BaseCommand.handle` or :meth:`~NoArgsCommand.handle_noargs` method using
+the functions provided by the I18N support code:
 
-        from django.core.management.base import BaseCommand, CommandError
-        from django.utils import translation
+.. code-block:: python
 
-        class Command(BaseCommand):
-            ...
-            can_import_settings = True
+    from django.core.management.base import BaseCommand, CommandError
+    from django.utils import translation
 
-            def handle(self, *args, **options):
+    class Command(BaseCommand):
+        ...
+        can_import_settings = True
 
-                # Activate a fixed locale, e.g. Russian
-                translation.activate('ru')
+        def handle(self, *args, **options):
 
-                # Or you can activate the LANGUAGE_CODE
-                # chosen in the settings:
-                #
-                #from django.conf import settings
-                #translation.activate(settings.LANGUAGE_CODE)
+            # Activate a fixed locale, e.g. Russian
+            translation.activate('ru')
 
-                # Your command logic here
-                # ...
+            # Or you can activate the LANGUAGE_CODE # chosen in the settings:
+            #
+            #from django.conf import settings
+            #translation.activate(settings.LANGUAGE_CODE)
 
-                translation.deactivate()
+            # Your command logic here
+            # ...
 
-    Take into account though, that system management commands typically have to
-    be very careful about running in non-uniform locales, so:
+            translation.deactivate()
 
-    * Make sure the :setting:`USE_I18N` setting is always ``True`` when running
-      the command (this is one good example of the potential problems stemming
-      from a dynamic runtime environment that Django commands avoid offhand by
-      always using a fixed locale).
+Another need might be that your command simply should use the locale set in
+settings and Django should be kept from forcing it to 'en-us'. You can achieve
+it by using the :data:`BaseCommand.leave_locale_alone` option.
 
-    * Review the code of your command and the code it calls for behavioral
-      differences when locales are changed and evaluate its impact on
-      predictable behavior of your command.
+When working on the scenarios described above though, take into account that
+system management commands typically have to be very careful about running in
+non-uniform locales, so you might need to:
+
+* Make sure the :setting:`USE_I18N` setting is always ``True`` when running
+  the command (this is a good example of the potential problems stemming
+  from a dynamic runtime environment that Django commands avoid offhand by
+  always using a fixed locale).
+
+* Review the code of your command and the code it calls for behavioral
+  differences when locales are changed and evaluate its impact on
+  predictable behavior of your command.
 
 Command objects
 ===============
@@ -220,6 +235,29 @@ All attributes can be set in your derived class and can be used in
   rather than all applications' models, call
   :meth:`~BaseCommand.validate` from :meth:`~BaseCommand.handle`.
 
+.. attribute:: BaseCommand.leave_locale_alone
+
+  A boolean indicating whether the locale set in settings should be preserved
+  during the execution of the command instead of being forcibly set to 'en-us'.
+
+  Default value is ``False``.
+
+  Make sure you know what you are doing if you decide to change the value of
+  this option in your custom command if it creates database content that
+  is locale-sensitive and such content shouldn't contain any translations (like
+  it happens e.g. with django.contrim.auth permissions) as making the locale
+  differ from the de facto default 'en-us' might cause unintended effects. See
+  the `Management commands and locales`_ section above for further details.
+
+  This option can't be ``False`` when the
+  :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
+  because attempting to set the locale needs access to settings. This condition
+  will generate a :class:`CommandError`.
+
+.. versionadded:: 1.6
+
+    The ``leave_locale_alone`` option was added in Django 1.6.
+
 Methods
 -------
 
@@ -260,6 +298,13 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. method:: BaseCommand.handle(*args, **options)
 
     The actual logic of the command. Subclasses must implement this method.
+
+.. method:: BaseCommand.validate(app=None, display_num_errors=False)
+
+    Validates the given app, raising :class:`CommandError` for any errors.
+
+    If ``app`` is None, then all installed apps are validated.
+
 
 .. _ref-basecommand-subclasses:
 

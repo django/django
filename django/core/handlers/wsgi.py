@@ -57,6 +57,7 @@ STATUS_CODE_TEXT = {
     415: 'UNSUPPORTED MEDIA TYPE',
     416: 'REQUESTED RANGE NOT SATISFIABLE',
     417: 'EXPECTATION FAILED',
+    418: "I'M A TEAPOT",
     422: 'UNPROCESSABLE ENTITY',
     423: 'LOCKED',
     424: 'FAILED DEPENDENCY',
@@ -128,19 +129,16 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_text(environ.get('PATH_INFO', '/'))
-        if not path_info or path_info == script_name:
+        path_info = base.get_path_info(environ)
+        if not path_info:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
             # operate as if they'd requested '/'. Not amazingly nice to force
             # the path like this, but should be harmless.
-            #
-            # (The comparison of path_info to script_name is to work around an
-            # apparent bug in flup 1.0.1. See Django ticket #8490).
             path_info = '/'
         self.environ = environ
         self.path_info = path_info
-        self.path = '%s%s' % (script_name, path_info)
+        self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
@@ -253,8 +251,8 @@ class WSGIHandler(base.BaseHandler):
             response = http.HttpResponseBadRequest()
         else:
             response = self.get_response(request)
-        finally:
-            signals.request_finished.send(sender=self.__class__)
+
+        response._handler_class = self.__class__
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]

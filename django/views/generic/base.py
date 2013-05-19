@@ -113,6 +113,7 @@ class TemplateResponseMixin(object):
     """
     template_name = None
     response_class = TemplateResponse
+    content_type = None
 
     def render_to_response(self, context, **response_kwargs):
         """
@@ -122,6 +123,7 @@ class TemplateResponseMixin(object):
         If any keyword arguments are provided, they will be
         passed to the constructor of the response class.
         """
+        response_kwargs.setdefault('content_type', self.content_type)
         return self.response_class(
             request = self.request,
             template = self.get_template_names(),

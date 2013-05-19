@@ -7,72 +7,72 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:38+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-03-08 12:32+0000\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
-"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: views.py:7
+#: views.py:9
 msgid "No feeds are registered."
 msgstr "Žádné dávky nejsou registrované."
 
-#: views.py:17
+#: views.py:19
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Identifikátor %r není registrován."
 
-#: db/models/fields.py:50
+#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Základní GIS pole -- mapováno na typ Geometry podle specifikace OpenGIS."
 
-#: db/models/fields.py:270
+#: db/models/fields.py:271
 msgid "Point"
 msgstr "Bod"
 
-#: db/models/fields.py:274
+#: db/models/fields.py:275
 msgid "Line string"
 msgstr "Úsek čáry"
 
-#: db/models/fields.py:278
+#: db/models/fields.py:279
 msgid "Polygon"
 msgstr "Polygon"
 
-#: db/models/fields.py:282
+#: db/models/fields.py:283
 msgid "Multi-point"
 msgstr "Mnohonásobný bod"
 
-#: db/models/fields.py:286
+#: db/models/fields.py:287
 msgid "Multi-line string"
 msgstr "Mnohonásobný úsek čáry"
 
-#: db/models/fields.py:290
+#: db/models/fields.py:291
 msgid "Multi polygon"
 msgstr "Mnohonásobný polygon"
 
-#: db/models/fields.py:294
+#: db/models/fields.py:295
 msgid "Geometry collection"
 msgstr "Kolekce geometrií"
 
-#: forms/fields.py:17
+#: forms/fields.py:19
 msgid "No geometry value provided."
 msgstr "Hodnota geometrie nezadána."
 
-#: forms/fields.py:18
+#: forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr "Neplatná hodnota geometrie."
 
-#: forms/fields.py:19
+#: forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr "Neplatný typ geometrie."
 
-#: forms/fields.py:20
+#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -80,17 +80,17 @@ msgstr ""
 "Nastala chyba při transformaci geometrie na identifikátor SRID geometrického "
 "formulářového pole."
 
-#: sitemaps/views.py:44
+#: sitemaps/views.py:46
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "Mapa webu není definovaná pro sekci: %r"
 
-#: sitemaps/views.py:58
+#: sitemaps/views.py:60
 #, python-format
 msgid "Page %s empty"
 msgstr "Stránka %s je prázdná"
 
-#: sitemaps/views.py:60
+#: sitemaps/views.py:62
 #, python-format
 msgid "No page '%s'"
 msgstr "Není stránka '%s'"

@@ -75,7 +75,7 @@ def shortcut(request, content_type_id, object_id):
     # If all that malarkey found an object domain, use it. Otherwise, fall back
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
-        protocol = request.is_secure() and 'https' or 'http'
+        protocol = 'https' if request.is_secure() else 'http'
         return http.HttpResponseRedirect('%s://%s%s'
                                          % (protocol, object_domain, absurl))
     else:

@@ -49,6 +49,8 @@ loader can find the default templates.)
 Initialization
 ==============
 
+.. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', mimetype='application/xml')
+
 To activate sitemap generation on your Django site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
 
@@ -213,8 +215,6 @@ Sitemap class reference
 
     .. attribute:: Sitemap.protocol
 
-        .. versionadded:: 1.4
-
         **Optional.**
 
         This attribute defines the protocol (``'http'`` or ``'https'``) of the
@@ -242,9 +242,9 @@ The sitemap framework provides a couple convenience classes for common cases:
 
     The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
     create a sitemap by passing it a dictionary which has to contain at least
-    a :data:`queryset` entry. This queryset will be used to generate the items
-    of the sitemap. It may also have a :data:`date_field` entry that
-    specifies a date field for objects retrieved from the :data:`queryset`.
+    a ``queryset`` entry. This queryset will be used to generate the items
+    of the sitemap. It may also have a ``date_field`` entry that
+    specifies a date field for objects retrieved from the ``queryset``.
     This will be used for the :attr:`~Sitemap.lastmod` attribute in the
     generated sitemap. You may also pass :attr:`~Sitemap.priority` and
     :attr:`~Sitemap.changefreq` keyword arguments to the
@@ -256,7 +256,7 @@ Example
 
 Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
     from blog.models import Entry
 
@@ -283,14 +283,16 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 Creating a sitemap index
 ========================
 
+.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', mimetype='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
+
 The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
-:data:`sitemaps` dictionary. The only differences in usage are:
+``sitemaps`` dictionary. The only differences in usage are:
 
 * You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
   and :func:`django.contrib.sitemaps.views.sitemap`.
 * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
-  :data:`section` keyword argument.
+  ``section`` keyword argument.
 
 Here's what the relevant URLconf lines would look like for the example above::
 
@@ -301,14 +303,12 @@ Here's what the relevant URLconf lines would look like for the example above::
 
 This will automatically generate a :file:`sitemap.xml` file that references
 both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
-:class:`~django.contrib.sitemaps.Sitemap` classes and the :data:`sitemaps`
+:class:`~django.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
 dict don't change at all.
 
 You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
 index will reflect that.
-
-.. versionadded:: 1.4
 
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
@@ -346,29 +346,28 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     )
 
 
-.. versionchanged:: 1.4
-    In addition, these views also return
-    :class:`~django.template.response.TemplateResponse`
-    instances which allow you to easily customize the response data before
-    rendering. For more details, see the
-    :doc:`TemplateResponse documentation </ref/template-response>`.
+These views return :class:`~django.template.response.TemplateResponse`
+instances which allow you to easily customize the response data before
+rendering. For more details, see the :doc:`TemplateResponse documentation
+</ref/template-response>`.
 
 Context variables
 ------------------
 
-When customizing the templates for the :func:`~django.contrib.sitemaps.views.index`
-and :func:`~django.contrib.sitemaps.views.sitemaps` views, you can rely on the
+When customizing the templates for the
+:func:`~django.contrib.sitemaps.views.index` and
+:func:`~django.contrib.sitemaps.views.sitemap` views, you can rely on the
 following context variables.
 
 Index
 -----
 
-The variable :data:`sitemaps` is a list of absolute URLs to each of the sitemaps.
+The variable ``sitemaps`` is a list of absolute URLs to each of the sitemaps.
 
 Sitemap
 -------
 
-The variable :data:`urlset` is a list of URLs that should appear in the
+The variable ``urlset`` is a list of URLs that should appear in the
 sitemap. Each URL exposes attributes as defined in the
 :class:`~django.contrib.sitemaps.Sitemap` class:
 
@@ -377,8 +376,6 @@ sitemap. Each URL exposes attributes as defined in the
 - ``lastmod``
 - ``location``
 - ``priority``
-
-.. versionadded:: 1.4
 
 The ``item`` attribute has been added for each URL to allow more flexible
 customization of the templates, such as `Google news sitemaps`_. Assuming
@@ -419,14 +416,14 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 
 .. function:: ping_google
 
-    :func:`ping_google` takes an optional argument, :data:`sitemap_url`,
+    :func:`ping_google` takes an optional argument, ``sitemap_url``,
     which should be the absolute path to your site's sitemap (e.g.,
     :file:`'/sitemap.xml'`). If this argument isn't provided,
     :func:`ping_google` will attempt to figure out your
     sitemap by performing a reverse looking in your URLconf.
 
     :func:`ping_google` raises the exception
-    :exc:`django.contrib.sitemaps.SitemapNotFound` if it cannot determine your
+    ``django.contrib.sitemaps.SitemapNotFound`` if it cannot determine your
     sitemap URL.
 
 .. admonition:: Register with Google first!
@@ -457,8 +454,8 @@ cron script, or some other scheduled task. The function makes an HTTP request
 to Google's servers, so you may not want to introduce that network overhead
 each time you call ``save()``.
 
-Pinging Google via `manage.py`
-------------------------------
+Pinging Google via ``manage.py``
+--------------------------------
 
 .. django-admin:: ping_google
 

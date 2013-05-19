@@ -35,8 +35,8 @@ YearMixin
         Tries the following sources, in order:
 
         * The value of the :attr:`YearMixin.year` attribute.
-        * The value of the `year` argument captured in the URL pattern.
-        * The value of the `year` GET query argument.
+        * The value of the ``year`` argument captured in the URL pattern.
+        * The value of the ``year`` ``GET`` query argument.
 
         Raises a 404 if no valid year specification can be found.
 
@@ -87,8 +87,8 @@ MonthMixin
         Tries the following sources, in order:
 
         * The value of the :attr:`MonthMixin.month` attribute.
-        * The value of the `month` argument captured in the URL pattern.
-        * The value of the `month` GET query argument.
+        * The value of the ``month`` argument captured in the URL pattern.
+        * The value of the ``month`` ``GET`` query argument.
 
         Raises a 404 if no valid month specification can be found.
 
@@ -100,7 +100,7 @@ MonthMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-    .. method:: get_prev_month(date)
+    .. method:: get_previous_month(date)
 
         Returns a date object containing the first day of the month before the
         date provided. This function can also return ``None`` or raise an
@@ -139,8 +139,8 @@ DayMixin
         Tries the following sources, in order:
 
         * The value of the :attr:`DayMixin.day` attribute.
-        * The value of the `day` argument captured in the URL pattern.
-        * The value of the `day` GET query argument.
+        * The value of the ``day`` argument captured in the URL pattern.
+        * The value of the ``day`` ``GET`` query argument.
 
         Raises a 404 if no valid day specification can be found.
 
@@ -152,7 +152,7 @@ DayMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-    .. method:: get_prev_day(date)
+    .. method:: get_previous_day(date)
 
         Returns a date object containing the previous valid day. This function
         can also return ``None`` or raise an :class:`~django.http.Http404`
@@ -192,8 +192,8 @@ WeekMixin
         Tries the following sources, in order:
 
         * The value of the :attr:`WeekMixin.week` attribute.
-        * The value of the `week` argument captured in the URL pattern
-        * The value of the `week` GET query argument.
+        * The value of the ``week`` argument captured in the URL pattern
+        * The value of the ``week`` ``GET`` query argument.
 
         Raises a 404 if no valid week specification can be found.
 
@@ -287,8 +287,9 @@ BaseDateListView
         available. If this is ``True`` and no objects are available, the view
         will display an empty page instead of raising a 404.
 
-        This is identical to :attr:`MultipleObjectMixin.allow_empty`, except
-        for the default value, which is ``False``.
+        This is identical to
+        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        except for the default value, which is ``False``.
 
     .. attribute:: date_list_period
 
@@ -329,5 +330,6 @@ BaseDateListView
         :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.
 
         .. versionchanged:: 1.5
+
             The ``ordering`` parameter was added, and the default order was
             changed to ascending.

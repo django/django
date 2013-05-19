@@ -11,6 +11,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField':         'serial',
+        'BinaryField':       'bytea',
         'BooleanField':      'boolean',
         'CharField':         'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
@@ -41,7 +42,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         return ''
 
     def sql_indexes_for_field(self, model, f, style):
-        if f.db_index and not f.unique:
+        output = []
+        if f.db_index or f.unique:
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -60,7 +62,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
                         "%s;" % tablespace_sql)
 
-            output = [get_index_sql('%s_%s' % (db_table, f.column))]
+            if not f.unique:
+                output = [get_index_sql('%s_%s' % (db_table, f.column))]
 
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
@@ -73,15 +76,4 @@ class DatabaseCreation(BaseDatabaseCreation):
             elif db_type.startswith('text'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' text_pattern_ops'))
-        else:
-            output = []
         return output
-
-    def set_autocommit(self):
-        self._prepare_for_test_db_ddl()
-
-    def _prepare_for_test_db_ddl(self):
-        """Rollback and close the active transaction."""
-        self.connection.connection.rollback()
-        self.connection.connection.set_isolation_level(
-                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

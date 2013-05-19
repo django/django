@@ -195,38 +195,6 @@ class UserManager(BaseUserManager):
         return u
 
 
-# A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj):
-    permissions = set()
-    for backend in auth.get_backends():
-        if hasattr(backend, "get_all_permissions"):
-            if obj is not None:
-                permissions.update(backend.get_all_permissions(user, obj))
-            else:
-                permissions.update(backend.get_all_permissions(user))
-    return permissions
-
-
-def _user_has_perm(user, perm, obj):
-    for backend in auth.get_backends():
-        if hasattr(backend, "has_perm"):
-            if obj is not None:
-                if backend.has_perm(user, perm, obj):
-                    return True
-            else:
-                if backend.has_perm(user, perm):
-                    return True
-    return False
-
-
-def _user_has_module_perms(user, app_label):
-    for backend in auth.get_backends():
-        if hasattr(backend, "has_module_perms"):
-            if backend.has_module_perms(user, app_label):
-                return True
-    return False
-
-
 @python_2_unicode_compatible
 class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
@@ -290,32 +258,39 @@ class AbstractBaseUser(models.Model):
         raise NotImplementedError()
 
 
-class AbstractUser(AbstractBaseUser):
-    """
-    An abstract base class implementing a fully featured User model with
-    admin-compliant permissions.
+# A few helper functions for common logic between User and AnonymousUser.
+def _user_get_all_permissions(user, obj):
+    permissions = set()
+    for backend in auth.get_backends():
+        if hasattr(backend, "get_all_permissions"):
+            permissions.update(backend.get_all_permissions(user, obj))
+    return permissions
 
-    Username, password and email are required. Other fields are optional.
+
+def _user_has_perm(user, perm, obj):
+    for backend in auth.get_backends():
+        if hasattr(backend, "has_perm"):
+            if backend.has_perm(user, perm, obj):
+                return True
+    return False
+
+
+def _user_has_module_perms(user, app_label):
+    for backend in auth.get_backends():
+        if hasattr(backend, "has_module_perms"):
+            if backend.has_module_perms(user, app_label):
+                return True
+    return False
+
+
+class PermissionsMixin(models.Model):
     """
-    username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'),
-        validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
-        ])
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    email = models.EmailField(_('email address'), blank=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-        help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+    A mixin class that adds the fields and methods necessary to support
+    Django's Group and Permission model using the ModelBackend.
+    """
     is_superuser = models.BooleanField(_('superuser status'), default=False,
         help_text=_('Designates that this user has all permissions without '
                     'explicitly assigning them.'))
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
         blank=True, help_text=_('The groups this user belongs to. A user will '
                                 'get all permissions granted to each of '
@@ -324,29 +299,8 @@ class AbstractUser(AbstractBaseUser):
         verbose_name=_('user permissions'), blank=True,
         help_text='Specific permissions for this user.')
 
-    objects = UserManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
-
     class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
         abstract = True
-
-    def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.username)
-
-    def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = '%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
-
-    def get_short_name(self):
-        "Returns the short name for the user."
-        return self.first_name
 
     def get_group_permissions(self, obj=None):
         """
@@ -357,11 +311,7 @@ class AbstractUser(AbstractBaseUser):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if obj is not None:
-                    permissions.update(backend.get_group_permissions(self,
-                                                                     obj))
-                else:
-                    permissions.update(backend.get_group_permissions(self))
+                permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
     def get_all_permissions(self, obj=None):
@@ -405,6 +355,55 @@ class AbstractUser(AbstractBaseUser):
 
         return _user_has_module_perms(self, app_label)
 
+
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
+    """
+    An abstract base class implementing a fully featured User model with
+    admin-compliant permissions.
+
+    Username, password and email are required. Other fields are optional.
+    """
+    username = models.CharField(_('username'), max_length=30, unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
+                    '@/./+/-/_ characters'),
+        validators=[
+            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+        ])
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+        abstract = True
+
+    def get_absolute_url(self):
+        return "/users/%s/" % urlquote(self.username)
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        "Returns the short name for the user."
+        return self.first_name
+
     def email_user(self, subject, message, from_email=None):
         """
         Sends an email to this User.
@@ -417,7 +416,7 @@ class AbstractUser(AbstractBaseUser):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         warnings.warn("The use of AUTH_PROFILE_MODULE to define user profiles has been deprecated.",
-            PendingDeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
@@ -451,7 +450,7 @@ class User(AbstractUser):
 
     Username, password and email are required. Other fields are optional.
     """
-    class Meta:
+    class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
 
@@ -463,8 +462,8 @@ class AnonymousUser(object):
     is_staff = False
     is_active = False
     is_superuser = False
-    _groups = EmptyManager()
-    _user_permissions = EmptyManager()
+    _groups = EmptyManager(Group)
+    _user_permissions = EmptyManager(Permission)
 
     def __init__(self):
         pass

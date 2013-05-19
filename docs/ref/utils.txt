@@ -138,15 +138,13 @@ results. Instead do::
 ``django.utils.dateparse``
 ==========================
 
-.. versionadded:: 1.4
-
 .. module:: django.utils.dateparse
    :synopsis: Functions to parse datetime objects.
 
 The functions defined in this module share the following properties:
 
-- They raise :exc:`ValueError` if their input is well formatted but isn't a
-  valid date or time.
+- They raise :exc:`~exceptions.ValueError` if their input is well formatted but
+  isn't a valid date or time.
 - They return ``None`` if it isn't well formatted at all.
 - They accept up to picosecond resolution in input, but they truncate it to
   microseconds, since that's what Python supports.
@@ -192,8 +190,7 @@ The functions defined in this module share the following properties:
     Like ``decorator_from_middleware``, but returns a function
     that accepts the arguments to be passed to the middleware_class.
     For example, the :func:`~django.views.decorators.cache.cache_page`
-    decorator is created from the
-    :class:`~django.middleware.cache.CacheMiddleware` like this::
+    decorator is created from the ``CacheMiddleware`` like this::
 
          cache_page = decorator_from_middleware_with_args(CacheMiddleware)
 
@@ -284,15 +281,15 @@ The functions defined in this module share the following properties:
 .. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Alias of :func:`smart_bytes` on Python 2 and :func:`smart_text` on Python
-    3. This function returns a :class:`str` or a lazy string.
+    3. This function returns a ``str`` or a lazy string.
 
-    For instance, this is  suitable for writing to :attr:`sys.stdout` on
+    For instance, this is  suitable for writing to :data:`sys.stdout` on
     Python 2 and 3.
 
 .. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Alias of :func:`force_bytes` on Python 2 and :func:`force_text` on Python
-    3. This function always returns a :class:`str`.
+    3. This function always returns a ``str``.
 
 .. function:: iri_to_uri(iri)
 
@@ -302,6 +299,18 @@ The functions defined in this module share the following properties:
     This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`. However,
     since we are assuming input is either UTF-8 or unicode already, we can
     simplify things a little from the full method.
+
+    Returns an ASCII string containing the encoded result.
+
+.. function:: filepath_to_uri(path)
+
+    Convert a file system path to a URI portion that is suitable for inclusion
+    in a URL. The path is assumed to be either UTF-8 or unicode.
+
+    This method will encode certain characters that would normally be
+    recognized as special characters for URIs.  Note that this method does not
+    encode the ' character, as it is a valid character within URIs. See
+    ``encodeURIComponent()`` JavaScript function for more details.
 
     Returns an ASCII string containing the encoded result.
 
@@ -520,7 +529,7 @@ escaping HTML.
 
     .. code-block:: python
 
-        format_html(u"%{0} <b>{1}</b> {2}",
+        format_html(u"{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
@@ -531,6 +540,19 @@ escaping HTML.
     (e.g. number formatting) will not work, since all arguments are passed
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_text` on the values.
+
+.. function:: format_html_join(sep, format_string, args_generator)
+
+    A wrapper of :func:`format_html`, for the common case of a group of
+    arguments that need to be formatted using the same format string, and then
+    joined using ``sep``. ``sep`` is also passed through
+    :func:`conditional_escape`.
+
+    ``args_generator`` should be an iterator that returns the sequence of
+    ``args`` that will be passed to :func:`format_html`. For example::
+
+        format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+                                                    for u in users))
 
 .. function:: strip_tags(value)
 
@@ -546,11 +568,11 @@ escaping HTML.
 
 .. function:: remove_tags(value, tags)
 
-    Removes a list of [X]HTML tag names from the output.
+    Removes a space-separated list of [X]HTML tag names from the output.
 
     For example::
 
-        remove_tags(value, ["b", "span"])
+        remove_tags(value, "b span")
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
     return value will be ``"Joel <button>is</button> a slug"``.
@@ -614,12 +636,34 @@ escaping HTML.
 .. function:: base36_to_int(s)
 
     Converts a base 36 string to an integer. On Python 2 the output is
-    guaranteed to be an :class:`int` and not a :class:`long`.
+    guaranteed to be an ``int`` and not a ``long``.
 
 .. function:: int_to_base36(i)
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
-    smaller than :attr:`sys.maxint`.
+    smaller than :data:`sys.maxint`.
+
+``django.utils.module_loading``
+===============================
+
+.. module:: django.utils.module_loading
+   :synopsis: Functions for working with Python modules.
+
+Functions for working with Python modules.
+
+.. function:: import_by_path(dotted_path, error_prefix='')
+
+    Imports a dotted module path and returns the attribute/class designated by
+    the last name in the path. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes
+    wrong. For example::
+
+        from django.utils.module_loading import import_by_path
+        ImproperlyConfigured = import_by_path('django.core.exceptions.ImproperlyConfigured')
+
+    is equivalent to::
+
+        from django.core.exceptions import ImproperlyConfigured
 
 ``django.utils.safestring``
 ===========================
@@ -637,12 +681,12 @@ appropriate entities.
 
     .. versionadded:: 1.5
 
-    A :class:`bytes` subclass that has been specifically marked as "safe"
+    A ``bytes`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes.
 
 .. class:: SafeString
 
-    A :class:`str` subclass that has been specifically marked as "safe"
+    A ``str`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes. This is
     :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
 
@@ -650,7 +694,7 @@ appropriate entities.
 
     .. versionadded:: 1.5
 
-    A :class:`str` (in Python 3) or :class:`unicode` (in Python 2) subclass
+    A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
     that has been specifically marked as "safe" for HTML output purposes.
 
 .. class:: SafeUnicode
@@ -776,8 +820,6 @@ For a complete discussion on the usage of the following see the
 
 .. function:: override(language, deactivate=False)
 
-    .. versionadded:: 1.4
-
     A Python context manager that uses
     :func:`django.utils.translation.activate` to fetch the translation object
     for a given language, installing it as the translation object for the
@@ -799,8 +841,6 @@ For a complete discussion on the usage of the following see the
     * ``True`` = right-to-left layout
 
 .. function:: get_language_from_request(request, check_path=False)
-
-    .. versionchanged:: 1.4
 
     Analyzes the request to find what language the user wants the system to show.
     Only languages listed in settings.LANGUAGES are taken into account. If the user
@@ -825,8 +865,6 @@ For a complete discussion on the usage of the following see the
 
 ``django.utils.timezone``
 =========================
-
-.. versionadded:: 1.4
 
 .. module:: django.utils.timezone
     :synopsis: Timezone support.

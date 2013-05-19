@@ -285,16 +285,16 @@ This affects the following settings:
 =========================================  ==========================
  Old setting                                New Setting
 =========================================  ==========================
-:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-:setting:`DATABASE_HOST`                   :setting:`HOST`
-:setting:`DATABASE_NAME`                   :setting:`NAME`
-:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-:setting:`DATABASE_PORT`                   :setting:`PORT`
-:setting:`DATABASE_USER`                   :setting:`USER`
-:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+`DATABASE_ENGINE`                          :setting:`ENGINE <DATABASE-ENGINE>`
+`DATABASE_HOST`                            :setting:`HOST`
+`DATABASE_NAME`                            :setting:`NAME`
+`DATABASE_OPTIONS`                         :setting:`OPTIONS`
+`DATABASE_PASSWORD`                        :setting:`PASSWORD`
+`DATABASE_PORT`                            :setting:`PORT`
+`DATABASE_USER`                            :setting:`USER`
+`TEST_DATABASE_CHARSET`                    :setting:`TEST_CHARSET`
+`TEST_DATABASE_COLLATION`                  :setting:`TEST_COLLATION`
+`TEST_DATABASE_NAME`                       :setting:`TEST_NAME`
 =========================================  ==========================
 
 These changes are also required if you have manually created a database
@@ -428,7 +428,7 @@ Support for multiple databases
 
 Django 1.2 adds the ability to use :doc:`more than one database
 </topics/db/multi-db>` in your Django project. Queries can be
-issued at a specific database with the `using()` method on
+issued at a specific database with the ``using()`` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
 

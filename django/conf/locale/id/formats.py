@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
+from __future__ import unicode_literals
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
@@ -29,15 +30,19 @@ TIME_INPUT_FORMATS = (
 
 DATETIME_INPUT_FORMATS = (
     '%d-%m-%Y %H.%M.%S',                # '25-10-2009 14.30.59'
+    '%d-%m-%Y %H.%M.%S.%f',             # '25-10-2009 14.30.59.000200'
     '%d-%m-%Y %H.%M',                   # '25-10-2009 14.30'
     '%d-%m-%Y',                         # '25-10-2009'
     '%d-%m-%y %H.%M.%S',                # '25-10-09' 14.30.59'
+    '%d-%m-%y %H.%M.%S.%f',             # '25-10-09' 14.30.59.000200'
     '%d-%m-%y %H.%M',                   # '25-10-09' 14.30'
     '%d-%m-%y',                         # '25-10-09''
     '%m/%d/%y %H.%M.%S',                # '10/25/06 14.30.59'
+    '%m/%d/%y %H.%M.%S.%f',             # '10/25/06 14.30.59.000200'
     '%m/%d/%y %H.%M',                   # '10/25/06 14.30'
     '%m/%d/%y',                         # '10/25/06'
     '%m/%d/%Y %H.%M.%S',                # '25/10/2009 14.30.59'
+    '%m/%d/%Y %H.%M.%S.%f',             # '25/10/2009 14.30.59.000200'
     '%m/%d/%Y %H.%M',                   # '25/10/2009 14.30'
     '%m/%d/%Y',                         # '10/25/2009'
 )

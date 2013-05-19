@@ -70,6 +70,8 @@ documentation.  Just return an instance of one of those subclasses instead of
 a normal :class:`~django.http.HttpResponse` in order to signify an error. For
 example::
 
+    from django.http import HttpResponse, HttpResponseNotFound
+
     def my_view(request):
         # ...
         if foo:
@@ -82,6 +84,8 @@ since many of them aren't going to be that common. However, as documented in
 the :class:`~django.http.HttpResponse` documentation, you can also pass the
 HTTP status code into the constructor for :class:`~django.http.HttpResponse`
 to create a return class for any status code you like. For example::
+
+    from django.http import HttpResponse
 
     def my_view(request):
         # ...
@@ -110,6 +114,8 @@ standard error page for your application, along with an HTTP error code 404.
 Example usage::
 
     from django.http import Http404
+    from django.shortcuts import render_to_response
+    from polls.models import Poll
 
     def detail(request, poll_id):
         try:
@@ -131,6 +137,8 @@ Customizing error views
 
 The 404 (page not found) view
 -----------------------------
+
+.. function:: django.views.defaults.page_not_found(request, template_name='404.html')
 
 When you raise an ``Http404`` exception, Django loads a special view devoted
 to handling 404 errors. By default, it's the view
@@ -198,8 +206,6 @@ One thing to note about 500 views:
 
 The 403 (HTTP Forbidden) view
 -----------------------------
-
-.. versionadded:: 1.4
 
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by

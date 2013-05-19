@@ -5,8 +5,6 @@ Cryptographic signing
 .. module:: django.core.signing
    :synopsis: Django's signing framework.
 
-.. versionadded:: 1.4
-
 The golden rule of Web application security is to never trust data from
 untrusted sources. Sometimes it can be useful to pass data through an
 untrusted medium. Cryptographically signed values can be passed through an
@@ -60,6 +58,7 @@ You can retrieve the original value using the ``unsign`` method::
 If the signature or value have been altered in any way, a
 ``django.core.signing.BadSignature`` exception will be raised::
 
+    >>> from django.core import signing
     >>> value += 'm'
     >>> try:
     ...    original = signer.unsign(value)

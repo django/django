@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"POT-Creation-Date: 2012-12-15 23:27+0100\n"
+"PO-Revision-Date: 2012-12-16 08:51+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
-"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:41
 msgid "Personal info"
@@ -31,220 +31,185 @@ msgstr "הרשאות"
 msgid "Important dates"
 msgstr "תאריכים חשובים"
 
-#: admin.py:125
+#: admin.py:126
 msgid "Password changed successfully."
 msgstr "הסיסמה שונתה בהצלחה."
 
-#: admin.py:135
+#: admin.py:136
 #, python-format
 msgid "Change password: %s"
 msgstr "שינוי סיסמה: %s"
 
-#: forms.py:62
+#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+msgid "No password set."
+msgstr "לא נקבעה סיסמה."
+
+#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
+
+#: forms.py:67
 msgid "A user with that username already exists."
 msgstr "משתמש עם שם משתמש זה קיים כבר"
 
-#: forms.py:63 forms.py:251 forms.py:308
+#: forms.py:68 forms.py:269 forms.py:329
 msgid "The two password fields didn't match."
 msgstr "שני שדות הסיסמה אינם זהים."
 
-#: forms.py:65 forms.py:110 forms.py:139
+#: forms.py:70 forms.py:115
 msgid "Username"
 msgstr "שם משתמש"
 
-#: forms.py:67 forms.py:111
+#: forms.py:72 forms.py:116
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
 
-#: forms.py:70 forms.py:114
+#: forms.py:75 forms.py:119
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ בלבד."
 
-#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
+#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
 msgid "Password"
 msgstr "סיסמה"
 
-#: forms.py:74
+#: forms.py:79
 msgid "Password confirmation"
 msgstr "אימות סיסמה"
 
-#: forms.py:76
+#: forms.py:81
 msgid "Enter the same password as above, for verification."
 msgstr "יש להזין את אותה סיסמה שוב,לאימות."
 
-#: forms.py:117
+#: forms.py:122
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, ניתן "
+"לשנות את הסיסמה בעזרת  <a href=\"password/\">טופס זה</a>."
 
-#: forms.py:143
+#: forms.py:151
+#, python-format
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
 msgstr ""
-"נא להזין שם משתמש וסיסמה נכונים. בשני השדות גודל האותיות האנגליות משנה."
 
-#: forms.py:145
+#: forms.py:153
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך. הן נדרשות כדי להתחבר."
 
-#: forms.py:147
+#: forms.py:155
 msgid "This account is inactive."
 msgstr "חשבון זה אינו פעיל."
 
-#: forms.py:191
+#: forms.py:206
 msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
+"That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "כתובת דואר אלקטרוני זו אינה משוייכת למשתמש. בטוח שנרשמת ?"
+msgstr "כתובת הדוא\"ל הזו אינה משוייכת לחשבון משתמש. האם בטוח שנרשמת ?"
 
-#: forms.py:193
+#: forms.py:208 tests/forms.py:374
 msgid ""
-"The user account associated with this e-mail address cannot reset the "
+"The user account associated with this email address cannot reset the "
 "password."
-msgstr "החשבון מחובר לדוא\"ל זה לא יכול להחליף את הסיסמה."
+msgstr "חשבון המשתמש המשוייך לכתובת דוא\"ל זו אינו יכול לאפס את הסיסמה."
 
-#: forms.py:196
-msgid "E-mail"
-msgstr "כתובת דוא\"ל"
+#: forms.py:211
+msgid "Email"
+msgstr "דוא\"ל"
 
-#: forms.py:253
+#: forms.py:271
 msgid "New password"
 msgstr "סיסמה חדשה"
 
-#: forms.py:255
+#: forms.py:273
 msgid "New password confirmation"
 msgstr "אימות סיסמה חדשה"
 
-#: forms.py:284
+#: forms.py:302
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "סיסמתך הישנה הוזנה בצורה שגויה. נא להזינה שוב."
 
-#: forms.py:287
+#: forms.py:305
 msgid "Old password"
 msgstr "סיסמה ישנה"
 
-#: forms.py:312
+#: forms.py:333
 msgid "Password (again)"
 msgstr "סיסמה (שוב)"
 
-#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
-#: hashers.py:389
+#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
+#: hashers.py:412
 msgid "algorithm"
 msgstr "אלגוריתם"
 
-#: hashers.py:219
+#: hashers.py:242
 msgid "iterations"
 msgstr "חזרות"
 
-#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
 msgid "salt"
-msgstr ""
+msgstr "salt"
 
-#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
 msgid "hash"
-msgstr ""
+msgstr "גיבוב"
 
-#: hashers.py:270
+#: hashers.py:293
 msgid "work factor"
-msgstr ""
+msgstr "work factor"
 
-#: hashers.py:272
+#: hashers.py:295
 msgid "checksum"
 msgstr "סיכום ביקורת"
 
-#: models.py:66 models.py:113
+#: models.py:72 models.py:121
 msgid "name"
 msgstr "שם"
 
-#: models.py:68
+#: models.py:74
 msgid "codename"
 msgstr "שם קוד"
 
-#: models.py:72
+#: models.py:78
 msgid "permission"
 msgstr "הרשאה"
 
-#: models.py:73 models.py:115
+#: models.py:79 models.py:123
 msgid "permissions"
 msgstr "הרשאות"
 
-#: models.py:120
+#: models.py:128
 msgid "group"
 msgstr "קבוצה"
 
-#: models.py:121 models.py:250
+#: models.py:129 models.py:301
 msgid "groups"
 msgstr "קבוצות"
 
-#: models.py:232
-msgid "username"
-msgstr "שם משתמש"
-
-#: models.py:233
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות והתווים @/./+/-/_ בלבד."
-
-#: models.py:235
-msgid "first name"
-msgstr "שם פרטי"
-
-#: models.py:236
-msgid "last name"
-msgstr "שם משפחה"
-
-#: models.py:237
-msgid "e-mail address"
-msgstr "כתובת דוא\"ל"
-
-#: models.py:238
+#: models.py:200
 msgid "password"
 msgstr "סיסמה"
 
-#: models.py:239
-msgid "staff status"
-msgstr "סטטוס איש צוות"
+#: models.py:201
+msgid "last login"
+msgstr "כניסה אחרונה"
 
-#: models.py:240
-msgid "Designates whether the user can log into this admin site."
-msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
-
-#: models.py:242
-msgid "active"
-msgstr "פעיל"
-
-#: models.py:243
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-"מציין האם יש להתייחס למשתמש כפעיל. יש לבטל בחירה זו במקום למחוק חשבונות "
-"משתמשים."
-
-#: models.py:245
+#: models.py:298
 msgid "superuser status"
 msgstr "סטטוס משתמש על"
 
-#: models.py:246
+#: models.py:299
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "מציין שלמשתמש זה יש את כל ההרשאות ללא הצורך המפורש בהענקתן."
 
-#: models.py:248
-msgid "last login"
-msgstr "כניסה אחרונה"
-
-#: models.py:249
-msgid "date joined"
-msgstr "תאריך הצטרפות"
-
-#: models.py:251
+#: models.py:302
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -252,25 +217,70 @@ msgstr ""
 "הקבוצות שמשתמש זה שייך אליהן. משתמש יקבל את כל ההרשאות המוקצות לקבוצה שלו/"
 "שלה."
 
-#: models.py:255
+#: models.py:306
 msgid "user permissions"
 msgstr "הרשאות משתמש"
 
-#: models.py:260
+#: models.py:377
+msgid "username"
+msgstr "שם משתמש"
+
+#: models.py:378
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות והתווים @/./+/-/_ בלבד."
+
+#: models.py:381
+msgid "Enter a valid username."
+msgstr "נא להזין שם משתמש חוקי."
+
+#: models.py:383
+msgid "first name"
+msgstr "שם פרטי"
+
+#: models.py:384
+msgid "last name"
+msgstr "שם משפחה"
+
+#: models.py:385
+msgid "email address"
+msgstr "כתובת דוא\"ל"
+
+#: models.py:386
+msgid "staff status"
+msgstr "סטטוס איש צוות"
+
+#: models.py:387
+msgid "Designates whether the user can log into this admin site."
+msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
+
+#: models.py:389
+msgid "active"
+msgstr "פעיל"
+
+#: models.py:390
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"מציין האם יש להתייחס למשתמש כפעיל. יש לבטל בחירה זו במקום למחוק חשבונות "
+"משתמשים."
+
+#: models.py:392
+msgid "date joined"
+msgstr "תאריך הצטרפות"
+
+#: models.py:400
 msgid "user"
 msgstr "משתמש"
 
-#: models.py:261
+#: models.py:401
 msgid "users"
 msgstr "משתמשים"
 
-#: views.py:93
+#: views.py:94
 msgid "Logged out"
 msgstr "יצאת מהמערכת"
-
-#: management/commands/createsuperuser.py:27
-msgid "Enter a valid e-mail address."
-msgstr "יש להזין כתובת דוא\"ל חוקית."
 
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
