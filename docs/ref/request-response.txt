@@ -616,7 +616,13 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP Status code`_ for the response.
+    The `HTTP status code`_ for the response.
+
+.. attribute:: HttpResponse.reason_phrase
+
+    .. versionadded:: 1.6
+
+    The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
 
@@ -628,7 +634,7 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
@@ -646,8 +652,12 @@ Methods
 
     Historically, this parameter was called ``mimetype`` (now deprecated).
 
-    ``status`` is the `HTTP Status code`_ for the response.
+    ``status`` is the `HTTP status code`_ for the response.
 
+    .. versionadded:: 1.6
+
+    ``reason`` is the HTTP response phrase. If not provided, a default phrase
+    will be used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -727,8 +737,7 @@ Methods
 
     This method makes an :class:`HttpResponse` instance a file-like object.
 
-.. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
-
+.. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 .. _ref-httpresponse-subclasses:
 
@@ -851,7 +860,13 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP Status code`_ for the response.
+    The `HTTP status code`_ for the response.
+
+.. attribute:: HttpResponse.reason_phrase
+
+    .. versionadded:: 1.6
+
+    The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
 
