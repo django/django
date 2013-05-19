@@ -167,9 +167,9 @@ class JsI18NTestsMultiPackage(TestCase):
                 self.assertContains(response, javascript_quote('este texto de app3 debe ser traducido'))
 
     def testI18NWithLocalePaths(self):
-        extended_locale_paths = settings.LOCALE_PATHS + (
+        extended_locale_paths = settings.LOCALE_PATHS + [
             path.join(path.dirname(
-                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale'),)
+                path.dirname(path.abspath(upath(__file__)))), 'app3', 'locale')]
         with self.settings(LANGUAGE_CODE='es-ar', LOCALE_PATHS=extended_locale_paths):
             with override('es-ar'):
                 response = self.client.get('/views/jsi18n/')

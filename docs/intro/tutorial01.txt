@@ -408,15 +408,15 @@ Edit the :file:`mysite/settings.py` file again, and change the
 :setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
 look like this::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'polls',
-    )
+        'polls'
+    ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 

@@ -23,8 +23,10 @@ class RemoteUserTest(TestCase):
     def setUp(self):
         self.curr_middleware = settings.MIDDLEWARE_CLASSES
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.MIDDLEWARE_CLASSES += (self.middleware,)
-        settings.AUTHENTICATION_BACKENDS += (self.backend,)
+        settings.MIDDLEWARE_CLASSES = (list(settings.MIDDLEWARE_CLASSES) +
+                                       [self.middleware])
+        settings.AUTHENTICATION_BACKENDS = (
+            list(settings.AUTHENTICATION_BACKENDS) + [self.backend])
 
     def test_no_remote_user(self):
         """

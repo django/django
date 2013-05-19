@@ -50,9 +50,9 @@ from .models import Company, TestModel
 
 
 here = os.path.dirname(os.path.abspath(upath(__file__)))
-extended_locale_paths = settings.LOCALE_PATHS + (
+extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
-)
+]
 
 
 class TranslationTests(TransRealMixin, TestCase):
@@ -1132,14 +1132,14 @@ class MultipleLocaleActivationTests(TransRealMixin, TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('en', 'English'),
-        ('fr', 'French'),
-    ),
-    MIDDLEWARE_CLASSES=(
+        ('fr', 'French')
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
-    ),
+        'django.middleware.common.CommonMiddleware'
+    ]
 )
 class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
@@ -1154,15 +1154,15 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
 @override_settings(
     USE_I18N=True,
-    LANGUAGES=(
+    LANGUAGES=[
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
-        ('pt-br', 'Portugese (Brazil)'),
-    ),
-    MIDDLEWARE_CLASSES=(
+        ('pt-br', 'Portugese (Brazil)')
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
-    ),
+        'django.middleware.common.CommonMiddleware'
+    ]
 )
 class CountrySpecificLanguageTests(TransRealMixin, TestCase):
 
