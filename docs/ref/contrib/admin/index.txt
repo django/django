@@ -1574,7 +1574,10 @@ The ``InlineModelAdmin`` class adds:
     The dynamic link will not appear if the number of currently displayed forms
     exceeds ``max_num``, or if the user does not have JavaScript enabled.
 
-    Also see :meth:`InlineModelAdmin.get_extra` for advanced functionality
+    .. versionadded:: 1.6
+
+    Also see :meth:`InlineModelAdmin.get_extra` if you need to customize the
+    behavior for this.
 
     .. _ref-contrib-admin-inline-max-num:
 
@@ -1625,6 +1628,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_extra(self, request, obj=None, **kwargs)
 
+    .. versionadded:: 1.6
+
+
     Returns the number of extra inline forms needed. By default, returns the
     :attr:`InlineModelAdmin.extra` attribute.
 
@@ -1640,8 +1646,6 @@ The ``InlineModelAdmin`` class adds:
                 if obj:
                   return extra - obj.binarytree_set.count()
                 return extra
-
-.. versionadded:: 1.6
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
