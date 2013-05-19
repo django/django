@@ -183,6 +183,9 @@ the ``default_validators`` attribute.
 Simple validators can be used to validate values inside the field, let's have
 a look at Django's ``SlugField``::
 
+    from django.forms import CharField
+    from django.core import validators
+
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
 
@@ -252,6 +255,8 @@ we want to make sure that the ``recipients`` field always contains the address
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -289,6 +294,8 @@ common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -320,6 +327,8 @@ since it can lead to confusing form output. We're showing what is possible
 here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
+
+    from django import forms
 
     class ContactForm(forms.Form):
         # Everything as before.
