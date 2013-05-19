@@ -1,5 +1,6 @@
 import os
 import time
+import warnings
 
 from django.conf import settings
 from django.db import connections
@@ -13,6 +14,9 @@ setting_changed = Signal(providing_args=["setting", "value"])
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
+
+# See tickets #19031, #20075
+COMPLEX_OVERRIDE_SETTINGS = ['DATABASES', 'CACHES']
 
 
 @receiver(setting_changed)
@@ -74,8 +78,15 @@ def language_changed(**kwargs):
         if kwargs['setting'] == 'LOCALE_PATHS':
             trans_real._translations = {}
 
+
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
     if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
+
+
+@receiver(setting_changed)
+def complex_setting_changed(**kwargs):
+    if kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
+        warnings.warn("Overriding setting %s can lead to unexpected behaviour." % kwargs['setting'])

@@ -104,19 +104,23 @@ class SettingsTests(TestCase):
             settings.TEST = 'test'
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
 
-    def test_warn_override(self):
-        from django.test import utils
-        old_warn_override_settings = utils.WARN_OVERRIDE_SETTINGS.copy()
+    def test_complex_override_warning(self):
+        """Regression test for #19031"""
+        from django.test import signals
+        old_warn_override_settings = signals.COMPLEX_OVERRIDE_SETTINGS[:]
 
-        utils.WARN_OVERRIDE_SETTINGS.add('TEST_WARN')
+        signals.COMPLEX_OVERRIDE_SETTINGS.append('TEST_WARN')
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            self.settings(TEST_WARN='override')
 
-            self.assertEqual(len(w), 1)
+            self.settings(TEST_WARN='override').enable()
+            self.settings(TEST_WARN='override').disable()
+
+            self.assertEqual(len(w), 2)
             self.assertEqual('Overriding setting %s can lead to unexpected behaviour.' % 'TEST_WARN', str(w[-1].message))
 
-        utils.WARN_OVERRIDE_SETTINGS = old_warn_override_settings
+        signals.COMPLEX_OVERRIDE_SETTINGS = old_warn_override_settings
+        self.assertFalse('TEST_WARN' in signals.COMPLEX_OVERRIDE_SETTINGS)
 
     @override_settings(TEST='override')
     def test_decorator(self):
