@@ -584,11 +584,18 @@ Setting header fields
 To set or remove a header field in your response, treat it like a dictionary::
 
     >>> response = HttpResponse()
-    >>> response['Cache-Control'] = 'no-cache'
-    >>> del response['Cache-Control']
+    >>> response['Age'] = 120
+    >>> del response['Age']
 
 Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
 field doesn't exist.
+
+For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
+to use the :meth:`~django.utils.cache.patch_cache_control` and
+:meth:`~django.utils.cache.patch_vary_headers` methods from
+:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
+values. The patch-methods ensure that other present values, e.g. added by a
+middleware, are not removed.
 
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
