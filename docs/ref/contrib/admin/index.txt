@@ -1005,6 +1005,9 @@ subclass::
         Performs a full-text match. This is like the default search method but
         uses an index. Currently this is only available for MySQL.
 
+    If you need to customize search you can use :meth:`ModelAdmin.get_search_results` to provide additional or alternate
+    search behaviour.
+
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1101,6 +1104,39 @@ templates used by the :class:`ModelAdmin` views:
                     return ['name', 'rank']
                 else:
                     return ['name']
+
+.. method:: ModelAdmin.get_search_results(self, request, queryset, search_term)
+
+    .. versionadded:: 1.6
+
+    The ``get_search_results`` method modifies the list of objects displayed in
+    to those that match the provided search term. It accepts the request, a
+    queryset that applies the current filters, and the user-provided search term.
+    It returns a tuple containing a queryset modified to implement the search, and
+    a boolean indicating if the results may contain duplicates.
+
+    The default implementation searches the fields named in :attr:`ModelAdmin.search_fields`.
+
+    This method may be overridden with your own custom search method. For
+    example, you might wish to search by an integer field, or use an external
+    tool such as Solr or Haystack. You must establish if the queryset changes
+    implemented by your search method may introduce duplicates into the results,
+    and return ``True`` in the second element of the return value.
+
+    For example, to enable search by integer field, you could use::
+
+        class PersonAdmin(admin.ModelAdmin):
+            list_display = ('name', 'age')
+            search_fields = ('name',)
+
+            def get_search_results(self, request, queryset, search_term):
+                queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
+                try:
+                    search_term_as_int = int(search_term)
+                    queryset |= self.model.objects.filter(age=search_term_as_int)
+                except:
+                    pass
+                return queryset, use_distinct
 
 .. method:: ModelAdmin.save_related(self, request, form, formsets, change)
 

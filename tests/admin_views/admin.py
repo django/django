@@ -24,7 +24,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
     WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
+    Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
@@ -530,6 +530,20 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
     colored_name.admin_order_field = 'name'
 
 
+class PluggableSearchPersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age')
+    search_fields = ('name',)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(request, queryset, search_term)
+        try:
+            search_term_as_int = int(search_term)
+            queryset |= self.model.objects.filter(age=search_term_as_int)
+        except:
+            pass
+        return queryset, use_distinct
+
+
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
@@ -733,6 +747,7 @@ site.register(Question)
 site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
+site.register(PluggableSearchPerson, PluggableSearchPersonAdmin)
 site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
 site.register(AdminOrderedField, AdminOrderedFieldAdmin)
 site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
