@@ -24,6 +24,8 @@ representing your models -- so far, it's been solving two years' worth of
 database-schema problems. Here's a quick example, which might be saved in
 the file ``mysite/news/models.py``::
 
+    from django.db import models 
+
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
@@ -213,6 +215,8 @@ The rest is up to you.
 Generally, a view retrieves data according to the parameters, loads a template
 and renders the template with the retrieved data. Here's an example view for
 ``year_archive`` from above::
+
+    from django.shortcuts import render_to_response 
 
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)

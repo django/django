@@ -12,8 +12,11 @@ Related objects reference
     * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
       That is::
 
+            from django.db import models
+
             class Reporter(models.Model):
-                ...
+                # ...
+                pass
 
             class Article(models.Model):
                 reporter = models.ForeignKey(Reporter)
@@ -24,7 +27,8 @@ Related objects reference
     * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
 
             class Topping(models.Model):
-                ...
+                # ...
+                pass
 
             class Pizza(models.Model):
                 toppings = models.ManyToManyField(Topping)

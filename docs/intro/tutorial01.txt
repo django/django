@@ -582,6 +582,8 @@ of this object. Let's fix that by editing the polls model (in the
 ``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
 following example::
 
+    from django.db import models
+
     class Poll(models.Model):
         # ...
         def __unicode__(self):  # Python 3: def __str__(self):

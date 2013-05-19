@@ -232,6 +232,7 @@ the model field that is being aggregated.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -699,6 +700,8 @@ And here's ``select_related`` lookup::
 ``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
 
+    from django.db import models
+
     class City(models.Model):
         # ...
         pass
@@ -813,6 +816,8 @@ that are supported by ``select_related``. It also supports prefetching of
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
 
 For example, suppose you have these models::
+
+    from django.db import models
 
     class Topping(models.Model):
         name = models.CharField(max_length=30)
@@ -1565,6 +1570,7 @@ aggregated.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -2042,6 +2048,7 @@ Range test (inclusive).
 
 Example::
 
+    import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))

@@ -90,6 +90,8 @@ attributes. Be careful not to choose field names that conflict with the
 
 Example::
 
+    from django.db import models
+
     class Musician(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -290,8 +292,11 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
 ``Manufacturer`` makes multiple cars but each ``Car`` only has one
 ``Manufacturer`` -- use the following definitions::
 
+    from django.db import models
+
     class Manufacturer(models.Model):
         # ...
+        pass
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer)
@@ -340,8 +345,11 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 ``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings
 -- here's how you'd represent that::
 
+    from django.db import models
+
     class Topping(models.Model):
         # ...
+        pass
 
     class Pizza(models.Model):
         # ...
@@ -402,6 +410,8 @@ intermediate model. The intermediate model is associated with the
 :attr:`through <ManyToManyField.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
 something like this::
+
+    from django.db import models
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
@@ -583,6 +593,7 @@ It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
 just refer to the other model class wherever needed. For example::
 
+    from django.db import models
     from geography.models import ZipCode
 
     class Restaurant(models.Model):
@@ -630,6 +641,8 @@ Meta options
 
 Give your model metadata by using an inner ``class Meta``, like so::
 
+    from django.db import models
+
     class Ox(models.Model):
         horn_length = models.IntegerField()
 
@@ -659,6 +672,8 @@ This is a valuable technique for keeping business logic in one place -- the
 model.
 
 For example, this model has a few custom methods::
+
+    from django.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -729,6 +744,8 @@ A classic use-case for overriding the built-in methods is if you want something
 to happen whenever you save an object. For example (see
 :meth:`~Model.save` for documentation of the parameters it accepts)::
 
+    from django.db import models
+
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
@@ -739,6 +756,8 @@ to happen whenever you save an object. For example (see
             do_something_else()
 
 You can also prevent saving::
+
+    from django.db import models
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -826,6 +845,8 @@ the child (and Django will raise an exception).
 
 An example::
 
+    from django.db import models
+
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
         age = models.PositiveIntegerField()
@@ -854,14 +875,16 @@ attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
 class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
 extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
 
+    from django.db import models
+
     class CommonInfo(models.Model):
-        ...
+        # ...
         class Meta:
             abstract = True
             ordering = ['name']
 
     class Student(CommonInfo):
-        ...
+        # ...
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
@@ -900,6 +923,8 @@ abstract base class (only), part of the name should contain
   resulting name will end up being different.
 
 For example, given an app ``common/models.py``::
+
+    from django.db import models
 
     class Base(models.Model):
         m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
@@ -948,6 +973,8 @@ database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
 (via an automatically-created :class:`~django.db.models.OneToOneField`).
 For example::
+
+    from django.db import models
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -998,7 +1025,7 @@ If the parent has an ordering and you don't want the child to have any natural
 ordering, you can explicitly disable it::
 
     class ChildModel(ParentModel):
-        ...
+        # ...
         class Meta:
             # Remove parent's ordering effect
             ordering = []
@@ -1061,15 +1088,21 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the ``Person`` model described
-above. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model. You can do it like this::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
 
     class MyPerson(Person):
         class Meta:
             proxy = True
 
         def do_something(self):
-            ...
+            # ...
+            pass
 
 The ``MyPerson`` class operates on the same database table as its parent
 ``Person`` class. In particular, any new instances of ``Person`` will also be
@@ -1125,8 +1158,11 @@ classes will still be available.
 Continuing our example from above, you could change the default manager used
 when you query the ``Person`` model like this::
 
+    from django.db import models
+
     class NewManager(models.Manager):
-        ...
+        # ...
+        pass
 
     class MyPerson(Person):
         objects = NewManager()
