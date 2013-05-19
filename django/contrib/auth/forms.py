@@ -29,7 +29,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if not encoded or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded.startswith(UNUSABLE_PASSWORD):
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -222,7 +222,7 @@ class PasswordResetForm(forms.Form):
         for user in users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
-            if user.password == UNUSABLE_PASSWORD:
+            if user.password.startswith(UNUSABLE_PASSWORD):
                 continue
             if not domain_override:
                 current_site = get_current_site(request)

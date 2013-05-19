@@ -2,6 +2,7 @@ import warnings
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.models import (Group, User, SiteProfileNotAvailable,
     UserManager)
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -87,7 +88,7 @@ class UserManagerTestCase(TestCase):
         user = User.objects.create_user('user', email_lowercase)
         self.assertEqual(user.email, email_lowercase)
         self.assertEqual(user.username, 'user')
-        self.assertEqual(user.password, '!')
+        self.assertTrue(user.password.startswith(UNUSABLE_PASSWORD))
 
     def test_create_user_email_domain_normalize_rfc3696(self):
         # According to  http://tools.ietf.org/html/rfc3696#section-3

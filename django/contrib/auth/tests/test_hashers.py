@@ -119,6 +119,10 @@ class TestUtilsHashPass(unittest.TestCase):
 
     def test_unusable(self):
         encoded = make_password(None)
+        # Assert that the unusable passwords actually contain a random part.
+        # This might fail one day due to a hash collision.
+        self.assertNotEqual(encoded, make_password(None), "Random password collision?")
+        self.assertEqual(len(encoded), len(UNUSABLE_PASSWORD) + 40)
         self.assertFalse(is_password_usable(encoded))
         self.assertFalse(check_password(None, encoded))
         self.assertFalse(check_password(UNUSABLE_PASSWORD, encoded))
