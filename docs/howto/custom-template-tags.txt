@@ -300,18 +300,21 @@ Template filter code falls into one of two situations:
 
    .. code-block:: python
 
-       from django.utils.html import conditional_escape
-       from django.utils.safestring import mark_safe
+      from django import template
+      from django.utils.html import conditional_escape
+      from django.utils.safestring import mark_safe
 
-       @register.filter(needs_autoescape=True)
-       def initial_letter_filter(text, autoescape=None):
-           first, other = text[0], text[1:]
-           if autoescape:
-               esc = conditional_escape
-           else:
-               esc = lambda x: x
-           result = '<strong>%s</strong>%s' % (esc(first), esc(other))
-           return mark_safe(result)
+      register = template.Library()
+
+      @register.filter(needs_autoescape=True)
+      def initial_letter_filter(text, autoescape=None):
+          first, other = text[0], text[1:]
+          if autoescape:
+              esc = conditional_escape
+          else:
+              esc = lambda x: x
+          result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+          return mark_safe(result)
 
    The ``needs_autoescape`` flag and the ``autoescape`` keyword argument mean
    that our function will know whether automatic escaping is in effect when the
@@ -454,8 +457,9 @@ Continuing the above example, we need to define ``CurrentTimeNode``:
 
 .. code-block:: python
 
-    from django import template
     import datetime
+    from django import template
+
     class CurrentTimeNode(template.Node):
         def __init__(self, format_string):
             self.format_string = format_string
@@ -497,6 +501,8 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
 ``autoescape`` that you can use for this purpose. For example:
 
 .. code-block:: python
+
+    from django.template import Context
 
     def render(self, context):
         # ...
@@ -545,7 +551,10 @@ A naive implementation of ``CycleNode`` might look something like this:
 
 .. code-block:: python
 
-    class CycleNode(Node):
+    import itertools
+    from django import template
+
+    class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cycle_iter = itertools.cycle(cyclevars)
         def render(self, context):
@@ -576,7 +585,7 @@ Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
 
 .. code-block:: python
 
-    class CycleNode(Node):
+    class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cyclevars = cyclevars
         def render(self, context):
@@ -664,6 +673,7 @@ Now your tag should begin to look like this:
 .. code-block:: python
 
     from django import template
+
     def do_format_time(parser, token):
         try:
             # split_contents() knows not to split quoted strings.
@@ -721,6 +731,11 @@ mentioned above and registers it with the template system.
 Our earlier ``current_time`` function could thus be written like this:
 
 .. code-block:: python
+
+    import datetime
+    from django import template
+
+    register = template.Library()
 
     def current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
@@ -964,6 +979,9 @@ object in the ``render()`` method. Here's an updated version of
 outputting it:
 
 .. code-block:: python
+
+    import datetime
+    from django import template
 
     class CurrentTimeNode2(template.Node):
         def __init__(self, format_string):

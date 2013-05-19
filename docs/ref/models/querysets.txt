@@ -1409,6 +1409,41 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
+.. warning::
+
+  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  attributes and reverse relations. In that case you will restrict the queries
+  inside the context of that relation. That could lead you to some integrity
+  problems if you don't use it consistently.
+
+  Being the following models::
+
+      class Chapter(models.Model):
+          title = models.CharField(max_length=255, unique=True)
+
+      class Book(models.Model):
+          title = models.CharField(max_length=256)
+          chapters = models.ManyToManyField(Chapter)
+
+  You can use ``get_or_create()`` through Book's chapters field, but it only
+  fetches inside the context of that book::
+
+      >>> book = Book.objects.create(title="Ulysses")
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, True)
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, False)
+      >>> Chapter.objects.create(title="Chapter 1")
+      <Chapter: Chapter 1>
+      >>> book.chapters.get_or_create(title="Chapter 1")
+      # Raises IntegrityError
+
+  This is happening because it's trying to get or create "Chapter 1" through the
+  book "Ulysses", but it can't do any of them: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
+
+
 bulk_create
 ~~~~~~~~~~~
 
