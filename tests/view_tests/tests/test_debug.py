@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 import inspect
 import os
 import sys
+import tempfile
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -13,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
 from django.test.utils import (override_settings, setup_test_template_loader,
     restore_template_loaders)
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, force_bytes
 from django.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
@@ -121,6 +122,24 @@ class ExceptionReporterTests(TestCase):
         self.assertIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertIn('<p>Request data not supplied</p>', html)
+
+    def test_eol_support(self):
+        """Test that the ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
+        LINES = list('print %d' % i for i in range(1, 6))
+        reporter = ExceptionReporter(None, None, None, None)
+
+        for newline in ['\n','\r\n','\r']:
+            fd,filename = tempfile.mkstemp(text = False)
+            os.write(fd, force_bytes(newline.join(LINES)+newline))
+            os.close(fd)
+
+            try:
+                self.assertEqual(
+                    reporter._get_lines_from_file(filename, 3, 2),
+                    (1, LINES[1:3], LINES[3], LINES[4:])
+                )
+            finally:
+                os.unlink(filename)
 
     def test_no_exception(self):
         "An exception report can be generated for just a request"

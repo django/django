@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import get_current_site
-from django.core.xheaders import populate_xheaders
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader, RequestContext
@@ -70,5 +69,4 @@ def render_flatpage(request, f):
         'flatpage': f,
     })
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, FlatPage, f.id)
     return response

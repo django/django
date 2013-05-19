@@ -80,9 +80,10 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-field. If this is given, the default form widget will be a select box with
-these choices instead of the standard text field.
+An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
+two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
+this is given, the default form widget will be a select box with these choices
+instead of the standard text field.
 
 The first element in each tuple is the actual value to be stored, and the
 second element is the human-readable name. For example::
@@ -96,6 +97,8 @@ second element is the human-readable name. For example::
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
+
+    from django.db import models
 
     class Student(models.Model):
         FRESHMAN = 'FR'
@@ -889,7 +892,8 @@ The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField([**options])
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values up to 32767 are safe in all databases
+supported by Django.
 
 ``SlugField``
 -------------
@@ -917,7 +921,8 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values from -32768 to 32767 are safe in all databases
+supported by Django.
 
 ``TextField``
 -------------
@@ -994,12 +999,15 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
+    from django.db import models
+
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
         # ...
 
     class Manufacturer(models.Model):
         # ...
+        pass
 
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
@@ -1132,6 +1140,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     necessary to avoid executing queries at the time your models.py is
     imported::
 
+        from django.db import models
+        from django.contrib.auth.models import User
+
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
 
@@ -1203,6 +1214,8 @@ that control how the relationship functions.
 
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
+
+        from django.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")

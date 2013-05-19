@@ -18,13 +18,11 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.transaction import TransactionMiddleware
 from django.test import TransactionTestCase, TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
 from django.utils.unittest import expectedFailure, skipIf
-
-from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Band
 

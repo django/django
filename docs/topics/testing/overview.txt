@@ -21,17 +21,16 @@ module defines tests using a class-based approach.
 
 .. admonition:: unittest2
 
-    Python 2.7 introduced some major changes to the unittest library,
+    Python 2.7 introduced some major changes to the ``unittest`` library,
     adding some extremely useful features. To ensure that every Django
     project can benefit from these new features, Django ships with a
-    copy of unittest2_, a copy of the Python 2.7 unittest library,
-    backported for Python 2.6 compatibility.
+    copy of unittest2_, a copy of Python 2.7's ``unittest``, backported for
+    Python 2.6 compatibility.
 
     To access this library, Django provides the
     ``django.utils.unittest`` module alias. If you are using Python
-    2.7, or you have installed unittest2 locally, Django will map the
-    alias to the installed version of the unittest library. Otherwise,
-    Django will use its own bundled version of unittest2.
+    2.7, or you have installed ``unittest2`` locally, Django will map the alias
+    to it. Otherwise, Django will use its own bundled version of ``unittest2``.
 
     To use this alias, simply use::
 
@@ -41,8 +40,8 @@ module defines tests using a class-based approach.
 
         import unittest
 
-    If you want to continue to use the base unittest library, you can --
-    you just won't get any of the nice new unittest2 features.
+    If you want to continue to use the legacy ``unittest`` library, you can --
+    you just won't get any of the nice new ``unittest2`` features.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
@@ -858,24 +857,46 @@ SimpleTestCase
 
 .. class:: SimpleTestCase()
 
-A very thin subclass of :class:`unittest.TestCase`, it extends it with some
-basic functionality like:
+A thin subclass of :class:`unittest.TestCase`, it extends it with some basic
+functionality like:
 
 * Saving and restoring the Python warning machinery state.
-* Checking that a callable :meth:`raises a certain exception <SimpleTestCase.assertRaisesMessage>`.
-* :meth:`Testing form field rendering <SimpleTestCase.assertFieldOutput>`.
-* Testing server :ref:`HTML responses for the presence/lack of a given fragment <assertions>`.
-* The ability to run tests with :ref:`modified settings <overriding-settings>`
+* Some useful assertions like:
+
+  * Checking that a callable :meth:`raises a certain exception
+    <SimpleTestCase.assertRaisesMessage>`.
+  * Testing form field :meth:`rendering and error treatment
+    <SimpleTestCase.assertFieldOutput>`.
+  * Testing :meth:`HTML responses for the presence/lack of a given fragment
+    <SimpleTestCase.assertContains>`.
+  * Verifying that a template :meth:`has/hasn't been used to generate a given
+    response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
+    performed by the app.
+  * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
+    for equality/inequality or :meth:`containment <SimpleTestCase.assertInHTML>`.
+  * Robustly testing two :meth:`XML fragments <SimpleTestCase.assertXMLEqual>`
+    for equality/inequality.
+  * Robustly testing two :meth:`JSON fragments <SimpleTestCase.assertJSONEqual>`
+    for equality.
+
+* The ability to run tests with :ref:`modified settings <overriding-settings>`.
+* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.client.Client`.
+* Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
+
+.. versionchanged:: 1.6
+
+    The latter two features were moved from ``TransactionTestCase`` to
+    ``SimpleTestCase`` in Django 1.6.
 
 If you need any of the other more complex and heavyweight Django-specific
 features like:
 
-* Using the :attr:`~TestCase.client` :class:`~django.test.client.Client`.
 * Testing or using the ORM.
-* Database :attr:`~TestCase.fixtures`.
-* Custom test-time :attr:`URL maps <TestCase.urls>`.
+* Database :attr:`~TransactionTestCase.fixtures`.
 * Test :ref:`skipping based on database backend features <skipping-tests>`.
-* The remaining specialized :ref:`assert* <assertions>` methods.
+* The remaining specialized :meth:`assert*
+  <TransactionTestCase.assertQuerysetEqual>` methods.
 
 then you should use :class:`~django.test.TransactionTestCase` or
 :class:`~django.test.TestCase` instead.
@@ -1137,9 +1158,9 @@ Test cases features
 Default test client
 ~~~~~~~~~~~~~~~~~~~
 
-.. attribute:: TestCase.client
+.. attribute:: SimpleTestCase.client
 
-Every test case in a ``django.test.TestCase`` instance has access to an
+Every test case in a ``django.test.*TestCase`` instance has access to an
 instance of a Django test client. This client can be accessed as
 ``self.client``. This client is recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
@@ -1176,10 +1197,10 @@ This means, instead of instantiating a ``Client`` in each test::
 Customizing the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. attribute:: TestCase.client_class
+.. attribute:: SimpleTestCase.client_class
 
 If you want to use a different ``Client`` class (for example, a subclass
-with customized behavior), use the :attr:`~TestCase.client_class` class
+with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
     from django.test import TestCase
@@ -1200,11 +1221,12 @@ attribute::
 Fixture loading
 ~~~~~~~~~~~~~~~
 
-.. attribute:: TestCase.fixtures
+.. attribute:: TransactionTestCase.fixtures
 
 A test case for a database-backed Web site isn't much use if there isn't any
 data in the database. To make it easy to put test data into the database,
-Django's custom ``TestCase`` class provides a way of loading **fixtures**.
+Django's custom ``TransactionTestCase`` class provides a way of loading
+**fixtures**.
 
 A fixture is a collection of data that Django knows how to import into a
 database. For example, if your site has user accounts, you might set up a
@@ -1273,7 +1295,7 @@ or by the order of test execution.
 URLconf configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. attribute:: TestCase.urls
+.. attribute:: SimpleTestCase.urls
 
 If your application provides views, you may want to include tests that use the
 test client to exercise those views. However, an end user is free to deploy the
@@ -1282,9 +1304,9 @@ tests can't rely upon the fact that your views will be available at a
 particular URL.
 
 In order to provide a reliable URL space for your test,
-``django.test.TestCase`` provides the ability to customize the URLconf
+``django.test.*TestCase`` classes provide the ability to customize the URLconf
 configuration for the duration of the execution of a test suite. If your
-``TestCase`` instance defines an ``urls`` attribute, the ``TestCase`` will use
+``*TestCase`` instance defines an ``urls`` attribute, the ``*TestCase`` will use
 the value of that attribute as the :setting:`ROOT_URLCONF` for the duration
 of that test.
 
@@ -1307,7 +1329,7 @@ URLconf for the duration of the test case.
 Multi-database support
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. attribute:: TestCase.multi_db
+.. attribute:: TransactionTestCase.multi_db
 
 Django sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings
@@ -1340,12 +1362,12 @@ This test case will flush *all* the test databases before running
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
-.. method:: TestCase.settings
+.. method:: SimpleTestCase.settings
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
 Django provides a standard Python context manager (see :pep:`343`)
-:meth:`~django.test.TestCase.settings`, which can be used like this::
+:meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
 
     from django.test import TestCase
 
@@ -1435,8 +1457,8 @@ MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use Django's custom ``TestCase`` class, the test runner will clear the
-contents of the test email outbox at the start of each test case.
+If you use any of Django's custom ``TestCase`` classes, the test runner will
+clear thecontents of the test email outbox at the start of each test case.
 
 For more detail on email services during tests, see `Email services`_ below.
 
@@ -1486,31 +1508,7 @@ your test suite.
 
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
 
-
-.. method:: TestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
-
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` appears in the content of the response. If ``count`` is
-    provided, ``text`` must occur exactly ``count`` times in the response.
-
-    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
-    the response content will be based on HTML semantics instead of
-    character-by-character equality. Whitespace is ignored in most cases,
-    attribute ordering is not significant. See
-    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
-
-.. method:: TestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
-
-    Asserts that a ``Response`` instance produced the given ``status_code`` and
-    that ``text`` does not appears in the content of the response.
-
-    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
-    the response content will be based on HTML semantics instead of
-    character-by-character equality. Whitespace is ignored in most cases,
-    attribute ordering is not significant. See
-    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
-
-.. method:: TestCase.assertFormError(response, form, field, errors, msg_prefix='')
+.. method:: SimpleTestCase.assertFormError(response, form, field, errors, msg_prefix='')
 
     Asserts that a field on a form raises the provided list of errors when
     rendered on the form.
@@ -1525,7 +1523,30 @@ your test suite.
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
-.. method:: TestCase.assertTemplateUsed(response, template_name, msg_prefix='')
+.. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
+
+    Asserts that a ``Response`` instance produced the given ``status_code`` and
+    that ``text`` appears in the content of the response. If ``count`` is
+    provided, ``text`` must occur exactly ``count`` times in the response.
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+.. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
+
+    Asserts that a ``Response`` instance produced the given ``status_code`` and
+    that ``text`` does not appears in the content of the response.
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='')
 
     Asserts that the template with the given name was used in rendering the
     response.
@@ -1539,15 +1560,15 @@ your test suite.
         with self.assertTemplateUsed(template_name='index.html'):
             render_to_string('index.html')
 
-.. method:: TestCase.assertTemplateNotUsed(response, template_name, msg_prefix='')
+.. method:: SimpleTestCase.assertTemplateNotUsed(response, template_name, msg_prefix='')
 
     Asserts that the template with the given name was *not* used in rendering
     the response.
 
     You can use this as a context manager in the same way as
-    :meth:`~TestCase.assertTemplateUsed`.
+    :meth:`~SimpleTestCase.assertTemplateUsed`.
 
-.. method:: TestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
+.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
 
     Asserts that the response return a ``status_code`` redirect status, it
     redirected to ``expected_url`` (including any GET data), and the final
@@ -1556,44 +1577,6 @@ your test suite.
     If your request used the ``follow`` argument, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
-
-.. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
-
-    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
-
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
-
-    By default, the comparison is also ordering dependent. If ``qs`` doesn't
-    provide an implicit ordering, you can set the ``ordered`` parameter to
-    ``False``, which turns the comparison into a Python set comparison.
-
-    .. versionchanged:: 1.6
-
-        The method now checks for undefined order and raises ``ValueError``
-        if undefined order is spotted. The ordering is seen as undefined if
-        the given ``qs`` isn't ordered and the comparison is against more
-        than one ordered values.
-
-.. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
-
-    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
-    ``num`` database queries are executed.
-
-    If a ``"using"`` key is present in ``kwargs`` it is used as the database
-    alias for which to check the number of queries.  If you wish to call a
-    function with a ``using`` parameter you can do it by wrapping the call with
-    a ``lambda`` to add an extra parameter::
-
-        self.assertNumQueries(7, lambda: my_function(using=7))
-
-    You can also use this as a context manager::
-
-        with self.assertNumQueries(2):
-            Person.objects.create(name="Aaron")
-            Person.objects.create(name="Daniel")
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
@@ -1624,6 +1607,8 @@ your test suite.
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
+    Output in case of error can be customized with the ``msg`` argument.
+
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 
     Asserts that the strings ``html1`` and ``html2`` are *not* equal. The
@@ -1632,6 +1617,8 @@ your test suite.
 
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
+
+    Output in case of error can be customized with the ``msg`` argument.
 
 .. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
 
@@ -1644,6 +1631,8 @@ your test suite.
     syntax differences. When unvalid XML is passed in any parameter, an
     ``AssertionError`` is always raised, even if both string are identical.
 
+    Output in case of error can be customized with the ``msg`` argument.
+
 .. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
 
     .. versionadded:: 1.5
@@ -1651,6 +1640,68 @@ your test suite.
     Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
     comparison is based on XML semantics. See
     :meth:`~SimpleTestCase.assertXMLEqual` for details.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
+
+    .. versionadded:: 1.5
+
+    Asserts that the HTML fragment ``needle`` is contained in the ``haystack`` one.
+
+    If the ``count`` integer argument is specified, then additionally the number
+    of ``needle`` occurrences will be strictly verified.
+
+    Whitespace in most cases is ignored, and attribute ordering is not
+    significant. The passed-in arguments must be valid HTML.
+
+.. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
+
+    .. versionadded:: 1.5
+
+    Asserts that the JSON fragments ``raw`` and ``expected_data`` are equal.
+    Usual JSON non-significant whitespace rules apply as the heavyweight is
+    delegated to the :mod:`json` library.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
+.. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
+
+    Asserts that a queryset ``qs`` returns a particular list of values ``values``.
+
+    The comparison of the contents of ``qs`` and ``values`` is performed using
+    the function ``transform``; by default, this means that the ``repr()`` of
+    each value is compared. Any other callable can be used if ``repr()`` doesn't
+    provide a unique or helpful comparison.
+
+    By default, the comparison is also ordering dependent. If ``qs`` doesn't
+    provide an implicit ordering, you can set the ``ordered`` parameter to
+    ``False``, which turns the comparison into a Python set comparison.
+
+    .. versionchanged:: 1.6
+
+        The method now checks for undefined order and raises ``ValueError``
+        if undefined order is spotted. The ordering is seen as undefined if
+        the given ``qs`` isn't ordered and the comparison is against more
+        than one ordered values.
+
+.. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
+
+    Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
+    ``num`` database queries are executed.
+
+    If a ``"using"`` key is present in ``kwargs`` it is used as the database
+    alias for which to check the number of queries.  If you wish to call a
+    function with a ``using`` parameter you can do it by wrapping the call with
+    a ``lambda`` to add an extra parameter::
+
+        self.assertNumQueries(7, lambda: my_function(using=7))
+
+    You can also use this as a context manager::
+
+        with self.assertNumQueries(2):
+            Person.objects.create(name="Aaron")
+            Person.objects.create(name="Daniel")
 
 .. _topics-testing-email:
 
@@ -1701,7 +1752,7 @@ and contents::
             self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
-at the start of every test in a Django ``TestCase``. To empty the outbox
+at the start of every test in a Django ``*TestCase``. To empty the outbox
 manually, assign the empty list to ``mail.outbox``::
 
     from django.core import mail

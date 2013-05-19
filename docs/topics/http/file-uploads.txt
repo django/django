@@ -15,6 +15,7 @@ Basic file uploads
 
 Consider a simple form containing a :class:`~django.forms.FileField`::
 
+    # In forms.py...
     from django import forms
 
     class UploadFileForm(forms.Form):
@@ -39,6 +40,7 @@ something like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render_to_response
+    from .forms import UploadFileForm
 
     # Imaginary function to handle an uploaded file.
     from somewhere import handle_uploaded_file
