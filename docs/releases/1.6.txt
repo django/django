@@ -241,6 +241,8 @@ Minor features
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
 
+* The reason phrase can be customized in HTTP responses.
+
 Backwards incompatible changes in 1.6
 =====================================
 
