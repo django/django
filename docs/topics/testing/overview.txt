@@ -794,14 +794,15 @@ can access these properties as part of a test condition.
     A dictionary-like object containing session information. See the
     :doc:`session documentation</topics/http/sessions>` for full details.
 
-    To modify the session and then save it, it must be stored in a variable
-    first (because a new ``SessionStore`` is created every time this property
-    is accessed)::
+.. versionadded:: 1.6
+
+    If you wish to manipulate the session directly you can do that directly
+    on the client and the modified values will be saved on subsequent requests.
 
         def test_something(self):
-            session = self.client.session
-            session['somekey'] = 'test'
-            session.save()
+            self.client.session['somekey'] = value
+            self.client.session['anotherkey'] = value
+
 
 Example
 ~~~~~~~
