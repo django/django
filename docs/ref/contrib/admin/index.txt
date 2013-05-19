@@ -1702,6 +1702,22 @@ The ``InlineModelAdmin`` class adds:
                   return extra - obj.binarytree_set.count()
                 return extra
 
+
+.. method:: InlineModelAdmin.get_max_num(self, request, obj=None, **kwargs)
+
+    .. versionadded:: 1.6
+
+
+    Returns the maximum number of extra inline forms needed. By default, returns the
+    :attr:`InlineModelAdmin.max_num` attribute.
+
+    Here, you can programmatically determine the maximum number of extra inline
+    forms which should be shown on the interface. This may be based on the object
+    passed as the keyword argument ``obj``. For example::
+
+        class BinaryTreeAdmin(admin.TabularInline):
+            model = BinaryTree
+
             def get_max_num(self, request, obj=None, **kwargs):
                 max_num = 10
                 if obj.parent:
