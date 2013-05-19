@@ -1022,7 +1022,8 @@ class FilePathField(ChoiceField):
         if self.required:
             self.choices = []
         else:
-            self.choices = [("", "---------")]
+            from django.db.models.fields import VERBOSE_BLANK_CHOICE_DASH
+            self.choices = [("", VERBOSE_BLANK_CHOICE_DASH)]
 
         if self.match is not None:
             self.match_re = re.compile(self.match)

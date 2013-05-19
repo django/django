@@ -33,7 +33,8 @@ class NOT_PROVIDED:
 
 # The values to use for "blank" in SelectFields. Will be appended to the start
 # of most "choices" lists.
-BLANK_CHOICE_DASH = [("", "---------")]
+VERBOSE_BLANK_CHOICE_DASH = "---------"
+BLANK_CHOICE_DASH = [("", VERBOSE_BLANK_CHOICE_DASH)]
 
 def _load_field(app_label, model_name, field_name):
     return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
