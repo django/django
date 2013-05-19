@@ -71,7 +71,7 @@ urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 def urlencode(query, doseq=0):
     """
     A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first case to UTF-8 encoded strings and
+    unicode strings. The parameters are first cast to UTF-8 encoded strings and
     then encoded as per normal.
     """
     if isinstance(query, MultiValueDict):
