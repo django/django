@@ -12,7 +12,7 @@ from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
-        ItemTag, WithManualPK)
+        ItemTag, WithManualPK, Bill, Row)
 
 
 class AggregationTests(TestCase):
@@ -1020,3 +1020,14 @@ class AggregationTests(TestCase):
                 ('The Definitive Guide to Django: Web Development Done Right', 0)
             ]
         )
+
+    def test_annotate_exclude(self):
+        bill = Bill.objects.create(amount=50)
+        Row.objects.create(bill=bill, amount=20)
+        Row.objects.create(bill=bill, amount=30)
+
+        incoherent = Bill.objects.annotate(row_amount=Sum('row__amount')).exclude(row_amount=F('amount'))
+        self.assertQuerysetEqual(incoherent, [])
+
+        incoherent = Bill.objects.annotate(row_amount=Sum('row__amount')).exclude(amount=F('row_amount'))
+        self.assertQuerysetEqual(incoherent, [])

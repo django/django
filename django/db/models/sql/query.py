@@ -1141,6 +1141,7 @@ class Query(object):
         # By default, this is a WHERE clause. If an aggregate is referenced
         # in the value, the filter will be promoted to a HAVING
         having_clause = False
+        expression_aggregate = None
 
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
@@ -1155,9 +1156,12 @@ class Query(object):
             # If value is a query expression, evaluate it
             value = SQLEvaluator(value, self, reuse=can_reuse)
             having_clause = value.contains_aggregate
+            if having_clause and hasattr(value.expression, 'name'):
+                expression_aggregate = value.expression.name
 
         for alias, aggregate in self.aggregates.items():
-            if alias in (parts[0], LOOKUP_SEP.join(parts)):
+            is_negated_aggregate = (negate and alias == expression_aggregate)
+            if alias in (parts[0], LOOKUP_SEP.join(parts)) or is_negated_aggregate:
                 entry = self.where_class()
                 entry.add((aggregate, lookup_type, value), AND)
                 if negate:

@@ -87,3 +87,12 @@ class HardbackBook(Book):
 
     def __str__(self):
         return "%s (hardback): %s" % (self.name, self.weight)
+
+
+class Bill(models.Model):
+    amount = models.IntegerField()
+
+
+class Row(models.Model):
+    bill = models.ForeignKey(Bill)
+    amount = models.IntegerField()
