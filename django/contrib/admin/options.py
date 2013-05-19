@@ -1,6 +1,6 @@
 import copy
 import operator
-from functools import update_wrapper, partial
+from functools import partial, reduce, update_wrapper
 
 from django import forms
 from django.conf import settings
