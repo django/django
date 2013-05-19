@@ -44,6 +44,11 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.oracle.client import DatabaseClient
@@ -77,6 +82,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
+    has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
     can_defer_constraint_checks = True
     ignores_nulls_in_unique_constraints = False
