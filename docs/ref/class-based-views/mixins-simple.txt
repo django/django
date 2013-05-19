@@ -60,6 +60,17 @@ TemplateResponseMixin
         altered later (e.g. in
         :ref:`template response middleware <template-response-middleware>`).
 
+        .. admonition:: Context processors
+
+            ``TemplateResponse`` uses :class:`~django.template.RequestContext`
+            which  means that callables defined in
+            :setting:`TEMPLATE_CONTEXT_PROCESSORS` may overwrite template
+            variables defined in your views. For example, if you subclass
+            :class:`DetailView <django.views.generic.detail.DetailView>` and
+            set ``context_object_name`` to ``user``, the
+            ``django.contrib.auth.context_processors.auth`` context processor
+            will happily overwrite your variable with current user.
+
         If you need custom template loading or custom context object
         instantiation, create a ``TemplateResponse`` subclass and assign it to
         ``response_class``.
@@ -67,7 +78,6 @@ TemplateResponseMixin
     .. attribute:: content_type
 
         .. versionadded:: 1.5
-            The ``content_type`` attribute was added.
 
         The content type to use for the response. ``content_type`` is passed
         as a keyword argument to ``response_class``. Default is ``None`` --

@@ -25,9 +25,10 @@ copy ``django-admin.py`` to a location on your existing path or edit the
 Environment...``) to point to its installed location.
 
 Generally, when working on a single Django project, it's easier to use
-``manage.py``. Use ``django-admin.py`` with ``DJANGO_SETTINGS_MODULE``, or the
-``--settings`` command line option, if you need to switch between multiple
-Django settings files.
+``manage.py`` than ``django-admin.py``. If you need to switch between multiple
+Django settings files, use ``django-admin.py`` with
+:envvar:`DJANGO_SETTINGS_MODULE` or the :djadminopt:`--settings` command line
+option.
 
 The command-line examples throughout this document use ``django-admin.py`` to
 be consistent, but any example can use ``manage.py`` just as well.
@@ -97,6 +98,7 @@ Can be run as a cronjob or directly to clean out old data from the database
 (only expired sessions at the moment).
 
 .. versionchanged:: 1.5
+
     :djadmin:`cleanup` is deprecated. Use :djadmin:`clearsessions` instead.
 
 compilemessages
@@ -121,7 +123,7 @@ Example usage::
 
 .. versionchanged:: 1.6
 
-Added the ability to specify multiple locales.
+    Added the ability to specify multiple locales.
 
 createcachetable
 ----------------
@@ -168,8 +170,12 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 :setting:`ROOT_URLCONF` is followed by ``"###"`` in the output of
 ``diffsettings``.
 
-Note that Django's default settings live in ``django/conf/global_settings.py``,
-if you're ever curious to see the full list of defaults.
+The :djadminopt:`--all` option may be provided to display all settings, even
+if they have Django's default value. Such settings are prefixed by ``"###"``.
+
+.. versionadded:: 1.6
+
+    The :djadminopt:`--all` option was added.
 
 dumpdata <appname appname appname.Model ...>
 --------------------------------------------
@@ -303,8 +309,8 @@ database to introspect.
 
 .. versionchanged:: 1.6
 
-The behavior by which introspected models are created as unmanaged ones is new
-in Django 1.6.
+    The behavior by which introspected models are created as unmanaged ones is new
+    in Django 1.6.
 
 loaddata <fixture fixture ...>
 ------------------------------
@@ -367,7 +373,46 @@ application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 :setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
 
 When fixture files are processed, the data is saved to the database as is.
-Model defined ``save`` methods and ``pre_save`` signals are not called.
+Model defined :meth:`~django.db.models.Model.save` methods are not called, and
+any :data:`~django.db.models.signals.pre_save` or
+:data:`~django.db.models.signals.post_save` signals will be called with
+``raw=True`` since the instance only contains attributes that are local to the
+model. You may, for example, want to disable handlers that access
+related fields that aren't present during fixture loading and would otherwise
+raise an exception::
+
+    from django.db.models.signals import post_save
+    from .models import MyModel
+
+    def my_handler(**kwargs):
+        # disable the handler during fixture loading
+        if kwargs['raw']:
+            return
+        ...
+
+    post_save.connect(my_handler, sender=MyModel)
+
+You could also write a simple decorator to encapsulate this logic::
+
+    from functools import wraps
+
+    def disable_for_loaddata(signal_handler):
+        """
+        Decorator that turns off signal handlers when loading fixture data.
+        """
+        @wraps(signal_handler)
+        def wrapper(*args, **kwargs):
+            if kwargs['raw']:
+                return
+            signal_handler(*args, **kwargs)
+        return wrapper
+
+    @disable_for_loaddata
+    def my_handler(**kwargs):
+        ...
+
+Just be aware that this logic will disable the signals whenever fixtures are
+deserialized, not just during ``loaddata``.
 
 Note that the order in which fixture files are processed is undefined. However,
 all fixture data is installed as a single transaction, so data in
@@ -463,7 +508,7 @@ You can also use commas to separate multiple locales::
 
 .. versionchanged:: 1.6
 
-Added the ability to specify multiple locales.
+    Added the ability to specify multiple locales.
 
 .. django-admin-option:: --domain
 
@@ -758,7 +803,8 @@ Serving static files with the development server
 
 By default, the development server doesn't serve any static files for your site
 (such as CSS files, images, things under :setting:`MEDIA_URL` and so forth). If
-you want to configure Django to serve static media, read :doc:`/howto/static-files`.
+you want to configure Django to serve static media, read
+:doc:`/howto/static-files/index`.
 
 shell
 -----
@@ -772,8 +818,6 @@ rich shell installed but want to force use of the "plain" Python interpreter,
 use the ``--plain`` option, like so::
 
     django-admin.py shell --plain
-
-.. versionchanged:: 1.5
 
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
@@ -802,9 +846,13 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
+.. versionadded:: 1.5
+
+    The ``--interface`` option was added in Django 1.5.
+
 .. versionadded:: 1.6
 
-The ``--no-startup`` option was added in Django 1.6.
+    The ``--no-startup`` option was added in Django 1.6.
 
 sql <appname appname ...>
 -------------------------
@@ -859,6 +907,18 @@ table-creation statements have been executed. Use this SQL hook to make any
 table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
+sqldropindexes <appname appname ...>
+------------------------------------
+
+.. django-admin:: sqldropindexes
+
+.. versionadded:: 1.6
+
+Prints the DROP INDEX SQL statements for the given app name(s).
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -1020,7 +1080,8 @@ through the template engine: the files whose extensions match the
 with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
-- Any option passed to the startproject command
+- Any option passed to the startapp command (among the command's supported
+  options)
 - ``project_name`` -- the project name as passed to the command
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
@@ -1274,7 +1335,7 @@ collectstatic
 ~~~~~~~~~~~~~
 
 This command is only available if the :doc:`static files application
-</howto/static-files>` (``django.contrib.staticfiles``) is installed.
+</howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
 
 Please refer to its :djadmin:`description <collectstatic>` in the
 :doc:`staticfiles </ref/contrib/staticfiles>` documentation.
@@ -1283,7 +1344,7 @@ findstatic
 ~~~~~~~~~~
 
 This command is only available if the :doc:`static files application
-</howto/static-files>` (``django.contrib.staticfiles``) is installed.
+</howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
 
 Please refer to its :djadmin:`description <findstatic>` in the :doc:`staticfiles
 </ref/contrib/staticfiles>` documentation.
@@ -1330,8 +1391,14 @@ Example usage::
     django-admin.py syncdb --traceback
 
 By default, ``django-admin.py`` will show a simple error message whenever an
-error occurs. If you specify ``--traceback``, ``django-admin.py``  will
-output a full stack trace whenever an exception is raised.
+:class:`~django.core.management.CommandError` occurs, but a full stack trace
+for any other exception. If you specify ``--traceback``, ``django-admin.py``
+will also output a full stack trace when a ``CommandError`` is raised.
+
+.. versionchanged:: 1.6
+
+    Previously, Django didn't show a full stack trace by default for exceptions
+    other than ``CommandError``.
 
 .. django-admin-option:: --verbosity
 
@@ -1365,7 +1432,7 @@ For example, to dump data from the database with the alias ``master``::
 .. django-admin-option:: --exclude
 
 Exclude a specific application from the applications whose contents is
-output. For example, to specifically exclude the `auth` application from
+output. For example, to specifically exclude the ``auth`` application from
 the output of dumpdata, you would call::
 
     django-admin.py dumpdata --exclude=auth

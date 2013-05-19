@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type codes to Django Field types.
     data_types_reverse = {
         16: 'BooleanField',
+        17: 'BinaryField',
         20: 'BigIntegerField',
         21: 'SmallIntegerField',
         23: 'IntegerField',
@@ -45,7 +47,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE table_name = %s""", [table_name])
         null_map = dict(cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*(line[:6] + (null_map[line[0]]=='YES',)))
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])]=='YES',)))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):

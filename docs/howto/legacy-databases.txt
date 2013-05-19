@@ -61,7 +61,7 @@ this generated model definition:
 
       class Person(models.Model):
           id = models.IntegerField(primary_key=True)
-          first_name = models.ChaField(max_length=70)
+          first_name = models.CharField(max_length=70)
           class Meta:
 	       **managed = False**
 	       db_table = 'CENSUS_PERSONS'
@@ -75,8 +75,8 @@ access to your precious data on a model by model basis.
 
 .. versionchanged:: 1.6
 
-The behavior by which introspected models are created as unmanaged ones is new
-in Django 1.6.
+    The behavior by which introspected models are created as unmanaged ones is new
+    in Django 1.6.
 
 Install the core Django tables
 ==============================

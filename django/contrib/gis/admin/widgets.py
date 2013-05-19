@@ -40,7 +40,8 @@ class OpenLayersWidget(Textarea):
                 )
                 value = None
 
-        if value and value.geom_type.upper() != self.geom_type:
+        if (value and value.geom_type.upper() != self.geom_type and
+                self.geom_type != 'GEOMETRY'):
             value = None
 
         # Constructing the dictionary of the map options.

@@ -69,9 +69,9 @@ application :doc:`that is created by django-admin.py startproject
         LoadModule auth_basic_module modules/mod_auth_basic.so
         LoadModule authz_user_module modules/mod_authz_user.so
 
-Finally, edit your WSGI script ``mysite.wsgi`` to tie Apache's
-authentication to your site's authentication mechanisms by importing the
-check_user function:
+Finally, edit your WSGI script ``mysite.wsgi`` to tie Apache's authentication
+to your site's authentication mechanisms by importing the ``check_password``
+function:
 
 .. code-block:: python
 

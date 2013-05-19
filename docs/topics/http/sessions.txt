@@ -71,6 +71,7 @@ default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
 .. versionchanged:: 1.5
+
     The :setting:`SESSION_CACHE_ALIAS` setting was added.
 
 Once your cache is configured, you've got two choices for how to store data in
@@ -119,10 +120,28 @@ and the :setting:`SECRET_KEY` setting.
 
 .. note::
 
+    When using cookies-based sessions :mod:`django.contrib.sessions` can be
+    removed from :setting:`INSTALLED_APPS` setting because data is loaded
+    from the key itself and not from the database, so there is no need for the
+    creation and usage of ``django.contrib.sessions.models.Session`` table.
+
+.. note::
+
     It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
     ``True`` to prevent tampering of the stored data from JavaScript.
 
 .. warning::
+
+    **If the SECRET_KEY is not kept secret, this can lead to arbitrary remote
+    code execution.**
+
+    An attacker in possession of the :setting:`SECRET_KEY` can not only
+    generate falsified session data, which your site will trust, but also
+    remotely execute arbitrary code, as the data is serialized using pickle.
+
+    If you use cookie-based sessions, pay extra care that your secret key is
+    always kept completely secret, for any system which might be remotely
+    accessible.
 
     **The session data is signed but not encrypted**
 
@@ -451,7 +470,10 @@ Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
 .. versionchanged:: 1.5
+
   The session is not saved if the response's status code is 500.
+
+.. _browser-length-vs-persistent-sessions:
 
 Browser-length sessions vs. persistent sessions
 ===============================================
@@ -473,6 +495,16 @@ they open a browser.
 This setting is a global default and can be overwritten at a per-session level
 by explicitly calling the :meth:`~backends.base.SessionBase.set_expiry` method
 of ``request.session`` as described above in `using sessions in views`_.
+
+.. note::
+
+    Some browsers (Chrome, for example) provide settings that allow users to
+    continue browsing sessions after closing and re-opening the browser. In
+    some cases, this can interfere with the
+    :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
+    from expiring on browser close. Please be aware of this while testing
+    Django applications which have the
+    :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
 Clearing the session store
 ==========================

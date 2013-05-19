@@ -116,6 +116,12 @@ class Command(NoArgsCommand):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
             for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    self.stderr.write("Post-processing '%s' failed!" % original_path)
+                    # Add a blank line before the traceback, otherwise it's
+                    # too easy to miss the relevant part of the error message.
+                    self.stderr.write("")
+                    raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
                              (original_path, processed_path), level=1)
@@ -168,7 +174,7 @@ Type 'yes' to continue, or 'no' to cancel: """
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
+                'identifier': 'static file' + ('' if modified_count == 1 else 's'),
                 'action': self.symlink and 'symlinked' or 'copied',
                 'destination': (destination_path and " to '%s'"
                                 % destination_path or ''),

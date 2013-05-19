@@ -1,6 +1,6 @@
 """Utilities for writing code that runs on Python 2 and 3"""
 
-# Copyright (c) 2010-2012 Benjamin Peterson
+# Copyright (c) 2010-2013 Benjamin Peterson
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -209,22 +209,28 @@ if PY3:
     _meth_func = "__func__"
     _meth_self = "__self__"
 
+    _func_closure = "__closure__"
     _func_code = "__code__"
     _func_defaults = "__defaults__"
+    _func_globals = "__globals__"
 
     _iterkeys = "keys"
     _itervalues = "values"
     _iteritems = "items"
+    _iterlists = "lists"
 else:
     _meth_func = "im_func"
     _meth_self = "im_self"
 
+    _func_closure = "func_closure"
     _func_code = "func_code"
     _func_defaults = "func_defaults"
+    _func_globals = "func_globals"
 
     _iterkeys = "iterkeys"
     _itervalues = "itervalues"
     _iteritems = "iteritems"
+    _iterlists = "iterlists"
 
 
 try:
@@ -235,14 +241,18 @@ except NameError:
 next = advance_iterator
 
 
+try:
+    callable = callable
+except NameError:
+    def callable(obj):
+        return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
+
+
 if PY3:
     def get_unbound_function(unbound):
         return unbound
 
     Iterator = object
-
-    def callable(obj):
-        return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
 else:
     def get_unbound_function(unbound):
         return unbound.im_func
@@ -259,21 +269,27 @@ _add_doc(get_unbound_function,
 
 get_method_function = operator.attrgetter(_meth_func)
 get_method_self = operator.attrgetter(_meth_self)
+get_function_closure = operator.attrgetter(_func_closure)
 get_function_code = operator.attrgetter(_func_code)
 get_function_defaults = operator.attrgetter(_func_defaults)
+get_function_globals = operator.attrgetter(_func_globals)
 
 
-def iterkeys(d):
+def iterkeys(d, **kw):
     """Return an iterator over the keys of a dictionary."""
-    return iter(getattr(d, _iterkeys)())
+    return iter(getattr(d, _iterkeys)(**kw))
 
-def itervalues(d):
+def itervalues(d, **kw):
     """Return an iterator over the values of a dictionary."""
-    return iter(getattr(d, _itervalues)())
+    return iter(getattr(d, _itervalues)(**kw))
 
-def iteritems(d):
+def iteritems(d, **kw):
     """Return an iterator over the (key, value) pairs of a dictionary."""
-    return iter(getattr(d, _iteritems)())
+    return iter(getattr(d, _iteritems)(**kw))
+
+def iterlists(d, **kw):
+    """Return an iterator over the (key, [values]) pairs of a dictionary."""
+    return iter(getattr(d, _iterlists)(**kw))
 
 
 if PY3:
@@ -317,17 +333,17 @@ if PY3:
     del builtins
 
 else:
-    def exec_(code, globs=None, locs=None):
+    def exec_(_code_, _globs_=None, _locs_=None):
         """Execute code in a namespace."""
-        if globs is None:
+        if _globs_ is None:
             frame = sys._getframe(1)
-            globs = frame.f_globals
-            if locs is None:
-                locs = frame.f_locals
+            _globs_ = frame.f_globals
+            if _locs_ is None:
+                _locs_ = frame.f_locals
             del frame
-        elif locs is None:
-            locs = globs
-        exec("""exec code in globs, locs""")
+        elif _locs_ is None:
+            _locs_ = _globs_
+        exec("""exec _code_ in _globs_, _locs_""")
 
 
     exec_("""def reraise(tp, value, tb=None):
@@ -391,18 +407,19 @@ def with_metaclass(meta, base=object):
 ### Additional customizations for Django ###
 
 if PY3:
-    _iterlists = "lists"
     _assertRaisesRegex = "assertRaisesRegex"
     _assertRegex = "assertRegex"
+    memoryview = memoryview
 else:
-    _iterlists = "iterlists"
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
-
-
-def iterlists(d):
-    """Return an iterator over the values of a MultiValueDict."""
-    return getattr(d, _iterlists)()
+    # memoryview and buffer are not stricly equivalent, but should be fine for
+    # django core usage (mainly BinaryField). However, Jython doesn't support
+    # buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
+    if sys.platform.startswith('java'):
+        memoryview = memoryview
+    else:
+        memoryview = buffer
 
 
 def assertRaisesRegex(self, *args, **kwargs):

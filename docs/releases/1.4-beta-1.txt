@@ -646,7 +646,7 @@ If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
 are configured and your web server serves the files correctly. The development
 server continues to serve the admin files just like before. Don't hesitate to
-consult the :doc:`static files howto </howto/static-files>` for further
+consult the :doc:`static files howto </howto/static-files/index>` for further
 details.
 
 In case your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
@@ -946,7 +946,7 @@ removed.
 The ``open`` method of the base Storage class took an obscure parameter
 ``mixin`` which allowed you to dynamically change the base classes of the
 returned file object. This has been removed. In the rare case you relied on the
-`mixin` parameter, you can easily achieve the same by overriding the `open`
+``mixin`` parameter, you can easily achieve the same by overriding the ``open``
 method, e.g.::
 
     from django.core.files import File

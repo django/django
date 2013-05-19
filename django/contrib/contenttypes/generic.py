@@ -8,18 +8,28 @@ from functools import partial
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import signals
 from django.db import models, router, DEFAULT_DB_ALIAS
-from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
+from django.db.models import signals
+from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
-from django.forms import ModelForm
-from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
+from django.db.models.sql.where import Constraint
+from django.forms import ModelForm, ALL_FIELDS
+from django.forms.models import (BaseModelFormSet, modelformset_factory, save_instance,
+    modelform_defines_fields)
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
+from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import smart_text
 
 
-class GenericForeignKey(object):
+class RenameGenericForeignKeyMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+    )
+
+
+class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
@@ -60,7 +70,7 @@ class GenericForeignKey(object):
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
-    def get_prefetch_query_set(self, instances):
+    def get_prefetch_queryset(self, instances):
         # For efficiency, group the instances by content type and then do one
         # query per model
         fk_dict = defaultdict(set)
@@ -128,9 +138,6 @@ class GenericForeignKey(object):
             return rel_obj
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("%s must be accessed via instance" % self.related.opts.object_name)
-
         ct = None
         fk = None
         if value is not None:
@@ -141,17 +148,14 @@ class GenericForeignKey(object):
         setattr(instance, self.fk_field, fk)
         setattr(instance, self.cache_attr, value)
 
-class GenericRelation(RelatedField, Field):
+class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
-        kwargs['rel'] = GenericRel(to,
-                            related_name=kwargs.pop('related_name', None),
-                            limit_choices_to=kwargs.pop('limit_choices_to', None),
-                            symmetrical=kwargs.pop('symmetrical', True))
-
-
+        kwargs['rel'] = GenericRel(
+            self, to, related_name=kwargs.pop('related_name', None),
+            limit_choices_to=kwargs.pop('limit_choices_to', None),)
         # Override content-type/object-id field names on the related class
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
         self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
@@ -159,47 +163,44 @@ class GenericRelation(RelatedField, Field):
         kwargs['blank'] = True
         kwargs['editable'] = False
         kwargs['serialize'] = False
-        Field.__init__(self, **kwargs)
+        # This construct is somewhat of an abuse of ForeignObject. This field
+        # represents a relation from pk to object_id field. But, this relation
+        # isn't direct, the join is generated reverse along foreign key. So,
+        # the from_field is object_id field, to_field is pk because of the
+        # reverse join.
+        super(GenericRelation, self).__init__(
+            to, to_fields=[],
+            from_fields=[self.object_id_field_name], **kwargs)
 
-    def get_path_info(self):
-        from_field = self.model._meta.pk
+    def resolve_related_fields(self):
+        self.to_fields = [self.model._meta.pk.name]
+        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
+                 self.model._meta.pk)]
+
+    def get_reverse_path_info(self):
         opts = self.rel.to._meta
         target = opts.get_field_by_name(self.object_id_field_name)[0]
-        # Note that we are using different field for the join_field
-        # than from_field or to_field. This is a hack, but we need the
-        # GenericRelation to generate the extra SQL.
-        return ([PathInfo(from_field, target, self.model._meta, opts, self, True, False)],
-                opts, target, self)
+        return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_choices_default(self):
-        return Field.get_choices(self, include_blank=False)
+        return super(GenericRelation, self).get_choices(include_blank=False)
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
         return smart_text([instance._get_pk_val() for instance in qs])
 
-    def m2m_db_table(self):
-        return self.rel.to._meta.db_table
-
-    def m2m_column_name(self):
-        return self.object_id_field_name
-
-    def m2m_reverse_name(self):
-        return self.rel.to._meta.pk.column
-
-    def m2m_target_field_name(self):
-        return self.model._meta.pk.name
-
-    def m2m_reverse_target_field_name(self):
-        return self.rel.to._meta.pk.name
+    def get_joining_columns(self, reverse_join=False):
+        if not reverse_join:
+            # This error message is meant for the user, and from user
+            # perspective this is a reverse join along the GenericRelation.
+            raise ValueError('Joining in reverse direction not allowed.')
+        return super(GenericRelation, self).get_joining_columns(reverse_join)
 
     def contribute_to_class(self, cls, name):
-        super(GenericRelation, self).contribute_to_class(cls, name)
-
+        super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
         # Save a reference to which model this class is on for future use
         self.model = cls
-
-        # Add the descriptor for the m2m relation
+        # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
@@ -211,21 +212,18 @@ class GenericRelation(RelatedField, Field):
     def get_internal_type(self):
         return "ManyToManyField"
 
-    def db_type(self, connection):
-        # Since we're simulating a ManyToManyField, in effect, best return the
-        # same db_type as well.
-        return None
-
     def get_content_type(self):
         """
         Returns the content type associated with this field's model.
         """
         return ContentType.objects.get_for_model(self.model)
 
-    def get_extra_join_sql(self, connection, qn, lhs_alias, rhs_alias):
-        extra_col = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0].column
-        contenttype = self.get_content_type().pk
-        return " AND %s.%s = %%s" % (qn(rhs_alias), qn(extra_col)), [contenttype]
+    def get_extra_restriction(self, where_class, alias, remote_alias):
+        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        contenttype_pk = self.get_content_type().pk
+        cond = where_class()
+        cond.add((Constraint(remote_alias, field.column, field), 'exact', contenttype_pk), 'AND')
+        return cond
 
     def bulk_related_objects(self, objs, using=DEFAULT_DB_ALIAS):
         """
@@ -265,12 +263,12 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         qn = connection.ops.quote_name
         content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance)
 
+        join_cols = self.field.get_joining_columns(reverse_join=True)[0]
         manager = RelatedManager(
             model = rel_model,
             instance = instance,
-            symmetrical = (self.field.rel.symmetrical and instance.__class__ == rel_model),
-            source_col_name = qn(self.field.m2m_column_name()),
-            target_col_name = qn(self.field.m2m_reverse_name()),
+            source_col_name = qn(join_cols[0]),
+            target_col_name = qn(join_cols[1]),
             content_type = content_type,
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name,
@@ -280,9 +278,6 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        if instance is None:
-            raise AttributeError("Manager must be accessed via instance")
-
         manager = self.__get__(instance)
         manager.clear()
         for obj in value:
@@ -316,21 +311,21 @@ def create_generic_related_manager(superclass):
                 '%s__exact' % object_id_field_name: instance._get_pk_val(),
             }
 
-        def get_query_set(self):
+        def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
                 db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
+                return super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**self.core_filters)
 
-        def get_prefetch_query_set(self, instances):
+        def get_prefetch_queryset(self, instances):
             db = self._db or router.db_for_read(self.model, instance=instances[0])
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
                 '%s__in' % self.object_id_field_name:
                     set(obj._get_pk_val() for obj in instances)
                 }
-            qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            qs = super(GenericRelatedObjectManager, self).get_queryset().using(db).filter(**query)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
@@ -370,14 +365,10 @@ def create_generic_related_manager(superclass):
 
     return GenericRelatedObjectManager
 
-class GenericRel(ManyToManyRel):
-    def __init__(self, to, related_name=None, limit_choices_to=None, symmetrical=True):
-        self.to = to
-        self.related_name = related_name
-        self.limit_choices_to = limit_choices_to or {}
-        self.symmetrical = symmetrical
-        self.multiple = True
-        self.through = None
+class GenericRel(ForeignObjectRel):
+
+    def __init__(self, field, to, related_name=None, limit_choices_to=None):
+        super(GenericRel, self).__init__(field, to, related_name, limit_choices_to)
 
 class BaseGenericInlineFormSet(BaseModelFormSet):
     """
@@ -427,7 +418,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   fields=None, exclude=None,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None,
-                                  formfield_callback=None):
+                                  formfield_callback=None, validate_max=False):
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 
@@ -449,7 +440,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                    formfield_callback=formfield_callback,
                                    formset=formset,
                                    extra=extra, can_delete=can_delete, can_order=can_order,
-                                   fields=fields, exclude=exclude, max_num=max_num)
+                                   fields=fields, exclude=exclude, max_num=max_num,
+                                   validate_max=validate_max)
     FormSet.ct_field = ct_field
     FormSet.ct_fk_field = fk_field
     return FormSet
@@ -489,6 +481,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "exclude": exclude
         }
         defaults.update(kwargs)
+
+        if defaults['fields'] is None and not modelform_defines_fields(defaults['form']):
+            defaults['fields'] = ALL_FIELDS
+
         return generic_inlineformset_factory(self.model, **defaults)
 
 class GenericStackedInline(GenericInlineModelAdmin):

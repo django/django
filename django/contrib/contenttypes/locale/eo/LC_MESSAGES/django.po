@@ -1,45 +1,45 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste  <bapdarth@yahoo.fr>, 2011.
+# Baptiste  <bapdarth@yahoo.fr>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
-"Last-Translator: Baptiste <bapdarth@yahoo.fr>\n"
-"Language-Team: Esperanto (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-09-15 19:58+0000\n"
+"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
+"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
-"Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eo\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:123
+#: models.py:130
 msgid "python model class name"
 msgstr "klasa nomo de pitona modelo"
 
-#: models.py:127
+#: models.py:134
 msgid "content type"
 msgstr "enhava tipo"
 
-#: models.py:128
+#: models.py:135
 msgid "content types"
 msgstr "enhavaj tipoj"
 
-#: views.py:15
+#: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "Objekto kun enhava tipo %(ct_id)s ne havas asociitaj modeloj"
 
-#: views.py:19
+#: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "Objekto %(obj_id)s kun enhava tipo %(ct_id)s ne ekzistas"
 
-#: views.py:25
+#: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr " %(ct_name)s objektoj ne havas metodon get_absolute_url()"

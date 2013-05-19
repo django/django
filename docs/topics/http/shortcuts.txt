@@ -51,6 +51,7 @@ Optional arguments
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
     .. versionchanged:: 1.5
+
         This parameter used to be called ``mimetype``.
 
 ``status``
@@ -129,6 +130,7 @@ Optional arguments
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
     .. versionchanged:: 1.5
+
         This parameter used to be called ``mimetype``.
 
 
@@ -169,8 +171,9 @@ This example is equivalent to::
 
    * A model: the model's `get_absolute_url()` function will be called.
 
-   * A view name, possibly with arguments: `urlresolvers.reverse()` will
-     be used to reverse-resolve the name.
+   * A view name, possibly with arguments: :func:`urlresolvers.reverse
+     <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
+     name.
 
    * A URL, which will be used as-is for the redirect location.
 

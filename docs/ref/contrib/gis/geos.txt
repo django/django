@@ -845,7 +845,7 @@ include the SRID value (in other words, EWKB).
 .. class:: WKBWriter
 
 ``WKBWriter`` provides the most control over its output.  By default it
-returns OGC-compliant WKB when it's ``write`` method is called.  However,
+returns OGC-compliant WKB when its ``write`` method is called.  However,
 it has properties that allow for the creation of EWKB, a superset of the
 WKB standard that includes additional information.
 

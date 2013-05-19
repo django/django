@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.six.moves import xrange
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
-        error_message="This is not a valid IPv6 address"):
+        error_message="This is not a valid IPv6 address."):
     """
     Cleans a IPv6 address string.
 

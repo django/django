@@ -9,7 +9,7 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 from __future__ import unicode_literals
 
-import os
+from io import BytesIO
 import socket
 import sys
 import traceback
@@ -24,8 +24,15 @@ from wsgiref.util import FileWrapper   # for backwards compatibility
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
+from django.utils import six
 
-__all__ = ['WSGIServer', 'WSGIRequestHandler']
+__all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
+
+
+# If data is too large, socket will choke, so write chunks no larger than 32MB
+# at a time. The rationale behind the 32MB can be found on Django's Trac:
+# https://code.djangoproject.com/ticket/5596#comment:4
+MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
 def get_internal_wsgi_application():
@@ -77,19 +84,9 @@ class ServerHandler(simple_server.ServerHandler, object):
             self.bytes_sent += len(data)
 
         # XXX check Content-Length and truncate if too many bytes written?
-
-        # If data is too large, socket will choke, so write chunks no larger
-        # than 32MB at a time.
-        length = len(data)
-        if length > 33554432:
-            offset = 0
-            while offset < length:
-                chunk_size = min(33554432, length)
-                self._write(data[offset:offset+chunk_size])
-                self._flush()
-                offset += chunk_size
-        else:
-            self._write(data)
+        data = BytesIO(data)
+        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), b''):
+            self._write(chunk)
             self._flush()
 
     def error_output(self, environ, start_response):
@@ -111,6 +108,8 @@ class ServerHandler(simple_server.ServerHandler, object):
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
+    request_queue_size = 10
+
     def __init__(self, *args, **kwargs):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6
@@ -121,7 +120,7 @@ class WSGIServer(simple_server.WSGIServer, object):
         try:
             super(WSGIServer, self).server_bind()
         except Exception as e:
-            raise WSGIServerException(e)
+            six.reraise(WSGIServerException, WSGIServerException(e), sys.exc_info()[2])
         self.setup_environ()
 
 

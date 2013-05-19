@@ -2,7 +2,7 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
@@ -66,12 +66,6 @@ class AdminSite(object):
         if not admin_class:
             admin_class = ModelAdmin
 
-        # Don't import the humongous validation code unless required
-        if admin_class and settings.DEBUG:
-            from django.contrib.admin.validation import validate
-        else:
-            validate = lambda model, adminclass: None
-
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -94,8 +88,8 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                # Validate (which might be a no-op)
-                validate(admin_class, model)
+                if admin_class is not ModelAdmin and settings.DEBUG:
+                    admin_class.validate(model)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
@@ -129,7 +123,7 @@ class AdminSite(object):
 
     def get_action(self, name):
         """
-        Explicitally get a registered global action wheather it's enabled or
+        Explicitly get a registered global action whether it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]
@@ -193,6 +187,8 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
+            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
+                auth_logout(request)
             if not self.has_permission(request):
                 if request.path == reverse('admin:logout',
                                            current_app=self.name):

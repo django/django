@@ -19,7 +19,7 @@ only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
 `PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
 
-.. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
+.. _PostgreSQL custom types: http://www.postgresql.org/docs/current/interactive/sql-createtype.html
 
 Alternatively, you may have a complex Python object that can somehow be
 serialized to fit into a standard database column type. This is another case
@@ -222,9 +222,9 @@ parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* ``auto_created``: True if the field was
-  automatically created, as for the `OneToOneField` used by model
-  inheritance. For advanced use only.
+* ``auto_created``: ``True`` if the field was automatically created, as for the
+  :class:`~django.db.models.OneToOneField` used by model inheritance. For
+  advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation

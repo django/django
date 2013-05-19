@@ -5,284 +5,303 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:34+0100\n"
-"PO-Revision-Date: 2012-03-16 19:56+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
-"Language-Team: Swahili (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:52+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
-"Language: sw\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: sw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Umefuta %(items)s %(count)d kwa mafanikio."
+msgstr "Umefanikiwa kufuta %(items)s %(count)d."
 
-#: actions.py:60 options.py:1295
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Huwezi kufuta %(name)s"
 
-#: actions.py:62 options.py:1297
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "Una uhakika?"
 
 #: actions.py:83
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Futa %(verbose_name_plural)s teule"
 
-#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
 msgstr "yote"
 
-#: filters.py:232
+#: filters.py:238
 msgid "Yes"
 msgstr "Ndiyo"
 
-#: filters.py:233
+#: filters.py:239
 msgid "No"
 msgstr "Hapana"
 
-#: filters.py:247
+#: filters.py:253
 msgid "Unknown"
 msgstr "Haijulikani"
 
-#: filters.py:306
+#: filters.py:308
 msgid "Any date"
 msgstr "Tarehe yoyote"
 
-#: filters.py:307
+#: filters.py:309
 msgid "Today"
 msgstr "Leo"
 
-#: filters.py:311
+#: filters.py:313
 msgid "Past 7 days"
 msgstr "Siku 7 zilizopita"
 
-#: filters.py:315
+#: filters.py:317
 msgid "This month"
 msgstr "mwezi huu"
 
-#: filters.py:319
+#: filters.py:321
 msgid "This year"
 msgstr "Mwaka huu"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
 
-#: forms.py:18
+#: forms.py:19
 msgid "Please log in again, because your session has expired."
 msgstr "Tafadhali ingia tena, kwani kipindi chako cha matumizi kimekwisha."
 
-#: forms.py:37
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-"Anuani yako ya baruapepe si jina lako la mtumiaji. Badala yake jaribu '%s'."
-
-#: helpers.py:20
+#: helpers.py:23
 msgid "Action:"
 msgstr "Tendo"
 
-#: models.py:19
+#: models.py:24
 msgid "action time"
 msgstr "muda wa tendo"
 
-#: models.py:22
+#: models.py:27
 msgid "object id"
-msgstr ""
+msgstr "Kitambulisho cha kitu"
 
-#: models.py:23
+#: models.py:28
 msgid "object repr"
-msgstr ""
+msgstr "`repr` ya kitu"
 
-#: models.py:24
+#: models.py:29
 msgid "action flag"
-msgstr ""
+msgstr "bendera ya tendo"
 
-#: models.py:25
+#: models.py:30
 msgid "change message"
 msgstr "badilisha ujumbe"
 
-#: models.py:30
+#: models.py:35
 msgid "log entry"
-msgstr ""
+msgstr "ingizo kwenye kumbukumbu"
 
-#: models.py:31
+#: models.py:36
 msgid "log entries"
-msgstr ""
+msgstr "maingizo kwenye kumbukumbu"
 
-#: models.py:40
+#: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Kuongezwa kwa \"%(object)s\"."
 
-#: models.py:42
+#: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Kubadilishwa kwa \"%(object)s\" - %(changes)s"
 
-#: models.py:44
+#: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Kufutwa kwa \"%(object)s\"."
 
-#: models.py:46
+#: models.py:54
 msgid "LogEntry Object"
-msgstr ""
+msgstr "Kitu cha Ingizo la Kumbukumbu"
 
-#: options.py:150 options.py:166
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "Hakuna"
 
-#: options.py:671
+#: options.py:684
 #, python-format
 msgid "Changed %s."
-msgstr ""
+msgstr "Mabadiliko ya %s."
 
-#: options.py:671 options.py:681
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "na"
 
-#: options.py:676
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Ingizo la \"%(object)s\" %(name)s "
 
-#: options.py:680
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Mabadiliko %(list)s kwa \"%(object)s\\v %(name)s."
 
-#: options.py:685
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Kumefutwa \"%(object)s\" %(name)s."
 
-#: options.py:689
+#: options.py:702
 msgid "No fields changed."
-msgstr "Hakuna sehemu zilizobadilishwa"
+msgstr "Hakuna uga uliobadilishwa."
 
-#: options.py:772
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
-
-#: options.py:776 options.py:824
-msgid "You may edit it again below."
-msgstr "unaweza kuhariri tena hapo chini."
-
-#: options.py:788 options.py:837
-#, python-format
-msgid "You may add another %s below."
-msgstr "Unaweza kuongeza tena %s hapo chini."
-
-#: options.py:822
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
-
-#: options.py:830
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"Ingizo la \"%(obj)s\" %(name)s limefanyika kwa mafanikio. Unaweza "
+"kuhariritena hapo chini."
 
-#: options.py:899 options.py:1159
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "Ingizo la \"%(obj)s\" %(name)s limefanyika kwa mafanikio."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "Mabadiliko ya \"%(obj)s\" %(name)s yamefanikiwa."
+
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Nilazima kuchagua vitu ili kufanyia kitu fulani. Hakuna kitu "
+"kilichochaguliwa."
 
-#: options.py:918
+#: options.py:970
 msgid "No action selected."
 msgstr "Hakuna tendo lililochaguliwa"
 
-#: options.py:998
+#: options.py:1050
 #, python-format
 msgid "Add %s"
-msgstr "ongeza %s"
+msgstr "Ongeza %s"
 
-#: options.py:1023 options.py:1267
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Hakuna %(name)s yenye `primary key` %(key)r."
 
-#: options.py:1089
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "Badilisha %s"
 
-#: options.py:1138
+#: options.py:1190
 msgid "Database error"
-msgstr ""
+msgstr "Hitilafu katika hifadhidata"
 
-#: options.py:1201
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "mabadiliko ya %(name)s %(count)s yamefanikiwa."
+msgstr[1] "mabadiliko ya %(name)s %(count)s yamefanikiwa."
 
-#: options.py:1228
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s kuchaguliwa"
+msgstr[1] "%(total_count)s (kila kitu) kuchaguliwa"
 
-#: options.py:1233
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "Vilivyo chaguliwa ni 0 kati ya %(cnt)s"
 
-#: options.py:1283
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Ufutaji wa \"%(obj)s\" %(name)s umefanikiwa."
 
-#: options.py:1330
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "Badilisha historia: %s"
 
-#: sites.py:315 tests.py:61 templates/admin/login.html:49
-#: templates/registration/password_reset_complete.html:20
-#: views/decorators.py:23
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
 msgid "Log in"
 msgstr "Ingia"
 
-#: sites.py:380
+#: sites.py:388
 msgid "Site administration"
 msgstr "Utawala wa tovuti"
 
-#: sites.py:432
+#: sites.py:440
 #, python-format
 msgid "%s administration"
 msgstr "utawala %s"
 
-#: widgets.py:87
+#: widgets.py:90
 msgid "Date:"
 msgstr "Tarehe"
 
-#: widgets.py:87
+#: widgets.py:91
 msgid "Time:"
 msgstr "Saa"
 
-#: widgets.py:161
+#: widgets.py:165
 msgid "Lookup"
-msgstr ""
+msgstr "`Lookup`"
 
-#: widgets.py:267
+#: widgets.py:271
 msgid "Add Another"
 msgstr "Ongeza"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr ""
+
+#: widgets.py:317
+msgid "Change:"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -292,39 +311,39 @@ msgstr "Ukurasa haujapatikana"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Samahani, ukurasa uliohitajika haukupatikana."
 
-#: templates/admin/500.html:7 templates/admin/app_index.html:8
-#: templates/admin/base.html:45 templates/admin/change_form.html:21
-#: templates/admin/change_list.html:43
-#: templates/admin/delete_confirmation.html:8
-#: templates/admin/delete_selected_confirmation.html:8
-#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
-#: templates/admin/auth/user/change_password.html:15
-#: templates/registration/logged_out.html:5
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:7
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Sebule"
 
-#: templates/admin/500.html:8
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "Hitilafu ya seva"
 
-#: templates/admin/500.html:12
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Hitilafu ya seva (500)"
 
-#: templates/admin/500.html:15
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Hitilafu ya seva <em>(500)</em>"
 
-#: templates/admin/500.html:16
+#: templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
 #: templates/admin/actions.html:4
@@ -348,7 +367,7 @@ msgstr "Chagua kila %(module_name)s, (%(total_count)s). "
 msgid "Clear selection"
 msgstr "Safisha chaguo"
 
-#: templates/admin/app_index.html:11 templates/admin/index.html:19
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -358,22 +377,22 @@ msgid "Welcome,"
 msgstr "Karibu"
 
 #: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "Nyaraka"
 
-#: templates/admin/base.html:35
-#: templates/admin/auth/user/change_password.html:19
-#: templates/admin/auth/user/change_password.html:53
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Badilisha nenosiri"
 
-#: templates/admin/base.html:36
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Toka"
 
@@ -385,35 +404,35 @@ msgstr "Utawala wa tovuti ya django"
 msgid "Django administration"
 msgstr "Utawala wa Django"
 
-#: templates/admin/change_form.html:24 templates/admin/index.html:29
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
 msgid "Add"
 msgstr "Ongeza"
 
-#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
 msgid "History"
 msgstr "Historia"
 
-#: templates/admin/change_form.html:35
+#: templates/admin/change_form.html:33
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Ona kwenye tovuti"
 
-#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
-#: templates/admin/login.html:18
-#: templates/admin/auth/user/change_password.html:29
-#: templates/registration/password_change_form.html:21
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Tafadhali sahihisha kosa lifuatalo"
 msgstr[1] "Tafadhali sahihisha makosa yafuatayo "
 
-#: templates/admin/change_list.html:60
+#: templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Ongeza %(name)s"
 
-#: templates/admin/change_list.html:80
+#: templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Chuja"
 
@@ -424,136 +443,149 @@ msgstr "Ondoa katika upangaji"
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "Kipaumbele katika mpangilio: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "Geuza mpangilio"
 
-#: templates/admin/delete_confirmation.html:12
+#: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Futa"
 
-#: templates/admin/delete_confirmation.html:19
+#: templates/admin/delete_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"Kufutwa kwa '%(escaped_object)s' %(object_name)s  kutasababisha kufutwa kwa "
+"vitu vinavyohuisana, lakini akaunti yako haina ruhusa ya kufuta vitu vya "
+"aina zifuatazo:"
 
-#: templates/admin/delete_confirmation.html:27
+#: templates/admin/delete_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Kufuta '%(escaped_object)s' %(object_name)s  kutahitaji kufuta vitu "
+"vifuatavyo ambavyo vinavyohuisana na vimelindwa:"
 
-#: templates/admin/delete_confirmation.html:35
+#: templates/admin/delete_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Una uhakika kuwa unataka kufuta \"%(escaped_object)s\" %(object_name)s ? "
+"Vitu vyote vinavyohuisana kati ya vifuatavyo vitafutwa:"
 
-#: templates/admin/delete_confirmation.html:40
-#: templates/admin/delete_selected_confirmation.html:45
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
 msgid "Yes, I'm sure"
 msgstr "Ndiyo, Nina uhakika"
 
-#: templates/admin/delete_selected_confirmation.html:11
+#: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
 msgstr "Futa viumbile mbalimbali"
 
-#: templates/admin/delete_selected_confirmation.html:18
+#: templates/admin/delete_selected_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Kufutwa kwa %(objects_name)s chaguliwa kutasababisha kufutwa kwa "
+"vituvinavyohusiana, lakini akaunti yako haina ruhusa ya kufuta vitu vya "
+"vifuatavyo:"
 
-#: templates/admin/delete_selected_confirmation.html:26
+#: templates/admin/delete_selected_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Kufutwa kwa %(objects_name)s kutahitaji kufutwa kwa vitu vifuatavyo vyenye "
+"uhusiano na vilivyolindwa:"
 
-#: templates/admin/delete_selected_confirmation.html:34
+#: templates/admin/delete_selected_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Una uhakika kuwa unataka kufuta %(objects_name)s chaguliwa ? Vitu vyote kati "
+"ya vifuatavyo vinavyohusiana vitafutwa:"
 
 #: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " Kwa %(filter_title)s"
 
-#: templates/admin/index.html:18
+#: templates/admin/index.html:20
 #, python-format
-msgid "Models available in the %(name)s application."
+msgid "Models in the %(name)s application"
 msgstr ""
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:39
 msgid "Change"
 msgstr "Badilisha"
 
-#: templates/admin/index.html:45
+#: templates/admin/index.html:49
 msgid "You don't have permission to edit anything."
 msgstr "Huna ruhusa ya kuhariri chochote"
 
-#: templates/admin/index.html:53
+#: templates/admin/index.html:57
 msgid "Recent Actions"
 msgstr "Matendo ya hivi karibuni"
 
-#: templates/admin/index.html:54
+#: templates/admin/index.html:58
 msgid "My Actions"
 msgstr "Matendo yangu"
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "None available"
 msgstr "Hakuna kilichopatikana"
 
-#: templates/admin/index.html:72
+#: templates/admin/index.html:76
 msgid "Unknown content"
 msgstr "Maudhui hayajulikani"
 
-#: templates/admin/invalid_setup.html:13
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Kuna tatizo limetokea katika usanikishaji wako wa hifadhidata. Hakikisha "
+"kuwa majedwali sahihi ya hifadhidata yameundwa, na hakikisha hifadhidata "
+"inaweza kusomwana mtumiaji sahihi."
 
-#: templates/admin/login.html:34
-msgid "Username:"
-msgstr "Jina la mtumiaji"
-
-#: templates/admin/login.html:38
+#: templates/admin/login.html:37
 msgid "Password:"
 msgstr "nenosiri"
 
-#: templates/admin/login.html:45
+#: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
 msgstr "Umesahau jina na nenosiri lako?"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:23
 msgid "Date/time"
 msgstr "Tarehe/saa"
 
-#: templates/admin/object_history.html:25
+#: templates/admin/object_history.html:24
 msgid "User"
 msgstr "Mtumiaji"
 
-#: templates/admin/object_history.html:26
+#: templates/admin/object_history.html:25
 msgid "Action"
 msgstr "Tendo"
 
-#: templates/admin/object_history.html:40
+#: templates/admin/object_history.html:39
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -609,64 +641,64 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "Ingiza jina la mtumiaji na nenosiri."
 
-#: templates/admin/auth/user/change_password.html:33
+#: templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ingiza nenosiri la mtumiaji <strong>%(username)s</strong>."
 
-#: templates/admin/auth/user/change_password.html:40
+#: templates/admin/auth/user/change_password.html:38
 msgid "Password"
 msgstr "Nenosiri"
 
-#: templates/admin/auth/user/change_password.html:46
-#: templates/registration/password_change_form.html:43
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
 msgid "Password (again)"
 msgstr "Nenosiri (tena)"
 
-#: templates/admin/auth/user/change_password.html:47
+#: templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
 msgstr "Ingiza nenosiri linalofanana na la juu, kwa uthibitisho."
 
-#: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:115
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Ondoa"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Ongeza %(verbose_name)s"
-
-#: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:118
-msgid "Remove"
-msgstr "Ondoa"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Futa?"
 
-#: templates/registration/logged_out.html:9
+#: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ahsante kwa kutumia muda wako katika Tovuti yetu leo. "
 
-#: templates/registration/logged_out.html:11
+#: templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "ingia tena"
 
-#: templates/registration/password_change_done.html:8
-#: templates/registration/password_change_form.html:9
-#: templates/registration/password_change_form.html:13
-#: templates/registration/password_change_form.html:25
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
 msgid "Password change"
 msgstr "Badilisha nenosiri"
 
-#: templates/registration/password_change_done.html:12
-#: templates/registration/password_change_done.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
 msgid "Password change successful"
 msgstr "Ubadilishaji wa nenosiri umefanikiwa"
 
-#: templates/registration/password_change_done.html:18
+#: templates/registration/password_change_done.html:17
 msgid "Your password was changed."
 msgstr "Nenosiri lako lilibadilishwa"
 
-#: templates/registration/password_change_form.html:27
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -675,46 +707,46 @@ msgstr ""
 "nenosiri jipya mara mbili ili tuweze kuthibitisha kuwa umelichapisha kwa "
 "usahihi."
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "Nenosiri la zamani"
 
-#: templates/registration/password_change_form.html:38
+#: templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "Nenosiri jipya"
 
-#: templates/registration/password_change_form.html:49
-#: templates/registration/password_reset_confirm.html:27
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
 msgid "Change my password"
 msgstr "Badilisha nenosiri langu"
 
-#: templates/registration/password_reset_complete.html:8
-#: templates/registration/password_reset_confirm.html:12
-#: templates/registration/password_reset_done.html:8
-#: templates/registration/password_reset_form.html:8
-#: templates/registration/password_reset_form.html:12
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
 msgid "Password reset"
 msgstr "Kuseti upya nenosiri"
 
-#: templates/registration/password_reset_complete.html:12
-#: templates/registration/password_reset_complete.html:16
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
 msgid "Password reset complete"
 msgstr "Kuseti upya nenosiri kumekamilika"
 
-#: templates/registration/password_reset_complete.html:18
+#: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Nenosiri lako limesetiwa. Unaweza kuendelea na kuingia sasa."
 
-#: templates/registration/password_reset_confirm.html:8
+#: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Uthibitisho wa kuseti upya nenosiri"
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:17
 msgid "Enter new password"
 msgstr "Ingiza nenosiri"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:19
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -722,19 +754,19 @@ msgstr ""
 "Tafadhali ingiza nenosiri mara mbili ili tuweze kuthibitisha kuwa "
 "umelichapisha kwa usahihi."
 
-#: templates/registration/password_reset_confirm.html:24
+#: templates/registration/password_reset_confirm.html:23
 msgid "New password:"
 msgstr "Nenosiri jipya"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:25
 msgid "Confirm password:"
 msgstr "Thibitisha nenosiri"
 
-#: templates/registration/password_reset_confirm.html:32
+#: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
 msgstr "Kuseti upya nenosiri hakujafanikiwa"
 
-#: templates/registration/password_reset_confirm.html:34
+#: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -742,27 +774,23 @@ msgstr ""
 "Kiungo cha kuseti upya nenosiri ni batili, inawezekana ni kwa sababu kiungo "
 "hicho tayari kimetumika. tafadhali omba upya kuseti nenosiri"
 
-#: templates/registration/password_reset_done.html:12
-#: templates/registration/password_reset_done.html:16
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
 msgstr "Kuseti upya nenosiri kumefaninikiwa"
 
-#: templates/registration/password_reset_done.html:18
+#: templates/registration/password_reset_done.html:17
 msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
+"We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Tumekutumia maelekezo ya kuseti nenosiri lako kwenda anuani ya barua pepe "
-"uliyotupatia. Unatakiwa kuipata ndani ya muda mfupi. "
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your "
+"You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Unapokea baruapepe hii kwa sababu umeomba kuseti upya nenosiri lako kwa "
-"ajili ya akaunti ya %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -781,36 +809,34 @@ msgstr "Ahsante kwa kutumia tovui yetu!"
 msgid "The %(site_name)s team"
 msgstr "timu ya %(site_name)s"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:17
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Umesahau nenosiri lako? Ingiza anuani yako ya baruapepe hapo chini "
-"nasitutakutumia maelekezo ya kuseti nenosiri jipya."
 
-#: templates/registration/password_reset_form.html:22
-msgid "E-mail address:"
-msgstr "Anuani ya Baruapepe"
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr ""
 
-#: templates/registration/password_reset_form.html:22
+#: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "Seti upya nenosiri langu"
 
-#: templatetags/admin_list.py:336
+#: templatetags/admin_list.py:344
 msgid "All dates"
 msgstr "Tarehe zote"
 
-#: views/main.py:31
+#: views/main.py:33
 msgid "(None)"
 msgstr "(Hakuna)"
 
-#: views/main.py:74
+#: views/main.py:76
 #, python-format
 msgid "Select %s"
 msgstr "Chagua %s"
 
-#: views/main.py:76
+#: views/main.py:78
 #, python-format
 msgid "Select %s to change"
 msgstr "Chaguo %s kwa mabadilisho"

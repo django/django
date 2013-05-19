@@ -6,7 +6,7 @@ try:
 except ImportError:
     import pickle
 
-from django.core.cache.backends.base import BaseCache
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.utils.synch import RWLock
 
 # Global in-memory store of cache data. Keyed by name, to provide
@@ -23,7 +23,7 @@ class LocMemCache(BaseCache):
         self._expire_info = _expire_info.setdefault(name, {})
         self._lock = _locks.setdefault(name, RWLock())
 
-    def add(self, key, value, timeout=None, version=None):
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.writer():
@@ -41,10 +41,8 @@ class LocMemCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.reader():
-            exp = self._expire_info.get(key)
-            if exp is None:
-                return default
-            elif exp > time.time():
+            exp = self._expire_info.get(key, 0)
+            if exp is None or exp > time.time():
                 try:
                     pickled = self._cache[key]
                     return pickle.loads(pickled)
@@ -58,15 +56,16 @@ class LocMemCache(BaseCache):
                 pass
             return default
 
-    def _set(self, key, value, timeout=None):
+    def _set(self, key, value, timeout=DEFAULT_TIMEOUT):
         if len(self._cache) >= self._max_entries:
             self._cull()
-        if timeout is None:
+        if timeout == DEFAULT_TIMEOUT:
             timeout = self.default_timeout
+        expiry = None if timeout is None else time.time() + timeout
         self._cache[key] = value
-        self._expire_info[key] = time.time() + timeout
+        self._expire_info[key] = expiry
 
-    def set(self, key, value, timeout=None, version=None):
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.writer():

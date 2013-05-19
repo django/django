@@ -261,13 +261,13 @@ class QuerySet(object):
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
-            fields = self.model._meta.fields
+            fields = self.model._meta.concrete_fields
 
         load_fields = []
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_fields_with_model():
+            for field, model in self.model._meta.get_concrete_fields_with_model():
                 if model is None:
                     model = self.model
                 try:
@@ -280,7 +280,7 @@ class QuerySet(object):
                     load_fields.append(field.name)
 
         index_start = len(extra_select)
-        aggregate_start = index_start + len(load_fields or self.model._meta.fields)
+        aggregate_start = index_start + len(load_fields or self.model._meta.concrete_fields)
 
         skip = None
         if load_fields and not fill_cache:
@@ -430,12 +430,7 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_fields
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
@@ -446,13 +441,6 @@ class QuerySet(object):
                 if objs_without_pk:
                     fields= [f for f in fields if not isinstance(f, AutoField)]
                     self._batched_insert(objs_without_pk, fields, batch_size)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
 
         return objs
 
@@ -474,14 +462,14 @@ class QuerySet(object):
             return self.get(**lookup), False
         except self.model.DoesNotExist:
             try:
-                params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+                params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
                 params.update(defaults)
                 obj = self.model(**params)
                 sid = transaction.savepoint(using=self.db)
                 obj.save(force_insert=True, using=self.db)
                 transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
-            except IntegrityError as e:
+            except IntegrityError:
                 transaction.savepoint_rollback(sid, using=self.db)
                 exc_info = sys.exc_info()
                 try:
@@ -569,20 +557,8 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(None)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -893,7 +869,7 @@ class QuerySet(object):
         """
         if self.query.extra_order_by or self.query.order_by:
             return True
-        elif self.query.default_ordering and self.query.model._meta.ordering:
+        elif self.query.default_ordering and self.query.get_meta().ordering:
             return True
         else:
             return False
@@ -986,7 +962,7 @@ class QuerySet(object):
         """
         opts = self.model._meta
         if self.query.group_by is None:
-            field_names = [f.attname for f in opts.fields]
+            field_names = [f.attname for f in opts.concrete_fields]
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
@@ -1079,7 +1055,7 @@ class ValuesQuerySet(QuerySet):
         else:
             # Default to all fields.
             self.extra_names = None
-            self.field_names = [f.attname for f in self.model._meta.fields]
+            self.field_names = [f.attname for f in self.model._meta.concrete_fields]
             self.aggregate_names = None
 
         self.query.select = []
@@ -1290,7 +1266,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_fields_with_model():
+        for field, model in klass._meta.get_concrete_fields_with_model():
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1309,22 +1285,22 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     else:
         # Load all fields on klass
 
-        field_count = len(klass._meta.fields)
+        field_count = len(klass._meta.concrete_fields)
         # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_fields) != len(klass._meta.fields):
+        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
                                if not issubclass(from_parent, p)]
             # Load local fields, too...
             non_seen_models.append(klass)
-            field_names = [f.attname for f in klass._meta.fields
+            field_names = [f.attname for f in klass._meta.concrete_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
         # Try to avoid populating field_names variable for perfomance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
-        if field_count == len(klass._meta.fields):
+        if field_count == len(klass._meta.concrete_fields):
             field_names = ()
 
     restricted = requested is not None
@@ -1721,9 +1697,9 @@ def prefetch_related_objects(result_cache, related_lookups):
 def get_prefetcher(instance, attr):
     """
     For the attribute 'attr' on the given instance, finds
-    an object that has a get_prefetch_query_set().
+    an object that has a get_prefetch_queryset().
     Returns a 4 tuple containing:
-    (the object with get_prefetch_query_set (or None),
+    (the object with get_prefetch_queryset (or None),
      the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
      a boolean that is True if the attribute has already been fetched)
@@ -1746,8 +1722,8 @@ def get_prefetcher(instance, attr):
         attr_found = True
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
-            # get_prefetch_query_set() method.
-            if hasattr(rel_obj_descriptor, 'get_prefetch_query_set'):
+            # get_prefetch_queryset() method.
+            if hasattr(rel_obj_descriptor, 'get_prefetch_queryset'):
                 prefetcher = rel_obj_descriptor
                 if rel_obj_descriptor.is_cached(instance):
                     is_fetched = True
@@ -1756,7 +1732,7 @@ def get_prefetcher(instance, attr):
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, attr)
-                if hasattr(rel_obj, 'get_prefetch_query_set'):
+                if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
@@ -1772,7 +1748,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     prefetches that must be done due to prefetch_related lookups
     found from default managers.
     """
-    # prefetcher must have a method get_prefetch_query_set() which takes a list
+    # prefetcher must have a method get_prefetch_queryset() which takes a list
     # of instances, and returns a tuple:
 
     # (queryset of instances of self.model that are related to passed in instances,
@@ -1785,7 +1761,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     # in a dictionary.
 
     rel_qs, rel_obj_attr, instance_attr, single, cache_name =\
-        prefetcher.get_prefetch_query_set(instances)
+        prefetcher.get_prefetch_queryset(instances)
     # We have to handle the possibility that the default manager itself added
     # prefetch_related lookups to the QuerySet we just got back. We don't want to
     # trigger the prefetch_related functionality by evaluating the query.

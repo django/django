@@ -12,7 +12,7 @@ editing content:
 
 .. note::
 
-    Some of the examples on this page assume that an ``Article`` model has been
+    Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
         from django.core.urlresolvers import reverse
@@ -110,6 +110,7 @@ CreateView
 
         class AuthorCreate(CreateView):
             model = Author
+            fields = ['name']
 
 UpdateView
 ----------
@@ -152,6 +153,7 @@ UpdateView
 
         class AuthorUpdate(UpdateView):
             model = Author
+            fields = ['name']
 
 DeleteView
 ----------

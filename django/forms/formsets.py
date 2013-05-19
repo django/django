@@ -9,7 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
-from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext as _
 
 
 __all__ = ('BaseFormSet', 'all_valid')
@@ -33,6 +33,9 @@ class ManagementForm(Form):
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
+        # MAX_NUM_FORM_COUNT is output with the rest of the management form,
+        # but only for the convenience of client-side code. The POST
+        # value of MAX_NUM_FORM_COUNT returned from the client is not checked.
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
@@ -94,7 +97,11 @@ class BaseFormSet(object):
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
         if self.is_bound:
-            return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
+            # return absolute_max if it is lower than the actual total form
+            # count in the data; this is DoS protection to prevent clients
+            # from forcing the server to instantiate arbitrary numbers of
+            # forms
+            return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
             total_forms = initial_forms + self.extra
@@ -111,16 +118,15 @@ class BaseFormSet(object):
         if self.is_bound:
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
-            # Use the length of the inital data if it's there, 0 otherwise.
-            initial_forms = self.initial and len(self.initial) or 0
-            if initial_forms > self.max_num >= 0:
-                initial_forms = self.max_num
+            # Use the length of the initial data if it's there, 0 otherwise.
+            initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
     def _construct_forms(self):
         # instantiate all the forms and put them in self.forms
         self.forms = []
-        for i in xrange(min(self.total_form_count(), self.absolute_max)):
+        # DoS protection is included in total_form_count()
+        for i in xrange(self.total_form_count()):
             self.forms.append(self._construct_form(i))
 
     def _construct_form(self, i, **kwargs):
@@ -168,7 +174,6 @@ class BaseFormSet(object):
         self.add_fields(form, None)
         return form
 
-    # Maybe this should just go away?
     @property
     def cleaned_data(self):
         """
@@ -245,9 +250,9 @@ class BaseFormSet(object):
         form -- i.e., from formset.clean(). Returns an empty ErrorList if there
         are none.
         """
-        if self._non_form_errors is not None:
-            return self._non_form_errors
-        return self.error_class()
+        if self._non_form_errors is None:
+            self.full_clean()
+        return self._non_form_errors
 
     @property
     def errors(self):
@@ -286,16 +291,24 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors.
+        Cleans all of self.data and populates self._errors and
+        self._non_form_errors.
         """
         self._errors = []
+        self._non_form_errors = self.error_class()
+
         if not self.is_bound: # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             self._errors.append(form.errors)
-        # Give self.clean() a chance to do cross-form validation.
         try:
+            if (self.validate_max and self.total_form_count() > self.max_num) or \
+                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                raise ValidationError(ungettext(
+                    "Please submit %d or fewer forms.",
+                    "Please submit %d or fewer forms.", self.max_num) % self.max_num)
+            # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
             self._non_form_errors = self.error_class(e.messages)
@@ -367,16 +380,18 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None):
+                    can_delete=False, max_num=None, validate_max=False):
     """Return a FormSet for the given form class."""
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
-    # limit defaults to DEFAULT_MAX_NUM, but developer can increase it via max_num
-    absolute_max = max(DEFAULT_MAX_NUM, max_num)
+    # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
+    # if max_num is None in the first place)
+    absolute_max = max_num + DEFAULT_MAX_NUM
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num, 'absolute_max': absolute_max}
+             'max_num': max_num, 'absolute_max': absolute_max,
+             'validate_max' : validate_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
 
 def all_valid(formsets):

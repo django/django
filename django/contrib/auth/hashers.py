@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
+import binascii
 import hashlib
 
 from django.dispatch import receiver
@@ -8,7 +9,7 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
@@ -127,9 +128,14 @@ def identify_hasher(encoded):
     get_hasher() to return hasher. Raises ValueError if
     algorithm cannot be identified, or if hasher is not loaded.
     """
+    # Ancient versions of Django created plain MD5 passwords and accepted
+    # MD5 passwords with an empty salt.
     if ((len(encoded) == 32 and '$' not in encoded) or
             (len(encoded) == 37 and encoded.startswith('md5$$'))):
         algorithm = 'unsalted_md5'
+    # Ancient versions of Django accepted SHA1 passwords with an empty salt.
+    elif len(encoded) == 46 and encoded.startswith('sha1$$'):
+        algorithm = 'unsalted_sha1'
     else:
         algorithm = encoded.split('$', 1)[0]
     return get_hasher(algorithm)
@@ -252,17 +258,18 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     digest = hashlib.sha1
 
 
-class BCryptPasswordHasher(BasePasswordHasher):
+class BCryptSHA256PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the bcrypt algorithm (recommended)
 
     This is considered by many to be the most secure algorithm but you
-    must first install the py-bcrypt library.  Please be warned that
+    must first install the bcrypt library.  Please be warned that
     this library depends on native C code and might cause portability
     issues.
     """
-    algorithm = "bcrypt"
-    library = ("py-bcrypt", "bcrypt")
+    algorithm = "bcrypt_sha256"
+    digest = hashlib.sha256
+    library = ("bcrypt", "bcrypt")
     rounds = 12
 
     def salt(self):
@@ -273,14 +280,37 @@ class BCryptPasswordHasher(BasePasswordHasher):
         bcrypt = self._load_library()
         # Need to reevaluate the force_bytes call once bcrypt is supported on
         # Python 3
-        data = bcrypt.hashpw(force_bytes(password), salt)
-        return "%s$%s" % (self.algorithm, data)
+
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        data = bcrypt.hashpw(password, salt)
+        return "%s$%s" % (self.algorithm, force_text(data))
 
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
         bcrypt = self._load_library()
-        return constant_time_compare(data, bcrypt.hashpw(force_bytes(password), data))
+
+        # Hash the password prior to using bcrypt to prevent password truncation
+        #   See: https://code.djangoproject.com/ticket/20138
+        if self.digest is not None:
+            # We use binascii.hexlify here because Python3 decided that a hex encoded
+            #   bytestring is somehow a unicode.
+            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
+        else:
+            password = force_bytes(password)
+
+        # Ensure that our data is a bytestring
+        data = force_bytes(data)
+
+        return constant_time_compare(data, bcrypt.hashpw(password, data))
 
     def safe_summary(self, encoded):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
@@ -292,6 +322,25 @@ class BCryptPasswordHasher(BasePasswordHasher):
             (_('salt'), mask_hash(salt)),
             (_('checksum'), mask_hash(checksum)),
         ])
+
+
+class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
+    """
+    Secure password hashing using the bcrypt algorithm
+
+    This is considered by many to be the most secure algorithm but you
+    must first install the bcrypt library.  Please be warned that
+    this library depends on native C code and might cause portability
+    issues.
+
+    This hasher does not first hash the password which means it is subject to
+    the 72 character bcrypt password truncation, most use cases should prefer
+    the BCryptSha512PasswordHasher.
+
+    See: https://code.djangoproject.com/ticket/20138
+    """
+    algorithm = "bcrypt"
+    digest = None
 
 
 class SHA1PasswordHasher(BasePasswordHasher):
@@ -350,14 +399,48 @@ class MD5PasswordHasher(BasePasswordHasher):
         ])
 
 
+class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
+    """
+    Very insecure algorithm that you should *never* use; stores SHA1 hashes
+    with an empty salt.
+
+    This class is implemented because Django used to accept such password
+    hashes. Some older Django installs still have these values lingering
+    around so we need to handle and upgrade them properly.
+    """
+    algorithm = "unsalted_sha1"
+
+    def salt(self):
+        return ''
+
+    def encode(self, password, salt):
+        assert salt == ''
+        hash = hashlib.sha1(force_bytes(password)).hexdigest()
+        return 'sha1$$%s' % hash
+
+    def verify(self, password, encoded):
+        encoded_2 = self.encode(password, '')
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        assert encoded.startswith('sha1$$')
+        hash = encoded[6:]
+        return SortedDict([
+            (_('algorithm'), self.algorithm),
+            (_('hash'), mask_hash(hash)),
+        ])
+
+
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
-    I am an incredibly insecure algorithm you should *never* use;
-    stores unsalted MD5 hashes without the algorithm prefix.
+    Incredibly insecure algorithm that you should *never* use; stores unsalted
+    MD5 hashes without the algorithm prefix, also accepts MD5 hashes with an
+    empty salt.
 
-    This class is implemented because Django used to store passwords
-    this way. Some older Django installs still have these values
-    lingering around so we need to handle and upgrade them properly.
+    This class is implemented because Django used to store passwords this way
+    and to accept such password hashes. Some older Django installs still have
+    these values lingering around so we need to handle and upgrade them
+    properly.
     """
     algorithm = "unsalted_md5"
 
@@ -365,6 +448,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
+        assert salt == ''
         return hashlib.md5(force_bytes(password)).hexdigest()
 
     def verify(self, password, encoded):

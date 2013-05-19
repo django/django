@@ -7,7 +7,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
 PathInfo = namedtuple('PathInfo',
-                      'from_field to_field from_opts to_opts join_field '
+                      'from_opts to_opts target_fields join_field '
                       'm2m direct')
 
 class RelatedObject(object):
@@ -27,7 +27,7 @@ class RelatedObject(object):
         Analogue of django.db.models.fields.Field.get_choices, provided
         initially for utilisation by RelatedFieldListFilter.
         """
-        first_choice = include_blank and blank_choice or []
+        first_choice = blank_choice if include_blank else []
         queryset = self.model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(

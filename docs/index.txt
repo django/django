@@ -45,7 +45,8 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 2 <intro/tutorial02>` |
   :doc:`Part 3 <intro/tutorial03>` |
   :doc:`Part 4 <intro/tutorial04>` |
-  :doc:`Part 5 <intro/tutorial05>`
+  :doc:`Part 5 <intro/tutorial05>` |
+  :doc:`Part 6 <intro/tutorial06>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -98,6 +99,7 @@ to know about views via the links below:
   :doc:`Decorators <topics/http/decorators>`
 
 * **Reference:**
+  :doc:`Built-in Views <ref/views>` |
   :doc:`Request/response objects <ref/request-response>` |
   :doc:`TemplateResponse objects <ref/template-response>`
 
@@ -183,14 +185,13 @@ testing of Django applications:
 * **Testing:**
   :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
-  :doc:`Advanced topics <topics/testing/advanced>` |
-  :doc:`Doctests <topics/testing/doctests>`
+  :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
-  :doc:`Handling static files <howto/static-files>` |
+  :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
 The admin
@@ -254,7 +255,6 @@ applications:
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`
 * :doc:`Syndication feeds (RSS/Atom) <ref/contrib/syndication>`
-* :doc:`Comments <ref/contrib/comments/index>`, :doc:`comment moderation <ref/contrib/comments/moderation>` and :doc:`custom comments <ref/contrib/comments/custom>`
 * :doc:`Pagination <topics/pagination>`
 * :doc:`Messages framework <ref/contrib/messages>`
 * :doc:`Serialization <topics/serialization>`

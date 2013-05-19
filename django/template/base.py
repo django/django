@@ -641,7 +641,7 @@ class FilterExpression(object):
                                       (name, len(nondefs), plen))
 
         # Defaults can be overridden.
-        defaults = defaults and list(defaults) or []
+        defaults = list(defaults) if defaults else []
         try:
             for parg in provided:
                 defaults.pop(0)
@@ -861,7 +861,7 @@ class TextNode(Node):
     def render(self, context):
         return self.s
 
-def _render_value_in_context(value, context):
+def render_value_in_context(value, context):
     """
     Converts any value to a string to become part of a rendered template. This
     means escaping, if required, and conversion to a unicode object. If value
@@ -891,7 +891,7 @@ class VariableNode(Node):
             # control (e.g. exception rendering). In that case, we fail
             # quietly.
             return ''
-        return _render_value_in_context(output, context)
+        return render_value_in_context(output, context)
 
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")

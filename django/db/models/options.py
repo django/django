@@ -10,6 +10,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
 from django.utils import six
+from django.utils.functional import cached_property
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
@@ -173,6 +174,22 @@ class Options(object):
             if hasattr(self, '_field_cache'):
                 del self._field_cache
                 del self._field_name_cache
+                # The fields, concrete_fields and local_concrete_fields are
+                # implemented as cached properties for performance reasons.
+                # The attrs will not exists if the cached property isn't
+                # accessed yet, hence the try-excepts.
+                try:
+                    del self.fields
+                except AttributeError:
+                    pass
+                try:
+                    del self.concrete_fields
+                except AttributeError:
+                    pass
+                try:
+                    del self.local_concrete_fields
+                except AttributeError:
+                    pass
 
         if hasattr(self, '_name_map'):
             del self._name_map
@@ -245,7 +262,8 @@ class Options(object):
         return None
     swapped = property(_swapped)
 
-    def _fields(self):
+    @cached_property
+    def fields(self):
         """
         The getter for self.fields. This returns the list of field objects
         available to this model (including through parent models).
@@ -258,7 +276,14 @@ class Options(object):
         except AttributeError:
             self._fill_fields_cache()
         return self._field_name_cache
-    fields = property(_fields)
+
+    @cached_property
+    def concrete_fields(self):
+        return [f for f in self.fields if f.column is not None]
+
+    @cached_property
+    def local_concrete_fields(self):
+        return [f for f in self.local_fields if f.column is not None]
 
     def get_fields_with_model(self):
         """
@@ -271,6 +296,10 @@ class Options(object):
         except AttributeError:
             self._fill_fields_cache()
         return self._field_cache
+
+    def get_concrete_fields_with_model(self):
+        return [(field, model) for field, model in self.get_fields_with_model() if
+                field.column is not None]
 
     def _fill_fields_cache(self):
         cache = []
@@ -318,7 +347,7 @@ class Options(object):
         """
         Returns the requested field by name. Raises FieldDoesNotExist on error.
         """
-        to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
+        to_search = (self.fields + self.many_to_many) if many_to_many else self.fields
         for f in to_search:
             if f.name == name:
                 return f
@@ -377,6 +406,9 @@ class Options(object):
             cache[f.name] = (f, model, True, True)
         for f, model in self.get_fields_with_model():
             cache[f.name] = (f, model, True, False)
+        for f in self.virtual_fields:
+            if hasattr(f, 'related'):
+                cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
         if app_cache_ready():
             self._name_map = cache
         return cache
@@ -432,7 +464,7 @@ class Options(object):
         for klass in get_models(include_auto_created=True, only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_fields:
-                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                    if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
                         if self == f.rel.to._meta:
                             cache[f.related] = None
                             proxy_cache[f.related] = None

@@ -22,9 +22,13 @@ tell Django is installed and which version by running the following command:
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|. If the versions don't match,
-you can refer to the tutorial for your version of Django or update Django to
-the newest version.
+This tutorial is written for Django |version| and Python 2.x. If the Django
+version doesn't match, you can refer to the tutorial for your version of
+Django by using the version switcher at the bottom right corner of this page,
+or update Django to the newest version. If you are using Python 3.x, be aware
+that your code may need to differ from what is in the tutorial and you should
+continue using the tutorial only if you know what you are doing with Python
+3.x.
 
 See :doc:`How to install Django </topics/install>` for advice on how to remove
 older versions of Django and install a newer one.
@@ -119,7 +123,7 @@ These files are:
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
 
-* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible webservers to
+* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
@@ -239,9 +243,6 @@ come with Django:
 
 * :mod:`django.contrib.sessions` -- A session framework.
 
-* :mod:`django.contrib.sites` -- A framework for managing multiple sites
-  with one Django installation.
-
 * :mod:`django.contrib.messages` -- A messaging framework.
 
 * :mod:`django.contrib.staticfiles` -- A framework for managing
@@ -249,7 +250,7 @@ come with Django:
 
 These applications are included by default as a convenience for the common case.
 
-Each of these applications makes use of at least one database table, though,
+Some of these applications makes use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
@@ -259,7 +260,7 @@ that, run the following command:
 
 The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
-in your :file:`mysqlite/settings.py` file. You'll see a message for each
+in your :file:`mysite/settings.py` file. You'll see a message for each
 database table it creates, and you'll get a prompt asking you if you'd like to
 create a superuser account for the authentication system. Go ahead and do
 that.
@@ -359,7 +360,7 @@ class -- e.g., :class:`~django.db.models.CharField` for character fields and
 type of data each field holds.
 
 The name of each :class:`~django.db.models.Field` instance (e.g. ``question`` or
-``pub_date`` ) is the field's name, in machine-friendly format. You'll use this
+``pub_date``) is the field's name, in machine-friendly format. You'll use this
 value in your Python code, and your database will use it as the column name.
 
 You can use an optional first positional argument to a
@@ -522,7 +523,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
-the Python import path to your :file:`settings.py` file.
+the Python import path to your :file:`mysite/settings.py` file.
 
 .. admonition:: Bypassing manage.py
 
@@ -578,27 +579,34 @@ Wait a minute. ``<Poll: Poll object>`` is, utterly, an unhelpful representation
 of this object. Let's fix that by editing the polls model (in the
 ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__unicode__` method to both ``Poll`` and
-``Choice``::
+``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
+following example::
+
+    from django.db import models
 
     class Poll(models.Model):
         # ...
-        def __unicode__(self):
+        def __unicode__(self):  # Python 3: def __str__(self):
             return self.question
 
     class Choice(models.Model):
         # ...
-        def __unicode__(self):
+        def __unicode__(self):  # Python 3: def __str__(self):
             return self.choice_text
 
-It's important to add :meth:`~django.db.models.Model.__unicode__` methods to
-your models, not only for your own sanity when dealing with the interactive
-prompt, but also because objects' representations are used throughout Django's
-automatically-generated admin.
+It's important to add :meth:`~django.db.models.Model.__unicode__` methods (or
+:meth:`~django.db.models.Model.__str__` on Python 3) to your models, not only
+for your own sanity when dealing with the interactive prompt, but also because
+objects' representations are used throughout Django's automatically-generated
+admin.
 
-.. admonition:: Why :meth:`~django.db.models.Model.__unicode__` and not
-                :meth:`~django.db.models.Model.__str__`?
+.. admonition:: `__unicode__` or `__str__`?
 
-    If you're familiar with Python, you might be in the habit of adding
+    On Python 3, things are simpler, just use
+    :meth:`~django.db.models.Model.__str__` and forget about
+    :meth:`~django.db.models.Model.__unicode__`.
+
+    If you're familiar with Python 2, you might be in the habit of adding
     :meth:`~django.db.models.Model.__str__` methods to your classes, not
     :meth:`~django.db.models.Model.__unicode__` methods. We use
     :meth:`~django.db.models.Model.__unicode__` here because Django models deal

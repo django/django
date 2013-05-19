@@ -116,6 +116,18 @@ ModelFormMixin
         by examining ``self.object`` or
         :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`.
 
+    .. attribute:: fields
+
+        .. versionadded:: 1.6
+
+        A list of names of fields. This is interpreted the same way as the
+        ``Meta.fields`` attribute of :class:`~django.forms.ModelForm`.
+
+        This is a required attribute if you are generating the form class
+        automatically (e.g. using ``model``). Omitting this attribute will
+        result in all fields being used, but this behaviour is deprecated
+        and will be removed in Django 1.8.
+
     .. attribute:: success_url
 
         The URL to redirect to when the form is successfully processed.
@@ -188,7 +200,10 @@ ProcessFormView
         Constructs a form, checks the form for validity, and handles it
         accordingly.
 
-    The PUT action is also handled, as an analog of POST.
+    .. method:: put(*args, **kwargs)
+
+        The ``PUT`` action is also handled and just passes all parameters
+        through to :meth:`post`.
 
 .. class:: django.views.generic.edit.DeletionMixin
 
@@ -203,12 +218,12 @@ ProcessFormView
 
         .. versionadded:: 1.6
 
-        ``success_url`` may contain dictionary string formatting, which
-        will be interpolated against the object's field attributes. For
-        example, you could use ``success_url="/parent/%(parent_id)s/"`` to
-        redirect to a URL composed out of the ``parent_id`` field on a model.
+            ``success_url`` may contain dictionary string formatting, which
+            will be interpolated against the object's field attributes. For
+            example, you could use ``success_url="/parent/%(parent_id)s/"`` to
+            redirect to a URL composed out of the ``parent_id`` field on a model.
 
-    .. method:: get_success_url(obj)
+    .. method:: get_success_url()
 
         Returns the url to redirect to when the nominated object has been
         successfully deleted. Returns

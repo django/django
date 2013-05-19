@@ -639,6 +639,19 @@ For a field's list of errors, access the field's ``errors`` attribute.
         >>> str(f['subject'].errors)
         ''
 
+.. method:: BoundField.label_tag(contents=None, attrs=None)
+
+To separately render the label tag of a form field, you can call its
+``label_tag`` method::
+
+    >>> f = ContactForm(data)
+    >>> print(f['message'].label_tag())
+    <label for="id_message">Message</label>
+
+Optionally, you can provide the ``contents`` parameter which will replace the
+auto-generated label tag. An optional ``attrs`` dictionary may contain
+additional attributes for the ``<label>`` tag.
+
 .. method:: BoundField.css_classes()
 
 When you use Django's rendering shortcuts, CSS classes are used to

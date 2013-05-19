@@ -111,7 +111,7 @@ class AdminEmailHandler(logging.Handler):
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
-        html_message = self.include_html and reporter.get_traceback_html() or None
+        html_message = reporter.get_traceback_html() if self.include_html else None
         mail.mail_admins(subject, message, fail_silently=True,
                          html_message=html_message,
                          connection=self.connection())

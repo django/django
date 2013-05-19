@@ -6,30 +6,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"POT-Creation-Date: 2012-10-15 10:57+0200\n"
 "PO-Revision-Date: 2012-02-14 13:49+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"Language-Team: Serbian (Latin) (http://www.transifex.com/projects/p/django/"
 "language/sr@latin/)\n"
-"Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sr@latin\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: models.py:37
+#: models.py:39
 msgid "domain name"
 msgstr "ime domena"
 
-#: models.py:38
+#: models.py:40
 msgid "display name"
 msgstr "prikazano ime"
 
-#: models.py:43
+#: models.py:45
 msgid "site"
 msgstr "sajt"
 
-#: models.py:44
+#: models.py:46
 msgid "sites"
 msgstr "sajtovi"

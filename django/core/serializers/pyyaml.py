@@ -6,6 +6,7 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 
 import decimal
 import yaml
+import sys
 from io import StringIO
 
 from django.db import models
@@ -71,4 +72,4 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        raise DeserializationError(e)
+        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])

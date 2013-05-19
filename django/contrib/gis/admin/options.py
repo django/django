@@ -51,9 +51,10 @@ class GeoModelAdmin(ModelAdmin):
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Overloaded from ModelAdmin so that an OpenLayersWidget is used
-        for viewing/editing GeometryFields.
+        for viewing/editing 2D GeometryFields (OpenLayers 2 does not support
+        3D editing).
         """
-        if isinstance(db_field, models.GeometryField):
+        if isinstance(db_field, models.GeometryField) and db_field.dim < 3:
             request = kwargs.pop('request', None)
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
@@ -93,6 +94,7 @@ class GeoModelAdmin(ModelAdmin):
                       'scrollable' : self.scrollable,
                       'layerswitcher' : self.layerswitcher,
                       'collection_type' : collection_type,
+                      'is_generic' : db_field.geom_type == 'GEOMETRY',
                       'is_linestring' : db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
                       'is_polygon' : db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
                       'is_point' : db_field.geom_type in ('POINT', 'MULTIPOINT'),

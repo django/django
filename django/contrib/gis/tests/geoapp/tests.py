@@ -3,26 +3,31 @@ from __future__ import absolute_import
 import re
 
 from django.db import connection
-from django.db.utils import DatabaseError
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import (fromstr, GEOSGeometry,
-    Point, LineString, LinearRing, Polygon, GeometryCollection)
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
 from django.utils import six, unittest
+from django.utils.unittest import skipUnless
 
-from .models import Country, City, PennsylvaniaCity, State, Track
+if HAS_GEOS:
+    from django.contrib.gis.geos import (fromstr, GEOSGeometry,
+        Point, LineString, LinearRing, Polygon, GeometryCollection)
 
-from .test_feeds import GeoFeedTest
-from .test_regress import GeoRegressionTests
-from .test_sitemaps import GeoSitemapTest
+    from .models import Country, City, PennsylvaniaCity, State, Track
 
-
-if not spatialite:
+if HAS_GEOS and not spatialite:
     from .models import Feature, MinusOneSRID
 
+
+def postgis_bug_version():
+    spatial_version = getattr(connection.ops, "spatial_version", (0,0,0))
+    return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
+
+
+@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeoModelTest(TestCase):
 
     def test_fixtures(self):
@@ -197,6 +202,7 @@ class GeoModelTest(TestCase):
         self.assertTrue(isinstance(cities2[0].point, Point))
 
 
+@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeoLookupTest(TestCase):
 
     @no_mysql
@@ -297,7 +303,7 @@ class GeoLookupTest(TestCase):
 
     # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
     # http://trac.osgeo.org/postgis/ticket/2035
-    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+    if postgis_bug_version():
         test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
@@ -382,6 +388,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
+@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeoQuerySetTest(TestCase):
     # Please keep the tests in GeoQuerySet method's alphabetic order
 

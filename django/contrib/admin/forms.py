@@ -33,5 +33,4 @@ class AdminAuthenticationForm(AuthenticationForm):
                 raise forms.ValidationError(message % {
                     'username': self.username_field.verbose_name
                 })
-        self.check_for_test_cookie()
         return self.cleaned_data

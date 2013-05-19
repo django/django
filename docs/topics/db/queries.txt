@@ -17,6 +17,8 @@ models, which comprise a Weblog application:
 
 .. code-block:: python
 
+    from django.db import models
+
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
@@ -297,8 +299,8 @@ the query - in this case, it will be a
 :class:`~django.db.models.query.QuerySet` containing a single element.
 
 If you know there is only one object that matches your query, you can use the
-:meth:`~django.db.models.query.QuerySet.get` method on a `Manager` which
-returns the object directly::
+:meth:`~django.db.models.query.QuerySet.get` method on a
+:class:`~django.db.models.Manager` which returns the object directly::
 
     >>> one_entry = Entry.objects.get(pk=1)
 
@@ -638,6 +640,7 @@ that were modified more than 3 days after they were published::
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
 .. versionadded:: 1.5
+
     ``.bitand()`` and ``.bitor()``
 
 The ``F()`` objects now support bitwise operations by ``.bitand()`` and
@@ -646,6 +649,7 @@ The ``F()`` objects now support bitwise operations by ``.bitand()`` and
     >>> F('somefield').bitand(16)
 
 .. versionchanged:: 1.5
+
     The previously undocumented operators ``&`` and ``|`` no longer produce
     bitwise operations, use ``.bitand()`` and ``.bitor()`` instead.
 
@@ -824,7 +828,7 @@ precede the definition of any keyword arguments. For example::
     The `OR lookups examples`_ in the Django unit tests show some possible uses
     of ``Q``.
 
-    .. _OR lookups examples: https://github.com/django/django/blob/master/tests/modeltests/or_lookups/tests.py
+    .. _OR lookups examples: https://github.com/django/django/blob/master/tests/or_lookups/tests.py
 
 Comparing objects
 =================
@@ -1109,15 +1113,6 @@ above example code would look like this::
     # b.entries is a Manager that returns QuerySets.
     >>> b.entries.filter(headline__contains='Lennon')
     >>> b.entries.count()
-
-You cannot access a reverse :class:`~django.db.models.ForeignKey`
-:class:`~django.db.models.Manager` from the class; it must be accessed from an
-instance::
-
-    >>> Blog.entry_set
-    Traceback:
-        ...
-    AttributeError: "Manager must be accessed via instance".
 
 In addition to the :class:`~django.db.models.query.QuerySet` methods defined in
 "Retrieving objects" above, the :class:`~django.db.models.ForeignKey`

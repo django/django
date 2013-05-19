@@ -169,7 +169,7 @@ issued on the ``project.interesting`` and
 ``project.interesting.stuff`` loggers.
 
 This propagation can be controlled on a per-logger basis. If
-you don't want a particular logger to propagate to it's parents, you
+you don't want a particular logger to propagate to its parents, you
 can turn off this behavior.
 
 Making logging calls
@@ -308,7 +308,7 @@ This logging configuration does the following things:
   * ``simple``, that just outputs the log level name (e.g.,
     ``DEBUG``) and the log message.
 
-    The `format` string is a normal Python formatting string
+    The ``format`` string is a normal Python formatting string
     describing the details that are to be output on each logging
     line. The full list of detail that can be output can be
     found in the `formatter documentation`_.
@@ -330,7 +330,7 @@ This logging configuration does the following things:
     higher) message to ``/dev/null``.
 
   * ``console``, a StreamHandler, which will print any ``DEBUG``
-    (or higher) message to stderr. This handler uses the `simple` output
+    (or higher) message to stderr. This handler uses the ``simple`` output
     format.
 
   * ``mail_admins``, an AdminEmailHandler, which will email any
@@ -544,7 +544,7 @@ logging module.
 
    This filter is used as follows in the default :setting:`LOGGING`
    configuration to ensure that the :class:`AdminEmailHandler` only sends error
-   emails to admins when :setting:`DEBUG` is `False`::
+   emails to admins when :setting:`DEBUG` is ``False``::
 
        'filters': {
             'require_debug_false': {
@@ -564,7 +564,7 @@ logging module.
    .. versionadded:: 1.5
 
    This filter is similar to :class:`RequireDebugFalse`, except that records are
-   passed only when :setting:`DEBUG` is `True`.
+   passed only when :setting:`DEBUG` is ``True``.
 
 .. _default-logging-configuration:
 
@@ -576,8 +576,8 @@ with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
 long as the :setting:`DEBUG` setting is set to ``False``.
 
 All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
-`True` are sent to the console. They are simply discarded (sent to
-``NullHandler``) when :setting:`DEBUG` is `False`.
+``True`` are sent to the console. They are simply discarded (sent to
+``NullHandler``) when :setting:`DEBUG` is ``False``.
 
 .. versionchanged:: 1.5
 

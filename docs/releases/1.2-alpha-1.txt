@@ -428,7 +428,7 @@ Support for multiple databases
 
 Django 1.2 adds the ability to use :doc:`more than one database
 </topics/db/multi-db>` in your Django project. Queries can be
-issued at a specific database with the `using()` method on
+issued at a specific database with the ``using()`` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
 

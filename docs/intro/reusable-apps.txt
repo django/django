@@ -2,11 +2,11 @@
 Advanced tutorial: How to write reusable apps
 =============================================
 
-This advanced tutorial begins where :doc:`Tutorial 5 </intro/tutorial05>` left
-off. We'll be turning our Web-poll into a standalone Python package you can
-reuse in new projects and share with other people.
+This advanced tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>`
+left off. We'll be turning our Web-poll into a standalone Python package
+you can reuse in new projects and share with other people.
 
-If you haven't recently completed Tutorials 1–5, we encourage you to review
+If you haven't recently completed Tutorials 1–6, we encourage you to review
 these so that your example project matches the one described below.
 
 Reusability matters
@@ -66,19 +66,24 @@ After the previous tutorials, our project should look like this::
             __init__.py
             admin.py
             models.py
-            tests.py
+            static/
+                polls
+                    images/
+                        background.gif
+                    style.css
             templates/
                 polls/
                     detail.html
                     index.html
                     results.html
+            tests.py
             urls.py
             views.py
-        mytemplates/
+        templates/
             admin/
                 base_site.html
 
-You created ``mysite/mytemplates`` in :doc:`Tutorial 2 </intro/tutorial02>`,
+You created ``mysite/templates`` in :doc:`Tutorial 2 </intro/tutorial02>`,
 and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
 it is clearer why we chose to have separate template directories for the
 project and application: everything that is part of the polls application is in
@@ -125,7 +130,7 @@ this. For a small app like polls, this process isn't too difficult.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
-3. Create a file ``django-polls/README.txt`` with the following contents::
+3. Create a file ``django-polls/README.rst`` with the following contents::
 
     =====
     Polls
@@ -153,7 +158,7 @@ this. For a small app like polls, this process isn't too difficult.
     3. Run `python manage.py syncdb` to create the polls models.
 
     4. Start the development server and visit http://127.0.0.1:8000/admin/
-      to create a poll (you'll need the Admin app enabled).
+       to create a poll (you'll need the Admin app enabled).
 
     5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
@@ -173,23 +178,23 @@ Create a file ``django-polls/setup.py`` with the following contents::
     import os
     from setuptools import setup
 
-    README = open(os.path.join(os.path.dirname(__file__), 'README.txt')).read()
+    README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
     # allow setup.py to be run from any path
     os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
     setup(
-        name = 'django-polls',
-        version = '0.1',
-        packages = ['polls'],
-        include_package_data = True,
-        license = 'BSD License', # example license
-        description = 'A simple Django app to conduct Web-based polls.',
-        long_description = README,
-        url = 'http://www.example.com/',
-        author = 'Your Name',
-        author_email = 'yourname@example.com',
-        classifiers = [
+        name='django-polls',
+        version='0.1',
+        packages=['polls'],
+        include_package_data=True,
+        license='BSD License',  # example license
+        description='A simple Django app to conduct Web-based polls.',
+        long_description=README,
+        url='http://www.example.com/',
+        author='Your Name',
+        author_email='yourname@example.com',
+        classifiers=[
             'Environment :: Web Environment',
             'Framework :: Django',
             'Intended Audience :: Developers',
@@ -212,10 +217,13 @@ Create a file ``django-polls/setup.py`` with the following contents::
 6. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
    distribute docs referred to in the previous step discuss this file in more
-   details. To include the templates and our LICENSE file, create a file
-   ``django-polls/MANIFEST.in`` with the following contents::
+   details. To include the templates, the ``README.rst`` and our ``LICENSE``
+   file, create a file ``django-polls/MANIFEST.in`` with the following
+   contents::
 
     include LICENSE
+    include README.rst
+    recursive-include polls/static *
     recursive-include polls/templates *
 
 7. It's optional, but recommended, to include detailed documentation with your

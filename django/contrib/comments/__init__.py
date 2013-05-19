@@ -1,9 +1,12 @@
+import warnings
 from django.conf import settings
 from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
 from django.utils.importlib import import_module
+
+warnings.warn("django.contrib.comments is deprecated and will be removed before Django 1.8.", PendingDeprecationWarning)
 
 DEFAULT_COMMENTS_APP = 'django.contrib.comments'
 

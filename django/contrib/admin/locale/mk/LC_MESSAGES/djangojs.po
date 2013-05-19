@@ -11,13 +11,13 @@ msgstr ""
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
 "PO-Revision-Date: 2012-03-12 11:27+0000\n"
 "Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
-"Language-Team: Macedonian (http://www.transifex.net/projects/p/django/"
+"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
-"Language: mk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1\n"
+"Language: mk\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format

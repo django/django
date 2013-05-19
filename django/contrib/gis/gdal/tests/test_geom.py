@@ -5,12 +5,19 @@ try:
 except ImportError:
     import pickle
 
-from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType, OGRException,
-    OGRIndexError, SpatialReference, CoordTransform, GDAL_VERSION)
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils.six.moves import xrange
 from django.utils import unittest
+from django.utils.unittest import skipUnless
 
+if HAS_GDAL:
+    from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,
+        OGRException, OGRIndexError, SpatialReference, CoordTransform,
+        GDAL_VERSION)
+
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class OGRGeomTest(unittest.TestCase, TestDataMixin):
     "This tests the OGR Geometry."
 
@@ -476,11 +483,3 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing equivalence methods with non-OGRGeometry instances."
         self.assertNotEqual(None, OGRGeometry('POINT(0 0)'))
         self.assertEqual(False, OGRGeometry('LINESTRING(0 0, 1 1)') == 3)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(OGRGeomTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

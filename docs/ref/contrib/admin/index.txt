@@ -18,6 +18,7 @@ The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
 .. versionchanged:: 1.6
+
     In previous versions, the admin wasn't enabled by default.
 
 For reference, here are the requirements:
@@ -142,6 +143,13 @@ subclass::
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
 
+    .. note::
+
+        ``date_hierarchy`` uses :meth:`QuerySet.datetimes()
+        <django.db.models.query.QuerySet.datetimes>` internally. Please refer
+        to its documentation for some caveats when time zone support is
+        enabled (:setting:`USE_TZ = True <USE_TZ>`).
+
 .. attribute:: ModelAdmin.exclude
 
     This attribute, if given, should be a list of field names to exclude from
@@ -185,6 +193,11 @@ subclass::
     will be displayed, sequentially, in the form. ``fields`` can contain
     values defined in :attr:`ModelAdmin.readonly_fields` to be displayed as
     read-only.
+
+    The ``fields`` option, unlike :attr:`~ModelAdmin.list_display`, may only
+    contain names of fields on the model or the form specified by
+    :attr:`~ModelAdmin.form`. It may contain callables only if they are listed
+    in :attr:`~ModelAdmin.readonly_fields`.
 
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
@@ -253,10 +266,10 @@ subclass::
             'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
             }
 
-        Just like with the :attr:`~ModelAdmin.fields` option, to display
-        multiple fields on the same line, wrap those fields in their own
-        tuple. In this example, the ``first_name`` and ``last_name`` fields
-        will display on the same line::
+        As with the :attr:`~ModelAdmin.fields` option, to display multiple
+        fields on the same line, wrap those fields in their own tuple. In this
+        example, the ``first_name`` and ``last_name`` fields will display on
+        the same line::
 
             {
             'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
@@ -264,6 +277,10 @@ subclass::
 
         ``fields`` can contain values defined in
         :attr:`~ModelAdmin.readonly_fields` to be displayed as read-only.
+
+        If you add the name of a callable to ``fields``, the same rule applies
+        as with the :attr:`~ModelAdmin.fields` option: the callable must be
+        listed in :attr:`~ModelAdmin.readonly_fields`.
 
     * ``classes``
         A list containing extra CSS classes to apply to the fieldset.
@@ -317,6 +334,22 @@ subclass::
     :meth:`ModelAdmin.get_form` method.
 
     For an example see the section `Adding custom validation to the admin`_.
+
+    .. admonition:: Note
+
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        since the admin has its own way of defining fields, the ``Meta.fields``
+        attribute will be ignored.
+
+        If the ``ModelForm`` is only going to be used for the admin, the easiest
+        solution is to omit the ``Meta.model`` attribute, since ``ModelAdmin``
+        will provide the correct model to use. Alternatively, you can set
+        ``fields = []`` in the ``Meta`` class to satisfy the validation on the
+        ``ModelForm``.
 
     .. admonition:: Note
 
@@ -534,6 +567,13 @@ subclass::
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
 
+    * .. versionadded:: 1.6
+
+      The field names in ``list_display`` will also appear as CSS classes in
+      the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
+      element. This can be used to set column widths in a CSS file for example.
+
+
 .. attribute:: ModelAdmin.list_display_links
 
     Set ``list_display_links`` to control which fields in ``list_display``
@@ -680,7 +720,7 @@ subclass::
                       Only show the lookups if there actually is
                       anyone born in the corresponding decades.
                       """
-                      qs = model_admin.queryset(request)
+                      qs = model_admin.get_queryset(request)
                       if qs.filter(birthday__gte=date(1980, 1, 1),
                                     birthday__lte=date(1989, 12, 31)).exists():
                           yield ('80s', _('in the eighties'))
@@ -1259,12 +1299,23 @@ templates used by the :class:`ModelAdmin` views:
     on the changelist page. To use a custom form, for example::
 
         class MyForm(forms.ModelForm):
-            class Meta:
-                model = MyModel
+            pass
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_changelist_form(self, request, **kwargs):
                 return MyForm
+
+    .. admonition:: Note
+
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        ``ModelAdmin`` ignores this value, overriding it with the
+        :attr:`ModelAdmin.list_editable` attribute. The easiest solution is to
+        omit the ``Meta.model`` attribute, since ``ModelAdmin`` will provide the
+        correct model to use.
 
 .. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
 
@@ -1303,26 +1354,32 @@ templates used by the :class:`ModelAdmin` views:
     be interpreted as meaning that the current user is not permitted to delete
     any object of this type).
 
-.. method:: ModelAdmin.queryset(self, request)
+.. method:: ModelAdmin.get_queryset(self, request)
 
-    The ``queryset`` method on a ``ModelAdmin`` returns a
+    The ``get_queryset`` method on a ``ModelAdmin`` returns a
     :class:`~django.db.models.query.QuerySet` of all model instances that
     can be edited by the admin site. One use case for overriding this method
     is to show objects owned by the logged-in user::
 
         class MyModelAdmin(admin.ModelAdmin):
-            def queryset(self, request):
-                qs = super(MyModelAdmin, self).queryset(request)
+            def get_queryset(self, request):
+                qs = super(MyModelAdmin, self).get_queryset(request)
                 if request.user.is_superuser:
                     return qs
                 return qs.filter(author=request.user)
+
+    .. versionchanged:: 1.6
+
+        The ``get_queryset`` method was previously named ``queryset``.
 
 .. method:: ModelAdmin.message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
 
     Sends a message to the user using the :mod:`django.contrib.messages`
     backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
 
-    .. versionadded:: 1.5
+    .. versionchanged:: 1.5
+
+        Keyword arguments were added in Django 1.5.
 
     Keyword arguments allow you to change the message level, add extra CSS
     tags, or fail silently if the ``contrib.messages`` framework is not
@@ -1425,6 +1482,7 @@ in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.6
+
     The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
@@ -1459,9 +1517,6 @@ needed. Now within your form you can add your own custom validation for
 any field::
 
     class MyArticleAdminForm(forms.ModelForm):
-        class Meta:
-            model = Article
-
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]
@@ -1526,7 +1581,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
-- :meth:`~ModelAdmin.queryset`
+- :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`
@@ -1908,7 +1963,7 @@ and 500 pages.
 
 .. note::
 
-    Some of the admin templates, such as ``change_list_request.html`` are used
+    Some of the admin templates, such as ``change_list_results.html`` are used
     to render custom inclusion tags. These may be overridden, but in such cases
     you are probably better off creating your own version of the tag in
     question and giving it a different name. That way you can use it
@@ -2155,5 +2210,5 @@ To allow easier reversing of the admin urls in templates, Django provides an
 
 The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
-object which has an ``app_label`` and ``module_name`` and is usually supplied
-by the admin views for the current model.
+object which has an ``app_label`` and ``model_name`` attributes and is usually
+supplied by the admin views for the current model.

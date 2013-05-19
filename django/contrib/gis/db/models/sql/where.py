@@ -32,13 +32,14 @@ class GeoWhereNode(WhereNode):
     Used to represent the SQL where-clause for spatial databases --
     these are tied to the GeoQuery class that created it.
     """
-    def add(self, data, connector):
+
+    def _prepare_data(self, data):
         if isinstance(data, (list, tuple)):
             obj, lookup_type, value = data
             if ( isinstance(obj, Constraint) and
                  isinstance(obj.field, GeometryField) ):
                 data = (GeoConstraint(obj), lookup_type, value)
-        super(GeoWhereNode, self).add(data, connector)
+        return super(GeoWhereNode, self)._prepare_data(data)
 
     def make_atom(self, child, qn, connection):
         lvalue, lookup_type, value_annot, params_or_value = child

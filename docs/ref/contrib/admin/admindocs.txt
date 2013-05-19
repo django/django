@@ -57,9 +57,10 @@ Model reference
 ===============
 
 The **models** section of the ``admindocs`` page describes each model in the
-system along with all the fields and methods available on it. Relationships to
-other models appear as hyperlinks. Descriptions are pulled from ``help_text``
-attributes on fields or from docstrings on model methods.
+system along with all the fields and methods (without any arguments) available
+on it. While model properties don't have any arguments, they are not listed.
+Relationships to other models appear as hyperlinks. Descriptions are pulled
+from ``help_text`` attributes on fields or from docstrings on model methods.
 
 A model with useful documentation might look like this::
 

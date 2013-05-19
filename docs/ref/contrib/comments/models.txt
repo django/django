@@ -5,6 +5,18 @@ The built-in comment models
 .. module:: django.contrib.comments.models
    :synopsis: The built-in comment models
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 .. class:: Comment
 
     Django's built-in comment model. Has the following fields:

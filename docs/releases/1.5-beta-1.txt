@@ -225,7 +225,9 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
-* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+* The ``wkb`` and ``hex`` properties of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
@@ -281,8 +283,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
-* By default, all logging messages reaching the `django` logger when
-  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+* By default, all logging messages reaching the ``django`` logger when
+  :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
 * When using :class:`~django.template.RequestContext`, it is now possible to
@@ -299,8 +301,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an `ignorenonexistent` option to
-  ignore data for fields that no longer exist.
+* The loaddata management command now supports an
+  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
+  longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -595,7 +598,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is `0666` (octal) and the current umask value
+  needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by

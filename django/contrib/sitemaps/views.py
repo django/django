@@ -1,4 +1,5 @@
 import warnings
+from functools import wraps
 
 from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
@@ -7,6 +8,15 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils import six
 
+def x_robots_tag(func):
+    @wraps(func)
+    def inner(request, *args, **kwargs):
+        response = func(request, *args, **kwargs)
+        response['X-Robots-Tag'] = 'noindex, noodp, noarchive'
+        return response
+    return inner
+
+@x_robots_tag
 def index(request, sitemaps,
           template_name='sitemap_index.xml', content_type='application/xml',
           sitemap_url_name='django.contrib.sitemaps.views.sitemap',
@@ -35,6 +45,7 @@ def index(request, sitemaps,
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
 
+@x_robots_tag
 def sitemap(request, sitemaps, section=None,
             template_name='sitemap.xml', content_type='application/xml',
             mimetype=None):

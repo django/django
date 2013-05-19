@@ -187,7 +187,7 @@ behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
 :func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
-Django's bundled version adds :func:`~django.utils.six.iterlists` for
+It also contains an undocumented ``iterlists`` function that works well for
 ``django.utils.datastructures.MultiValueDict`` and its subclasses.
 
 :class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
@@ -201,8 +201,8 @@ According to :pep:`3333`:
 Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
 contains ``bytes``, which may become an issue if you compare it with a
 ``str`` in your tests. The preferred solution is to rely on
-:meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains`. These methods accept a
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.SimpleTestCase.assertNotContains`. These methods accept a
 response and a unicode string as arguments.
 
 Coding guidelines
@@ -238,7 +238,7 @@ under Python 3, use the :func:`str` builtin::
     str('my string')
 
 In Python 3, there aren't any automatic conversions between ``str`` and
-``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.decode`
+``bytes``, and the :mod:`codecs` module became more strict. :meth:`str.encode`
 always returns ``bytes``, and ``bytes.decode`` always returns ``str``. As a
 consequence, the following pattern is sometimes necessary::
 
@@ -317,6 +317,9 @@ Division
         def __idiv__(self, other):  # Python 2 compatibility
             return type(self).__itruediv__(self, other)
 
+Special methods are looked up on the class and not on the instance to reflect
+the behavior of the Python interpreter.
+
 .. module: django.utils.six
 
 Writing compatible code with six
@@ -391,12 +394,7 @@ function.
 Customizations of six
 ---------------------
 
-The version of six bundled with Django includes one extra function:
-
-.. function:: iterlists(MultiValueDict)
-
-    Returns an iterator over the lists of values of a ``MultiValueDict``. This
-    replaces ``iterlists()`` on Python 2 and ``lists()`` on Python 3.
+The version of six bundled with Django includes a few extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
 

@@ -691,7 +691,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
-    {% blocktrans %}Ambiguous translatable block of text{% endtransblock %}
+    {% blocktrans %}Ambiguous translatable block of text{% endblocktrans %}
 
 .. note:: Just for completeness, these are the corresponding fragments of the
     resulting ``.po`` file:
@@ -721,6 +721,31 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
         # path/to/template/file.html:103
         msgid "Ambiguous translatable block of text"
         msgstr ""
+
+.. templatetag:: language
+
+Switching language in templates
+-------------------------------
+
+If you want to select a language within a template, you can use the
+``language`` template tag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    <!-- Current language: {{ LANGUAGE_CODE }} -->
+    <p>{% trans "Welcome to our page" %}</p>
+
+    {% language 'en' %}
+        {% get_current_language as LANGUAGE_CODE %}
+        <!-- Current language: {{ LANGUAGE_CODE }} -->
+        <p>{% trans "Welcome to our page" %}</p>
+    {% endlanguage %}
+
+While the first occurrence of "Welcome to our page" uses the current language,
+the second will always be in English.
 
 .. _template-translation-vars:
 
@@ -946,6 +971,52 @@ This isn't as fast as string interpolation in Python, so keep it to those
 cases where you really need it (for example, in conjunction with ``ngettext``
 to produce proper pluralizations).
 
+Note on performance
+-------------------
+
+The :func:`~django.views.i18n.javascript_catalog` view generates the catalog
+from ``.mo`` files on every request. Since its output is constant — at least
+for a given version of a site — it's a good candidate for caching.
+
+Server-side caching will reduce CPU load. It's easily implemented with the
+:func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
+invalidation when your translations change, provide a version-dependant key
+prefix, as shown in the example below, or map the view at a version-dependant
+URL.
+
+.. code-block:: python
+
+    from django.views.decorators.cache import cache_page
+    from django.views.i18n import javascript_catalog
+
+    # The value returned by get_version() must change when translations change.
+    @cache_page(86400, key_prefix='js18n-%s' % get_version())
+    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+        return javascript_catalog(request, domain, packages)
+
+Client-side caching will save bandwidth and make your site load faster. If
+you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
+covered. Otherwise, you can apply :ref:`conditional decorators
+<conditional-decorators>`. In the following example, the cache is invalidated
+whenever your restart your application server.
+
+.. code-block:: python
+
+    from django.utils import timezone
+    from django.views.decorators.http import last_modified
+    from django.views.i18n import javascript_catalog
+
+    last_modified_date = timezone.now()
+    @last_modified(lambda req, **kw: last_modified_date)
+    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+        return javascript_catalog(request, domain, packages)
+
+You can even pre-generate the javascript catalog as part of your deployment
+procedure and serve it as a static file. This radical technique is implemented
+in django-statici18n_.
+
+.. _django-statici18n: http://django-statici18n.readthedocs.org/en/latest/
+
 .. _url-internationalization:
 
 Internationalization: in URL patterns
@@ -984,11 +1055,11 @@ prepend the current active language code to all url patterns defined within
     from django.conf.urls import patterns, include, url
     from django.conf.urls.i18n import i18n_patterns
 
-    urlpatterns = patterns(''
+    urlpatterns = patterns('',
         url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
     )
 
-    news_patterns = patterns(''
+    news_patterns = patterns('',
         url(r'^$', 'news.views.index', name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
         url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
@@ -1080,13 +1151,11 @@ active language. Example::
 
 .. _reversing_in_templates:
 
-.. templatetag:: language
-
 Reversing in templates
 ----------------------
 
 If localized URLs get reversed in templates they always use the current
-language. To link to a URL in another language use the ``language``
+language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
 .. code-block:: html+django
@@ -1391,7 +1460,9 @@ Here's example HTML template code:
     <select name="language">
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
-    <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+    <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
+        {{ language.name_local }} ({{ language.code }})
+    </option>
     {% endfor %}
     </select>
     <input type="submit" value="Go" />
@@ -1483,6 +1554,7 @@ selection based on data from the request. It customizes content for each user.
 ``'django.middleware.locale.LocaleMiddleware'``.
 
 .. versionchanged:: 1.6
+
     In previous versions, ``LocaleMiddleware``  wasn't enabled by default.
 
 Because middleware order matters, you should follow these guidelines:

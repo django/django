@@ -435,10 +435,10 @@ The login_required decorator
 
     .. versionchanged:: 1.5
 
-    The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
-    view function names and :ref:`named URL patterns <naming-url-patterns>`.
-    This allows you to freely remap your login view within your URLconf
-    without having to update the setting.
+        The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
+        view function names and :ref:`named URL patterns <naming-url-patterns>`.
+        This allows you to freely remap your login view within your URLconf
+        without having to update the setting.
 
 .. note::
 
@@ -743,10 +743,25 @@ patterns.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
+    If the email address provided does not exist in the system, this view
+    won't send an email, but the user won't receive any error message either.
+    This prevents information leaking to potential attackers. If you want to
+    provide an error message in this case, you can subclass
+    :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
+    ``password_reset_form`` argument.
+
+
     Users flagged with an unusable password (see
     :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
     allowed to request a password reset to prevent misuse when using an
-    external authentication source like LDAP.
+    external authentication source like LDAP. Note that they won't receive any
+    error message since this would expose their account's existence but no
+    mail will be sent either.
+
+    .. versionchanged:: 1.6
+
+        Previously, error messages indicated whether a given email was
+        registered.
 
     **URL name:** ``password_reset``
 
@@ -912,13 +927,26 @@ If you don't want to use the built-in views, but want the convenience of not
 having to write forms for this functionality, the authentication system
 provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
+.. note::
+    The built-in authentication forms make certain assumptions about the user
+    model that they are working with. If you're using a :ref:`custom User model
+    <auth-custom-user>`, it may be necessary to define your own forms for the
+    authentication system. For more information, refer to the documentation
+    about :ref:`using the built-in authentication forms with custom user models
+    <custom-users-and-the-built-in-auth-forms>`.
+
 .. class:: AdminPasswordChangeForm
 
     A form used in the admin interface to change a user's password.
 
+    Takes the ``user`` as the first positional argument.
+
 .. class:: AuthenticationForm
 
     A form for logging a user in.
+
+    Takes ``request`` as its first positional argument, which is stored on the
+    form instance for use by sub-classes.
 
 .. class:: PasswordChangeForm
 
@@ -1019,6 +1047,7 @@ Thus, you can check permissions in template ``{% if %}`` statements:
     {% endif %}
 
 .. versionadded:: 1.5
+
     Permission lookup by "if in".
 
 It is possible to also look permissions up by ``{% if in %}`` statements.

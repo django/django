@@ -32,6 +32,10 @@
     padding-right: 1em;
 }
 
+#changelist-form .results {
+  overflow-x: auto;
+}
+
 #changelist .toplinks {
     border-bottom: 1px solid #ccc !important;
 }

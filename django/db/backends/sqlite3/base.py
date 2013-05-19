@@ -10,7 +10,6 @@ import datetime
 import decimal
 import warnings
 import re
-import sys
 
 from django.db import utils
 from django.db.backends import *
@@ -100,6 +99,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
+    autocommits_when_autocommit_is_off = True
+
+    @cached_property
+    def uses_savepoints(self):
+        return Database.sqlite_version_info >= (3, 6, 8)
 
     @cached_property
     def supports_stddev(self):
@@ -291,6 +295,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    Database = Database
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
 
@@ -346,6 +352,33 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
+    def close(self):
+        self.validate_thread_sharing()
+        # If database is in memory, closing the connection destroys the
+        # database. To prevent accidental data loss, ignore close requests on
+        # an in-memory db.
+        if self.settings_dict['NAME'] != ":memory:":
+            BaseDatabaseWrapper.close(self)
+
+    def _savepoint_allowed(self):
+        # When 'isolation_level' is not None, sqlite3 commits before each
+        # savepoint; it's a bug. When it is None, savepoints don't make sense
+        # because autocommit is enabled. The only exception is inside atomic
+        # blocks. To work around that bug, on SQLite, atomic starts a
+        # transaction explicitly rather than simply disable autocommit.
+        return self.in_atomic_block
+
+    def _set_autocommit(self, autocommit):
+        if autocommit:
+            level = None
+        else:
+            # sqlite3's internal default is ''. It's different from None.
+            # See Modules/_sqlite/connection.c.
+            level = ''
+        # 'isolation_level' is a misleading API.
+        # SQLite always runs at the SERIALIZABLE isolation level.
+        self.connection.isolation_level = level
+
     def check_constraints(self, table_names=None):
         """
         Checks each table name in `table_names` for rows with invalid foreign key references. This method is
@@ -380,13 +413,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0], table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
 
-    def close(self):
-        self.validate_thread_sharing()
-        # If database is in memory, closing the connection destroys the
-        # database. To prevent accidental data loss, ignore close requests on
-        # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:":
-            BaseDatabaseWrapper.close(self)
+    def is_usable(self):
+        return True
+
+    def _start_transaction_under_autocommit(self):
+        """
+        Start a transaction explicitly in autocommit mode.
+
+        Staying in autocommit mode works around a bug of sqlite3 that breaks
+        savepoints when autocommit is disabled.
+        """
+        self.cursor().execute("BEGIN")
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 
@@ -396,26 +433,18 @@ class SQLiteCursorWrapper(Database.Cursor):
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
     """
-    def execute(self, query, params=()):
+    def execute(self, query, params=None):
+        if params is None:
+            return Database.Cursor.execute(self, query)
         query = self.convert_query(query)
-        try:
-            return Database.Cursor.execute(self, query, params)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+        return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
-        try:
-            return Database.Cursor.executemany(self, query, param_list)
-        except Database.IntegrityError as e:
-            six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-        except Database.DatabaseError as e:
-            six.reraise(utils.DatabaseError, utils.DatabaseError(*tuple(e.args)), sys.exc_info()[2])
+        return Database.Cursor.executemany(self, query, param_list)
 
     def convert_query(self, query):
-        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%','%')
+        return FORMAT_QMARK_REGEX.sub('?', query).replace('%%', '%')
 
 def _sqlite_date_extract(lookup_type, dt):
     if dt is None:

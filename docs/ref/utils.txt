@@ -568,11 +568,11 @@ escaping HTML.
 
 .. function:: remove_tags(value, tags)
 
-    Removes a list of [X]HTML tag names from the output.
+    Removes a space-separated list of [X]HTML tag names from the output.
 
     For example::
 
-        remove_tags(value, ["b", "span"])
+        remove_tags(value, "b span")
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
     return value will be ``"Joel <button>is</button> a slug"``.
@@ -642,6 +642,28 @@ escaping HTML.
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than :data:`sys.maxint`.
+
+``django.utils.module_loading``
+===============================
+
+.. module:: django.utils.module_loading
+   :synopsis: Functions for working with Python modules.
+
+Functions for working with Python modules.
+
+.. function:: import_by_path(dotted_path, error_prefix='')
+
+    Imports a dotted module path and returns the attribute/class designated by
+    the last name in the path. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes
+    wrong. For example::
+
+        from django.utils.module_loading import import_by_path
+        ImproperlyConfigured = import_by_path('django.core.exceptions.ImproperlyConfigured')
+
+    is equivalent to::
+
+        from django.core.exceptions import ImproperlyConfigured
 
 ``django.utils.safestring``
 ===========================

@@ -5,7 +5,6 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy
 from django.utils.unittest import skipIf
@@ -43,7 +42,7 @@ class override_settings_tags(override_settings):
         base.LEVEL_TAGS = self.old_level_tags
 
 
-class BaseTest(TestCase):
+class BaseTests(object):
     storage_class = default_storage
     urls = 'django.contrib.messages.tests.urls'
     levels = {

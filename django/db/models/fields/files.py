@@ -30,7 +30,6 @@ class FieldFile(File):
         return not self.__eq__(other)
 
     def __hash__(self):
-        # Required because we defined a custom __eq__.
         return hash(self.name)
 
     # The standard File contains most of the necessary properties, but

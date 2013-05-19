@@ -5,19 +5,23 @@ import os
 from copy import copy
 from decimal import Decimal
 
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.tests.utils import mysql
-from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
-    InvalidDecimal, MissingForeignKey)
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
 from django.db import router
 from django.conf import settings
 from django.test import TestCase
 from django.utils import unittest
+from django.utils.unittest import skipUnless
 from django.utils._os import upath
 
-from .models import (
-    City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-    city_mapping, co_mapping, cofeat_mapping, inter_mapping)
+if HAS_GDAL:
+    from django.contrib.gis.utils.layermapping import (LayerMapping,
+        LayerMapError, InvalidDecimal, MissingForeignKey)
+    from django.contrib.gis.gdal import DataSource
+
+    from .models import (
+        City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
+        city_mapping, co_mapping, cofeat_mapping, inter_mapping)
 
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
@@ -32,6 +36,7 @@ NUMS   = [1, 2, 1, 19, 1] # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -310,6 +315,7 @@ class OtherRouter(object):
         return True
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class LayerMapRouterTest(TestCase):
 
     def setUp(self):

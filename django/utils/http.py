@@ -71,7 +71,7 @@ urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 def urlencode(query, doseq=0):
     """
     A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first case to UTF-8 encoded strings and
+    unicode strings. The parameters are first cast to UTF-8 encoded strings and
     then encoded as per normal.
     """
     if isinstance(query, MultiValueDict):
@@ -144,7 +144,7 @@ def parse_http_date(date):
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception:
-        raise ValueError("%r is not a valid date" % date)
+        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
 
 def parse_http_date_safe(date):
     """
@@ -217,7 +217,7 @@ def parse_etags(etag_str):
 
 def quote_etag(etag):
     """
-    Wraps a string in double quotes escaping contents as necesary.
+    Wraps a string in double quotes escaping contents as necessary.
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
@@ -226,7 +226,10 @@ def same_origin(url1, url2):
     Checks if two URLs are 'same-origin'
     """
     p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
-    return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+    try:
+        return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+    except ValueError:
+        return False
 
 def is_safe_url(url, host=None):
     """

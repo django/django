@@ -3,14 +3,22 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 
-from django.contrib.gis.db.models import Union, Extent3D
-from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
-from django.contrib.gis.utils import LayerMapping, LayerMapError
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import postgis
 from django.test import TestCase
 from django.utils._os import upath
+from django.utils.unittest import skipUnless
 
-from .models import (City3D, Interstate2D, Interstate3D, InterstateProj2D,
-    InterstateProj3D, Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
+if HAS_GEOS:
+    from django.contrib.gis.db.models import Union, Extent3D
+    from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
+
+    from .models import (City3D, Interstate2D, Interstate3D, InterstateProj2D,
+        InterstateProj3D, Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
+
+if HAS_GDAL:
+    from django.contrib.gis.utils import LayerMapping, LayerMapError
 
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
@@ -54,6 +62,7 @@ bbox_data = (
 )
 
 
+@skipUnless(HAS_GEOS and HAS_GDAL and postgis, "Geos, GDAL and postgis are required.")
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase

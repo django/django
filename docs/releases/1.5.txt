@@ -1,6 +1,6 @@
-============================================
-Django 1.5 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.5 release notes
+========================
 
 Welcome to Django 1.5!
 
@@ -144,9 +144,9 @@ keyword argument ``update_fields``. By using this argument it is possible to
 save only a select list of model's fields. This can be useful for performance
 reasons or when trying to avoid overwriting concurrent changes.
 
-Deferred instances (those loaded by .only() or .defer()) will automatically
-save just the loaded fields. If any field is set manually after load, that
-field will also get updated on save.
+Deferred instances (those loaded by ``.only()`` or ``.defer()``) will
+automatically save just the loaded fields. If any field is set manually after
+load, that field will also get updated on save.
 
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
@@ -222,7 +222,9 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
-* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+* The ``wkb`` and ``hex`` properties of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
@@ -292,8 +294,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
-* By default, all logging messages reaching the `django` logger when
-  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+* By default, all logging messages reaching the ``django`` logger when
+  :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
 * When using :class:`~django.template.RequestContext`, it is now possible to
@@ -310,8 +312,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an `ignorenonexistent` option to
-  ignore data for fields that no longer exist.
+* The loaddata management command now supports an
+  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
+  longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -663,7 +666,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is `0666` (octal) and the current umask value
+  needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by
@@ -692,6 +695,10 @@ Miscellaneous
   :doc:`django.contrib.sites </ref/contrib/sites>`. This isn't allowed any
   longer. If you're using ``django.contrib.redirects``, make sure
   :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
+
+* :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
+  escapes its ``contents`` argument. To avoid the HTML escaping, use
+  :func:`django.utils.safestring.mark_safe` on the argument before passing it.
 
 Features deprecated in 1.5
 ==========================

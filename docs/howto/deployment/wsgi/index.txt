@@ -62,7 +62,7 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
     run multiple Django sites in the same process. This happens with mod_wsgi.
 
     To avoid this problem, use mod_wsgi's daemon mode with each site in its
-    own daemon process, or override the value from the environnemnt by
+    own daemon process, or override the value from the environment by
     enforcing ``os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"`` in
     your :file:`wsgi.py`.
 
@@ -71,7 +71,7 @@ Applying WSGI middleware
 ------------------------
 
 To apply `WSGI middleware`_ you can simply wrap the application object. For
-istance you could add these lines at the bottom of :file:`wsgi.py`::
+instance you could add these lines at the bottom of :file:`wsgi.py`::
 
     from helloworld.wsgi import HelloWorldApplication
     application = HelloWorldApplication(application)

@@ -3,9 +3,11 @@ Base/mixin classes for the spatial backend database operations and the
 `SpatialRefSys` model the backend.
 """
 import re
+
 from django.contrib.gis import gdal
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+
 
 class BaseSpatialOperations(object):
     """
@@ -18,7 +20,7 @@ class BaseSpatialOperations(object):
     geometry_operators = {}
     geography_operators = {}
     geography_functions = {}
-    gis_terms = {}
+    gis_terms = set()
     truncate_params = {}
 
     # Quick booleans for the type of this spatial backend, and

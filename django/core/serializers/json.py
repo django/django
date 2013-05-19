@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import datetime
 import decimal
 import json
+import sys
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -72,7 +73,7 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        raise DeserializationError(e)
+        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
 
 
 class DjangoJSONEncoder(json.JSONEncoder):

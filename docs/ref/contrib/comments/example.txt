@@ -4,6 +4,18 @@
 Example of using the built-in comments app
 ===========================================
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 Follow the first three steps of the quick start guide in the
 :doc:`documentation </ref/contrib/comments/index>`.
 

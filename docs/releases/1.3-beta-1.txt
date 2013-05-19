@@ -37,7 +37,7 @@ Based on feedback from the community this release adds two new options to the
 
 See the :doc:`staticfiles reference documentation </ref/contrib/staticfiles>`
 for more details, or learn :doc:`how to manage static files
-</howto/static-files>`.
+</howto/static-files/index>`.
 
 Translation comments
 ~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +154,7 @@ too few.
 In Django 1.3 we're taking a new approach to this problem, implemented
 as a pair of changes:
 
-* The choice list for `USStateField` has changed. Previously, it
+* The choice list for ``USStateField`` has changed. Previously, it
   consisted of the 50 U.S. states, the District of Columbia and
   U.S. overseas territories. As of Django 1.3 it includes all previous
   choices, plus the U.S. Armed Forces postal codes.
@@ -163,7 +163,7 @@ as a pair of changes:
   ``django.contrib.localflavor.us.models.USPostalCodeField``, has
   been added which draws its choices from a list of all postal
   abbreviations recognized by the U.S Postal Service. This includes
-  all abbreviations recognized by `USStateField`, plus three
+  all abbreviations recognized by ``USStateField``, plus three
   independent nations -- the Federated States of Micronesia, the
   Republic of the Marshall Islands and the Republic of Palau -- which
   are serviced under treaty by the U.S. postal system. A new form
@@ -176,7 +176,7 @@ territories, and other locations serviced by the U.S. postal
 system. Consult the ``django.contrib.localflavor`` documentation
 for more details.
 
-The change to `USStateField` is technically backwards-incompatible for
+The change to ``USStateField`` is technically backwards-incompatible for
 users who expect this field to exclude Armed Forces locations. If you
 need to support U.S. mailing addresses without Armed Forces locations,
 see the list of choice tuples available in the localflavor

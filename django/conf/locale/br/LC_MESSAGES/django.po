@@ -1,0 +1,1259 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Fulup  <fulup.jakez@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:47+0000\n"
+"Last-Translator: Fulup <fulup.jakez@gmail.com>\n"
+"Language-Team: Breton (http://www.transifex.com/projects/p/django/language/"
+"br/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: br\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: conf/global_settings.py:48
+msgid "Afrikaans"
+msgstr ""
+
+#: conf/global_settings.py:49
+msgid "Arabic"
+msgstr "Arabeg"
+
+#: conf/global_settings.py:50
+msgid "Azerbaijani"
+msgstr "Azeri"
+
+#: conf/global_settings.py:51
+msgid "Bulgarian"
+msgstr "Bulgareg"
+
+#: conf/global_settings.py:52
+msgid "Belarusian"
+msgstr ""
+
+#: conf/global_settings.py:53
+msgid "Bengali"
+msgstr "Bengaleg"
+
+#: conf/global_settings.py:54
+msgid "Breton"
+msgstr ""
+
+#: conf/global_settings.py:55
+msgid "Bosnian"
+msgstr "Bosneg"
+
+#: conf/global_settings.py:56
+msgid "Catalan"
+msgstr "Katalaneg"
+
+#: conf/global_settings.py:57
+msgid "Czech"
+msgstr "Tchekeg"
+
+#: conf/global_settings.py:58
+msgid "Welsh"
+msgstr "Kembraeg"
+
+#: conf/global_settings.py:59
+msgid "Danish"
+msgstr "Daneg"
+
+#: conf/global_settings.py:60
+msgid "German"
+msgstr "Alamaneg"
+
+#: conf/global_settings.py:61
+msgid "Greek"
+msgstr "Gresianeg"
+
+#: conf/global_settings.py:62
+msgid "English"
+msgstr "Saozneg"
+
+#: conf/global_settings.py:63
+msgid "British English"
+msgstr "Saozneg Breizh-Veur"
+
+#: conf/global_settings.py:64
+msgid "Esperanto"
+msgstr "Esperanteg"
+
+#: conf/global_settings.py:65
+msgid "Spanish"
+msgstr "Spagnoleg"
+
+#: conf/global_settings.py:66
+msgid "Argentinian Spanish"
+msgstr "Spagnoleg Arc'hantina"
+
+#: conf/global_settings.py:67
+msgid "Mexican Spanish"
+msgstr "Spagnoleg Mec'hiko"
+
+#: conf/global_settings.py:68
+msgid "Nicaraguan Spanish"
+msgstr "Spagnoleg Nicaragua"
+
+#: conf/global_settings.py:69
+msgid "Venezuelan Spanish"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Estonian"
+msgstr "Estoneg"
+
+#: conf/global_settings.py:71
+msgid "Basque"
+msgstr "Euskareg"
+
+#: conf/global_settings.py:72
+msgid "Persian"
+msgstr "Perseg"
+
+#: conf/global_settings.py:73
+msgid "Finnish"
+msgstr "Finneg"
+
+#: conf/global_settings.py:74
+msgid "French"
+msgstr "Galleg"
+
+#: conf/global_settings.py:75
+msgid "Frisian"
+msgstr "Frizeg"
+
+#: conf/global_settings.py:76
+msgid "Irish"
+msgstr "Iwerzhoneg"
+
+#: conf/global_settings.py:77
+msgid "Galician"
+msgstr "Galizeg"
+
+#: conf/global_settings.py:78
+msgid "Hebrew"
+msgstr "Hebraeg"
+
+#: conf/global_settings.py:79
+msgid "Hindi"
+msgstr "Hindi"
+
+#: conf/global_settings.py:80
+msgid "Croatian"
+msgstr "Kroateg"
+
+#: conf/global_settings.py:81
+msgid "Hungarian"
+msgstr "Hungareg"
+
+#: conf/global_settings.py:82
+msgid "Interlingua"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Indonesian"
+msgstr "Indonezeg"
+
+#: conf/global_settings.py:84
+msgid "Icelandic"
+msgstr "Islandeg"
+
+#: conf/global_settings.py:85
+msgid "Italian"
+msgstr "Italianeg"
+
+#: conf/global_settings.py:86
+msgid "Japanese"
+msgstr "Japaneg"
+
+#: conf/global_settings.py:87
+msgid "Georgian"
+msgstr "Jorjianeg"
+
+#: conf/global_settings.py:88
+msgid "Kazakh"
+msgstr "kazak"
+
+#: conf/global_settings.py:89
+msgid "Khmer"
+msgstr "Khmer"
+
+#: conf/global_settings.py:90
+msgid "Kannada"
+msgstr "Kannata"
+
+#: conf/global_settings.py:91
+msgid "Korean"
+msgstr "Koreaneg"
+
+#: conf/global_settings.py:92
+msgid "Luxembourgish"
+msgstr ""
+
+#: conf/global_settings.py:93
+msgid "Lithuanian"
+msgstr "Lituaneg"
+
+#: conf/global_settings.py:94
+msgid "Latvian"
+msgstr "Latveg"
+
+#: conf/global_settings.py:95
+msgid "Macedonian"
+msgstr "Makedoneg"
+
+#: conf/global_settings.py:96
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: conf/global_settings.py:97
+msgid "Mongolian"
+msgstr "Mongoleg"
+
+#: conf/global_settings.py:98
+msgid "Norwegian Bokmal"
+msgstr "Norvegeg Bokmal"
+
+#: conf/global_settings.py:99
+msgid "Nepali"
+msgstr "nepaleg"
+
+#: conf/global_settings.py:100
+msgid "Dutch"
+msgstr "Nederlandeg"
+
+#: conf/global_settings.py:101
+msgid "Norwegian Nynorsk"
+msgstr "Norvegeg Nynorsk"
+
+#: conf/global_settings.py:102
+msgid "Punjabi"
+msgstr "Punjabeg"
+
+#: conf/global_settings.py:103
+msgid "Polish"
+msgstr "Poloneg"
+
+#: conf/global_settings.py:104
+msgid "Portuguese"
+msgstr "Portugaleg"
+
+#: conf/global_settings.py:105
+msgid "Brazilian Portuguese"
+msgstr "Portugaleg Brazil"
+
+#: conf/global_settings.py:106
+msgid "Romanian"
+msgstr "Roumaneg"
+
+#: conf/global_settings.py:107
+msgid "Russian"
+msgstr "Rusianeg"
+
+#: conf/global_settings.py:108
+msgid "Slovak"
+msgstr "Slovakeg"
+
+#: conf/global_settings.py:109
+msgid "Slovenian"
+msgstr "Sloveneg"
+
+#: conf/global_settings.py:110
+msgid "Albanian"
+msgstr "Albaneg"
+
+#: conf/global_settings.py:111
+msgid "Serbian"
+msgstr "Serbeg"
+
+#: conf/global_settings.py:112
+msgid "Serbian Latin"
+msgstr "Serbeg e lizherennoù latin"
+
+#: conf/global_settings.py:113
+msgid "Swedish"
+msgstr "Svedeg"
+
+#: conf/global_settings.py:114
+msgid "Swahili"
+msgstr "swahileg"
+
+#: conf/global_settings.py:115
+msgid "Tamil"
+msgstr "Tamileg"
+
+#: conf/global_settings.py:116
+msgid "Telugu"
+msgstr "Telougou"
+
+#: conf/global_settings.py:117
+msgid "Thai"
+msgstr "Thai"
+
+#: conf/global_settings.py:118
+msgid "Turkish"
+msgstr "Turkeg"
+
+#: conf/global_settings.py:119
+msgid "Tatar"
+msgstr "tatar"
+
+#: conf/global_settings.py:120
+msgid "Udmurt"
+msgstr ""
+
+#: conf/global_settings.py:121
+msgid "Ukrainian"
+msgstr "Ukraineg"
+
+#: conf/global_settings.py:122
+msgid "Urdu"
+msgstr "Ourdou"
+
+#: conf/global_settings.py:123
+msgid "Vietnamese"
+msgstr "Vietnameg"
+
+#: conf/global_settings.py:124
+msgid "Simplified Chinese"
+msgstr "Sinaeg eeunaet"
+
+#: conf/global_settings.py:125
+msgid "Traditional Chinese"
+msgstr "Sinaeg hengounel"
+
+#: core/validators.py:21 forms/fields.py:52
+msgid "Enter a valid value."
+msgstr "Merkit un talvoud reizh"
+
+#: core/validators.py:104 forms/fields.py:464
+msgid "Enter a valid email address."
+msgstr ""
+
+#: core/validators.py:107 forms/fields.py:1013
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"N'hall bezañ er vaezienn-mañ nemet lizherennoù, niveroù, tiredoù izel _ ha "
+"barrennigoù-stagañ."
+
+#: core/validators.py:110 core/validators.py:129 forms/fields.py:987
+msgid "Enter a valid IPv4 address."
+msgstr "Merkit ur chomlec'h IPv4 reizh."
+
+#: core/validators.py:115 core/validators.py:130
+msgid "Enter a valid IPv6 address."
+msgstr "Merkit ur chomlec'h IPv6 reizh."
+
+#: core/validators.py:125 core/validators.py:128
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Merkit ur chomlec'h IPv4 pe IPv6 reizh."
+
+#: core/validators.py:151 db/models/fields/__init__.py:655
+msgid "Enter only digits separated by commas."
+msgstr "Merkañ hepken sifroù dispartiet dre skejoù."
+
+#: core/validators.py:157
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+"Bezit sur ez eo an talvoud-mañ %(limit_value)s (evit ar mare ez eo "
+"%(show_value)s)."
+
+#: core/validators.py:176 forms/fields.py:210 forms/fields.py:263
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Gwiriit mat emañ an talvoud-mañ a-is pe par da %(limit_value)s."
+
+#: core/validators.py:182 forms/fields.py:211 forms/fields.py:264
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Gwiriit mat emañ an talvoud-mañ a-us pe par da %(limit_value)s."
+
+#: core/validators.py:189
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Gwiriit mat ez eus da nebeutañ %(limit_value)d arouezenn en talvoud-mañ "
+"(evit ar mare ez eus %(show_value)d)."
+
+#: core/validators.py:196
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr ""
+"Gwiriit mat ez eus d'ar muiañ %(limit_value)d arouezenn en talvoud-mañ (evit "
+"ar mare ez eus %(show_value)d)."
+
+#: db/models/base.py:857
+#, python-format
+msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
+msgstr ""
+"Ret eo da %(field_name)s bezañ e-unan evit al lodenn %(date_field)s "
+"%(lookup)s."
+
+#: db/models/base.py:880 forms/models.py:573
+msgid "and"
+msgstr "ha"
+
+#: db/models/base.py:881 db/models/fields/__init__.py:70
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "Bez' ez eus c'hoazh eus ur %(model_name)s gant ar %(field_label)s-mañ."
+
+#: db/models/fields/__init__.py:67
+#, python-format
+msgid "Value %r is not a valid choice."
+msgstr "N'eo ket an talvoud %r un dibab reizh."
+
+#: db/models/fields/__init__.py:68
+msgid "This field cannot be null."
+msgstr "N'hall ket ar vaezienn chom goullo"
+
+#: db/models/fields/__init__.py:69
+msgid "This field cannot be blank."
+msgstr "N'hall ket ar vaezienn chom goullo"
+
+#: db/models/fields/__init__.py:76
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Seurt maezienn : %(field_type)s"
+
+#: db/models/fields/__init__.py:517 db/models/fields/__init__.py:985
+msgid "Integer"
+msgstr "Anterin"
+
+#: db/models/fields/__init__.py:521 db/models/fields/__init__.py:983
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr "Ret eo d'an talvoud '%s' bezañ un niver anterin."
+
+#: db/models/fields/__init__.py:569
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr "Ret eo d'an talvoud '%s' bezañ Gwir pe Gaou."
+
+#: db/models/fields/__init__.py:571
+msgid "Boolean (Either True or False)"
+msgstr "Boulean (gwir pe gaou)"
+
+#: db/models/fields/__init__.py:622
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "neudennad arouezennoù (betek %(max_length)s)"
+
+#: db/models/fields/__init__.py:650
+msgid "Comma-separated integers"
+msgstr "Niveroù anterin dispartiet dre ur skej"
+
+#: db/models/fields/__init__.py:664
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr ""
+"Direizh eo furmad deiziad an talvoud '%s'. Ret eo dezhañ klotañ gant BBBB-MM-"
+"DD."
+
+#: db/models/fields/__init__.py:666 db/models/fields/__init__.py:754
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr ""
+"Reizh eo furmad deiziad an talvoud '%s'  (BBBB-MM-DD) nemet eo faos an "
+"deiziad."
+
+#: db/models/fields/__init__.py:669
+msgid "Date (without time)"
+msgstr "Deizad (hep eur)"
+
+#: db/models/fields/__init__.py:752
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"Direizh eo furmad deiziad an talvoud '%s'. Ret eo dezhañ klotañ gant ar "
+"furmad BBBB-MM-DD HH:MM[:ss[.uuuuuu]][TZ] ."
+
+#: db/models/fields/__init__.py:756
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
+"Reizh eo furmad deiziad an talvoud '%s' (BBBB-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"nemet eo faos an eur/deiziad."
+
+#: db/models/fields/__init__.py:760
+msgid "Date (with time)"
+msgstr "Deizad (gant an eur)"
+
+#: db/models/fields/__init__.py:849
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr "Ret eo d'an talvoud '%s' bezañ un niver dekvedennel."
+
+#: db/models/fields/__init__.py:851
+msgid "Decimal number"
+msgstr "Niver dekvedennel"
+
+#: db/models/fields/__init__.py:908
+msgid "Email address"
+msgstr "Chomlec'h postel"
+
+#: db/models/fields/__init__.py:927
+msgid "File path"
+msgstr "Treug war-du ar restr"
+
+#: db/models/fields/__init__.py:954
+#, python-format
+msgid "'%s' value must be a float."
+msgstr "Ret eo d'an talvoud '%s' bezañ ur skej nij."
+
+#: db/models/fields/__init__.py:956
+msgid "Floating point number"
+msgstr "Niver gant skej nij"
+
+#: db/models/fields/__init__.py:1017
+msgid "Big (8 byte) integer"
+msgstr "Anterin bras (8 okted)"
+
+#: db/models/fields/__init__.py:1031
+msgid "IPv4 address"
+msgstr "Chomlec'h IPv4"
+
+#: db/models/fields/__init__.py:1047
+msgid "IP address"
+msgstr "Chomlec'h IP"
+
+#: db/models/fields/__init__.py:1090
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr "Ret eo d'an talvoud '%s' bezañ Netra, Gwir pe Gaou."
+
+#: db/models/fields/__init__.py:1092
+msgid "Boolean (Either True, False or None)"
+msgstr "Boulean (gwir pe gaou pe netra)"
+
+#: db/models/fields/__init__.py:1141
+msgid "Positive integer"
+msgstr "Niver anterin pozitivel"
+
+#: db/models/fields/__init__.py:1152
+msgid "Positive small integer"
+msgstr "Niver anterin bihan pozitivel"
+
+#: db/models/fields/__init__.py:1163
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (betek %(max_length)s arouez.)"
+
+#: db/models/fields/__init__.py:1181
+msgid "Small integer"
+msgstr "Niver anterin bihan"
+
+#: db/models/fields/__init__.py:1187
+msgid "Text"
+msgstr "Testenn"
+
+#: db/models/fields/__init__.py:1205
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+"Direizh eo furmad an talvoud '%s'. Ret eo dezhañ klotañ gant ar furmad HH:MM"
+"[:ss[.uuuuuu]]."
+
+#: db/models/fields/__init__.py:1207
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+"Reizh eo furmad deiziad an talvoud '%s' (HH:MM[:ss[.uuuuuu]]) nemet eo faos "
+"an eur."
+
+#: db/models/fields/__init__.py:1210
+msgid "Time"
+msgstr "Eur"
+
+#: db/models/fields/__init__.py:1272
+msgid "URL"
+msgstr "URL"
+
+#: db/models/fields/files.py:216
+msgid "File"
+msgstr "Restr"
+
+#: db/models/fields/files.py:323
+msgid "Image"
+msgstr "Skeudenn"
+
+#: db/models/fields/related.py:979
+#, python-format
+msgid "Model %(model)s with pk %(pk)r does not exist."
+msgstr "N'eus ket eus ar patrom %(model)s gant an alc'hwez-mamm pk %(pk)r."
+
+#: db/models/fields/related.py:981
+msgid "Foreign Key (type determined by related field)"
+msgstr "Alc'hwez estren (seurt termenet dre ar vaezienn liammet)"
+
+#: db/models/fields/related.py:1111
+msgid "One-to-one relationship"
+msgstr "Darempred unan-ouzh-unan"
+
+#: db/models/fields/related.py:1178
+msgid "Many-to-many relationship"
+msgstr "Darempred lies-ouzh-lies"
+
+#: db/models/fields/related.py:1203
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Dalc'hit da bouezañ \"Ktrl\" pe \"Urzhiad\" (stokell Aval) war ur Mac."
+
+#: forms/fields.py:51
+msgid "This field is required."
+msgstr "Rekis eo leuniañ ar vaezienn."
+
+#: forms/fields.py:209
+msgid "Enter a whole number."
+msgstr "Merkit un niver anterin."
+
+#: forms/fields.py:241 forms/fields.py:262
+msgid "Enter a number."
+msgstr "Merkit un niver."
+
+#: forms/fields.py:265
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Gwiriit mat n'eus ket ouzhpenn %s sifr en holl."
+
+#: forms/fields.py:266
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Gwiriit mat n'eus ket ouzhpenn %s sifr goude ar skej."
+
+#: forms/fields.py:267
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Gwiriit mat n'eus ket ouzhpenn %s sifr a-raok ar skej."
+
+#: forms/fields.py:355 forms/fields.py:953
+msgid "Enter a valid date."
+msgstr "Merkit un deiziad reizh"
+
+#: forms/fields.py:378 forms/fields.py:954
+msgid "Enter a valid time."
+msgstr "Merkit un eur reizh"
+
+#: forms/fields.py:399
+msgid "Enter a valid date/time."
+msgstr "Merkit un eur/deiziad reizh"
+
+#: forms/fields.py:475
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "N'eus ket kaset restr ebet. Gwiriit ar seurt enkodañ evit ar restr"
+
+#: forms/fields.py:476
+msgid "No file was submitted."
+msgstr "N'eus bet kaset restr ebet."
+
+#: forms/fields.py:477
+msgid "The submitted file is empty."
+msgstr "Goullo eo ar restr kaset."
+
+#: forms/fields.py:478
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+"Gwiriit mat n'eus ket ouzhpenn %(max)d arouezenn da anv ar restr (bez' he "
+"deus %(length)d)."
+
+#: forms/fields.py:479
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Kasit ur restr pe askit al log riñsañ; an eil pe egile"
+
+#: forms/fields.py:534
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Enpozhiit ur skeudenn reizh. Ar seurt bet enporzhiet ganeoc'h a oa foeltret "
+"pe ne oa ket ur skeudenn"
+
+#: forms/fields.py:580
+msgid "Enter a valid URL."
+msgstr "Merkit un URL reizh"
+
+#: forms/fields.py:666 forms/fields.py:746
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Dizuit un dibab reizh. %(value)s n'emañ ket e-touez an dibaboù posupl."
+
+#: forms/fields.py:747 forms/fields.py:835 forms/models.py:1002
+msgid "Enter a list of values."
+msgstr "Merkit ur roll talvoudoù"
+
+#: forms/formsets.py:324 forms/formsets.py:326
+msgid "Order"
+msgstr "Urzh"
+
+#: forms/formsets.py:328
+msgid "Delete"
+msgstr "Diverkañ"
+
+#: forms/models.py:567
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Reizhit ar roadennoù e doubl e %(field)s."
+
+#: forms/models.py:571
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+"Reizhit ar roadennoù e doubl e %(field)s, na zle bezañ enni nemet talvoudoù "
+"dzho o-unan."
+
+#: forms/models.py:577
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Reizhit ar roadennoù e doubl e %(field_name)s a rank bezañ ennañ talvodoù en "
+"o-unan evit lodenn %(lookup)s %(date_field)s."
+
+#: forms/models.py:585
+msgid "Please correct the duplicate values below."
+msgstr "Reizhañ ar roadennoù e doubl zo a-is"
+
+#: forms/models.py:852
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr ""
+"Ne glot ket an alc'hwez estren enlinenn gant alc'hwez-mamm an urzhiataer "
+"galloudel kar"
+
+#: forms/models.py:913
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Diuzit un dibab reizh. N'emañ ket an dibab-mañ e-touez ar re bosupl."
+
+#: forms/models.py:1003
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Diuzit un dibab reizh. N'emañ ket %s e-touez ar re bosupl."
+
+#: forms/models.py:1005
+#, python-format
+msgid "\"%s\" is not a valid value for a primary key."
+msgstr "N'eo ket \"%s\" un talvoud reizh evit un alc'hwez-mamm."
+
+#: forms/util.py:81
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"N'eo ket bete komprenet an talvoud %(datetime)s er werzhid eur "
+"%(current_timezone)s; pe eo amjestr pe n'eus ket anezhañ."
+
+#: forms/widgets.py:336
+msgid "Currently"
+msgstr "Evit ar mare"
+
+#: forms/widgets.py:337
+msgid "Change"
+msgstr "Kemmañ"
+
+#: forms/widgets.py:338
+msgid "Clear"
+msgstr "Riñsañ"
+
+#: forms/widgets.py:594
+msgid "Unknown"
+msgstr "Dianav"
+
+#: forms/widgets.py:595
+msgid "Yes"
+msgstr "Ya"
+
+#: forms/widgets.py:596
+msgid "No"
+msgstr "Ket"
+
+#: template/defaultfilters.py:794
+msgid "yes,no,maybe"
+msgstr "ya, ket, marteze"
+
+#: template/defaultfilters.py:822 template/defaultfilters.py:833
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d okted"
+msgstr[1] "%(size)d okted"
+
+#: template/defaultfilters.py:835
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#: template/defaultfilters.py:837
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: template/defaultfilters.py:839
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#: template/defaultfilters.py:841
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#: template/defaultfilters.py:842
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+#: utils/dateformat.py:47
+msgid "p.m."
+msgstr "g.m."
+
+#: utils/dateformat.py:48
+msgid "a.m."
+msgstr "mintin"
+
+#: utils/dateformat.py:53
+msgid "PM"
+msgstr "G.M."
+
+#: utils/dateformat.py:54
+msgid "AM"
+msgstr "Mintin"
+
+#: utils/dateformat.py:103
+msgid "midnight"
+msgstr "hanternoz"
+
+#: utils/dateformat.py:105
+msgid "noon"
+msgstr "kreisteiz"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Lun"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Meurzh"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Merc'her"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Yaou"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Gwener"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Sadorn"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Sul"
+
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Lun"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Meu"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Mer"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Yao"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Gwe"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Sad"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Sul"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "Genver"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "C'hwevrer"
+
+#: utils/dates.py:18
+msgid "March"
+msgstr "Meurzh"
+
+#: utils/dates.py:18
+msgid "April"
+msgstr "Ebrel"
+
+#: utils/dates.py:18
+msgid "May"
+msgstr "Mae"
+
+#: utils/dates.py:18
+msgid "June"
+msgstr "Mezheven"
+
+#: utils/dates.py:19
+msgid "July"
+msgstr "Gouere"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "Eost"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "Gwengolo"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "Here"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "Du"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "Kerzu"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "Gen"
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "C'hwe"
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "Meu"
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "Ebr"
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "Mae"
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "Mez"
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "Gou"
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "Eos"
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "Gwe"
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "Her"
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "Du"
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "Kzu"
+
+#: utils/dates.py:31
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Gen."
+
+#: utils/dates.py:32
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "C'hwe."
+
+#: utils/dates.py:33
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Meu."
+
+#: utils/dates.py:34
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "Ebr."
+
+#: utils/dates.py:35
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "Mae"
+
+#: utils/dates.py:36
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "Mez."
+
+#: utils/dates.py:37
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "Gou."
+
+#: utils/dates.py:38
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Eos."
+
+#: utils/dates.py:39
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Gwe."
+
+#: utils/dates.py:40
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Her."
+
+#: utils/dates.py:41
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Du"
+
+#: utils/dates.py:42
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Kzu"
+
+#: utils/dates.py:45
+msgctxt "alt. month"
+msgid "January"
+msgstr "Genver"
+
+#: utils/dates.py:46
+msgctxt "alt. month"
+msgid "February"
+msgstr "C'hwevrer"
+
+#: utils/dates.py:47
+msgctxt "alt. month"
+msgid "March"
+msgstr "Meurzh"
+
+#: utils/dates.py:48
+msgctxt "alt. month"
+msgid "April"
+msgstr "Ebrel"
+
+#: utils/dates.py:49
+msgctxt "alt. month"
+msgid "May"
+msgstr "Mae"
+
+#: utils/dates.py:50
+msgctxt "alt. month"
+msgid "June"
+msgstr "Mezheven"
+
+#: utils/dates.py:51
+msgctxt "alt. month"
+msgid "July"
+msgstr "Gouere"
+
+#: utils/dates.py:52
+msgctxt "alt. month"
+msgid "August"
+msgstr "Eost"
+
+#: utils/dates.py:53
+msgctxt "alt. month"
+msgid "September"
+msgstr "Gwengolo"
+
+#: utils/dates.py:54
+msgctxt "alt. month"
+msgid "October"
+msgstr "Here"
+
+#: utils/dates.py:55
+msgctxt "alt. month"
+msgid "November"
+msgstr "Du"
+
+#: utils/dates.py:56
+msgctxt "alt. month"
+msgid "December"
+msgstr "Kerzu"
+
+#: utils/text.py:70
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
+
+#: utils/text.py:239
+msgid "or"
+msgstr "pe"
+
+#. Translators: This string is used as a separator between list elements
+#: utils/text.py:256
+msgid ", "
+msgstr ","
+
+#: utils/timesince.py:22
+msgid "year"
+msgid_plural "years"
+msgstr[0] "bloaz"
+msgstr[1] "bloaz"
+
+#: utils/timesince.py:23
+msgid "month"
+msgid_plural "months"
+msgstr[0] "miz"
+msgstr[1] "miz"
+
+#: utils/timesince.py:24
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "sizhun"
+msgstr[1] "sizhun"
+
+#: utils/timesince.py:25
+msgid "day"
+msgid_plural "days"
+msgstr[0] "deiz"
+msgstr[1] "deiz"
+
+#: utils/timesince.py:26
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "eur"
+msgstr[1] "eur"
+
+#: utils/timesince.py:27
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "munut"
+msgstr[1] "munut"
+
+#: utils/timesince.py:43
+msgid "minutes"
+msgstr "munut"
+
+#: utils/timesince.py:48
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:54
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: views/static.py:56
+msgid "Directory indexes are not allowed here."
+msgstr "N'haller ket diskwel endalc'had ar c'havlec'h-mañ."
+
+#: views/static.py:58
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr "N'eus ket eus \"%(path)s\""
+
+#: views/static.py:98
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Meneger %(directory)s"
+
+#: views/generic/dates.py:42
+msgid "No year specified"
+msgstr "N'eus bet resisaet bloavezh ebet"
+
+#: views/generic/dates.py:98
+msgid "No month specified"
+msgstr "N'eus bet resisaet miz ebet"
+
+#: views/generic/dates.py:157
+msgid "No day specified"
+msgstr "N'eus bet resisaet deiz ebet"
+
+#: views/generic/dates.py:213
+msgid "No week specified"
+msgstr "N'eus bet resisaet sizhun ebet"
+
+#: views/generic/dates.py:368 views/generic/dates.py:393
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "N'eus %(verbose_name_plural)s ebet da gaout."
+
+#: views/generic/dates.py:646
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"En dazont ne vo ket a %(verbose_name_plural)s rak faos eo %(class_name)s."
+"allow_future."
+
+#: views/generic/dates.py:678
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+"Direizh eo ar furmad '%(format)s' evit an neudennad deiziad '%(datestr)s'"
+
+#: views/generic/detail.py:54
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+"N'eus bet kavet traezenn %(verbose_name)s ebet o klotaén gant ar goulenn"
+
+#: views/generic/list.py:51
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+"N'eo ket 'last' ar bajenn na n'hall ket bezañ amdroet en un niver anterin."
+
+#: views/generic/list.py:56
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: views/generic/list.py:137
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr "Roll goullo ha faos eo '%(class_name)s.allow_empty'."

@@ -54,6 +54,7 @@ The following countries have django-localflavor- packages.
 * Finland: https://github.com/django/django-localflavor-fi
 * France: https://github.com/django/django-localflavor-fr
 * Germany: https://github.com/django/django-localflavor-de
+* Greece: https://github.com/spapas/django-localflavor-gr
 * Hong Kong: https://github.com/django/django-localflavor-hk
 * Iceland: https://github.com/django/django-localflavor-is
 * India: https://github.com/django/django-localflavor-in

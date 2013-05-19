@@ -71,7 +71,7 @@ class CachedFilesMixin(object):
                     pattern, template = pattern
                 else:
                     template = self.default_template
-                compiled = re.compile(pattern)
+                compiled = re.compile(pattern, re.IGNORECASE)
                 self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
@@ -251,7 +251,10 @@ class CachedFilesMixin(object):
                     for patterns in self._patterns.values():
                         for pattern, template in patterns:
                             converter = self.url_converter(name, template)
-                            content = pattern.sub(converter, content)
+                            try:
+                                content = pattern.sub(converter, content)
+                            except ValueError as exc:
+                                yield name, None, exc
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result

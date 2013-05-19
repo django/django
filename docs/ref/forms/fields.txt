@@ -30,6 +30,8 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid email address.']
 
+.. _core-field-arguments:
+
 Core field arguments
 --------------------
 
@@ -398,21 +400,21 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d',       # '2006-10-25'
+        ['%Y-%m-%d',       # '2006-10-25'
         '%m/%d/%Y',       # '10/25/2006'
-        '%m/%d/%y',       # '10/25/06'
+        '%m/%d/%y']       # '10/25/06'
 
     Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
     following will also be included in the default input formats::
 
-        '%b %d %Y',       # 'Oct 25 2006'
+        ['%b %d %Y',      # 'Oct 25 2006'
         '%b %d, %Y',      # 'Oct 25, 2006'
         '%d %b %Y',       # '25 Oct 2006'
         '%d %b, %Y',      # '25 Oct, 2006'
         '%B %d %Y',       # 'October 25 2006'
         '%B %d, %Y',      # 'October 25, 2006'
         '%d %B %Y',       # '25 October 2006'
-        '%d %B, %Y',      # '25 October, 2006'
+        '%d %B, %Y']      # '25 October, 2006'
 
     See also :ref:`format localization <format-localization>`.
 
@@ -437,7 +439,7 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+        ['%Y-%m-%d %H:%M:%S',    # '2006-10-25 14:30:59'
         '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
         '%Y-%m-%d',              # '2006-10-25'
         '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
@@ -445,7 +447,7 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%Y',              # '10/25/2006'
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-        '%m/%d/%y',              # '10/25/06'
+        '%m/%d/%y']              # '10/25/06'
 
     See also :ref:`format localization <format-localization>`.
 
@@ -466,6 +468,11 @@ For each field, we describe the default widget used if you don't specify
 
     The ``max_value`` and ``min_value`` error messages may contain
     ``%(limit_value)s``, which will be substituted by the appropriate limit.
+
+    .. versionchanged:: 1.6
+
+        Similarly, the ``max_digits``, ``max_decimal_places`` and
+        ``max_whole_digits`` error messages may contain ``%(max)s``.
 
     Takes four optional arguments:
 
@@ -603,19 +610,21 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by PIL.
+      file is of an image format understood by Pillow/PIL.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
-    is installed and supports the image formats you use. If you encounter a
-    ``corrupt image`` error when you upload an image, it usually means PIL
+    Using an ``ImageField`` requires that either `Pillow`_ (recommended) or the
+    `Python Imaging Library`_ (PIL) are installed and supports the image
+    formats you use. If you encounter a ``corrupt image`` error when you
+    upload an image, it usually means either Pillow or PIL
     doesn't understand its format. To fix this, install the appropriate
-    library and reinstall PIL.
+    library and reinstall Pillow or PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+.. _Pillow: http://python-imaging.github.io/Pillow/
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
@@ -1010,8 +1019,15 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
       ``invalid_pk_value``
 
     .. versionchanged:: 1.5
+
         The empty and normalized values were changed to be consistently
         ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
+
+    .. versionchanged:: 1.6
+
+        The ``invalid_choice`` message may contain ``%(value)s`` and the
+        ``invalid_pk_value`` message may contain ``%(pk)s``, which will be
+        substituted by the appropriate values.
 
     Allows the selection of one or more model objects, suitable for
     representing a many-to-many relation. As with :class:`ModelChoiceField`,

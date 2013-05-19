@@ -143,7 +143,7 @@ def get_template_dirs():
     """
     from django.conf import settings
     dirs = set()
-    if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS 
+    if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
         or  'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
@@ -281,12 +281,10 @@ def search_python_list(python_code, template_names):
     Returns a list of tuples, each one being:
      (filename, line number)
     """
-    retval = []
+    retval = set()
     for tn in template_names:
-        retval.extend(search_python(python_code, tn))
-    retval = list(set(retval))
-    retval.sort()
-    return retval
+        retval.update(search_python(python_code, tn))
+    return sorted(retval)
 
 def search_python(python_code, template_name):
     """

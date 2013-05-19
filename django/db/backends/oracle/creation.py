@@ -17,6 +17,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     data_types = {
         'AutoField':                    'NUMBER(11)',
+        'BinaryField':                  'BLOB',
         'BooleanField':                 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
         'CharField':                    'NVARCHAR2(%(max_length)s)',
         'CommaSeparatedIntegerField':   'VARCHAR2(%(max_length)s)',
@@ -272,6 +273,3 @@ class DatabaseCreation(BaseDatabaseCreation):
             settings_dict['NAME'],
             self._test_database_user(),
         )
-
-    def set_autocommit(self):
-        self.connection.connection.autocommit = True

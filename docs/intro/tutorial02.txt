@@ -78,8 +78,8 @@ Make the poll app modifiable in the admin
 But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: we need to tell the admin that ``Poll``
-objects have an admin interface. To do this, open the file called
-``admin.py`` in your ``polls`` directory, and edit it to look like this::
+objects have an admin interface. To do this, open the :file:`polls/admin.py`
+file, and edit it to look like this::
 
     from django.contrib import admin
     from polls.models import Poll
@@ -158,6 +158,9 @@ you want when you register the object.
 Let's see how this works by re-ordering the fields on the edit form. Replace
 the ``admin.site.register(Poll)`` line with::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
 
@@ -179,6 +182,9 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),
@@ -197,6 +203,9 @@ You can assign arbitrary HTML classes to each fieldset. Django provides a
 ``"collapse"`` class that displays a particular fieldset initially collapsed.
 This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
+
+        from django.contrib import admin
+        from polls.models import Poll
 
         class PollAdmin(admin.ModelAdmin):
             fieldsets = [
@@ -218,6 +227,7 @@ Yet.
 There are two ways to solve this problem. The first is to register ``Choice``
 with the admin just as we did with ``Poll``. That's easy::
 
+    from django.contrib import admin
     from polls.models import Choice
 
     admin.site.register(Choice)
@@ -339,8 +349,14 @@ of an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
-You can improve that by giving that method (in ``models.py``) a few
+You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
+
+    import datetime
+    from django.utils import timezone
+    from django.db import models
+
+    from polls.models import Poll
 
     class Poll(models.Model):
         # ...
@@ -350,8 +366,8 @@ attributes, as follows::
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
-Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
-following line to ``PollAdmin``::
+Edit your :file:`polls/admin.py` file again and add an improvement to the Poll
+change list page: Filters. Add the following line to ``PollAdmin``::
 
     list_filter = ['pub_date']
 
@@ -404,21 +420,20 @@ system.
 Customizing your *project's* templates
 --------------------------------------
 
-Create a ``mytemplates`` directory in your project directory. Templates can
+Create a ``templates`` directory in your project directory. Templates can
 live anywhere on your filesystem that Django can access. (Django runs as
 whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
-Open your settings file (``mysite/settings.py``, remember) and  add a
+Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`TEMPLATE_DIRS` setting::
 
-    TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'mytemplates'),)
+    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-Don't forget the trailing comma. :setting:`TEMPLATE_DIRS` is a tuple of
-filesystem directories to check when loading Django templates; it's a search
-path.
+:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
+loading Django templates; it's a search path.
 
-Now create a directory called ``admin`` inside ``mytemplates``, and copy the
+Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
 (``django/contrib/admin/templates``) into that directory.

@@ -11,6 +11,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:     # Python 2
     from urlparse import urljoin
+import warnings
 
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
@@ -331,6 +332,8 @@ class ClearableFileInput(FileInput):
 
     template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
 
+    url_markup_template = '<a href="{0}">{1}</a>'
+
     def clear_checkbox_name(self, name):
         """
         Given the name of the file input, return the name of the clear checkbox
@@ -356,7 +359,7 @@ class ClearableFileInput(FileInput):
 
         if value and hasattr(value, "url"):
             template = self.template_with_initial
-            substitutions['initial'] = format_html('<a href="{0}">{1}</a>',
+            substitutions['initial'] = format_html(self.url_markup_template,
                                                    value.url,
                                                    force_text(value))
             if not self.is_required:
@@ -583,14 +586,16 @@ class SelectMultiple(Select):
 
 
 @python_2_unicode_compatible
-class RadioInput(SubWidget):
+class ChoiceInput(SubWidget):
     """
-    An object used by RadioFieldRenderer that represents a single
-    <input type='radio'>.
+    An object used by ChoiceFieldRenderer that represents a single
+    <input type='$input_type'>.
     """
+    input_type = None  # Subclasses must define this
 
     def __init__(self, name, value, attrs, choice, index):
-        self.name, self.value = name, value
+        self.name = name
+        self.value = value
         self.attrs = attrs
         self.choice_value = force_text(choice[0])
         self.choice_label = force_text(choice[1])
@@ -607,8 +612,7 @@ class RadioInput(SubWidget):
             label_for = format_html(' for="{0}_{1}"', self.attrs['id'], self.index)
         else:
             label_for = ''
-        choice_label = force_text(self.choice_label)
-        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), choice_label)
+        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -616,48 +620,96 @@ class RadioInput(SubWidget):
     def tag(self):
         if 'id' in self.attrs:
             self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
-        final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
+        final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))
 
+
+class RadioChoiceInput(ChoiceInput):
+    input_type = 'radio'
+
+    def __init__(self, *args, **kwargs):
+        super(RadioChoiceInput, self).__init__(*args, **kwargs)
+        self.value = force_text(self.value)
+
+
+class RadioInput(RadioChoiceInput):
+    def __init__(self, *args, **kwargs):
+        msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
+        warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+        super(RadioInput, self).__init__(*args, **kwargs)
+
+
+class CheckboxChoiceInput(ChoiceInput):
+    input_type = 'checkbox'
+
+    def __init__(self, *args, **kwargs):
+        super(CheckboxChoiceInput, self).__init__(*args, **kwargs)
+        self.value = set(force_text(v) for v in self.value)
+
+    def is_checked(self):
+        return self.choice_value in self.value
+
+
 @python_2_unicode_compatible
-class RadioFieldRenderer(object):
+class ChoiceFieldRenderer(object):
     """
     An object used by RadioSelect to enable customization of radio widgets.
     """
 
+    choice_input_class = None
+
     def __init__(self, name, value, attrs, choices):
-        self.name, self.value, self.attrs = name, value, attrs
+        self.name = name
+        self.value = value
+        self.attrs = attrs
         self.choices = choices
 
     def __iter__(self):
         for i, choice in enumerate(self.choices):
-            yield RadioInput(self.name, self.value, self.attrs.copy(), choice, i)
+            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, i)
 
     def __getitem__(self, idx):
         choice = self.choices[idx] # Let the IndexError propogate
-        return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
+        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):
         return self.render()
 
     def render(self):
-        """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul>\n{0}\n</ul>',
-                           format_html_join('\n', '<li>{0}</li>',
-                                            [(force_text(w),) for w in self]
-                                            ))
+        """
+        Outputs a <ul> for this set of choice fields.
+        If an id was given to the field, it is applied to the <ul> (each
+        item in the list will get an id of `$id_$i`).
+        """
+        id_ = self.attrs.get('id', None)
+        start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
+        output = [start_tag]
+        for widget in self:
+            output.append(format_html('<li>{0}</li>', force_text(widget)))
+        output.append('</ul>')
+        return mark_safe('\n'.join(output))
 
-class RadioSelect(Select):
-    renderer = RadioFieldRenderer
+
+class RadioFieldRenderer(ChoiceFieldRenderer):
+    choice_input_class = RadioChoiceInput
+
+
+class CheckboxFieldRenderer(ChoiceFieldRenderer):
+    choice_input_class = CheckboxChoiceInput
+
+
+class RendererMixin(object):
+    renderer = None  # subclasses must define this
+    _empty_value = None
 
     def __init__(self, *args, **kwargs):
         # Override the default renderer if we were passed one.
         renderer = kwargs.pop('renderer', None)
         if renderer:
             self.renderer = renderer
-        super(RadioSelect, self).__init__(*args, **kwargs)
+        super(RendererMixin, self).__init__(*args, **kwargs)
 
     def subwidgets(self, name, value, attrs=None, choices=()):
         for widget in self.get_renderer(name, value, attrs, choices):
@@ -665,55 +717,35 @@ class RadioSelect(Select):
 
     def get_renderer(self, name, value, attrs=None, choices=()):
         """Returns an instance of the renderer."""
-        if value is None: value = ''
-        str_value = force_text(value) # Normalize to string.
+        if value is None:
+            value = self._empty_value
         final_attrs = self.build_attrs(attrs)
         choices = list(chain(self.choices, choices))
-        return self.renderer(name, str_value, final_attrs, choices)
+        return self.renderer(name, value, final_attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
         return self.get_renderer(name, value, attrs, choices).render()
 
     def id_for_label(self, id_):
-        # RadioSelect is represented by multiple <input type="radio"> fields,
-        # each of which has a distinct ID. The IDs are made distinct by a "_X"
-        # suffix, where X is the zero-based index of the radio field. Thus,
-        # the label for a RadioSelect should reference the first one ('_0').
+        # Widgets using this RendererMixin are made of a collection of
+        # subwidgets, each with their own <label>, and distinct ID.
+        # The IDs are made distinct by y "_X" suffix, where X is the zero-based
+        # index of the choice field. Thus, the label for the main widget should
+        # reference the first subwidget, hence the "_0" suffix.
         if id_:
             id_ += '_0'
         return id_
 
-class CheckboxSelectMultiple(SelectMultiple):
-    def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = []
-        final_attrs = self.build_attrs(attrs, name=name)
-        id_ = final_attrs.get('id', None)
-        output = ['<ul>']
-        # Normalize to strings
-        str_values = set([force_text(v) for v in value])
-        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
-            # If an ID attribute was given, add a numeric index as a suffix,
-            # so that the checkboxes don't all have the same ID attribute.
-            if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-                label_for = format_html(' for="{0}_{1}"', id_, i)
-            else:
-                label_for = ''
 
-            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-            option_value = force_text(option_value)
-            rendered_cb = cb.render(name, option_value)
-            option_label = force_text(option_label)
-            output.append(format_html('<li><label{0}>{1} {2}</label></li>',
-                                      label_for, rendered_cb, option_label))
-        output.append('</ul>')
-        return mark_safe('\n'.join(output))
+class RadioSelect(RendererMixin, Select):
+    renderer = RadioFieldRenderer
+    _empty_value = ''
 
-    def id_for_label(self, id_):
-        # See the comment for RadioSelect.id_for_label()
-        if id_:
-            id_ += '_0'
-        return id_
+
+class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
+    renderer = CheckboxFieldRenderer
+    _empty_value = []
+
 
 class MultiWidget(Widget):
     """
@@ -743,7 +775,7 @@ class MultiWidget(Widget):
     You'll probably want to use this class with MultiValueField.
     """
     def __init__(self, widgets, attrs=None):
-        self.widgets = [isinstance(w, type) and w() or w for w in widgets]
+        self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super(MultiWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):

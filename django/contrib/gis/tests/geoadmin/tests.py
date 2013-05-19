@@ -1,12 +1,18 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
-from django.contrib.gis import admin
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.utils.unittest import skipUnless
 
-from .models import City
+if HAS_GEOS and HAS_SPATIAL_DB:
+    from django.contrib.gis import admin
+    from django.contrib.gis.geos import Point
+
+    from .models import City
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoAdminTest(TestCase):
     urls = 'django.contrib.gis.tests.geoadmin.urls'
 
@@ -24,10 +30,7 @@ class GeoAdminTest(TestCase):
             result)
 
     def test_olmap_WMS_rendering(self):
-        admin.site.unregister(City)
-        admin.site.register(City, admin.GeoModelAdmin)
-
-        geoadmin = admin.site._registry[City]
+        geoadmin = admin.GeoModelAdmin(City, admin.site)
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
             ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
