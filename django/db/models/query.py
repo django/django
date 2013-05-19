@@ -165,9 +165,9 @@ class QuerySet(object):
         while True:
             if len(self._result_cache) <= pos:
                 self._fill_cache(num=1)
-            if self._iter is None:
-                # we ran out of items
-                return False
+                if self._iter is None:
+                    # we ran out of items
+                    return False
             if self._result_cache[pos] == val:
                 return True
             pos += 1
