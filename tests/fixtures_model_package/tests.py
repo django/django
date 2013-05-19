@@ -102,8 +102,11 @@ class FixtureTestCase(TestCase):
         )
 
         # Load a fixture that doesn't exist
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
+        self.assertEqual(len(w), 1)
+        self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
 
         self.assertQuerysetEqual(
             Article.objects.all(), [

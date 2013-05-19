@@ -142,6 +142,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Loading a fixture that doesn't exist emits a warning
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             management.call_command('loaddata', 'unknown.json', verbosity=0,
                 commit=False)
         self.assertEqual(len(w), 1)
