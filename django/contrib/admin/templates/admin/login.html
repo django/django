@@ -14,7 +14,7 @@
 {% block content %}
 {% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
 <p class="errornote">
-{% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
 </p>
 {% endif %}
 
