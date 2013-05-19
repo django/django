@@ -28,3 +28,12 @@ class ManualPrimaryKeyTest(models.Model):
 
 class Profile(models.Model):
     person = models.ForeignKey(Person, primary_key=True)
+
+
+class Tag(models.Model):
+    text = models.CharField(max_length=256, unique=True)
+
+
+class Thing(models.Model):
+    name = models.CharField(max_length=256)
+    tags = models.ManyToManyField(Tag)
