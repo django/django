@@ -363,6 +363,8 @@ class QuerySet(object):
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
+        assert kwargs, \
+            'get_or_create() must be passed at least one keyword argument'
         lookup, params, defaults = self._extract_model_params(**kwargs)
         try:
             self._for_write = True
@@ -372,11 +374,13 @@ class QuerySet(object):
 
     def update_or_create(self, **kwargs):
         """
-        Looks up an object with the given kwargs, update them with defaults if exists, otherwise
-        create new one.
+        Looks up an object with the given kwargs, update them with defaults
+        if exists, otherwise create new one.
         Returns a tuple (object, created), where created is a boolean
         specyfing whether an object was created.
         """
+        assert kwargs, \
+            'update_or_create() must be passed at least one keyword argument'
         lookup, defaults, params = self._extract_model_params(**kwargs)
         try:
             self._for_write = True
@@ -421,6 +425,23 @@ class QuerySet(object):
                 except self.model.DoesNotExist:
                     # Re-raise the IntegrityError with its original traceback.
                     six.reraise(*exc_info)
+
+    def _extract_model_params(self, **kwargs):
+        """
+        Prepares lookup, params and defaults fields based on given kwargs.
+        Used in get_or_create and create_or_update.
+        """
+        _defaults = kwargs.pop('defaults', {})
+        defaults = {}
+        lookup = kwargs.copy()
+        for f in self.model._meta.fields:
+            if f.attname in lookup:
+                lookup[f.name] = lookup.pop(f.attname)
+            if f.attname in _defaults:
+                defaults[f.name] = _defaults.pop(f.attname)
+        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params.update(defaults)
+        return lookup, params, defaults
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
         """

@@ -1365,6 +1365,10 @@ The above example can be rewritten using ``get_or_create()`` like so::
     obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
                       defaults={'birthday': date(1940, 10, 9)})
 
+There is also similar method ``update_or_create`` which will be helpful
+in similar cases that reqires to ensure that model after performing update exists
+even where they didn't exists in database before.
+
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is
 found, ``get_or_create()`` returns a tuple of that object and ``False``. If
@@ -1444,10 +1448,10 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
   because ``title`` field should be unique.
 
 
-create_or_update
+update_or_create
 ~~~~~~~~~~~~~~~~
 
-.. method:: create_or_update(**kwargs)
+.. method:: update_or_create(**kwargs)
 
 A convenience method for updating an object with the given kwargs, creating
 new one if necessary.
@@ -1459,29 +1463,26 @@ created.
 The ``create_or_update`` method tries to fetch object from database based on passed
 keywords arguments, and then update fields passed in ``defaults`` dict on kwargs.
 
-For example::
+There is also similar method ``get_or_create`` which will be useful when we need
+to get object with given parameters even when they didnt's exists before.
 
-        Person.objects.create(
-            first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
-        )
-        person, created = Person.objects.create_or_update(
-            first_name="John", last_name="Lennon", defaults={
-                "birthday": date(1940, 10, 10)
-            }
-        )
+This is meant as a shortcut to boilerplatish code and is mostly useful for
+data-handling scripts. For example::
 
-After executing above code, created will be False, and person object would have updated
-value of their birthday.
+        try:
+            obj = SalesRank.objects.get(product_name='Pony')
+            for key, value in updated_values.iteritems():
+                setattr(obj, key, value)
+            obj.save()
+        except SalesRank.DoesNotExist:
+            obj = SalesRank(**updated_values.update({product_name='Pony')
+            obj.save()
 
-Second case is::
+This pattern gets quite unwieldy as the number of fields in a model goes up.
+The above example can be rewritten using ``update__or_create()`` like so::
 
-        person, created = Person.create_or_update(
-            first_name="Django", second_name="Pony", defaults={
-                "birthday": date(1990, 10, 10)
-            }
-        )
-
-New person object will be created with values form both plain kwargs and defaults.
+    obj, created = SalesRank.objects.update_or_create(produc_name='Pony,
+                      defaults=updated_values)
 
 For detailed description how names passed in kwargs are resolved see ``get_or_create`` documentation.
 
