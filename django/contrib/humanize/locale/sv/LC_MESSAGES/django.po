@@ -32,7 +32,7 @@ msgstr "imorgon"
 
 #: templatetags/humanize.py:25
 msgid "th"
-msgstr ":a"
+msgstr ":e"
 
 #: templatetags/humanize.py:25
 msgid "st"
@@ -40,7 +40,7 @@ msgstr ":a"
 
 #: templatetags/humanize.py:25
 msgid "nd"
-msgstr ":e"
+msgstr ":a"
 
 #: templatetags/humanize.py:25
 msgid "rd"
