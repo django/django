@@ -1243,7 +1243,7 @@ Default: ``()`` (Empty tuple)
 A tuple of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
-* Receive X headers if the ``XViewMiddleware`` is installed (see
+* Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
   :doc:`/topics/http/middleware`)
 
 .. setting:: LANGUAGE_CODE
