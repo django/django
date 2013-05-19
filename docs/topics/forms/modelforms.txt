@@ -23,6 +23,7 @@ class from a Django model.
 For example::
 
     >>> from django.forms import ModelForm
+    >>> from myapp.models import Article
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
@@ -222,6 +223,9 @@ supplied, ``save()`` will update that instance. If it's not supplied,
 
 .. code-block:: python
 
+    >>> from myapp.models import Article
+    >>> from myapp.forms import ArticleForm
+
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
 
@@ -316,6 +320,8 @@ these security concerns do not apply to you:
 1. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
    that all fields in the model should be used. For example::
 
+       from django.forms import ModelForm
+
        class AuthorForm(ModelForm):
            class Meta:
                model = Author
@@ -401,6 +407,7 @@ of its default ``<input type="text">``, you can override the field's
 widget::
 
     from django.forms import ModelForm, Textarea
+    from myapp.models import Author
 
     class AuthorForm(ModelForm):
         class Meta:
@@ -421,6 +428,9 @@ you can do this by declaratively specifying fields like you would in a regular
 For example, if you wanted to use ``MyDateFormField`` for the ``pub_date``
 field, you could do the following::
 
+    from django.forms import ModelForm
+    from myapp.models import Article
+
     class ArticleForm(ModelForm):
         pub_date = MyDateFormField()
 
@@ -431,6 +441,9 @@ field, you could do the following::
 
 If you want to override a field's default label, then specify the ``label``
 parameter when declaring the form field::
+
+    from django.forms import ModelForm, DateField
+    from myapp.models import Article
 
     class ArticleForm(ModelForm):
         pub_date = DateField(label='Publication date')
@@ -484,6 +497,8 @@ By default, the fields in a ``ModelForm`` will not localize their data. To
 enable localization for fields, you can use the ``localized_fields``
 attribute on the ``Meta`` class.
 
+    >>> from django.forms import ModelForm
+    >>> from myapp.models import Author
     >>> class AuthorForm(ModelForm):
     ...     class Meta:
     ...         model = Author
@@ -574,6 +589,7 @@ definition. This may be more convenient if you do not have many customizations
 to make::
 
     >>> from django.forms.models import modelform_factory
+    >>> from myapp.models import Book
     >>> BookForm = modelform_factory(Book, fields=("author", "title"))
 
 This can also be used to make simple modifications to existing forms, for
@@ -604,6 +620,7 @@ of enhanced formset classes that make it easy to work with Django models. Let's
 reuse the ``Author`` model from above::
 
     >>> from django.forms.models import modelformset_factory
+    >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
@@ -642,6 +659,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
     from django.forms.models import BaseModelFormSet
+    from myapp.models import Author
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
@@ -787,6 +805,10 @@ Using a model formset in a view
 Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
+    from django.forms.models import modelformset_factory
+    from django.shortcuts import render_to_response
+    from myapp.models import Author
+
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
         if request.method == 'POST':
@@ -815,18 +837,25 @@ the unique constraints on your model (either ``unique``, ``unique_together`` or
 on a ``model_formset`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
+    from django.forms.models import BaseModelFormSet
+
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
             super(MyModelFormSet, self).clean()
             # example custom validation across forms in the formset:
             for form in self.forms:
                 # your custom formset validation
+                pass
 
 Using a custom queryset
 -----------------------
 
 As stated earlier, you can override the default queryset used by the model
 formset::
+
+    from django.forms.models import modelformset_factory
+    from django.shortcuts import render_to_response
+    from myapp.models import Author
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
@@ -913,6 +942,8 @@ Inline formsets
 Inline formsets is a small abstraction layer on top of model formsets. These
 simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
+
+    from django.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
