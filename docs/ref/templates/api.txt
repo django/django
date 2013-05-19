@@ -286,6 +286,7 @@ fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
 dictionary syntax::
 
+    >>> from django.template import Context
     >>> c = Context({"foo": "bar"})
     >>> c['foo']
     'bar'
@@ -397,6 +398,9 @@ Also, you can give ``RequestContext`` a list of additional processors, using the
 optional, third positional argument, ``processors``. In this example, the
 ``RequestContext`` instance gets a ``ip_address`` variable::
 
+    from django.http import HttpResponse
+    from django.template import RequestContext
+
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
@@ -416,6 +420,9 @@ optional, third positional argument, ``processors``. In this example, the
     rendering, pass an optional third argument to
     :func:`~django.shortcuts.render_to_response()`: a ``RequestContext``
     instance. Your code might look like this::
+
+        from django.shortcuts import render_to_response
+        from django.template import RequestContext
 
         def some_view(request):
             # ...

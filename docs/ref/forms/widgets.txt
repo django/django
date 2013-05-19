@@ -201,6 +201,7 @@ foundation for custom widgets.
 
         .. code-block:: python
 
+            >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
             u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
@@ -249,6 +250,8 @@ foundation for custom widgets.
         :class:`~datetime.datetime` value into a list with date and time split
         into two separate values::
 
+            from django.forms import MultiWidget
+            
             class SplitDateTimeWidget(MultiWidget):
 
                 # ...
