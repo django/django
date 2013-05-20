@@ -232,6 +232,7 @@ the model field that is being aggregated.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -544,6 +545,11 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+Note that this method returns a ``ValuesListQuerySet``. This class behaves
+like a list. Most of the time this is enough, but if you require an actual
+Python list object, you can simply call ``list()`` on it, which will evaluate
+the queryset.
+
 dates
 ~~~~~
 
@@ -694,6 +700,8 @@ And here's ``select_related`` lookup::
 ``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
 
+    from django.db import models
+
     class City(models.Model):
         # ...
         pass
@@ -808,6 +816,8 @@ that are supported by ``select_related``. It also supports prefetching of
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
 
 For example, suppose you have these models::
+
+    from django.db import models
 
     class Topping(models.Model):
         name = models.CharField(max_length=30)
@@ -1399,6 +1409,41 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
+.. warning::
+
+  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  attributes and reverse relations. In that case you will restrict the queries
+  inside the context of that relation. That could lead you to some integrity
+  problems if you don't use it consistently.
+
+  Being the following models::
+
+      class Chapter(models.Model):
+          title = models.CharField(max_length=255, unique=True)
+
+      class Book(models.Model):
+          title = models.CharField(max_length=256)
+          chapters = models.ManyToManyField(Chapter)
+
+  You can use ``get_or_create()`` through Book's chapters field, but it only
+  fetches inside the context of that book::
+
+      >>> book = Book.objects.create(title="Ulysses")
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, True)
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, False)
+      >>> Chapter.objects.create(title="Chapter 1")
+      <Chapter: Chapter 1>
+      >>> book.chapters.get_or_create(title="Chapter 1")
+      # Raises IntegrityError
+
+  This is happening because it's trying to get or create "Chapter 1" through the
+  book "Ulysses", but it can't do any of them: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
+
+
 bulk_create
 ~~~~~~~~~~~
 
@@ -1486,7 +1531,7 @@ internally so that repeated evaluations do not result in additional queries. In
 contrast, ``iterator()`` will read results directly, without doing any caching
 at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
 and caches the return value). For a ``QuerySet`` which returns a large number of
-objects that you only need to access once, this can results in better
+objects that you only need to access once, this can result in better
 performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
@@ -1560,6 +1605,7 @@ aggregated.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -2037,6 +2083,7 @@ Range test (inclusive).
 
 Example::
 
+    import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))

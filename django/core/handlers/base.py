@@ -66,10 +66,11 @@ class BaseHandler(object):
         self._request_middleware = request_middleware
 
     def make_view_atomic(self, view):
-        if getattr(view, 'transactions_per_request', True):
-            for db in connections.all():
-                if db.settings_dict['ATOMIC_REQUESTS']:
-                    view = transaction.atomic(using=db.alias)(view)
+        non_atomic_requests = getattr(view, '_non_atomic_requests', set())
+        for db in connections.all():
+            if (db.settings_dict['ATOMIC_REQUESTS']
+                    and db.alias not in non_atomic_requests):
+                view = transaction.atomic(using=db.alias)(view)
         return view
 
     def get_response(self, request):

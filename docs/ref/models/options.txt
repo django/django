@@ -145,6 +145,12 @@ Django quotes column and table names behind the scenes.
     and a question has more than one answer, and the order of answers matters, you'd
     do this::
 
+        from django.db import models
+
+        class Question(models.Model):
+            text = models.TextField()
+            # ...
+
         class Answer(models.Model):
             question = models.ForeignKey(Question)
             # ...

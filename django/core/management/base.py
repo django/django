@@ -7,7 +7,6 @@ import os
 import sys
 
 from optparse import make_option, OptionParser
-import traceback
 
 import django
 from django.core.exceptions import ImproperlyConfigured
@@ -60,7 +59,7 @@ class OutputWrapper(object):
         return getattr(self._out, name)
 
     def write(self, msg, style_func=None, ending=None):
-        ending = ending is None and self.ending or ending
+        ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = [f for f in (style_func, self.style_func, lambda x:x)
@@ -171,7 +170,7 @@ class BaseCommand(object):
         make_option('--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
-            help='Print traceback on exception'),
+            help='Raise on exception'),
     )
     help = ''
     args = ''
@@ -231,7 +230,8 @@ class BaseCommand(object):
         Set up any environment changes requested (e.g., Python path
         and Django settings), then run this command. If the
         command raises a ``CommandError``, intercept it and print it sensibly
-        to stderr.
+        to stderr. If the ``--traceback`` option is present or the raised
+        ``Exception`` is not ``CommandError``, raise it.
         """
         parser = self.create_parser(argv[0], argv[1])
         options, args = parser.parse_args(argv[2:])
@@ -239,12 +239,12 @@ class BaseCommand(object):
         try:
             self.execute(*args, **options.__dict__)
         except Exception as e:
+            if options.traceback or not isinstance(e, CommandError):
+                raise
+
             # self.stderr is not guaranteed to be set here
             stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
-            if options.traceback or not isinstance(e, CommandError):
-                stderr.write(traceback.format_exc())
-            else:
-                stderr.write('%s: %s' % (e.__class__.__name__, e))
+            stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -311,7 +311,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, num_errors != 1 and 's' or ''))
+            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
 
     def handle(self, *args, **options):
         """

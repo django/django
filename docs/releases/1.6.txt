@@ -114,6 +114,13 @@ Django 1.6 adds support for savepoints in SQLite, with some :ref:`limitations
 A new :class:`django.db.models.BinaryField` model field allows to store raw
 binary data in the database.
 
+GeoDjango form widgets
+~~~~~~~~~~~~~~~~~~~~~~
+
+GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
+its geo-specialized fields. They are OpenLayers-based by default, but they can
+be customized to use any other JS framework.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -220,6 +227,32 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
+* `Pillow`_ is now the preferred image manipulation library to use with Django.
+  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
+  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
+
+.. _`Pillow`: https://pypi.python.org/pypi/Pillow
+.. _`PIL`: https://pypi.python.org/pypi/PIL
+
+* :doc:`ModelForm </topics/forms/modelforms/>` accepts a new
+  Meta option: ``localized_fields``. Fields included in this list will be localized
+  (by setting ``localize`` on the form field).
+
+* The ``choices`` argument to model fields now accepts an iterable of iterables
+  instead of requiring an iterable of lists or tuples.
+
+* The reason phrase can be customized in HTTP responses.
+
+* When giving the URL of the next page for :func:`~django.contrib.auth.views.logout`,
+  :func:`~django.contrib.auth.views.password_reset`,
+  :func:`~django.contrib.auth.views.password_reset_confirm`,
+  and :func:`~django.contrib.auth.views.password_change`, you can now pass
+  URL names and they will be resolved.
+
+* The ``dumpdata`` manage.py command now has a --pks option which will
+  allow users to specify the primary keys of objects they want to dump.
+  This option can only be used with one model.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -250,9 +283,10 @@ The changes in transaction management may result in additional statements to
 create, release or rollback savepoints. This is more likely to happen with
 SQLite, since it didn't support savepoints until this release.
 
-If tests using :meth:`~django.test.TestCase.assertNumQueries` fail because of
-a higher number of queries than expected, check that the extra queries are
-related to savepoints, and adjust the expected number of queries accordingly.
+If tests using :meth:`~django.test.TransactionTestCase.assertNumQueries` fail
+because of a higher number of queries than expected, check that the extra
+queries are related to savepoints, and adjust the expected number of queries
+accordingly.
 
 Autocommit option for PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -447,6 +481,44 @@ parameters. For example::
 
 ``SQLite`` users need to check and update such queries.
 
+.. _m2m-help_text:
+
+Help text of model form fields for ManyToManyField fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+HTML rendering of model form fields corresponding to
+:class:`~django.db.models.ManyToManyField` ORM model fields used to get the
+hard-coded sentence
+
+  *Hold down "Control", or "Command" on a Mac, to select more than one.*
+
+(or its translation to the active locale) imposed as the help legend shown along
+them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
+<django.forms.Field.help_text>` ``help_text`` attribute was specified by the
+user (or appended to, if ``help_text`` was provided.)
+
+This happened always, possibly even with form fields implementing user
+interactions that don't involve a keyboard and/or a mouse and was handled at the
+model field layer.
+
+Starting with Django 1.6 this doesn't happen anymore.
+
+The change can affect you in a backward incompatible way if you employ custom
+model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
+do rely on the automatic provision of the mentioned hard-coded sentence. These
+form field implementations need to adapt to the new scenario by providing their
+own handling of the ``help_text`` attribute.
+
+Applications that use Django :doc:`model form </topics/forms/modelforms>`
+facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
+and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
+what's described in :ref:`m2m-help_text-deprecation` below.
+
+This is because, as an temporary backward-compatible provision, the described
+non-standard behavior has been preserved but moved to the model form field layer
+and occurs only when the associated widget is
+:class:`~django.forms.SelectMultiple` or a subclass.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -466,6 +538,21 @@ Miscellaneous
   field documentation for details about the names of the placeholders. The
   changes in 1.6 particularly affect :class:`~django.forms.DecimalField` and
   :class:`~django.forms.ModelMultipleChoiceField`.
+
+* There have been changes in the way timeouts are handled in cache backends.
+  Explicitly passing in ``timeout=None`` no longer results in using the
+  default timeout. It will now set a non-expiring timeout. Passing 0 into the
+  memcache backend no longer uses the default timeout, and now will
+  set-and-expire-immediately the value.
+
+* The ``django.contrib.flatpages`` app used to set custom HTTP headers for
+  debugging purposes. This functionality was not documented and made caching
+  ineffective so it has been removed, along with its generic implementation,
+  previously available in ``django.core.xheaders``.
+
+* The ``XViewMiddleware`` has been moved from ``django.middleware.doc`` to
+  ``django.contrib.admindocs.middleware`` because it is an implementation
+  detail of admindocs, proven not to be reusable in general.
 
 Features deprecated in 1.6
 ==========================
@@ -536,6 +623,23 @@ modified to use the ``future`` versions.
 If necessary, you can temporarily disable auto-escaping with
 :func:`~django.utils.safestring.mark_safe` or :ttag:`{% autoescape off %}
 <autoescape>`.
+
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``CacheMiddleware`` used to provide a way to cache requests only if they
+weren't made by a logged-in user. This mechanism was largely ineffective
+because the middleware correctly takes into account the ``Vary: Cookie`` HTTP
+header, and this header is being set on a variety of occasions, such as:
+
+* accessing the session, or
+* using CSRF protection, which is turned on by default, or
+* using a client-side library which sets cookies, like `Google Analytics`__.
+
+This makes the cache effectively work on a per-session basis regardless of the
+``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting.
+
+__ http://www.google.com/analytics/
 
 ``SEND_BROKEN_LINK_EMAILS`` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -641,3 +745,16 @@ you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
 defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
 subclass to be used with a model but without an explicit list of fields is
 deprecated.
+
+.. _m2m-help_text-deprecation:
+
+Munging of help text of model form fields for ManyToManyField fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All special handling of the ``help_text`` attibute of ManyToManyField model
+fields performed by standard model or model form fields as described in
+:ref:`m2m-help_text` above is deprecated and will be removed in Django 1.8.
+
+Help text of these fields will need to be handled either by applications, custom
+form fields or widgets, just like happens with the rest of the model field
+types.

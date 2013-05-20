@@ -53,6 +53,7 @@ How to use ``FormPreview``
    overrides the ``done()`` method::
 
        from django.contrib.formtools.preview import FormPreview
+       from django.http import HttpResponseRedirect
        from myapp.models import SomeModel
 
        class SomeModelFormPreview(FormPreview):

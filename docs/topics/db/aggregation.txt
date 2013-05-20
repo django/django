@@ -18,27 +18,29 @@ used to track the inventory for a series of online bookstores:
 
 .. code-block:: python
 
+    from django.db import models
+
     class Author(models.Model):
-       name = models.CharField(max_length=100)
-       age = models.IntegerField()
+        name = models.CharField(max_length=100)
+        age = models.IntegerField()
 
     class Publisher(models.Model):
-       name = models.CharField(max_length=300)
-       num_awards = models.IntegerField()
+        name = models.CharField(max_length=300)
+        num_awards = models.IntegerField()
 
     class Book(models.Model):
-       name = models.CharField(max_length=300)
-       pages = models.IntegerField()
-       price = models.DecimalField(max_digits=10, decimal_places=2)
-       rating = models.FloatField()
-       authors = models.ManyToManyField(Author)
-       publisher = models.ForeignKey(Publisher)
-       pubdate = models.DateField()
+        name = models.CharField(max_length=300)
+        pages = models.IntegerField()
+        price = models.DecimalField(max_digits=10, decimal_places=2)
+        rating = models.FloatField()
+        authors = models.ManyToManyField(Author)
+        publisher = models.ForeignKey(Publisher)
+        pubdate = models.DateField()
 
     class Store(models.Model):
-       name = models.CharField(max_length=300)
-       books = models.ManyToManyField(Book)
-       registered_users = models.PositiveIntegerField()
+        name = models.CharField(max_length=300)
+        books = models.ManyToManyField(Book)
+        registered_users = models.PositiveIntegerField()
 
 Cheat sheet
 ===========
@@ -123,7 +125,7 @@ If you want to generate more than one aggregate, you just add another
 argument to the ``aggregate()`` clause. So, if we also wanted to know
 the maximum and minimum price of all books, we would issue the query::
 
-    >>> from django.db.models import Avg, Max, Min, Count
+    >>> from django.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
@@ -148,6 +150,7 @@ the number of authors:
 .. code-block:: python
 
     # Build an annotated queryset
+    >>> from django.db.models import Count
     >>> q = Book.objects.annotate(Count('authors'))
     # Interrogate the first object in the queryset
     >>> q[0]
@@ -192,6 +195,7 @@ and aggregate the related value.
 For example, to find the price range of books offered in each store,
 you could use the annotation::
 
+    >>> from django.db.models import Max, Min
     >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
 
 This tells Django to retrieve the ``Store`` model, join (through the
@@ -222,7 +226,7 @@ For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
 ``Publisher`` -> ``Book`` reverse foreign key hop)::
 
-    >>> from django.db.models import Count, Min, Sum, Max, Avg
+    >>> from django.db.models import Count, Min, Sum, Avg
     >>> Publisher.objects.annotate(Count('book'))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -269,6 +273,7 @@ constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
 with "Django" using the query::
 
+    >>> from django.db.models import Count, Avg
     >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
@@ -407,6 +412,8 @@ particularly, when counting things.
 
 By way of example, suppose you have a model like this::
 
+    from django.db import models
+
     class Item(models.Model):
         name = models.CharField(max_length=10)
         data = models.IntegerField()
@@ -457,5 +464,6 @@ For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
 aggregate that author count, referencing the annotation field::
 
+    >>> from django.db.models import Count, Avg
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}

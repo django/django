@@ -95,7 +95,8 @@ An authentication backend is a class that implements two required methods:
 optional permission related :ref:`authorization methods <authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
-database ID or whatever -- and returns a ``User`` object.
+database ID or whatever, but has to be the primary key of your ``User`` object
+-- and returns a ``User`` object.
 
 The ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
@@ -1074,7 +1075,6 @@ code would be required in the app's ``admin.py`` file::
             (None, {'fields': ('email', 'password')}),
             ('Personal info', {'fields': ('date_of_birth',)}),
             ('Permissions', {'fields': ('is_admin',)}),
-            ('Important dates', {'fields': ('last_login',)}),
         )
         add_fieldsets = (
             (None, {
@@ -1091,3 +1091,8 @@ code would be required in the app's ``admin.py`` file::
     # ... and, since we're not using Django's builtin permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
+
+Finally, specify the custom model as the default user model for your project
+using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
+
+    AUTH_USER_MODEL = 'customauth.MyUser'

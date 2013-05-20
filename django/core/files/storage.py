@@ -200,9 +200,9 @@ class FileSystemStorage(Storage):
                              getattr(os, 'O_BINARY', 0))
                     # The current umask value is masked out by os.open!
                     fd = os.open(full_path, flags, 0o666)
+                    _file = None
                     try:
                         locks.lock(fd, locks.LOCK_EX)
-                        _file = None
                         for chunk in content.chunks():
                             if _file is None:
                                 mode = 'wb' if isinstance(chunk, bytes) else 'wt'

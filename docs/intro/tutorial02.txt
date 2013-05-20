@@ -158,6 +158,9 @@ you want when you register the object.
 Let's see how this works by re-ordering the fields on the edit form. Replace
 the ``admin.site.register(Poll)`` line with::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fields = ['pub_date', 'question']
 
@@ -179,6 +182,9 @@ of fields, choosing an intuitive order is an important usability detail.
 And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
+    from django.contrib import admin
+    from polls.models import Poll
+
     class PollAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question']}),
@@ -197,6 +203,9 @@ You can assign arbitrary HTML classes to each fieldset. Django provides a
 ``"collapse"`` class that displays a particular fieldset initially collapsed.
 This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
+
+        from django.contrib import admin
+        from polls.models import Poll
 
         class PollAdmin(admin.ModelAdmin):
             fieldsets = [
@@ -218,6 +227,7 @@ Yet.
 There are two ways to solve this problem. The first is to register ``Choice``
 with the admin just as we did with ``Poll``. That's easy::
 
+    from django.contrib import admin
     from polls.models import Choice
 
     admin.site.register(Choice)
@@ -341,6 +351,12 @@ representation of the output.
 
 You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
+
+    import datetime
+    from django.utils import timezone
+    from django.db import models
+
+    from polls.models import Poll
 
     class Poll(models.Model):
         # ...

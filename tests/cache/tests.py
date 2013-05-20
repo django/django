@@ -28,8 +28,8 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import override_settings, six
-from django.utils import timezone, translation, unittest
+from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
+from django.utils import six, timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.utils.encoding import force_text
@@ -440,6 +440,34 @@ class BaseCacheTests(object):
         self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60*60*24*30 + 1)
         self.assertEqual(self.cache.get('key3'), 'sausage')
         self.assertEqual(self.cache.get('key4'), 'lobster bisque')
+
+    def test_forever_timeout(self):
+        '''
+        Passing in None into timeout results in a value that is cached forever
+        '''
+        self.cache.set('key1', 'eggs', None)
+        self.assertEqual(self.cache.get('key1'), 'eggs')
+
+        self.cache.add('key2', 'ham', None)
+        self.assertEqual(self.cache.get('key2'), 'ham')
+
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
+        self.assertEqual(self.cache.get('key3'), 'sausage')
+        self.assertEqual(self.cache.get('key4'), 'lobster bisque')
+
+    def test_zero_timeout(self):
+        '''
+        Passing in None into timeout results in a value that is cached forever
+        '''
+        self.cache.set('key1', 'eggs', 0)
+        self.assertEqual(self.cache.get('key1'), None)
+
+        self.cache.add('key2', 'ham', 0)
+        self.assertEqual(self.cache.get('key2'), None)
+
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
+        self.assertEqual(self.cache.get('key3'), None)
+        self.assertEqual(self.cache.get('key4'), None)
 
     def test_float_timeout(self):
         # Make sure a timeout given as a float doesn't crash anything.
@@ -1564,9 +1592,10 @@ def hello_world_view(request, value):
             },
         },
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TestCase):
 
     def setUp(self):
+        super(CacheMiddlewareTest, self).setUp()
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
@@ -1574,6 +1603,7 @@ class CacheMiddlewareTest(TestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
+        super(CacheMiddlewareTest, self).tearDown()
 
     def test_constructor(self):
         """

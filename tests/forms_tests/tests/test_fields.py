@@ -125,6 +125,15 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_length_not_int(self):
+        """
+        Ensure that setting min_length or max_length to something that is not a
+        number returns an exception.
+        """
+        self.assertRaises(ValueError, CharField, min_length='a')
+        self.assertRaises(ValueError, CharField, max_length='a')
+        self.assertRaises(ValueError, CharField, 'a')
+
     def test_charfield_widget_attrs(self):
         """
         Ensure that CharField.widget_attrs() always returns a dictionary.

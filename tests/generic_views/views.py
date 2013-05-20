@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -201,6 +200,17 @@ class BookDetailGetObjectCustomQueryset(BookDetail):
         return super(BookDetailGetObjectCustomQueryset,self).get_object(
             queryset=Book.objects.filter(pk=2))
 
+
+class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):
+    queryset = [
+        {'name': 'John'},
+        {'name': 'Yoko'},
+    ]
+
+    def get(self, request):
+        self.object_list = self.get_queryset()
+
+
 class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     model = Book
     object = Book(name='dummy')
@@ -215,6 +225,10 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
 
     def get_context_object_name(self, obj):
         return "test_name"
+
+class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
+    model = Book
+    object = Book(name="dummy")
 
 class BookSigningConfig(object):
     model = BookSigning

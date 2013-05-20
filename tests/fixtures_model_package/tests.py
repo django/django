@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.core import management
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase
@@ -100,7 +102,12 @@ class FixtureTestCase(TestCase):
         )
 
         # Load a fixture that doesn't exist
-        management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
+        self.assertEqual(len(w), 1)
+        self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
+
         self.assertQuerysetEqual(
             Article.objects.all(), [
                 "Django conquers world!",

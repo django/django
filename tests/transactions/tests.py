@@ -5,6 +5,7 @@ import warnings
 
 from django.db import connection, transaction, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils.unittest import skipIf, skipUnless
 
@@ -317,19 +318,6 @@ class AtomicMiscTests(TransactionTestCase):
                 pass
         # Must not raise an exception
         transaction.atomic(Callable())
-
-
-class IgnorePendingDeprecationWarningsMixin(object):
-
-    def setUp(self):
-        super(IgnorePendingDeprecationWarningsMixin, self).setUp()
-        self.catch_warnings = warnings.catch_warnings()
-        self.catch_warnings.__enter__()
-        warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
-    def tearDown(self):
-        self.catch_warnings.__exit__(*sys.exc_info())
-        super(IgnorePendingDeprecationWarningsMixin, self).tearDown()
 
 
 class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):

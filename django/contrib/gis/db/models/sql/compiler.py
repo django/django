@@ -121,7 +121,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         """
         result = []
         if opts is None:
-            opts = self.query.model._meta
+            opts = self.query.get_meta()
         aliases = set()
         only_load = self.deferred_to_columns()
         seen = self.query.included_inherited_models.copy()
@@ -247,7 +247,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         used.  If `column` is specified, it will be used instead of the value
         in `field.column`.
         """
-        if table_alias is None: table_alias = self.query.model._meta.db_table
+        if table_alias is None: table_alias = self.query.get_meta().db_table
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
 

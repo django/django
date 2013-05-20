@@ -34,6 +34,8 @@ that, you need to :meth:`~Model.save()`.
 
     1. Add a classmethod on the model class::
 
+        from django.db import models
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
@@ -105,6 +107,7 @@ individually.
 You'll need to call ``full_clean`` manually when you want to run one-step model
 validation for your own manually created models. For example::
 
+    from django.core.exceptions import ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
@@ -132,6 +135,7 @@ automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
     def clean(self):
+        import datetime
         from django.core.exceptions import ValidationError
         # Don't allow draft entries to have a pub_date.
         if self.status == 'draft' and self.pub_date is not None:
@@ -434,6 +438,8 @@ representation of the model from the ``__unicode__()`` method.
 
 For example::
 
+    from django.db import models
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -459,6 +465,9 @@ Thus, you should return a nice, human-readable string for the object's
 
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::
+
+    from django.db import models
+    from django.utils.encoding import force_bytes
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -490,6 +499,7 @@ function is usually the best approach.)
 For example::
 
     def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
         return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object

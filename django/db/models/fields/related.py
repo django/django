@@ -11,7 +11,7 @@ from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
 from django import forms
@@ -1347,9 +1347,6 @@ class ManyToManyField(RelatedField):
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
         super(ManyToManyField, self).__init__(**kwargs)
-
-        msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
-        self.help_text = string_concat(self.help_text, ' ', msg)
 
     def _get_path_info(self, direct=False):
         """

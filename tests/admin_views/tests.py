@@ -46,7 +46,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     DooHickey, FancyDoodad, Whatsit, Category, Post, Plot, FunkyTag, Chapter,
     Book, Promo, WorkHour, Employee, Question, Answer, Inquisition, Actor,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
-    OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
+    OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, Choice, ShortMessage, Telegram)
@@ -2201,6 +2201,20 @@ class AdminSearchTest(TestCase):
         # confirm the search returned zero objects
         self.assertContains(response, "\n0 persons\n")
         self.assertNotContains(response, "Guido")
+
+    def test_pluggable_search(self):
+        p1 = PluggableSearchPerson.objects.create(name="Bob", age=10)
+        p2 = PluggableSearchPerson.objects.create(name="Amy", age=20)
+
+        response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=Bob')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 pluggable search person\n")
+        self.assertContains(response, "Bob")
+
+        response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=20')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 pluggable search person\n")
+        self.assertContains(response, "Amy")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

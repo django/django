@@ -384,6 +384,7 @@ Utilities
     the middleware. Example::
 
         from django.views.decorators.csrf import csrf_exempt
+        from django.http import HttpResponse
 
         @csrf_exempt
         def my_view(request):

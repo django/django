@@ -541,8 +541,8 @@ compare HTML directly with the new
 :meth:`~django.test.SimpleTestCase.assertHTMLEqual` and
 :meth:`~django.test.SimpleTestCase.assertHTMLNotEqual` assertions, or use
 the ``html=True`` flag with
-:meth:`~django.test.TestCase.assertContains` and
-:meth:`~django.test.TestCase.assertNotContains` to test whether the
+:meth:`~django.test.SimpleTestCase.assertContains` and
+:meth:`~django.test.SimpleTestCase.assertNotContains` to test whether the
 client's response contains a given HTML fragment. See the :ref:`assertions
 documentation <assertions>` for more.
 
@@ -1093,8 +1093,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.TestCase.assertTemplateUsed` and
-:meth:`~django.test.TestCase.assertTemplateNotUsed`. And they
+code with :meth:`~django.test.SimpleTestCase.assertTemplateUsed` and
+:meth:`~django.test.SimpleTestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):

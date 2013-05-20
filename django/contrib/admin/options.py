@@ -1,5 +1,6 @@
 import copy
-from functools import update_wrapper, partial
+import operator
+from functools import partial, reduce, update_wrapper
 
 from django import forms
 from django.conf import settings
@@ -9,7 +10,8 @@ from django.forms.models import (modelform_factory, modelformset_factory,
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
-    model_format_dict, NestedObjects)
+    model_format_dict, NestedObjects, lookup_needs_distinct)
+from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -37,7 +39,7 @@ from django.utils.encoding import force_text
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
-get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
+get_ul_class = lambda x: 'radiolist%s' % (' inline' if x == HORIZONTAL else '')
 
 
 class IncorrectLookupParameters(Exception):
@@ -86,6 +88,14 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+
+    # validation
+    validator_class = validation.BaseValidator
+
+    @classmethod
+    def validate(cls, model):
+        validator = cls.validator_class()
+        validator.validate(cls, model)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
@@ -189,7 +199,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
                 'class': get_ul_class(self.radio_fields[db_field.name]),
             })
-            kwargs['empty_label'] = db_field.blank and _('None') or None
+            kwargs['empty_label'] = _('None') if db_field.blank else None
 
         queryset = self.get_field_queryset(db, db_field, request)
         if queryset is not None:
@@ -245,6 +255,34 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         Hook for specifying custom prepopulated fields.
         """
         return self.prepopulated_fields
+
+    def get_search_results(self, request, queryset, search_term):
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        if self.search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in self.search_fields]
+            for bit in search_term.split():
+                or_queries = [models.Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+            if not use_distinct:
+                for search_spec in orm_lookups:
+                    if lookup_needs_distinct(self.opts, search_spec):
+                        use_distinct = True
+                        break
+
+        return queryset, use_distinct
 
     def get_queryset(self, request):
         """
@@ -370,6 +408,9 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
+
+    # validation
+    validator_class = validation.ModelAdminValidator
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1446,6 +1487,9 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+
+    # validation
+    validator_class = validation.InlineValidator
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site

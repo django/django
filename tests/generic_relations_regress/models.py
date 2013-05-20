@@ -122,3 +122,12 @@ class Tag(models.Model):
 
 class Board(models.Model):
     name = models.CharField(primary_key=True, max_length=15)
+
+class HasLinks(models.Model):
+    links = generic.GenericRelation(Link)
+
+    class Meta:
+        abstract = True
+
+class HasLinkThing(HasLinks):
+    pass

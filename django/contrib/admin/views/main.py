@@ -1,7 +1,5 @@
-import operator
 import sys
 import warnings
-from functools import reduce
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
@@ -332,7 +330,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
-         use_distinct) = self.get_filters(request)
+         filters_use_distinct) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
@@ -379,31 +377,11 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+        # Apply search results
+        qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
 
-        if self.search_fields and self.query:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in self.search_fields]
-            for bit in self.query.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                qs = qs.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.lookup_opts, search_spec):
-                        use_distinct = True
-                        break
-
-        if use_distinct:
+        # Remove duplicates from results, if neccesary
+        if filters_use_distinct | search_use_distinct:
             return qs.distinct()
         else:
             return qs

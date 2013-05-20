@@ -187,7 +187,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     If autoescape is True, the link text and URLs will get autoescaped.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    def trim_url(x, limit=trim_url_limit):
+        if limit is None or len(x) <= limit:
+            return x
+        return '%s...' % x[:max(0, limit - 3)]
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -278,3 +281,10 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
+def avoid_wrapping(value):
+    """
+    Avoid text wrapping in the middle of a phrase by adding non-breaking
+    spaces where there previously were normal spaces.
+    """
+    return value.replace(" ", "\xa0")

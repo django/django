@@ -329,7 +329,7 @@ model:
 .. admonition:: Serializing references to ``ContentType`` objects
 
    If you're serializing data (for example, when generating
-   :class:`~django.test.TestCase.fixtures`) from a model that implements
+   :class:`~django.test.TransactionTestCase.fixtures`) from a model that implements
    generic relations, you should probably be using a natural key to uniquely
    identify related :class:`~django.contrib.contenttypes.models.ContentType`
    objects. See :ref:`natural keys<topics-serialization-natural-keys>` and

@@ -1,2 +1,5 @@
 from django.forms import *
-from django.contrib.gis.forms.fields import GeometryField
+from .fields import (GeometryField, GeometryCollectionField, PointField,
+    MultiPointField, LineStringField, MultiLineStringField, PolygonField,
+    MultiPolygonField)
+from .widgets import BaseGeometryWidget, OpenLayersWidget, OSMWidget

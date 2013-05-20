@@ -274,3 +274,10 @@ class ContentTypesTests(TestCase):
             model = 'OldModel',
         )
         self.assertEqual(six.text_type(ct), 'Old model')
+        self.assertIsNone(ct.model_class())
+
+        # Make sure stale ContentTypes can be fetched like any other object.
+        # Before Django 1.6 this caused a NoneType error in the caching mechanism.
+        # Instead, just return the ContentType object and let the app detect stale states.
+        ct_fetched = ContentType.objects.get_for_id(ct.pk)
+        self.assertIsNone(ct_fetched.model_class())

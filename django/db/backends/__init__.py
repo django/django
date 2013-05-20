@@ -390,9 +390,10 @@ class BaseDatabaseWrapper(object):
     def disable_constraint_checking(self):
         """
         Backends can implement as needed to temporarily disable foreign key
-        constraint checking.
+        constraint checking. Should return True if the constraints were 
+        disabled and will need to be reenabled.
         """
-        pass
+        return False
 
     def enable_constraint_checking(self):
         """
@@ -765,12 +766,12 @@ class BaseDatabaseOperations(object):
         """
         return cursor.fetchone()[0]
 
-    def field_cast_sql(self, db_type):
+    def field_cast_sql(self, db_type, internal_type):
         """
-        Given a column type (e.g. 'BLOB', 'VARCHAR'), returns the SQL necessary
-        to cast it before using it in a WHERE statement. Note that the
-        resulting string should contain a '%s' placeholder for the column being
-        searched against.
+        Given a column type (e.g. 'BLOB', 'VARCHAR'), and an internal type
+        (e.g. 'GenericIPAddressField'), returns the SQL necessary to cast it
+        before using it in a WHERE statement. Note that the resulting string
+        should contain a '%s' placeholder for the column being searched against.
         """
         return '%s'
 

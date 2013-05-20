@@ -367,14 +367,19 @@ class EscapingChecks(TestCase):
     All tests in this test case are also run with settings.DEBUG=True in
     EscapingChecksDebug test case, to also test CursorDebugWrapper.
     """
+
+    # For Oracle, when you want to select a value, you need to specify the
+    # special pseudo-table 'dual'; a select with no from clause is invalid.
+    bare_select_suffix = " FROM DUAL" if connection.vendor == 'oracle' else ""
+
     def test_paramless_no_escaping(self):
         cursor = connection.cursor()
-        cursor.execute("SELECT '%s'")
+        cursor.execute("SELECT '%s'" + self.bare_select_suffix)
         self.assertEqual(cursor.fetchall()[0][0], '%s')
 
     def test_parameter_escaping(self):
         cursor = connection.cursor()
-        cursor.execute("SELECT '%%', %s", ('%d',))
+        cursor.execute("SELECT '%%', %s" + self.bare_select_suffix, ('%d',))
         self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
     @unittest.skipUnless(connection.vendor == 'sqlite',

@@ -659,11 +659,11 @@ Functions for working with Python modules.
     wrong. For example::
 
         from django.utils.module_loading import import_by_path
-        import_by_path = import_by_path('django.utils.module_loading.import_by_path')
+        ImproperlyConfigured = import_by_path('django.core.exceptions.ImproperlyConfigured')
 
     is equivalent to::
 
-        from django.utils.module_loading import import_by_path
+        from django.core.exceptions import ImproperlyConfigured
 
 ``django.utils.safestring``
 ===========================

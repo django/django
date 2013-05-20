@@ -30,7 +30,8 @@ from django.utils.translation import (activate, deactivate,
     ngettext, ngettext_lazy,
     ungettext, ungettext_lazy,
     pgettext, pgettext_lazy,
-    npgettext, npgettext_lazy)
+    npgettext, npgettext_lazy,
+    check_for_language)
 
 from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
 if can_run_extraction_tests:
@@ -43,6 +44,7 @@ if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
         CompilationErrorHandling)
+from . import TransRealMixin
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
 
@@ -52,7 +54,8 @@ extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
 
-class TranslationTests(TestCase):
+
+class TranslationTests(TransRealMixin, TestCase):
 
     def test_override(self):
         activate('de')
@@ -333,10 +336,43 @@ class TranslationTests(TestCase):
             self.assertEqual(rendered, 'My other name is James.')
 
 
-@override_settings(USE_L10N=True)
-class FormattingTests(TestCase):
+class TranslationThreadSafetyTests(TestCase):
+    """Specifically not using TransRealMixin here to test threading."""
 
     def setUp(self):
+        self._old_language = get_language()
+        self._translations = trans_real._translations
+
+        # here we rely on .split() being called inside the _fetch()
+        # in trans_real.translation()
+        class sideeffect_str(str):
+            def split(self, *args, **kwargs):
+                res = str.split(self, *args, **kwargs)
+                trans_real._translations['en-YY'] = None
+                return res
+
+        trans_real._translations = {sideeffect_str('en-XX'): None}
+
+    def tearDown(self):
+        trans_real._translations = self._translations
+        activate(self._old_language)
+
+    def test_bug14894_translation_activate_thread_safety(self):
+        translation_count = len(trans_real._translations)
+        try:
+            translation.activate('pl')
+        except RuntimeError:
+            self.fail('translation.activate() is not thread-safe')
+
+        # make sure sideeffect_str actually added a new translation
+        self.assertLess(translation_count, len(trans_real._translations))
+
+
+@override_settings(USE_L10N=True)
+class FormattingTests(TransRealMixin, TestCase):
+
+    def setUp(self):
+        super(FormattingTests, self).setUp()
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -738,9 +774,10 @@ class FormattingTests(TestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
-class MiscTests(TestCase):
+class MiscTests(TransRealMixin, TestCase):
 
     def setUp(self):
+        super(MiscTests, self).setUp()
         self.rf = RequestFactory()
 
     def test_parse_spec_http_header(self):
@@ -884,17 +921,15 @@ class MiscTests(TestCase):
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
 
 
-class ResolutionOrderI18NTests(TestCase):
+class ResolutionOrderI18NTests(TransRealMixin, TestCase):
 
     def setUp(self):
-        # Okay, this is brutal, but we have no other choice to fully reset
-        # the translation framework
-        trans_real._active = local()
-        trans_real._translations = {}
+        super(ResolutionOrderI18NTests, self).setUp()
         activate('de')
 
     def tearDown(self):
         deactivate()
+        super(ResolutionOrderI18NTests, self).tearDown()
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
@@ -967,15 +1002,17 @@ class TestLanguageInfo(TestCase):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
 
-class MultipleLocaleActivationTests(TestCase):
+class MultipleLocaleActivationTests(TransRealMixin, TestCase):
     """
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
     """
     def setUp(self):
+        super(MultipleLocaleActivationTests, self).setUp()
         self._old_language = get_language()
 
     def tearDown(self):
+        super(MultipleLocaleActivationTests, self).tearDown()
         activate(self._old_language)
 
     def test_single_locale_activation(self):
@@ -1104,7 +1141,7 @@ class MultipleLocaleActivationTests(TestCase):
         'django.middleware.common.CommonMiddleware',
     ),
 )
-class LocaleMiddlewareTests(TestCase):
+class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
     urls = 'i18n.urls'
 
@@ -1114,3 +1151,54 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Oui/Non")
         response = self.client.get('/en/streaming/')
         self.assertContains(response, "Yes/No")
+
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=(
+        ('bg', 'Bulgarian'),
+        ('en-us', 'English'),
+        ('pt-br', 'Portugese (Brazil)'),
+    ),
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ),
+)
+class CountrySpecificLanguageTests(TransRealMixin, TestCase):
+
+    urls = 'i18n.urls'
+
+    def setUp(self):
+        super(CountrySpecificLanguageTests, self).setUp()
+        self.rf = RequestFactory()
+
+    def test_check_for_language(self):
+        self.assertTrue(check_for_language('en'))
+        self.assertTrue(check_for_language('en-us'))
+        self.assertTrue(check_for_language('en-US'))
+
+    def test_get_language_from_request(self):
+        # issue 19919
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('en-us', lang)
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('bg', lang)
+
+    def test_specific_language_codes(self):
+        # issue 11915
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)

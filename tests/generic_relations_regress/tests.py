@@ -4,7 +4,7 @@ from django.test import TestCase, skipIfDBFeature
 
 from .models import (Address, Place, Restaurant, Link, CharLink, TextLink,
     Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board)
+    Developer, Team, Guild, Tag, Board, HasLinkThing)
 
 
 class GenericRelationTests(TestCase):
@@ -135,3 +135,21 @@ class GenericRelationTests(TestCase):
         b1 = Board.objects.create(name='')
         tag = Tag(label='VP', content_object=b1)
         tag.save()
+
+    def test_ticket_20378(self):
+        hs1 = HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        l1 = Link.objects.create(content_object=hs1)
+        l2 = Link.objects.create(content_object=hs2)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l1),
+            [hs1], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l2),
+            [hs2], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.exclude(links=l2),
+            [hs1], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.exclude(links=l1),
+            [hs2], lambda x: x)

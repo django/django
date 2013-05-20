@@ -6,7 +6,7 @@ import traceback
 from django.db import IntegrityError
 from django.test import TestCase, TransactionTestCase
 
-from .models import Person, ManualPrimaryKeyTest, Profile
+from .models import Person, ManualPrimaryKeyTest, Profile, Tag, Thing
 
 
 class GetOrCreateTests(TestCase):
@@ -77,3 +77,28 @@ class GetOrCreateTransactionTests(TransactionTestCase):
             pass
         else:
             self.skipTest("This backend does not support integrity checks.")
+
+
+class GetOrCreateThroughManyToMany(TestCase):
+
+    def test_get_get_or_create(self):
+        tag = Tag.objects.create(text='foo')
+        a_thing = Thing.objects.create(name='a')
+        a_thing.tags.add(tag)
+        obj, created = a_thing.tags.get_or_create(text='foo')
+
+        self.assertFalse(created)
+        self.assertEqual(obj.pk, tag.pk)
+
+    def test_create_get_or_create(self):
+        a_thing = Thing.objects.create(name='a')
+        obj, created = a_thing.tags.get_or_create(text='foo')
+
+        self.assertTrue(created)
+        self.assertEqual(obj.text, 'foo')
+        self.assertIn(obj, a_thing.tags.all())
+
+    def test_something(self):
+        Tag.objects.create(text='foo')
+        a_thing = Thing.objects.create(name='a')
+        self.assertRaises(IntegrityError, a_thing.tags.get_or_create, text='foo')

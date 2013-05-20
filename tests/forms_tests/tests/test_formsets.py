@@ -972,6 +972,38 @@ class FormsFormsetTestCase(TestCase):
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
+    def test_non_form_errors_run_full_clean(self):
+        # Regression test for #11160
+        # If non_form_errors() is called without calling is_valid() first,
+        # it should ensure that full_clean() is called.
+        class BaseCustomFormSet(BaseFormSet):
+            def clean(self):
+                raise ValidationError("This is a non-form error")
+
+        ChoiceFormSet = formset_factory(Choice, formset=BaseCustomFormSet)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertTrue(isinstance(formset.non_form_errors(), ErrorList))
+        self.assertEqual(list(formset.non_form_errors()),
+            ['This is a non-form error'])
+
+    def test_validate_max_ignores_forms_marked_for_deletion(self):
+        class CheckForm(Form):
+           field = IntegerField()
+
+        data = {
+            'check-TOTAL_FORMS': '2',
+            'check-INITIAL_FORMS': '0',
+            'check-MAX_NUM_FORMS': '1',
+            'check-0-field': '200',
+            'check-0-DELETE': '',
+            'check-1-field': '50',
+            'check-1-DELETE': 'on',
+        }
+        CheckFormSet = formset_factory(CheckForm, max_num=1, validate_max=True,
+                                       can_delete=True)
+        formset = CheckFormSet(data, prefix='check')
+        self.assertTrue(formset.is_valid())
+
 
 data = {
     'choices-TOTAL_FORMS': '1', # the number of forms rendered

@@ -119,7 +119,7 @@ class BaseFormSet(object):
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
             # Use the length of the initial data if it's there, 0 otherwise.
-            initial_forms = self.initial and len(self.initial) or 0
+            initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
     def _construct_forms(self):
@@ -250,9 +250,9 @@ class BaseFormSet(object):
         form -- i.e., from formset.clean(). Returns an empty ErrorList if there
         are none.
         """
-        if self._non_form_errors is not None:
-            return self._non_form_errors
-        return self.error_class()
+        if self._non_form_errors is None:
+            self.full_clean()
+        return self._non_form_errors
 
     @property
     def errors(self):
@@ -291,16 +291,20 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors.
+        Cleans all of self.data and populates self._errors and
+        self._non_form_errors.
         """
         self._errors = []
+        self._non_form_errors = self.error_class()
+
         if not self.is_bound: # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             self._errors.append(form.errors)
         try:
-            if (self.validate_max and self.total_form_count() > self.max_num) or \
+            if (self.validate_max and
+                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",

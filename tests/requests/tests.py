@@ -503,9 +503,9 @@ class RequestsTests(SimpleTestCase):
         })
         self.assertEqual(request.POST, {'key': ['España']})
 
-    def test_body_after_POST_multipart(self):
+    def test_body_after_POST_multipart_form_data(self):
         """
-        Reading body after parsing multipart is not allowed
+        Reading body after parsing multipart/form-data is not allowed
         """
         # Because multipart is used for large amounts fo data i.e. file uploads,
         # we don't want the data held in memory twice, and we don't want to
@@ -523,6 +523,29 @@ class RequestsTests(SimpleTestCase):
                                'wsgi.input': payload})
         self.assertEqual(request.POST, {'name': ['value']})
         self.assertRaises(Exception, lambda: request.body)
+
+    def test_body_after_POST_multipart_related(self):
+        """
+        Reading body after parsing multipart that isn't form-data is allowed
+        """
+        # Ticket #9054
+        # There are cases in which the multipart data is related instead of
+        # being a binary upload, in which case it should still be accessible
+        # via body.
+        payload_data = b"\r\n".join([
+                b'--boundary',
+                b'Content-ID: id; name="name"',
+                b'',
+                b'value',
+                b'--boundary--'
+                b''])
+        payload = FakePayload(payload_data)
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'multipart/related; boundary=boundary',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': payload})
+        self.assertEqual(request.POST, {})
+        self.assertEqual(request.body, payload_data)
 
     def test_POST_multipart_with_content_length_zero(self):
         """

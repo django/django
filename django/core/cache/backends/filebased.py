@@ -9,8 +9,9 @@ try:
 except ImportError:
     import pickle
 
-from django.core.cache.backends.base import BaseCache
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.utils.encoding import force_bytes
+
 
 class FileBasedCache(BaseCache):
     def __init__(self, dir, params):
@@ -19,7 +20,7 @@ class FileBasedCache(BaseCache):
         if not os.path.exists(self._dir):
             self._createdir()
 
-    def add(self, key, value, timeout=None, version=None):
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         if self.has_key(key, version=version):
             return False
 
@@ -35,7 +36,7 @@ class FileBasedCache(BaseCache):
             with open(fname, 'rb') as f:
                 exp = pickle.load(f)
                 now = time.time()
-                if exp < now:
+                if exp is not None and exp < now:
                     self._delete(fname)
                 else:
                     return pickle.load(f)
@@ -43,14 +44,14 @@ class FileBasedCache(BaseCache):
             pass
         return default
 
-    def set(self, key, value, timeout=None, version=None):
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
 
         fname = self._key_to_file(key)
         dirname = os.path.dirname(fname)
 
-        if timeout is None:
+        if timeout == DEFAULT_TIMEOUT:
             timeout = self.default_timeout
 
         self._cull()
@@ -60,8 +61,8 @@ class FileBasedCache(BaseCache):
                 os.makedirs(dirname)
 
             with open(fname, 'wb') as f:
-                now = time.time()
-                pickle.dump(now + timeout, f, pickle.HIGHEST_PROTOCOL)
+                expiry = None if timeout is None else time.time() + timeout
+                pickle.dump(expiry, f, pickle.HIGHEST_PROTOCOL)
                 pickle.dump(value, f, pickle.HIGHEST_PROTOCOL)
         except (IOError, OSError):
             pass

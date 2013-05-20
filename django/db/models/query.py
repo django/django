@@ -388,13 +388,11 @@ class QuerySet(object):
             return clone._result_cache[0]
         if not num:
             raise self.model.DoesNotExist(
-                "%s matching query does not exist. "
-                "Lookup parameters were %s" %
-                (self.model._meta.object_name, kwargs))
+                "%s matching query does not exist." %
+                self.model._meta.object_name)
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s! "
-            "Lookup parameters were %s" %
-            (self.model._meta.object_name, num, kwargs))
+            "get() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num))
 
     def create(self, **kwargs):
         """
@@ -869,7 +867,7 @@ class QuerySet(object):
         """
         if self.query.extra_order_by or self.query.order_by:
             return True
-        elif self.query.default_ordering and self.query.model._meta.ordering:
+        elif self.query.default_ordering and self.query.get_meta().ordering:
             return True
         else:
             return False

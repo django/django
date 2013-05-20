@@ -443,15 +443,9 @@ Then, add the following required settings to your Django settings file:
 The cache middleware caches GET and HEAD responses with status 200, where the request
 and response headers allow. Responses to requests for the same URL with different
 query parameters are considered to be unique pages and are cached separately.
-Optionally, if the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
-setting is ``True``, only anonymous requests (i.e., not those made by a
-logged-in user) will be cached. This is a simple and effective way of disabling
-caching for any user-specific pages (including Django's admin interface). Note
-that if you use :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`, you should make
-sure you've activated ``AuthenticationMiddleware``. The cache middleware
-expects that a HEAD request is answered with the same response headers as
-the corresponding GET request; in which case it can return a cached GET
-response for HEAD request.
+The cache middleware expects that a HEAD request is answered with the same
+response headers as the corresponding GET request; in which case it can return
+a cached GET response for HEAD request.
 
 Additionally, the cache middleware automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
@@ -707,10 +701,15 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     >>> cache.get('my_key')
     'hello, world!'
 
-The ``timeout`` argument is optional and defaults to the ``timeout``
-argument of the appropriate backend in the :setting:`CACHES` setting
-(explained above). It's the number of seconds the value should be stored
-in the cache.
+The ``timeout`` argument is optional and defaults to the ``timeout`` argument
+of the appropriate backend in the :setting:`CACHES` setting (explained above).
+It's the number of seconds the value should be stored in the cache. Passing in
+``None`` for ``timeout`` will cache the value forever.
+
+.. versionchanged:: 1.6
+
+    Previously, passing ``None`` explicitly would use the default timeout
+    value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
