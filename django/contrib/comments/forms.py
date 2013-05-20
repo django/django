@@ -21,12 +21,13 @@ class CommentSecurityForm(forms.Form):
     timestamp     = forms.IntegerField(widget=forms.HiddenInput)
     security_hash = forms.CharField(min_length=40, max_length=40, widget=forms.HiddenInput)
 
-    def __init__(self, target_object, data=None, initial=None):
+    def __init__(self, target_object, data=None, initial=None, **kwargs):
         self.target_object = target_object
         if initial is None:
             initial = {}
         initial.update(self.generate_security_data())
-        super(CommentSecurityForm, self).__init__(data=data, initial=initial)
+        super(CommentSecurityForm, self).__init__(data=data,
+                                                  initial=initial, **kwargs)
 
     def security_errors(self):
         """Return just those errors associated with security"""
