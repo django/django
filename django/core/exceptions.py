@@ -43,7 +43,7 @@ class DisallowedHost(SuspiciousOperation):
     pass
 
 
-class DissallowedRedirect(SuspiciousOperation):
+class DisallowedRedirect(SuspiciousOperation):
     "Redirect to scheme not in allowed list"
     pass
 

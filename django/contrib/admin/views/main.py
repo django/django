@@ -14,7 +14,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
-from django.contrib.admin.exceptions import DissallowedModeladminLookup
+from django.contrib.admin.exceptions import DisallowedModeladminLookup
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
@@ -129,7 +129,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 lookup_params[force_str(key)] = value
 
             if not self.model_admin.lookup_allowed(key, value):
-                raise DissallowedModeladminLookup("Filtering by %s not allowed" % key)
+                raise DisallowedModeladminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
         if self.list_filter:
