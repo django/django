@@ -303,7 +303,8 @@ class BaseFormSet(object):
             form = self.forms[i]
             self._errors.append(form.errors)
         try:
-            if (self.validate_max and self.total_form_count() > self.max_num) or \
+            if (self.validate_max and
+                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
