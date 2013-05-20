@@ -35,9 +35,10 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     fields.
     """
 
-    def __init__(self, ct_field="content_type", fk_field="object_id"):
+    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
         self.fk_field = fk_field
+        self.for_concrete_model = for_concrete_model
 
     def contribute_to_class(self, cls, name):
         self.name = name
@@ -63,7 +64,8 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
 
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
-            return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
+            return ContentType.objects.db_manager(obj._state.db).get_for_model(
+                obj, for_concrete_model=self.for_concrete_model)
         elif id:
             return ContentType.objects.db_manager(using).get_for_id(id)
         else:
@@ -160,6 +162,8 @@ class GenericRelation(ForeignObject):
         self.object_id_field_name = kwargs.pop("object_id_field", "object_id")
         self.content_type_field_name = kwargs.pop("content_type_field", "content_type")
 
+        self.for_concrete_model = kwargs.pop("for_concrete_model", True)
+
         kwargs['blank'] = True
         kwargs['editable'] = False
         kwargs['serialize'] = False
@@ -201,7 +205,7 @@ class GenericRelation(ForeignObject):
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation
-        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self))
+        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
 
     def contribute_to_related_class(self, cls, related):
         pass
@@ -216,7 +220,8 @@ class GenericRelation(ForeignObject):
         """
         Returns the content type associated with this field's model.
         """
-        return ContentType.objects.get_for_model(self.model)
+        return ContentType.objects.get_for_model(self.model,
+                                                 for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
         field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
@@ -232,7 +237,8 @@ class GenericRelation(ForeignObject):
         """
         return self.rel.to._base_manager.db_manager(using).filter(**{
                 "%s__pk" % self.content_type_field_name:
-                    ContentType.objects.db_manager(using).get_for_model(self.model).pk,
+                    ContentType.objects.db_manager(using).get_for_model(
+                        self.model, for_concrete_model=self.for_concrete_model).pk,
                 "%s__in" % self.object_id_field_name:
                     [obj.pk for obj in objs]
                 })
@@ -247,8 +253,9 @@ class ReverseGenericRelatedObjectsDescriptor(object):
     "article.publications", the publications attribute is a
     ReverseGenericRelatedObjectsDescriptor instance.
     """
-    def __init__(self, field):
+    def __init__(self, field, for_concrete_model=True):
         self.field = field
+        self.for_concrete_model = for_concrete_model
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -261,7 +268,8 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         RelatedManager = create_generic_related_manager(superclass)
 
         qn = connection.ops.quote_name
-        content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance)
+        content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
+            instance, for_concrete_model=self.for_concrete_model)
 
         join_cols = self.field.get_joining_columns(reverse_join=True)[0]
         manager = RelatedManager(
@@ -389,7 +397,8 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             if queryset is None:
                 queryset = self.model._default_manager
             qs = queryset.filter(**{
-                self.ct_field.name: ContentType.objects.get_for_model(self.instance),
+                self.ct_field.name: ContentType.objects.get_for_model(
+                    self.instance, for_concrete_model=self.for_concrete_model),
                 self.ct_fk_field.name: self.instance.pk,
             })
         super(BaseGenericInlineFormSet, self).__init__(
@@ -406,7 +415,8 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
 
     def save_new(self, form, commit=True):
         kwargs = {
-            self.ct_field.get_attname(): ContentType.objects.get_for_model(self.instance).pk,
+            self.ct_field.get_attname(): ContentType.objects.get_for_model(
+                self.instance, for_concrete_model=self.for_concrete_model).pk,
             self.ct_fk_field.get_attname(): self.instance.pk,
         }
         new_obj = self.model(**kwargs)
@@ -418,7 +428,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   fields=None, exclude=None,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None,
-                                  formfield_callback=None, validate_max=False):
+                                  formfield_callback=None, validate_max=False,
+                                  for_concrete_model=True):
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 
@@ -444,6 +455,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                    validate_max=validate_max)
     FormSet.ct_field = ct_field
     FormSet.ct_fk_field = fk_field
+    FormSet.for_concrete_model = for_concrete_model
     return FormSet
 
 class GenericInlineModelAdmin(InlineModelAdmin):
