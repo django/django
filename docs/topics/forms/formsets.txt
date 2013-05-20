@@ -58,7 +58,7 @@ example::
 
     >>> import datetime
     >>> from django.forms.formsets import formset_factory
-    >>> from myapp.forms imporrt ArticleForm
+    >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
     >>> formset = ArticleFormSet(initial=[
     ...     {'title': u'Django is now open source',
@@ -92,7 +92,7 @@ gives you the ability to limit the maximum number of empty forms the formset
 will display::
 
     >>> from django.forms.formsets import formset_factory
-    >>> from myapp.forms imporrt ArticleForm
+    >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormSet()
     >>> for form in formset:
@@ -130,7 +130,7 @@ an ``is_valid`` method on the formset to provide a convenient way to validate
 all forms in the formset::
 
     >>> from django.forms.formsets import formset_factory
-    >>> from myapp.forms imporrt ArticleForm
+    >>> from myapp.forms import ArticleForm
     >>> ArticleFormSet = formset_factory(ArticleForm)
     >>> data = {
     ...     'form-TOTAL_FORMS': u'1',
