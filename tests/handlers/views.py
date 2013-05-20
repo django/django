@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import connection
+from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
 
 def regular(request):
@@ -12,6 +12,6 @@ def streaming(request):
 def in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
 
+@transaction.non_atomic_requests
 def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
-not_in_transaction.transactions_per_request = False

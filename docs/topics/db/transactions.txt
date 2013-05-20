@@ -45,14 +45,6 @@ You may perfom partial commits and rollbacks in your view code, typically with
 the :func:`atomic` context manager. However, at the end of the view, either
 all the changes will be committed, or none of them.
 
-To disable this behavior for a specific view, you must set the
-``transactions_per_request`` attribute of the view function itself to
-``False``, like this::
-
-    def my_view(request):
-        do_stuff()
-    my_view.transactions_per_request = False
-
 .. warning::
 
     While the simplicity of this transaction model is appealing, it also makes it
@@ -77,6 +69,26 @@ decorator described below.
 Note that only the execution of your view is enclosed in the transactions.
 Middleware runs outside of the transaction, and so does the rendering of
 template responses.
+
+When :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` is enabled, it's
+still possible to prevent views from running in a transaction.
+
+.. function:: non_atomic_requests(using=None)
+
+    This decorator will negate the effect of :setting:`ATOMIC_REQUESTS
+    <DATABASE-ATOMIC_REQUESTS>` for a given view::
+
+        from django.db import transaction
+
+        @transaction.non_atomic_requests
+        def my_view(request):
+            do_stuff()
+
+        @transaction.non_atomic_requests(using='other')
+        def my_other_view(request):
+            do_stuff_on_the_other_database()
+
+    It only works if it's applied to the view itself.
 
 .. versionchanged:: 1.6
 
@@ -519,8 +531,8 @@ Transaction states
 ------------------
 
 The three functions described above relied on a concept called "transaction
-states". This mechanisme was deprecated in Django 1.6, but it's still
-available until Django 1.8.
+states". This mechanism was deprecated in Django 1.6, but it's still available
+until Django 1.8.
 
 At any time, each database connection is in one of these two states:
 
@@ -554,23 +566,14 @@ Transaction middleware
 
 In Django 1.6, ``TransactionMiddleware`` is deprecated and replaced
 :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>`. While the general
-behavior is the same, there are a few differences.
+behavior is the same, there are two differences.
 
-With the transaction middleware, it was still possible to switch to autocommit
-or to commit explicitly in a view. Since :func:`atomic` guarantees atomicity,
-this isn't allowed any longer.
-
-To avoid wrapping a particular view in a transaction, instead of::
-
-    @transaction.autocommit
-    def my_view(request):
-        do_stuff()
-
-you must now use this pattern::
-
-    def my_view(request):
-        do_stuff()
-    my_view.transactions_per_request = False
+With the previous API, it was possible to switch to autocommit or to commit
+explicitly anywhere inside a view. Since :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` relies on :func:`atomic` which enforces atomicity,
+this isn't allowed any longer. However, at the toplevel, it's still possible
+to avoid wrapping an entire view in a transaction. To achieve this, decorate
+the view with :func:`non_atomic_requests` instead of :func:`autocommit`.
 
 The transaction middleware applied not only to view functions, but also to
 middleware modules that came after it. For instance, if you used the session
@@ -624,6 +627,9 @@ you should now use::
     finally:
         transaction.set_autocommit(False)
 
+Unless you're implementing a transaction management framework, you shouldn't
+ever need to do this.
+
 Disabling transaction management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -653,7 +659,7 @@ Sequences of custom SQL queries
 If you're executing several :ref:`custom SQL queries <executing-custom-sql>`
 in a row, each one now runs in its own transaction, instead of sharing the
 same "automatic transaction". If you need to enforce atomicity, you must wrap
-the sequence of queries in :func:`commit_on_success`.
+the sequence of queries in :func:`atomic`.
 
 To check for this problem, look for calls to ``cursor.execute()``. They're
 usually followed by a call to ``transaction.commit_unless_managed()``, which
