@@ -193,6 +193,17 @@ Minor features
   follow the :setting:`SESSION_COOKIE_SECURE` and
   :setting:`SESSION_COOKIE_HTTPONLY` settings.
 
+:mod:`django.contrib.redirects`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+  has two new attributes
+  (:attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class`
+  and
+  :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`)
+  that specify the types of :class:`~django.http.HttpResponse` instances the
+  middleware returns.
+
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
