@@ -116,7 +116,7 @@ class SettingsTests(TestCase):
             self.settings(TEST_WARN='override').enable()
             self.settings(TEST_WARN='override').disable()
 
-            self.assertEqual(len(w), 2)
+            self.assertEqual(len(w), 1)
             self.assertEqual('Overriding setting %s can lead to unexpected behaviour.' % 'TEST_WARN', str(w[-1].message))
 
         signals.COMPLEX_OVERRIDE_SETTINGS = old_warn_override_settings
