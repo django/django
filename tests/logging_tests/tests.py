@@ -7,10 +7,13 @@ import warnings
 
 from django.conf import LazySettings
 from django.core import mail
+from django.core.exceptions import (SuspiciousOperation, DisallowedHost,
+    DisallowedRedirect)
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils.log import CallbackFilter, RequireDebugFalse, RequireDebugTrue
+from django.utils.log import (CallbackFilter, RequireDebugFalse,
+    RequireDebugTrue, NullHandler)
 from django.utils.six import StringIO
 from django.utils.unittest import skipUnless
 
@@ -354,3 +357,43 @@ class SettingsConfigureLogging(TestCase):
         settings.configure(
             LOGGING_CONFIG='logging_tests.tests.dictConfig')
         self.assertTrue(dictConfig.called)
+
+
+class SecurityLoggerTest(TestCase):
+    def setUp(self):
+        # Turn on propogation so we can use the root django logger's stream
+        # handler for testing
+        logging.getLogger('django.security').propagate = True
+        self.logger = logging.getLogger('django')
+        self.old_stream = self.logger.handlers[0].stream
+        self.output = StringIO()
+        self.logger.handlers[0].stream = self.output
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream
+        logging.getLogger('django.security').propagate = False
+
+    def testexception_init_creates_log_message(self):
+        with self.settings(DEBUG=True):
+            try:
+                raise SuspiciousOperation("logloglog")
+            except SuspiciousOperation:
+                pass
+            self.assertEqual(self.output.getvalue(), 'logloglog\n')
+
+    def test_silence_sub_logger(self):
+        logger = logging.getLogger('django.security.DisallowedHost')
+        handler = NullHandler()
+        logger.addHandler(handler)
+        logger.propagate = False
+        with self.settings(DEBUG=True):
+            try:
+                raise DisallowedHost("logloglog")
+            except SuspiciousOperation:
+                pass
+            self.assertEqual(self.output.getvalue(), '')
+            try:
+                raise DisallowedRedirect("logloglog")
+            except SuspiciousOperation:
+                pass
+            self.assertEqual(self.output.getvalue(), 'logloglog\n')
