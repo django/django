@@ -283,7 +283,8 @@ Validating the number of forms in a formset
 
 If ``validate_max=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
-that the number of forms in the data set is less than or equal to ``max_num``.
+that the number of forms in the data set, minus those marked for
+deletion, is less than or equal to ``max_num``.
 
     >>> from django.forms.formsets import formset_factory
     >>> from myapp.forms import ArticleForm
