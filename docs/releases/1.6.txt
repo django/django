@@ -253,6 +253,11 @@ Minor features
   allow users to specify the primary keys of objects they want to dump.
   This option can only be used with one model.
 
+* :exc:`~django.core.exceptions.SuspiciousOperation` has been differentiated
+  into a number of subclasses, and each will log to a matching named logger
+  under the ``django.security`` logging hierarchy of ``django.security`` when
+  raised.
+
 Backwards incompatible changes in 1.6
 =====================================
 
