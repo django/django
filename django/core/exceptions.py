@@ -23,8 +23,8 @@ class SuspiciousOperation(Exception):
     "The user did something suspicious"
 
     def __init__(self, message):
-        logger = logging.getLogger('django.security')
-        logger.error(message, extra={'exception_type': self.__class__})
+        logger = logging.getLogger('django.security.%s' % self.__class__.__name__)
+        logger.error(message)
         super(SuspiciousOperation, self).__init__(message)
 
 
