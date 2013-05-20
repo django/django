@@ -383,6 +383,7 @@ class QuerySet(object):
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter():
             clone = clone.order_by()
+        clone = clone[:2]
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -392,9 +393,8 @@ class QuerySet(object):
                 "Lookup parameters were %s" %
                 (self.model._meta.object_name, kwargs))
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s! "
-            "Lookup parameters were %s" %
-            (self.model._meta.object_name, num, kwargs))
+            "get() returned more than one %s! Lookup parameters were %s" %
+            (self.model._meta.object_name, kwargs))
 
     def create(self, **kwargs):
         """
