@@ -11,7 +11,7 @@ from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnle
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article
+from .models import Article, SelfRef
 
 
 class ModelTest(TestCase):
@@ -87,23 +87,14 @@ class ModelTest(TestCase):
         # parameters don't match any object.
         six.assertRaisesRegex(self,
             ObjectDoesNotExist,
-            "Article matching query does not exist. Lookup parameters were "
-            "{'id__exact': 2000}",
+            "Article matching query does not exist.",
             Article.objects.get,
             id__exact=2000,
         )
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.
-        six.assertRaisesRegex(self,
+        self.assertRaises(
             ObjectDoesNotExist,
-            ".*'pub_date__year': 2005.*",
-            Article.objects.get,
-            pub_date__year=2005,
-            pub_date__month=8,
-        )
-        six.assertRaisesRegex(self,
-            ObjectDoesNotExist,
-            ".*'pub_date__month': 8.*",
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=8,
@@ -111,8 +102,7 @@ class ModelTest(TestCase):
 
         six.assertRaisesRegex(self,
             ObjectDoesNotExist,
-            "Article matching query does not exist. Lookup parameters were "
-            "{'pub_date__week_day': 6}",
+            "Article matching query does not exist.",
             Article.objects.get,
             pub_date__week_day=6,
         )
@@ -688,6 +678,12 @@ class ModelTest(TestCase):
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)
+
+    def test_ticket_20278(self):
+        sr = SelfRef.objects.create()
+        with self.assertRaises(ObjectDoesNotExist):
+            SelfRef.objects.get(selfref=sr)
+
 
 class ConcurrentSaveTests(TransactionTestCase):
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
