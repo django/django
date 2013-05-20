@@ -54,8 +54,8 @@ def bad_request(request, template_name='400.html'):
     try:
         template = loader.get_template(template_name)
     except TemplateDoesNotExist:
-        return http.HttpResponseServerError('<h1>Bad Request (400)</h1>')
-    return http.HttpResponseServerError(template.render(Context({})))
+        return http.HttpResponseBadRequest('<h1>Bad Request (400)</h1>')
+    return http.HttpResponseBadRequest(template.render(Context({})))
 
 
 # This can be called when CsrfViewMiddleware.process_view has not run,
