@@ -8,7 +8,7 @@ import threading
 
 from django.conf import settings
 from django.core.management.color import no_style
-from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
+from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
@@ -50,7 +50,8 @@ class OracleChecks(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        convert_unicode = backend.convert_unicode
+        from django.db.backends.oracle.base import convert_unicode
+
         cursor = connection.cursor()
         cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
                         [convert_unicode('_django_testing!')])
@@ -60,8 +61,10 @@ class OracleChecks(unittest.TestCase):
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables
         # as query parameters.
+        from django.db.backends.oracle.base import Database
+
         cursor = connection.cursor()
-        var = cursor.var(backend.Database.STRING)
+        var = cursor.var(Database.STRING)
         cursor.execute("BEGIN %s := 'X'; END; ", [var])
         self.assertEqual(var.getvalue(), 'X')
 
