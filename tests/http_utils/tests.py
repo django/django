@@ -11,8 +11,11 @@ from django.test import TestCase
 # based on Python 3.3's gzip.compress
 def gzip_compress(data):
     buf = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf, mode='wb', compresslevel=0) as f:
+    f = gzip.GzipFile(fileobj=buf, mode='wb', compresslevel=0)
+    try:
         f.write(data)
+    finally:
+        f.close()
     return buf.getvalue()
 
 
