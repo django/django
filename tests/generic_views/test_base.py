@@ -384,6 +384,12 @@ class RedirectViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, '/bar/')
 
+    def test_redirect_PATCH(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.patch('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.url, '/bar/')
+
     def test_redirect_DELETE(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
