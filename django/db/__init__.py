@@ -1,6 +1,5 @@
 import warnings
 
-from django.conf import settings
 from django.core import signals
 from django.db.utils import (DEFAULT_DB_ALIAS,
     DataError, OperationalError, IntegrityError, InternalError,
@@ -14,7 +13,7 @@ __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
 
 connections = ConnectionHandler()
 
-router = ConnectionRouter(settings.DATABASE_ROUTERS)
+router = ConnectionRouter()
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
