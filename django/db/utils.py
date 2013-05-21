@@ -214,14 +214,23 @@ class ConnectionHandler(object):
 
 
 class ConnectionRouter(object):
-    def __init__(self, routers):
-        self.routers = []
-        for r in routers:
+    def __init__(self, routers=None):
+        """
+        If routers is not specified, will default to settings.DATABASE_ROUTERS.
+        """
+        self._routers = routers
+
+    @cached_property
+    def routers(self):
+        if self._routers is None:
+            self._routers = settings.DATABASE_ROUTERS
+        for r in self._routers:
             if isinstance(r, six.string_types):
                 router = import_by_path(r)()
             else:
                 router = r
-            self.routers.append(router)
+            self._routers.append(router)
+        return self._routers
 
     def _router_func(action):
         def _route_db(self, model, **hints):
