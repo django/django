@@ -4,11 +4,7 @@ from functools import wraps
 import sys
 
 from django.utils import six
-
-try:
-    import copyreg
-except ImportError:
-    import copy_reg as copyreg
+from django.utils.six.moves import copyreg
 
 
 # You can't trivially replace this with `functools.partial` because this binds
