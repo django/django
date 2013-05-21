@@ -36,3 +36,16 @@ class Happening(models.Model):
     number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
     number3 = models.IntegerField(blank=True, default=Numbers.get_class_number)
     number4 = models.IntegerField(blank=True, default=nn.get_member_number)
+
+class Person(models.Model):
+    name = models.CharField(max_length=200)
+
+class SocialProfile(models.Model):
+    person = models.ForeignKey(Person)
+    friends = models.ManyToManyField('self')
+
+class Post(models.Model):
+    post_date = models.DateTimeField(default=datetime.datetime.now)
+
+class Material(models.Model):
+    post = models.ForeignKey(Post, related_name='materials')

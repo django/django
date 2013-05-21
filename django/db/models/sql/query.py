@@ -208,12 +208,17 @@ class Query(object):
         Unpickling support.
         """
         # Rebuild list of field instances
-        opts = obj_dict['model']._meta
-        obj_dict['select_fields'] = [
-            name is not None and opts.get_field(name) or None
-            for name in obj_dict['select_fields']
-        ]
-
+        model = obj_dict['model']
+        if model is None:
+            # if model is None the queryset should be emptyqs. So the
+            # select_fields do not matter.
+            obj_dict['select_fields'] = []
+        else:
+            opts = model._meta
+            obj_dict['select_fields'] = [
+                name is not None and opts.get_field(name) or None
+                for name in obj_dict['select_fields']
+            ]
         self.__dict__.update(obj_dict)
 
     def prepare(self):

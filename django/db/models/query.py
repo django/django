@@ -68,10 +68,26 @@ class QuerySet(object):
         """
         # Force the cache to be fully populated.
         len(self)
-
         obj_dict = self.__dict__.copy()
         obj_dict['_iter'] = None
+        obj_dict['_known_related_objects'] = dict(
+            (field.name, val) for field, val in self._known_related_objects.items()
+        )
         return obj_dict
+
+    def __setstate__(self, obj_dict):
+        model = obj_dict['model']
+        if model is None:
+            # if model is None, then self should be emptyqs and the related
+            # objects do not matter.
+            self._known_related_objects = {}
+        else:
+            opts = model._meta
+            self._known_related_objects = dict(
+                (opts.get_field(field.name if hasattr(field, 'name') else field), val)
+                for field, val in obj_dict['_known_related_objects'].items()
+            )
+        self.__dict__.update(obj_dict)
 
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
