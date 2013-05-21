@@ -248,9 +248,6 @@ WHEN (new.%(col_name)s IS NULL)
                 value = value.date()
         return value
 
-    def datetime_cast_sql(self):
-        return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
-
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
