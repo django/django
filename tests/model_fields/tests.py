@@ -193,28 +193,28 @@ class BooleanFieldTests(unittest.TestCase):
         b.bfield = True
         b.save()
         b2 = BooleanModel.objects.get(pk=b.pk)
-        self.assertTrue(isinstance(b2.bfield, bool))
+        self.assertIsInstance(b2.bfield, bool)
         self.assertEqual(b2.bfield, True)
 
         b3 = BooleanModel()
         b3.bfield = False
         b3.save()
         b4 = BooleanModel.objects.get(pk=b3.pk)
-        self.assertTrue(isinstance(b4.bfield, bool))
+        self.assertIsInstance(b4.bfield, bool)
         self.assertEqual(b4.bfield, False)
 
         b = NullBooleanModel()
         b.nbfield = True
         b.save()
         b2 = NullBooleanModel.objects.get(pk=b.pk)
-        self.assertTrue(isinstance(b2.nbfield, bool))
+        self.assertIsInstance(b2.nbfield, bool)
         self.assertEqual(b2.nbfield, True)
 
         b3 = NullBooleanModel()
         b3.nbfield = False
         b3.save()
         b4 = NullBooleanModel.objects.get(pk=b3.pk)
-        self.assertTrue(isinstance(b4.nbfield, bool))
+        self.assertIsInstance(b4.nbfield, bool)
         self.assertEqual(b4.nbfield, False)
 
         # http://code.djangoproject.com/ticket/13293
@@ -371,11 +371,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        self.assertIsInstance(b.value, six.integer_types)
         b.save()
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        self.assertIsInstance(b.value, six.integer_types)
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, six.integer_types))
+        self.assertIsInstance(b.value, six.integer_types)
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')

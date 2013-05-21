@@ -432,7 +432,7 @@ class ModelTest(TestCase):
             Article.objects.all()[0:-5]
         except Exception as e:
             error = e
-        self.assertTrue(isinstance(error, AssertionError))
+        self.assertIsInstance(error, AssertionError)
         self.assertEqual(str(error), "Negative indexing is not supported.")
 
         # An Article instance doesn't have access to the "objects" attribute.
@@ -637,15 +637,15 @@ class ModelTest(TestCase):
         # Can't be instantiated
         with self.assertRaises(TypeError):
             EmptyQuerySet()
-        self.assertTrue(isinstance(Article.objects.none(), EmptyQuerySet))
+        self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
 
     def test_emptyqs_values(self):
         # test for #15959
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             qs = Article.objects.none().values_list('pk')
-            self.assertTrue(isinstance(qs, EmptyQuerySet))
-            self.assertTrue(isinstance(qs, ValuesListQuerySet))
+            self.assertIsInstance(qs, EmptyQuerySet)
+            self.assertIsInstance(qs, ValuesListQuerySet)
             self.assertEqual(len(qs), 0)
 
     def test_emptyqs_customqs(self):
@@ -660,7 +660,7 @@ class ModelTest(TestCase):
         qs = qs.none()
         with self.assertNumQueries(0):
             self.assertEqual(len(qs), 0)
-            self.assertTrue(isinstance(qs, EmptyQuerySet))
+            self.assertIsInstance(qs, EmptyQuerySet)
             self.assertEqual(qs.do_something(), 'did something')
 
     def test_emptyqs_values_order(self):

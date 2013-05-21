@@ -360,7 +360,7 @@ class DefaultFiltersTests(TestCase):
         escaped = force_escape('<some html & special characters > here')
         self.assertEqual(
             escaped, '&lt;some html &amp; special characters &gt; here')
-        self.assertTrue(isinstance(escaped, SafeData))
+        self.assertIsInstance(escaped, SafeData)
         self.assertEqual(
             force_escape('<some html & special characters > here ĐÅ€£'),
             '&lt;some html &amp; special characters &gt; here'\

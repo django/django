@@ -274,8 +274,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = '__all__'
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -287,8 +287,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url']
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -300,8 +300,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = [] # url will still appear, since it is explicit above
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_override_field(self):
         class AuthorForm(forms.ModelForm):

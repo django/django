@@ -264,4 +264,4 @@ class GenericInlineFormsetTest(TestCase):
     def test_generic_inlineformset_factory(self):
         Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
         form = Formset().forms[0]
-        self.assertTrue(isinstance(form['tag'].field.widget, CustomWidget))
+        self.assertIsInstance(form['tag'].field.widget, CustomWidget)

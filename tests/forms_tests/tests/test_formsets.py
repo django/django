@@ -982,7 +982,7 @@ class FormsFormsetTestCase(TestCase):
 
         ChoiceFormSet = formset_factory(Choice, formset=BaseCustomFormSet)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertTrue(isinstance(formset.non_form_errors(), ErrorList))
+        self.assertIsInstance(formset.non_form_errors(), ErrorList)
         self.assertEqual(list(formset.non_form_errors()),
             ['This is a non-form error'])
 

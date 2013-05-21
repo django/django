@@ -68,7 +68,7 @@ class TestUtilsSimpleLazyObject(TestCase):
 
         # Second, for an evaluated SimpleLazyObject
         name = x.name  # evaluate
-        self.assertTrue(isinstance(x._wrapped, _ComplexObject))
+        self.assertIsInstance(x._wrapped, _ComplexObject)
         # __repr__ contains __repr__ of wrapped object
         self.assertEqual("<SimpleLazyObject: %r>" % x._wrapped, repr(x))
 

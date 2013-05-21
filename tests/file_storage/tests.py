@@ -588,11 +588,11 @@ class ContentFileTestCase(unittest.TestCase):
         Test that ContentFile can accept both bytes and unicode and that the
         retrieved content is of the same type.
         """
-        self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
+        self.assertIsInstance(ContentFile(b"content").read(), bytes)
         if six.PY3:
-            self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+            self.assertIsInstance(ContentFile("español").read(), six.text_type)
         else:
-            self.assertTrue(isinstance(ContentFile("español").read(), bytes))
+            self.assertIsInstance(ContentFile("español").read(), bytes)
 
     def test_content_saving(self):
         """
