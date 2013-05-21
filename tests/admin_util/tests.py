@@ -236,6 +236,20 @@ class UtilTests(unittest.TestCase):
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 
+    def test_label_for_property(self):
+        # NOTE: cannot use @property decorator, because of
+        # AttributeError: 'property' object has no attribute 'short_description'
+        class MockModelAdmin(object):
+            def my_property(self):
+                return "this if from property"
+            my_property.short_description = 'property short description'
+            test_from_property = property(my_property)
+
+        self.assertEqual(
+            label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
+            'property short description'
+        )
+
     def test_related_name(self):
         """
         Regression test for #13963
