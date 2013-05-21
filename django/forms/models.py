@@ -13,7 +13,7 @@ from django.forms.forms import BaseForm, get_declared_fields
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
-    MultipleHiddenInput, media_property)
+    MultipleHiddenInput, media_property, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text
 from django.utils.datastructures import SortedDict
 from django.utils import six
@@ -1104,9 +1104,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
             cache_choices, required, widget, label, initial, help_text,
             *args, **kwargs)
-        if isinstance(self.widget, SelectMultiple):
+        # Remove this in Django 1.8
+        if isinstance(self.widget, SelectMultiple) and not isinstance(self.widget, CheckboxSelectMultiple):
             msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
-            self.help_text = string_concat(self.help_text, ' ', msg) if self.help_text else msg
+            self.help_text = string_concat(self.help_text, ' ', msg)
 
     def clean(self, value):
         if self.required and not value:
