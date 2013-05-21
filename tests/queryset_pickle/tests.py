@@ -3,9 +3,10 @@ from __future__ import absolute_import
 import pickle
 import datetime
 
+from django.db import models
 from django.test import TestCase
 
-from .models import Group, Event, Happening
+from .models import Group, Event, Happening, Container, M2MModel
 
 
 class PickleabilityTestCase(TestCase):
@@ -49,3 +50,43 @@ class PickleabilityTestCase(TestCase):
         # can't just use assertEqual(original, unpickled)
         self.assertEqual(original.__class__, unpickled.__class__)
         self.assertEqual(original.args, unpickled.args)
+
+    def test_model_pickle(self):
+        """
+        Test that a model not defined on module level is pickleable.
+        """
+        original = Container.SomeModel(pk=1)
+        dumped = pickle.dumps(original)
+        reloaded = pickle.loads(dumped)
+        self.assertEqual(original, reloaded)
+        # Also, deferred dynamic model works
+        Container.SomeModel.objects.create(somefield=1)
+        original = Container.SomeModel.objects.defer('somefield')[0]
+        dumped = pickle.dumps(original)
+        reloaded = pickle.loads(dumped)
+        self.assertEqual(original, reloaded)
+        self.assertEqual(original.somefield, reloaded.somefield)
+
+    def test_model_pickle_m2m(self):
+        """
+        Test intentionally the automatically created through model.
+        """
+        m1 = M2MModel.objects.create()
+        g1 = Group.objects.create(name='foof')
+        m1.groups.add(g1)
+        m2m_through = M2MModel._meta.get_field_by_name('groups')[0].rel.through
+        original = m2m_through.objects.get()
+        dumped = pickle.dumps(original)
+        reloaded = pickle.loads(dumped)
+        self.assertEqual(original, reloaded)
+
+    def test_model_pickle_dynamic(self):
+        class Meta:
+            proxy = True
+        dynclass = type("DynamicEventSubclass", (Event, ),
+                        {'Meta': Meta, '__module__': Event.__module__})
+        original = dynclass(pk=1)
+        dumped = pickle.dumps(original)
+        reloaded = pickle.loads(dumped)
+        self.assertEqual(original, reloaded)
+        self.assertIs(reloaded.__class__, dynclass)
