@@ -2231,6 +2231,9 @@ Controls where Django stores message data. Valid values are:
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
+The backends that use cookies -- ``CookieStorage`` and ``FallbackStorage`` --
+use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
+
 .. setting:: MESSAGE_TAGS
 
 MESSAGE_TAGS
@@ -2261,18 +2264,6 @@ to override. See :ref:`message-displaying` above for more details.
    If desired, you may specify the numeric values for the constants directly
    according to the values in the above :ref:`constants table
    <message-level-constants>`.
-
-.. _messages-session_cookie_domain:
-
-SESSION_COOKIE_DOMAIN
----------------------
-
-Default: ``None``
-
-The storage backends that use cookies -- ``CookieStorage`` and
-``FallbackStorage`` -- use the value of :setting:`SESSION_COOKIE_DOMAIN` in
-setting their cookies.
-
 
 .. _settings-sessions:
 
