@@ -510,13 +510,13 @@ class BaseCacheTests(object):
                 # memcached does not allow whitespace or control characters in keys
                 self.cache.set('key with spaces', 'value')
                 self.assertEqual(len(w), 2)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 # memcached limits key length to 250
                 self.cache.set('a' * 251, 'value')
                 self.assertEqual(len(w), 1)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
         finally:
             self.cache.key_func = old_func
 
@@ -1097,10 +1097,10 @@ class GetCacheTests(unittest.TestCase):
     def test_simple(self):
         cache = get_cache('locmem://')
         from django.core.cache.backends.locmem import LocMemCache
-        self.assertTrue(isinstance(cache, LocMemCache))
+        self.assertIsInstance(cache, LocMemCache)
 
         from django.core.cache import cache
-        self.assertTrue(isinstance(cache, get_cache('default').__class__))
+        self.assertIsInstance(cache, get_cache('default').__class__)
 
         cache = get_cache(
             'django.core.cache.backends.dummy.DummyCache', **{'TIMEOUT': 120})

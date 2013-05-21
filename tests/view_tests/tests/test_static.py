@@ -60,7 +60,7 @@ class StaticTests(TestCase):
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
             )
-        self.assertTrue(isinstance(response, HttpResponseNotModified))
+        self.assertIsInstance(response, HttpResponseNotModified)
 
     def test_invalid_if_modified_since(self):
         """Handle bogus If-Modified-Since values gracefully

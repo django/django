@@ -19,7 +19,7 @@ class CustomManagerTests(TestCase):
         )
         # The RelatedManager used on the 'books' descriptor extends the default
         # manager
-        self.assertTrue(isinstance(p2.books, PublishedBookManager))
+        self.assertIsInstance(p2.books, PublishedBookManager)
 
         b1 = Book.published_objects.create(
             title="How to program", author="Rodney Dangerfield", is_published=True
@@ -34,7 +34,7 @@ class CustomManagerTests(TestCase):
 
         # The RelatedManager used on the 'authors' descriptor extends the
         # default manager
-        self.assertTrue(isinstance(b2.authors, PersonManager))
+        self.assertIsInstance(b2.authors, PersonManager)
 
         self.assertQuerysetEqual(
             Book.published_objects.all(), [
