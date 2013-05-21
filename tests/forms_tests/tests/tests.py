@@ -52,9 +52,9 @@ class TestTicket14567(TestCase):
         form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': [option.pk]})
         self.assertTrue(form.is_valid())
         # Check that the empty value is a QuerySet
-        self.assertTrue(isinstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet))
+        self.assertIsInstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet)
         # While we're at it, test whether a QuerySet is returned if there *is* a value.
-        self.assertTrue(isinstance(form.cleaned_data['multi_choice'], models.query.QuerySet))
+        self.assertIsInstance(form.cleaned_data['multi_choice'], models.query.QuerySet)
 
 
 class ModelFormCallableModelDefault(TestCase):

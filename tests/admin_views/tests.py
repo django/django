@@ -1995,7 +1995,7 @@ class AdminViewListEditable(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/person/', data)
         non_form_errors = response.context['cl'].formset.non_form_errors()
-        self.assertTrue(isinstance(non_form_errors, ErrorList))
+        self.assertIsInstance(non_form_errors, ErrorList)
         self.assertEqual(str(non_form_errors), str(ErrorList(["Grace is not a Zombie"])))
 
     def test_list_editable_ordering(self):

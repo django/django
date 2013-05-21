@@ -39,4 +39,4 @@ class TestBaseConv(TestCase):
 
     def test_exception(self):
         self.assertRaises(ValueError, BaseConverter, 'abc', sign='a')
-        self.assertTrue(isinstance(BaseConverter('abc', sign='d'), BaseConverter))
+        self.assertIsInstance(BaseConverter('abc', sign='d'), BaseConverter)
