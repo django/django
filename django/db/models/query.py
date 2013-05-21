@@ -504,7 +504,7 @@ class QuerySet(object):
         """
         qs = self if self.ordered else self.order_by('pk')
         try:
-            return qs[0]
+            return qs[:1][0]
         except IndexError:
             return None
 
@@ -514,7 +514,7 @@ class QuerySet(object):
         """
         qs = self.reverse() if self.ordered else self.order_by('-pk')
         try:
-            return qs[0]
+            return qs[:1][0]
         except IndexError:
             return None
 
