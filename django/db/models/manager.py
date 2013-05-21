@@ -186,6 +186,12 @@ class Manager(six.with_metaclass(RenameManagerMethods)):
     def latest(self, *args, **kwargs):
         return self.get_queryset().latest(*args, **kwargs)
 
+    def first(self):
+        return self.get_queryset().first()
+
+    def last(self):
+        return self.get_queryset().last()
+
     def order_by(self, *args, **kwargs):
         return self.get_queryset().order_by(*args, **kwargs)
 

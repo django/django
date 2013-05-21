@@ -253,6 +253,11 @@ Minor features
   allow users to specify the primary keys of objects they want to dump.
   This option can only be used with one model.
 
+* Added ``QuerySet`` methods :meth:`~django.db.models.query.QuerySet.first`
+  and :meth:`~django.db.models.query.QuerySet.last` which are convenience
+  methods returning the first or last object matching the filters. Returns
+  ``None`` if there are no objects matching.
+
 Backwards incompatible changes in 1.6
 =====================================
 
