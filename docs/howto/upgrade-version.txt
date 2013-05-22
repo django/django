@@ -54,7 +54,7 @@ The most convenient way is to use pip_:
 
 .. code-block:: bash
 
-   pip install Django
+   pip install -U Django
 
 pip_ also automatically uninstalls the previous version of Django.
 
