@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.utils import importlib
+from django.core.compat_checks import django_1_6_0
 
 
 COMPAT_CHECKS = [
-    # Add new modules here, so we keep things in descending order.
-    u'django_1_6_0',
+    # Add new modules at the top, so we keep things in descending order.
+    # After two-three minor releases, old versions should get dropped.
+    django_1_6_0,
 ]
 
 
@@ -23,9 +24,7 @@ def check_compatibility():
     """
     messages = []
 
-    for check_name in COMPAT_CHECKS:
-        mod_name = u'django.core.compat_checks.' + check_name
-        check_module = importlib.import_module(mod_name)
+    for check_module in COMPAT_CHECKS:
         check = getattr(check_module, u'run_checks', None)
 
         if check is None:
