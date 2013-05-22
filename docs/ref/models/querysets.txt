@@ -1613,7 +1613,7 @@ last
 
 .. versionadded:: 1.6
 
-Works like  :meth:`first()` except the ordering is reversed.
+Works like  :meth:`first()`, but returns the last object in the queryset.
 
 aggregate
 ~~~~~~~~~
