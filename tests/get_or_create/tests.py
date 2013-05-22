@@ -2,14 +2,16 @@ from __future__ import absolute_import
 
 from datetime import date
 import traceback
+import warnings
 
-from django.db import IntegrityError
+from django.db import IntegrityError, DatabaseError
 from django.test import TestCase, TransactionTestCase
 
 from .models import Person, ManualPrimaryKeyTest, Profile, Tag, Thing
 
 
 class GetOrCreateTests(TestCase):
+
     def test_get_or_create(self):
         p = Person.objects.create(
             first_name='John', last_name='Lennon', birthday=date(1940, 10, 9)
@@ -63,6 +65,22 @@ class GetOrCreateTests(TestCase):
         except IntegrityError as e:
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)
+
+    def test_savepoint_rollback(self):
+        # Regression test for #20463: the database connection should still be
+        # usable after a DataError or ProgrammingError in .get_or_create().
+        try:
+            # Hide warnings when broken data is saved with a warning (MySQL).
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                Person.objects.get_or_create(
+                    birthday=date(1970, 1, 1),
+                    defaults={'first_name': "\xff", 'last_name': "\xff"})
+        except DatabaseError:
+            Person.objects.create(
+                first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))
+        else:
+            self.skipTest("This backend accepts broken utf-8.")
 
 
 class GetOrCreateTransactionTests(TransactionTestCase):
