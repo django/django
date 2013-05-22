@@ -112,6 +112,7 @@ your function. Example:
         """Converts a string into all lowercase"""
         return value.lower()
 
+
 Registering custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -151,6 +152,7 @@ Finally, ``register.filter()`` also accepts three keyword arguments,
 are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
 :ref:`filters and time zones <filters-timezones>` below.
 
+
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -177,6 +179,7 @@ won't cause an ``AttributeError`` (because integers don't have ``lower()``
 methods).
 
 .. _filters-auto-escaping:
+
 
 Filters and auto-escaping
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -335,6 +338,7 @@ Template filter code falls into one of two situations:
 
 .. _filters-timezones:
 
+
 Filters and time zones
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -384,7 +388,7 @@ To ease the creation of these types of tags, Django provides a helper function,
 arguments, wraps it in a ``render`` function and the other necessary bits
 mentioned above and registers it with the template system.
 
-Our earlier ``current_time`` function could thus be written like this:
+Our ``current_time`` function could thus be written like this:
 
 .. code-block:: python
 
@@ -964,6 +968,7 @@ Notes:
   techniques such as EBNF grammars, but those experiments made the template
   engine too slow. It's low-level because that's fastest.
 
+
 Writing the renderer
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -996,6 +1001,7 @@ Notes:
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.
+
 
 Auto-escaping considerations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1038,6 +1044,7 @@ automatically escaped, which may not be the desired behavior if the template
 tag is used inside a :ttag:`{% autoescape off %}<autoescape>` block.
 
 .. _template_tag_thread_safety:
+
 
 Thread-safety considerations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1121,6 +1128,7 @@ like the current iteration of the ``CycleNode``, should be stored in the
     the key into ``render_context``. If you're keeping track of several state
     variables, make ``render_context[self]`` a dictionary.
 
+
 Registering the tag
 ^^^^^^^^^^^^^^^^^^^
 
@@ -1152,6 +1160,7 @@ As with filter registration, it is also possible to use this as a decorator:
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
+
 
 Passing template variables to the tag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
