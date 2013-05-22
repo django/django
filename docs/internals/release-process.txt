@@ -39,49 +39,45 @@ issued from those branches.
 For more information about how the Django project issues new releases for
 security purposes, please see :doc:`our security policies <security>`.
 
-Major releases
---------------
+.. glossary::
 
-Major releases (1.0, 2.0, etc.) will happen very infrequently (think "years",
-not "months"), and may represent major, sweeping changes to Django.
+  Major release
+    Major releases (1.0, 2.0, etc.) will happen very infrequently (think "years",
+    not "months"), and may represent major, sweeping changes to Django.
 
-Minor releases
---------------
+  Minor release
+    Minor release (1.5, 1.6, etc.) will happen roughly every nine months -- see
+    `release process`_, below for details. These releases will contain new
+    features, improvements to existing features, and such.
 
-Minor release (1.5, 1.6, etc.) will happen roughly every nine months -- see
-`release process`_, below for details. These releases will contain new
-features, improvements to existing features, and such.
+    .. _internal-release-deprecation-policy:
 
-.. _internal-release-deprecation-policy:
+    A minor release may deprecate certain features from previous releases. If a
+    feature is deprecated in version ``A.B``, it will continue to work in versions
+    ``A.B`` and  ``A.B+1`` but raise warnings. It will be removed in version
+    ``A.B+2``.
 
-A minor release may deprecate certain features from previous releases. If a
-feature is deprecated in version ``A.B``, it will continue to work in versions
-``A.B`` and  ``A.B+1`` but raise warnings. It will be removed in version
-``A.B+2``.
+    So, for example, if we decided to start the deprecation of a function in
+    Django 1.5:
 
-So, for example, if we decided to start the deprecation of a function in
-Django 1.5:
+    * Django 1.5 will contain a backwards-compatible replica of the function which
+      will raise a ``PendingDeprecationWarning``. This warning is silent by
+      default; you can turn on display of these warnings with the ``-Wd`` option
+      of Python.
 
-* Django 1.5 will contain a backwards-compatible replica of the function which
-  will raise a ``PendingDeprecationWarning``. This warning is silent by
-  default; you can turn on display of these warnings with the ``-Wd`` option
-  of Python.
+    * Django 1.6 will contain the backwards-compatible replica, but the warning
+      will be promoted to a full-fledged ``DeprecationWarning``. This warning is
+      *loud* by default, and will likely be quite annoying.
 
-* Django 1.6 will contain the backwards-compatible replica, but the warning
-  will be promoted to a full-fledged ``DeprecationWarning``. This warning is
-  *loud* by default, and will likely be quite annoying.
+    * Django 1.7 will remove the feature outright.
 
-* Django 1.7 will remove the feature outright.
+  Micro release
+    Micro releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to
+    fix security issues.
 
-Micro releases
---------------
-
-Micro releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to
-fix security issues.
-
-These releases will be 100% compatible with the associated minor release, unless
-this is impossible for security reasons. So the answer to "should I upgrade to
-the latest micro release?" will always be "yes."
+    These releases will be 100% compatible with the associated minor release, unless
+    this is impossible for security reasons. So the answer to "should I upgrade to
+    the latest micro release?" will always be "yes."
 
 .. _backwards-compatibility-policy:
 
@@ -126,15 +122,15 @@ Django 1.6 and 1.7. At this point in time:
 
 * Features will be added to development master, to be released as Django 1.7.
 
-* Critical bug fixes will be applied to the ``stable/1.6.X`` branch, and
+* Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
   released as 1.6.1, 1.6.2, etc.
 
-* Security fixes will be applied to ``master``, to the ``stable/1.6.X``
-  branch, and to the ``stable/1.5.X`` branch. They will trigger the release of
+* Security fixes will be applied to ``master``, to the ``stable/1.6.x``
+  branch, and to the ``stable/1.5.x`` branch. They will trigger the release of
   ``1.6.1``, ``1.5.1``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
-  the ``1.6.X`` branch. Bugfixes may also be backported.
+  the ``1.6.x`` branch. Bugfixes may also be backported.
 
 .. _release-process:
 
@@ -193,9 +189,9 @@ Phase two will culminate with an alpha release. At this point, the
 Phase three: bugfixes
 ~~~~~~~~~~~~~~~~~~~~~
 
-The last third of a release is spent fixing bugs -- no new features will be
-accepted during this time. We'll try to release a beta release after one month
-and a release candidate after two months.
+The last third of a release cycle is spent fixing bugs -- no new features will
+be accepted during this time. We'll try to release a beta release after one
+month and a release candidate after two months.
 
 The release candidate marks the string freeze, and it happens at least two
 weeks before the final release. After this point, new translatable strings
