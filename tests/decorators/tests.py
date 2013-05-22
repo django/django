@@ -126,15 +126,15 @@ class DecoratorsTest(TestCase):
         my_safe_view = require_safe(my_view)
         request = HttpRequest()
         request.method = 'GET'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        self.assertIsInstance(my_safe_view(request), HttpResponse)
         request.method = 'HEAD'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        self.assertIsInstance(my_safe_view(request), HttpResponse)
         request.method = 'POST'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
         request.method = 'PUT'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
         request.method = 'DELETE'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
 
 
 # For testing method_decorator, a decorator that assumes a single argument.

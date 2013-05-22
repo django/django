@@ -4,6 +4,7 @@ from functools import wraps
 import sys
 
 from django.utils import six
+from django.utils.six.moves import copyreg
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -323,15 +324,23 @@ class SimpleLazyObject(LazyObject):
             self._setup()
         return self._wrapped.__dict__
 
-    # Python 3.3 will call __reduce__ when pickling; these methods are needed
-    # to serialize and deserialize correctly. They are not called in earlier
-    # versions of Python.
+    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # to serialize and deserialize correctly.
     @classmethod
     def __newobj__(cls, *args):
         return cls.__new__(cls, *args)
 
-    def __reduce__(self):
-        return (self.__newobj__, (self.__class__,), self.__getstate__())
+    def __reduce_ex__(self, proto):
+        if proto >= 2:
+            # On Py3, since the default protocol is 3, pickle uses the
+            # ``__newobj__`` method (& more efficient opcodes) for writing.
+            return (self.__newobj__, (self.__class__,), self.__getstate__())
+        else:
+            # On Py2, the default protocol is 0 (for back-compat) & the above
+            # code fails miserably (see regression test). Instead, we return
+            # exactly what's returned if there's no ``__reduce__`` method at
+            # all.
+            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
 
     # Return a meaningful representation of the lazy object for debugging
     # without evaluating the wrapped object.

@@ -155,7 +155,6 @@ class ContentType(models.Model):
 
     def model_class(self):
         "Returns the Python model class for this type of content."
-        from django.db import models
         return models.get_model(self.app_label, self.model,
                                 only_installed=False)
 

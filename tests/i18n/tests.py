@@ -8,6 +8,7 @@ import pickle
 from threading import local
 
 from django.conf import settings
+from django.core.management.utils import find_command
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory
@@ -33,14 +34,13 @@ from django.utils.translation import (activate, deactivate,
     npgettext, npgettext_lazy,
     check_for_language)
 
-from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
-if can_run_extraction_tests:
+if find_command('xgettext'):
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
         NoLocationExtractorTests, KeepPotFileExtractorTests,
         MultipleLocaleExtractionTests)
-if can_run_compilation_tests:
+if find_command('msgfmt'):
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
         CompilationErrorHandling)

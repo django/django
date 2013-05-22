@@ -23,14 +23,14 @@ class SimpleTests(TestCase):
 
         # ... and pull it out via the other set.
         a2 = A02.objects.all()[0]
-        self.assertTrue(isinstance(a2, A02))
+        self.assertIsInstance(a2, A02)
         self.assertEqual(a2.f_a, "foo")
 
         b2 = B02.objects.all()[0]
-        self.assertTrue(isinstance(b2, B02))
+        self.assertIsInstance(b2, B02)
         self.assertEqual(b2.f_a, "fred")
 
-        self.assertTrue(isinstance(b2.fk_a, A02))
+        self.assertIsInstance(b2.fk_a, A02)
         self.assertEqual(b2.fk_a.f_a, "foo")
 
         self.assertEqual(list(C02.objects.filter(f_a=None)), [])
@@ -38,7 +38,7 @@ class SimpleTests(TestCase):
         resp = list(C02.objects.filter(mm_a=a.id))
         self.assertEqual(len(resp), 1)
 
-        self.assertTrue(isinstance(resp[0], C02))
+        self.assertIsInstance(resp[0], C02)
         self.assertEqual(resp[0].f_a, 'barney')
 
 

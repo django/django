@@ -16,6 +16,9 @@ from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
 
+from .html_parser import HTMLParser
+
+
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
@@ -33,7 +36,6 @@ link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
-strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
 def escape(text):
@@ -116,9 +118,31 @@ def linebreaks(value, autoescape=False):
     return '\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, six.text_type)
 
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def handle_entityref(self, name):
+        self.fed.append('&%s;' % name)
+    def handle_charref(self, name):
+        self.fed.append('&#%s;' % name)
+    def get_data(self):
+        return ''.join(self.fed)
+
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return strip_tags_re.sub('', force_text(value))
+    s = MLStripper()
+    s.feed(value)
+    data = s.get_data()
+    try:
+        res = s.close()
+    except Exception as e:
+        data += s.rawdata
+    return data
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):

@@ -172,7 +172,7 @@ class LastExecutedQueryTest(TestCase):
         sql, params = persons.query.sql_with_params()
         cursor = persons.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertTrue(isinstance(last_sql, six.text_type))
+        self.assertIsInstance(last_sql, six.text_type)
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")

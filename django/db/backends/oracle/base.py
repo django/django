@@ -248,9 +248,6 @@ WHEN (new.%(col_name)s IS NULL)
                 value = value.date()
         return value
 
-    def datetime_cast_sql(self):
-        return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
-
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
@@ -437,6 +434,16 @@ WHEN (new.%(col_name)s IS NULL)
     def year_lookup_bounds_for_date_field(self, value):
         first = '%s-01-01'
         second = '%s-12-31'
+        return [first % value, second % value]
+
+    def year_lookup_bounds_for_datetime_field(self, value):
+        # The default implementation uses datetime objects for the bounds.
+        # This must be overridden here, to use a formatted date (string) as
+        # 'second' instead -- cx_Oracle chops the fraction-of-second part
+        # off of datetime objects, leaving almost an entire second out of
+        # the year under the default implementation.
+        first = '%s-01-01'
+        second = '%s-12-31 23:59:59.999999'
         return [first % value, second % value]
 
     def combine_expression(self, connector, sub_expressions):

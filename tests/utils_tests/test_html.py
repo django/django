@@ -5,6 +5,7 @@ import os
 
 from django.utils import html
 from django.utils._os import upath
+from django.utils.encoding import force_text
 from django.utils.unittest import TestCase
 
 
@@ -63,10 +64,12 @@ class TestUtilsHtml(TestCase):
     def test_strip_tags(self):
         f = html.strip_tags
         items = (
+            ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
+             'See: &#39;&eacute; is an apostrophe followed by e acute'),
             ('<adf>a', 'a'),
             ('</adf>a', 'a'),
             ('<asdf><asdf>e', 'e'),
-            ('<f', '<f'),
+            ('hi, <f x', 'hi, <f x'),
             ('</fe', '</fe'),
             ('<x>b<y>', 'b'),
             ('a<p onclick="alert(\'<test>\')">b</p>c', 'abc'),
@@ -81,8 +84,9 @@ class TestUtilsHtml(TestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
             with open(path, 'r') as fp:
+                content = force_text(fp.read())
                 start = datetime.now()
-                stripped = html.strip_tags(fp.read())
+                stripped = html.strip_tags(content)
                 elapsed = datetime.now() - start
             self.assertEqual(elapsed.seconds, 0)
             self.assertIn("Please try again.", stripped)

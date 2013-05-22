@@ -1,5 +1,7 @@
 import sys
 import time
+
+from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 from django.utils.six.moves import input
 
@@ -105,7 +107,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
 
-        from django.db import settings
         real_settings = settings.DATABASES[self.connection.alias]
         real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
         real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']

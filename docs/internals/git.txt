@@ -35,8 +35,9 @@ The Git repository includes several `branches`_:
   the next packaged release of Django. This is where most development
   activity is focused.
 
-* ``stable/A.B.x`` are the maintenance branches. They are used to support
-  older versions of Django.
+* ``stable/A.B.x`` are the branches where release preparation work happens.
+  They are also used for support and bugfix releases which occur as necessary
+  after the initial release of a major or minor version.
 
 * ``soc20XX/<project>`` branches were used by students who worked on Django
   during the 2009 and 2010 Google Summer of Code programs.
@@ -83,13 +84,50 @@ coding style and how to generate and submit a patch.
 Other branches
 ==============
 
-Django uses branches for two main purposes:
+Django uses branches to prepare for releases of Django (whether they be
+:term:`major <Major release>`, :term:`minor <Minor release>`, or
+:term:`micro <Micro release>`).
 
-1. Development of major or experimental features, to keep them from
-   affecting progress on other work in master.
+In the past when Django was hosted on Subversion, branches were also used for
+feature development. Now Django is hosted on Git and feature development is
+done on contributor's forks, but the Subversion feature branches remain in Git
+for historical reference.
 
-2. Security and bugfix support for older releases of Django, during
-   their support lifetimes.
+Stable branches
+---------------
+
+These branches can be found in the repository as ``stable/A.B.x``
+branches and will be created right after the first alpha is tagged.
+
+For example, immediately after *Django 1.5 alpha 1* was tagged, the branch
+``stable/1.5.x`` was created and all further work on preparing the code for the
+final 1.5 release was done there.
+
+These branches also provide limited bugfix support for the most recent released
+version of Django and security support for the two most recently-released
+versions of Django.
+
+For example, after the release of Django 1.5, the branch ``stable/1.5.x``
+receives only fixes for security and critical stability bugs, which are
+eventually released as Django 1.5.1 and so on, ``stable/1.4.x`` receives only
+security fixes, and ``stable/1.3.x`` no longer receives any updates.
+
+.. admonition:: Historical information
+
+    This policy for handling ``stable/A.B.x`` branches was adopted starting
+    with the Django 1.5 release cycle.
+
+    Previously, these branches weren't created until right after the releases
+    and the stabilization work occurred on the main repository branch. Thus,
+    no new features development work for the next release of Django could be
+    committed until the final release happened.
+
+    For example, shortly after the release of Django 1.3 the branch
+    ``stable/1.3.x`` was created. Official support for that release has expired,
+    and so it no longer receives direct maintenance from the Django project.
+    However, that and all other similarly named branches continue to exist and
+    interested community members have occasionally used them to provide
+    unofficial support for old Django releases.
 
 Feature-development branches
 ----------------------------
@@ -202,30 +240,6 @@ All of the above-mentioned branches now reside in ``attic``.
 
 Finally, the repository contains ``soc2009/xxx`` and ``soc2010/xxx`` feature
 branches, used for Google Summer of Code projects.
-
-Support and bugfix branches
----------------------------
-
-In addition to fixing bugs in current master, the Django project provides
-official bugfix support for the most recent released version of Django, and
-security support for the two most recently-released versions of Django.
-
-This support is provided via branches in which the necessary bug or security
-fixes are applied; the branches are then used as the basis for issuing bugfix
-or security releases.
-
-These branches can be found in the repository as ``stable/A.B.x``
-branches, and new branches will be created there after each new Django
-release.
-
-For example, shortly after the release of Django 1.0, the branch
-``stable/1.0.x`` was created to receive bug fixes, and shortly after the
-release of Django 1.1 the branch ``stable/1.1.x`` was created.
-
-Official support for the above mentioned releases has expired, and so they no
-longer receive direct maintenance from the Django project. However, the
-branches continue to exist and interested community members have occasionally
-used them to provide unofficial support for old Django releases.
 
 Tags
 ====

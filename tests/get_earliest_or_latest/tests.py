@@ -121,3 +121,34 @@ class EarliestOrLatestTests(TestCase):
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
         self.assertRaises(AssertionError, Person.objects.latest)
         self.assertEqual(Person.objects.latest("birthday"), p2)
+
+    def test_first(self):
+        p1 = Person.objects.create(name="Bob", birthday=datetime(1950, 1, 1))
+        p2 = Person.objects.create(name="Alice", birthday=datetime(1961, 2, 3))
+        self.assertEqual(
+            Person.objects.first(), p1)
+        self.assertEqual(
+            Person.objects.order_by('name').first(), p2)
+        self.assertEqual(
+            Person.objects.filter(birthday__lte=datetime(1955, 1, 1)).first(),
+            p1)
+        self.assertIs(
+            Person.objects.filter(birthday__lte=datetime(1940, 1, 1)).first(),
+            None)
+
+    def test_last(self):
+        p1 = Person.objects.create(
+            name="Alice", birthday=datetime(1950, 1, 1))
+        p2 = Person.objects.create(
+            name="Bob", birthday=datetime(1960, 2, 3))
+        # Note: by default PK ordering.
+        self.assertEqual(
+            Person.objects.last(), p2)
+        self.assertEqual(
+            Person.objects.order_by('-name').last(), p1)
+        self.assertEqual(
+            Person.objects.filter(birthday__lte=datetime(1955, 1, 1)).last(),
+            p1)
+        self.assertIs(
+            Person.objects.filter(birthday__lte=datetime(1940, 1, 1)).last(),
+            None)

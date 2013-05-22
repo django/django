@@ -464,7 +464,7 @@ subclass::
               list_display = ('upper_case_name',)
 
               def upper_case_name(self, obj):
-                return ("%s %s" % (obj.first_name, obj.last_name)).upper()
+                  return ("%s %s" % (obj.first_name, obj.last_name)).upper()
               upper_case_name.short_description = 'Name'
 
     * A string representing an attribute on the model. This behaves almost
@@ -588,6 +588,27 @@ subclass::
 
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
+
+    * Elements of ``list_display`` can also be properties. Please note however,
+      that due to the way properties work in Python, setting
+      ``short_description`` on a property is only possible when using the
+      ``property()`` function and **not** with the ``@property`` decorator.
+
+      For example::
+
+          class Person(object):
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+
+              def my_property(self):
+                  return self.first_name + ' ' + self.last_name
+              my_property.short_description = "Full name of the person"
+
+              full_name = property(my_property)
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('full_name',)
+
 
     * .. versionadded:: 1.6
 
