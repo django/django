@@ -98,7 +98,7 @@ class BaseHandler(object):
                     urlresolvers.set_urlconf(urlconf)
                     resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
 
-                resolver_match = resolver.resolve(request.path_info)
+                resolver_match = resolver.resolve(request.path_info, request=request)
                 callback, callback_args, callback_kwargs = resolver_match
                 request.resolver_match = resolver_match
 

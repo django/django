@@ -89,3 +89,15 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started'])
         self.assertEqual(b''.join(response.streaming_content), b"streaming content")
         self.assertEqual(self.signals, ['started', 'finished'])
+
+
+class PredicatesTests(TestCase):
+    urls = 'handlers.urls'
+
+    def test_request_predicates(self):
+        response = self.client.post('/predicate/')
+        self.assertEqual(response.content, b"predicate content")
+
+    def test_request_predicates_fail_return_404(self):
+        response = self.client.get('/predicate/')
+        self.assertEqual(response.status_code, 404)
