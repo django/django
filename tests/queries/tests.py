@@ -2504,6 +2504,13 @@ class IteratorExceptionsTest(TestCase):
         with self.assertRaises(AttributeError):
             list(qs)
 
+    def test_invalid_qs_list(self):
+        # Test for #19895 - second iteration over invalid queryset
+        # raises errors.
+        qs = Article.objects.order_by('invalid_column')
+        self.assertRaises(FieldError, list, qs)
+        self.assertRaises(FieldError, list, qs)
+
 
 class NullJoinPromotionOrTest(TestCase):
     def setUp(self):
