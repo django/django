@@ -360,7 +360,7 @@ conversions in templates <time-zones-in-templates>`.
 Writing custom template tags
 ----------------------------
 
-Tags are more complex than filters, because tags can do anything.  Thankfully,
+Tags are more complex than filters, because tags can do anything. Thankfully,
 Django provides a number of shortcuts to spare you the complexity of writing
 your own from the bottom up.  However you always have the option to go the more
 advanced route as well.
@@ -375,9 +375,8 @@ Simple custom tags
 
 Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on
-the input arguments and some external information. For example, the
-``current_time`` tag we wrote above is of this variety: we give it a format
-string, it returns the time as a string.
+the input arguments and some external information. For example, a
+``current_time`` tag may accept a format string, and return the time as a string.
 
 To ease the creation of these types of tags, Django provides a helper function,
 ``simple_tag``. This function, which is a method of
@@ -412,7 +411,8 @@ A few things to note about the ``simple_tag`` helper function:
   current value of the variable, not the variable itself.
 
 If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag:
+``takes_context`` argument when registering your tag. Lets use the
+``current_time`` tag we mentioned earlier:
 
 .. code-block:: python
 
