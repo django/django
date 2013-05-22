@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.forms import (CharField, DateField, FileField, Form, IntegerField,
-    ValidationError, formsets)
+    SplitDateTimeField, ValidationError, formsets)
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.test import TestCase
@@ -43,6 +45,13 @@ class EmptyFsetWontValidate(BaseFormSet):
 # ``test_regression_6926`` & ``test_regression_12878``.
 FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm,
     formset=BaseFavoriteDrinksFormSet, extra=3)
+
+
+# Used in ``test_formset_splitdatetimefield``.
+class SplitDateTimeForm(Form):
+    when = SplitDateTimeField(initial=datetime.datetime.now)
+
+SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
 class FormsFormsetTestCase(TestCase):
@@ -882,6 +891,19 @@ class FormsFormsetTestCase(TestCase):
         self.assertEqual(len(formset.forms), 0)
         self.assertTrue(formset)
 
+    def test_formset_splitdatetimefield(self):
+        """
+        Formset should also work with SplitDateTimeField(initial=datetime.datetime.now).
+        Regression test for #18709.
+        """
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-when_0': '1904-06-16',
+            'form-0-when_1': '15:51:33',
+        }
+        formset = SplitDateTimeFormSet(data)
+        self.assertTrue(formset.is_valid())
 
     def test_formset_error_class(self):
         # Regression tests for #16479 -- formsets form use ErrorList instead of supplied error_class

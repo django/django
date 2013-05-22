@@ -342,6 +342,8 @@ class BaseForm(object):
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
                 if not field.show_hidden_initial:
                     initial_value = self.initial.get(name, field.initial)
+                    if callable(initial_value):
+                        initial_value = initial_value()
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
