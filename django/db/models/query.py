@@ -382,16 +382,19 @@ class QuerySet(object):
         assert kwargs, \
             'update_or_create() must be passed at least one keyword argument'
         lookup, defaults, params = self._extract_model_params(**kwargs)
+        created = False
         try:
             self._for_write = True
             obj = self.get(**lookup)
         except self.model.DoesNotExist:
-            return self._create_object_from_params(lookup, params, defaults)
+            obj, created = self._create_object_from_params(lookup, defaults)
+        if created:
+            return obj, created
         for k, v in defaults.iteritems():
             setattr(obj, k, v)
         try:
             sid = transaction.savepoint(using=self.db)
-            obj.save(force_update=True, using=self.db)
+            obj.save(update_fields=defaults.keys(), using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, False
         except DatabaseError:
@@ -431,14 +434,15 @@ class QuerySet(object):
         Prepares lookup, params and defaults fields based on given kwargs.
         Used in get_or_create and create_or_update.
         """
-        _defaults = kwargs.pop('defaults', {})
+        unfiltered_defaults = kwargs.pop('defaults', {})
         defaults = {}
         lookup = kwargs.copy()
         for f in self.model._meta.fields:
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
-            if f.attname in _defaults:
-                defaults[f.name] = _defaults.pop(f.attname)
+            # Strictly filters out fields that don't belongs to model.
+            if f.attname in unfiltered_defaults:
+                defaults[f.name] = unfiltered_defaults.pop(f.attname)
         params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
         params.update(defaults)
         return lookup, params, defaults
