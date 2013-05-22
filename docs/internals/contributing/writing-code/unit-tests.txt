@@ -7,15 +7,14 @@ code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-* Models and the database API (``tests/modeltests``),
-* Everything else in core Django code (``tests/regressiontests``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests``).
+* Models, the database API and everything else in core Django core (``tests/``),
+* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications </topics/testing>`
-for an explanation of how to write new tests.
+testing applications. See :doc:`Testing Django applications
+</topics/testing/overview>` for an explanation of how to write new tests.
 
 .. _running-unit-tests:
 
@@ -28,15 +27,15 @@ Quickstart
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides a
 sample settings module that uses the SQLite database. To run the tests
-with this sample ``settings`` module, ``cd`` into the Django
-``tests/`` directory and run:
+with this sample ``settings`` module:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite
+    git clone git@github.com:django/django.git django-repo
+    cd django-repo/tests
+    PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
-If you get an ``ImportError: No module named django.contrib`` error,
-you need to add your install of Django to your ``PYTHONPATH``.
+.. _running-unit-tests-settings:
 
 Using another ``settings`` module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,14 +45,10 @@ SQLite. If you want to test behavior using a different database (and
 if you're proposing patches for Django, it's a good idea to test
 across databases), you may need to define your own settings file.
 
-To run the tests with different settings, ``cd`` to the ``tests/`` directory
-and type:
+To run the tests with different settings, ensure that the module is on your
+``PYTHONPATH`` and pass the module with ``--settings``.
 
-.. code-block:: bash
-
-    ./runtests.py --settings=path.to.django.settings
-
-The :setting:`DATABASES` setting in this test settings module needs to define
+The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
 
 * A ``default`` database. This database should use the backend that
@@ -102,9 +97,9 @@ internationalization, type:
 
     ./runtests.py --settings=path.to.settings generic_relations i18n
 
-How do you find out the names of individual tests? Look in
-``tests/modeltests`` and ``tests/regressiontests`` — each directory name
-there is the name of a test. Contrib app names are also valid test names.
+How do you find out the names of individual tests? Look in ``tests/`` — each
+directory name there is the name of a test. Contrib app names are also valid
+test names.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
@@ -125,13 +120,15 @@ Running the Selenium tests
 
 Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
 real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path.
-
-Then, run the tests normally, for example:
+install the selenium_ package (version > 2.13) into your Python path and run
+the tests with the ``--selenium`` option:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite admin_inlines
+    ./runtests.py --settings=test_sqlite --selenium admin_inlines
+
+
+.. _running-unit-tests-dependencies:
 
 Running all the tests
 ~~~~~~~~~~~~~~~~~~~~~
@@ -140,9 +137,6 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  PyYAML_
-*  Markdown_
-*  Textile_
-*  Docutils_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
@@ -155,9 +149,6 @@ Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
-.. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
-.. _Textile: http://pypi.python.org/pypi/textile
-.. _docutils: http://pypi.python.org/pypi/docutils/0.4
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
@@ -195,7 +186,7 @@ multiple modules by using a ``tests`` directory in the normal Python way.
 For the tests to be found, a ``models.py`` file must exist, even if it's empty.
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
-To run tests for just one contrib app (e.g. ``markup``), use the same
+To run tests for just one contrib app (e.g. ``auth``), use the same
 method as above::
 
-    ./runtests.py --settings=settings markup
+    ./runtests.py --settings=settings auth

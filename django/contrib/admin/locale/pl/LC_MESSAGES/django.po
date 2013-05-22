@@ -6,33 +6,34 @@
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Karol  <kfuks2@o2.pl>, 2012.
 # konryd <konryd@gmail.com>, 2011.
+#   <ola@sitarska.com>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:34+0100\n"
-"PO-Revision-Date: 2012-03-12 00:20+0000\n"
-"Last-Translator: angularcircle <angular.circle@gmail.com>\n"
-"Language-Team: Polish (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-06 10:41+0000\n"
+"Last-Translator: ola <ola@sitarska.com>\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
-"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2)\n"
+"|| n%100>=20) ? 1 : 2);\n"
 
 #: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Usunięto %(count)d %(items)s."
 
-#: actions.py:60 options.py:1295
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nie można usunąć %(name)s"
 
-#: actions.py:62 options.py:1297
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "Jesteś pewien?"
 
@@ -41,199 +42,205 @@ msgstr "Jesteś pewien?"
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Usuń wybrane %(verbose_name_plural)s"
 
-#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
 msgstr "Wszystko"
 
-#: filters.py:232
+#: filters.py:238
 msgid "Yes"
 msgstr "Tak"
 
-#: filters.py:233
+#: filters.py:239
 msgid "No"
 msgstr "Nie"
 
-#: filters.py:247
+#: filters.py:253
 msgid "Unknown"
 msgstr "Nieznany"
 
-#: filters.py:306
+#: filters.py:308
 msgid "Any date"
 msgstr "Dowolna data"
 
-#: filters.py:307
+#: filters.py:309
 msgid "Today"
 msgstr "Dzisiaj"
 
-#: filters.py:311
+#: filters.py:313
 msgid "Past 7 days"
 msgstr "Ostatnie 7 dni"
 
-#: filters.py:315
+#: filters.py:317
 msgid "This month"
 msgstr "Ten miesiąc"
 
-#: filters.py:319
+#: filters.py:321
 msgid "This year"
 msgstr "Ten rok"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
-"Proszę podać poprawną nazwę użytkownika i hasło dla konta administratora. "
-"Zauważ, że w obu polach wielkość znaków ma znaczenie."
 
-#: forms.py:18
+#: forms.py:19
 msgid "Please log in again, because your session has expired."
 msgstr "Twoja sesja wygasła, zaloguj się ponownie."
 
-#: forms.py:37
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Podany adres e-mail nie jest Twoją nazwą użytkownika. Spróbuj '%s'."
-
-#: helpers.py:20
+#: helpers.py:23
 msgid "Action:"
 msgstr "Akcja:"
 
-#: models.py:19
+#: models.py:24
 msgid "action time"
 msgstr "czas akcji"
 
-#: models.py:22
+#: models.py:27
 msgid "object id"
 msgstr "id obiektu"
 
-#: models.py:23
+#: models.py:28
 msgid "object repr"
 msgstr "reprezentacja obiektu"
 
-#: models.py:24
+#: models.py:29
 msgid "action flag"
 msgstr "flaga akcji"
 
-#: models.py:25
+#: models.py:30
 msgid "change message"
 msgstr "zmień wiadomość"
 
-#: models.py:30
+#: models.py:35
 msgid "log entry"
 msgstr "log"
 
-#: models.py:31
+#: models.py:36
 msgid "log entries"
 msgstr "logi"
 
-#: models.py:40
+#: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Dodano \" %(object)s \"."
 
-#: models.py:42
+#: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Zmieniono \" %(object)s \" - %(changes)s "
 
-#: models.py:44
+#: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Usunięto \" %(object)s \"."
 
-#: models.py:46
+#: models.py:54
 msgid "LogEntry Object"
 msgstr "Obiekt typu LogEntry"
 
-#: options.py:150 options.py:166
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "brak"
 
-#: options.py:671
+#: options.py:684
 #, python-format
 msgid "Changed %s."
 msgstr "Zmieniono %s"
 
-#: options.py:671 options.py:681
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "i"
 
-#: options.py:676
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: options.py:680
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmieniono %(list)s w %(name)s \"%(object)s\"."
 
-#: options.py:685
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Usunięto %(name)s \"%(object)s\"."
 
-#: options.py:689
+#: options.py:702
 msgid "No fields changed."
 msgstr "Żadne pole nie zmienione."
 
-#: options.py:772
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
-
-#: options.py:776 options.py:824
-msgid "You may edit it again below."
-msgstr "Możesz ponownie edytować wpis poniżej."
-
-#: options.py:788 options.py:837
-#, python-format
-msgid "You may add another %s below."
-msgstr "Możesz dodać nowy wpis %s poniżej."
-
-#: options.py:822
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
-
-#: options.py:830
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" dodane pomyślnie. Możesz edytować ponownie wpis poniżej."
 
-#: options.py:899 options.py:1159
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" dodany pomyślnie."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" zostało pomyślnie zmienione."
+
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Wykonanie akcji wymaga wybrania obiektów. Żaden obiekt nie został zmieniony."
 
-#: options.py:918
+#: options.py:970
 msgid "No action selected."
 msgstr "Nie wybrano akcji."
 
-#: options.py:998
+#: options.py:1050
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj %s"
 
-#: options.py:1023 options.py:1267
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
 
-#: options.py:1089
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "Zmień %s"
 
-#: options.py:1138
+#: options.py:1190
 msgid "Database error"
 msgstr "Błąd bazy danych"
 
-#: options.py:1201
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -241,7 +248,7 @@ msgstr[0] "%(count)s %(name)s został pomyślnie zmieniony."
 msgstr[1] "%(count)s %(name)s zostały pomyślnie zmienione."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 
-#: options.py:1228
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -249,51 +256,59 @@ msgstr[0] "%(total_count)s wybrany"
 msgstr[1] "%(total_count)s wybrane"
 msgstr[2] "%(total_count)s wybranych"
 
-#: options.py:1233
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 z %(cnt)s wybranych"
 
-#: options.py:1283
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
 
-#: options.py:1330
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
 
-#: sites.py:315 tests.py:61 templates/admin/login.html:49
-#: templates/registration/password_reset_complete.html:20
-#: views/decorators.py:23
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
 msgid "Log in"
 msgstr "Zaloguj się"
 
-#: sites.py:380
+#: sites.py:388
 msgid "Site administration"
 msgstr "Administracja stroną"
 
-#: sites.py:432
+#: sites.py:440
 #, python-format
 msgid "%s administration"
 msgstr "%s - administracja"
 
-#: widgets.py:87
+#: widgets.py:90
 msgid "Date:"
 msgstr "Data:"
 
-#: widgets.py:87
+#: widgets.py:91
 msgid "Time:"
 msgstr "Czas:"
 
-#: widgets.py:161
+#: widgets.py:165
 msgid "Lookup"
 msgstr "Szukaj"
 
-#: widgets.py:267
+#: widgets.py:271
 msgid "Add Another"
 msgstr "Dodaj kolejny"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr ""
+
+#: widgets.py:317
+msgid "Change:"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -303,42 +318,40 @@ msgstr "Strona nie znaleziona"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Niestety, żądana strona nie została znaleziona."
 
-#: templates/admin/500.html:7 templates/admin/app_index.html:8
-#: templates/admin/base.html:45 templates/admin/change_form.html:21
-#: templates/admin/change_list.html:43
-#: templates/admin/delete_confirmation.html:8
-#: templates/admin/delete_selected_confirmation.html:8
-#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
-#: templates/admin/auth/user/change_password.html:15
-#: templates/registration/logged_out.html:5
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:7
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Początek"
 
-#: templates/admin/500.html:8
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "Błąd serwera"
 
-#: templates/admin/500.html:12
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Błąd serwera (500)"
 
-#: templates/admin/500.html:15
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Błąd Serwera <em>(500)</em>"
 
-#: templates/admin/500.html:16
+#: templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Wystąpił niespodziewany błąd. Został on zgłoszony e-mailem administratorowi "
-"strony i powinien zostać wkrótce naprawiony. Dziękujemy za cierpliwość."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -361,7 +374,7 @@ msgstr "Wybierz wszystkie %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Wyczyść wybór"
 
-#: templates/admin/app_index.html:11 templates/admin/index.html:19
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -371,22 +384,22 @@ msgid "Welcome,"
 msgstr "Witaj,"
 
 #: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "Dokumentacja"
 
-#: templates/admin/base.html:35
-#: templates/admin/auth/user/change_password.html:19
-#: templates/admin/auth/user/change_password.html:53
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Zmiana hasła"
 
-#: templates/admin/base.html:36
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Wyloguj się"
 
@@ -398,36 +411,36 @@ msgstr "Administracja stroną Django"
 msgid "Django administration"
 msgstr "Administracja Django"
 
-#: templates/admin/change_form.html:24 templates/admin/index.html:29
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
 msgid "Add"
 msgstr "Dodaj"
 
-#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
 msgid "History"
 msgstr "Historia"
 
-#: templates/admin/change_form.html:35
+#: templates/admin/change_form.html:33
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Pokaż na stronie"
 
-#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
-#: templates/admin/login.html:18
-#: templates/admin/auth/user/change_password.html:29
-#: templates/registration/password_change_form.html:21
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Proszę, popraw poniższy błąd."
 msgstr[1] "Proszę, popraw poniższe błędy."
 msgstr[2] "Proszę, popraw poniższe błędy."
 
-#: templates/admin/change_list.html:60
+#: templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
 
-#: templates/admin/change_list.html:80
+#: templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtr"
 
@@ -444,12 +457,12 @@ msgstr "Priorytet sortowania: %(priority_number)s "
 msgid "Toggle sorting"
 msgstr "Zmień sortowanie"
 
-#: templates/admin/delete_confirmation.html:12
+#: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Usuń"
 
-#: templates/admin/delete_confirmation.html:19
+#: templates/admin/delete_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -460,7 +473,7 @@ msgstr ""
 "zależnych obiektów, lecz nie posiadasz uprawnień do usunięcia następujących "
 "typów obiektów:"
 
-#: templates/admin/delete_confirmation.html:27
+#: templates/admin/delete_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -469,7 +482,7 @@ msgstr ""
 "Skasowanie %(object_name)s '%(escaped_object)s'  wymaga usunięcia "
 "następujących chronionych zależnych obiektów:"
 
-#: templates/admin/delete_confirmation.html:35
+#: templates/admin/delete_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -478,16 +491,16 @@ msgstr ""
 "Czy chcesz skasować %(object_name)s \"%(escaped_object)s\"? Następujące "
 "zależne obiekty zostaną skasowane:"
 
-#: templates/admin/delete_confirmation.html:40
-#: templates/admin/delete_selected_confirmation.html:45
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
 msgid "Yes, I'm sure"
 msgstr "Tak, na pewno"
 
-#: templates/admin/delete_selected_confirmation.html:11
+#: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
 msgstr "Usuwanie wielu obiektów"
 
-#: templates/admin/delete_selected_confirmation.html:18
+#: templates/admin/delete_selected_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -497,7 +510,7 @@ msgstr ""
 "Skasowanie %(objects_name)s spowoduje usunięcie zależnych obiektów, lecz nie "
 "posiadasz uprawnień do usunięcia następujących typów obiektów:"
 
-#: templates/admin/delete_selected_confirmation.html:26
+#: templates/admin/delete_selected_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -506,7 +519,7 @@ msgstr ""
 "Skasowanie %(objects_name)s wymaga usunięcia następujących chronionych "
 "zależnych obiektów:"
 
-#: templates/admin/delete_selected_confirmation.html:34
+#: templates/admin/delete_selected_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -520,36 +533,36 @@ msgstr ""
 msgid " By %(filter_title)s "
 msgstr " Używając %(filter_title)s "
 
-#: templates/admin/index.html:18
+#: templates/admin/index.html:20
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Modele dostępne w aplikacji %(name)s."
+msgid "Models in the %(name)s application"
+msgstr "Modele w aplikacji %(name)s"
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:39
 msgid "Change"
 msgstr "Zmień"
 
-#: templates/admin/index.html:45
+#: templates/admin/index.html:49
 msgid "You don't have permission to edit anything."
 msgstr "Nie masz uprawnień by edytować cokolwiek."
 
-#: templates/admin/index.html:53
+#: templates/admin/index.html:57
 msgid "Recent Actions"
 msgstr "Ostatnie akcje"
 
-#: templates/admin/index.html:54
+#: templates/admin/index.html:58
 msgid "My Actions"
 msgstr "Moje akcje"
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "None available"
 msgstr "Brak"
 
-#: templates/admin/index.html:72
+#: templates/admin/index.html:76
 msgid "Unknown content"
 msgstr "Zawartość nieznana"
 
-#: templates/admin/invalid_setup.html:13
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -559,31 +572,27 @@ msgstr ""
 "tabele zostały utworzone i odpowiedni użytkownik jest uprawniony do ich "
 "odczytu."
 
-#: templates/admin/login.html:34
-msgid "Username:"
-msgstr "Nazwa użytkownika:"
-
-#: templates/admin/login.html:38
+#: templates/admin/login.html:37
 msgid "Password:"
 msgstr "Hasło:"
 
-#: templates/admin/login.html:45
+#: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
 msgstr "Nie pamiętasz swojego hasła, bądź nazwy konta użytkownika?"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:23
 msgid "Date/time"
 msgstr "Data/czas"
 
-#: templates/admin/object_history.html:25
+#: templates/admin/object_history.html:24
 msgid "User"
 msgstr "Użytkownik"
 
-#: templates/admin/object_history.html:26
+#: templates/admin/object_history.html:25
 msgid "Action"
 msgstr "Akcja"
 
-#: templates/admin/object_history.html:40
+#: templates/admin/object_history.html:39
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -640,109 +649,109 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "Podaj nazwę użytkownika i hasło."
 
-#: templates/admin/auth/user/change_password.html:33
+#: templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Podaj nowe hasło dla użytkownika <strong>%(username)s</strong>."
 
-#: templates/admin/auth/user/change_password.html:40
+#: templates/admin/auth/user/change_password.html:38
 msgid "Password"
 msgstr "Hasło"
 
-#: templates/admin/auth/user/change_password.html:46
-#: templates/registration/password_change_form.html:43
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
 msgid "Password (again)"
 msgstr "Hasło (powtórz)"
 
-#: templates/admin/auth/user/change_password.html:47
+#: templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
 msgstr "Podaj powyższe hasło w celu weryfikacji."
 
-#: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:115
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "Usuń"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Dodaj kolejne %(verbose_name)s"
-
-#: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:118
-msgid "Remove"
-msgstr "Usuń"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Usunąć?"
 
-#: templates/registration/logged_out.html:9
+#: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dziękujemy za odwiedzenie serwisu."
 
-#: templates/registration/logged_out.html:11
+#: templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Zaloguj się ponownie"
 
-#: templates/registration/password_change_done.html:8
-#: templates/registration/password_change_form.html:9
-#: templates/registration/password_change_form.html:13
-#: templates/registration/password_change_form.html:25
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
 msgid "Password change"
 msgstr "Zmiana hasła"
 
-#: templates/registration/password_change_done.html:12
-#: templates/registration/password_change_done.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
 msgid "Password change successful"
 msgstr "Hasło zmienione"
 
-#: templates/registration/password_change_done.html:18
+#: templates/registration/password_change_done.html:17
 msgid "Your password was changed."
 msgstr "Twoje hasło zostało zmienione."
 
-#: templates/registration/password_change_form.html:27
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr "Podaj swoje stare hasło i dwa razy nowe."
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "Stare hasło"
 
-#: templates/registration/password_change_form.html:38
+#: templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "Nowe hasło"
 
-#: templates/registration/password_change_form.html:49
-#: templates/registration/password_reset_confirm.html:27
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
 msgid "Change my password"
 msgstr "Zmień hasło"
 
-#: templates/registration/password_reset_complete.html:8
-#: templates/registration/password_reset_confirm.html:12
-#: templates/registration/password_reset_done.html:8
-#: templates/registration/password_reset_form.html:8
-#: templates/registration/password_reset_form.html:12
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
 msgid "Password reset"
 msgstr "Zresetuj hasło"
 
-#: templates/registration/password_reset_complete.html:12
-#: templates/registration/password_reset_complete.html:16
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
 msgid "Password reset complete"
 msgstr "Hasło zostało zresetowane"
 
-#: templates/registration/password_reset_complete.html:18
+#: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Twoje hasło zostało ustawione. Możesz się teraz zalogować."
 
-#: templates/registration/password_reset_confirm.html:8
+#: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Potwierdzenie zresetowania hasła"
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:17
 msgid "Enter new password"
 msgstr "Podaj nowe hasło"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:19
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -750,19 +759,19 @@ msgstr ""
 "Podaj dwukrotnie nowe hasło, by można było zweryfikować, czy zostało wpisane "
 "poprawnie."
 
-#: templates/registration/password_reset_confirm.html:24
+#: templates/registration/password_reset_confirm.html:23
 msgid "New password:"
 msgstr "Nowe hasło:"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:25
 msgid "Confirm password:"
 msgstr "Potwierdź hasło:"
 
-#: templates/registration/password_reset_confirm.html:32
+#: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
 msgstr "Zresetowanie hasła nie powiodło się"
 
-#: templates/registration/password_reset_confirm.html:34
+#: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -770,27 +779,23 @@ msgstr ""
 "Link do resetowania hasła był niepoprawny, być może dlatego, że został już "
 "raz użyty. Możesz ponownie zażądać zresetowania hasła."
 
-#: templates/registration/password_reset_done.html:12
-#: templates/registration/password_reset_done.html:16
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
 msgstr "Zresetowanie hasła zakończyło się powodzeniem"
 
-#: templates/registration/password_reset_done.html:18
+#: templates/registration/password_reset_done.html:17
 msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
+"We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Instrukcje dalszego postępowania zostały wysłane na podany adres e-mail. "
-"Powinieneś otrzymać je niebawem."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your "
+"You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Otrzymujesz tę wiadomość w odpowiedzi na prośbę o zresetowanie hasła dla "
-"twojego konta na stronie %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -811,36 +816,34 @@ msgstr "Dziękujemy za skorzystanie naszej strony."
 msgid "The %(site_name)s team"
 msgstr "Zespół %(site_name)s"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:17
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"Zapomniałeś hasła? Podaj swój adres e-mail, a prześlemy Ci instrukcję, jak "
-"ustawić nowe hasło."
 
-#: templates/registration/password_reset_form.html:22
-msgid "E-mail address:"
-msgstr "Adres e-mail:"
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr ""
 
-#: templates/registration/password_reset_form.html:22
+#: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: templatetags/admin_list.py:336
+#: templatetags/admin_list.py:344
 msgid "All dates"
 msgstr "Wszystkie daty"
 
-#: views/main.py:31
+#: views/main.py:33
 msgid "(None)"
 msgstr "(Brak)"
 
-#: views/main.py:74
+#: views/main.py:76
 #, python-format
 msgid "Select %s"
 msgstr "Zaznacz %s"
 
-#: views/main.py:76
+#: views/main.py:78
 #, python-format
 msgid "Select %s to change"
 msgstr "Zaznacz %s aby zmienić"

@@ -39,8 +39,6 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
 .. function:: require_safe()
 
-    .. versionadded:: 1.4
-
     Decorator to require that a view only accept the GET and HEAD methods.
     These methods are commonly considered "safe" because they should not have
     the significance of taking an action other than retrieving the requested

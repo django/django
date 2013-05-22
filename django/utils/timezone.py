@@ -80,7 +80,8 @@ class LocalTimezone(tzinfo):
             return ZERO
 
     def tzname(self, dt):
-        return _time.tzname[self._isdst(dt)]
+        is_dst = False if dt is None else self._isdst(dt)
+        return _time.tzname[is_dst]
 
     def _isdst(self, dt):
         tt = (dt.year, dt.month, dt.day,
@@ -111,6 +112,7 @@ def get_default_timezone():
         if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
             _localtime = pytz.timezone(settings.TIME_ZONE)
         else:
+            # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
             _localtime = LocalTimezone()
     return _localtime
 
@@ -144,8 +146,7 @@ def _get_timezone_name(timezone):
         return timezone.zone
     except AttributeError:
         # for regular tzinfo objects
-        local_now = datetime.now(timezone)
-        return timezone.tzname(local_now)
+        return timezone.tzname(None)
 
 # Timezone selection functions.
 
@@ -198,10 +199,10 @@ class override(object):
             activate(self.timezone)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.old_timezone is not None:
-            _active.value = self.old_timezone
+        if self.old_timezone is None:
+            deactivate()
         else:
-            del _active.value
+            _active.value = self.old_timezone
 
 
 # Templates

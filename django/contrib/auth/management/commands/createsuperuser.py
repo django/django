@@ -1,6 +1,7 @@
 """
 Management utility to create superusers.
 """
+from __future__ import unicode_literals
 
 import getpass
 import sys
@@ -11,6 +12,7 @@ from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.encoding import force_str
 from django.utils.six.moves import input
 from django.utils.text import capfirst
 
@@ -79,12 +81,14 @@ class Command(BaseCommand):
             try:
 
                 # Get a username
+                verbose_field_name = self.username_field.verbose_name
                 while username is None:
                     if not username:
-                        input_msg = capfirst(self.username_field.verbose_name)
+                        input_msg = capfirst(verbose_field_name)
                         if default_username:
-                            input_msg += " (leave blank to use '%s')" % default_username
-                        raw_value = input(input_msg + ': ')
+                            input_msg = "%s (leave blank to use '%s')" % (
+                                input_msg, default_username)
+                        raw_value = input(force_str('%s: ' % input_msg))
 
                     if default_username and raw_value == '':
                         raw_value = default_username
@@ -95,19 +99,19 @@ class Command(BaseCommand):
                         username = None
                         continue
                     try:
-                        self.UserModel.objects.db_manager(database).get_by_natural_key(username)
+                        self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
                     except self.UserModel.DoesNotExist:
                         pass
                     else:
                         self.stderr.write("Error: That %s is already taken." %
-                                self.username_field.verbose_name)
+                                verbose_field_name)
                         username = None
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        raw_value = input(capfirst(field.verbose_name + ': '))
+                        raw_value = input(force_str('%s: ' % capfirst(field.verbose_name)))
                         try:
                             user_data[field_name] = field.clean(raw_value, None)
                         except exceptions.ValidationError as e:
@@ -118,7 +122,7 @@ class Command(BaseCommand):
                 while password is None:
                     if not password:
                         password = getpass.getpass()
-                        password2 = getpass.getpass('Password (again): ')
+                        password2 = getpass.getpass(force_str('Password (again): '))
                         if password != password2:
                             self.stderr.write("Error: Your passwords didn't match.")
                             password = None
@@ -134,6 +138,6 @@ class Command(BaseCommand):
 
         user_data[self.UserModel.USERNAME_FIELD] = username
         user_data['password'] = password
-        self.UserModel.objects.db_manager(database).create_superuser(**user_data)
+        self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
         if verbosity >= 1:
             self.stdout.write("Superuser created successfully.")

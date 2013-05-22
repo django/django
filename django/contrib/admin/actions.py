@@ -3,6 +3,7 @@ Built-in, globally-available admin actions.
 """
 
 from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.admin.util import get_deleted_objects, model_ngettext
 from django.db import router
@@ -47,7 +48,7 @@ def delete_selected(modeladmin, request, queryset):
             queryset.delete()
             modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
                 "count": n, "items": model_ngettext(modeladmin.opts, n)
-            })
+            }, messages.SUCCESS)
         # Return None to display the change list page again.
         return None
 
@@ -75,7 +76,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # Display the confirmation page
     return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
-        "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
+        "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.model_name),
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"
     ], context, current_app=modeladmin.admin_site.name)

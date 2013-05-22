@@ -1,3 +1,5 @@
+import warnings
+
 from django import http
 from django.template import (Context, RequestContext,
                              loader, Template, TemplateDoesNotExist)
@@ -63,12 +65,9 @@ def permission_denied(request, template_name='403.html'):
 
 
 def shortcut(request, content_type_id, object_id):
-    # TODO: Remove this in Django 2.0.
-    # This is a legacy view that depends on the contenttypes framework.
-    # The core logic was moved to django.contrib.contenttypes.views after
-    # Django 1.0, but this remains here for backwards compatibility.
-    # Note that the import is *within* this function, rather than being at
-    # module level, because we don't want to assume people have contenttypes
-    # installed.
+    warnings.warn(
+        "django.views.defaults.shortcut will be removed in Django 1.8. "
+        "Import it from django.contrib.contenttypes.views instead.",
+        PendingDeprecationWarning, stacklevel=2)
     from django.contrib.contenttypes.views import shortcut as real_shortcut
     return real_shortcut(request, content_type_id, object_id)

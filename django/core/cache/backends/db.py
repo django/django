@@ -9,8 +9,8 @@ except ImportError:
     import pickle
 
 from django.conf import settings
-from django.core.cache.backends.base import BaseCache
-from django.db import connections, router, transaction, DatabaseError
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
+from django.db import connections, transaction, router, DatabaseError
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
 
@@ -23,10 +23,10 @@ class Options(object):
     def __init__(self, table):
         self.db_table = table
         self.app_label = 'django_cache'
-        self.module_name = 'cacheentry'
+        self.model_name = 'cacheentry'
         self.verbose_name = 'cache entry'
         self.verbose_name_plural = 'cache entries'
-        self.object_name =  'CacheEntry'
+        self.object_name = 'CacheEntry'
         self.abstract = False
         self.managed = True
         self.proxy = False
@@ -65,28 +65,28 @@ class DatabaseCache(BaseDatabaseCache):
         if row is None:
             return default
         now = timezone.now()
+
         if row[2] < now:
             db = router.db_for_write(self.cache_model_class)
             cursor = connections[db].cursor()
             cursor.execute("DELETE FROM %s "
                            "WHERE cache_key = %%s" % table, [key])
-            transaction.commit_unless_managed(using=db)
             return default
         value = connections[db].ops.process_clob(row[1])
         return pickle.loads(base64.b64decode(force_bytes(value)))
 
-    def set(self, key, value, timeout=None, version=None):
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         self._base_set('set', key, value, timeout)
 
-    def add(self, key, value, timeout=None, version=None):
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         return self._base_set('add', key, value, timeout)
 
-    def _base_set(self, mode, key, value, timeout=None):
-        if timeout is None:
+    def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
+        if timeout == DEFAULT_TIMEOUT:
             timeout = self.default_timeout
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
@@ -96,7 +96,9 @@ class DatabaseCache(BaseDatabaseCache):
         num = cursor.fetchone()[0]
         now = timezone.now()
         now = now.replace(microsecond=0)
-        if settings.USE_TZ:
+        if timeout is None:
+            exp = datetime.max
+        elif settings.USE_TZ:
             exp = datetime.utcfromtimestamp(time.time() + timeout)
         else:
             exp = datetime.fromtimestamp(time.time() + timeout)
@@ -109,25 +111,24 @@ class DatabaseCache(BaseDatabaseCache):
         # string, not bytes. Refs #19274.
         if six.PY3:
             b64encoded = b64encoded.decode('latin1')
-        cursor.execute("SELECT cache_key, expires FROM %s "
-                       "WHERE cache_key = %%s" % table, [key])
         try:
-            result = cursor.fetchone()
-            if result and (mode == 'set' or
-                    (mode == 'add' and result[1] < now)):
-                cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
-                               "WHERE cache_key = %%s" % table,
-                               [b64encoded, connections[db].ops.value_to_db_datetime(exp), key])
-            else:
-                cursor.execute("INSERT INTO %s (cache_key, value, expires) "
-                               "VALUES (%%s, %%s, %%s)" % table,
-                               [key, b64encoded, connections[db].ops.value_to_db_datetime(exp)])
+            with transaction.atomic(using=db):
+                cursor.execute("SELECT cache_key, expires FROM %s "
+                               "WHERE cache_key = %%s" % table, [key])
+                result = cursor.fetchone()
+                exp = connections[db].ops.value_to_db_datetime(exp)
+                if result and (mode == 'set' or (mode == 'add' and result[1] < now)):
+                    cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
+                                   "WHERE cache_key = %%s" % table,
+                                   [b64encoded, exp, key])
+                else:
+                    cursor.execute("INSERT INTO %s (cache_key, value, expires) "
+                                   "VALUES (%%s, %%s, %%s)" % table,
+                                   [key, b64encoded, exp])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
-            transaction.rollback_unless_managed(using=db)
             return False
         else:
-            transaction.commit_unless_managed(using=db)
             return True
 
     def delete(self, key, version=None):
@@ -139,7 +140,6 @@ class DatabaseCache(BaseDatabaseCache):
         cursor = connections[db].cursor()
 
         cursor.execute("DELETE FROM %s WHERE cache_key = %%s" % table, [key])
-        transaction.commit_unless_managed(using=db)
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)

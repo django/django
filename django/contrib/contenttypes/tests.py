@@ -6,6 +6,7 @@ from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site, get_current_site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.http import urlquote
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -203,6 +204,7 @@ class ContentTypesTests(TestCase):
         })
 
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
         """
         Check that the shortcut view (used for the admin "view on site"
@@ -272,3 +274,10 @@ class ContentTypesTests(TestCase):
             model = 'OldModel',
         )
         self.assertEqual(six.text_type(ct), 'Old model')
+        self.assertIsNone(ct.model_class())
+
+        # Make sure stale ContentTypes can be fetched like any other object.
+        # Before Django 1.6 this caused a NoneType error in the caching mechanism.
+        # Instead, just return the ContentType object and let the app detect stale states.
+        ct_fetched = ContentType.objects.get_for_id(ct.pk)
+        self.assertIsNone(ct_fetched.model_class())

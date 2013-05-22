@@ -1,11 +1,14 @@
 import hashlib
 import sys
 import time
+import warnings
 
 from django.conf import settings
 from django.db.utils import load_backend
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
+
+from .util import truncate_name
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -75,9 +78,9 @@ class BaseDatabaseCreation(object):
                     tablespace, inline=True)
                 if tablespace_sql:
                     field_output.append(tablespace_sql)
-            if f.rel:
+            if f.rel and f.db_constraint:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(
-                    f, known_models, style)
+                    model, f, known_models, style)
                 if pending:
                     pending_references.setdefault(f.rel.to, []).append(
                         (model, f))
@@ -116,15 +119,16 @@ class BaseDatabaseCreation(object):
 
         return final_output, pending_references
 
-    def sql_for_inline_foreign_key_references(self, field, known_models, style):
+    def sql_for_inline_foreign_key_references(self, model, field, known_models, style):
         """
         Return the SQL snippet defining the foreign key reference for a field.
         """
         qn = self.connection.ops.quote_name
-        if field.rel.to in known_models:
+        rel_to = field.rel.to
+        if rel_to in known_models or rel_to == model:
             output = [style.SQL_KEYWORD('REFERENCES') + ' ' +
-                style.SQL_TABLE(qn(field.rel.to._meta.db_table)) + ' (' +
-                style.SQL_FIELD(qn(field.rel.to._meta.get_field(
+                style.SQL_TABLE(qn(rel_to._meta.db_table)) + ' (' +
+                style.SQL_FIELD(qn(rel_to._meta.get_field(
                     field.rel.field_name).column)) + ')' +
                 self.connection.ops.deferrable_sql()
             ]
@@ -141,8 +145,6 @@ class BaseDatabaseCreation(object):
         """
         Returns any ALTER TABLE statements to add constraints after the fact.
         """
-        from django.db.backends.util import truncate_name
-
         opts = model._meta
         if not opts.managed or opts.proxy or opts.swapped:
             return []
@@ -192,8 +194,6 @@ class BaseDatabaseCreation(object):
             return []
 
     def sql_indexes_for_fields(self, model, fields, style):
-        from django.db.backends.util import truncate_name
-
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -240,7 +240,6 @@ class BaseDatabaseCreation(object):
         return output
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
-        from django.db.backends.util import truncate_name
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
@@ -260,6 +259,52 @@ class BaseDatabaseCreation(object):
                     r_name, self.connection.ops.max_name_length())))))
         del references_to_delete[model]
         return output
+
+    def sql_destroy_indexes_for_model(self, model, style):
+        """
+        Returns the DROP INDEX SQL statements for a single model.
+        """
+        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
+            return []
+        output = []
+        for f in model._meta.local_fields:
+            output.extend(self.sql_destroy_indexes_for_field(model, f, style))
+        for fs in model._meta.index_together:
+            fields = [model._meta.get_field_by_name(f)[0] for f in fs]
+            output.extend(self.sql_destroy_indexes_for_fields(model, fields, style))
+        return output
+
+    def sql_destroy_indexes_for_field(self, model, f, style):
+        """
+        Return the DROP INDEX SQL statements for a single model field.
+        """
+        if f.db_index and not f.unique:
+            return self.sql_destroy_indexes_for_fields(model, [f], style)
+        else:
+            return []
+
+    def sql_destroy_indexes_for_fields(self, model, fields, style):
+        if len(fields) == 1 and fields[0].db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
+        elif model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
+        else:
+            tablespace_sql = ""
+        if tablespace_sql:
+            tablespace_sql = " " + tablespace_sql
+
+        field_names = []
+        qn = self.connection.ops.quote_name
+        for f in fields:
+            field_names.append(style.SQL_FIELD(qn(f.column)))
+
+        index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
+
+        return [
+            style.SQL_KEYWORD("DROP INDEX") + " " +
+            style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + " " +
+            ";",
+        ]
 
     def create_test_db(self, verbosity=1, autoclobber=False):
         """
@@ -281,6 +326,7 @@ class BaseDatabaseCreation(object):
         self._create_test_db(verbosity, autoclobber)
 
         self.connection.close()
+        settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
         # Report syncdb messages at one level lower than that requested.
@@ -337,11 +383,8 @@ class BaseDatabaseCreation(object):
 
         qn = self.connection.ops.quote_name
 
-        # Create the test database and connect to it. We need to autocommit
-        # if the database supports it because PostgreSQL doesn't allow
-        # CREATE/DROP DATABASE statements within transactions.
+        # Create the test database and connect to it.
         cursor = self.connection.cursor()
-        self._prepare_for_test_db_ddl()
         try:
             cursor.execute(
                 "CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
@@ -408,7 +451,6 @@ class BaseDatabaseCreation(object):
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         cursor = self.connection.cursor()
-        self._prepare_for_test_db_ddl()
         # Wait to avoid "database is being accessed by other users" errors.
         time.sleep(1)
         cursor.execute("DROP DATABASE %s"
@@ -421,16 +463,10 @@ class BaseDatabaseCreation(object):
         anymore by Django code. Kept for compatibility with user code that
         might use it.
         """
-        pass
-
-    def _prepare_for_test_db_ddl(self):
-        """
-        Internal implementation - Hook for tasks that should be performed
-        before the ``CREATE DATABASE``/``DROP DATABASE`` clauses used by
-        testing code to create/ destroy test databases. Needed e.g. in
-        PostgreSQL to rollback and close any active transaction.
-        """
-        pass
+        warnings.warn(
+            "set_autocommit was moved from BaseDatabaseCreation to "
+            "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
+        return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):
         """

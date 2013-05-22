@@ -113,8 +113,8 @@ class SyndicationFeed(object):
 
     def add_item(self, title, link, description, author_email=None,
         author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, enclosure=None, categories=(), item_copyright=None,
-        ttl=None, **kwargs):
+        unique_id=None, unique_id_is_permalink=None, enclosure=None,
+        categories=(), item_copyright=None, ttl=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate, which is a datetime.datetime object, and
@@ -136,6 +136,7 @@ class SyndicationFeed(object):
             'pubdate': pubdate,
             'comments': to_unicode(comments),
             'unique_id': to_unicode(unique_id),
+            'unique_id_is_permalink': unique_id_is_permalink,
             'enclosure': enclosure,
             'categories': categories or (),
             'item_copyright': to_unicode(item_copyright),
@@ -280,7 +281,11 @@ class Rss201rev2Feed(RssFeed):
         if item['comments'] is not None:
             handler.addQuickElement("comments", item['comments'])
         if item['unique_id'] is not None:
-            handler.addQuickElement("guid", item['unique_id'])
+            guid_attrs = {}
+            if isinstance(item.get('unique_id_is_permalink'), bool):
+                guid_attrs['isPermaLink'] = str(
+                    item['unique_id_is_permalink']).lower()
+            handler.addQuickElement("guid", item['unique_id'], guid_attrs)
         if item['ttl'] is not None:
             handler.addQuickElement("ttl", item['ttl'])
 

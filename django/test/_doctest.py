@@ -49,6 +49,13 @@ files containing doctests.  There are also many ways to override parts
 of doctest's default behaviors.  See the Library Reference Manual for
 details.
 """
+import warnings
+
+warnings.warn(
+    "The django.test._doctest module is deprecated; "
+    "use the doctest module from the Python standard library instead.",
+    PendingDeprecationWarning)
+
 
 __docformat__ = 'reStructuredText en'
 
@@ -883,7 +890,7 @@ class DocTestFinder:
         if module is None:
             return True
         elif inspect.isfunction(object):
-            return module.__dict__ is object.__globals__
+            return module.__dict__ is six.get_function_globals(object)
         elif inspect.isclass(object):
             return module.__name__ == object.__module__
         elif inspect.getmodule(object) is not None:
@@ -1021,7 +1028,7 @@ class DocTestFinder:
 
         # Find the line number for functions & methods.
         if inspect.ismethod(obj): obj = obj.__func__
-        if inspect.isfunction(obj): obj = obj.__code__
+        if inspect.isfunction(obj): obj = six.get_function_code(obj)
         if inspect.istraceback(obj): obj = obj.tb_frame
         if inspect.isframe(obj): obj = obj.f_code
         if inspect.iscode(obj):

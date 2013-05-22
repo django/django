@@ -44,6 +44,7 @@ class GeometryField(Field):
 
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
+    form_class = forms.GeometryField
 
     # Geodetic units.
     geodetic_units = ('Decimal Degree', 'degree')
@@ -201,12 +202,14 @@ class GeometryField(Field):
         return connection.ops.geo_db_type(self)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class' : forms.GeometryField,
-                    'null' : self.null,
+        defaults = {'form_class' : self.form_class,
                     'geom_type' : self.geom_type,
                     'srid' : self.srid,
                     }
         defaults.update(kwargs)
+        if (self.dim > 2 and not 'widget' in kwargs and
+                not getattr(defaults['form_class'].widget, 'supports_3d', False)):
+            defaults['widget'] = forms.Textarea
         return super(GeometryField, self).formfield(**defaults)
 
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
@@ -268,28 +271,35 @@ class GeometryField(Field):
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
+    form_class = forms.PointField
     description = _("Point")
 
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
+    form_class = forms.LineStringField
     description = _("Line string")
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
+    form_class = forms.PolygonField
     description = _("Polygon")
 
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
+    form_class = forms.MultiPointField
     description = _("Multi-point")
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
+    form_class = forms.MultiLineStringField
     description = _("Multi-line string")
 
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
+    form_class = forms.MultiPolygonField
     description = _("Multi polygon")
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'
+    form_class = forms.GeometryCollectionField
     description = _("Geometry collection")

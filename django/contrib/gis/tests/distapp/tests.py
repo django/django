@@ -2,24 +2,33 @@ from __future__ import absolute_import
 
 from django.db import connection
 from django.db.models import Q
-from django.contrib.gis.geos import GEOSGeometry, LineString
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D # alias for Distance
-from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle, no_spatialite
+from django.contrib.gis.tests.utils import (
+    HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
+)
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 
-from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
-    SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
+if HAS_GEOS and HAS_SPATIAL_DB:
+    from django.contrib.gis.geos import GEOSGeometry, LineString
+
+    from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
+        SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB and not mysql,
+    "Geos and spatial db (not mysql) are required.")
 class DistanceTest(TestCase):
 
-    # A point we are testing distances with -- using a WGS84
-    # coordinate that'll be implicitly transormed to that to
-    # the coordinate system of the field, EPSG:32140 (Texas South Central
-    # w/units in meters)
-    stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
-    # Another one for Australia
-    au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
+    if HAS_GEOS and HAS_SPATIAL_DB:
+        # A point we are testing distances with -- using a WGS84
+        # coordinate that'll be implicitly transormed to that to
+        # the coordinate system of the field, EPSG:32140 (Texas South Central
+        # w/units in meters)
+        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        # Another one for Australia
+        au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
 
     def get_names(self, qs):
         cities = [c.name for c in qs]

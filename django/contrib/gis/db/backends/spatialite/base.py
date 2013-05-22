@@ -1,15 +1,15 @@
+import sys
 from ctypes.util import find_library
 from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.sqlite3.base import (
-    _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp, _sqlite_format_dtdelta,
-    connection_created, Database, DatabaseWrapper as SQLiteDatabaseWrapper,
-    SQLiteCursorWrapper)
+from django.db.backends.sqlite3.base import (Database,
+    DatabaseWrapper as SQLiteDatabaseWrapper, SQLiteCursorWrapper)
 from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
+from django.utils import six
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
@@ -36,29 +36,25 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         self.creation = SpatiaLiteCreation(self)
         self.introspection = SpatiaLiteIntrospection(self)
 
-    def _cursor(self):
-        if self.connection is None:
-            self._sqlite_create_connection()
-
-            ## From here on, customized for GeoDjango ##
-
-            # Enabling extension loading on the SQLite connection.
-            try:
-                self.connection.enable_load_extension(True)
-            except AttributeError:
-                raise ImproperlyConfigured('The pysqlite library does not support C extension loading. '
-                                           'Both SQLite and pysqlite must be configured to allow '
-                                           'the loading of extensions to use SpatiaLite.'
-                                           )
-
-            # Loading the SpatiaLite library extension on the connection, and returning
-            # the created cursor.
-            cur = self.connection.cursor(factory=SQLiteCursorWrapper)
-            try:
-                cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
-            except Exception as msg:
-                raise ImproperlyConfigured('Unable to load the SpatiaLite library extension '
-                                           '"%s" because: %s' % (self.spatialite_lib, msg))
-            return cur
-        else:
-            return self.connection.cursor(factory=SQLiteCursorWrapper)
+    def get_new_connection(self, conn_params):
+        conn = super(DatabaseWrapper, self).get_new_connection(conn_params)
+        # Enabling extension loading on the SQLite connection.
+        try:
+            conn.enable_load_extension(True)
+        except AttributeError:
+            raise ImproperlyConfigured(
+                'The pysqlite library does not support C extension loading. '
+                'Both SQLite and pysqlite must be configured to allow '
+                'the loading of extensions to use SpatiaLite.')
+        # Loading the SpatiaLite library extension on the connection, and returning
+        # the created cursor.
+        cur = conn.cursor(factory=SQLiteCursorWrapper)
+        try:
+            cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
+        except Exception as msg:
+            new_msg = (
+                'Unable to load the SpatiaLite library extension '
+                '"%s" because: %s') % (self.spatialite_lib, msg)
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
+        cur.close()
+        return conn

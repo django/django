@@ -11,13 +11,13 @@ msgstr ""
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
 "PO-Revision-Date: 2012-03-20 00:23+0000\n"
 "Last-Translator: gudbergur <gudbergur@gmail.com>\n"
-"Language-Team: Icelandic (http://www.transifex.net/projects/p/django/"
+"Language-Team: Icelandic (http://www.transifex.com/projects/p/django/"
 "language/is/)\n"
-"Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format

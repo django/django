@@ -50,6 +50,10 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
+    .. versionchanged:: 1.5
+
+        This parameter used to be called ``mimetype``.
+
 ``status``
     The status code for the response. Defaults to ``200``.
 
@@ -87,7 +91,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name[, dictionary][, context_instance][, mimetype])
+.. function:: render_to_response(template_name[, dictionary][, context_instance][, content_type])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -121,9 +125,14 @@ Optional arguments
                                   my_data_dictionary,
                                   context_instance=RequestContext(request))
 
-``mimetype``
+``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
+
+    .. versionchanged:: 1.5
+
+        This parameter used to be called ``mimetype``.
+
 
 Example
 -------
@@ -148,7 +157,7 @@ This example is equivalent to::
         t = loader.get_template('myapp/template.html')
         c = Context({'foo': 'bar'})
         return HttpResponse(t.render(c),
-            mimetype="application/xhtml+xml")
+            content_type="application/xhtml+xml")
 
 ``redirect``
 ============
@@ -162,8 +171,9 @@ This example is equivalent to::
 
    * A model: the model's `get_absolute_url()` function will be called.
 
-   * A view name, possibly with arguments: `urlresolvers.reverse()` will
-     be used to reverse-resolve the name.
+   * A view name, possibly with arguments: :func:`urlresolvers.reverse
+     <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
+     name.
 
    * A URL, which will be used as-is for the redirect location.
 

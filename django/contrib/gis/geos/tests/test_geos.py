@@ -6,20 +6,28 @@ import random
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 
+from django.contrib.gis.gdal import HAS_GDAL
+
 from django.contrib.gis import memoryview
-from django.contrib.gis.geos import (GEOSException, GEOSIndexError, GEOSGeometry,
-    GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
-    LineString, MultiLineString, fromfile, fromstr, geos_version_info)
-from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
-from django.contrib.gis.geos.libgeos import GEOS_PREPARE
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
 from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
 from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+from .. import HAS_GEOS
+
+if HAS_GEOS:
+    from .. import (GEOSException, GEOSIndexError, GEOSGeometry,
+        GeometryCollection, Point, MultiPoint, Polygon, MultiPolygon, LinearRing,
+        LineString, MultiLineString, fromfile, fromstr, geos_version_info,
+        GEOS_PREPARE)
+    from ..base import gdal, numpy, GEOSBase
 
 
+@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(unittest.TestCase, TestDataMixin):
 
     @property
@@ -80,7 +88,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing WKT output."
         for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
-            self.assertEqual(g.ewkt, geom.wkt)
+            if geom.hasz and geos_version_info()['version'] >= '3.3.0':
+                self.assertEqual(g.ewkt, geom.wkt)
 
     def test_hex(self):
         "Testing HEX output."
@@ -197,7 +206,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(srid, poly.shell.srid)
                 self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_json(self):
         "Testing GeoJSON input/output (via GDAL)."
         for g in self.geometries.json_geoms:
@@ -451,6 +460,21 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(poly.wkt, Polygon(*tuple(r for r in poly)).wkt)
             self.assertEqual(poly.wkt, Polygon(*tuple(LinearRing(r.tuple) for r in poly)).wkt)
 
+    def test_polygon_comparison(self):
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        p2 = Polygon(((0, 0), (0, 1), (1, 0), (0, 0)))
+        self.assertTrue(p1 > p2)
+        self.assertFalse(p1 < p2)
+        self.assertFalse(p2 > p1)
+        self.assertTrue(p2 < p1)
+
+        p3 = Polygon(((0, 0), (0, 1), (1, 1), (2, 0), (0, 0)))
+        p4 = Polygon(((0, 0), (0, 1), (2, 2), (1, 0), (0, 0)))
+        self.assertFalse(p4 < p3)
+        self.assertTrue(p3 < p4)
+        self.assertTrue(p4 > p3)
+        self.assertFalse(p3 > p4)
+
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
         prev = fromstr('POINT (0 0)')
@@ -646,6 +670,23 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
+    def test_custom_srid(self):
+        """ Test with a srid unknown from GDAL """
+        pnt = Point(111200, 220900, srid=999999)
+        self.assertTrue(pnt.ewkt.startswith("SRID=999999;POINT (111200.0"))
+        self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
+        self.assertIsNone(pnt.srs)
+
+        # Test conversion from custom to a known srid
+        c2w = gdal.CoordTransform(
+            gdal.SpatialReference('+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 +datum=WGS84 +units=m +no_defs'),
+            gdal.SpatialReference(4326))
+        new_pnt = pnt.transform(c2w, clone=True)
+        self.assertEqual(new_pnt.srid, 4326)
+        self.assertAlmostEqual(new_pnt.x, 1, 3)
+        self.assertAlmostEqual(new_pnt.y, 2, 3)
+
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
         ### Testing the mutability of Polygons ###
@@ -673,7 +714,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             for i in range(len(mp)):
                 # Creating a random point.
                 pnt = mp[i]
-                new = Point(random.randint(1, 100), random.randint(1, 100))
+                new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
                 s = str(new) # what was used for the assignment is still accessible
@@ -819,7 +860,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # And, they should be equal.
         self.assertEqual(gc1, gc2)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required")
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."
         g1 = fromstr('POINT(5 23)')
@@ -846,7 +887,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertNotEqual(poly._ptr, cpy1._ptr)
         self.assertNotEqual(poly._ptr, cpy2._ptr)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
+    @skipUnless(HAS_GDAL, "GDAL is required to transform geometries")
     def test_transform(self):
         "Testing `transform` method."
         orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
@@ -871,7 +912,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
-    @unittest.skipUnless(gdal.HAS_GDAL, "gdal is required to transform geometries")
+    @skipUnless(HAS_GDAL, "GDAL is required to transform geometries")
     def test_transform_3d(self):
         p3d = GEOSGeometry('POINT (5 23 100)', 4326)
         p3d.transform(2774)
@@ -880,6 +921,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         else:
             self.assertIsNone(p3d.z)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_noop(self):
         """ Testing `transform` method (SRID match) """
         # transform() should no-op if source & dest SRIDs match,
@@ -930,6 +972,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
         self.assertRaises(GEOSException, g.transform, 2774, clone=True)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_nogdal(self):
         """ Testing `transform` method (GDAL not available) """
         old_has_gdal = gdal.HAS_GDAL
@@ -984,7 +1027,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(geom, tmpg)
                 if not no_srid: self.assertEqual(geom.srid, tmpg.srid)
 
-    @unittest.skipUnless(GEOS_PREPARE, "geos >= 3.1.0 is required")
+    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_prepared(self):
         "Testing PreparedGeometry support."
         # Creating a simple multipolygon and getting a prepared version.
@@ -1011,7 +1054,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         for geom, merged in zip(ref_geoms, ref_merged):
             self.assertEqual(merged, geom.merged)
 
-    @unittest.skipUnless(GEOS_PREPARE, "geos >= 3.1.0 is required")
+    @skipUnless(HAS_GEOS and GEOS_PREPARE, "geos >= 3.1.0 is required")
     def test_valid_reason(self):
         "Testing IsValidReason support"
 
@@ -1026,7 +1069,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
-    @unittest.skipUnless(geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
+    @skipUnless(HAS_GEOS and geos_version_info()['version'] >= '3.2.0', "geos >= 3.2.0 is required")
     def test_linearref(self):
         "Testing linear referencing"
 
@@ -1048,21 +1091,14 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(mls.interpolate(17), Point(10, 7))
 
     def test_geos_version(self):
-        "Testing the GEOS version regular expression."
+        """Testing the GEOS version regular expression."""
         from django.contrib.gis.geos.libgeos import version_regex
-        versions = [ ('3.0.0rc4-CAPI-1.3.3', '3.0.0'),
-                     ('3.0.0-CAPI-1.4.1', '3.0.0'),
-                     ('3.4.0dev-CAPI-1.8.0', '3.4.0') ]
-        for v, expected in versions:
-            m = version_regex.match(v)
-            self.assertTrue(m)
-            self.assertEqual(m.group('version'), expected)
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GEOSTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
+        versions = [('3.0.0rc4-CAPI-1.3.3', '3.0.0', '1.3.3'),
+                    ('3.0.0-CAPI-1.4.1', '3.0.0', '1.4.1'),
+                    ('3.4.0dev-CAPI-1.8.0', '3.4.0', '1.8.0'),
+                    ('3.4.0dev-CAPI-1.8.0 r0', '3.4.0', '1.8.0')]
+        for v_init, v_geos, v_capi in versions:
+            m = version_regex.match(v_init)
+            self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
+            self.assertEqual(m.group('version'), v_geos)
+            self.assertEqual(m.group('capi_version'), v_capi)

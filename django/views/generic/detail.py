@@ -84,7 +84,7 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
-            return obj._meta.object_name.lower()
+            return obj._meta.model_name
         else:
             return None
 
@@ -93,9 +93,11 @@ class SingleObjectMixin(ContextMixin):
         Insert the single object into the context dict.
         """
         context = {}
-        context_object_name = self.get_context_object_name(self.object)
-        if context_object_name:
-            context[context_object_name] = self.object
+        if self.object:
+            context['object'] = self.object
+            context_object_name = self.get_context_object_name(self.object)
+            if context_object_name:
+                context[context_object_name] = self.object
         context.update(kwargs)
         return super(SingleObjectMixin, self).get_context_data(**context)
 
@@ -122,7 +124,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<object_name><template_name_suffix>.html``        
+        * ``<app_label>/<object_name><template_name_suffix>.html``
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
@@ -144,13 +146,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         if isinstance(self.object, models.Model):
             names.append("%s/%s%s.html" % (
                 self.object._meta.app_label,
-                self.object._meta.object_name.lower(),
+                self.object._meta.model_name,
                 self.template_name_suffix
             ))
         elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
             names.append("%s/%s%s.html" % (
                 self.model._meta.app_label,
-                self.model._meta.object_name.lower(),
+                self.model._meta.model_name,
                 self.template_name_suffix
             ))
         return names

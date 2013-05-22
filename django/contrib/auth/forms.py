@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
@@ -27,7 +29,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if encoded == '' or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded == UNUSABLE_PASSWORD:
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -51,6 +53,14 @@ class ReadOnlyPasswordHashField(forms.Field):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("required", False)
         super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
+
+    def bound_data(self, data, initial):
+        # Always return initial because the widget doesn't
+        # render an input field.
+        return initial
+
+    def _has_changed(self, initial, data):
+        return False
 
 
 class UserCreationForm(forms.ModelForm):
@@ -84,7 +94,7 @@ class UserCreationForm(forms.ModelForm):
         # but it sets a nicer error message than the ORM. See #13147.
         username = self.cleaned_data["username"]
         try:
-            User.objects.get(username=username)
+            User._default_manager.get(username=username)
         except User.DoesNotExist:
             return username
         raise forms.ValidationError(self.error_messages['duplicate_username'])
@@ -120,6 +130,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
@@ -143,19 +154,15 @@ class AuthenticationForm(forms.Form):
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
-        'invalid_login': _("Please enter a correct username and password. "
-                           "Note that both fields are case-sensitive."),
-        'no_cookies': _("Your Web browser doesn't appear to have cookies "
-                        "enabled. Cookies are required for logging in."),
+        'invalid_login': _("Please enter a correct %(username)s and password. "
+                           "Note that both fields may be case-sensitive."),
         'inactive': _("This account is inactive."),
     }
 
     def __init__(self, request=None, *args, **kwargs):
         """
-        If request is passed in, the form will validate that cookies are
-        enabled. Note that the request (a HttpRequest object) must have set a
-        cookie with the key TEST_COOKIE_NAME and value TEST_COOKIE_VALUE before
-        running this validation.
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
         """
         self.request = request
         self.user_cache = None
@@ -163,8 +170,9 @@ class AuthenticationForm(forms.Form):
 
         # Set the label for the "username" field.
         UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.fields['username'].label = capfirst(username_field.verbose_name)
+        self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        if self.fields['username'].label is None:
+            self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -175,15 +183,16 @@ class AuthenticationForm(forms.Form):
                                            password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login'])
+                    self.error_messages['invalid_login'] % {
+                        'username': self.username_field.verbose_name
+                    })
             elif not self.user_cache.is_active:
                 raise forms.ValidationError(self.error_messages['inactive'])
-        self.check_for_test_cookie()
         return self.cleaned_data
 
     def check_for_test_cookie(self):
-        if self.request and not self.request.session.test_cookie_worked():
-            raise forms.ValidationError(self.error_messages['no_cookies'])
+        warnings.warn("check_for_test_cookie is deprecated; ensure your login "
+                "view is CSRF-protected.", DeprecationWarning)
 
     def get_user_id(self):
         if self.user_cache:
@@ -195,30 +204,7 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    error_messages = {
-        'unknown': _("That email address doesn't have an associated "
-                     "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this email "
-                      "address cannot reset the password."),
-    }
     email = forms.EmailField(label=_("Email"), max_length=254)
-
-    def clean_email(self):
-        """
-        Validates that an active user exists with the given email address.
-        """
-        UserModel = get_user_model()
-        email = self.cleaned_data["email"]
-        self.users_cache = UserModel.objects.filter(email__iexact=email)
-        if not len(self.users_cache):
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if not any(user.is_active for user in self.users_cache):
-            # none of the filtered users are active
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password == UNUSABLE_PASSWORD)
-               for user in self.users_cache):
-            raise forms.ValidationError(self.error_messages['unusable'])
-        return email
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
@@ -230,7 +216,14 @@ class PasswordResetForm(forms.Form):
         user.
         """
         from django.core.mail import send_mail
-        for user in self.users_cache:
+        UserModel = get_user_model()
+        email = self.cleaned_data["email"]
+        users = UserModel._default_manager.filter(email__iexact=email)
+        for user in users:
+            # Make sure that no email is sent to a user that actually has
+            # a password marked as unusable
+            if user.password == UNUSABLE_PASSWORD:
+                continue
             if not domain_override:
                 current_site = get_current_site(request)
                 site_name = current_site.name
@@ -241,7 +234,7 @@ class PasswordResetForm(forms.Form):
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': int_to_base36(user.id),
+                'uid': int_to_base36(user.pk),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',

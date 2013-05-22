@@ -1,10 +1,13 @@
-from django.conf.urls import patterns
+from django.conf.urls import patterns, url
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, Template
 from django.template.response import TemplateResponse
 from django.views.decorators.cache import never_cache
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic.edit import FormView
 
 TEMPLATE = """{% if messages %}
 <ul class="messages">
@@ -49,8 +52,21 @@ def show(request):
 def show_template_response(request):
     return TemplateResponse(request, Template(TEMPLATE))
 
+
+class ContactForm(forms.Form):
+    name = forms.CharField(required=True)
+    slug = forms.SlugField(required=True)
+
+
+class ContactFormViewWithMsg(SuccessMessageMixin, FormView):
+    form_class = ContactForm
+    success_url = show
+    success_message = "%(name)s was created successfully"
+
+
 urlpatterns = patterns('',
     ('^add/(debug|info|success|warning|error)/$', add),
+    url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
     ('^show/$', show),
     ('^template_response/add/(debug|info|success|warning|error)/$', add_template_response),
     ('^template_response/show/$', show_template_response),

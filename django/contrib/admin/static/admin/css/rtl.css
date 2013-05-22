@@ -84,6 +84,11 @@ table thead th.sorted .sortoptions {
    float: left;
 }
 
+thead th.sorted .text {
+	padding-right: 0;
+	padding-left: 42px;
+}
+
 /* dashboard styles */
 
 .dashboard .module table td a {

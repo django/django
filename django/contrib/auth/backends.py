@@ -8,12 +8,12 @@ class ModelBackend(object):
     Authenticates against django.contrib.auth.models.User.
     """
 
-    # TODO: Model, login attribute name and password attribute name should be
-    # configurable.
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, username=None, password=None, **kwargs):
+        UserModel = get_user_model()
+        if username is None:
+            username = kwargs.get(UserModel.USERNAME_FIELD)
         try:
-            UserModel = get_user_model()
-            user = UserModel.objects.get_by_natural_key(username)
+            user = UserModel._default_manager.get_by_natural_key(username)
             if user.check_password(password):
                 return user
         except UserModel.DoesNotExist:
@@ -64,7 +64,7 @@ class ModelBackend(object):
     def get_user(self, user_id):
         try:
             UserModel = get_user_model()
-            return UserModel.objects.get(pk=user_id)
+            return UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
 

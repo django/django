@@ -12,6 +12,7 @@ class FlatpageForm(forms.ModelForm):
 
     class Meta:
         model = FlatPage
+        fields = '__all__'
 
     def clean_url(self):
         url = self.cleaned_data['url']
@@ -35,7 +36,7 @@ class FlatpageForm(forms.ModelForm):
             for site in sites:
                 if same_url.filter(sites=site).exists():
                     raise forms.ValidationError(
-                        _('Flatpage with url %(url)s already exists for site %(site)s' %
-                          {'url': url, 'site': site}))
+                        _('Flatpage with url %(url)s already exists for site %(site)s') %
+                          {'url': url, 'site': site})
 
         return super(FlatpageForm, self).clean()

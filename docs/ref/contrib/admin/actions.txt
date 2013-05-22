@@ -140,6 +140,15 @@ That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
 advanced techniques.
 
+Handling errors in actions
+--------------------------
+
+If there are foreseeable error conditions that may occur while running your
+action, you should gracefully inform the user of the problem. This means
+handling exceptions and and using
+:meth:`django.contrib.admin.ModelAdmin.message_user` to display a user friendly
+description of the problem in the response.
+
 Advanced action techniques
 ==========================
 
@@ -166,7 +175,7 @@ That's easy enough to do::
         make_published.short_description = "Mark selected stories as published"
 
 Notice first that we've moved ``make_published`` into a method and renamed the
-`modeladmin` parameter to `self`, and second that we've now put the string
+``modeladmin`` parameter to ``self``, and second that we've now put the string
 ``'make_published'`` in ``actions`` instead of a direct function reference. This
 tells the :class:`ModelAdmin` to look up the action as a method.
 
@@ -214,7 +223,7 @@ objects as JSON::
     from django.core import serializers
 
     def export_as_json(modeladmin, request, queryset):
-        response = HttpResponse(mimetype="text/javascript")
+        response = HttpResponse(content_type="application/json")
         serializers.serialize("json", queryset, stream=response)
         return response
 
@@ -347,5 +356,3 @@ Conditionally enabling or disabling actions
                     if 'delete_selected' in actions:
                         del actions['delete_selected']
                 return actions
-
-

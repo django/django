@@ -81,7 +81,7 @@ commit them::
     git commit
 
 When writing the commit message, follow the :ref:`commit message
-guidelines <committing-guidlines>` to ease the work of the committer. If
+guidelines <committing-guidelines>` to ease the work of the committer. If
 you're uncomfortable with English, try at least to describe precisely what the
 commit does.
 
@@ -121,7 +121,7 @@ a pull request at GitHub. A good pull request means:
 
 * well-formed messages for each commit: a summary line and then paragraphs
   wrapped at 72 characters thereafter -- see the :ref:`committing guidelines
-  <committing-guidlines>` for more details,
+  <committing-guidelines>` for more details,
 
 * documentation and tests, if needed -- actually tests are always needed,
   except for documentation changes.

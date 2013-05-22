@@ -395,8 +395,8 @@ Extended IPv6 support
 
 The previously added support for IPv6 addresses when using the runserver
 management command in Django 1.3 has now been further extended by adding
-a :class:`~django.db.models.fields.GenericIPAddressField` model field,
-a :class:`~django.forms.fields.GenericIPAddressField` form field and
+a :class:`~django.db.models.GenericIPAddressField` model field,
+a :class:`~django.forms.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`
 
@@ -563,8 +563,8 @@ Django 1.4 also includes several smaller improvements worth noting:
 * In the documentation, a helpful :doc:`security overview </topics/security>`
   page.
 
-* The :func:`django.contrib.auth.models.check_password` function has been moved
-  to the :mod:`django.contrib.auth.utils` module. Importing it from the old
+* The ``django.contrib.auth.models.check_password`` function has been moved
+  to the ``django.contrib.auth.utils`` module. Importing it from the old
   location will still work, but you should update your imports.
 
 * The :djadmin:`collectstatic` management command gained a ``--clear`` option
@@ -646,7 +646,7 @@ If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
 are configured and your web server serves the files correctly. The development
 server continues to serve the admin files just like before. Don't hesitate to
-consult the :doc:`static files howto </howto/static-files>` for further
+consult the :doc:`static files howto </howto/static-files/index>` for further
 details.
 
 In case your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
@@ -881,11 +881,12 @@ For more details, see the documentation about
 
 Until Django 1.3, it was possible to exclude some URLs from Django's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
-:setting:`IGNORABLE_404_STARTS` and suffixes to :setting:`IGNORABLE_404_ENDS`.
+``IGNORABLE_404_STARTS`` and suffixes to ``IGNORABLE_404_ENDS``.
 
 In Django 1.4, these two settings are superseded by
-:setting:`IGNORABLE_404_URLS`, which is a list of compiled regular expressions.
-Django won't send an email for 404 errors on URLs that match any of them.
+:setting:`IGNORABLE_404_URLS`, which is a list of compiled regular
+expressions. Django won't send an email for 404 errors on URLs that match any
+of them.
 
 Furthermore, the previous settings had some rather arbitrary default values::
 
@@ -895,12 +896,12 @@ Furthermore, the previous settings had some rather arbitrary default values::
 
 It's not Django's role to decide if your website has a legacy ``/cgi-bin/``
 section or a ``favicon.ico``. As a consequence, the default values of
-:setting:`IGNORABLE_404_URLS`, :setting:`IGNORABLE_404_STARTS` and
-:setting:`IGNORABLE_404_ENDS` are all now empty.
+:setting:`IGNORABLE_404_URLS`, ``IGNORABLE_404_STARTS``, and
+``IGNORABLE_404_ENDS`` are all now empty.
 
-If you have customized :setting:`IGNORABLE_404_STARTS` or
-:setting:`IGNORABLE_404_ENDS`, or if you want to keep the old default value,
-you should add the following lines in your settings file::
+If you have customized ``IGNORABLE_404_STARTS`` or ``IGNORABLE_404_ENDS``, or
+if you want to keep the old default value, you should add the following lines
+in your settings file::
 
     import re
     IGNORABLE_404_URLS = (
@@ -945,7 +946,7 @@ removed.
 The ``open`` method of the base Storage class took an obscure parameter
 ``mixin`` which allowed you to dynamically change the base classes of the
 returned file object. This has been removed. In the rare case you relied on the
-`mixin` parameter, you can easily achieve the same by overriding the `open`
+``mixin`` parameter, you can easily achieve the same by overriding the ``open``
 method, e.g.::
 
     from django.core.files import File

@@ -1,0 +1,48 @@
+==============
+Built-in Views
+==============
+
+.. module:: django.views
+   :synopsis: Django's built-in views.
+
+Several of Django's built-in views are documented in
+:doc:`/topics/http/views` as well as elsewhere in the documentation.
+
+Serving files in development
+----------------------------
+
+.. function:: static.serve(request, path, document_root, show_indexes=False)
+
+There may be files other than your project's static assets that, for
+convenience, you'd like to have Django serve for you in local development.
+The :func:`~django.views.static.serve` view can be used to serve any directory
+you give it. (This view is **not** hardened for production use and should be
+used only as a development aid; you should serve these files in production
+using a real front-end web server).
+
+The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
+``django.contrib.staticfiles`` is intended for static assets and has no
+built-in handling for user-uploaded files, but you can have Django serve your
+:setting:`MEDIA_ROOT` by appending something like this to your URLconf::
+
+    from django.conf import settings
+
+    # ... the rest of your URLconf goes here ...
+
+    if settings.DEBUG:
+        urlpatterns += patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+                'document_root': settings.MEDIA_ROOT,
+            }),
+       )
+
+Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
+``'/media/'``. This will call the :func:`~django.views.static.serve` view,
+passing in the path from the URLconf and the (required) ``document_root``
+parameter.
+
+Since it can become a bit cumbersome to define this URL pattern, Django
+ships with a small URL helper function :func:`~django.conf.urls.static.static`
+that takes as parameters the prefix such as :setting:`MEDIA_URL` and a dotted
+path to a view, such as ``'django.views.static.serve'``. Any other function
+parameter will be transparently passed to the view.

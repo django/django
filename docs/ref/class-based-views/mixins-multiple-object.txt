@@ -61,16 +61,33 @@ MultipleObjectMixin
     .. attribute:: queryset
 
         A ``QuerySet`` that represents the objects. If provided, the value of
-        :attr:`MultipleObjectMixin.queryset` supersedes the value provided for
-        :attr:`MultipleObjectMixin.model`.
+        ``queryset`` supersedes the value provided for :attr:`model`.
 
     .. attribute:: paginate_by
 
         An integer specifying how many objects should be displayed per page. If
         this is given, the view will paginate objects with
-        :attr:`MultipleObjectMixin.paginate_by` objects per page. The view will
-        expect either a ``page`` query string parameter (via ``GET``) or a
-        ``page`` variable specified in the URLconf.
+        ``paginate_by`` objects per page. The view will
+        expect either a ``page`` query string parameter (via ``request.GET``)
+        or a ``page`` variable specified in the URLconf.
+
+    .. attribute:: paginate_orphans
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. This extends the :attr:`paginate_by` limit on the last
+        page by up to ``paginate_orphans``, in order to keep the last page from
+        having a very small number of objects.
+
+    .. attribute:: page_kwarg
+
+        .. versionadded:: 1.5
+
+        A string specifying the name to use for the page parameter.
+        The view will expect this prameter to be available either as a query
+        string parameter (via ``request.GET``) or as a kwarg variable specified
+        in the URLconf. Defaults to ``page``.
 
     .. attribute:: paginator_class
 
@@ -78,7 +95,7 @@ MultipleObjectMixin
        :class:`django.core.paginator.Paginator` is used. If the custom paginator
        class doesn't have the same constructor interface as
        :class:`django.core.paginator.Paginator`, you will also need to
-       provide an implementation for :meth:`MultipleObjectMixin.get_paginator`.
+       provide an implementation for :meth:`get_paginator`.
 
     .. attribute:: context_object_name
 
@@ -103,12 +120,20 @@ MultipleObjectMixin
 
         Returns the number of items to paginate by, or ``None`` for no
         pagination. By default this simply returns the value of
-        :attr:`MultipleObjectMixin.paginate_by`.
+        :attr:`paginate_by`.
 
     .. method:: get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
 
         Returns an instance of the paginator to use for this view. By default,
         instantiates an instance of :attr:`paginator_class`.
+
+    .. method:: get_paginate_orphans()
+
+        .. versionadded:: 1.6
+
+        An integer specifying the number of "overflow" objects the last page
+        can contain. By default this simply returns the value of
+        :attr:`paginate_orphans`.
 
     .. method:: get_allow_empty()
 
@@ -122,7 +147,7 @@ MultipleObjectMixin
         Return the context variable name that will be used to contain
         the list of data that this view is manipulating. If
         ``object_list`` is a queryset of Django objects and
-        :attr:`~MultipleObjectMixin.context_object_name` is not set,
+        :attr:`context_object_name` is not set,
         the context name will be the ``object_name`` of the model that
         the queryset is composed from, with postfix ``'_list'``
         appended. For example, the model ``Article`` would have a

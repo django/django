@@ -26,13 +26,14 @@ DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
-simple_url_re = re.compile(r'^https?://\w', re.IGNORECASE)
+simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
+strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
 def escape(text):
@@ -86,8 +87,8 @@ def format_html(format_string, *args, **kwargs):
 
 def format_html_join(sep, format_string, args_generator):
     """
-    A wrapper format_html, for the common case of a group of arguments that need
-    to be formatted using the same format string, and then joined using
+    A wrapper of format_html, for the common case of a group of arguments that
+    need to be formatted using the same format string, and then joined using
     'sep'. 'sep' is also passed through conditional_escape.
 
     'args_generator' should be an iterator that returns the sequence of 'args'
@@ -117,7 +118,7 @@ linebreaks = allow_lazy(linebreaks, six.text_type)
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return re.sub(r'<[^>]*?>', '', force_text(value))
+    return strip_tags_re.sub('', force_text(value))
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
@@ -149,13 +150,17 @@ fix_ampersands = allow_lazy(fix_ampersands, six.text_type)
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     # Handle IDN before quoting.
-    scheme, netloc, path, query, fragment = urlsplit(url)
     try:
-        netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
-    except UnicodeError: # invalid domain part
+        scheme, netloc, path, query, fragment = urlsplit(url)
+        try:
+            netloc = netloc.encode('idna').decode('ascii') # IDN -> ACE
+        except UnicodeError: # invalid domain part
+            pass
+        else:
+            url = urlunsplit((scheme, netloc, path, query, fragment))
+    except ValueError:
+        # invalid IPv6 URL (normally square brackets in hostname part).
         pass
-    else:
-        url = urlunsplit((scheme, netloc, path, query, fragment))
 
     # An URL is considered unquoted if it contains no % characters or
     # contains a % not followed by two hexadecimal digits. See #9655.
@@ -182,7 +187,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     If autoescape is True, the link text and URLs will get autoescaped.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    def trim_url(x, limit=trim_url_limit):
+        if limit is None or len(x) <= limit:
+            return x
+        return '%s...' % x[:max(0, limit - 3)]
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -273,3 +281,10 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
+def avoid_wrapping(value):
+    """
+    Avoid text wrapping in the middle of a phrase by adding non-breaking
+    spaces where there previously were normal spaces.
+    """
+    return value.replace(" ", "\xa0")

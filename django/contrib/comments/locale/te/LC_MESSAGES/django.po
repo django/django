@@ -8,68 +8,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: bhaskar teja yerneni <prudhviy@gmail.com>\n"
-"Language-Team: Telugu (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Telugu (http://www.transifex.com/projects/p/django/language/"
 "te/)\n"
-"Language: te\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: te\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "విషయం"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr ""
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr ""
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "అంగికరించబడినది"
 msgstr[1] "అంగికరించబడినది"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "ఎంచుకున్న వ్యాఖ్యానమునలను సంమతించుము"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "తీసివేయబడినది "
 msgstr[1] "తీసివేయబడినది "
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "ఎంచుకున్న వ్యాఖ్యానమునలను తీసివేయుము "
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "1 వ్యాఖ్యానము జయప్రదముగా %(action)s."
 msgstr[1] "%(count)s వ్యాఖ్యానములు జయప్రదముగా %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s వ్యాఖ్యలు"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "తాజా వ్యాఖ్యానములు %(site_name)s నందు కలదు "
@@ -106,78 +106,78 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "ఈ క్షేత్రములో ఏదయినా వ్యాఖ్య రాసినట్లయితే అది అసంధర్బ వ్యాఖ్య గా పరిగనించబడుతుంది "
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "సూచన రకం"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "వస్తువు ఐడి"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "వాడుకరి"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "వాడుకరి పేరు"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "వాడుకరి ఈమెయిలు చిరునామా"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "వాడుకరి URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "వ్యాఖ్య"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "సమర్పించిన తేదీ/సమయం"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "ఐపీ చిరునామా"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "బహిరంగమయినది"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "తీసివేయబడినది"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr " ఈ వ్యాఖ్యానము సరిగ్గా లేదని తోచినచో ఈ  డబ్బా ని చెక్ చేయండి "
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "వ్యాఖ్యలు"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -187,19 +187,19 @@ msgid ""
 "http://%(domain)s%(url)s"
 msgstr ""
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr ""
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "తేదీ"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr ""
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr ""
 

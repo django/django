@@ -15,7 +15,7 @@ using the decorator multiple times, is harmless and efficient.
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
     # We need this to behave just like the CsrfViewMiddleware, but not reject
-    # requests.
+    # requests or log warnings.
     def _reject(self, request, reason):
         return None
 
@@ -47,24 +47,6 @@ Use this decorator to ensure that a view sets a CSRF cookie, whether or not it
 uses the csrf_token template tag, or the CsrfViewMiddleware is used.
 """
 
-
-def csrf_response_exempt(view_func):
-    """
-    Modifies a view function so that its response is exempt
-    from the post-processing of the CSRF middleware.
-    """
-    warnings.warn("csrf_response_exempt is deprecated. It no longer performs a "
-                  "function, and calls to it can be removed.",
-                  DeprecationWarning)
-    return view_func
-
-def csrf_view_exempt(view_func):
-    """
-    Marks a view function as being exempt from CSRF view protection.
-    """
-    warnings.warn("csrf_view_exempt is deprecated. Use csrf_exempt instead.",
-                  DeprecationWarning)
-    return csrf_exempt(view_func)
 
 def csrf_exempt(view_func):
     """

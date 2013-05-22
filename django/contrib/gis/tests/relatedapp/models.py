@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from django.contrib.localflavor.us.models import USStateField
 from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
@@ -11,7 +10,7 @@ class Location(models.Model):
 @python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=50)
-    state = USStateField()
+    state = models.CharField(max_length=2)
     location = models.ForeignKey(Location)
     objects = models.GeoManager()
     def __str__(self): return self.name

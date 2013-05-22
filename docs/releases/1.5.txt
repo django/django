@@ -1,6 +1,6 @@
-============================================
-Django 1.5 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.5 release notes
+========================
 
 Welcome to Django 1.5!
 
@@ -47,7 +47,7 @@ Other notable new features in Django 1.5 include:
 * ... and more; `see below <#what-s-new-in-django-1-5>`_.
 
 Wherever possible we try to introduce new features in a backwards-compatible
-manner per :doc:`our API stability policy </misc/api-stability>` policy.
+manner per :doc:`our API stability policy </misc/api-stability>`.
 However, as with previous releases, Django 1.5 ships with some minor
 `backwards incompatible changes`_; people upgrading from previous versions
 of Django should read that list carefully.
@@ -67,8 +67,8 @@ can simply remove that line under Django 1.5
 Python compatibility
 ====================
 
-Django 1.5 requires Python 2.6.5 or above, though we **highly recommended**
-Python 2.7.3 or above. Support for Python 2.5 and below as been dropped.
+Django 1.5 requires Python 2.6.5 or above, though we **highly recommend**
+Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
@@ -88,17 +88,25 @@ Python 3 support
 Django 1.5 introduces support for Python 3 - specifically, Python
 3.2 and above. This comes in the form of a **single** codebase; you don't
 need to install a different version of Django on Python 3. This means that
-you can write application targeted for just Python 2, just Python 3, or single
+you can write applications targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
 However, we're labeling this support "experimental" for now: although it's
 received extensive testing via our automated test suite, it's received very
 little real-world testing. We've done our best to eliminate bugs, but we can't
-be sure we covered all possible uses of Django. Further, Django's more than a
-web framework; it's an ecosystem of pluggable components. At this point, very
-few third-party applications have been ported to Python 3, so it's unlikely
-that a real-world application will have all its dependencies satisfied under
-Python 3.
+be sure we covered all possible uses of Django.
+
+Some features of Django aren't available because they depend on third-party
+software that hasn't been ported to Python 3 yet, including:
+
+- the MySQL database backend (depends on MySQLdb)
+- :class:`~django.db.models.ImageField` (depends on PIL)
+- :class:`~django.test.LiveServerTestCase` (depends on Selenium WebDriver)
+
+Further, Django's more than a web framework; it's an ecosystem of pluggable
+components. At this point, very few third-party applications have been ported
+to Python 3, so it's unlikely that a real-world application will have all its
+dependencies satisfied under Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
 3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
@@ -136,9 +144,9 @@ keyword argument ``update_fields``. By using this argument it is possible to
 save only a select list of model's fields. This can be useful for performance
 reasons or when trying to avoid overwriting concurrent changes.
 
-Deferred instances (those loaded by .only() or .defer()) will automatically
-save just the loaded fields. If any field is set manually after load, that
-field will also get updated on save.
+Deferred instances (those loaded by ``.only()`` or ``.defer()``) will
+automatically save just the loaded fields. If any field is set manually after
+load, that field will also get updated on save.
 
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
@@ -214,10 +222,21 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
-* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+* The ``wkb`` and ``hex`` properties of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
+
+New tutorials
+~~~~~~~~~~~~~
+
+Additions to the docs include a revamped :doc:`Tutorial 3</intro/tutorial03>`
+and a new :doc:`tutorial on testing</intro/tutorial05>`. A new section,
+"Advanced Tutorials", offers :doc:`How to write reusable apps
+</intro/reusable-apps>` as well as a step-by-step guide for new contributors in
+:doc:`Writing your first patch for Django </intro/contributing>`.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -235,6 +254,11 @@ Django 1.5 also includes several smaller improvements worth noting:
 * Management commands do not raise ``SystemExit`` any more when called by code
   from :ref:`call_command <call-command>`. Any exception raised by the command
   (mostly :ref:`CommandError <ref-command-exceptions>`) is propagated.
+
+  Moreover, when you output errors or messages in your custom commands, you
+  should now use ``self.stdout.write('message')`` and
+  ``self.stderr.write('error')`` (see the note on
+  :ref:`management commands output <management-commands-output>`).
 
 * The dumpdata management command outputs one row at a time, preventing
   out-of-memory errors when dumping large datasets.
@@ -270,8 +294,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
-* By default, all logging messages reaching the `django` logger when
-  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+* By default, all logging messages reaching the ``django`` logger when
+  :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
 * When using :class:`~django.template.RequestContext`, it is now possible to
@@ -288,8 +312,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an `ignorenonexistent` option to
-  ignore data for fields that no longer exist.
+* The loaddata management command now supports an
+  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
+  longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -306,6 +331,21 @@ Django 1.5 also includes several smaller improvements worth noting:
   :attr:`~django.db.models.Options.index_together` documentation for more
   information.
 
+* During Django's logging configuration verbose Deprecation warnings are
+  enabled and warnings are captured into the logging system. Logged warnings
+  are routed through the ``console`` logging handler, which by default requires
+  :setting:`DEBUG` to be True for output to be generated. The result is that
+  DeprecationWarnings should be printed to the console in development
+  environments the way they have been in Python versions < 2.7.
+
+* The API for :meth:`django.contrib.admin.ModelAdmin.message_user` method has
+  been modified to accept additional arguments adding capabilities similar to
+  :func:`django.contrib.messages.add_message`. This is useful for generating
+  error messages from admin actions.
+
+* The admin's list filters can now be customized per-request thanks to the new
+  :meth:`django.contrib.admin.ModelAdmin.get_list_filter` method.
+
 Backwards incompatible changes in 1.5
 =====================================
 
@@ -316,6 +356,31 @@ Backwards incompatible changes in 1.5
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
+
+``ALLOWED_HOSTS`` required in production
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new :setting:`ALLOWED_HOSTS` setting validates the request's ``Host``
+header and protects against host-poisoning attacks. This setting is now
+required whenever :setting:`DEBUG` is ``False``, or else
+:meth:`django.http.HttpRequest.get_host()` will raise
+:exc:`~django.core.exceptions.SuspiciousOperation`. For more details see the
+:setting:`full documentation<ALLOWED_HOSTS>` for the new setting.
+
+Managers on abstract models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Abstract models are able to define a custom manager, and that manager
+:ref:`will be inherited by any concrete models extending the abstract model
+<custom-managers-and-inheritance>`. However, if you try to use the abstract
+model to call a method on the manager, an exception will now be raised.
+Previously, the call would have been permitted, but would have failed as soon
+as any database operation was attempted (usually with a "table does not exist"
+error from the database).
+
+If you have functionality on a manager that you have been invoking using
+the abstract class, you should migrate that logic to a Python
+``staticmethod`` or ``classmethod`` on the abstract class.
 
 Context in year archive class-based views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -364,6 +429,19 @@ attribute. Developers wishing to access the raw POST data for these cases,
 should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
 instead.
 
+:data:`~django.core.signals.request_finished` signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django used to send the :data:`~django.core.signals.request_finished` signal
+as soon as the view function returned a response. This interacted badly with
+:ref:`streaming responses <httpresponse-streaming>` that delay content
+generation.
+
+This signal is now sent after the content is fully consumed by the WSGI
+gateway. This might be backwards incompatible if you rely on the signal being
+fired before sending the response content to the client. If you do, you should
+consider using a middleware instead.
+
 OPTIONS, PUT and DELETE requests in the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -390,12 +468,12 @@ System version of :mod:`simplejson` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`As explained below <simplejson-deprecation>`, Django 1.5 deprecates
-:mod:`django.utils.simplejson` in favor of Python 2.6's built-in :mod:`json`
+``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of :mod:`simplejson`, it may trigger errors
 in some circumstances.
 
-JSON-related features in Django 1.4 always used :mod:`django.utils.simplejson`.
+JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
 - A system version of :mod:`simplejson`, if one was available (ie. ``import
@@ -422,7 +500,7 @@ More information on these incompatibilities is available in `ticket #18023`_.
 
 The net result is that, if you have installed :mod:`simplejson` and your code
 uses Django's serialization internals directly -- for instance
-:class:`django.core.serializers.json.DjangoJSONEncoder`, the switch from
+``django.core.serializers.json.DjangoJSONEncoder``, the switch from
 :mod:`simplejson` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
@@ -448,8 +526,8 @@ When using :doc:`object pagination </topics/pagination>`,
 the ``previous_page_number()`` and ``next_page_number()`` methods of the
 :class:`~django.core.paginator.Page` object did not check if the returned
 number was inside the existing page range.
-It does check it now and raises an :exc:`InvalidPage` exception when the number
-is either too low or too high.
+It does check it now and raises an :exc:`~django.core.paginator.InvalidPage`
+exception when the number is either too low or too high.
 
 Behavior of autocommit database option on PostgreSQL changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -539,14 +617,48 @@ with the :meth:`~django.forms.Form.is_valid()` method and not with the
 presence or absence of the :attr:`~django.forms.Form.cleaned_data` attribute
 on the form.
 
+Behavior of :djadmin:`syncdb` with multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:djadmin:`syncdb` now queries the database routers to determine if content
+types (when :mod:`~django.contrib.contenttypes` is enabled) and permissions
+(when :mod:`~django.contrib.auth` is enabled) should be created in the target
+database. Previously, it created them in the default database, even when
+another database was specified with the :djadminopt:`--database` option.
+
+If you use :djadmin:`syncdb` on multiple databases, you should ensure that
+your routers allow synchronizing content types and permissions to only one of
+them. See the docs on the :ref:`behavior of contrib apps with multiple
+databases <contrib_app_multiple_databases>` for more information.
+
+XML deserializer will not parse documents with a DTD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to prevent exposure to denial-of-service attacks related to external
+entity references and entity expansion, the XML model deserializer now refuses
+to parse XML documents containing a DTD (DOCTYPE definition). Since the XML
+serializer does not output a DTD, this will not impact typical usage, only
+cases where custom-created XML documents are passed to Django's model
+deserializer.
+
+Formsets default ``max_num``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A (default) value of ``None`` for the ``max_num`` argument to a formset factory
+no longer defaults to allowing any number of forms in the formset. Instead, in
+order to prevent memory-exhaustion attacks, it now defaults to a limit of 1000
+forms. This limit can be raised by explicitly setting a higher value for
+``max_num``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
 * :class:`django.forms.ModelMultipleChoiceField` now returns an empty
   ``QuerySet`` as the empty value instead of an empty list.
 
-* :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
-  instead of :exc:`ValueError` for non-integer inputs.
+* :func:`~django.utils.http.int_to_base36` properly raises a
+  :exc:`~exceptions.TypeError` instead of :exc:`~exceptions.ValueError` for
+  non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
@@ -554,7 +666,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is `0666` (octal) and the current umask value
+  needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by
@@ -563,14 +675,54 @@ Miscellaneous
   :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
   the operators are used as boolean AND and OR operators.
 
+* In a ``filter()`` call, when :ref:`F() expressions <query-expressions>`
+  contained lookups spanning multi-valued relations, they didn't always reuse
+  the same relations as other lookups along the same chain. This was changed,
+  and now F() expressions will always use the same relations as other lookups
+  within the same ``filter()`` call.
+
 * The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
   HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
   in your pages.
 
+* The template tags library ``adminmedia``, which only contained the
+  deprecated template tag ``{% admin_media_prefix %}``, was removed.
+  Attempting to load it with ``{% load adminmedia %}`` will fail. If your
+  templates still contain that line you must remove it.
+
+* Because of an implementation oversight, it was possible to use
+  :doc:`django.contrib.redirects </ref/contrib/redirects>` without enabling
+  :doc:`django.contrib.sites </ref/contrib/sites>`. This isn't allowed any
+  longer. If you're using ``django.contrib.redirects``, make sure
+  :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
+
+* :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
+  escapes its ``contents`` argument. To avoid the HTML escaping, use
+  :func:`django.utils.safestring.mark_safe` on the argument before passing it.
+
 Features deprecated in 1.5
 ==========================
 
-.. _simplejson-deprecation:
+``django.contrib.localflavor``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The localflavor contrib app has been split into separate packages.
+``django.contrib.localflavor`` itself will be removed in Django 1.6, after an
+:ref:`accelerated deprecation <localflavor-deprecation-policy>`. The docs
+provide :ref:`migration instructions <localflavor-how-to-migrate>`.
+
+The new packages are available :ref:`on Github <localflavor-packages>`. The
+core team cannot efficiently maintain these packages in the long term — it
+spans just a dozen countries at this time; similar to translations, maintenance
+will be handed over to interested members of the community.
+
+``django.contrib.markup``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The markup contrib module has been deprecated and will follow an accelerated
+deprecation schedule. Direct use of python markup libraries or 3rd party tag
+libraries is preferred to Django maintaining this functionality in the
+framework.
 
 :setting:`AUTH_PROFILE_MODULE`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -585,8 +737,8 @@ the :setting:`AUTH_PROFILE_MODULE` setting, and the
 :meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
 the user profile model, should not be used any longer.
 
-Streaming behavior of :class:`HttpResponse`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Streaming behavior of :class:`~django.http.HttpResponse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.5 deprecates the ability to stream a response by passing an iterator
 to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
@@ -596,13 +748,15 @@ to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
 In Django 1.7 and above, the iterator will be consumed immediately by
 :class:`~django.http.HttpResponse`.
 
+.. _simplejson-deprecation:
+
 ``django.utils.simplejson``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since Django 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
 removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
-instead :mod:`django.utils.simplejson`.
+instead of ``django.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
 incompatibilities between versions of :mod:`simplejson` -- see the
@@ -620,16 +774,8 @@ Define a ``__str__`` method and apply the
 ``django.utils.itercompat.product``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+The ``django.utils.itercompat.product`` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
-
-``django.utils.markup``
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The markup contrib module has been deprecated and will follow an accelerated
-deprecation schedule. Direct use of python markup libraries or 3rd party tag
-libraries is preferred to Django maintaining this functionality in the
-framework.
 
 ``cleanup`` management command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

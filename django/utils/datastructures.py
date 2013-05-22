@@ -14,13 +14,19 @@ class MergeDict(object):
     def __init__(self, *dicts):
         self.dicts = dicts
 
+    def __bool__(self):
+        return any(self.dicts)
+
+    def __nonzero__(self):
+        return type(self).__bool__(self)
+
     def __getitem__(self, key):
         for dict_ in self.dicts:
             try:
                 return dict_[key]
             except KeyError:
                 pass
-        raise KeyError
+        raise KeyError(key)
 
     def __copy__(self):
         return self.__class__(*self.dicts)
@@ -217,7 +223,7 @@ class SortedDict(dict):
         # using collections.OrderedDict (Python 2.7 and up), which we'll
         # eventually switch to
         warnings.warn(
-            "SortedDict.value_for_index is deprecated", PendingDeprecationWarning,
+            "SortedDict.value_for_index is deprecated", DeprecationWarning,
             stacklevel=2
         )
         return self[self.keyOrder[index]]
@@ -225,7 +231,7 @@ class SortedDict(dict):
     def insert(self, index, key, value):
         """Inserts the key, value pair before the item with the given index."""
         warnings.warn(
-            "SortedDict.insert is deprecated", PendingDeprecationWarning,
+            "SortedDict.insert is deprecated", DeprecationWarning,
             stacklevel=2
         )
         if key in self.keyOrder:

@@ -18,54 +18,17 @@ def cache_page(*args, **kwargs):
     Additionally, all headers from the response's Vary header will be taken
     into account on caching -- just like the middleware does.
     """
-    # We need backwards compatibility with code which spells it this way:
-    #   def my_view(): pass
-    #   my_view = cache_page(my_view, 123)
-    # and this way:
-    #   my_view = cache_page(123)(my_view)
-    # and this:
-    #   my_view = cache_page(my_view, 123, key_prefix="foo")
-    # and this:
-    #   my_view = cache_page(123, key_prefix="foo")(my_view)
-    # and possibly this way (?):
-    #   my_view = cache_page(123, my_view)
-    # and also this way:
-    #   my_view = cache_page(my_view)
-    # and also this way:
-    #   my_view = cache_page()(my_view)
-
     # We also add some asserts to give better error messages in case people are
     # using other ways to call cache_page that no longer work.
+    if len(args) != 1 or callable(args[0]):
+        raise TypeError("cache_page has a single mandatory positional argument: timeout")
+    cache_timeout = args[0]
     cache_alias = kwargs.pop('cache', None)
     key_prefix = kwargs.pop('key_prefix', None)
-    assert not kwargs, "The only keyword arguments are cache and key_prefix"
-    def warn():
-        import warnings
-        warnings.warn('The cache_page decorator must be called like: '
-                      'cache_page(timeout, [cache=cache name], [key_prefix=key prefix]). '
-                      'All other ways are deprecated.',
-                      DeprecationWarning,
-                      stacklevel=2)
+    if kwargs:
+        raise TypeError("cache_page has two optional keyword arguments: cache and key_prefix")
 
-    if len(args) > 1:
-        assert len(args) == 2, "cache_page accepts at most 2 arguments"
-        warn()
-        if callable(args[0]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[1], cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
-        elif callable(args[1]):
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], cache_alias=cache_alias, key_prefix=key_prefix)(args[1])
-        else:
-            assert False, "cache_page must be passed a view function if called with two arguments"
-    elif len(args) == 1:
-        if callable(args[0]):
-            warn()
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)(args[0])
-        else:
-            # The One True Way
-            return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=args[0], cache_alias=cache_alias, key_prefix=key_prefix)
-    else:
-        warn()
-        return decorator_from_middleware_with_args(CacheMiddleware)(cache_alias=cache_alias, key_prefix=key_prefix)
+    return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=cache_timeout, cache_alias=cache_alias, key_prefix=key_prefix)
 
 
 def cache_control(**kwargs):

@@ -41,10 +41,10 @@ def _get_new_csrf_key():
 
 def get_token(request):
     """
-    Returns the the CSRF token required for a POST form. The token is an
+    Returns the CSRF token required for a POST form. The token is an
     alphanumeric value.
 
-    A side effect of calling this function is to make the the csrf_protect
+    A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
@@ -83,6 +83,13 @@ class CsrfViewMiddleware(object):
         return None
 
     def _reject(self, request, reason):
+        logger.warning('Forbidden (%s): %s',
+                       reason, request.path,
+            extra={
+                'status_code': 403,
+                'request': request,
+            }
+        )
         return _get_failure_view()(request, reason=reason)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
@@ -134,38 +141,18 @@ class CsrfViewMiddleware(object):
                 # we can use strict Referer checking.
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
-                    logger.warning('Forbidden (%s): %s',
-                                   REASON_NO_REFERER, request.path,
-                        extra={
-                            'status_code': 403,
-                            'request': request,
-                        }
-                    )
                     return self._reject(request, REASON_NO_REFERER)
 
                 # Note that request.get_host() includes the port.
                 good_referer = 'https://%s/' % request.get_host()
                 if not same_origin(referer, good_referer):
                     reason = REASON_BAD_REFERER % (referer, good_referer)
-                    logger.warning('Forbidden (%s): %s', reason, request.path,
-                        extra={
-                            'status_code': 403,
-                            'request': request,
-                        }
-                    )
                     return self._reject(request, reason)
 
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login
                 # CSRF.
-                logger.warning('Forbidden (%s): %s',
-                               REASON_NO_CSRF_COOKIE, request.path,
-                    extra={
-                        'status_code': 403,
-                        'request': request,
-                    }
-                )
                 return self._reject(request, REASON_NO_CSRF_COOKIE)
 
             # Check non-cookie token for match.
@@ -179,13 +166,6 @@ class CsrfViewMiddleware(object):
                 request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
 
             if not constant_time_compare(request_csrf_token, csrf_token):
-                logger.warning('Forbidden (%s): %s',
-                               REASON_BAD_TOKEN, request.path,
-                    extra={
-                        'status_code': 403,
-                        'request': request,
-                    }
-                )
                 return self._reject(request, REASON_BAD_TOKEN)
 
         return self._accept(request)
@@ -210,7 +190,8 @@ class CsrfViewMiddleware(object):
                             max_age = 60 * 60 * 24 * 7 * 52,
                             domain=settings.CSRF_COOKIE_DOMAIN,
                             path=settings.CSRF_COOKIE_PATH,
-                            secure=settings.CSRF_COOKIE_SECURE
+                            secure=settings.CSRF_COOKIE_SECURE,
+                            httponly=settings.CSRF_COOKIE_HTTPONLY
                             )
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))

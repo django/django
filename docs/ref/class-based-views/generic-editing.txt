@@ -12,9 +12,8 @@ editing content:
 
 .. note::
 
-    Some of the examples on this page assume that a model titled 'Author'
-    has been defined. For these cases we assume the following has been defined
-    in `myapp/models.py`::
+    Some of the examples on this page assume that an ``Author`` model has been
+    defined as follows in ``myapp/models.py``::
 
         from django.core.urlresolvers import reverse
         from django.db import models
@@ -39,7 +38,7 @@ FormView
 
     * :class:`django.views.generic.edit.FormView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseFormView`
+    * ``django.views.generic.edit.BaseFormView``
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
@@ -87,7 +86,7 @@ CreateView
     * :class:`django.views.generic.edit.CreateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseCreateView`
+    * ``django.views.generic.edit.BaseCreateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -98,11 +97,11 @@ CreateView
 
     .. attribute:: template_name_suffix
 
-        The CreateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form.html'``. For
-        example, changing this attribute to ``'_create_form.html'`` for a view
-        creating objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_create_form.html'``.
+        The ``CreateView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_form'``. For
+        example, changing this attribute to ``'_create_form'`` for a view
+        creating objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_create_form.html'``.
 
     **Example views.py**::
 
@@ -111,6 +110,7 @@ CreateView
 
         class AuthorCreate(CreateView):
             model = Author
+            fields = ['name']
 
 UpdateView
 ----------
@@ -129,7 +129,7 @@ UpdateView
     * :class:`django.views.generic.edit.UpdateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseUpdateView`
+    * ``django.views.generic.edit.BaseUpdateView``
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
@@ -140,11 +140,11 @@ UpdateView
 
     .. attribute:: template_name_suffix
 
-        The UpdateView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_form.html'``. For
-        example, changing this attribute to ``'_update_form.html'`` for a view
-        updating objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_update_form.html'``.
+        The ``UpdateView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_form'``. For
+        example, changing this attribute to ``'_update_form'`` for a view
+        updating objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_update_form.html'``.
 
     **Example views.py**::
 
@@ -153,6 +153,7 @@ UpdateView
 
         class AuthorUpdate(UpdateView):
             model = Author
+            fields = ['name']
 
 DeleteView
 ----------
@@ -171,9 +172,9 @@ DeleteView
     * :class:`django.views.generic.edit.DeleteView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.edit.BaseDeleteView`
+    * ``django.views.generic.edit.BaseDeleteView``
     * :class:`django.views.generic.edit.DeletionMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
@@ -181,11 +182,11 @@ DeleteView
 
     .. attribute:: template_name_suffix
 
-        The DeleteView page displayed to a GET request uses a
-        ``template_name_suffix`` of ``'_confirm_delete.html'``. For
-        example, changing this attribute to ``'_check_delete.html'`` for a view
-        deleting objects for the the example `Author` model would cause the the
-        default `template_name` to be ``'myapp/author_check_delete.html'``.
+        The ``DeleteView`` page displayed to a ``GET`` request uses a
+        ``template_name_suffix`` of ``'_confirm_delete'``. For
+        example, changing this attribute to ``'_check_delete'`` for a view
+        deleting objects for the example ``Author`` model would cause the
+        default ``template_name`` to be ``'myapp/author_check_delete.html'``.
 
 
     **Example views.py**::

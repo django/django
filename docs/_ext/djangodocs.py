@@ -5,9 +5,7 @@ import json
 import os
 import re
 
-from docutils import nodes, transforms
-
-from sphinx import addnodes, roles, __version__ as sphinx_ver
+from sphinx import addnodes, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
@@ -64,27 +62,25 @@ class VersionDirective(Directive):
     option_spec = {}
 
     def run(self):
+        if len(self.arguments) > 1:
+            msg = """Only one argument accepted for directive '{directive_name}::'.
+            Comments should be provided as content,
+            not as an extra argument.""".format(directive_name=self.name)
+            raise self.error(msg)
+
         env = self.state.document.settings.env
-        arg0 = self.arguments[0]
-        is_nextversion = env.config.django_next_version == arg0
         ret = []
         node = addnodes.versionmodified()
         ret.append(node)
-        if not is_nextversion:
-            if len(self.arguments) == 1:
-                linktext = 'Please see the release notes </releases/%s>' % (arg0)
-                xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state)
-                node.extend(xrefs[0])
-            node['version'] = arg0
-        else:
+
+        if self.arguments[0] == env.config.django_next_version:
             node['version'] = "Development version"
+        else:
+            node['version'] = self.arguments[0]
+
         node['type'] = self.name
-        if len(self.arguments) == 2:
-            inodes, messages = self.state.inline_text(self.arguments[1], self.lineno+1)
-            node.extend(inodes)
-            if self.content:
-                self.state.nested_parse(self.content, self.content_offset, node)
-            ret = ret + messages
+        if self.content:
+            self.state.nested_parse(self.content, self.content_offset, node)
         env.note_versionchange(node['type'], node['version'], node, self.lineno)
         return ret
 
@@ -126,7 +122,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # which is a bit less obvious that I'd like.
     #
     # FIXME: these messages are all hardcoded in English. We need to change
-    # that to accomodate other language docs, but I can't work out how to make
+    # that to accommodate other language docs, but I can't work out how to make
     # that work.
     #
     version_text = {
@@ -210,7 +206,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
                         if t == "templatefilter" and l == "ref/templates/builtins"],
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
-        with open(outfilename, 'wb') as fp:
+        with open(outfilename, 'w') as fp:
             fp.write('var django_template_builtins = ')
             json.dump(templatebuiltins, fp)
             fp.write(';\n')

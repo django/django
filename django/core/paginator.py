@@ -7,14 +7,19 @@ from django.utils import six
 class InvalidPage(Exception):
     pass
 
+
 class PageNotAnInteger(InvalidPage):
     pass
+
 
 class EmptyPage(InvalidPage):
     pass
 
+
 class Paginator(object):
-    def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
+
+    def __init__(self, object_list, per_page, orphans=0,
+                 allow_empty_first_page=True):
         self.object_list = object_list
         self.per_page = int(per_page)
         self.orphans = int(orphans)
@@ -22,7 +27,9 @@ class Paginator(object):
         self._num_pages = self._count = None
 
     def validate_number(self, number):
-        "Validates the given 1-based page number."
+        """
+        Validates the given 1-based page number.
+        """
         try:
             number = int(number)
         except (TypeError, ValueError):
@@ -37,16 +44,29 @@ class Paginator(object):
         return number
 
     def page(self, number):
-        "Returns a Page object for the given 1-based page number."
+        """
+        Returns a Page object for the given 1-based page number.
+        """
         number = self.validate_number(number)
         bottom = (number - 1) * self.per_page
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
-        return Page(self.object_list[bottom:top], number, self)
+        return self._get_page(self.object_list[bottom:top], number, self)
+
+    def _get_page(self, *args, **kwargs):
+        """
+        Returns an instance of a single page.
+
+        This hook can be used by subclasses to use an alternative to the
+        standard :cls:`Page` object.
+        """
+        return Page(*args, **kwargs)
 
     def _get_count(self):
-        "Returns the total number of objects, across all pages."
+        """
+        Returns the total number of objects, across all pages.
+        """
         if self._count is None:
             try:
                 self._count = self.object_list.count()
@@ -59,7 +79,9 @@ class Paginator(object):
     count = property(_get_count)
 
     def _get_num_pages(self):
-        "Returns the total number of pages."
+        """
+        Returns the total number of pages.
+        """
         if self._num_pages is None:
             if self.count == 0 and not self.allow_empty_first_page:
                 self._num_pages = 0
@@ -77,9 +99,12 @@ class Paginator(object):
         return range(1, self.num_pages + 1)
     page_range = property(_get_page_range)
 
-QuerySetPaginator = Paginator # For backwards-compatibility.
+
+QuerySetPaginator = Paginator   # For backwards-compatibility.
+
 
 class Page(collections.Sequence):
+
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
         self.number = number

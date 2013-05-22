@@ -21,8 +21,7 @@ SingleObjectMixin
     .. attribute:: queryset
 
         A ``QuerySet`` that represents the objects. If provided, the value of
-        :attr:`SingleObjectMixin.queryset` supersedes the value provided for
-        :attr:`SingleObjectMixin.model`.
+        ``queryset`` supersedes the value provided for :attr:`model`.
 
     .. attribute:: slug_field
 
@@ -31,14 +30,10 @@ SingleObjectMixin
 
     .. attribute:: slug_url_kwarg
 
-        .. versionadded:: 1.4
-
         The name of the URLConf keyword argument that contains the slug. By
         default, ``slug_url_kwarg`` is ``'slug'``.
 
     .. attribute:: pk_url_kwarg
-
-        .. versionadded:: 1.4
 
         The name of the URLConf keyword argument that contains the primary key.
         By default, ``pk_url_kwarg`` is ``'pk'``.
@@ -51,37 +46,37 @@ SingleObjectMixin
 
         Returns the single object that this view will display. If
         ``queryset`` is provided, that queryset will be used as the
-        source of objects; otherwise,
-        :meth:`~SingleObjectMixin.get_queryset` will be used.
-        ``get_object()`` looks for a
-        :attr:`SingleObjectMixin.pk_url_kwarg` argument in the arguments
-        to the view; if this argument is found, this method performs a
-        primary-key based lookup using that value. If this argument is not
-        found, it looks for a :attr:`SingleObjectMixin.slug_url_kwarg`
-        argument, and performs a slug lookup using the
-        :attr:`SingleObjectMixin.slug_field`.
+        source of objects; otherwise, :meth:`get_queryset` will be used.
+        ``get_object()`` looks for a :attr:`pk_url_kwarg` argument in the
+        arguments to the view; if this argument is found, this method performs
+        a primary-key based lookup using that value. If this argument is not
+        found, it looks for a :attr:`slug_url_kwarg` argument, and performs a
+        slug lookup using the :attr:`slug_field`.
 
     .. method:: get_queryset()
 
         Returns the queryset that will be used to retrieve the object that
-        this view will display. By default,
-        :meth:`~SingleObjectMixin.get_queryset` returns the value of the
-        :attr:`~SingleObjectMixin.queryset` attribute if it is set, otherwise
-        it constructs a :class:`QuerySet` by calling the `all()` method on the
-        :attr:`~SingleObjectMixin.model` attribute's default manager.
+        this view will display. By default, :meth:`get_queryset` returns the
+        value of the :attr:`queryset` attribute if it is set, otherwise
+        it constructs a :class:`~django.db.models.query.QuerySet` by calling
+        the ``all()`` method on the :attr:`model` attribute's default manager.
 
     .. method:: get_context_object_name(obj)
 
         Return the context variable name that will be used to contain the
-        data that this view is manipulating. If
-        :attr:`~SingleObjectMixin.context_object_name` is not set, the context
-        name will be constructed from the ``object_name`` of the model that
-        the queryset is composed from. For example, the model ``Article``
-        would have context object named ``'article'``.
+        data that this view is manipulating. If :attr:`context_object_name` is
+        not set, the context name will be constructed from the ``object_name``
+        of the model that the queryset is composed from. For example, the model
+        ``Article`` would have context object named ``'article'``.
 
     .. method:: get_context_data(**kwargs)
 
         Returns context data for displaying the list of objects.
+
+    .. method:: get_slug_field()
+
+        Returns the name of a slug field to be used to look up by slug. By
+        default this simply returns the value of :attr:`slug_field`.
 
     **Context**
 

@@ -277,8 +277,9 @@ Handle uploaded files using the new API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Replace use of uploaded files -- that is, entries in ``request.FILES`` -- as
-simple dictionaries with the new :class:`~django.core.files.UploadedFile`. The
-old dictionary syntax no longer works.
+simple dictionaries with the new
+:class:`~django.core.files.uploadedfile.UploadedFile`. The old dictionary
+syntax no longer works.
 
 Thus, in a view like::
 
@@ -391,8 +392,8 @@ Comments
 --------
 
 If you were using Django 0.96's ``django.contrib.comments`` app, you'll need to
-upgrade to the new comments app introduced in 1.0. See
-:doc:`/ref/contrib/comments/upgrade` for details.
+upgrade to the new comments app introduced in 1.0. See the upgrade guide
+for details.
 
 Template tags
 -------------
@@ -410,7 +411,7 @@ U.S. local flavor
 ~~~~~~~~~~~~~~~~~
 
 ``django.contrib.localflavor.usa`` has been renamed to
-:mod:`django.contrib.localflavor.us`. This change was made to match the naming
+``django.contrib.localflavor.us``. This change was made to match the naming
 scheme of other local flavors. To migrate your code, all you need to do is
 change the imports.
 
@@ -439,9 +440,10 @@ Settings
 Better exceptions
 ~~~~~~~~~~~~~~~~~
 
-The old :exc:`EnvironmentError` has split into an :exc:`ImportError` when
-Django fails to find the settings module and a :exc:`RuntimeError` when you try
-to reconfigure settings after having already used them
+The old :exc:`~exceptions.EnvironmentError` has split into an
+:exc:`~exceptions.ImportError` when Django fails to find the settings module
+and a :exc:`~exceptions.RuntimeError` when you try to reconfigure settings
+after having already used them.
 
 :setting:`LOGIN_URL` has moved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -476,8 +478,8 @@ Smaller model changes
 Different exception from ``get()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Managers now return a :exc:`MultipleObjectsReturned` exception
-instead of :exc:`AssertionError`:
+Managers now return a :exc:`~django.core.exceptions.MultipleObjectsReturned`
+exception instead of :exc:`~exceptions.AssertionError`:
 
 Old (0.96)::
 
@@ -548,7 +550,7 @@ need to reload your data. Do this after you have made the change to using
   **Back up your database first!**
 
   For SQLite, this means making a copy of the single file that stores the
-  database (the name of that file is the :setting:`DATABASE_NAME` in your
+  database (the name of that file is the ``DATABASE_NAME`` in your
   settings.py file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
@@ -641,8 +643,8 @@ The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
 Testing
 -------
 
-:meth:`django.test.Client.login` has changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:meth:`django.test.client.Client.login` has changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Old (0.96)::
 
@@ -720,7 +722,7 @@ To update your code:
 1. Use :class:`django.utils.datastructures.SortedDict` wherever you were
    using ``django.newforms.forms.SortedDictFromList``.
 
-2. Because :meth:`django.utils.datastructures.SortedDict.copy` doesn't
+2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
    return a deepcopy as ``SortedDictFromList.copy()`` did, you will need
    to update your code if you were relying on a deepcopy. Do this by using
    ``copy.deepcopy`` directly.
@@ -769,4 +771,3 @@ Old (0.96)                               New (1.0)
 ``backend.uses_case_insensitive_names``  ``connection.features.uses_case_insensitive_names``
 ``backend.uses_custom_queryset``         ``connection.features.uses_custom_queryset``
 =======================================  ===================================================
-

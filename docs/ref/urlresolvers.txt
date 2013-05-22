@@ -71,8 +71,6 @@ You can use ``kwargs`` instead of ``args``. For example::
 reverse_lazy()
 --------------
 
-.. versionadded:: 1.4
-
 A lazily evaluated version of `reverse()`_.
 
 .. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
@@ -178,25 +176,17 @@ whether a view would raise a ``Http404`` error before redirecting to it::
             return HttpResponseRedirect('/')
         return response
 
-
-permalink()
------------
-
-The :func:`~django.db.models.permalink` decorator is useful for writing short
-methods that return a full URL path. For example, a model's
-``get_absolute_url()`` method. See :func:`django.db.models.permalink` for more.
-
 get_script_prefix()
 -------------------
 
 .. function:: get_script_prefix()
 
-Normally, you should always use :func:`~django.core.urlresolvers.reverse` or
-:func:`~django.db.models.permalink` to define URLs within your application.
-However, if your application constructs part of the URL hierarchy itself, you
-may occasionally need to generate URLs. In that case, you need to be able to
-find the base URL of the Django project within its Web server
-(normally, :func:`~django.core.urlresolvers.reverse` takes care of this for
-you). In that case, you can call ``get_script_prefix()``, which will return the
-script prefix portion of the URL for your Django project. If your Django
-project is at the root of its Web server, this is always ``"/"``.
+Normally, you should always use :func:`~django.core.urlresolvers.reverse` to
+define URLs within your application. However, if your application constructs
+part of the URL hierarchy itself, you may occasionally need to generate URLs.
+In that case, you need to be able to find the base URL of the Django project
+within its Web server (normally, :func:`~django.core.urlresolvers.reverse`
+takes care of this for you). In that case, you can call
+``get_script_prefix()``, which will return the script prefix portion of the URL
+for your Django project. If your Django project is at the root of its web
+server, this is always ``"/"``.

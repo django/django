@@ -142,10 +142,9 @@ Geometry Objects
 
 .. class:: GEOSGeometry(geo_input[, srid=None])
 
-  :param geo_input: Geometry input value
-  :type geo_input: string or buffer
+  :param geo_input: Geometry input value (string or buffer)
   :param srid: spatial reference identifier
-  :type srid: integer
+  :type srid: int
 
 This is the base class for all GEOS geometry objects.  It initializes on the
 given ``geo_input`` argument, and then assumes the proper geometry subclass
@@ -656,6 +655,17 @@ is returned instead.
 
    Returns the number of interior rings in this geometry.
 
+.. admonition:: Comparing Polygons
+
+    Note that it is possible to compare ``Polygon`` objects directly with ``<``
+    or ``>``, but as the comparison is made through Polygon's
+    :class:`LineString`, it does not mean much (but is consistent and quick).
+    You can always force the comparison with the :attr:`~GEOSGeometry.area`
+    property::
+
+        >>> if poly_1.area > poly_2.area:
+        >>>     pass
+
 Geometry Collections
 ====================
 
@@ -789,7 +799,7 @@ Example::
    :param string: string that contains spatial data
    :type string: string
    :param srid: spatial reference identifier
-   :type srid: integer
+   :type srid: int
    :rtype: a :class:`GEOSGeometry` corresponding to the spatial data in the string
 
 Example::
@@ -835,7 +845,7 @@ include the SRID value (in other words, EWKB).
 .. class:: WKBWriter
 
 ``WKBWriter`` provides the most control over its output.  By default it
-returns OGC-compliant WKB when it's ``write`` method is called.  However,
+returns OGC-compliant WKB when its ``write`` method is called.  However,
 it has properties that allow for the creation of EWKB, a superset of the
 WKB standard that includes additional information.
 
@@ -955,3 +965,10 @@ location (e.g., ``/home/bob/lib/libgeos_c.so``).
 
     The setting must be the *full* path to the **C** shared library; in
     other words you want to use ``libgeos_c.so``, not ``libgeos.so``.
+
+Exceptions
+==========
+
+.. exception:: GEOSException
+
+The base GEOS exception, indicates a GEOS-related error.

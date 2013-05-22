@@ -1,4 +1,4 @@
-{% load i18n admin_static admin_modify %}
+{% load i18n admin_static admin_modify %}{% load cycle from future %}
 <div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
@@ -46,7 +46,7 @@
             {% for field in line %}
               <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
               {% if field.is_readonly %}
-                  <p>{{ field.contents }}</p>
+                  <p>{{ field.contents|linebreaksbr }}</p>
               {% else %}
                   {{ field.field.errors.as_ul }}
                   {{ field.field }}

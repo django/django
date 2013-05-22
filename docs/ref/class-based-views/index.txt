@@ -32,15 +32,16 @@ A class-based view is deployed into a URL pattern using the
 .. admonition:: Thread safety with view arguments
 
     Arguments passed to a view are shared between every instance of a view.
-    This means that you shoudn't use a list, dictionary, or any other
+    This means that you shouldn't use a list, dictionary, or any other
     mutable object as an argument to a view. If you do and the shared object
     is modified, the actions of one user visiting your view could have an
     effect on subsequent users visiting the same view.
 
-Any argument passed into :meth:`~django.views.generic.base.View.as_view()` will
+Arguments passed into :meth:`~django.views.generic.base.View.as_view()` will
 be assigned onto the instance that is used to service a request. Using the
 previous example, this means that every request on ``MyView`` is able to use
-``self.size``.
+``self.size``. Arguments must correspond to attributes that already exist on
+the class (return ``True`` on a ``hasattr`` check).
 
 Base vs Generic views
 ---------------------

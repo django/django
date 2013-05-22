@@ -5,6 +5,18 @@ Comment form classes
 .. module:: django.contrib.comments.forms
    :synopsis: Forms for dealing with the built-in comment model.
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 The ``django.contrib.comments.forms`` module contains a handful of forms
 you'll use when writing custom views dealing with comments, or when writing
 :doc:`custom comment apps </ref/contrib/comments/custom>`.

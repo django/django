@@ -66,13 +66,13 @@ those models. Do this by editing your settings file and changing the
 your ``models.py``.
 
 For example, if the models for your application live in the module
-``mysite.myapp.models`` (the package structure that is created for an
+``myapp.models`` (the package structure that is created for an
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = (
         #...
-        'mysite.myapp',
+        'myapp',
         #...
     )
 
@@ -89,6 +89,8 @@ attributes. Be careful not to choose field names that conflict with the
 ``delete``.
 
 Example::
+
+    from django.db import models
 
     class Musician(models.Model):
         first_name = models.CharField(max_length=50)
@@ -290,8 +292,11 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
 ``Manufacturer`` makes multiple cars but each ``Car`` only has one
 ``Manufacturer`` -- use the following definitions::
 
+    from django.db import models
+
     class Manufacturer(models.Model):
         # ...
+        pass
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer)
@@ -340,8 +345,11 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 ``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings
 -- here's how you'd represent that::
 
+    from django.db import models
+
     class Topping(models.Model):
         # ...
+        pass
 
     class Pizza(models.Model):
         # ...
@@ -402,6 +410,8 @@ intermediate model. The intermediate model is associated with the
 :attr:`through <ManyToManyField.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
 something like this::
+
+    from django.db import models
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
@@ -583,6 +593,7 @@ It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
 just refer to the other model class wherever needed. For example::
 
+    from django.db import models
     from geography.models import ZipCode
 
     class Restaurant(models.Model):
@@ -630,6 +641,8 @@ Meta options
 
 Give your model metadata by using an inner ``class Meta``, like so::
 
+    from django.db import models
+
     class Ox(models.Model):
         horn_length = models.IntegerField()
 
@@ -660,7 +673,7 @@ model.
 
 For example, this model has a few custom methods::
 
-    from django.contrib.localflavor.us.models import USStateField
+    from django.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -668,16 +681,17 @@ For example, this model has a few custom methods::
         birth_date = models.DateField()
         address = models.CharField(max_length=100)
         city = models.CharField(max_length=50)
-        state = USStateField() # Yes, this is America-centric...
+        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
             import datetime
-            if datetime.date(1945, 8, 1) <= self.birth_date <= datetime.date(1964, 12, 31):
-                return "Baby boomer"
             if self.birth_date < datetime.date(1945, 8, 1):
                 return "Pre-boomer"
-            return "Post-boomer"
+            elif self.birth_date < datetime.date(1965, 1, 1):
+                return "Baby boomer"
+            else:
+                return "Post-boomer"
 
         def is_midwestern(self):
             "Returns True if this person is from the Midwest."
@@ -730,6 +744,8 @@ A classic use-case for overriding the built-in methods is if you want something
 to happen whenever you save an object. For example (see
 :meth:`~Model.save` for documentation of the parameters it accepts)::
 
+    from django.db import models
+
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
@@ -740,6 +756,8 @@ to happen whenever you save an object. For example (see
             do_something_else()
 
 You can also prevent saving::
+
+    from django.db import models
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -827,6 +845,8 @@ the child (and Django will raise an exception).
 
 An example::
 
+    from django.db import models
+
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
         age = models.PositiveIntegerField()
@@ -855,14 +875,16 @@ attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
 class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
 extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
 
+    from django.db import models
+
     class CommonInfo(models.Model):
-        ...
+        # ...
         class Meta:
             abstract = True
             ordering = ['name']
 
     class Student(CommonInfo):
-        ...
+        # ...
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
@@ -901,6 +923,8 @@ abstract base class (only), part of the name should contain
   resulting name will end up being different.
 
 For example, given an app ``common/models.py``::
+
+    from django.db import models
 
     class Base(models.Model):
         m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
@@ -949,6 +973,8 @@ database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
 (via an automatically-created :class:`~django.db.models.OneToOneField`).
 For example::
+
+    from django.db import models
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -999,7 +1025,7 @@ If the parent has an ordering and you don't want the child to have any natural
 ordering, you can explicitly disable it::
 
     class ChildModel(ParentModel):
-        ...
+        # ...
         class Meta:
             # Remove parent's ordering effect
             ordering = []
@@ -1062,52 +1088,52 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the standard
-:class:`~django.contrib.auth.models.User` model that will be used in your
-templates. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model. You can do it like this::
 
-    from django.contrib.auth.models import User
+    from django.db import models
 
-    class MyUser(User):
+    class Person(models.Model):
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
+
+    class MyPerson(Person):
         class Meta:
             proxy = True
 
         def do_something(self):
-            ...
+            # ...
+            pass
 
-The ``MyUser`` class operates on the same database table as its parent
-:class:`~django.contrib.auth.models.User` class. In particular, any new
-instances of :class:`~django.contrib.auth.models.User` will also be accessible
-through ``MyUser``, and vice-versa::
+The ``MyPerson`` class operates on the same database table as its parent
+``Person`` class. In particular, any new instances of ``Person`` will also be
+accessible through ``MyPerson``, and vice-versa::
 
-    >>> u = User.objects.create(username="foobar")
-    >>> MyUser.objects.get(username="foobar")
-    <MyUser: foobar>
+    >>> p = Person.objects.create(first_name="foobar")
+    >>> MyPerson.objects.get(first_name="foobar")
+    <MyPerson: foobar>
 
-You could also use a proxy model to define a different default ordering on a
-model. The standard :class:`~django.contrib.auth.models.User` model has no
-ordering defined on it (intentionally; sorting is expensive and we don't want
-to do it all the time when we fetch users). You might want to regularly order
-by the ``username`` attribute when you use the proxy. This is easy::
+You could also use a proxy model to define a different default ordering on
+a model. You might not always want to order the ``Person`` model, but regularly
+order by the ``last_name`` attribute when you use the proxy. This is easy::
 
-    class OrderedUser(User):
+    class OrderedPerson(Person):
         class Meta:
-            ordering = ["username"]
+            ordering = ["last_name"]
             proxy = True
 
-Now normal :class:`~django.contrib.auth.models.User` queries will be unordered
-and ``OrderedUser`` queries will be ordered by ``username``.
+Now normal ``Person`` queries will be unordered
+and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
 QuerySets still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is no way to have Django return, say, a ``MyUser`` object whenever you
-query for :class:`~django.contrib.auth.models.User` objects. A queryset for
-``User`` objects will return those types of objects. The whole point of proxy
-objects is that code relying on the original ``User`` will use those and your
-own code can use the extensions you included (that no other code is relying on
-anyway). It is not a way to replace the ``User`` (or any other) model
-everywhere with something of your own creation.
+There is no way to have Django return, say, a ``MyPerson`` object whenever you
+query for ``Person`` objects. A queryset for ``Person`` objects will return
+those types of objects. The whole point of proxy objects is that code relying
+on the original ``Person`` will use those and your own code can use the
+extensions you included (that no other code is relying on anyway). It is not
+a way to replace the ``Person`` (or any other) model everywhere with something
+of your own creation.
 
 Base class restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1130,12 +1156,15 @@ it will become the default, although any managers defined on the parent
 classes will still be available.
 
 Continuing our example from above, you could change the default manager used
-when you query the ``User`` model like this::
+when you query the ``Person`` model like this::
+
+    from django.db import models
 
     class NewManager(models.Manager):
-        ...
+        # ...
+        pass
 
-    class MyUser(User):
+    class MyPerson(Person):
         objects = NewManager()
 
         class Meta:
@@ -1153,7 +1182,7 @@ containing the new managers and inherit that after the primary base class::
         class Meta:
             abstract = True
 
-    class MyUser(User, ExtraManagers):
+    class MyPerson(Person, ExtraManagers):
         class Meta:
             proxy = True
 

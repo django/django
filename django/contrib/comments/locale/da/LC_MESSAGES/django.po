@@ -6,68 +6,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Danish (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
 "da/)\n"
-"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: da\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Indhold"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Metadata"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "Markeret"
 msgstr[1] "Markeret"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "Marker valgte kommentarer"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "Godkendt"
 msgstr[1] "Godkendt"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "Godkend valgte kommentarer"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "fjernet"
 msgstr[1] "fjernet"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "Fjern valgte kommentarer"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "1 kommentar blev %(action)s"
 msgstr[1] "%(count)s kommentarer blev %(action)s."
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "kommentarer på %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "Seneste kommentarer på %(site_name)s"
@@ -106,57 +106,57 @@ msgstr ""
 "Hvis du indtaster noget i dette felt, vil din kommentar blive betragtet som "
 "spam."
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "indholdstype"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "objekt-ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "bruger"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "brugerens navn"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "brugerens e-mail-adresse"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "brugerens URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "kommentar"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "dato/tidspunkt for oprettelse"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP-adresse"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "er offentlig"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
 "Hvis du fjerner afkrydsningen her, bliver din kommentar slettet fra sitet."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "er fjernet"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -164,11 +164,11 @@ msgstr ""
 "Afkryds denne boks, hvis kommentaren er upassende. Beskeden \"Denne "
 "kommentar er blevet fjernet\" vil blive vist i stedet."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "kommentarer"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -176,7 +176,7 @@ msgstr ""
 "Denne kommentar blev indsendt af en autenticeret bruger; derfor er navnet "
 "skrivebeskyttet."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -184,7 +184,7 @@ msgstr ""
 "Denne kommentar blev indsendt af en autenticeret bruger; derfor er e-mail-"
 "adressen skrivebeskyttet."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -199,19 +199,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "Flag"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "dato"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "kommentarflag"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "kommentarflag"
 

@@ -1,11 +1,16 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django import forms
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.contrib.gis.geos import GEOSException, GEOSGeometry, fromstr
+from .widgets import OpenLayersWidget
+
 
 class GeometryField(forms.Field):
     """
@@ -13,10 +18,11 @@ class GeometryField(forms.Field):
     accepted by GEOSGeometry is accepted by this form.  By default,
     this includes WKT, HEXEWKB, WKB (in a buffer), and GeoJSON.
     """
-    widget = forms.Textarea
+    widget = OpenLayersWidget
+    geom_type = 'GEOMETRY'
 
     default_error_messages = {
-        'no_geom' : _('No geometry value provided.'),
+        'required' : _('No geometry value provided.'),
         'invalid_geom' : _('Invalid geometry value.'),
         'invalid_geom_type' : _('Invalid geometry type.'),
         'transform_error' : _('An error occurred when transforming the geometry '
@@ -27,14 +33,20 @@ class GeometryField(forms.Field):
         # Pop out attributes from the database field, or use sensible
         # defaults (e.g., allow None).
         self.srid = kwargs.pop('srid', None)
-        self.geom_type = kwargs.pop('geom_type', 'GEOMETRY')
-        self.null = kwargs.pop('null', True)
+        self.geom_type = kwargs.pop('geom_type', self.geom_type)
+        if 'null' in kwargs:
+            kwargs.pop('null', True)
+            warnings.warn("Passing 'null' keyword argument to GeometryField is deprecated.",
+                DeprecationWarning, stacklevel=2)
         super(GeometryField, self).__init__(**kwargs)
+        self.widget.attrs['geom_type'] = self.geom_type
 
     def to_python(self, value):
         """
         Transforms the value to a Geometry object.
         """
+        if value in self.empty_values:
+            return None
         try:
             return GEOSGeometry(value)
         except (GEOSException, ValueError, TypeError):
@@ -46,15 +58,9 @@ class GeometryField(forms.Field):
         object (which is returned).  A ValidationError is raised if
         the value cannot be instantiated as a Geometry.
         """
-        if not value:
-            if self.null and not self.required:
-                # The geometry column allows NULL and is not required.
-                return None
-            else:
-                raise forms.ValidationError(self.error_messages['no_geom'])
-
-        # Transform the value to a python object first
-        geom = self.to_python(value)
+        geom = super(GeometryField, self).clean(value)
+        if geom is None:
+            return geom
 
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).
@@ -73,3 +79,53 @@ class GeometryField(forms.Field):
                     raise forms.ValidationError(self.error_messages['transform_error'])
 
         return geom
+
+    def _has_changed(self, initial, data):
+        """ Compare geographic value of data with its initial value. """
+
+        # Ensure we are dealing with a geographic object
+        if isinstance(initial, six.string_types):
+            try:
+                initial = GEOSGeometry(initial)
+            except (GEOSException, ValueError):
+                initial = None
+
+        # Only do a geographic comparison if both values are available
+        if initial and data:
+            data = fromstr(data)
+            data.transform(initial.srid)
+            # If the initial value was not added by the browser, the geometry
+            # provided may be slightly different, the first time it is saved.
+            # The comparison is done with a very low tolerance.
+            return not initial.equals_exact(data, tolerance=0.000001)
+        else:
+            # Check for change of state of existence
+            return bool(initial) != bool(data)
+
+
+class GeometryCollectionField(GeometryField):
+    geom_type = 'GEOMETRYCOLLECTION'
+
+
+class PointField(GeometryField):
+    geom_type = 'POINT'
+
+
+class MultiPointField(GeometryField):
+    geom_type = 'MULTIPOINT'
+
+
+class LineStringField(GeometryField):
+    geom_type = 'LINESTRING'
+
+
+class MultiLineStringField(GeometryField):
+    geom_type = 'MULTILINESTRING'
+
+
+class PolygonField(GeometryField):
+    geom_type = 'POLYGON'
+
+
+class MultiPolygonField(GeometryField):
+    geom_type = 'MULTIPOLYGON'

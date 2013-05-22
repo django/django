@@ -15,8 +15,10 @@ class MultipleObjectMixin(ContextMixin):
     queryset = None
     model = None
     paginate_by = None
+    paginate_orphans = 0
     context_object_name = None
     paginator_class = Paginator
+    page_kwarg = 'page'
 
     def get_queryset(self):
         """
@@ -38,8 +40,11 @@ class MultipleObjectMixin(ContextMixin):
         """
         Paginate the queryset, if needed.
         """
-        paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
-        page = self.kwargs.get('page') or self.request.GET.get('page') or 1
+        paginator = self.get_paginator(
+            queryset, page_size, orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty())
+        page_kwarg = self.page_kwarg
+        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
             page_number = int(page)
         except ValueError:
@@ -62,11 +67,21 @@ class MultipleObjectMixin(ContextMixin):
         """
         return self.paginate_by
 
-    def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True):
+    def get_paginator(self, queryset, per_page, orphans=0,
+                      allow_empty_first_page=True, **kwargs):
         """
         Return an instance of the paginator for this view.
         """
-        return self.paginator_class(queryset, per_page, orphans=orphans, allow_empty_first_page=allow_empty_first_page)
+        return self.paginator_class(
+            queryset, per_page, orphans=orphans,
+            allow_empty_first_page=allow_empty_first_page, **kwargs)
+
+    def get_paginate_orphans(self):
+        """
+        Returns the maximum number of orphans extend the last page by when
+        paginating.
+        """
+        return self.paginate_orphans
 
     def get_allow_empty(self):
         """
@@ -82,7 +97,7 @@ class MultipleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return '%s_list' % object_list.model._meta.object_name.lower()
+            return '%s_list' % object_list.model._meta.model_name
         else:
             return None
 
@@ -90,7 +105,7 @@ class MultipleObjectMixin(ContextMixin):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list')
+        queryset = kwargs.pop('object_list', self.object_list)
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
@@ -134,7 +149,7 @@ class BaseListView(MultipleObjectMixin, View):
             if is_empty:
                 raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
                         % {'class_name': self.__class__.__name__})
-        context = self.get_context_data(object_list=self.object_list)
+        context = self.get_context_data()
         return self.render_to_response(context)
 
 
@@ -162,7 +177,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # generated ones.
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
-            names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
+            names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
 
         return names
 

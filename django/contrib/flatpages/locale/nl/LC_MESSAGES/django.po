@@ -9,22 +9,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
 "Last-Translator: Harro van der Klauw <hvdklauw@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "Geavanceerde opties"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
 msgstr "URL"
 
@@ -54,23 +54,23 @@ msgstr "In de URL ontbreekt een eind slash."
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "Platte pagina met url %(url)s bestaat al voor site %(site)s"
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "titel"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "inhoud"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
 msgstr "opmerkingen toestaan"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "sjabloonnaam"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -78,20 +78,24 @@ msgstr ""
 "Voorbeeld: 'flatpages/contact_page.html'. Als deze niet is opgegeven, dan "
 "wordt 'flatpages/default.html' gebruikt."
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
 msgstr "registratie verplicht"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Indien dit is aangevinkt kunnen alleen ingelogde gebruikers deze pagina "
 "bekijken."
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "platte pagina"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "platte pagina's"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "Dit veld is verplicht."

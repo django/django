@@ -1,10 +1,12 @@
 """
 Utility functions for handling images.
 
-Requires PIL, as you might imagine.
+Requires Pillow (or PIL), as you might imagine.
 """
+import zlib
 
 from django.core.files import File
+
 
 class ImageFile(File):
     """
@@ -26,17 +28,14 @@ class ImageFile(File):
             self._dimensions_cache = get_image_dimensions(self, close=close)
         return self._dimensions_cache
 
+
 def get_image_dimensions(file_or_path, close=False):
     """
     Returns the (width, height) of an image, given an open file or a path.  Set
     'close' to True to close the file at the end if it is initially in an open
     state.
     """
-    # Try to import PIL in either of the two ways it can end up installed.
-    try:
-        from PIL import ImageFile as PILImageFile
-    except ImportError:
-        import ImageFile as PILImageFile
+    from django.utils.image import ImageFile as PILImageFile
 
     p = PILImageFile.Parser()
     if hasattr(file_or_path, 'read'):
@@ -55,7 +54,15 @@ def get_image_dimensions(file_or_path, close=False):
             data = file.read(chunk_size)
             if not data:
                 break
-            p.feed(data)
+            try:
+                p.feed(data)
+            except zlib.error as e:
+                # ignore zlib complaining on truncated stream, just feed more
+                # data to parser (ticket #19457).
+                if e.args[0].startswith("Error -5"):
+                    pass
+                else:
+                    raise
             if p.image:
                 return p.image.size
             chunk_size = chunk_size*2

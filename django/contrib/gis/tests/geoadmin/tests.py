@@ -1,12 +1,18 @@
 from __future__ import absolute_import
 
 from django.test import TestCase
-from django.contrib.gis import admin
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+from django.utils.unittest import skipUnless
 
-from .models import City
+if HAS_GEOS and HAS_SPATIAL_DB:
+    from django.contrib.gis import admin
+    from django.contrib.gis.geos import Point
+
+    from .models import City
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoAdminTest(TestCase):
     urls = 'django.contrib.gis.tests.geoadmin.urls'
 
@@ -24,10 +30,7 @@ class GeoAdminTest(TestCase):
             result)
 
     def test_olmap_WMS_rendering(self):
-        admin.site.unregister(City)
-        admin.site.register(City, admin.GeoModelAdmin)
-
-        geoadmin = admin.site._registry[City]
+        geoadmin = admin.GeoModelAdmin(City, admin.site)
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
             ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
@@ -38,7 +41,7 @@ class GeoAdminTest(TestCase):
         """ Check that changes are accurately noticed by OpenLayersWidget. """
         geoadmin = admin.site._registry[City]
         form = geoadmin.get_changelist_form(None)()
-        has_changed = form.fields['point'].widget._has_changed
+        has_changed = form.fields['point']._has_changed
 
         initial = Point(13.4197458572965953, 52.5194108501149799, srid=4326)
         data_same = "SRID=3857;POINT(1493879.2754093995 6894592.019687599)"

@@ -9,6 +9,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # schema inspection is more useful.
     data_types = {
         'AutoField':                    'integer',
+        'BinaryField':                  'BLOB',
         'BooleanField':                 'bool',
         'CharField':                    'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField':   'varchar(%(max_length)s)',
@@ -70,9 +71,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_database_name and test_database_name != ":memory:":
             # Remove the SQLite database file
             os.remove(test_database_name)
-
-    def set_autocommit(self):
-        self.connection.connection.isolation_level = None
 
     def test_db_signature(self):
         """

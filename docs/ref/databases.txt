@@ -11,36 +11,87 @@ This file describes some of the features that might be relevant to Django
 usage. Of course, it is not intended as a replacement for server-specific
 documentation or reference manuals.
 
+General notes
+=============
+
+.. _persistent-database-connections:
+
+Persistent connections
+----------------------
+
+.. versionadded:: 1.6
+
+Persistent connections avoid the overhead of re-establishing a connection to
+the database in each request. They're controlled by the
+:setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
+connection. It can be set independently for each database.
+
+The default value is ``0``, preserving the historical behavior of closing the
+database connection at the end of each request. To enable persistent
+connections, set :setting:`CONN_MAX_AGE` to a positive number of seconds. For
+unlimited persistent connections, set it to ``None``.
+
+Connection management
+~~~~~~~~~~~~~~~~~~~~~
+
+Django opens a connection to the database when it first makes a database
+query. It keeps this connection open and reuses it in subsequent requests.
+Django closes the connection once it exceeds the maximum age defined by
+:setting:`CONN_MAX_AGE` or when it isn't usable any longer.
+
+In detail, Django automatically opens a connection to the database whenever it
+needs one and doesn't have one already — either because this is the first
+connection, or because the previous connection was closed.
+
+At the beginning of each request, Django closes the connection if it has
+reached its maximum age. If your database terminates idle connections after
+some time, you should set :setting:`CONN_MAX_AGE` to a lower value, so that
+Django doesn't attempt to use a connection that has been terminated by the
+database server. (This problem may only affect very low traffic sites.)
+
+At the end of each request, Django closes the connection if it has reached its
+maximum age or if it is in an unrecoverable error state. If any database
+errors have occurred while processing the requests, Django checks whether the
+connection still works, and closes it if it doesn't. Thus, database errors
+affect at most one request; if the connection becomes unusable, the next
+request gets a fresh connection.
+
+Caveats
+~~~~~~~
+
+Since each thread maintains its own connection, your database must support at
+least as many simultaneous connections as you have worker threads.
+
+Sometimes a database won't be accessed by the majority of your views, for
+example because it's the database of an external system, or thanks to caching.
+In such cases, you should set :setting:`CONN_MAX_AGE` to a low value or even
+``0``, because it doesn't make sense to maintain a connection that's unlikely
+to be reused. This will help keep the number of simultaneous connections to
+this database small.
+
+The development server creates a new thread for each request it handles,
+negating the effect of persistent connections. Don't enable them during
+development.
+
+When Django establishes a connection to the database, it sets up appropriate
+parameters, depending on the backend being used. If you enable persistent
+connections, this setup is no longer repeated every request. If you modify
+parameters such as the connection's isolation level or time zone, you should
+either restore Django's defaults at the end of each request, force an
+appropriate value at the beginning of each request, or disable persistent
+connections.
+
 .. _postgresql-notes:
 
 PostgreSQL notes
 ================
 
-.. versionchanged:: 1.4
-
-Django supports PostgreSQL 8.2 and higher.
-
-PostgreSQL 8.2 to 8.2.4
------------------------
-
-The implementation of the population statistics aggregates ``STDDEV_POP`` and
-``VAR_POP`` that shipped with PostgreSQL 8.2 to 8.2.4 are `known to be
-faulty`_. Users of these releases of PostgreSQL are advised to upgrade to
-`Release 8.2.5`_ or later. Django will raise a ``NotImplementedError`` if you
-attempt to use the ``StdDev(sample=False)`` or ``Variance(sample=False)``
-aggregate with a database backend that falls within the affected release range.
-
-.. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
-.. _Release 8.2.5: http://www.postgresql.org/docs/devel/static/release-8-2-5.html
+Django supports PostgreSQL 8.4 and higher.
 
 PostgreSQL connection settings
-------------------------------
+-------------------------------
 
-By default (empty :setting:`HOST`), the connection to the database is done
-through UNIX domain sockets ('local' lines in pg_hba.conf). If you want to
-connect through TCP sockets, set :setting:`HOST` to 'localhost' or '127.0.0.1'
-('host' lines in pg_hba.conf). On Windows, you should always define
-:setting:`HOST`, as UNIX domain sockets are not available.
+See :setting:`HOST` for details.
 
 Optimizing PostgreSQL's configuration
 -------------------------------------
@@ -48,7 +99,8 @@ Optimizing PostgreSQL's configuration
 Django needs the following parameters for its database connections:
 
 - ``client_encoding``: ``'UTF8'``,
-- ``default_transaction_isolation``: ``'read committed'``,
+- ``default_transaction_isolation``: ``'read committed'`` by default,
+  or the value set in the connection options (see below),
 - ``timezone``: ``'UTC'`` when :setting:`USE_TZ` is ``True``, value of
   :setting:`TIME_ZONE` otherwise.
 
@@ -62,58 +114,57 @@ will do some additional queries to set these parameters.
 
 .. _ALTER ROLE: http://www.postgresql.org/docs/current/interactive/sql-alterrole.html
 
-Transaction handling
----------------------
-
-:doc:`By default </topics/db/transactions>`, Django runs with an open
-transaction which it commits automatically when any built-in, data-altering
-model function is called. The PostgreSQL backends normally operate the same as
-any other Django backend in this respect.
-
 .. _postgresql-autocommit-mode:
 
 Autocommit mode
-~~~~~~~~~~~~~~~
+---------------
 
-If your application is particularly read-heavy and doesn't make many
-database writes, the overhead of a constantly open transaction can
-sometimes be noticeable. For those situations, you can configure Django
-to use *"autocommit"* behavior for the connection, meaning that each database
-operation will normally be in its own transaction, rather than having
-the transaction extend over multiple operations. In this case, you can
-still manually start a transaction if you're doing something that
-requires consistency across multiple database operations. The
-autocommit behavior is enabled by setting the ``autocommit`` key in
-the :setting:`OPTIONS` part of your database configuration in
-:setting:`DATABASES`::
+.. versionchanged:: 1.6
 
-    'OPTIONS': {
-        'autocommit': True,
+In previous versions of Django, database-level autocommit could be enabled by
+setting the ``autocommit`` key in the :setting:`OPTIONS` part of your database
+configuration in :setting:`DATABASES`::
+
+    DATABASES = {
+        # ...
+        'OPTIONS': {
+            'autocommit': True,
+        },
     }
 
-In this configuration, Django still ensures that :ref:`delete()
-<topics-db-queries-delete>` and :ref:`update() <topics-db-queries-update>`
-queries run inside a single transaction, so that either all the affected
-objects are changed or none of them are.
+Since Django 1.6, autocommit is turned on by default. This configuration is
+ignored and can be safely removed.
 
-.. admonition:: This is database-level autocommit
+Isolation level
+---------------
 
-    This functionality is not the same as the :ref:`autocommit
-    <topics-db-transactions-autocommit>` decorator. That decorator is
-    a Django-level implementation that commits automatically after
-    data changing operations. The feature enabled using the
-    :setting:`OPTIONS` option provides autocommit behavior at the
-    database adapter level. It commits after *every* operation.
+.. versionadded:: 1.6
 
-If you are using this feature and performing an operation akin to delete or
-updating that requires multiple operations, you are strongly recommended to
-wrap you operations in manual transaction handling to ensure data consistency.
-You should also audit your existing code for any instances of this behavior
-before enabling this feature. It's faster, but it provides less automatic
-protection for multi-call operations.
+Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
+level <postgresql-isolation-levels>`_. If you need a higher isolation level
+such as ``REPEATABLE READ`` or ``SERIALIZABLE``, set it in the
+:setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
+
+    import psycopg2.extensions
+
+    DATABASES = {
+        # ...
+        'OPTIONS': {
+            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+        },
+    }
+
+.. note::
+
+    Under higher isolation levels, your application should be prepared to
+    handle exceptions raised on serialization failures. This option is
+    designed for advanced uses.
+
+.. _postgresql-isolation-levels: http://www.postgresql.org/docs/current/static/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 When specifying ``db_index=True`` on your model fields, Django typically
 outputs a single ``CREATE INDEX`` statement.  However, if the database type
@@ -124,7 +175,7 @@ for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
-.. _PostgreSQL operator class: http://www.postgresql.org/docs/8.4/static/indexes-opclass.html
+.. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
 .. _mysql-notes:
 
@@ -140,6 +191,7 @@ Django supports MySQL 5.0.3 and higher.
 data on all database schema. Django's ``inspectdb`` feature uses it.
 
 .. versionchanged:: 1.5
+
     The minimum version requirement of MySQL 5.0.3 was set in Django 1.5.
 
 Django expects the database to support Unicode (UTF-8 encoding) and delegates to
@@ -177,18 +229,6 @@ running ``syncdb``::
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
 
-.. versionchanged:: 1.4
-
-In previous versions of Django, fixtures with forward references (i.e.
-relations to rows that have not yet been inserted into the database) would fail
-to load when using the InnoDB storage engine. This was due to the fact that InnoDB
-deviates from the SQL standard by checking foreign key constraints immediately
-instead of deferring the check until the transaction is committed. This
-problem has been resolved in Django 1.4. Fixture data is now loaded with foreign key
-checks turned off; foreign key checks are then re-enabled when the data has
-finished loading, at which point the entire table is checked for invalid foreign
-key references and an `IntegrityError` is raised if any are found.
-
 .. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
 .. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html
 .. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb.html
@@ -211,7 +251,27 @@ required for full MySQL support in Django.
     1.2.1p2 or newer, then delete the ``sets.py`` file in the MySQLdb
     directory that was left by an earlier version.
 
+.. note::
+    There are known issues with the way MySQLdb converts date strings into
+    datetime objects. Specifically, date strings with value 0000-00-00 are valid for
+    MySQL but will be converted into None by MySQLdb.
+
+    This means you should be careful while using loaddata/dumpdata with rows
+    that may have 0000-00-00 values, as they will be converted to None.
+
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
+
+Python 3
+--------
+
+At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
+Python 3. In order to use MySQL under Python 3, you'll have to install an
+unofficial fork, such as `MySQL-for-Python-3`_.
+
+This port is still in alpha. In particular, it doesn't support binary data,
+making it impossible to use :class:`django.db.models.BinaryField`.
+
+.. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
 
 Creating your database
 ----------------------
@@ -277,9 +337,9 @@ recommended solution.
 
 Should you decide to use ``utf8_bin`` collation for some of your tables with
 MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
-(the default) collation for the :class:`django.contrib.sessions.models.Session`
+(the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
-:class:`django.contrib.admin.models.LogEntry` table (usually called
+``django.contrib.admin.models.LogEntry`` table (usually called
 ``django_admin_log``). Those are the two standard tables that use
 :class:`~django.db.models.TextField` internally.
 
@@ -322,8 +382,8 @@ Here's a sample configuration which uses a MySQL option file::
     default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,
-``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
-`MySQLdb documentation`_ for more details.
+``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
+more details.
 
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
@@ -381,8 +441,7 @@ Savepoints
 
 Both the Django ORM and MySQL (when using the InnoDB :ref:`storage engine
 <mysql-storage-engines>`) support database :ref:`savepoints
-<topics-db-transactions-savepoints>`, but this feature wasn't available in
-Django until version 1.4 when such supports was added.
+<topics-db-transactions-savepoints>`.
 
 If you use the MyISAM storage engine please be aware of the fact that you will
 receive database-generated errors if you try to use the :ref:`savepoint-related

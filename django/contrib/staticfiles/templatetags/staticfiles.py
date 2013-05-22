@@ -34,4 +34,4 @@ def do_static(parser, token):
 
 
 def static(path):
-    return StaticNode.handle_simple(path)
+    return staticfiles_storage.url(path)

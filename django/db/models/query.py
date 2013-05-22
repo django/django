@@ -7,6 +7,7 @@ import itertools
 import sys
 import warnings
 
+from django.conf import settings
 from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
@@ -17,11 +18,7 @@ from django.db.models.deletion import Collector
 from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
-
-# Used to control how many objects are worked with at once in some cases (e.g.
-# when deleting objects).
-CHUNK_SIZE = 100
-ITER_CHUNK_SIZE = CHUNK_SIZE
+from django.utils import timezone
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
@@ -29,22 +26,21 @@ REPR_OUTPUT_SIZE = 20
 # Pull into this namespace for backwards compatibility.
 EmptyResultSet = sql.EmptyResultSet
 
+
 class QuerySet(object):
     """
     Represents a lazy database lookup for a set of objects.
     """
     def __init__(self, model=None, query=None, using=None):
         self.model = model
-        # EmptyQuerySet instantiates QuerySet with model as None
         self._db = using
         self.query = query or sql.Query(self.model)
         self._result_cache = None
-        self._iter = None
         self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
-        self._known_related_object = None       # (attname, rel_obj)
+        self._known_related_objects = {}        # {rel_field, {pk: rel_obj}}
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -55,8 +51,8 @@ class QuerySet(object):
         Deep copy of a QuerySet doesn't populate the cache
         """
         obj = self.__class__()
-        for k,v in self.__dict__.items():
-            if k in ('_iter','_result_cache'):
+        for k, v in self.__dict__.items():
+            if k == '_result_cache':
                 obj.__dict__[k] = None
             else:
                 obj.__dict__[k] = copy.deepcopy(v, memo)
@@ -67,10 +63,8 @@ class QuerySet(object):
         Allows the QuerySet to be pickled.
         """
         # Force the cache to be fully populated.
-        len(self)
-
+        self._fetch_all()
         obj_dict = self.__dict__.copy()
-        obj_dict['_iter'] = None
         return obj_dict
 
     def __repr__(self):
@@ -80,95 +74,31 @@ class QuerySet(object):
         return repr(data)
 
     def __len__(self):
-        # Since __len__ is called quite frequently (for example, as part of
-        # list(qs), we make some effort here to be as efficient as possible
-        # whilst not messing up any existing iterators against the QuerySet.
-        if self._result_cache is None:
-            if self._iter:
-                self._result_cache = list(self._iter)
-            else:
-                self._result_cache = list(self.iterator())
-        elif self._iter:
-            self._result_cache.extend(self._iter)
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            self._prefetch_related_objects()
+        self._fetch_all()
         return len(self._result_cache)
 
     def __iter__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is None:
-            self._iter = self.iterator()
-            self._result_cache = []
-        if self._iter:
-            return self._result_iter()
-        # Python's list iterator is better than our version when we're just
-        # iterating over the cache.
+        """
+        The queryset iterator protocol uses three nested iterators in the
+        default case:
+            1. sql.compiler:execute_sql()
+               - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
+                 using cursor.fetchmany(). This part is responsible for
+                 doing some column masking, and returning the rows in chunks.
+            2. sql/compiler.results_iter()
+               - Returns one row at time. At this point the rows are still just
+                 tuples. In some cases the return values are converted to
+                 Python values at this location (see resolve_columns(),
+                 resolve_aggregate()).
+            3. self.iterator()
+               - Responsible for turning the rows into model objects.
+        """
+        self._fetch_all()
         return iter(self._result_cache)
 
-    def _result_iter(self):
-        pos = 0
-        while 1:
-            upper = len(self._result_cache)
-            while pos < upper:
-                yield self._result_cache[pos]
-                pos = pos + 1
-            if not self._iter:
-                raise StopIteration
-            if len(self._result_cache) <= pos:
-                self._fill_cache()
-
-    def __bool__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is not None:
-            return bool(self._result_cache)
-        try:
-            next(iter(self))
-        except StopIteration:
-            return False
-        return True
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
-    def __contains__(self, val):
-        # The 'in' operator works without this method, due to __iter__. This
-        # implementation exists only to shortcut the creation of Model
-        # instances, by bailing out early if we find a matching element.
-        pos = 0
-        if self._result_cache is not None:
-            if val in self._result_cache:
-                return True
-            elif self._iter is None:
-                # iterator is exhausted, so we have our answer
-                return False
-            # remember not to check these again:
-            pos = len(self._result_cache)
-        else:
-            # We need to start filling the result cache out. The following
-            # ensures that self._iter is not None and self._result_cache is not
-            # None
-            it = iter(self)
-
-        # Carry on, one result at a time.
-        while True:
-            if len(self._result_cache) <= pos:
-                self._fill_cache(num=1)
-            if self._iter is None:
-                # we ran out of items
-                return False
-            if self._result_cache[pos] == val:
-                return True
-            pos += 1
+    def __nonzero__(self):
+        self._fetch_all()
+        return bool(self._result_cache)
 
     def __getitem__(self, k):
         """
@@ -182,19 +112,6 @@ class QuerySet(object):
                 "Negative indexing is not supported."
 
         if self._result_cache is not None:
-            if self._iter is not None:
-                # The result cache has only been partially populated, so we may
-                # need to fill it out a bit more.
-                if isinstance(k, slice):
-                    if k.stop is not None:
-                        # Some people insist on passing in strings here.
-                        bound = int(k.stop)
-                    else:
-                        bound = None
-                else:
-                    bound = k + 1
-                if len(self._result_cache) < bound:
-                    self._fill_cache(bound - len(self._result_cache))
             return self._result_cache[k]
 
         if isinstance(k, slice):
@@ -209,26 +126,30 @@ class QuerySet(object):
                 stop = None
             qs.query.set_limits(start, stop)
             return k.step and list(qs)[::k.step] or qs
-        try:
-            qs = self._clone()
-            qs.query.set_limits(k, k + 1)
-            return list(qs)[0]
-        except self.model.DoesNotExist as e:
-            raise IndexError(e.args)
+
+        qs = self._clone()
+        qs.query.set_limits(k, k + 1)
+        return list(qs)[0]
 
     def __and__(self, other):
         self._merge_sanity_check(other)
         if isinstance(other, EmptyQuerySet):
-            return other._clone()
+            return other
+        if isinstance(self, EmptyQuerySet):
+            return self
         combined = self._clone()
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.AND)
         return combined
 
     def __or__(self, other):
         self._merge_sanity_check(other)
-        combined = self._clone()
+        if isinstance(self, EmptyQuerySet):
+            return other
         if isinstance(other, EmptyQuerySet):
-            return combined
+            return self
+        combined = self._clone()
+        combined._merge_known_related_objects(other)
         combined.query.combine(other.query, sql.OR)
         return combined
 
@@ -255,13 +176,13 @@ class QuerySet(object):
 
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
-            fields = self.model._meta.fields
+            fields = self.model._meta.concrete_fields
 
         load_fields = []
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_fields_with_model():
+            for field, model in self.model._meta.get_concrete_fields_with_model():
                 if model is None:
                     model = self.model
                 try:
@@ -274,7 +195,7 @@ class QuerySet(object):
                     load_fields.append(field.name)
 
         index_start = len(extra_select)
-        aggregate_start = index_start + len(load_fields or self.model._meta.fields)
+        aggregate_start = index_start + len(load_fields or self.model._meta.concrete_fields)
 
         skip = None
         if load_fields and not fill_cache:
@@ -289,10 +210,9 @@ class QuerySet(object):
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
 
-        # Cache db, model and known_related_object outside the loop
+        # Cache db and model outside the loop
         db = self.db
         model = self.model
-        kro_attname, kro_instance = self._known_related_object or (None, None)
         compiler = self.query.get_compiler(using=db)
         if fill_cache:
             klass_info = get_klass_info(model, max_depth=max_depth,
@@ -323,9 +243,16 @@ class QuerySet(object):
                 for i, aggregate in enumerate(aggregate_select):
                     setattr(obj, aggregate, row[i + aggregate_start])
 
-            # Add the known related object to the model, if there is one
-            if kro_instance:
-                setattr(obj, kro_attname, kro_instance)
+            # Add the known related objects to the model, if there are any
+            if self._known_related_objects:
+                for field, rel_objs in self._known_related_objects.items():
+                    pk = getattr(obj, field.get_attname())
+                    try:
+                        rel_obj = rel_objs[pk]
+                    except KeyError:
+                        pass               # may happen in qs1 | qs2 scenarios
+                    else:
+                        setattr(obj, field.name, rel_obj)
 
             yield obj
 
@@ -358,7 +285,7 @@ class QuerySet(object):
         If the QuerySet is already fully cached this simply returns the length
         of the cached results set to avoid multiple SELECT COUNT(*) calls.
         """
-        if self._result_cache is not None and not self._iter:
+        if self._result_cache is not None:
             return len(self._result_cache)
 
         return self.query.get_count(using=self.db)
@@ -376,13 +303,11 @@ class QuerySet(object):
             return clone._result_cache[0]
         if not num:
             raise self.model.DoesNotExist(
-                "%s matching query does not exist. "
-                "Lookup parameters were %s" %
-                (self.model._meta.object_name, kwargs))
+                "%s matching query does not exist." %
+                self.model._meta.object_name)
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s! "
-            "Lookup parameters were %s" %
-            (self.model._meta.object_name, num, kwargs))
+            "get() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num))
 
     def create(self, **kwargs):
         """
@@ -418,12 +343,7 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_fields
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
@@ -434,13 +354,6 @@ class QuerySet(object):
                 if objs_without_pk:
                     fields= [f for f in fields if not isinstance(f, AutoField)]
                     self._batched_insert(objs_without_pk, fields, batch_size)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
 
         return objs
 
@@ -462,14 +375,14 @@ class QuerySet(object):
             return self.get(**lookup), False
         except self.model.DoesNotExist:
             try:
-                params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
+                params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
                 params.update(defaults)
                 obj = self.model(**params)
                 sid = transaction.savepoint(using=self.db)
                 obj.save(force_insert=True, using=self.db)
                 transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
-            except IntegrityError as e:
+            except IntegrityError:
                 transaction.savepoint_rollback(sid, using=self.db)
                 exc_info = sys.exc_info()
                 try:
@@ -478,20 +391,47 @@ class QuerySet(object):
                     # Re-raise the IntegrityError with its original traceback.
                     six.reraise(*exc_info)
 
-    def latest(self, field_name=None):
+    def _earliest_or_latest(self, field_name=None, direction="-"):
         """
-        Returns the latest object, according to the model's 'get_latest_by'
-        option or optional given field_name.
+        Returns the latest object, according to the model's
+        'get_latest_by' option or optional given field_name.
         """
-        latest_by = field_name or self.model._meta.get_latest_by
-        assert bool(latest_by), "latest() requires either a field_name parameter or 'get_latest_by' in the model"
+        order_by = field_name or getattr(self.model._meta, 'get_latest_by')
+        assert bool(order_by), "earliest() and latest() require either a "\
+            "field_name parameter or 'get_latest_by' in the model"
         assert self.query.can_filter(), \
-                "Cannot change a query once a slice has been taken."
+            "Cannot change a query once a slice has been taken."
         obj = self._clone()
         obj.query.set_limits(high=1)
-        obj.query.clear_ordering()
-        obj.query.add_ordering('-%s' % latest_by)
+        obj.query.clear_ordering(force_empty=True)
+        obj.query.add_ordering('%s%s' % (direction, order_by))
         return obj.get()
+
+    def earliest(self, field_name=None):
+        return self._earliest_or_latest(field_name=field_name, direction="")
+
+    def latest(self, field_name=None):
+        return self._earliest_or_latest(field_name=field_name, direction="-")
+
+    def first(self):
+        """
+        Returns the first object of a query, returns None if no match is found.
+        """
+        qs = self if self.ordered else self.order_by('pk')
+        try:
+            return qs[0]
+        except IndexError:
+            return None
+
+    def last(self):
+        """
+        Returns the last object of a query, returns None if no match is found.
+        """
+        qs = self.reverse() if self.ordered else self.order_by('-pk')
+        try:
+            return qs[0]
+        except IndexError:
+            return None
 
     def in_bulk(self, id_list):
         """
@@ -522,7 +462,7 @@ class QuerySet(object):
         # Disable non-supported fields.
         del_query.query.select_for_update = False
         del_query.query.select_related = False
-        del_query.query.clear_ordering()
+        del_query.query.clear_ordering(force_empty=True)
 
         collector = Collector(using=del_query.db)
         collector.collect(del_query)
@@ -550,20 +490,8 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        if not transaction.is_managed(using=self.db):
-            transaction.enter_transaction_management(using=self.db)
-            forced_managed = True
-        else:
-            forced_managed = False
-        try:
+        with transaction.commit_on_success_unless_managed(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(None)
-            if forced_managed:
-                transaction.commit(using=self.db)
-            else:
-                transaction.commit_unless_managed(using=self.db)
-        finally:
-            if forced_managed:
-                transaction.leave_transaction_management(using=self.db)
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -612,21 +540,40 @@ class QuerySet(object):
 
     def dates(self, field_name, kind, order='ASC'):
         """
-        Returns a list of datetime objects representing all available dates for
+        Returns a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ("month", "year", "day"), \
+        assert kind in ("year", "month", "day"), \
                 "'kind' must be one of 'year', 'month' or 'day'."
         assert order in ('ASC', 'DESC'), \
                 "'order' must be either 'ASC' or 'DESC'."
         return self._clone(klass=DateQuerySet, setup=True,
                 _field_name=field_name, _kind=kind, _order=order)
 
+    def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
+        """
+        Returns a list of datetime objects representing all available
+        datetimes for the given field_name, scoped to 'kind'.
+        """
+        assert kind in ("year", "month", "day", "hour", "minute", "second"), \
+                "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
+        assert order in ('ASC', 'DESC'), \
+                "'order' must be either 'ASC' or 'DESC'."
+        if settings.USE_TZ:
+            if tzinfo is None:
+                tzinfo = timezone.get_current_timezone()
+        else:
+            tzinfo = None
+        return self._clone(klass=DateTimeQuerySet, setup=True,
+                _field_name=field_name, _kind=kind, _order=order, _tzinfo=tzinfo)
+
     def none(self):
         """
         Returns an empty QuerySet.
         """
-        return self._clone(klass=EmptyQuerySet)
+        clone = self._clone()
+        clone.query.set_empty()
+        return clone
 
     ##################################################################
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
@@ -703,7 +650,7 @@ class QuerySet(object):
         """
         if 'depth' in kwargs:
             warnings.warn('The "depth" keyword argument has been deprecated.\n'
-                    'Use related field names instead.', PendingDeprecationWarning)
+                    'Use related field names instead.', DeprecationWarning, stacklevel=2)
         depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
@@ -735,13 +682,6 @@ class QuerySet(object):
         else:
             clone._prefetch_related_lookups.extend(lookups)
         return clone
-
-    def dup_select_related(self, other):
-        """
-        Copies the related selection status from the QuerySet 'other' to the
-        current QuerySet.
-        """
-        self.query.select_related = other.query.select_related
 
     def annotate(self, *args, **kwargs):
         """
@@ -781,7 +721,7 @@ class QuerySet(object):
         assert self.query.can_filter(), \
                 "Cannot reorder a query once a slice has been taken."
         obj = self._clone()
-        obj.query.clear_ordering()
+        obj.query.clear_ordering(force_empty=False)
         obj.query.add_ordering(*field_names)
         return obj
 
@@ -862,7 +802,7 @@ class QuerySet(object):
         """
         if self.query.extra_order_by or self.query.order_by:
             return True
-        elif self.query.default_ordering and self.query.model._meta.ordering:
+        elif self.query.default_ordering and self.query.get_meta().ordering:
             return True
         else:
             return False
@@ -902,23 +842,17 @@ class QuerySet(object):
         c = klass(model=self.model, query=query, using=self._db)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
-        c._known_related_object = self._known_related_object
+        c._known_related_objects = self._known_related_objects
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
 
-    def _fill_cache(self, num=None):
-        """
-        Fills the result cache with 'num' more entries (or until the results
-        iterator is exhausted).
-        """
-        if self._iter:
-            try:
-                for i in range(num or ITER_CHUNK_SIZE):
-                    self._result_cache.append(next(self._iter))
-            except StopIteration:
-                self._iter = None
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
 
     def _next_is_sticky(self):
         """
@@ -942,13 +876,20 @@ class QuerySet(object):
         """
         pass
 
+    def _merge_known_related_objects(self, other):
+        """
+        Keep track of all known related objects from either QuerySet instance.
+        """
+        for field, objects in other._known_related_objects.items():
+            self._known_related_objects.setdefault(field, {}).update(objects)
+
     def _setup_aggregate_query(self, aggregates):
         """
         Prepare the query for computing a result that contains aggregate annotations.
         """
         opts = self.model._meta
         if self.query.group_by is None:
-            field_names = [f.attname for f in opts.fields]
+            field_names = [f.attname for f in opts.concrete_fields]
             self.query.add_fields(field_names, False)
             self.query.set_group_by()
 
@@ -968,6 +909,18 @@ class QuerySet(object):
     # empty" result.
     value_annotation = True
 
+class InstanceCheckMeta(type):
+    def __instancecheck__(self, instance):
+        return instance.query.is_empty()
+
+class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
+    """
+    Marker class usable for checking if a queryset is empty by .none():
+        isinstance(qs.none(), EmptyQuerySet) -> True
+    """
+
+    def __init__(self, *args, **kwargs):
+        raise TypeError("EmptyQuerySet can't be instantiated")
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -1029,7 +982,7 @@ class ValuesQuerySet(QuerySet):
         else:
             # Default to all fields.
             self.extra_names = None
-            self.field_names = [f.attname for f in self.model._meta.fields]
+            self.field_names = [f.attname for f in self.model._meta.concrete_fields]
             self.aggregate_names = None
 
         self.query.select = []
@@ -1077,7 +1030,7 @@ class ValuesQuerySet(QuerySet):
 
     def _as_sql(self, connection):
         """
-        For ValueQuerySet (and subclasses like ValuesListQuerySet), they can
+        For ValuesQuerySet (and subclasses like ValuesListQuerySet), they can
         only be used as nested queries if they're already set up to select only
         a single field (in which case, that is the field column that is
         returned). This differs from QuerySet.as_sql(), where the column to
@@ -1156,7 +1109,7 @@ class DateQuerySet(QuerySet):
         self.query.clear_deferred_loading()
         self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
-        self.query.add_date_select(self._field_name, self._kind, self._order)
+        self.query.add_select(self._field_name, self._kind, self._order)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
@@ -1167,137 +1120,31 @@ class DateQuerySet(QuerySet):
         return c
 
 
-class EmptyQuerySet(QuerySet):
-    def __init__(self, model=None, query=None, using=None):
-        super(EmptyQuerySet, self).__init__(model, query, using)
-        self._result_cache = []
+class DateTimeQuerySet(QuerySet):
+    def iterator(self):
+        return self.query.get_compiler(self.db).results_iter()
 
-    def __and__(self, other):
-        return self._clone()
+    def _setup_query(self):
+        """
+        Sets up any special features of the query attribute.
 
-    def __or__(self, other):
-        return other._clone()
-
-    def count(self):
-        return 0
-
-    def delete(self):
-        pass
+        Called by the _clone() method after initializing the rest of the
+        instance.
+        """
+        self.query.clear_deferred_loading()
+        self.query = self.query.clone(klass=sql.DateTimeQuery, setup=True, tzinfo=self._tzinfo)
+        self.query.select = []
+        self.query.add_select(self._field_name, self._kind, self._order)
 
     def _clone(self, klass=None, setup=False, **kwargs):
-        c = super(EmptyQuerySet, self)._clone(klass, setup=setup, **kwargs)
-        c._result_cache = []
+        c = super(DateTimeQuerySet, self)._clone(klass, False, **kwargs)
+        c._field_name = self._field_name
+        c._kind = self._kind
+        c._tzinfo = self._tzinfo
+        if setup and hasattr(c, '_setup_query'):
+            c._setup_query()
         return c
 
-    def iterator(self):
-        # This slightly odd construction is because we need an empty generator
-        # (it raises StopIteration immediately).
-        yield next(iter([]))
-
-    def all(self):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def filter(self, *args, **kwargs):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def exclude(self, *args, **kwargs):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def complex_filter(self, filter_obj):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def select_related(self, *fields, **kwargs):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def annotate(self, *args, **kwargs):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def order_by(self, *field_names):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def distinct(self, fields=None):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def extra(self, select=None, where=None, params=None, tables=None,
-              order_by=None, select_params=None):
-        """
-        Always returns EmptyQuerySet.
-        """
-        assert self.query.can_filter(), \
-                "Cannot change a query once a slice has been taken"
-        return self
-
-    def reverse(self):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def defer(self, *fields):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def only(self, *fields):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def update(self, **kwargs):
-        """
-        Don't update anything.
-        """
-        return 0
-
-    def aggregate(self, *args, **kwargs):
-        """
-        Return a dict mapping the aggregate names to None
-        """
-        for arg in args:
-            kwargs[arg.default_alias] = arg
-        return dict([(key, None) for key in kwargs])
-
-    def values(self, *fields):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    def values_list(self, *fields, **kwargs):
-        """
-        Always returns EmptyQuerySet.
-        """
-        return self
-
-    # EmptyQuerySet is always an empty result in where-clauses (and similar
-    # situations).
-    value_annotation = False
 
 def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                    only_load=None, from_parent=None):
@@ -1346,7 +1193,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_fields_with_model():
+        for field, model in klass._meta.get_concrete_fields_with_model():
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1365,22 +1212,22 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     else:
         # Load all fields on klass
 
-        field_count = len(klass._meta.fields)
+        field_count = len(klass._meta.concrete_fields)
         # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_fields) != len(klass._meta.fields):
+        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
                                if not issubclass(from_parent, p)]
             # Load local fields, too...
             non_seen_models.append(klass)
-            field_names = [f.attname for f in klass._meta.fields
+            field_names = [f.attname for f in klass._meta.concrete_fields
                            if f.model in non_seen_models]
             field_count = len(field_names)
         # Try to avoid populating field_names variable for perfomance reasons.
         # If field_names variable is set, we use **kwargs based model init
         # which is slower than normal init.
-        if field_count == len(klass._meta.fields):
+        if field_count == len(klass._meta.concrete_fields):
             field_names = ()
 
     restricted = requested is not None
@@ -1691,7 +1538,7 @@ def prefetch_related_objects(result_cache, related_lookups):
             continue
         done_lookups.add(lookup)
 
-        # Top level, the list of objects to decorate is the the result cache
+        # Top level, the list of objects to decorate is the result cache
         # from the primary QuerySet. It won't be for deeper levels.
         obj_list = result_cache
 
@@ -1780,9 +1627,9 @@ def prefetch_related_objects(result_cache, related_lookups):
 def get_prefetcher(instance, attr):
     """
     For the attribute 'attr' on the given instance, finds
-    an object that has a get_prefetch_query_set().
+    an object that has a get_prefetch_queryset().
     Returns a 4 tuple containing:
-    (the object with get_prefetch_query_set (or None),
+    (the object with get_prefetch_queryset (or None),
      the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
      a boolean that is True if the attribute has already been fetched)
@@ -1805,8 +1652,8 @@ def get_prefetcher(instance, attr):
         attr_found = True
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
-            # get_prefetch_query_set() method.
-            if hasattr(rel_obj_descriptor, 'get_prefetch_query_set'):
+            # get_prefetch_queryset() method.
+            if hasattr(rel_obj_descriptor, 'get_prefetch_queryset'):
                 prefetcher = rel_obj_descriptor
                 if rel_obj_descriptor.is_cached(instance):
                     is_fetched = True
@@ -1815,7 +1662,7 @@ def get_prefetcher(instance, attr):
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, attr)
-                if hasattr(rel_obj, 'get_prefetch_query_set'):
+                if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
@@ -1831,7 +1678,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     prefetches that must be done due to prefetch_related lookups
     found from default managers.
     """
-    # prefetcher must have a method get_prefetch_query_set() which takes a list
+    # prefetcher must have a method get_prefetch_queryset() which takes a list
     # of instances, and returns a tuple:
 
     # (queryset of instances of self.model that are related to passed in instances,
@@ -1844,7 +1691,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     # in a dictionary.
 
     rel_qs, rel_obj_attr, instance_attr, single, cache_name =\
-        prefetcher.get_prefetch_query_set(instances)
+        prefetcher.get_prefetch_queryset(instances)
     # We have to handle the possibility that the default manager itself added
     # prefetch_related lookups to the QuerySet we just got back. We don't want to
     # trigger the prefetch_related functionality by evaluating the query.

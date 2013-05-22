@@ -203,9 +203,6 @@ We see a template system as a tool that controls presentation and
 presentation-related logic -- and that's it. The template system shouldn't
 support functionality that goes beyond this basic goal.
 
-If we wanted to put everything in templates, we'd be using PHP. Been there,
-done that, wised up.
-
 Discourage redundancy
 ---------------------
 

@@ -19,6 +19,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
+from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
@@ -70,7 +71,7 @@ class CachedFilesMixin(object):
                     pattern, template = pattern
                 else:
                     template = self.default_template
-                compiled = re.compile(pattern)
+                compiled = re.compile(pattern, re.IGNORECASE)
                 self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
@@ -250,7 +251,10 @@ class CachedFilesMixin(object):
                     for patterns in self._patterns.values():
                         for pattern, template in patterns:
                             converter = self.url_converter(name, template)
-                            content = pattern.sub(converter, content)
+                            try:
+                                content = pattern.sub(converter, content)
+                            except ValueError as exc:
+                                yield name, None, exc
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
@@ -296,7 +300,7 @@ class AppStaticStorage(FileSystemStorage):
         """
         # app is the actual app module
         mod = import_module(app)
-        mod_path = os.path.dirname(mod.__file__)
+        mod_path = os.path.dirname(upath(mod.__file__))
         location = os.path.join(mod_path, self.source_dir)
         super(AppStaticStorage, self).__init__(location, *args, **kwargs)
 

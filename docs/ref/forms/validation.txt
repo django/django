@@ -181,24 +181,23 @@ the field's ``validators`` argument, or defined on the Field class itself with
 the ``default_validators`` attribute.
 
 Simple validators can be used to validate values inside the field, let's have
-a look at Django's ``EmailField``::
+a look at Django's ``SlugField``::
 
-    class EmailField(CharField):
-        default_error_messages = {
-            'invalid': _('Enter a valid email address.'),
-        }
-        default_validators = [validators.validate_email]
+    from django.forms import CharField
+    from django.core import validators
 
-As you can see, ``EmailField`` is just a ``CharField`` with customized error
-message and a validator that validates email addresses. This can also be done
-on field definition so::
+    class SlugField(CharField):
+        default_validators = [validators.validate_slug]
 
-    email = forms.EmailField()
+As you can see, ``SlugField`` is just a ``CharField`` with a customized
+validator that validates that submitted text obeys to some character rules.
+This can also be done on field definition so::
+
+    slug = forms.SlugField()
 
 is equivalent to::
 
-    email = forms.CharField(validators=[validators.validate_email],
-            error_messages={'invalid': _('Enter a valid email address.')})
+    slug = forms.CharField(validators=[validators.validate_slug])
 
 
 Form field default cleaning
@@ -256,6 +255,8 @@ we want to make sure that the ``recipients`` field always contains the address
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -293,6 +294,8 @@ common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
+    from django import forms
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -324,6 +327,8 @@ since it can lead to confusing form output. We're showing what is possible
 here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
+
+    from django import forms
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -363,7 +368,7 @@ considering aren't valid, we must remember to remove them from the
 
 .. versionchanged:: 1.5
 
-Django used to remove the ``cleaned_data`` attribute entirely if there were
-any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
-the form doesn't validate, but it contains only field values that did
-validate.
+    Django used to remove the ``cleaned_data`` attribute entirely if there were
+    any errors in the form. Since version 1.5, ``cleaned_data`` is present even if
+    the form doesn't validate, but it contains only field values that did
+    validate.

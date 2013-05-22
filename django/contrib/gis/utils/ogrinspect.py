@@ -123,7 +123,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     to the given data source.  See the `ogrinspect` docstring for more details.
     """
     # Getting the DataSource
-    if isinstance(data_source, str):
+    if isinstance(data_source, six.string_types):
         data_source = DataSource(data_source)
     elif isinstance(data_source, DataSource):
         pass

@@ -28,9 +28,9 @@ Building from source
 
 First download the source archive, and extract::
 
-    $ wget http://postgis.refractions.net/download/postgis-2.0.1.tar.gz
-    $ tar xzf postgis-2.0.1.tar.gz
-    $ cd postgis-2.0.1
+    $ wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
+    $ tar xzf postgis-2.0.3.tar.gz
+    $ cd postgis-2.0.3
 
 Next, configure, make and install PostGIS::
 
@@ -56,10 +56,10 @@ Post-installation
 .. _spatialdb_template:
 .. _spatialdb_template91:
 
-Creating a spatial database with PostGIS 2.0 and PostgreSQL 9.1
----------------------------------------------------------------
+Creating a spatial database with PostGIS 2.0 and PostgreSQL 9.1+
+----------------------------------------------------------------
 
-PostGIS 2 includes an extension for Postgres 9.1 that can be used to enable
+PostGIS 2 includes an extension for Postgres 9.1+ that can be used to enable
 spatial functionality::
 
     $ createdb  <db name>
@@ -166,8 +166,8 @@ Managing the database
 ---------------------
 
 To administer the database, you can either use the pgAdmin III program
-(:menuselection:`Start --> PostgreSQL 9.0 --> pgAdmin III`) or the
-SQL Shell (:menuselection:`Start --> PostgreSQL 9.0 --> SQL Shell`).
+(:menuselection:`Start --> PostgreSQL 9.x --> pgAdmin III`) or the
+SQL Shell (:menuselection:`Start --> PostgreSQL 9.x --> SQL Shell`).
 For example, to create a ``geodjango`` spatial database and user, the following
 may be executed from the SQL Shell as the ``postgres`` user::
 

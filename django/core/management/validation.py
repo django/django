@@ -27,7 +27,6 @@ def get_validation_errors(outfile, app=None):
     """
     from django.db import models, connection
     from django.db.models.loading import get_app_errors
-    from django.db.models.fields.related import RelatedObject
     from django.db.models.deletion import SET_NULL, SET_DEFAULT
 
     e = ModelErrorCollection(outfile)
@@ -35,7 +34,7 @@ def get_validation_errors(outfile, app=None):
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
 
-    for cls in models.get_models(app):
+    for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
         # Check swappable attribute.
@@ -50,11 +49,15 @@ def get_validation_errors(outfile, app=None):
             # No need to perform any other validation checks on a swapped model.
             continue
 
-        # This is the current User model. Check known validation problems with User models
+        # If this is the current User model, check known validation problems with User models
         if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
                 e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
+
+            # Check that the username field is unique
+            if not opts.get_field(cls.USERNAME_FIELD).unique:
+                e.add(opts, 'The USERNAME_FIELD must be unique. Add unique=True to the field parameters.')
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
@@ -102,14 +105,10 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
-                # Try to import PIL in either of the two ways it can end up installed.
                 try:
-                    from PIL import Image
+                    from django.utils.image import Image
                 except ImportError:
-                    try:
-                        import Image
-                    except ImportError:
-                        e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+                    e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
                 e.add(opts, '"%s": BooleanFields do not accept null values. Use a NullBooleanField instead.' % f.name)
             if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
@@ -119,8 +118,8 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
-                        if not isinstance(c, (list, tuple)) or len(c) != 2:
-                            e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
+                        if isinstance(c, six.string_types) or not is_iterable(c) or len(c) != 2:
+                            e.add(opts, '"%s": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
@@ -138,22 +137,31 @@ def get_validation_errors(outfile, app=None):
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
                 if f.rel.to not in models.get_models():
-                    e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+                    # If the related model is swapped, provide a hint;
+                    # otherwise, the model just hasn't been installed.
+                    if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                        e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+                    else:
+                        e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
                     continue
 
-                # Make sure the model we're related hasn't been swapped out
-                if f.rel.to._meta.swapped:
-                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
-
                 # Make sure the related field specified by a ForeignKey is unique
-                if not f.rel.to._meta.get_field(f.rel.field_name).unique:
-                    e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
+                if f.requires_unique_target:
+                    if len(f.foreign_related_fields) > 1:
+                        has_unique_field = False
+                        for rel_field in f.foreign_related_fields:
+                            has_unique_field = has_unique_field or rel_field.unique
+                        if not has_unique_field:
+                            e.add(opts, "Field combination '%s' under model '%s' must have a unique=True constraint" % (','.join([rel_field.name for rel_field in f.foreign_related_fields]), f.rel.to.__name__))
+                    else:
+                        if not f.foreign_related_fields[0].unique:
+                            e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.foreign_related_fields[0].name, f.rel.to.__name__))
 
                 rel_opts = f.rel.to._meta
-                rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                rel_name = f.related.get_accessor_name()
                 rel_query_name = f.related_query_name()
                 if not f.rel.is_hidden():
                     for r in rel_opts.fields:
@@ -184,15 +192,17 @@ def get_validation_errors(outfile, app=None):
             # existing fields, m2m fields, m2m related objects or related
             # objects
             if f.rel.to not in models.get_models():
-                e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+                # If the related model is swapped, provide a hint;
+                # otherwise, the model just hasn't been installed.
+                if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
+                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+                else:
+                    e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
                     continue
-
-            # Make sure the model we're related hasn't been swapped out
-            if f.rel.to._meta.swapped:
-                e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
 
             # Check that the field is not set to unique.  ManyToManyFields do not support unique.
             if f.unique:
@@ -275,7 +285,7 @@ def get_validation_errors(outfile, app=None):
                 )
 
             rel_opts = f.rel.to._meta
-            rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
             # If rel_name is none, there is no reverse accessor (this only
             # occurs for symmetrical m2m relations to self). If this is the

@@ -13,65 +13,11 @@ from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_str, force_text, iri_to_uri
 
+# For backwards compatibility -- lots of code uses this in the wild!
+from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
+
 logger = logging.getLogger('django.request')
 
-
-# See http://www.iana.org/assignments/http-status-codes
-STATUS_CODE_TEXT = {
-    100: 'CONTINUE',
-    101: 'SWITCHING PROTOCOLS',
-    102: 'PROCESSING',
-    200: 'OK',
-    201: 'CREATED',
-    202: 'ACCEPTED',
-    203: 'NON-AUTHORITATIVE INFORMATION',
-    204: 'NO CONTENT',
-    205: 'RESET CONTENT',
-    206: 'PARTIAL CONTENT',
-    207: 'MULTI-STATUS',
-    208: 'ALREADY REPORTED',
-    226: 'IM USED',
-    300: 'MULTIPLE CHOICES',
-    301: 'MOVED PERMANENTLY',
-    302: 'FOUND',
-    303: 'SEE OTHER',
-    304: 'NOT MODIFIED',
-    305: 'USE PROXY',
-    306: 'RESERVED',
-    307: 'TEMPORARY REDIRECT',
-    400: 'BAD REQUEST',
-    401: 'UNAUTHORIZED',
-    402: 'PAYMENT REQUIRED',
-    403: 'FORBIDDEN',
-    404: 'NOT FOUND',
-    405: 'METHOD NOT ALLOWED',
-    406: 'NOT ACCEPTABLE',
-    407: 'PROXY AUTHENTICATION REQUIRED',
-    408: 'REQUEST TIMEOUT',
-    409: 'CONFLICT',
-    410: 'GONE',
-    411: 'LENGTH REQUIRED',
-    412: 'PRECONDITION FAILED',
-    413: 'REQUEST ENTITY TOO LARGE',
-    414: 'REQUEST-URI TOO LONG',
-    415: 'UNSUPPORTED MEDIA TYPE',
-    416: 'REQUESTED RANGE NOT SATISFIABLE',
-    417: 'EXPECTATION FAILED',
-    422: 'UNPROCESSABLE ENTITY',
-    423: 'LOCKED',
-    424: 'FAILED DEPENDENCY',
-    426: 'UPGRADE REQUIRED',
-    500: 'INTERNAL SERVER ERROR',
-    501: 'NOT IMPLEMENTED',
-    502: 'BAD GATEWAY',
-    503: 'SERVICE UNAVAILABLE',
-    504: 'GATEWAY TIMEOUT',
-    505: 'HTTP VERSION NOT SUPPORTED',
-    506: 'VARIANT ALSO NEGOTIATES',
-    507: 'INSUFFICIENT STORAGE',
-    508: 'LOOP DETECTED',
-    510: 'NOT EXTENDED',
-}
 
 class LimitedStream(object):
     '''
@@ -128,19 +74,16 @@ class LimitedStream(object):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
-        path_info = force_text(environ.get('PATH_INFO', '/'))
-        if not path_info or path_info == script_name:
+        path_info = base.get_path_info(environ)
+        if not path_info:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
             # operate as if they'd requested '/'. Not amazingly nice to force
             # the path like this, but should be harmless.
-            #
-            # (The comparison of path_info to script_name is to work around an
-            # apparent bug in flup 1.0.1. See Django ticket #8490).
             path_info = '/'
         self.environ = environ
         self.path_info = path_info
-        self.path = '%s%s' % (script_name, path_info)
+        self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
@@ -253,14 +196,10 @@ class WSGIHandler(base.BaseHandler):
             response = http.HttpResponseBadRequest()
         else:
             response = self.get_response(request)
-        finally:
-            signals.request_finished.send(sender=self.__class__)
 
-        try:
-            status_text = STATUS_CODE_TEXT[response.status_code]
-        except KeyError:
-            status_text = 'UNKNOWN STATUS CODE'
-        status = '%s %s' % (response.status_code, status_text)
+        response._handler_class = self.__class__
+
+        status = '%s %s' % (response.status_code, response.reason_phrase)
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))

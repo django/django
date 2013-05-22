@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2011, 2012.
+# Alireza Savand <alireza.savand@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Sina Cheraghi <sinacher@gmail.com>, 2011.
 msgid ""
@@ -9,15 +10,15 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Sina Cheraghi <sinacher@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"PO-Revision-Date: 2012-08-11 08:33+0000\n"
+"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -30,11 +31,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"این لیست%s های  در دسترس است. شما ممکن است برخی از آنها را در محل  زیرانتخاب "
+"نمایید و سپس روی \"انتخاب\" بین دو جعبه کلیک کنید."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "درون این جعبه تایپ کنید تا لیست %s های موجود فیلتر شود."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -47,11 +50,11 @@ msgstr "انتخاب همه"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "کلیک کنید را انتخاب کنید تمام %s را در یک بار."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "انتخاب"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -68,15 +71,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"این فهرست %s های انتخاب شده است. شما ممکن است برخی از انتخاب آنها را در محل "
+"زیر وارد نمایید و سپس روی \"حذف\" جهت دار بین دو جعبه حذف شده است."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "حذف همه"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "کلیک کنید تا تمام %s های انتخاب شده حذف شوند."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

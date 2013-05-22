@@ -34,6 +34,8 @@ that, you need to :meth:`~Model.save()`.
 
     1. Add a classmethod on the model class::
 
+        from django.db import models
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
@@ -105,6 +107,7 @@ individually.
 You'll need to call ``full_clean`` manually when you want to run one-step model
 validation for your own manually created models. For example::
 
+    from django.core.exceptions import ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
@@ -132,6 +135,7 @@ automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
     def clean(self):
+        import datetime
         from django.core.exceptions import ValidationError
         # Don't allow draft entries to have a pub_date.
         if self.status == 'draft' and self.pub_date is not None:
@@ -292,12 +296,14 @@ follows this algorithm:
 
 * If the object's primary key attribute is set to a value that evaluates to
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
-  executes a ``SELECT`` query to determine whether a record with the given
-  primary key already exists.
-* If the record with the given primary key does already exist, Django
-  executes an ``UPDATE`` query.
-* If the object's primary key attribute is *not* set, or if it's set but a
-  record doesn't exist, Django executes an ``INSERT``.
+  executes an ``UPDATE``.
+* If the object's primary key attribute is *not* set or if the ``UPDATE``
+  didn't update anything, Django executes an ``INSERT``.
+
+.. versionchanged:: 1.6
+
+    Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
+    algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
@@ -378,7 +384,7 @@ If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
 This may be desirable if you want to update just one or a few fields on
 an object. There will be a slight performance benefit from preventing
-all of the model fields from being updated in the database. For example:
+all of the model fields from being updated in the database. For example::
 
     product.name = 'Name changed again'
     product.save(update_fields=['name'])
@@ -432,6 +438,8 @@ representation of the model from the ``__unicode__()`` method.
 
 For example::
 
+    from django.db import models
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -458,6 +466,9 @@ Thus, you should return a nice, human-readable string for the object's
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::
 
+    from django.db import models
+    from django.utils.encoding import force_bytes
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -482,9 +493,14 @@ For example::
         return "/people/%i/" % self.id
 
 (Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`permalink() decorator <permalink>`,
-documented below, is usually the best approach and you should read that section
-before diving into code implementation.)
+write this kind of method. The :func:`~django.core.urlresolvers.reverse`
+function is usually the best approach.)
+
+For example::
+
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -529,11 +545,19 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The way we wrote ``get_absolute_url()`` above is a slightly violation of the
-DRY principle: the URL for this object is defined both in the URLconf file and
-in the model.
+.. warning::
 
-You can decouple your models from the URLconf using the ``permalink`` decorator:
+    The ``permalink`` decorator is no longer recommended. You should use
+    :func:`~django.core.urlresolvers.reverse` in the body of your
+    ``get_absolute_url`` method instead.
+
+In early versions of Django, there wasn't an easy way to use URLs defined in
+URLconf file inside :meth:`~django.db.models.Model.get_absolute_url`. That
+meant you would need to define the URL both in URLConf and
+:meth:`~django.db.models.Model.get_absolute_url`. The ``permalink`` decorator
+was added to overcome this DRY principle violation. However, since the
+introduction of :func:`~django.core.urlresolvers.reverse` there is no
+reason to use ``permalink`` any more.
 
 .. function:: permalink()
 
@@ -544,14 +568,14 @@ correct URL, with all parameters substituted in the correct positions.
 
 The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
 template tag and a high-level wrapper for the
-:func:`django.core.urlresolvers.reverse()` function.
+:func:`~django.core.urlresolvers.reverse` function.
 
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-...your model could have a :meth:`~django.db.models.Model.get_absolute_url()`
+...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
 method that looked like this::
 
     from django.db import models
@@ -589,7 +613,7 @@ pattern, it's possible to give a name to a pattern, and then reference the name
 rather than the view function. A named URL pattern is defined by replacing the
 pattern tuple by a call to the ``url`` function)::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url
 
     url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 
@@ -647,7 +671,7 @@ For every :class:`~django.db.models.DateField` and
 <django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-a :exc:`~django.db.DoesNotExist` exception when appropriate.
+a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
 described in :ref:`Field lookups <field-lookups>`.

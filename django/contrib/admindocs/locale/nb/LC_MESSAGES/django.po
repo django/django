@@ -7,73 +7,85 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-12 14:15+0000\n"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-22 08:46+0000\n"
 "Last-Translator: jonklo <jonklo@gmail.com>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.net/projects/p/django/"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
-"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: nb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "tag:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "filter:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "view:"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "Fant ikke applikasjonen %r"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Fant ikke modellen %(model_name)r i applikasjonen %(app_label)r"
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "det relaterte `%(app_label)s.%(data_type)s`-objektet"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "modell:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "relaterte `%(app_label)s.%(object_name)s`-objekter"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "alle %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "antall %s"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Felter på %s-objekter"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s ser ikke ut til å være et urlpattern-objekt"
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "Hjem"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -84,30 +96,18 @@ msgstr "%s ser ikke ut til å være et urlpattern-objekt"
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "Hjem"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "Dokumentasjon"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "Bokmerker"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Dokumentasjonsbokmerker"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -125,11 +125,11 @@ msgstr ""
 "(kontakt din systemadministrator hvis du er usikker på om maskinen din er "
 "\"intern\").</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Dokumentasjon for denne siden"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -137,11 +137,11 @@ msgstr ""
 "Hopp fra hvilken som helst side til dokumentasjonen for visningsfunksjonen "
 "som genererte den siden."
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Vis objekt-ID"
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -149,41 +149,50 @@ msgstr ""
 "Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
 "objekt."
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Rediger dette objektet (nåværende vindu)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Hopper til administrasjonssiden for sider som representerer et enkelt objekt."
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Rediger dette objektet (nytt vindu)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Samme som over, men åpner administrasjonssiden i et nytt vindu."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
 msgstr "Modeller"
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Maler"
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Filter"
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Tags"
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
 msgstr "Views"
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "Boolsk (True eller False)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Felt av typen: %(field_type)s"

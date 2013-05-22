@@ -29,17 +29,20 @@ body.login {
 }
 
 .login .form-row label {
-    float: left;
-    width: 9em;
     padding-right: 0.5em;
     line-height: 2em;
-    text-align: right;
     font-size: 1em;
+    clear: both;
     color: #333;
 }
 
 .login .form-row #id_username, .login .form-row #id_password {
-    width: 14em;
+    clear: both;
+    padding: 6px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 .login span.help {

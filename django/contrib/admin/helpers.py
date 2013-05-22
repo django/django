@@ -186,9 +186,7 @@ class AdminReadonlyField(object):
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:
-                if value is None:
-                    result_repr = EMPTY_CHANGELIST_VALUE
-                elif isinstance(f.rel, ManyToManyRel):
+                if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
@@ -226,19 +224,20 @@ class InlineAdminFormSet(object):
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
-        for i, field in enumerate(flatten_fieldsets(self.fieldsets)):
-            if fk and fk.name == field:
+        for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
+            if fk and fk.name == field_name:
                 continue
-            if field in self.readonly_fields:
+            if field_name in self.readonly_fields:
                 yield {
-                    'label': label_for_field(field, self.opts.model, self.opts),
+                    'label': label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {
                         'is_hidden': False
                     },
-                    'required': False
+                    'required': False,
+                    'help_text': help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                yield self.formset.form.base_fields[field]
+                yield self.formset.form.base_fields[field_name]
 
     def _media(self):
         media = self.opts.media + self.formset.media

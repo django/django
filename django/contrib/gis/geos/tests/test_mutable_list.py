@@ -363,6 +363,7 @@ class ListMixinTest(unittest.TestCase):
 
         pl, ul = self.lists_of_len()
         self.assertEqual(pl, ul, 'cmp for equal')
+        self.assertFalse(ul == pl + [2], 'cmp for not equal')
         self.assertTrue(pl >= ul, 'cmp for gte self')
         self.assertTrue(pl <= ul, 'cmp for lte self')
         self.assertTrue(ul >= pl, 'cmp for self gte')
@@ -377,6 +378,14 @@ class ListMixinTest(unittest.TestCase):
         self.assertTrue(ul < pl + [2], 'cmp')
         self.assertTrue(ul <= pl + [2], 'cmp')
 
+        # Also works with a custom IndexError
+        ul_longer = ul + [2]
+        ul_longer._IndexError = TypeError
+        ul._IndexError = TypeError
+        self.assertFalse(ul_longer == pl)
+        self.assertFalse(ul == ul_longer)
+        self.assertTrue(ul_longer > ul)
+
         pl[1] = 20
         self.assertTrue(pl > ul, 'cmp for gt self')
         self.assertTrue(ul < pl, 'cmp for self lt')
@@ -386,15 +395,3 @@ class ListMixinTest(unittest.TestCase):
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(ListMixinTest))
-    s.addTest(unittest.makeSuite(ListMixinTestSingle))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-if __name__ == '__main__':
-    run()
