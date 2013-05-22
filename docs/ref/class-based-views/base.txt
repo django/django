@@ -55,7 +55,7 @@ View
 
         Default::
 
-            ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
     **Methods**
 
