@@ -542,7 +542,8 @@ class AdminViewBasicTest(TestCase):
                 self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        self.client.get, "/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy"
+        response = self.client.get("/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy")
+        self.assertEqual(response.status_code, 400)
 
         # Filters are allowed if explicitly included in list_filter
         response = self.client.get("/test_admin/admin/admin_views/thing/?color__value__startswith=red")
