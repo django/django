@@ -6,6 +6,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils.module_loading import import_by_path
 from django.utils._os import upath
@@ -138,16 +139,28 @@ class ConnectionDoesNotExist(Exception):
 
 
 class ConnectionHandler(object):
-    def __init__(self, databases):
-        if not databases:
-            self.databases = {
+    def __init__(self, databases=None):
+        """
+        databases is an optional dictionary of database definitions (structured
+        like settings.DATABASES.
+        """
+        if databases == {}:
+            self._databases = {
                 DEFAULT_DB_ALIAS: {
                     'ENGINE': 'django.db.backends.dummy',
                 },
             }
         else:
-            self.databases = databases
+            self._databases = databases
         self._connections = local()
+
+    @cached_property
+    def databases(self):
+        if self._databases is None:
+            self._databases = settings.DATABASES
+            if self._databases and DEFAULT_DB_ALIAS not in self._databases:
+                raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
+        return self._databases
 
     def ensure_defaults(self, alias):
         """
@@ -202,14 +215,23 @@ class ConnectionHandler(object):
 
 
 class ConnectionRouter(object):
-    def __init__(self, routers):
-        self.routers = []
-        for r in routers:
+    def __init__(self, routers=None):
+        """
+        If routers is not specified, will default to settings.DATABASE_ROUTERS.
+        """
+        self._routers = routers
+
+    @cached_property
+    def routers(self):
+        if self._routers is None:
+            self._routers = settings.DATABASE_ROUTERS
+        for r in self._routers:
             if isinstance(r, six.string_types):
                 router = import_by_path(r)()
             else:
                 router = r
-            self.routers.append(router)
+            self._routers.append(router)
+        return self._routers
 
     def _router_func(action):
         def _route_db(self, model, **hints):

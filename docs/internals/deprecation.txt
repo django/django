@@ -373,6 +373,7 @@ these changes.
 
 * The following private APIs will be removed:
 
+  - ``django.db.backend``
   - ``django.db.close_connection()``
   - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
   - ``django.db.transaction.is_managed()``
