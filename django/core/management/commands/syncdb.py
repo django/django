@@ -1,11 +1,12 @@
 from optparse import make_option
+import itertools
 import traceback
 
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
-from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal
+from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
@@ -79,6 +80,9 @@ class Command(NoArgsCommand):
             (app_name, list(filter(model_installed, model_list)))
             for app_name, model_list in all_models
         )
+
+        create_models = set([x for x in itertools.chain(*manifest.values())])
+        emit_pre_sync_signal(create_models, verbosity, interactive, db)
 
         # Create the tables for each model
         if verbosity >= 1:

@@ -137,6 +137,7 @@ def sql_indexes(app, style, connection):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
+
 def sql_destroy_indexes(app, style, connection):
     "Returns a list of the DROP INDEX SQL statements for all models in the given app."
     output = []
@@ -189,6 +190,19 @@ def custom_sql_for_model(model, style, connection):
                 # so split into separate statements.
                 output.extend(_split_statements(fp.read()))
     return output
+
+
+def emit_pre_sync_signal(create_models, verbosity, interactive, db):
+    # Emit the pre_sync signal for every application.
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if verbosity >= 2:
+            print("Running pre-sync handlers for application %s" % app_name)
+        models.signals.pre_syncdb.send(sender=app, app=app,
+                                       create_models=create_models,
+                                       verbosity=verbosity,
+                                       interactive=interactive,
+                                       db=db)
 
 
 def emit_post_sync_signal(created_models, verbosity, interactive, db):

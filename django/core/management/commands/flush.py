@@ -20,7 +20,7 @@ class Command(NoArgsCommand):
             default=DEFAULT_DB_ALIAS, help='Nominates a database to flush. '
                 'Defaults to the "default" database.'),
         make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
- 		            help='Tells Django not to load any initial data after database synchronization.'),
+            help='Tells Django not to load any initial data after database synchronization.'),
     )
     help = ('Returns the database to the state it was in immediately after '
            'syncdb was executed. This means that all data will be removed '
