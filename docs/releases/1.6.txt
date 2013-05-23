@@ -342,8 +342,8 @@ by the ``pk_url_kwarg``, ``slug_field``, and ``slug_url_kwarg`` attributes.
 These have now been replaced with a single ``lookup_field`` attribute.
 
 The ``lookup_field`` attribute should correspond with the model field that
-should be used for object lookups, and should also correspond with a named
-argument in the URLconf.
+is used for object lookups, and should also correspond with a named argument
+in the URLconf.
 
 The default value for the ``lookup_field`` attribute is ``'pk'``.  If you are
 using ``slug`` lookups for a :class:`DetailView`, you should now explicitly
