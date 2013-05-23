@@ -148,13 +148,13 @@ class Storage(object):
 
     def move(self, src_name, dst_name):
         """
-        Move file specified by src_name to dst_name.
+        Move the file specified by src_name to dst_name.
         """
         raise NotImplementedError()
 
     def copy(self, src_name, dst_name):
         """
-        Copy file specified by src_name to dst_name.
+        Copy the file specified by src_name to dst_name.
         """
         raise NotImplementedError()
 
