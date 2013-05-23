@@ -16,7 +16,7 @@ from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
 
-from .html_parser import HTMLParser
+from .html_parser import HTMLParser, HTMLParseError
 
 
 # Configuration for urlize() function.
@@ -136,13 +136,13 @@ class MLStripper(HTMLParser):
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     s = MLStripper()
-    s.feed(value)
-    data = s.get_data()
     try:
-        res = s.close()
-    except Exception as e:
-        data += s.rawdata
-    return data
+        s.feed(value)
+        s.close()
+    except HTMLParseError:
+        return value
+    else:
+        return s.get_data()
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
