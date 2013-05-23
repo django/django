@@ -255,3 +255,7 @@ class Colour(models.Model):
 class ColourfulItem(models.Model):
     name = models.CharField(max_length=50)
     colours = models.ManyToManyField(Colour)
+
+class ArticleStatusNote(models.Model):
+    name = models.CharField(max_length=20)
+    status = models.ManyToManyField(ArticleStatus)

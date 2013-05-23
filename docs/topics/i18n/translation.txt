@@ -698,7 +698,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
 
 .. code-block:: html+django
 
-    {# Translators: Label of a button that triggers search{% endcomment #}
+    {# Translators: Label of a button that triggers search #}
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}

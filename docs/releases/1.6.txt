@@ -258,6 +258,9 @@ Minor features
   methods returning the first or last object matching the filters. Returns
   ``None`` if there are no objects matching.
 
+* :class:`~django.views.generic.base.View` and
+  :class:`~django.views.generic.base.RedirectView` now support HTTP PATCH method.
+
 * :exc:`~django.core.exceptions.SuspiciousOperation` has been differentiated
   into a number of subclasses, and each will log to a matching named logger
   under the ``django.security`` logging hierarchy of ``django.security`` when
@@ -525,10 +528,10 @@ facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
 and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
 what's described in :ref:`m2m-help_text-deprecation` below.
 
-This is because, as an temporary backward-compatible provision, the described
-non-standard behavior has been preserved but moved to the model form field layer
-and occurs only when the associated widget is
-:class:`~django.forms.SelectMultiple` or a subclass.
+This is because, as an ad-hoc temporary backward-compatibility provision, the
+described non-standard behavior has been preserved but moved to the model form
+field layer and occurs only when the associated widget is
+:class:`~django.forms.SelectMultiple` or selected subclasses.
 
 QuerySet iteration
 ~~~~~~~~~~~~~~~~~~

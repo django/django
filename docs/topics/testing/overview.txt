@@ -925,13 +925,22 @@ to test the effects of commit and rollback:
 
 * A ``TestCase``, on the other hand, does not truncate tables after a test.
   Instead, it encloses the test code in a database transaction that is rolled
-  back at the end of the test.  It also prevents the code under test from
-  issuing any commit or rollback operations on the database, to ensure that the
-  rollback at the end of the test restores the database to its initial state.
+  back at the end of the test. Both explicit commits like
+  ``transaction.commit()`` and implicit ones that may be caused by
+  ``Model.save()`` are replaced with a ``nop`` operation. This guarantees that
+  the rollback at the end of the test restores the database to its initial
+  state.
 
   When running on a database that does not support rollback (e.g. MySQL with the
   MyISAM storage engine), ``TestCase`` falls back to initializing the database
   by truncating tables and reloading initial data.
+
+.. warning::
+
+    While ``commit`` and ``rollback`` operations still *appear* to work when
+    used in ``TestCase``, no actual commit or rollback will be performed by the
+    database. This can cause your tests to pass or fail unexpectedly. Always
+    use ``TransactionalTestCase`` when testing transactional behavior.
 
 .. note::
 

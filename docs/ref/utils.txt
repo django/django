@@ -490,7 +490,7 @@ Atom1Feed
 
 Usually you should build up HTML using Django's templates to make use of its
 autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
-where appropriate. This module provides some additional low level utilitiesfor
+where appropriate. This module provides some additional low level utilities for
 escaping HTML.
 
 .. function:: escape(text)
@@ -564,7 +564,13 @@ escaping HTML.
         strip_tags(value)
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel is a slug"``.
+    return value will be ``"Joel is a slug"``. Note that ``strip_tags`` result
+    may still contain unsafe HTML content, so you might use
+    :func:`~django.utils.html.escape` to make it a safe string.
+
+    .. versionchanged:: 1.6
+
+        For improved safety, ``strip_tags`` is now parser-based.
 
 .. function:: remove_tags(value, tags)
 

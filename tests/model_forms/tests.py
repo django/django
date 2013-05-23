@@ -24,7 +24,7 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    test_images)
+    ArticleStatusNote, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -233,6 +233,20 @@ class ColourfulItemForm(forms.ModelForm):
     class Meta:
         model = ColourfulItem
         fields = '__all__'
+
+# model forms for testing work on #9321:
+
+class StatusNoteForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+
+
+class StatusNoteCBM2mForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+        widgets = {'status': forms.CheckboxSelectMultiple}
 
 
 class ModelFormBaseTest(TestCase):
@@ -1677,3 +1691,22 @@ class OldFormForXTests(TestCase):
         <option value="%(blue_pk)s">Blue</option>
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
+
+
+class M2mHelpTextTest(TestCase):
+    """Tests for ticket #9321."""
+    def test_multiple_widgets(self):
+        """Help text of different widgets for ManyToManyFields model fields"""
+        dreaded_help_text = '<span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span>'
+
+        # Default widget (SelectMultiple):
+        std_form = StatusNoteForm()
+        self.assertInHTML(dreaded_help_text, std_form.as_p())
+
+        # Overridden widget (CheckboxSelectMultiple, a subclass of
+        # SelectMultiple but with a UI that doesn't involve Control/Command
+        # keystrokes to extend selection):
+        form = StatusNoteCBM2mForm()
+        html = form.as_p()
+        self.assertInHTML('<ul id="id_status">', html)
+        self.assertInHTML(dreaded_help_text, html, count=0)

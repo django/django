@@ -13,6 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import translation
 from django.utils.html import conditional_escape
 from django.utils.unittest import TestCase
@@ -138,6 +139,17 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testInheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
+
+    def test_m2m_widgets(self):
+        """m2m fields help text as it applies to admin app (#9321)."""
+        class AdvisorAdmin(admin.ModelAdmin):
+            filter_vertical=['companies']
+
+        self.assertFormfield(models.Advisor, 'companies', widgets.FilteredSelectMultiple,
+                             filter_vertical=['companies'])
+        ma = AdvisorAdmin(models.Advisor, admin.site)
+        f = ma.formfield_for_dbfield(models.Advisor._meta.get_field('companies'), request=None)
+        self.assertEqual(six.text_type(f.help_text), ' Hold down "Control", or "Command" on a Mac, to select more than one.')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
