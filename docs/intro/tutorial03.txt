@@ -336,7 +336,7 @@ Put the following code in that template:
         <p>No polls are available.</p>
     {% endif %}
 
-Now let's use that html template in our index view::
+Now let's update our ``index`` view in ``polls/views.py`` to use the template::
 
     from django.http import HttpResponse
     from django.template import Context, loader
