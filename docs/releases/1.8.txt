@@ -321,7 +321,6 @@ Email
 
 File Storage
 ^^^^^^^^^^^^
-
 * :meth:`Storage.get_available_name()
   <django.core.files.storage.Storage.get_available_name>` and
   :meth:`Storage.save() <django.core.files.storage.Storage.save>`
@@ -331,6 +330,11 @@ File Storage
   long filename that already exists on the storage. See the :ref:`deprecation
   note <storage-max-length-update>` about adding this argument to your custom
   storage classes.
+
+* :class:`~django.core.files.storage.Storage` and
+  :class:`~django.core.files.storage.FileSystemStorage` now have
+  :meth:`~django.core.files.storage.Storage.move()` and
+  :meth:`~django.core.files.storage.Storage.copy()` methods
 
 File Uploads
 ^^^^^^^^^^^^
