@@ -7,18 +7,21 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.exceptions import SuspiciousOperation
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import QueryDict
+from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils._os import upath
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.middleware.csrf import CsrfViewMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm, PasswordResetForm)
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.auth.views import login as login_view
 
 
 @override_settings(
@@ -360,6 +363,41 @@ class LoginTest(AuthViewsTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertTrue(good_url in response['Location'],
                             "%s should be allowed" % good_url)
+
+    def test_login_csrf_rotate(self, password='password'):
+        """
+        Makes sure that a login rotates the currently-used CSRF token.
+        """
+        # Do a GET to establish a CSRF token
+        # TestClient isn't used here as we're testing middleware, essentially.
+        req = HttpRequest()
+        CsrfViewMiddleware().process_view(req, login_view, (), {})
+        req.META["CSRF_COOKIE_USED"] = True
+        resp = login_view(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token1 = csrf_cookie.coded_value
+
+        # Prepare the POST request
+        req = HttpRequest()
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
+        req.method = "POST"
+        req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
+        req.REQUEST = req.POST
+
+        # Use POST request to log in
+        SessionMiddleware().process_request(req)
+        CsrfViewMiddleware().process_view(req, login_view, (), {})
+        req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
+        req.META["SERVER_PORT"] = 80
+        req.META["CSRF_COOKIE_USED"] = True
+        resp = login_view(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token2 = csrf_cookie.coded_value
+
+        # Check the CSRF token switched
+        self.assertNotEqual(token1, token2)
 
 
 @skipIfCustomUser

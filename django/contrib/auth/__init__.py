@@ -2,6 +2,7 @@ import re
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.middleware.csrf import rotate_token
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
 SESSION_KEY = '_auth_user_id'
@@ -92,6 +93,7 @@ def login(request, user):
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):
         request.user = user
+    rotate_token(request)
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 
