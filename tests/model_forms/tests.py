@@ -24,7 +24,7 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    test_images)
+    EmptyKeySource, EmptyKeySink, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -1665,6 +1665,15 @@ class OldFormForXTests(TestCase):
                          ['name'])
         self.assertHTMLEqual(six.text_type(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')
+
+    def test_foreignkeys_which_use_to_field_and_blank_string_key(self):
+        source_n = EmptyKeySource.objects.create(name="")
+        source_a = EmptyKeySource.objects.create(name="a")
+        source_b = EmptyKeySource.objects.create(name="b")
+
+        sink_n = EmptyKeySink.objects.create(title="Hello", source=source_n)
+
+        self.assertEqual(sink_n.source, source_n)
 
     def test_iterable_model_m2m(self) :
         colour = Colour.objects.create(name='Blue')

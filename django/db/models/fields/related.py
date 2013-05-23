@@ -1194,7 +1194,9 @@ class ForeignKey(ForeignObject):
         return field_default
 
     def get_db_prep_save(self, value, connection):
-        if value == '' or value == None:
+        if (value == None or
+            (connection.features.interprets_empty_strings_as_nulls 
+             and value == '')):
             return None
         else:
             return self.related_field.get_db_prep_save(value,

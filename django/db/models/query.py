@@ -1288,9 +1288,12 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0,
 
 
     fields = row[index_start : index_start + field_count]
-    # If the pk column is None (or the Oracle equivalent ''), then the related
+    # If the pk column is None (or the equivalent '' in the case the
+    # connection interprets empty strings as nulls), then the related
     # object must be non-existent - set the relation to None.
-    if fields[pk_idx] == None or fields[pk_idx] == '':
+    if (fields[pk_idx] == None or
+        (connections[using].features.interprets_empty_strings_as_nulls 
+         and fields[pk_idx] == '')):
         obj = None
     elif field_names:
         fields = list(fields)

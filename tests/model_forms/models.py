@@ -241,6 +241,14 @@ class FlexibleDatePost(models.Model):
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField(blank=True, null=True)
 
+
+class EmptyKeySource(models.Model):
+    name = models.CharField(max_length=50, unique=True, null=False, blank=True, db_index=True)
+
+class EmptyKeySink(models.Model):
+    title = models.CharField(max_length=50, unique=True, null=False, blank=True, db_index=True)
+    source = models.ForeignKey(EmptyKeySource, to_field='name', blank=True, null=False)
+
 @python_2_unicode_compatible
 class Colour(models.Model):
     name = models.CharField(max_length=50)
