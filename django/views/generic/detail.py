@@ -5,6 +5,7 @@ from django.db import models
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
+import warnings
 
 
 class SingleObjectMixin(ContextMixin):
@@ -13,8 +14,11 @@ class SingleObjectMixin(ContextMixin):
     """
     model = None
     queryset = None
-    slug_field = 'slug'
     context_object_name = None
+    lookup_field = 'pk'
+
+    # The following are pending deprecation
+    slug_field = 'slug'
     slug_url_kwarg = 'slug'
     pk_url_kwarg = 'pk'
 
@@ -30,22 +34,40 @@ class SingleObjectMixin(ContextMixin):
         if queryset is None:
             queryset = self.get_queryset()
 
-        # Next, try looking up by primary key.
+        lookup = self.kwargs.get(self.lookup_field, None)
         pk = self.kwargs.get(self.pk_url_kwarg, None)
         slug = self.kwargs.get(self.slug_url_kwarg, None)
-        if pk is not None:
+
+        # Try looking up by whichever field is specified in `lookup_field`.
+        if lookup is not None:
+            queryset = queryset.filter(**{self.lookup_field: lookup})
+
+        # Next, try looking up by primary key.  Note that we only attempt this
+        # deprecated lookup style if `lookup_field` has not been explicitly set.
+        elif pk is not None and self.lookup_field == 'pk':
+            warnings.warn(
+                "Usage of `pk_url_kwarg` is pending deprecation. "
+                "Set `lookup_field` on the '%s' view instead." %
+                self.__class__.__name__,
+                PendingDeprecationWarning)
             queryset = queryset.filter(pk=pk)
 
-        # Next, try looking up by slug.
-        elif slug is not None:
+        # Next, try looking up by slug.  Note that we only attempt this
+        # deprecated lookup style if `lookup_field` has not been explicitly set.
+        elif slug is not None and self.lookup_field == 'pk':
+            warnings.warn(
+                "Usage of `slug_field` and/or `slug_url_kwarg` is pending "
+                "deprecation. Set `lookup_field` on the '%s' view instead." %
+                self.__class__.__name__,
+                PendingDeprecationWarning)
             slug_field = self.get_slug_field()
             queryset = queryset.filter(**{slug_field: slug})
 
         # If none of those are defined, it's an error.
         else:
-            raise AttributeError("Generic detail view %s must be called with "
-                                 "either an object pk or a slug."
-                                 % self.__class__.__name__)
+            raise AttributeError("Generic detail view %s uses lookup field "
+                                 "'%s', which was not passed by the URL conf."
+                                 % (self.__class__.__name__, self.lookup_field))
 
         try:
             # Get the single item from the filtered queryset

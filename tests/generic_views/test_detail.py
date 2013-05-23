@@ -6,6 +6,7 @@ from django.views.generic.base import View
 
 from .models import Artist, Author, Page
 
+import warnings
 
 class DetailViewTest(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -25,26 +26,54 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['author'], Author.objects.get(pk=1))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
-    def test_detail_by_custom_pk(self):
-        res = self.client.get('/detail/author/bycustompk/1/')
+    def test_detail_by_custom_lookup(self):
+        res = self.client.get('/detail/author/bycustomlookup/scott-rosenberg/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk=1))
-        self.assertEqual(res.context['author'], Author.objects.get(pk=1))
+        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
+        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_custom_pk(self):
+        with warnings.catch_warnings(record=True) as warned:
+            warnings.simplefilter("always")
+            res = self.client.get('/detail/author/bycustompk/1/')
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.context['object'], Author.objects.get(pk=1))
+            self.assertEqual(res.context['author'], Author.objects.get(pk=1))
+            self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+            self.assertEqual(len(warned), 1)
+            self.assertTrue(issubclass(warned[0].category, PendingDeprecationWarning))
+            self.assertEqual(str(warned[0].message),
+                "Usage of `pk_url_kwarg` is pending deprecation. "
+                "Set `lookup_field` on the 'AuthorDetail' view instead.")
 
     def test_detail_by_slug(self):
-        res = self.client.get('/detail/author/byslug/scott-rosenberg/')
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+        with warnings.catch_warnings(record=True) as warned:
+            warnings.simplefilter("always")
+            res = self.client.get('/detail/author/byslug/scott-rosenberg/')
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
+            self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
+            self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+            self.assertEqual(len(warned), 1)
+            self.assertTrue(issubclass(warned[0].category, PendingDeprecationWarning))
+            self.assertEqual(str(warned[0].message),
+                "Usage of `slug_field` and/or `slug_url_kwarg` is pending deprecation. "
+                "Set `lookup_field` on the 'AuthorDetail' view instead.")
 
     def test_detail_by_custom_slug(self):
-        res = self.client.get('/detail/author/bycustomslug/scott-rosenberg/')
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+        with warnings.catch_warnings(record=True) as warned:
+            warnings.simplefilter("always")
+            res = self.client.get('/detail/author/bycustomslug/scott-rosenberg/')
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
+            self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
+            self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+            self.assertEqual(len(warned), 1)
+            self.assertTrue(issubclass(warned[0].category, PendingDeprecationWarning))
+            self.assertEqual(str(warned[0].message),
+                "Usage of `slug_field` and/or `slug_url_kwarg` is pending deprecation. "
+                "Set `lookup_field` on the 'AuthorDetail' view instead.")
 
     def test_verbose_name(self):
         res = self.client.get('/detail/artist/1/')

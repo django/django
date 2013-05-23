@@ -23,17 +23,32 @@ SingleObjectMixin
         A ``QuerySet`` that represents the objects. If provided, the value of
         ``queryset`` supersedes the value provided for :attr:`model`.
 
+    .. attribute:: lookup_field
+
+        The name of the field on the model that should be used for object
+        lookups. This name should also be used as the URLConf keyword argument.
+        By default, ``lookup_field`` is ``'pk'``.
+
+        Note that the ``lookup_field`` attribute replaces the previous usage
+        of ``slug_field``, ``slug_url_kwarg`` and ``pk_url_kwarg``.
+
     .. attribute:: slug_field
+
+        .. deprecated: 1.6
 
         The name of the field on the model that contains the slug. By default,
         ``slug_field`` is ``'slug'``.
 
     .. attribute:: slug_url_kwarg
 
+        .. deprecated: 1.6
+
         The name of the URLConf keyword argument that contains the slug. By
         default, ``slug_url_kwarg`` is ``'slug'``.
 
     .. attribute:: pk_url_kwarg
+
+        .. deprecated: 1.6
 
         The name of the URLConf keyword argument that contains the primary key.
         By default, ``pk_url_kwarg`` is ``'pk'``.
