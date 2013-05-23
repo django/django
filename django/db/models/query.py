@@ -364,19 +364,57 @@ class QuerySet(object):
         specifying whether an object was created.
         """
         assert kwargs, \
-                'get_or_create() must be passed at least one keyword argument'
-        defaults = kwargs.pop('defaults', {})
-        lookup = kwargs.copy()
-        for f in self.model._meta.fields:
-            if f.attname in lookup:
-                lookup[f.name] = lookup.pop(f.attname)
+            'get_or_create() must be passed at least one keyword argument'
+        lookup, params, defaults = self._extract_model_params(**kwargs)
         try:
             self._for_write = True
             return self.get(**lookup), False
         except self.model.DoesNotExist:
+            return self._create_object_from_params(lookup, params)
+
+    def update_or_create(self, **kwargs):
+        """
+        Looks up an object with the given kwargs, update them with defaults
+        if exists, otherwise create new one.
+        Returns a tuple (object, created), where created is a boolean
+        specyfing whether an object was created.
+        """
+        assert kwargs, \
+            'update_or_create() must be passed at least one keyword argument'
+        lookup, defaults, params = self._extract_model_params(**kwargs)
+        created = False
+        try:
+            self._for_write = True
+            obj = self.get(**lookup)
+        except self.model.DoesNotExist:
+            obj, created = self._create_object_from_params(lookup, defaults)
+        if created:
+            return obj, created
+        for k, v in defaults.iteritems():
+            setattr(obj, k, v)
+        try:
+            sid = transaction.savepoint(using=self.db)
+            obj.save(update_fields=defaults.keys(), using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, False
+        except DatabaseError:
+            transaction.savepoint_rollback(sid, using=self.db)
+            six.reraise(sys.exc_info())
+
+    def _create_object_from_params(self, lookup, params):
+        """
+        Tries to creating object based on passed parameters.
+        Used in get_or_create and create_or_update
+        """
+        try:
+            obj = self.model(**params)
+            sid = transaction.savepoint(using=self.db)
+            obj.save(force_insert=True, using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, True
+        except DatabaseError:
+            transaction.savepoint_rollback(sid, using=self.db)
             try:
-                params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
-                params.update(defaults)
                 obj = self.model(**params)
                 sid = transaction.savepoint(using=self.db)
                 obj.save(force_insert=True, using=self.db)
@@ -388,8 +426,26 @@ class QuerySet(object):
                 try:
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
-                    # Re-raise the DatabaseError with its original traceback.
+                    # Re-raise the IntegrityError with its original traceback.
                     six.reraise(*exc_info)
+
+    def _extract_model_params(self, **kwargs):
+        """
+        Prepares lookup, params and defaults fields based on given kwargs.
+        Used in get_or_create and create_or_update.
+        """
+        unfiltered_defaults = kwargs.pop('defaults', {})
+        defaults = {}
+        lookup = kwargs.copy()
+        for f in self.model._meta.fields:
+            if f.attname in lookup:
+                lookup[f.name] = lookup.pop(f.attname)
+            # Strictly filters out fields that don't belongs to model.
+            if f.attname in unfiltered_defaults:
+                defaults[f.name] = unfiltered_defaults.pop(f.attname)
+        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params.update(defaults)
+        return lookup, params, defaults
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
         """
