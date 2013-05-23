@@ -9,6 +9,8 @@ import os
 from django.core.files import locks
 
 
+__all__ = ['file_copy_safe']
+
 try:
     from shutil import copystat
 except ImportError:
@@ -41,6 +43,9 @@ def file_copy_safe(old_file_name, new_file_name, chunk_size=1024*64, allow_overw
             while current_chunk != b'':
                 current_chunk = old_file.read(chunk_size)
                 os.write(fd, current_chunk)
+        except OSError:
+            os.remove(new_file_name)
+            raise
         finally:
             locks.unlock(fd)
             os.close(fd)
