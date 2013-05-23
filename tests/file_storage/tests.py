@@ -75,8 +75,8 @@ class GetStorageClassTests(SimpleTestCase):
             get_storage_class(
                 'django.core.files.non_existing_storage.NonExistingStorage')
 
-class FileStorageTests(unittest.TestCase):
-    storage_class = FileSystemStorage
+
+class FileStorageTestsBase(unittest.TestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
@@ -89,6 +89,10 @@ class FileStorageTests(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
         shutil.rmtree(self.temp_dir2)
+
+
+class FileStorageTests(FileStorageTestsBase):
+    storage_class = FileSystemStorage
 
     def test_emtpy_location(self):
         """
@@ -361,6 +365,41 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
 
+    def test_copy_file(self):
+        f = ContentFile('content content')
+        src_name = self.storage.save('initial.file', f)
+        dst_name = self.storage.get_available_name('destination.file')
+        self.storage.copy(src_name, dst_name)
+        self.assertTrue(self.storage.exists(src_name))
+        self.assertTrue(self.storage.exists(dst_name))
+
+    def test_copy_file_no_path_walking(self):
+        f = ContentFile('content content')
+        src_name = self.storage.save('initial.file', f)
+        with self.assertRaises(SuspiciousOperation):
+            self.storage.copy(src_name, '/tmp/passwd')
+
+    def test_copy_raise_on_overwrite(self):
+        f = ContentFile('content content')
+        existing_name = self.storage.save('existing.file', f)
+        src_name = self.storage.save('src.file', f)
+        with self.assertRaises(OSError):
+            self.storage.copy(src_name, existing_name)
+
+    def test_move_file(self):
+        f = ContentFile('content content')
+        src_name = self.storage.save('initial.file', f)
+        dst_name = self.storage.get_available_name('destination.file')
+        self.storage.move(src_name, dst_name)
+        self.assertFalse(self.storage.exists(src_name))
+        self.assertTrue(self.storage.exists(dst_name))
+
+    def test_move_file_no_path_walking(self):
+        f = ContentFile('content content')
+        src_name = self.storage.save('initial.file', f)
+        with self.assertRaises(SuspiciousOperation):
+            self.storage.move(src_name, '/tmp/passwd')
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
@@ -376,7 +415,7 @@ class CustomStorage(FileSystemStorage):
 
         return name
 
-class CustomStorageTests(FileStorageTests):
+class CustomStorageTests(FileStorageTestsBase):
     storage_class = CustomStorage
 
     def test_custom_get_available_name(self):
