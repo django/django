@@ -308,7 +308,6 @@ Email
 
 File Storage
 ^^^^^^^^^^^^
-
 * :meth:`Storage.get_available_name()
   <django.core.files.storage.Storage.get_available_name>` and
   :meth:`Storage.save() <django.core.files.storage.Storage.save>`
