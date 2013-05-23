@@ -20,7 +20,8 @@ create a new app to hold them.
 The app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
 don't forget the ``__init__.py`` file to ensure the directory is treated as a
-Python package.
+Python package. After adding this module, you will need to restart your server
+before you can use the tags or filters in templates.
 
 Your custom tags and filters will live in a module inside the ``templatetags``
 directory. The name of the module file is the name you'll use to load the tags
