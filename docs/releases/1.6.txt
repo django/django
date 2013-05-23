@@ -581,6 +581,13 @@ Miscellaneous
   ``django.contrib.admindocs.middleware`` because it is an implementation
   detail of admindocs, proven not to be reusable in general.
 
+* ``GenericIPAddressField`` will now only allow blank values, if null
+  values are also allowed. Creating a ``GenericIPAddressField`` where blank
+  is allowed, but null is not, will trigger a model validation error. This is
+  needed because blank values are always stored as null. Previously, storing
+  a blank value in a field which did not allow null would cause a database
+  exception at runtime.
+
 Features deprecated in 1.6
 ==========================
 

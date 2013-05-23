@@ -158,3 +158,9 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         giptm.save()
         giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="18.52.18.52")
         self.assertFailsValidation(giptm.full_clean, ['generic_v4unpack_ip',])
+
+    def test_empty_generic_ip_passes(self):
+        giptm = GenericIPAddressTestModel(generic_ip="")
+        self.assertEqual(None, giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip=None)
+        self.assertEqual(None, giptm.full_clean())
