@@ -7,7 +7,8 @@ from xml.dom.minidom import parseString
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import mail
 from django.forms import fields
-from django.forms.forms import Form
+from django.forms.forms import Form, ValidationError
+from django.forms.formsets import formset_factory, BaseFormSet
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import Context, Template
@@ -95,6 +96,12 @@ class TestForm(Form):
     single = fields.ChoiceField(choices=TestChoices)
     multi = fields.MultipleChoiceField(choices=TestChoices)
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if cleaned_data.get("text") == "Raise non-field error":
+            raise ValidationError("Non-field error.")
+        return cleaned_data
+
 def form_view(request):
     "A view that tests a simple form"
     if request.method == 'POST':
@@ -129,6 +136,43 @@ def form_view_with_template(request):
             'message': message
         }
     )
+
+class BaseTestFormSet(BaseFormSet):
+    def clean(self):
+        """Checks that no two email addresses are the same."""
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid
+            return
+
+        emails = []
+        for i in range(0, self.total_form_count()):
+            form = self.forms[i]
+            email = form.cleaned_data['email']
+            if email in emails:
+                raise ValidationError(
+                    "Forms in a set must have distinct email addresses."
+                )
+            emails.append(email)
+
+TestFormSet = formset_factory(TestForm, BaseTestFormSet)
+
+def formset_view(request):
+    "A view that tests a simple formset"
+    if request.method == 'POST':
+        formset = TestFormSet(request.POST)
+        if formset.is_valid():
+            t = Template('Valid POST data.', name='Valid POST Template')
+            c = Context()
+        else:
+            t = Template('Invalid POST data. {{ my_formset.errors }}',
+                         name='Invalid POST Template')
+            c = Context({'my_formset': formset})
+    else:
+        formset = TestForm(request.GET)
+        t = Template('Viewing base formset. {{ my_formset }}.',
+                     name='Formset GET Template')
+        c = Context({'my_formset': formset})
+    return HttpResponse(t.render(c))
 
 def login_protected_view(request):
     "A simple view that is login protected."

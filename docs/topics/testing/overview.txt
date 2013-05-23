@@ -1532,6 +1532,27 @@ your test suite.
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
+.. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
+
+    .. versionadded:: 1.6
+
+    Asserts that the ``formset`` raises the provided list of errors when
+    rendered.
+
+    ``formset`` is the name the ``Formset`` instance was given in the template
+    context.
+
+    ``form_index`` is the number of the form within the ``Formset``.  If
+    ``form_index`` has a value of ``None``, non-form errors (errors you can
+    access via ``formset.non_form_errors()``) will be checked.
+
+    ``field`` is the name of the field on the form to check. If ``field``
+    has a value of ``None``, non-field errors (errors you can access via
+    ``form.non_field_errors()``) will be checked.
+
+    ``errors`` is an error string, or a list of error strings, that are
+    expected as a result of form validation.
+
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
     Asserts that a ``Response`` instance produced the given ``status_code`` and
