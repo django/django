@@ -258,6 +258,9 @@ Minor features
   methods returning the first or last object matching the filters. Returns
   ``None`` if there are no objects matching.
 
+* :class:`~django.views.generic.base.View` and
+  :class:`~django.views.generic.base.RedirectView` now support HTTP PATCH method.
+
 Backwards incompatible changes in 1.6
 =====================================
 
