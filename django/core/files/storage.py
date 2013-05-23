@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.files import locks, File
+from django.core.files.copy import file_copy_safe
 from django.core.files.move import file_move_safe
 from django.utils.crypto import get_random_string
 from django.utils.encoding import force_text, filepath_to_uri
@@ -141,6 +142,20 @@ class Storage(object):
         specified by name.
         """
         raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
+
+    def move(self, src_name, dst_name):
+        """
+        Move the file specified by src_name to dst_name. This method will raise
+        ValueError if dst_name already exists.
+        """
+        raise NotImplementedError('subclasses of Storage must provide a move() method')
+
+    def copy(self, src_name, dst_name):
+        """
+        Copy the file specified by src_name to dst_name. This method will raise
+        ValueError if dst_name already exists.
+        """
+        raise NotImplementedError('subclasses of Storage must provide a copy() method')
 
 
 @deconstructible
@@ -294,6 +309,25 @@ class FileSystemStorage(Storage):
 
     def modified_time(self, name):
         return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
+
+    def _do_safe_operation(self, operation, src_path, dst_path):
+        try:
+            operation(src_path, dst_path)
+        except OSError as e:
+            if e .errno == errno.EEXIST:
+                raise ValueError('Destination already exists')
+            else:
+                raise
+
+    def move(self, src_name, dst_name):
+        src_path = self.path(src_name)
+        dst_path = self.path(dst_name)
+        self._do_safe_operation(file_move_safe, src_path, dst_path)
+
+    def copy(self, src_name, dst_name):
+        src_path = self.path(src_name)
+        dst_path = self.path(dst_name)
+        self._do_safe_operation(file_copy_safe, src_path, dst_path)
 
 
 def get_storage_class(import_path=None):

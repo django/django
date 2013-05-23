@@ -271,7 +271,9 @@ Email
 File Storage
 ^^^^^^^^^^^^
 
-* ...
+* :class:`~django.core.files.storage.Storage` and
+  :class:`~django.core.files.storage.FileSystemStorage` now have ``move``
+  and ``copy`` methods
 
 File Uploads
 ^^^^^^^^^^^^

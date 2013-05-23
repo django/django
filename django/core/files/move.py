@@ -6,9 +6,8 @@ Move a file in the safest way possible::
 """
 
 import os
-from shutil import copystat
 
-from django.core.files import locks
+from django.core.files.copy import file_copy_safe
 
 
 __all__ = ['file_move_safe']
@@ -25,6 +24,7 @@ def _samefile(src, dst):
     # All other platforms: check for same pathname.
     return (os.path.normcase(os.path.abspath(src)) ==
             os.path.normcase(os.path.abspath(dst)))
+
 
 
 def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_overwrite=False):
@@ -54,21 +54,7 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
         # or when moving opened files on certain operating systems
         pass
 
-    # first open the old file, so that it won't go away
-    with open(old_file_name, 'rb') as old_file:
-        # now open the new file, not forgetting allow_overwrite
-        fd = os.open(new_file_name, (os.O_WRONLY | os.O_CREAT | getattr(os, 'O_BINARY', 0) |
-                                     (os.O_EXCL if not allow_overwrite else 0)))
-        try:
-            locks.lock(fd, locks.LOCK_EX)
-            current_chunk = None
-            while current_chunk != b'':
-                current_chunk = old_file.read(chunk_size)
-                os.write(fd, current_chunk)
-        finally:
-            locks.unlock(fd)
-            os.close(fd)
-    copystat(old_file_name, new_file_name)
+    file_copy_safe(old_file_name, new_file_name, chunk_size, allow_overwrite)
 
     try:
         os.remove(old_file_name)
