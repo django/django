@@ -6,23 +6,12 @@ Copy a file in the safest way possible::
 """
 
 import os
+from shutil import copystat
+
 from django.core.files import locks
 
 
 __all__ = ['file_copy_safe']
-
-try:
-    from shutil import copystat
-except ImportError:
-    import stat
-    def copystat(src, dst):
-        """Copy all stat info (mode bits, atime and mtime) from src to dst"""
-        st = os.stat(src)
-        mode = stat.S_IMODE(st.st_mode)
-        if hasattr(os, 'utime'):
-            os.utime(dst, (st.st_atime, st.st_mtime))
-        if hasattr(os, 'chmod'):
-            os.chmod(dst, mode)
 
 
 def file_copy_safe(old_file_name, new_file_name, chunk_size=1024*64, allow_overwrite=False):
