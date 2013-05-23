@@ -311,7 +311,7 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
-    def resolve(self, path):
+    def resolve(self, path, request=None):
         tried = []
         match = self.regex.search(path)
         if match:
@@ -329,10 +329,24 @@ class RegexURLResolver(LocaleRegexProvider):
                     if sub_match:
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
+
+                        # we check for the request to keep retro compatibility
+                        # and if the view function has been decorated with
+                        # predicates check before matching
+                        if request and hasattr(sub_match.func, 'predicates'):
+                            predicate_check = True
+                            for predicate in sub_match.func.predicates:
+                                if not predicate(request, *sub_match.args):
+                                    predicate_check = False
+                                    break
+
+                            if not predicate_check:
+                                continue
+
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
-        raise Resolver404({'path' : path})
+        raise Resolver404({'path': path})
 
     @property
     def urlconf_module(self):

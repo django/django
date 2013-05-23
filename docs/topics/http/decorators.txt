@@ -51,6 +51,42 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
         such as link checkers, rely on HEAD requests, you might prefer
         using ``require_safe`` instead of ``require_GET``.
 
+
+Predicates url processing
+=========================
+
+The decorators in :mod:django.views.decorators.predicate can be used to restrict 
+the view selection based on a list of function result. 
+These decorators will attach a list of functions to be checked before returning 
+a match for the url. 
+If the predicates fail then the process continue the url resolving process.
+
+.. function:: view_predicates(predicate_function_list)
+
+    Decorator to require that a view only match particular request. Usage::
+
+        url_pattern += url('/', my_view_GET)
+        url_pattern += url('/', my_view_POST)
+
+        ...
+
+        predicate_GET = lambda request: request.method == 'GET'
+        predicate_POST = lambda request: request.method == 'POST'
+
+        @url_predicates([predicate_GET])
+        def my_view_GET(request):
+            # I can assume now that only GET requests get match to the url
+            # associated to this view
+            # ...
+
+        @url_predicates([predicate_POST])
+        def my_view_POST(request):
+            # I can assume now that only POST requests get match to the url
+            # associated to this view
+            # ...
+
+
+
 Conditional view processing
 ===========================
 
