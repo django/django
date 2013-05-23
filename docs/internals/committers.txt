@@ -53,6 +53,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
 .. _heroku: http://heroku.com/
+.. _Rdio: http://rdio.com
 
 Current developers
 ==================
