@@ -34,9 +34,9 @@ class SingleObjectMixin(ContextMixin):
         if queryset is None:
             queryset = self.get_queryset()
 
-        lookup = self.kwargs.get(self.lookup_field, None)
-        pk = self.kwargs.get(self.pk_url_kwarg, None)
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        lookup = self.kwargs.get(self.lookup_field)
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        slug = self.kwargs.get(self.slug_url_kwarg)
 
         # Try looking up by whichever field is specified in `lookup_field`.
         if lookup is not None:
