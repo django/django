@@ -1,4 +1,3 @@
-from django.db import connections
 from django.db.models import signals
 from django.test import TestCase
 from django.core import management
@@ -32,7 +31,6 @@ class OneTimeReceiver(object):
     def __init__(self):
         self.call_counter = 0
         self.call_args = None
-        self.tables = None  # list of tables at the time of the call
 
     def __call__(self, signal, sender, **kwargs):
         # Although test runner calls syncdb for several databases,
@@ -40,8 +38,6 @@ class OneTimeReceiver(object):
         if kwargs['db'] == SYNCDB_DATABASE:
             self.call_counter = self.call_counter + 1
             self.call_args = kwargs
-            connection = connections[SYNCDB_DATABASE]
-            self.tables = connection.introspection.table_names()
             # we need to test only one call of syncdb
             signals.pre_syncdb.disconnect(pre_syncdb_receiver, sender=models)
 
@@ -61,7 +57,6 @@ signals.pre_syncdb.connect(pre_syncdb_receiver, sender=models)
 class SyncdbSignalTests(TestCase):
     def test_pre_syncdb_call_time(self):
         self.assertEqual(pre_syncdb_receiver.call_counter, 1)
-        self.assertFalse(pre_syncdb_receiver.tables)
 
     def test_pre_syncdb_args(self):
         r = PreSyncdbReceiver()
