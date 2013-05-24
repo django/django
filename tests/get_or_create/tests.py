@@ -7,7 +7,7 @@ import warnings
 from django.db import IntegrityError, DatabaseError
 from django.test import TestCase, TransactionTestCase
 
-from .models import Person, ManualPrimaryKeyTest, Profile, Tag, Thing
+from .models import DefaultPerson, Person, ManualPrimaryKeyTest, Profile, Tag, Thing
 
 
 class GetOrCreateTests(TestCase):
@@ -81,6 +81,13 @@ class GetOrCreateTests(TestCase):
                 first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))
         else:
             self.skipTest("This backend accepts broken utf-8.")
+
+    def test_get_or_create_empty(self):
+        try:
+            DefaultPerson.objects.get_or_create()
+        except AssertionError:
+            self.fail("If all the attributes on a model have defaults, we "
+                      "shouldn't need to pass any arguments.")
 
 
 class GetOrCreateTransactionTests(TransactionTestCase):
