@@ -1726,8 +1726,13 @@ def prefetch_related_objects(result_cache, related_lookups):
                         good_objects = False
                         break
                 else:
-                    # We already did this list
-                    break
+                    # Since prefetching can re-use instances, it is possible to
+                    # have the same instance multiple times in obj_list. So we
+                    # can reach this branch either because we did all of
+                    # obj_list already, or because we did 'obj' earlier in this
+                    # iteration over obj_list. In the first case we could
+                    # shortcut and exit the loop, but not in the second.
+                    continue
             if not good_objects:
                 break
 
