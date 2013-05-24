@@ -171,12 +171,12 @@ class BaseHandler(object):
                         resolver, sys.exc_info())
 
         except SuspiciousOperation as e:
-            logger.warning(
-                    'Suspicious operation: %s', e,
-                    extra={
-                        'status_code': 400,
-                        'request': request,
-                        'exception': e})
+            # The request logger receives events for any problematic request
+            # The security logger receives events for all SuspiciousOperations
+            security_logger = logging.getLogger('django.security.%s' %
+                            e.__class__.__name__)
+            security_logger.error(force_text(e))
+
             try:
                 callback, param_dict = resolver.resolve400()
                 response = callback(request, **param_dict)
@@ -190,7 +190,7 @@ class BaseHandler(object):
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except: # Handle everything else, including SuspiciousOperation, etc.
+        except: # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())

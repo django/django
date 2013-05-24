@@ -22,13 +22,6 @@ class MultipleObjectsReturned(Exception):
 class SuspiciousOperation(Exception):
     """The user did something suspicious"""
 
-    def __init__(self, message=None):
-        if message is None:
-            message = "%s raised" % self.__class__.__name__
-        logger = logging.getLogger('django.security.%s' % self.__class__.__name__)
-        logger.error(message)
-        super(SuspiciousOperation, self).__init__(message)
-
 
 class SuspiciousMultipartForm(SuspiciousOperation):
     """Suspect MIME request in multipart form data"""

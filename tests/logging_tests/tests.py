@@ -10,7 +10,7 @@ from django.core import mail
 from django.core.exceptions import (SuspiciousOperation, DisallowedHost,
     DisallowedRedirect)
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, patch_logger
 from django.utils.encoding import force_text
 from django.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, NullHandler)
@@ -360,40 +360,19 @@ class SettingsConfigureLogging(TestCase):
 
 
 class SecurityLoggerTest(TestCase):
-    def setUp(self):
-        # Turn on propogation so we can use the root django logger's stream
-        # handler for testing
-        logging.getLogger('django.security').propagate = True
-        self.logger = logging.getLogger('django')
-        self.old_stream = self.logger.handlers[0].stream
-        self.output = StringIO()
-        self.logger.handlers[0].stream = self.output
 
-    def tearDown(self):
-        self.logger.handlers[0].stream = self.old_stream
-        logging.getLogger('django.security').propagate = False
+    urls = 'logging_tests.urls'
 
-    def testexception_init_creates_log_message(self):
+    def test_suspicious_operation_creates_log_message(self):
         with self.settings(DEBUG=True):
-            try:
-                raise SuspiciousOperation("logloglog")
-            except SuspiciousOperation:
-                pass
-            self.assertEqual(self.output.getvalue(), 'logloglog\n')
+            with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
+                response = self.client.get('/suspicious/')
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], 'dubious')
 
-    def test_silence_sub_logger(self):
-        logger = logging.getLogger('django.security.DisallowedHost')
-        handler = NullHandler()
-        logger.addHandler(handler)
-        logger.propagate = False
+    def test_suspicious_operation_uses_sublogger(self):
         with self.settings(DEBUG=True):
-            try:
-                raise DisallowedHost("logloglog")
-            except SuspiciousOperation:
-                pass
-            self.assertEqual(self.output.getvalue(), '')
-            try:
-                raise DisallowedRedirect("logloglog")
-            except SuspiciousOperation:
-                pass
-            self.assertEqual(self.output.getvalue(), 'logloglog\n')
+            with patch_logger('django.security.DisallowedHost', 'error') as calls:
+                response = self.client.get('/suspicious_spec/')
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], 'dubious')

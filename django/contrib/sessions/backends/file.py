@@ -1,5 +1,6 @@
 import datetime
 import errno
+import logging
 import os
 import shutil
 import tempfile
@@ -8,6 +9,7 @@ from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError, VALID_KEY_CHARS
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 
@@ -77,7 +79,11 @@ class SessionStore(SessionBase):
             if file_data:
                 try:
                     session_data = self.decode(file_data)
-                except (EOFError, SuspiciousOperation):
+                except (EOFError, SuspiciousOperation) as e:
+                    if isinstance(e, SuspiciousOperation):
+                        logger = logging.getLogger('django.security.%s' %
+                                e.__class__.__name__)
+                        logger.warning(force_text(e))
                     self.create()
 
                 # Remove expired sessions.
