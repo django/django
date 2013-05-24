@@ -373,13 +373,10 @@ class SecurityLoggerTest(TestCase):
         self.logger.handlers[0].stream = self.old_stream
         logging.getLogger('django.security').propagate = False
 
-    def testexception_init_creates_log_message(self):
+    def test_suspicious_operation_creates_log_message(self):
         with self.settings(DEBUG=True):
-            try:
-                raise SuspiciousOperation("logloglog")
-            except SuspiciousOperation:
-                pass
-            self.assertEqual(self.output.getvalue(), 'logloglog\n')
+            response = self.client.get('/suspicious/')
+            self.assertEqual(self.output.getvalue(), 'dubious\n')
 
     def test_silence_sub_logger(self):
         logger = logging.getLogger('django.security.DisallowedHost')
@@ -387,13 +384,11 @@ class SecurityLoggerTest(TestCase):
         logger.addHandler(handler)
         logger.propagate = False
         with self.settings(DEBUG=True):
-            try:
-                raise DisallowedHost("logloglog")
-            except SuspiciousOperation:
-                pass
+            # view that raises the specific silenced subclass
+            # does not get logged
+            response = self.client.get('/suspicious_spec/')
             self.assertEqual(self.output.getvalue(), '')
-            try:
-                raise DisallowedRedirect("logloglog")
-            except SuspiciousOperation:
-                pass
-            self.assertEqual(self.output.getvalue(), 'logloglog\n')
+        with self.settings(DEBUG=True):
+            # but other SuspiciousOperations do get logged
+            response = self.client.get('/suspicious/')
+            self.assertEqual(self.output.getvalue(), 'dubious\n')
