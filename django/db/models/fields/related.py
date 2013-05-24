@@ -201,7 +201,9 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None:
-            raise self.related.model.DoesNotExist
+            raise self.related.model.DoesNotExist("%s has no %s." % (
+                                                  instance.__class__.__name__,
+                                                  self.related.get_accessor_name()))
         else:
             return rel_obj
 
@@ -304,7 +306,8 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                     setattr(rel_obj, self.field.related.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None and not self.field.null:
-            raise self.field.rel.to.DoesNotExist
+            raise self.field.rel.to.DoesNotExist(
+                "%s has no %s." % (self.field.model.__name__, self.field.name))
         else:
             return rel_obj
 
