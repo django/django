@@ -60,7 +60,7 @@ class FormsFormsetTestCase(TestCase):
         # for adding data. By default, it displays 1 blank form. It can display more,
         # but we'll look at how to do so later.
         formset = ChoiceFormSet(auto_id=False, prefix='choices')
-        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
+        self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" /></td></tr>""")
 
@@ -73,6 +73,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '1', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -99,6 +100,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '1', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '',
@@ -114,6 +116,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '1', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': '',
             'choices-0-votes': '',
@@ -155,6 +158,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '2', # the number of forms rendered
             'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -176,6 +180,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '2', # the number of forms rendered
             'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -195,6 +200,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '2', # the number of forms rendered
             'choices-INITIAL_FORMS': '1', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': '', # deleted value
             'choices-0-votes': '', # deleted value
@@ -232,6 +238,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': '',
             'choices-0-votes': '',
@@ -245,12 +252,46 @@ class FormsFormsetTestCase(TestCase):
         self.assertTrue(formset.is_valid())
         self.assertEqual([form.cleaned_data for form in formset.forms], [{}, {}, {}])
 
+    def test_min_num_displaying_more_than_one_blank_form(self):
+        # We can also display more than 1 empty form passing min_num argument
+        # to formset_factory. It will increment the extra argument
+        ChoiceFormSet = formset_factory(Choice, extra=1, min_num=1)
+
+        formset = ChoiceFormSet(auto_id=False, prefix='choices')
+        form_output = []
+
+        for form in formset.forms:
+            form_output.append(form.as_ul())
+
+        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" /></li>
+<li>Votes: <input type="number" name="choices-0-votes" /></li>
+<li>Choice: <input type="text" name="choices-1-choice" /></li>
+<li>Votes: <input type="number" name="choices-1-votes" /></li>""")
+
+    def test_min_num_displaying_more_than_one_blank_form_with_zero_extra(self):
+        # We can also display more than 1 empty form passing min_num argument
+        ChoiceFormSet = formset_factory(Choice, extra=0, min_num=3)
+
+        formset = ChoiceFormSet(auto_id=False, prefix='choices')
+        form_output = []
+
+        for form in formset.forms:
+            form_output.append(form.as_ul())
+
+        self.assertHTMLEqual('\n'.join(form_output), """<li>Choice: <input type="text" name="choices-0-choice" /></li>
+<li>Votes: <input type="number" name="choices-0-votes" /></li>
+<li>Choice: <input type="text" name="choices-1-choice" /></li>
+<li>Votes: <input type="number" name="choices-1-votes" /></li>
+<li>Choice: <input type="text" name="choices-2-choice" /></li>
+<li>Votes: <input type="number" name="choices-2-votes" /></li>""")
+
     def test_single_form_completed(self):
         # We can just fill out one of the forms.
 
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -274,6 +315,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '2', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '2', # max number of forms - should be ignored
             'choices-0-choice': 'Zero',
             'choices-0-votes': '0',
@@ -286,12 +328,35 @@ class FormsFormsetTestCase(TestCase):
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please submit 1 or fewer forms.'])
 
+    def test_formset_validate_min_flag(self):
+        # If validate_min is set and min_num is more than TOTAL_FORMS in the
+        # data, then throw an exception. MIN_NUM_FORMS in the data is
+        # irrelevant here (it's output as a hint for the client but its
+        # value in the returned data is not checked)
+
+        data = {
+            'choices-TOTAL_FORMS': '2', # the number of forms rendered
+            'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
+            'choices-MAX_NUM_FORMS': '0', # max number of forms - should be ignored
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '0',
+            'choices-1-choice': 'One',
+            'choices-1-votes': '1',
+        }
+
+        ChoiceFormSet = formset_factory(Choice, extra=1, min_num=3, validate_min=True)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please submit 3 or more forms.'])
+
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.
 
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -313,6 +378,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -376,6 +442,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '2', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -403,6 +470,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'check-TOTAL_FORMS': '3', # the number of forms rendered
             'check-INITIAL_FORMS': '2', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'check-MAX_NUM_FORMS': '0', # max number of forms
             'check-0-field': '200',
             'check-0-DELETE': '',
@@ -433,7 +501,7 @@ class FormsFormsetTestCase(TestCase):
         p = PeopleForm(
             {'form-0-name': '', 'form-0-DELETE': 'on', # no name!
              'form-TOTAL_FORMS': 1, 'form-INITIAL_FORMS': 1,
-             'form-MAX_NUM_FORMS': 1})
+             'form-MIN_NUM_FORMS': 0, 'form-MAX_NUM_FORMS': 1})
 
         self.assertTrue(p.is_valid())
         self.assertEqual(len(p.deleted_forms), 1)
@@ -470,6 +538,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '2', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -502,6 +571,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '4', # the number of forms rendered
             'choices-INITIAL_FORMS': '3', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -538,6 +608,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '3', # the number of forms rendered
             'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
         }
 
@@ -590,6 +661,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '4', # the number of forms rendered
             'choices-INITIAL_FORMS': '3', # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0', # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -636,6 +708,7 @@ class FormsFormsetTestCase(TestCase):
             'form-0-DELETE': 'on', # no name!
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
+            'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 1
         })
 
@@ -652,6 +725,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'drinks-TOTAL_FORMS': '2', # the number of forms rendered
             'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
+            'drinks-MIN_NUM_FORMS': '0', # min number of forms
             'drinks-MAX_NUM_FORMS': '0', # max number of forms
             'drinks-0-name': 'Gin and Tonic',
             'drinks-1-name': 'Gin and Tonic',
@@ -671,6 +745,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'drinks-TOTAL_FORMS': '2', # the number of forms rendered
             'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
+            'drinks-MIN_NUM_FORMS': '0', # min number of forms
             'drinks-MAX_NUM_FORMS': '0', # max number of forms
             'drinks-0-name': 'Gin and Tonic',
             'drinks-1-name': 'Bloody Mary',
@@ -823,6 +898,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
             'form-MAX_NUM_FORMS': '0',
         }
         formset = FavoriteDrinksFormSet(data=data)
@@ -837,6 +913,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'drinks-TOTAL_FORMS': '2', # the number of forms rendered
             'drinks-INITIAL_FORMS': '0', # the number of forms with initial data
+            'drinks-MIN_NUM_FORMS': '0', # min number of forms
             'drinks-MAX_NUM_FORMS': '0', # max number of forms
             'drinks-0-name': 'Gin and Tonic',
             'drinks-1-name': 'Gin and Tonic',
@@ -926,6 +1003,7 @@ class FormsFormsetTestCase(TestCase):
         data = {
             'choices-TOTAL_FORMS': '1',  # number of forms rendered
             'choices-INITIAL_FORMS': '0',  # number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0', # min number of forms
             'choices-MAX_NUM_FORMS': '0',  # max number of forms
             'choices-0-choice': 'Calexico',
             'choices-0-votes': '100',
@@ -946,6 +1024,7 @@ class FormsFormsetTestCase(TestCase):
                 {
                     'choices-TOTAL_FORMS': '4',
                     'choices-INITIAL_FORMS': '0',
+                    'choices-MIN_NUM_FORMS': '0', # min number of forms
                     'choices-MAX_NUM_FORMS': '4',
                     'choices-0-choice': 'Zero',
                     'choices-0-votes': '0',
@@ -977,6 +1056,7 @@ class FormsFormsetTestCase(TestCase):
                 {
                     'choices-TOTAL_FORMS': '4',
                     'choices-INITIAL_FORMS': '0',
+                    'choices-MIN_NUM_FORMS': '0', # min number of forms
                     'choices-MAX_NUM_FORMS': '4',
                     'choices-0-choice': 'Zero',
                     'choices-0-votes': '0',
@@ -1030,6 +1110,7 @@ class FormsFormsetTestCase(TestCase):
 data = {
     'choices-TOTAL_FORMS': '1', # the number of forms rendered
     'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+    'choices-MIN_NUM_FORMS': '0', # min number of forms
     'choices-MAX_NUM_FORMS': '0', # max number of forms
     'choices-0-choice': 'Calexico',
     'choices-0-votes': '100',
@@ -1044,19 +1125,19 @@ ChoiceFormSet = formset_factory(Choice)
 class FormsetAsFooTests(TestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_table(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" value="Calexico" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" value="100" /></td></tr>""")
 
     def test_as_p(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_p(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <p>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></p>
 <p>Votes: <input type="number" name="choices-0-votes" value="100" /></p>""")
 
     def test_as_ul(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
-        self.assertHTMLEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
+        self.assertHTMLEqual(formset.as_ul(),"""<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>""")
 
