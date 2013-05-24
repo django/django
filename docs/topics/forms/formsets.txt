@@ -298,6 +298,13 @@ method on the formset.
 Validating the number of forms in a formset
 -------------------------------------------
 
+Django provides a couple ways to validate the minimum or maximum number of
+submitted forms. Applications which need more customizable validation of the
+number of forms should use custom formset validation.
+
+``validate_max``
+~~~~~~~~~~~~~~~~
+
 If ``validate_max=True`` is passed to
 :func:`~django.forms.formsets.formset_factory`, validation will also check
 that the number of forms in the data set, minus those marked for
@@ -309,6 +316,7 @@ deletion, is less than or equal to ``max_num``.
     >>> data = {
     ...     'form-TOTAL_FORMS': u'2',
     ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MIN_NUM_FORMS': u'',
     ...     'form-MAX_NUM_FORMS': u'',
     ...     'form-0-title': u'Test',
     ...     'form-0-pub_date': u'1904-06-16',
@@ -327,9 +335,6 @@ deletion, is less than or equal to ``max_num``.
 ``max_num`` was exceeded because the amount of initial data supplied was
 excessive.
 
-Applications which need more customizable validation of the number of forms
-should use custom formset validation.
-
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
@@ -342,6 +347,42 @@ should use custom formset validation.
 .. versionchanged:: 1.6
 
    The ``validate_max`` parameter was added to
+   :func:`~django.forms.formsets.formset_factory`.
+
+``validate_min``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+If ``validate_min=True`` is passed to
+:func:`~django.forms.formsets.formset_factory`, validation will also check
+that the number of forms in the data set, minus those marked for
+deletion, is greater than or equal to ``min_num``.
+
+    >>> from django.forms.formsets import formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> ArticleFormSet = formset_factory(ArticleForm, min_num=3, validate_min=True)
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'2',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MIN_NUM_FORMS': u'',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-0-title': u'Test',
+    ...     'form-0-pub_date': u'1904-06-16',
+    ...     'form-1-title': u'Test 2',
+    ...     'form-1-pub_date': u'1912-06-23',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{}, {}]
+    >>> formset.non_form_errors()
+    [u'Please submit 3 or more forms.']
+
+.. versionchanged:: 1.7
+
+   The ``min_num`` and ``validate_min`` parameters were added to
    :func:`~django.forms.formsets.formset_factory`.
 
 Dealing with ordering and deletion of forms

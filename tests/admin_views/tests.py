@@ -1874,14 +1874,14 @@ class AdminViewListEditable(TestCase):
     def test_changelist_input_html(self):
         response = self.client.get('/test_admin/admin/admin_views/person/')
         # 2 inputs per object(the field and the hidden id field) = 6
-        # 3 management hidden fields = 3
+        # 4 management hidden fields = 4
         # 4 action inputs (3 regular checkboxes, 1 checkbox to select all)
         # main form submit button = 1
         # search field and search submit button = 2
         # CSRF field = 1
         # field to track 'select all' across paginated views = 1
-        # 6 + 3 + 4 + 1 + 2 + 1 + 1 = 18 inputs
-        self.assertContains(response, "<input", count=18)
+        # 6 + 4 + 4 + 1 + 2 + 1 + 1 = 19 inputs
+        self.assertContains(response, "<input", count=19)
         # 1 select per object = 3 selects
         self.assertContains(response, "<select", count=4)
 
@@ -3629,9 +3629,9 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/post/add/')
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="posted"')
-        # 3 fields + 2 submit buttons + 4 inline management form fields, + 2
+        # 3 fields + 2 submit buttons + 5 inline management form fields, + 2
         # hidden fields for inlines + 1 field for the inline + 2 empty form
-        self.assertContains(response, "<input", count=14)
+        self.assertContains(response, "<input", count=15)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response,
             "<label>Awesomeness level:</label>")

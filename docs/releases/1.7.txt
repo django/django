@@ -234,6 +234,10 @@ Forms
   <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.
 
+* The ``min_num`` and ``validate_min`` parameters were added to
+  :func:`~django.forms.formsets.formset_factory` to allow validating
+  a minimum number of submitted forms.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
