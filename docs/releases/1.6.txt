@@ -266,6 +266,9 @@ Minor features
   ``False`` allows the field to reference proxy models. The default is ``True``
   to retain the old behavior.
 
+* The ``DoesNotExist`` exception now includes a message indicating the name
+  of the attribute used for the lookup.
+
 Backwards incompatible changes in 1.6
 =====================================
 
