@@ -174,10 +174,10 @@ Joseph Kocherhans
 .. _charango: http://en.wikipedia.org/wiki/Charango
 
 `Brian Rosner`_
-    Brian is currently the tech lead at Eldarion_ managing and developing
+    Brian is the Chief Architect at Eldarion_ managing and developing
     Django / Pinax_ based Web sites. He enjoys learning more about programming
     languages and system architectures and contributing to open source
-    projects. Brian is the host of the `Django Dose`_ podcasts.
+    projects.
 
     Brian helped immensely in getting Django's "newforms-admin" branch finished
     in time for Django 1.0; he's now a full committer, continuing to improve on
@@ -187,7 +187,6 @@ Joseph Kocherhans
 
 .. _brian rosner: http://brosner.com/
 .. _eldarion: http://eldarion.com/
-.. _django dose: http://djangodose.com/
 .. _pinax: http://pinaxproject.com/
 
 Justin Bronn

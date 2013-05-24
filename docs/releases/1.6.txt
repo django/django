@@ -261,6 +261,11 @@ Minor features
 * :class:`~django.views.generic.base.View` and
   :class:`~django.views.generic.base.RedirectView` now support HTTP PATCH method.
 
+* :class:`GenericForeignKey <django.contrib.contenttypes.generic.GenericForeignKey>`
+  now takes an optional ``for_concrete_model`` argument, which when set to
+  ``False`` allows the field to reference proxy models. The default is ``True``
+  to retain the old behavior.
+
 * :exc:`~django.core.exceptions.SuspiciousOperation` has been differentiated
   into a number of subclasses, and each will log to a matching named logger
   under the ``django.security`` logging hierarchy of ``django.security`` when
