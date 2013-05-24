@@ -172,16 +172,9 @@ class BaseHandler(object):
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
-            logger.warning(
-                    'Suspicious operation: %s', e,
-                    extra={
-                        'status_code': 400,
-                        'request': request,
-                        'exception': e})
             # The security logger receives events for all SuspiciousOperations
             security_logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
-            logger.warning(e.message)
             security_logger.error(force_text(e))
 
             try:
