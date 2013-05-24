@@ -294,9 +294,9 @@ Note that if you set this to point to a :class:`DateTimeField`, only the date
 portion of the field will be considered.
 
 This is enforced by :meth:`Model.validate_unique()` during model
-validation but not at the database level. If any :attr:`~Field.unique_for_date` constraint
-involving fields are in ``exclude`` then :meth:`Model.validate_unique()`
-will skip validation.
+validation but not at the database level. If any :attr:`~Field.unique_for_date`
+constraint involving fields are in ``exclude``, :meth:`Model.validate_unique()`
+will skip validation for that particular constraint.
 
 ``unique_for_month``
 --------------------
