@@ -22,7 +22,8 @@ class OneToOneTests(TestCase):
         # A Place can access its restaurant, if available.
         self.assertEqual(repr(self.p1.restaurant), '<Restaurant: Demon Dogs the restaurant>')
         # p2 doesn't have an associated restaurant.
-        self.assertRaises(Restaurant.DoesNotExist, getattr, self.p2, 'restaurant')
+        with self.assertRaisesMessage(Restaurant.DoesNotExist, 'Place has no restaurant'):
+            self.p2.restaurant
 
     def test_setter(self):
         # Set the place using assignment notation. Because place is the primary

@@ -277,6 +277,9 @@ Minor features
   a ``SuspiciousOperation`` reaches the WSGI handler to return an
   ``HttpResponseBadRequest``.
 
+* The :exc:`~django.core.exceptions.DoesNotExist` exception now includes a
+  message indicating the name of the attribute used for the lookup.
+
 Backwards incompatible changes in 1.6
 =====================================
 
