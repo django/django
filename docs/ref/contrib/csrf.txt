@@ -120,7 +120,7 @@ Acquiring the token is straightforward:
     var csrftoken = getCookie('csrftoken');
 
 The above code could be simplified by using the `jQuery cookie plugin
-<http://plugins.jquery.com/project/Cookie>`_ to replace ``getCookie``:
+<http://plugins.jquery.com/cookie/>`_ to replace ``getCookie``:
 
 .. code-block:: javascript
 
