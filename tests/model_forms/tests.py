@@ -20,11 +20,10 @@ from django.utils import six
 from shared_models.models import Author, Book
 
 from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
-    Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
-    DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
-    ImprovedArticleWithParentLink, Inventory, Post, Price,
-    Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    test_images)
+    Category, CommaSeparatedInteger, CustomFieldForExclusionModel,
+    DateTimePost, DerivedBook, DerivedPost, ExplicitPK, FlexibleDatePost,
+    ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Post, Price,
+    Product, TextFile, AuthorProfile, Colour, ColourfulItem, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -73,6 +72,12 @@ class ExplicitPKForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
+        fields = '__all__'
+
+
+class DateTimePostForm(forms.ModelForm):
+    class Meta:
+        model = DateTimePost
         fields = '__all__'
 
 
@@ -667,6 +672,29 @@ class UniqueTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
+
+    def test_unique_for_date_in_exclude(self):
+        p = DateTimePost.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally",
+            posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
+        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(len(form.errors), 0)
+        form = DateTimePostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+        self.assertTrue(form.is_valid())
+        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+        self.assertTrue(form.is_valid())
+        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(len(form.errors), 0)
+        form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+        self.assertTrue(form.is_valid())
+        form = DateTimePostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
+            "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+        self.assertTrue(form.is_valid())
+        form = DateTimePostForm({'title': "Django 1.0 is released"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(len(form.errors), 0)
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
