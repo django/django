@@ -9,15 +9,17 @@ from django.test.utils import override_settings
 from django.utils import unittest, six
 
 
-@override_settings(TEST='override')
+@override_settings(TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
+        self.assertEqual(settings.TEST_OUTER, 'outer')
 
     @override_settings(TEST='override2')
     def test_method_override(self):
         self.assertEqual(settings.TEST, 'override2')
+        self.assertEqual(settings.TEST_OUTER, 'outer')
 
     def test_decorated_testcase_name(self):
         self.assertEqual(FullyDecoratedTranTestCase.__name__, 'FullyDecoratedTranTestCase')
