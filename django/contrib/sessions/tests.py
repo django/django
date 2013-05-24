@@ -15,13 +15,15 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import get_cache
 from django.core import management
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
 from django.utils import unittest
+
+from django.contrib.sessions.exceptions import InvalidSessionKey
 
 
 class SessionTestsMixin(object):
@@ -411,12 +413,12 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # This is tested directly on _key_to_file, as load() will swallow
         # a SuspiciousOperation in the same way as an IOError - by creating
         # a new session, making it unclear whether the slashes were detected.
-        self.assertRaises(SuspiciousOperation,
+        self.assertRaises(InvalidSessionKey,
                           self.backend()._key_to_file, "a\\b\\c")
 
     def test_invalid_key_forwardslash(self):
         # Ensure we don't allow directory-traversal
-        self.assertRaises(SuspiciousOperation,
+        self.assertRaises(InvalidSessionKey,
                           self.backend()._key_to_file, "a/b/c")
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file")
