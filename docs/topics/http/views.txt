@@ -239,7 +239,7 @@ The 400 (bad request) view
 
 When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
 the it may be handled by a component of Django (for example resetting the
-session data). If not specifically handled, Django will be consider the current
+session data). If not specifically handled, Django will consider the current
 request a 'bad request' instead of a server error.
 
 The view ``django.views.defaults.bad_request``, is otherwise very similar to
