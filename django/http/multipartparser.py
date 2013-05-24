@@ -11,7 +11,7 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
@@ -370,7 +370,7 @@ class LazyStream(six.Iterator):
                             if current_number == num_bytes])
 
         if number_equal > 40:
-            raise SuspiciousOperation(
+            raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
                 " if there is none, report this to the Django developers."

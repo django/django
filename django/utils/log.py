@@ -63,6 +63,11 @@ DEFAULT_LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'django.security': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'py.warnings': {
             'handlers': ['console'],
         },

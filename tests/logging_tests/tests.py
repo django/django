@@ -7,10 +7,13 @@ import warnings
 
 from django.conf import LazySettings
 from django.core import mail
+from django.core.exceptions import (SuspiciousOperation, DisallowedHost,
+    DisallowedRedirect)
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, patch_logger
 from django.utils.encoding import force_text
-from django.utils.log import CallbackFilter, RequireDebugFalse, RequireDebugTrue
+from django.utils.log import (CallbackFilter, RequireDebugFalse,
+    RequireDebugTrue, NullHandler)
 from django.utils.six import StringIO
 from django.utils.unittest import skipUnless
 
@@ -354,3 +357,22 @@ class SettingsConfigureLogging(TestCase):
         settings.configure(
             LOGGING_CONFIG='logging_tests.tests.dictConfig')
         self.assertTrue(dictConfig.called)
+
+
+class SecurityLoggerTest(TestCase):
+
+    urls = 'logging_tests.urls'
+
+    def test_suspicious_operation_creates_log_message(self):
+        with self.settings(DEBUG=True):
+            with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
+                response = self.client.get('/suspicious/')
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], 'dubious')
+
+    def test_suspicious_operation_uses_sublogger(self):
+        with self.settings(DEBUG=True):
+            with patch_logger('django.security.DisallowedHost', 'error') as calls:
+                response = self.client.get('/suspicious_spec/')
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0], 'dubious')

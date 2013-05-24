@@ -12,7 +12,7 @@ except ImportError:
 from django.conf import settings
 from django.core import signals
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, iri_to_uri
@@ -452,7 +452,7 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         parsed = urlparse(redirect_to)
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
-            raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+            raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
 

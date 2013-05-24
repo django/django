@@ -3,11 +3,14 @@ import json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
 from django.template import RequestContext
+
+
+class CustomTestException(Exception):
+    pass
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -18,7 +21,7 @@ def staff_only_view(request):
     if request.user.is_staff:
         return HttpResponse('')
     else:
-        raise SuspiciousOperation()
+        raise CustomTestException()
 
 def get_view(request):
     "A simple login protected view"
