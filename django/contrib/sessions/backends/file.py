@@ -1,5 +1,6 @@
 import datetime
 import errno
+import logging
 import os
 import shutil
 import tempfile
@@ -77,7 +78,11 @@ class SessionStore(SessionBase):
             if file_data:
                 try:
                     session_data = self.decode(file_data)
-                except (EOFError, SuspiciousOperation):
+                except (EOFError, SuspiciousOperation) as e:
+                    if isinstance(e, SuspiciousOperation):
+                        logger = logging.getLogger('django.security.%s' %
+                                e.__class__.__name__)
+                        logger.warning(e.message)
                     self.create()
 
                 # Remove expired sessions.
