@@ -17,7 +17,7 @@ from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils._os import upath
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, patch_logger
 from django.middleware.csrf import CsrfViewMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
@@ -154,23 +154,28 @@ class PasswordResetTest(AuthViewsTestCase):
         # produce a meaningful reset URL, we need to be certain that the
         # HTTP_HOST header isn't poisoned. This is done as a check when get_host()
         # is invoked, but we check here as a practical consequence.
-        response = self.client.post('/password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-            )
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(len(mail.outbox), 0)
+        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+            response = self.client.post('/password_reset/',
+                    {'email': 'staffmember@example.com'},
+                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+                )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(mail.outbox), 0)
+            self.assertEqual(len(logger_calls), 1)
 
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
         "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
-        response = self.client.post('/admin_password_reset/',
-                {'email': 'staffmember@example.com'},
-                HTTP_HOST='www.example:dr.frankenstein@evil.tld'
-            )
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(len(mail.outbox), 0)
+        with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
+            response = self.client.post('/admin_password_reset/',
+                    {'email': 'staffmember@example.com'},
+                    HTTP_HOST='www.example:dr.frankenstein@evil.tld'
+                )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(mail.outbox), 0)
+            self.assertEqual(len(logger_calls), 1)
+
 
     def _test_confirm_start(self):
         # Start by creating the email
@@ -677,5 +682,7 @@ class ChangelistTests(AuthViewsTestCase):
         self.login()
 
         # A lookup that tries to filter on password isn't OK
-        response = self.client.get('/admin/auth/user/?password__startswith=sha1$')
-        self.assertEqual(response.status_code, 400)
+        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as logger_calls:
+            response = self.client.get('/admin/auth/user/?password__startswith=sha1$')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(logger_calls), 1)
