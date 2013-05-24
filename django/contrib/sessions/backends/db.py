@@ -1,9 +1,9 @@
+import logging
+
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction, router
 from django.utils import timezone
-
-import logging
 
 class SessionStore(SessionBase):
     """
