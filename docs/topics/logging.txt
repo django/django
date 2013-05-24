@@ -437,17 +437,22 @@ level or handlers that are installed.
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The security loggers will receive ``ERROR`` level messages on any occurence of
+The security loggers will receive messages on any occurence of
 :exc:`~django.core.exceptions.SuspiciousOperation`. There is a sub-logger for
-each sub-type of SuspiciousOperation. For example, when an HTTP ``Host`` header is
-included in a request from a client that does not match
-:setting:`ALLOWED_HOSTS`, Django will return a 400 response, and the message
-will be logged to the ``django.security.DisallowedHost`` logger.
+each sub-type of SuspiciousOperation. The level of the log event depends on
+where the exception is handled.  Most occurences are logged as a warning, while
+any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
+error. For example, when an HTTP ``Host`` header is included in a request from
+a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
+response, and an error message will be logged to the
+``django.security.DisallowedHost`` logger.
 
 Only the parent ``django.security`` logger is configured by default, and all
 child loggers will propogate to the parent logger. The ``django.security``
-logger is configured the same as the ``django.request`` logger, and any events
-will be mailed to admins.
+logger is configured the same as the ``django.request`` logger, and any error
+events will be mailed to admins. Requests resulting in a 400 response due to
+a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
+but only to the ``django.security`` logger.
 
 To silence a particular type of SuspiciousOperation, you can override that
 specific logger following this example::
@@ -458,6 +463,11 @@ specific logger following this example::
                 'propagate': False,
             },
 
+A single :exc:`~django.core.exceptions.SuspiciousOperation` event is not likely
+reason for particular concern, sites should set up monitoring of the
+``django.security`` logger such that events occuring at high frequency should
+be investigated - the details of the monitoring setup with be determined by
+your sys admin setup.
 
 Handlers
 --------
