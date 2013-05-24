@@ -59,8 +59,11 @@ SuspiciousOperation
     * WizardViewCookieModified
 
     Third party apps may create their own subclass of ``SuspiciousOperation``.
-    When a SuspiciousOperation is raised, a message is logged with the
-    ``django.security.*`` logger matching the name of the subclass. See the
+    When a SuspiciousOperation is handled by Django, a warning level message is
+    logged with the ``django.security.*`` logger matching the name of the
+    subclass. If a ``SuspiciousOperation`` exception reaches the WSGI handler
+    level it is escalated and logged at an ``Error`` level and results in
+    a :class:`~django.http.HttpResponseBadRequest`. See the
     :doc:`logging documentation </topics/logging/>` for more information.
 
 PermissionDenied
