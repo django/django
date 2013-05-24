@@ -6,6 +6,7 @@ import sys
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import str_prefix
 from django.utils import six
 from django.utils import tzinfo
 from django.utils import unittest
@@ -213,6 +214,21 @@ class ModelTests(TestCase):
         # this is the actual test for #18432
         m3 = Model3.objects.get(model2=1000)
         m3.model2
+
+    def test_integer_field_empty_value(self):
+        """
+        Regression for #20205: passing "" for an IntegerField with blank=True &
+        null=True should raise a ValidationError (rather than a DatabaseError
+        during save).
+        """
+        article = Article(
+            article_text="Foo",
+            pub_date = datetime.datetime(2000, 1, 1),
+            status="",
+        )
+        expected_msg = str_prefix("""{'status': [%(_)s"'' value must be an integer."]}""")
+        with self.assertRaisesMessage(ValidationError, expected_msg):
+            article.full_clean()
 
 
 class ModelValidationTest(TestCase):
