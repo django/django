@@ -266,6 +266,9 @@ Minor features
   ``False`` allows the field to reference proxy models. The default is ``True``
   to retain the old behavior.
 
+* The :meth:`~django.db.models.query.QuerySet.get_or_create` method no longer
+  requires at least one keyword argument.
+
 Backwards incompatible changes in 1.6
 =====================================
 
