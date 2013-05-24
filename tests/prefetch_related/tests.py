@@ -8,7 +8,8 @@ from django.utils import six
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
-    BookWithYear, BookReview, Person, House, Room, Employee, Comment)
+    BookWithYear, BookReview, Person, House, Room, Employee, Comment,
+    LessonEntry, WordEntry)
 
 
 class PrefetchRelatedTests(TestCase):
@@ -618,3 +619,25 @@ class MultiDbTests(TestCase):
             ages = ", ".join(str(a.authorwithage.age) for a in A.prefetch_related('authorwithage'))
 
         self.assertEqual(ages, "50, 49")
+
+
+class Ticket19607Tests(TestCase):
+
+    def setUp(self):
+
+        for id, name1, name2 in [
+            (1, 'einfach', 'simple'),
+            (2, 'schwierig', 'difficult'),
+            ]:
+            LessonEntry.objects.create(id=id, name1=name1, name2=name2)
+
+        for id, lesson_entry_id, name in [
+            (1, 1, 'einfach'),
+            (2, 1, 'simple'),
+            (3, 2, 'schwierig'),
+            (4, 2, 'difficult'),
+            ]:
+            WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
+
+    def test_bug(self):
+        list(WordEntry.objects.prefetch_related('lesson_entry', 'lesson_entry__wordentry_set'))
