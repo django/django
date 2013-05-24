@@ -1,3 +1,4 @@
+import base64
 from datetime import timedelta
 import os
 import shutil
@@ -18,7 +19,7 @@ from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, patch_logger
 from django.utils import six
 from django.utils import timezone
 from django.utils import unittest
@@ -273,6 +274,15 @@ class SessionTestsMixin(object):
         data = {'a test key': 'a test value'}
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
+
+    def test_decode_failure_logged_to_security(self):
+        bad_encode = base64.b64encode('flaskdj:alkdjf')
+        with patch_logger('django.security.SuspiciousSession', 'warning') as calls:
+            self.assertEqual({}, self.session.decode(bad_encode))
+            # check that the failed decode is logged
+            self.assertEqual(len(calls), 1)
+            self.assertTrue('corrupted' in calls[0])
+
 
     def test_actual_expiry(self):
         # Regression test for #19200

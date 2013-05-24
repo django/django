@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+import logging
 import re
 import sys
 import warnings
@@ -401,3 +403,18 @@ class IgnoreDeprecationWarningsMixin(object):
 class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
 
         warning_class = PendingDeprecationWarning
+
+
+@contextmanager
+def patch_logger(logger_name, log_level):
+    # patches a log level and yields msgs called with matching level
+    calls = []
+    def replacement(msg):
+        calls.append(msg)
+    logger = logging.getLogger(logger_name)
+    orig = getattr(logger, log_level)
+    setattr(logger, log_level, replacement)
+    try:
+        yield calls
+    finally:
+        setattr(logger, log_level, orig)
