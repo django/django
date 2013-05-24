@@ -57,6 +57,12 @@ The Storage Class
         file. For storage systems that aren't able to return the last accessed
         time this will raise ``NotImplementedError`` instead.
 
+    .. method:: copy(src_name, dst_name)
+
+        Copy the file specified by src_name to dst_name. If dst_name already exists
+        ``ValueError`` will be raised. For storage systems that don't
+        support copy this will raise ``NotImplementedError`` instead.
+
     .. method:: created_time(name)
 
         Returns a ``datetime`` object containing the creation time of the file.
@@ -100,6 +106,12 @@ The Storage Class
         storage systems that aren't able to return the last modified time, this
         will raise ``NotImplementedError`` instead.
 
+    .. method:: move(src_name, dst_name)
+
+        Move the file specified by src_name to dst_name. If dst_name already exists
+        ``ValueError`` will be raised. For storage systems that don't
+        support move this will raise ``NotImplementedError`` instead.
+
     .. method:: open(name, mode='rb')
 
         Opens the file given by ``name``. Note that although the returned file
@@ -135,3 +147,4 @@ The Storage Class
         Returns the URL where the contents of the file referenced by ``name``
         can be accessed. For storage systems that don't support access by URL
         this will raise ``NotImplementedError`` instead.
+
