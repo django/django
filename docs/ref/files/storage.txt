@@ -59,8 +59,9 @@ The Storage Class
 
     .. method:: copy(src_name, dst_name)
 
-        Copy the file specified by src_name to dst_name. For storage systems that
-        don't support copy this will raise ``NotImplementedError`` instead.
+        Copy the file specified by src_name to dst_name. If dst_name already exists
+        ``ValueError`` will be raised. For storage systems that don't
+        support copy this will raise ``NotImplementedError`` instead.
 
     .. method:: created_time(name)
 
@@ -107,8 +108,9 @@ The Storage Class
 
     .. method:: move(src_name, dst_name)
 
-        Move the file specified by src_name to dst_name. For storage systems that
-        don't support move this will raise ``NotImplementedError`` instead.
+        Move the file specified by src_name to dst_name. If dst_name already exists
+        ``ValueError`` will be raised. For storage systems that don't
+        support move this will raise ``NotImplementedError`` instead.
 
     .. method:: open(name, mode='rb')
 

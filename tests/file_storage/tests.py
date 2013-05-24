@@ -383,7 +383,7 @@ class FileStorageTests(FileStorageTestsBase):
         f = ContentFile('content content')
         existing_name = self.storage.save('existing.file', f)
         src_name = self.storage.save('src.file', f)
-        with self.assertRaises(OSError):
+        with self.assertRaises(ValueError):
             self.storage.copy(src_name, existing_name)
 
     def test_move_file(self):
