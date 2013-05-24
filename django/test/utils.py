@@ -407,7 +407,10 @@ class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
 
 @contextmanager
 def patch_logger(logger_name, log_level):
-    # patches a log level and yields msgs called with matching level
+    """
+    Context manager that takes a named logger and the logging level
+    and provides a simple mock-like list of messages received
+    """
     calls = []
     def replacement(msg):
         calls.append(msg)
