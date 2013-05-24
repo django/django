@@ -280,6 +280,9 @@ Minor features
 * The :exc:`~django.core.exceptions.DoesNotExist` exception now includes a
   message indicating the name of the attribute used for the lookup.
 
+* The :meth:`~django.db.models.query.QuerySet.get_or_create` method no longer
+  requires at least one keyword argument.
+
 Backwards incompatible changes in 1.6
 =====================================
 

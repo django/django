@@ -1343,8 +1343,12 @@ get_or_create
 
 .. method:: get_or_create(**kwargs)
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+A convenience method for looking up an object with the given kwargs (may be
+empty if your model has defaults for all fields), creating one if necessary.
+
+.. versionchanged:: 1.6
+
+    Older versions of Django required ``kwargs``.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
