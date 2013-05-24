@@ -224,13 +224,14 @@ class ConnectionRouter(object):
     def routers(self):
         if self._routers is None:
             self._routers = settings.DATABASE_ROUTERS
+        routers = []
         for r in self._routers:
             if isinstance(r, six.string_types):
                 router = import_by_path(r)()
             else:
                 router = r
-            self._routers.append(router)
-        return self._routers
+            routers.append(router)
+        return routers
 
     def _router_func(action):
         def _route_db(self, model, **hints):
