@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError, VALID_KEY_CHARS
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 
@@ -82,7 +83,7 @@ class SessionStore(SessionBase):
                     if isinstance(e, SuspiciousOperation):
                         logger = logging.getLogger('django.security.%s' %
                                 e.__class__.__name__)
-                        logger.warning(e.message)
+                        logger.warning(force_text(e))
                     self.create()
 
                 # Remove expired sessions.

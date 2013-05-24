@@ -182,6 +182,7 @@ class BaseHandler(object):
             security_logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
             logger.warning(e.message)
+            security_logger.error(force_text(e))
 
             try:
                 callback, param_dict = resolver.resolve400()
