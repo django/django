@@ -17,8 +17,7 @@ Geolocation with GeoIP
     in ``utils``, but will be removed in Django 1.6.
 
 The :class:`GeoIP` object is a ctypes wrapper for the
-`MaxMind GeoIP C API`__. [#]_  This interface is a BSD-licensed alternative
-to the GPL-licensed `Python GeoIP`__ interface provided by MaxMind.
+`MaxMind GeoIP C API`__. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP` object requires
 the GeoIP C libary and either the GeoIP `Country`__ or `City`__ 
@@ -29,7 +28,6 @@ you set :setting:`GEOIP_PATH` with in your settings.  See the example and
 reference below for more details.
 
 __ http://www.maxmind.com/app/c
-__ http://www.maxmind.com/app/python
 __ http://www.maxmind.com/app/country
 __ http://www.maxmind.com/app/city
 __ http://www.maxmind.com/download/geoip/database/
