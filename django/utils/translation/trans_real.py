@@ -80,7 +80,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
         self.set_output_charset('utf-8')
-        self.django_output_charset = 'utf-8'
         self.__language = '??'
 
     def merge(self, other):
