@@ -124,7 +124,7 @@ def _detect_image_library():
                 import _imaging as PIL_imaging
             except ImportError as err:
                 raise ImproperlyConfigured(
-                    _("The '_imaging' module for the PIL could not be " +
+                    _("The '_imaging' module for the PIL could not be "
                       "imported: %s" % err)
                 )
 
