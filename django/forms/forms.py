@@ -526,9 +526,13 @@ class BoundField(object):
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             attrs = flatatt(attrs) if attrs else ''
-            contents = format_html('<label for="{0}"{1}>{2}</label>',
-                                   widget.id_for_label(id_), attrs, contents
-                                   )
+            id_for_label = widget.id_for_label(id_)
+            if id_for_label:
+                contents = format_html('<label for="{0}"{1}>{2}</label>',
+                                       id_for_label, attrs, contents)
+            else:
+                contents = format_html('<label{0}>{1}</label>',
+                                       attrs, contents)
         else:
             contents = conditional_escape(contents)
         return mark_safe(contents)
