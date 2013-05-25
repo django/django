@@ -76,7 +76,7 @@ class GetOrCreateTests(TestCase):
                 warnings.simplefilter('ignore')
                 Person.objects.get_or_create(
                     birthday=date(1970, 1, 1),
-                    defaults={'first_name': "\xff", 'last_name': "\xff"})
+                    defaults={'first_name': b"\xff", 'last_name': b"\xff"})
         except (DatabaseError, DjangoUnicodeDecodeError):
             Person.objects.create(
                 first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))
