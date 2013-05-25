@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"POT-Creation-Date: 2013-05-25 14:30+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -60,12 +60,13 @@ msgstr ""
 msgid "number of %s"
 msgstr ""
 
-#: views.py:270
+#. Translators: %s is an object type name
+#: views.py:271
 #, python-format
-msgid "Fields on %s objects"
+msgid "Attributes on %s objects"
 msgstr ""
 
-#: views.py:362
+#: views.py:363
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr ""
