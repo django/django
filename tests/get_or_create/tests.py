@@ -5,6 +5,7 @@ import traceback
 import warnings
 
 from django.db import IntegrityError, DatabaseError
+from django.utils.encoding import DjangoUnicodeDecodeError
 from django.test import TestCase, TransactionTestCase
 
 from .models import Person, ManualPrimaryKeyTest, Profile, Tag, Thing
@@ -76,7 +77,7 @@ class GetOrCreateTests(TestCase):
                 Person.objects.get_or_create(
                     birthday=date(1970, 1, 1),
                     defaults={'first_name': "\xff", 'last_name': "\xff"})
-        except DatabaseError:
+        except (DatabaseError, DjangoUnicodeDecodeError):
             Person.objects.create(
                 first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))
         else:
