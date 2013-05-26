@@ -132,6 +132,9 @@ def activate(language):
 def deactivate():
     return _trans.deactivate()
 
+def uncache(language):
+    return _trans.uncache(language)
+
 class override(object):
     def __init__(self, language, deactivate=False):
         self.language = language

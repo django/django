@@ -30,7 +30,8 @@ from django.utils.translation import (activate, deactivate,
     ngettext, ngettext_lazy,
     ungettext, ungettext_lazy,
     pgettext, pgettext_lazy,
-    npgettext, npgettext_lazy)
+    npgettext, npgettext_lazy,
+    check_for_language, uncache)
 
 from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
 if can_run_extraction_tests:
@@ -906,6 +907,9 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = ['i18n.resolution'] + list(settings.INSTALLED_APPS)
+        uncache('de')
+        self.assertIsNone(uncache('de'), "This test will not work if "
+            "the 'de' locale is already cached")
         super(AppResolutionOrderI18NTests, self).setUp()
 
     def tearDown(self):

@@ -96,6 +96,21 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
 
+def uncache(language):
+    """
+    Deletes a translation from the cache.
+
+    This is necessary if settings.INSTALLED_APPS has changed in a way that
+    affects translations, such as adding or removing an app that comes with
+    its own translations. This happens in
+    i18n.tests.AppResolutionOrderI18NTests.test_app_translation for example,
+    which fails if the "de" catalog was loaded and cached before the test
+    modifies INSTALLED_APPS.
+    """
+    if language in _translations:
+        return _translations.pop(language)
+    return None
+
 def translation(language):
     """
     Returns a translation object.
