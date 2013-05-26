@@ -82,7 +82,7 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += patterns('django.contrib.flatpages.views',
-        (r'^(?P<url>.*)$', 'flatpage'),
+        (r'^(?P<url>.*/)$', 'flatpage'),
     )
 
 Another common setup is to use flat pages for a limited set of known pages and
