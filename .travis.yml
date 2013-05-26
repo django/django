@@ -1,0 +1,88 @@
+language: python
+
+python:
+# - "2.6"
+ - "2.7"
+# - "3.2"
+# - "3.3"
+
+matrix:
+  exclude:
+    # Disable MySQL tests for 3.2 and 3.3
+    - python: "3.2"
+      env: DB=mysql
+    - python: "3.3"
+      env: DB=mysql
+
+env:
+  - DB=sqlite GIS=nogis
+  - DB=mysql GIS=nogis
+  - DB=mysql GIS=gis
+  - DB=postgres GIS=nogis
+  - DB=postgres GIS=gis
+  - ONLY_DOCS=1
+
+install:
+  - pip install -e .
+
+before_script:
+  - locale
+  - export PIP_USE_MIRRORS=true
+  - export PIP_INDEX_URL=https://restricted.crate.io/
+  - export DISPLAY=:99.0
+  - export CONFIG_SERVER=http://apolloner.eu/~apollo13/django/
+  # apparent workaround for postgres crash on Travis:
+  # https://code.djangoproject.com/wiki/ContinuousIntegration#PostgresCrashing
+  - echo 'restart_after_crash = off' | sudo tee -a /etc/postgresql/9.1/main/postgresql.conf
+  - echo 'checkpoint_timeout = 30'   | sudo tee -a /etc/postgresql/9.1/main/postgresql.conf
+  - sudo /etc/init.d/postgresql stop
+  - echo "data_directory = '/var/lib/postgresql/9.1/main'" | sudo tee -a /etc/postgresql/9.1/main/postgresql.conf
+  - sudo /etc/init.d/postgresql start
+  - sudo mount -o remount,size=1G remounted /var/ramfs
+  - df
+  - sh -x ./tests/travis_configs/before_script.sh
+
+script:
+  - cd tests
+  # don't run tests if $ONLY_DOCS is set
+  - test -n "$ONLY_DOCS" || PYTHONPATH=..:travis_configs python -Wall runtests.py --selenium --verbosity 2 --settings=travis_configs.test_$DB\_$GIS --failfast
+  - cd ../docs
+  # build docs only if $ONLY_DOCS is set
+  - test -z "$ONLY_DOCS" || make html
+
+after_failure:
+  - mount 
+  - df
+  - sudo ls -la / /var /var/lib /var/lib/postgresql /var/lib/postgresql/9.1 
+  - sudo sh -c 'du -sk /var/lib/postgresql/*/main'
+  - sudo sh -c 'du -sk /var/lib/postgresql/*/main/*'
+  - sudo sh -c 'ls -la /var/lib/postgresql/*/main'
+  - sudo sh -c 'ls -la /var/lib/postgresql/*/main/*'
+  # postgres log might be stupidly long, so do it last and trim:
+  - sudo head -100 /var/log/postgresql/postgresql-*-main.log
+  - sudo tail -100 /var/log/postgresql/postgresql-*-main.log
+
+services:
+  - memcached
+
+notifications:
+  email: false
+
+# Travis bug #902 means that this config only decides whether to build the
+# "current" branch or not. So every branch that you want to exclude must have
+# a .travis.yml file that excludes it, at the very least.
+# https://github.com/travis-ci/travis-ci/issues/902
+#
+# I've included a `travisci` branch here (which doesn't exist in
+# django/django) so that anyone can fork django/django and start
+# creating/updating their own `travisci` branch without having to change
+# this file (and then exclude the changes from their pull requests back
+# to django/django/master). And also ticket_19891, which is the branch
+# containing the proposed additions (pull request) to enable Travis for
+# Django.
+branches:
+  only:
+    - master
+    - travisci
+    - travisci_pgsql_crash
+    - ticket_19891
