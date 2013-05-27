@@ -468,7 +468,11 @@ class AdminViewBasicTest(TestCase):
         self.assertContains(response, '4 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'false'})
         self.assertContains(response, '3 articles')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '0'})
+        self.assertContains(response, '3 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'true'})
+        self.assertContains(response, '1 article')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '1'})
         self.assertContains(response, '1 article')
 
     def testLogoutAndPasswordChangeURLs(self):
@@ -3508,7 +3512,6 @@ class RawIdFieldsTest(TestCase):
 
     def test_limit_choices_to(self):
         """Regression test for 14880"""
-        # This includes tests integers, strings and booleans in the lookup query string
         actor = Actor.objects.create(name="Palin", age=27)
         inquisition1 = Inquisition.objects.create(expected=True,
                                                   leader=actor,
@@ -3524,10 +3527,56 @@ class RawIdFieldsTest(TestCase):
 
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
-        # Get the popup
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step also tests integers, strings and booleans in the
+        # lookup query string; in model we define inquisition field to have a
+        # limit_choices_to option that includes a filter on a string field
+        # (inquisition__actor__name), a filter on an integer field
+        # (inquisition__actor__age), and a filter on a boolean field
+        # (inquisition__expected).
         response2 = self.client.get(popup_url)
         self.assertContains(response2, "Spain")
         self.assertNotContains(response2, "England")
+
+    def test_limit_choices_to_isnull_false(self):
+        """Regression test for 20182"""
+        actor = Actor.objects.create(name="Palin", age=27)
+        actor = Actor.objects.create(name="Kilbraken", age=50, title="Judge")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant0"', response.content)
+        self.assertTrue(m)  # Got a match
+        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step tests field__isnull=0 gets parsed correctly from the
+        # lookup query string; in model we define defendant0 field to have a
+        # limit_choices_to option that includes "actor__title__isnull=False".
+        response2 = self.client.get(popup_url)
+        self.assertContains(response2, "Kilbraken")
+        self.assertNotContains(response2, "Palin")
+
+    def test_limit_choices_to_isnull_true(self):
+        """Regression test for 20182"""
+        actor = Actor.objects.create(name="Palin", age=27)
+        actor = Actor.objects.create(name="Kilbraken", age=50, title="Judge")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant1"', response.content)
+        self.assertTrue(m)  # Got a match
+        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step tests field__isnull=1 gets parsed correctly from the
+        # lookup query string; in model we define defendant1 field to have a
+        # limit_choices_to option that includes "actor__title__isnull=True".
+        response2 = self.client.get(popup_url)
+        self.assertNotContains(response2, "Kilbraken")
+        self.assertContains(response2, "Palin")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
