@@ -32,7 +32,7 @@ from django.utils.translation import (activate, deactivate,
     ungettext, ungettext_lazy,
     pgettext, pgettext_lazy,
     npgettext, npgettext_lazy,
-    check_for_language)
+    check_for_language, uncache)
 
 if find_command('xgettext'):
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
@@ -941,6 +941,9 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = ['i18n.resolution'] + list(settings.INSTALLED_APPS)
+        uncache('de')
+        self.assertIsNone(uncache('de'), "This test will not work if "
+            "the 'de' locale is already cached")
         super(AppResolutionOrderI18NTests, self).setUp()
 
     def tearDown(self):
