@@ -30,12 +30,11 @@ from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
-from django.test import _doctest as doctest
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
-    override_settings, compare_xml, strip_quotes)
+    override_settings, compare_xml)
 from django.utils import six, unittest as ut2
 from django.utils.encoding import force_text
 from django.utils.unittest import skipIf # Imported here for backward compatibility
@@ -43,13 +42,8 @@ from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
 
-__all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
+__all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
-
-
-normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
-normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)",
-                                lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
 
 
 def to_list(value):
@@ -94,75 +88,6 @@ def assert_and_parse_html(self, html, user_msg, msg):
         standardMsg = '%s\n%s' % (msg, e.msg)
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
-
-
-class OutputChecker(doctest.OutputChecker):
-    def __init__(self):
-        warnings.warn(
-            "The django.test.testcases.OutputChecker class is deprecated; "
-            "use the doctest module from the Python standard library instead.",
-            PendingDeprecationWarning)
-
-    def check_output(self, want, got, optionflags):
-        """
-        The entry method for doctest output checking. Defers to a sequence of
-        child checkers
-        """
-        checks = (self.check_output_default,
-                  self.check_output_numeric,
-                  self.check_output_xml,
-                  self.check_output_json)
-        for check in checks:
-            if check(want, got, optionflags):
-                return True
-        return False
-
-    def check_output_default(self, want, got, optionflags):
-        """
-        The default comparator provided by doctest - not perfect, but good for
-        most purposes
-        """
-        return doctest.OutputChecker.check_output(self, want, got, optionflags)
-
-    def check_output_numeric(self, want, got, optionflags):
-        """Doctest does an exact string comparison of output, which means that
-        some numerically equivalent values aren't equal. This check normalizes
-         * long integers (22L) so that they equal normal integers. (22)
-         * Decimals so that they are comparable, regardless of the change
-           made to __repr__ in Python 2.6.
-        """
-        return doctest.OutputChecker.check_output(self,
-            normalize_decimals(normalize_long_ints(want)),
-            normalize_decimals(normalize_long_ints(got)),
-            optionflags)
-
-    def check_output_xml(self, want, got, optionsflags):
-        try:
-            return compare_xml(want, got)
-        except Exception:
-            return False
-
-    def check_output_json(self, want, got, optionsflags):
-        """
-        Tries to compare want and got as if they were JSON-encoded data
-        """
-        want, got = strip_quotes(want, got)
-        try:
-            want_json = json.loads(want)
-            got_json = json.loads(got)
-        except Exception:
-            return False
-        return want_json == got_json
-
-
-class DocTestRunner(doctest.DocTestRunner):
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "The django.test.testcases.DocTestRunner class is deprecated; "
-            "use the doctest module from the Python standard library instead.",
-            PendingDeprecationWarning)
-        doctest.DocTestRunner.__init__(self, *args, **kwargs)
-        self.optionflags = doctest.ELLIPSIS
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):

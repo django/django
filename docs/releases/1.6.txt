@@ -345,21 +345,15 @@ support some types of tests that were supported by the previous runner:
   your test suite, follow the `recommendations in the Python documentation`_.
 
 Django bundles a modified version of the :mod:`doctest` module from the Python
-standard library (in ``django.test._doctest``) in order to allow passing in a
-custom ``DocTestRunner`` when instantiating a ``DocTestSuite``, and includes
-some additional doctest utilities (``django.test.testcases.DocTestRunner``
-turns on the ``ELLIPSIS`` option by default, and
-``django.test.testcases.OutputChecker`` provides better matching of XML, JSON,
-and numeric data types).
-
-These utilities are deprecated and will be removed in Django 1.8; doctest
-suites should be updated to work with the standard library's doctest module (or
-converted to unittest-compatible tests).
+standard library (in ``django.test._doctest``) and includes some additional
+doctest utilities. These utilities are deprecated and will be removed in Django
+1.8; doctest suites should be updated to work with the standard library's
+doctest module (or converted to unittest-compatible tests).
 
 If you wish to delay updates to your test suite, you can set your
 :setting:`TEST_RUNNER` setting to ``django.test.simple.DjangoTestSuiteRunner``
-to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is
-deprecated but will not be removed from Django until version 1.8.
+to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
+but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 

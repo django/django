@@ -386,10 +386,8 @@ these changes.
   ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
   ``django.test.runner.DiscoverRunner``.
 
-* The module ``django.test._doctest`` and the classes
-  ``django.test.testcases.DocTestRunner`` and
-  ``django.test.testcases.OutputChecker`` will be removed. Instead use the
-  doctest module from the Python standard library.
+* The module ``django.test._doctest`` will be removed. Instead use the doctest
+  module from the Python standard library.
 
 * The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
 
