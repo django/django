@@ -679,3 +679,29 @@ described in :ref:`Field lookups <field-lookups>`.
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
 duplicated. That also means you cannot use those methods on unsaved objects.
+
+.. method:: Model.choices_for_FOO()
+
+    .. versionadded:: 1.6
+
+    For every :class:`~django.db.models.ForeignKey` which
+    :attr:`~django.db.models.ForeignKey.limit_choices_to` is too limited, you
+    can define a ``choices_for_FOO`` method, where ``FOO`` is the name of the
+    field, that returns a queryset. It allows you to limit choices with
+    respect to ``self``. For example::
+
+        class MyModel(models.Model):
+            user = models.ForeignKey(User)
+
+            def choices_for_user(self):
+                return User.objects.filter(Q(id=self.user) | Q(is_active=True))
+
+    will make only active and currently associated users choosable.
+
+    .. note::
+
+        The ``choices_for_FOO`` method takes precedence over the
+        :attr:`~django.db.models.ForeignKey.limit_choices_to` option. So, when
+        a ``choices_for_FOO`` method is available it will always be used
+        instead of the queryset generated against
+        :attr:`~django.db.models.ForeignKey.limit_choices_to`.
