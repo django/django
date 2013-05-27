@@ -1170,10 +1170,7 @@ class ForeignKey(ForeignObject):
             return
 
         using = router.db_for_read(model_instance.__class__, instance=model_instance)
-        qs = self.rel.to._default_manager.using(using).filter(
-                **{self.rel.field_name: value}
-             )
-        qs = qs.complex_filter(self.rel.limit_choices_to)
+        qs = self.queryset.using(using).filter(**{self.rel.field_name: value})
         if not qs.exists():
             raise exceptions.ValidationError(self.error_messages['invalid'] % {
                 'model': self.rel.to._meta.verbose_name, 'pk': value})
@@ -1228,7 +1225,7 @@ class ForeignKey(ForeignObject):
                              (self.name, self.rel.to))
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.rel.to._default_manager.using(db).complex_filter(self.rel.limit_choices_to),
+            'queryset': self.queryset.using(db),
             'to_field_name': self.rel.field_name,
         }
         defaults.update(kwargs)

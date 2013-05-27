@@ -280,6 +280,9 @@ Minor features
 * The :exc:`~django.core.exceptions.DoesNotExist` exception now includes a
   message indicating the name of the attribute used for the lookup.
 
+* Added :attr:`~django.db.models.Model.choices_for_FOO` option allowing extended
+  filtering for :class:`~django.db.models.ForeignKey`.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -599,6 +602,12 @@ Miscellaneous
 * The ``XViewMiddleware`` has been moved from ``django.middleware.doc`` to
   ``django.contrib.admindocs.middleware`` because it is an implementation
   detail of admindocs, proven not to be reusable in general.
+
+* The support for extended filtering on :class:`~django.db.models.ForeignKey`
+  lookups for model-defined :attr:`~django.db.models.Model.choices_for_FOO`
+  methods, where ``FOO`` is the name of a field. Be careful when upgrading that
+  you haven't already defined some method following this pattern in your
+  codebase, otherwise things might not work as expected.
 
 Features deprecated in 1.6
 ==========================

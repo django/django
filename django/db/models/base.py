@@ -385,6 +385,10 @@ class Model(six.with_metaclass(ModelBase)):
                         # pass in "None" for related objects if it's allowed.
                         if rel_obj is None and field.null:
                             val = None
+                        # Set the model field choices function on the field.
+                        # Refs #2445.
+                        choice_func = getattr(self, 'choices_for_%s' % field.name, None)
+                        field._queryset = choice_func
                 else:
                     try:
                         val = kwargs.pop(field.attname)
