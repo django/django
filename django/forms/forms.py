@@ -134,7 +134,7 @@ class BaseForm(object):
 
         Subclasses may wish to override.
         """
-        return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
+        return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
         """

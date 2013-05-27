@@ -99,7 +99,7 @@ class Command(BaseCommand):
             "started_at": datetime.now().strftime('%B %d, %Y - %X'),
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
-            "addr": self._raw_ipv6 and '[%s]' % self.addr or self.addr,
+            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })

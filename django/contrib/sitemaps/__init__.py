@@ -94,7 +94,7 @@ class Sitemap(object):
                 'location':   loc,
                 'lastmod':    self.__get('lastmod', item, None),
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   str(priority is not None and priority or ''),
+                'priority':   str(priority if priority is not None else ''),
             }
             urls.append(url_info)
         return urls

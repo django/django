@@ -405,7 +405,7 @@ class ExceptionReporter(object):
             if pre_context_lineno is not None:
                 frames.append({
                     'tb': tb,
-                    'type': module_name.startswith('django.') and 'django' or 'user',
+                    'type': 'django' if module_name.startswith('django.') else 'user',
                     'filename': filename,
                     'function': function,
                     'lineno': lineno + 1,

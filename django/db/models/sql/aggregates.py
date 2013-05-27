@@ -99,7 +99,7 @@ class Count(Aggregate):
     sql_template = '%(function)s(%(distinct)s%(field)s)'
 
     def __init__(self, col, distinct=False, **extra):
-        super(Count, self).__init__(col, distinct=distinct and 'DISTINCT ' or '', **extra)
+        super(Count, self).__init__(col, distinct='DISTINCT ' if distinct else '', **extra)
 
 class Max(Aggregate):
     sql_function = 'MAX'

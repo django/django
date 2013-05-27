@@ -546,7 +546,7 @@ class LayerMapping(object):
                         # Attempting to save.
                         m.save(using=self.using)
                         num_saved += 1
-                        if verbose: stream.write('%s: %s\n' % (is_update and 'Updated' or 'Saved', m))
+                        if verbose: stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
                     except SystemExit:
                         raise
                     except Exception as msg:

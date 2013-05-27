@@ -137,7 +137,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         )
         title = "%s%s" % (
             self.version_text[node['type']] % node['version'],
-            len(node) and ":" or "."
+            ":" if len(node) else "."
         )
         self.body.append('<span class="title">%s</span> ' % title)
 

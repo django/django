@@ -125,7 +125,7 @@ class QuerySet(object):
             else:
                 stop = None
             qs.query.set_limits(start, stop)
-            return k.step and list(qs)[::k.step] or qs
+            return list(qs)[::k.step] if k.step else qs
 
         qs = self._clone()
         qs.query.set_limits(k, k + 1)

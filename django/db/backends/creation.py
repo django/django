@@ -97,7 +97,7 @@ class BaseDatabaseCreation(object):
                           style.SQL_TABLE(qn(opts.db_table)) + ' (']
         for i, line in enumerate(table_output):  # Combine and add commas.
             full_statement.append(
-                '    %s%s' % (line, i < len(table_output) - 1 and ',' or ''))
+                '    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(')')
         if opts.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(

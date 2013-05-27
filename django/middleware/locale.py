@@ -49,7 +49,7 @@ class LocaleMiddleware(object):
 
             if path_valid:
                 language_url = "%s://%s/%s%s" % (
-                    request.is_secure() and 'https' or 'http',
+                    'https' if request.is_secure() else 'http',
                     request.get_host(), language, request.get_full_path())
                 return HttpResponseRedirect(language_url)
 

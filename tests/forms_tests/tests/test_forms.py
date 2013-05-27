@@ -1398,7 +1398,7 @@ class FormsTestCase(TestCase):
             birthday = DateField()
 
             def add_prefix(self, field_name):
-                return self.prefix and '%s-prefix-%s' % (self.prefix, field_name) or field_name
+                return '%s-prefix-%s' % (self.prefix, field_name) if self.prefix else field_name
 
         p = Person(prefix='foo')
         self.assertHTMLEqual(p.as_ul(), """<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
