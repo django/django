@@ -564,7 +564,7 @@ API changes
 Transaction middleware
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 1.6, ``TransactionMiddleware`` is deprecated and replaced
+In Django 1.6, ``TransactionMiddleware`` is deprecated and replaced by
 :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>`. While the general
 behavior is the same, there are two differences.
 
