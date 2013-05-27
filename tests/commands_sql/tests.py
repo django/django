@@ -46,7 +46,13 @@ class SQLCommandsTestCase(TestCase):
     def test_sql_all(self):
         app = models.get_app('commands_sql')
         output = sql_all(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates two indexes
-        self.assertIn(len(output), [2, 3])
         self.assertTrue(output[0].startswith('CREATE TABLE'))
-        self.assertTrue(output[1].startswith('CREATE INDEX'))
+        if connections[DEFAULT_DB_ALIAS].vendor == 'oracle':
+            self.assertEqual(len(output), 4) # Oracle creates a table, a sequence, a trigger and an index
+            self.assertIn('CREATE SEQUENCE', output[1])
+            self.assertIn('CREATE OR REPLACE TRIGGER', output[2])
+            self.assertTrue(output[3].startswith('CREATE INDEX'))
+        else:
+            # PostgreSQL creates two indexes
+            self.assertIn(len(output), [2, 3])
+            self.assertTrue(output[1].startswith('CREATE INDEX'))
