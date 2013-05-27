@@ -408,9 +408,12 @@ class SubqueryConstraint(object):
             query.clear_ordering(True)
 
         query_compiler = query.get_compiler(connection=connection)
-        return query_compiler.as_subquery_condition(self.alias, self.columns)
+        return query_compiler.as_subquery_condition(self.alias, self.columns, qn)
 
-    def relabeled_clone(self, relabels):
+    def relabel_aliases(self, change_map):
+        self.alias = change_map.get(self.alias, self.alias)
+
+    def clone(self):
         return self.__class__(
-            relabels.get(self.alias, self.alias),
-            self.columns, self.query_object)
+            self.alias, self.columns, self.targets,
+            self.query_object)

@@ -17,7 +17,7 @@ from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
 from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
-    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ,
+    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, Join, LeafB, LoopX, LoopZ,
     ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
@@ -2827,3 +2827,17 @@ class ValuesSubqueryTests(TestCase):
         self.assertQuerysetEqual(
             Order.objects.filter(items__in=OrderItem.objects.values_list('status')),
             [o1.pk], lambda x: x.pk)
+
+class DoubleInSubqueryTests(TestCase):
+    def test_double_subquery_in(self):
+        lfa1 = LeafA.objects.create(data='foo')
+        lfa2 = LeafA.objects.create(data='bar')
+        lfb1 = LeafB.objects.create(data='lfb1')
+        lfb2 = LeafB.objects.create(data='lfb2')
+        Join.objects.create(a=lfa1, b=lfb1)
+        Join.objects.create(a=lfa2, b=lfb2)
+        leaf_as = LeafA.objects.filter(data='foo').values_list('pk', flat=True)
+        joins = Join.objects.filter(a__in=leaf_as).values_list('b__id', flat=True)
+        qs = LeafB.objects.filter(pk__in=joins)
+        self.assertQuerysetEqual(
+            qs, [lfb1], lambda x: x)

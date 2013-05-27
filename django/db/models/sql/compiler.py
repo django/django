@@ -786,8 +786,7 @@ class SQLCompiler(object):
             return list(result)
         return result
 
-    def as_subquery_condition(self, alias, columns):
-        qn = self.quote_name_unless_alias
+    def as_subquery_condition(self, alias, columns, qn):
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()
