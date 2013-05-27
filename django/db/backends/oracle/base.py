@@ -442,9 +442,10 @@ WHEN (new.%(col_name)s IS NULL)
         # 'second' instead -- cx_Oracle chops the fraction-of-second part
         # off of datetime objects, leaving almost an entire second out of
         # the year under the default implementation.
-        first = '%s-01-01'
-        second = '%s-12-31 23:59:59.999999'
-        return [first % value, second % value]
+        bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
+        if settings.USE_TZ:
+            bounds = [b.astimezone(timezone.utc).replace(tzinfo=None) for b in bounds]
+        return [b.isoformat(b' ') for b in bounds]
 
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"
