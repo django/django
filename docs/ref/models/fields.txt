@@ -368,7 +368,7 @@ to filter a queryset on a ``BinaryField`` value.
 
     Although you might think about storing files in the database, consider that
     it is bad design in 99% of the cases. This field is *not* a replacement for
-    proper :doc`static files </howto/static-files>` handling.
+    proper :doc:`static files </howto/static-files/index>` handling.
 
 ``BooleanField``
 ----------------
