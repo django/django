@@ -75,7 +75,7 @@ Model field                      Form field
 
 ``FileField``                    ``FileField``
 
-``FilePathField``                ``CharField``
+``FilePathField``                ``FilePathField``
 
 ``FloatField``                   ``FloatField``
 
