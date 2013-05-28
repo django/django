@@ -293,7 +293,12 @@ records with the same ``title`` and ``pub_date``.
 Note that if you set this to point to a :class:`DateTimeField`, only the date
 portion of the field will be considered.
 
-This is enforced by model validation but not at the database level.
+This is enforced by :meth:`Model.validate_unique()` during model validation
+but not at the database level. If any :attr:`~Field.unique_for_date` constraint
+involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+example, if one of the fields is listed in ``exclude`` or has
+:attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
+skip validation for that particular constraint.
 
 ``unique_for_month``
 --------------------

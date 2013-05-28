@@ -24,7 +24,7 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    ArticleStatusNote, test_images)
+    ArticleStatusNote, DateTimePost, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -73,6 +73,12 @@ class ExplicitPKForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
+        fields = '__all__'
+
+
+class DateTimePostForm(forms.ModelForm):
+    class Meta:
+        model = DateTimePost
         fields = '__all__'
 
 
@@ -681,6 +687,23 @@ class UniqueTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
+
+    def test_unique_for_date_in_exclude(self):
+        """If the date for unique_for_* constraints is excluded from the
+        ModelForm (in this case 'posted' has editable=False, then the
+        constraint should be ignored."""
+        p = DateTimePost.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally",
+            posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
+        # 'title' has unique_for_date='posted'
+        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        self.assertTrue(form.is_valid())
+        # 'slug' has unique_for_year='posted'
+        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        self.assertTrue(form.is_valid())
+        # 'subtitle' has unique_for_month='posted'
+        form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+        self.assertTrue(form.is_valid())
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
