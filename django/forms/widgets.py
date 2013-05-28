@@ -252,17 +252,45 @@ class TextInput(Input):
             self.input_type = attrs.pop('type', self.input_type)
         super(TextInput, self).__init__(attrs)
 
-
-class NumberInput(TextInput):
+    
+class NumberInput(widgets.Input):
+    """HTML5 Number Input."""
     input_type = 'number'
 
 
-class EmailInput(TextInput):
+class SearchInput(widgets.Input):
+    """HTML5 Search Input."""
+    input_type = 'search'
+
+
+class EmailInput(widgets.Input):
+    """HTML5 Email Input."""
     input_type = 'email'
 
 
-class URLInput(TextInput):
+class URLInput(widgets.Input):
+    """HTML5 URL Input."""
     input_type = 'url'
+
+
+class RangeInput(widgets.Input):
+    """HTML5 Range Input."""
+    input_type = 'range'
+
+
+#class DateInput(widgets.Input):
+#    """HTML5 Range Input."""
+#    input_type = 'date'
+
+
+#class DateTimeInput(widgets.Input):
+#    """HTML5 Range Input."""
+#    input_type = 'datetime'
+
+
+class ColorInput(widgets.Input):
+    """HTML5 Color Input."""
+    input_type = 'color'
 
 
 class PasswordInput(TextInput):
