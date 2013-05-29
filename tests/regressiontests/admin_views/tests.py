@@ -2375,6 +2375,29 @@ class AdminActionsTest(TestCase):
         response = self.client.post(url, action_data)
         self.assertRedirects(response, url)
 
+    def test_custom_function_action_streaming_response(self):
+        """Tests a custom action that returns a StreamingHttpResponse."""
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'download',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        content = b''.join(response.streaming_content)
+        self.assertEqual(content, b'This is the content of the file')
+        self.assertEqual(response.status_code, 200)
+
+    def test_custom_function_action_no_perm_response(self):
+        """Tests a custom action that returns an HttpResponse with 403 code."""
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'no_perm',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.content, b'No permission to perform this action')
+
     def test_actions_ordering(self):
         """
         Ensure that actions are ordered as expected.
@@ -2383,9 +2406,13 @@ class AdminActionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/externalsubscriber/')
         self.assertContains(response, '''<label>Action: <select name="action">
 <option value="" selected="selected">---------</option>
-<option value="delete_selected">Delete selected external subscribers</option>
+<option value="delete_selected">Delete selected external
+subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
-<option value="external_mail">External mail (Another awesome action)</option>
+<option value="external_mail">External mail (Another awesome
+action)</option>
+<option value="download">Download subscription</option>
+<option value="no_perm">No permission to run</option>
 </select>''', html=True)
 
     def test_model_without_action(self):
