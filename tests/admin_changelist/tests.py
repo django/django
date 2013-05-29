@@ -581,7 +581,7 @@ class ChangeListTests(TestCase):
 
         for page_num, objects_count, expected_page_range in [
             (0, per_page, []),
-            (0, per_page * 2, range(2)),
+            (0, per_page * 2, list(range(2))),
             (5, per_page * 11, list(range(11))),
             (5, per_page * 12, [0, 1, 2, 3, 4, 5, 6, 7, 8, '.', 10, 11]),
             (6, per_page * 12, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, 10, 11]),
@@ -597,9 +597,9 @@ class ChangeListTests(TestCase):
             cl.get_results(request)
             real_page_range = pagination(cl)['page_range']
 
-            self.assertEqual(
+            self.assertListEqual(
                 expected_page_range,
-                real_page_range,
+                list(real_page_range),
             )
 
 
