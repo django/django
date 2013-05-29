@@ -1111,6 +1111,17 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Report: r1>']
         )
 
+    def test_ticket_20250(self):
+        # A negated Q along with an annotated queryset failed in Django 1.4
+        qs = Author.objects.annotate(Count('item'))
+        qs = qs.filter(~Q(extra__value=0))
+
+        self.assertTrue('SELECT' in str(qs.query))
+        self.assertQuerysetEqual(
+            qs,
+            ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
+        )
+
 
 class Queries2Tests(TestCase):
     def setUp(self):
