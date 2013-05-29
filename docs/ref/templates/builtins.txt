@@ -862,6 +862,8 @@ above would result in the following output:
     * New York: 20,000,000
 * India
     * Calcutta: 15,000,000
+* USA
+    * Chicago: 7,000,000
 * Japan
     * Tokyo: 33,000,000
 
