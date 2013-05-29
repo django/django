@@ -9,11 +9,13 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
+from django.core.servers.basehttp import FileWrapper
 from django.conf.urls import patterns, url
 from django.db import models
 from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
+from django.utils.six import StringIO
 
 from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -238,8 +240,20 @@ def redirect_to(modeladmin, request, selected):
 redirect_to.short_description = 'Redirect to (Awesome action)'
 
 
+def download(modeladmin, request, selected):
+    buf = StringIO('This is the content of the file')
+    return StreamingHttpResponse(FileWrapper(buf))
+download.short_description = 'Download subscription'
+
+
+def no_perm(modeladmin, request, selected):
+    return HttpResponse(content='No permission to perform this action',
+                        status=403)
+no_perm.short_description = 'No permission to run'
+
+
 class ExternalSubscriberAdmin(admin.ModelAdmin):
-    actions = [redirect_to, external_mail]
+    actions = [redirect_to, external_mail, download, no_perm]
 
 
 class Podcast(Media):
