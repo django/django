@@ -5,6 +5,7 @@ import datetime
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
+from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
@@ -563,6 +564,44 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))
+
+    def test_pagination_page_range(self):
+        """
+        Regression tests for ticket #15653: testing that the number of pages
+        generated for changelist views are correct.
+        """
+        # instantiating and setting up ChangeList object
+        m = GroupAdmin(Group, admin.site)
+        request = self.factory.get('/group/')
+        cl = ChangeList(request, Group, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+        per_page = cl.list_per_page = 10
+
+        for page_num, objects_count, expected_page_range in [
+            (0, per_page, []),
+            (0, per_page * 2, range(2)),
+            (5, per_page * 11, range(11)),
+            (5, per_page * 12, [0, 1, 2, 3, 4, 5, 6, 7, 8, '.', 10, 11]),
+            (6, per_page * 12, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, per_page * 13, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
+        ]:
+            # assuming we have exactly `objects_count` objects
+            Group.objects.all().delete()
+            for i in xrange(objects_count):
+                Group.objects.create(name='test band')
+
+            # setting page number and calculating page range
+            cl.page_num = page_num
+            cl.get_results(request)
+            real_page_range = pagination(cl)['page_range']
+
+            self.assertEqual(
+                expected_page_range,
+                real_page_range,
+            )
+
 
 class AdminLogNodeTestCase(TestCase):
 

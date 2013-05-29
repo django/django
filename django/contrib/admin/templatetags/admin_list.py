@@ -62,7 +62,7 @@ def pagination(cl):
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
             if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range.extend(range(0, ON_EACH_SIDE - 1))
+                page_range.extend(range(0, ON_ENDS))
                 page_range.append(DOT)
                 page_range.extend(range(page_num - ON_EACH_SIDE, page_num + 1))
             else:
