@@ -5,7 +5,8 @@ from django.contrib.auth.views import login
 from django.contrib.auth import REDIRECT_FIELD_NAME
 
 
-def staff_member_required(view_func):
+def staff_member_required(view_func, template_name="admin/login.html", 
+                          authentication_form=AdminAuthenticationForm):
     """
     Decorator for views that checks that the user is logged in and is a staff
     member, displaying the login page if necessary.
@@ -17,14 +18,14 @@ def staff_member_required(view_func):
             return view_func(request, *args, **kwargs)
 
         assert hasattr(request, 'session'), "The Django admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
-        defaults = {
-            'template_name': 'admin/login.html',
-            'authentication_form': AdminAuthenticationForm,
+        login_kwargs = {
+            'template_name': template_name,
+            'authentication_form': authentication_form,
             'extra_context': {
                 'title': _('Log in'),
                 'app_path': request.get_full_path(),
                 REDIRECT_FIELD_NAME: request.get_full_path(),
             },
         }
-        return login(request, **defaults)
+        return login(request, **login_kwargs)
     return _checklogin
