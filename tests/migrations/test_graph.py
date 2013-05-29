@@ -1,11 +1,8 @@
-from django.test import TransactionTestCase, TestCase
-from django.db import connection
+from django.test import TestCase
 from django.db.migrations.graph import MigrationGraph, CircularDependencyError
-from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
 
 
-class GraphTests(TransactionTestCase):
+class GraphTests(TestCase):
     """
     Tests the digraph structure.
     """
@@ -116,21 +113,4 @@ class GraphTests(TransactionTestCase):
         self.assertRaises(
             CircularDependencyError,
             graph.forwards_plan, ("app_a", "0003"),
-        )
-
-
-class LoaderTests(TransactionTestCase):
-    """
-    Tests the disk and database loader.
-    """
-
-    def test_load(self):
-        """
-        Makes sure the loader can load the migrations for the test apps.
-        """
-        migration_loader = MigrationLoader(connection)
-        graph = migration_loader.build_graph()
-        self.assertEqual(
-            graph.forwards_plan(("migrations", "0002_second")),
-            [("migrations", "0001_initial"), ("migrations", "0002_second")],
         )

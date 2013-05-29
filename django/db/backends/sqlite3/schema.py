@@ -73,7 +73,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if restore_pk_field:
             restore_pk_field.primary_key = True
 
-    def create_field(self, model, field):
+    def add_field(self, model, field):
         """
         Creates a field on a model.
         Usually involves adding a column, but may involve adding a
@@ -89,7 +89,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             raise ValueError("You cannot add a null=False column without a default value on SQLite.")
         self._remake_table(model, create_fields=[field])
 
-    def delete_field(self, model, field):
+    def remove_field(self, model, field):
         """
         Removes a field from a model. Usually involves deleting a column,
         but for M2Ms may involve deleting a table.

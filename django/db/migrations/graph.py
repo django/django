@@ -1,4 +1,5 @@
 from django.utils.datastructures import SortedSet
+from django.db.migrations.state import ProjectState
 
 
 class MigrationGraph(object):
@@ -33,8 +34,10 @@ class MigrationGraph(object):
         self.nodes[node] = implementation
 
     def add_dependency(self, child, parent):
-        self.nodes[child] = None
-        self.nodes[parent] = None
+        if child not in self.nodes:
+            raise KeyError("Dependency references nonexistent child node %r" % (child,))
+        if parent not in self.nodes:
+            raise KeyError("Dependency references nonexistent parent node %r" % (parent,))
         self.dependencies.setdefault(child, set()).add(parent)
         self.dependents.setdefault(parent, set()).add(child)
 
@@ -116,6 +119,16 @@ class MigrationGraph(object):
 
     def __str__(self):
         return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
+
+    def project_state(self, node):
+        """
+        Given a migration node, returns a complete ProjectState for it.
+        """
+        plan = self.forwards_plan(node)
+        project_state = ProjectState()
+        for node in plan:
+            project_state = self.nodes[node].mutate_state(project_state)
+        return project_state
 
 
 class CircularDependencyError(Exception):

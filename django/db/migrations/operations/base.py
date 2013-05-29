@@ -15,21 +15,21 @@ class Operation(object):
     # Some operations are impossible to reverse, like deleting data.
     reversible = True
 
-    def state_forwards(self, app, state):
+    def state_forwards(self, app_label, state):
         """
         Takes the state from the previous migration, and mutates it
         so that it matches what this migration would perform.
         """
         raise NotImplementedError()
 
-    def database_forwards(self, app, schema_editor, from_state, to_state):
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
         """
         Performs the mutation on the database schema in the normal
         (forwards) direction.
         """
         raise NotImplementedError()
 
-    def database_backwards(self, app, schema_editor, from_state, to_state):
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """
         Performs the mutation on the database schema in the reverse
         direction - e.g. if this were CreateModel, it would in fact

@@ -132,7 +132,7 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
-    def test_create_field(self):
+    def test_add_field(self):
         """
         Tests adding fields to models
         """
@@ -146,7 +146,7 @@ class SchemaTests(TransactionTestCase):
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
         with connection.schema_editor() as editor:
-            editor.create_field(
+            editor.add_field(
                 Author,
                 new_field,
             )
@@ -251,7 +251,7 @@ class SchemaTests(TransactionTestCase):
             connection.rollback()
             # Add the field
             with connection.schema_editor() as editor:
-                editor.create_field(
+                editor.add_field(
                     Author,
                     new_field,
                 )
@@ -260,7 +260,7 @@ class SchemaTests(TransactionTestCase):
             self.assertEqual(columns['tag_id'][0], "IntegerField")
             # Remove the M2M table again
             with connection.schema_editor() as editor:
-                editor.delete_field(
+                editor.remove_field(
                     Author,
                     new_field,
                 )
@@ -530,7 +530,7 @@ class SchemaTests(TransactionTestCase):
         )
         # Add a unique column, verify that creates an implicit index
         with connection.schema_editor() as editor:
-            editor.create_field(
+            editor.add_field(
                 Book,
                 BookWithSlug._meta.get_field_by_name("slug")[0],
             )
@@ -568,7 +568,7 @@ class SchemaTests(TransactionTestCase):
         new_field = SlugField(primary_key=True)
         new_field.set_attributes_from_name("slug")
         with connection.schema_editor() as editor:
-            editor.delete_field(Tag, Tag._meta.get_field_by_name("id")[0])
+            editor.remove_field(Tag, Tag._meta.get_field_by_name("id")[0])
             editor.alter_field(
                 Tag,
                 Tag._meta.get_field_by_name("slug")[0],

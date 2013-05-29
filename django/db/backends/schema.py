@@ -272,7 +272,7 @@ class BaseDatabaseSchemaEditor(object):
             "new_tablespace": self.quote_name(new_db_tablespace),
         })
 
-    def create_field(self, model, field, keep_default=False):
+    def add_field(self, model, field, keep_default=False):
         """
         Creates a field on a model.
         Usually involves adding a column, but may involve adding a
@@ -325,7 +325,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
 
-    def delete_field(self, model, field):
+    def remove_field(self, model, field):
         """
         Removes a field from a model. Usually involves deleting a column,
         but for M2Ms may involve deleting a table.

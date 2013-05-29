@@ -21,7 +21,7 @@ class ProjectState(object):
     def clone(self):
         "Returns an exact copy of this ProjectState"
         return ProjectState(
-            models = dict((k, v.copy()) for k, v in self.models.items())
+            models = dict((k, v.clone()) for k, v in self.models.items())
         )
 
     def render(self):
@@ -49,12 +49,15 @@ class ModelState(object):
     mutate this one and then render it into a Model as required.
     """
 
-    def __init__(self, app_label, name, fields=None, options=None, bases=None):
+    def __init__(self, app_label, name, fields, options=None, bases=None):
         self.app_label = app_label
         self.name = name
-        self.fields = fields or []
+        self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model, )
+        # Sanity-check that fields is NOT a dict. It must be ordered.
+        if isinstance(self.fields, dict):
+            raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
 
     @classmethod
     def from_model(cls, model):

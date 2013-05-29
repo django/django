@@ -1,5 +1,6 @@
 import os
 from django.utils.importlib import import_module
+from django.utils.functional import cached_property
 from django.db.models.loading import cache
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
@@ -64,9 +65,10 @@ class MigrationLoader(object):
                 migration_module = import_module("%s.%s" % (module_name, migration_name))
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_label))
-                self.disk_migrations[app_label, migration_name] = migration_module.Migration
+                self.disk_migrations[app_label, migration_name] = migration_module.Migration(migration_name, app_label)
 
-    def build_graph(self):
+    @cached_property
+    def graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
         """
@@ -116,6 +118,7 @@ class MigrationLoader(object):
         graph = MigrationGraph()
         for key, migration in normal.items():
             graph.add_node(key, migration)
+        for key, migration in normal.items():
             for parent in migration.dependencies:
                 graph.add_dependency(key, parent)
         return graph

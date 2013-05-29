@@ -10,6 +10,9 @@ class Migration(object):
      - dependencies: A list of tuples of (app_path, migration_name)
      - run_before: A list of tuples of (app_path, migration_name)
      - replaces: A list of migration_names
+
+    Note that all migrations come out of migrations and into the Loader or
+    Graph as instances, having been initialised with their app label and name.
     """
 
     # Operations to apply during this migration, in order.
@@ -28,3 +31,17 @@ class Migration(object):
     # non-empty, this migration will only be applied if all these migrations
     # are not applied.
     replaces = []
+
+    def __init__(self, name, app_label):
+        self.name = name
+        self.app_label = app_label
+
+    def mutate_state(self, project_state):
+        """
+        Takes a ProjectState and returns a new one with the migration's
+        operations applied to it.
+        """
+        new_state = project_state.clone()
+        for operation in self.operations:
+            operation.state_forwards(self.app_label, new_state)
+        return new_state
