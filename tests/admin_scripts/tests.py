@@ -1682,3 +1682,22 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "### STATIC_URL = None")
+
+class Dumpdata(AdminScriptTestCase):
+    """Tests for dumpdata management command."""
+
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_pks_parsing(self):
+        """Regression for #20509
+
+        Test would raise an exception rather than printing an error message.
+        """
+        args = ['dumpdata', '--pks=1']
+        out, err = self.run_manage(args)
+        self.assertOutput(err, "You can only use --pks option with one model")
+        self.assertNoOutput(out)

@@ -27,7 +27,7 @@ class TestCaseFixtureLoadingTests(TestCase):
 class DumpDataAssertMixin(object):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
-                         use_base_manager=False, exclude_list=[], primary_keys=[]):
+                         use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
