@@ -775,7 +775,8 @@ class SQLCompiler(object):
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
+                    loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
+                    aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                 if resolve_columns:
                     if fields is None:
