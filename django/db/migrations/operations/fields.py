@@ -16,13 +16,13 @@ class AddField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = to_state.render()
-        model = app_cache.get_model(app_label, self.name)
-        schema_editor.add_field(model, model._meta.get_field_by_name(self.name))
+        model = app_cache.get_model(app_label, self.model_name)
+        schema_editor.add_field(model, model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = from_state.render()
-        model = app_cache.get_model(app_label, self.name)
-        schema_editor.remove_field(model, model._meta.get_field_by_name(self.name))
+        model = app_cache.get_model(app_label, self.model_name)
+        schema_editor.remove_field(model, model._meta.get_field_by_name(self.name)[0])
 
 
 class RemoveField(Operation):
@@ -43,10 +43,10 @@ class RemoveField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = from_state.render()
-        model = app_cache.get_model(app_label, self.name)
-        schema_editor.remove_field(model, model._meta.get_field_by_name(self.name))
+        model = app_cache.get_model(app_label, self.model_name)
+        schema_editor.remove_field(model, model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = to_state.render()
-        model = app_cache.get_model(app_label, self.name)
-        schema_editor.add_field(model, model._meta.get_field_by_name(self.name))
+        model = app_cache.get_model(app_label, self.model_name)
+        schema_editor.add_field(model, model._meta.get_field_by_name(self.name)[0])

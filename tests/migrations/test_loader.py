@@ -54,7 +54,7 @@ class LoaderTests(TransactionTestCase):
         author_state = project_state.models["migrations", "author"]
         self.assertEqual(
             [x for x, y in author_state.fields],
-            ["id", "name", "slug", "age", "important"]
+            ["id", "name", "slug", "age", "rating"]
         )
 
         book_state = project_state.models["migrations", "book"]

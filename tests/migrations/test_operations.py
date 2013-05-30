@@ -1,6 +1,6 @@
 from django.test import TransactionTestCase
 from django.db import connection, models, migrations
-from django.db.migrations.state import ProjectState, ModelState
+from django.db.migrations.state import ProjectState
 
 
 class OperationTests(TransactionTestCase):
@@ -15,6 +15,12 @@ class OperationTests(TransactionTestCase):
 
     def assertTableNotExists(self, table):
         self.assertNotIn(table, connection.introspection.get_table_list(connection.cursor()))
+
+    def assertColumnExists(self, table, column):
+        self.assertIn(column, [c.name for c in connection.introspection.get_table_description(connection.cursor(), table)])
+
+    def assertColumnNotExists(self, table, column):
+        self.assertNotIn(column, [c.name for c in connection.introspection.get_table_description(connection.cursor(), table)])
 
     def set_up_test_model(self, app_label):
         """
@@ -82,3 +88,23 @@ class OperationTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_dlmo", editor, new_state, project_state)
         self.assertTableExists("test_dlmo_pony")
+
+    def test_add_field(self):
+        """
+        Tests the AddField operation.
+        """
+        project_state = self.set_up_test_model("test_adfl")
+        # Test the state alteration
+        operation = migrations.AddField("Pony", "height", models.FloatField(null=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_adfl", new_state)
+        self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 3)
+        # Test the database alteration
+        self.assertColumnNotExists("test_adfl_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adfl", editor, project_state, new_state)
+        self.assertColumnExists("test_adfl_pony", "height")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_adfl", editor, new_state, project_state)
+        self.assertColumnNotExists("test_adfl_pony", "height")

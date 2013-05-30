@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
         migrations.RemoveField("Author", "silly_field"),
 
-        migrations.AddField("Author", "important", models.BooleanField()),
+        migrations.AddField("Author", "rating", models.IntegerField(default=0)),
 
         migrations.CreateModel(
             "Book",
