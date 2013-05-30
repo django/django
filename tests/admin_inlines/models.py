@@ -183,6 +183,12 @@ class ChildModel2(models.Model):
     def get_absolute_url(self):
         return '/child_model2/'
 
+
+# Models for #19425
+class BinaryTree(models.Model):
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey('self', null=True, blank=True)
+
 # Models for #19524
 
 class LifeForm(models.Model):
