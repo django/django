@@ -404,7 +404,7 @@ class ChangePasswordTest(AuthViewsTestCase):
 class LoginTest(AuthViewsTestCase):
 
     def test_current_site_in_context_after_login(self):
-        response = self.client.get(reverse('django.contrib.auth.views.login'))
+        response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
         if Site._meta.installed:
             site = Site.objects.get_current()
@@ -416,7 +416,7 @@ class LoginTest(AuthViewsTestCase):
                      'Login form is not an AuthenticationForm')
 
     def test_security_check(self, password='password'):
-        login_url = reverse('django.contrib.auth.views.login')
+        login_url = reverse('login')
 
         # Those URLs should not pass the security check
         for bad_url in ('http://example.com',
@@ -631,7 +631,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_security_check(self, password='password'):
-        logout_url = reverse('django.contrib.auth.views.logout')
+        logout_url = reverse('logout')
 
         # Those URLs should not pass the security check
         for bad_url in ('http://example.com',

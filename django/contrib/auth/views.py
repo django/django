@@ -142,7 +142,7 @@ def password_reset(request, is_admin_site=False,
                    current_app=None,
                    extra_context=None):
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('django.contrib.auth.views.password_reset_done')
+        post_reset_redirect = reverse('password_reset_done')
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     if request.method == "POST":
@@ -197,7 +197,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
     UserModel = get_user_model()
     assert uidb36 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
+        post_reset_redirect = reverse('password_reset_complete')
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
@@ -249,7 +249,7 @@ def password_change(request,
                     password_change_form=PasswordChangeForm,
                     current_app=None, extra_context=None):
     if post_change_redirect is None:
-        post_change_redirect = reverse('django.contrib.auth.views.password_change_done')
+        post_change_redirect = reverse('password_change_done')
     else:
         post_change_redirect = resolve_url(post_change_redirect)
     if request.method == "POST":
