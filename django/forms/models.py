@@ -238,7 +238,7 @@ class ModelFormMetaclass(type):
                 warnings.warn("Creating a ModelForm without either the 'fields' attribute "
                               "or the 'exclude' attribute is deprecated - form %s "
                               "needs updating" % name,
-                              PendingDeprecationWarning)
+                              PendingDeprecationWarning, stacklevel=2)
 
             if opts.fields == ALL_FIELDS:
                 # sentinel for fields_for_model to indicate "get the list of
