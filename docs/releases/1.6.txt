@@ -287,6 +287,11 @@ Minor features
   helper for testing formset errors:
   :meth:`~django.test.SimpleTestCase.assertFormsetError`.
 
+* The list of related fields added to a
+  :class:`~django.db.models.query.QuerySet` by
+  :meth:`~django.db.models.query.QuerySet.select_related` can be cleared using
+  ``select_related(None)``.
+
 Backwards incompatible changes in 1.6
 =====================================
 

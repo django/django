@@ -645,6 +645,8 @@ class QuerySet(object):
 
         If fields are specified, they must be ForeignKey fields and only those
         related objects are included in the selection.
+
+        If select_related(None) is called, the list is cleared.
         """
         if 'depth' in kwargs:
             warnings.warn('The "depth" keyword argument has been deprecated.\n'
@@ -654,7 +656,9 @@ class QuerySet(object):
             raise TypeError('Unexpected keyword arguments to select_related: %s'
                     % (list(kwargs),))
         obj = self._clone()
-        if fields:
+        if fields == (None,):
+            obj.query.select_related = False
+        elif fields:
             if depth:
                 raise TypeError('Cannot pass both "depth" and fields to select_related()')
             obj.query.add_select_related(fields)
