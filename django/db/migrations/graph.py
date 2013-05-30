@@ -120,11 +120,14 @@ class MigrationGraph(object):
     def __str__(self):
         return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
 
-    def project_state(self, node):
+    def project_state(self, node, at_end=True):
         """
         Given a migration node, returns a complete ProjectState for it.
+        If at_end is False, returns the state before the migration has run.
         """
         plan = self.forwards_plan(node)
+        if not at_end:
+            plan = plan[:-1]
         project_state = ProjectState()
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state)
