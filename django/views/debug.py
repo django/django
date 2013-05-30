@@ -595,7 +595,7 @@ TECHNICAL_500_TEMPLATE = """
 <body>
 <div id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
-  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception supplied{% endif %}</pre>
+  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
     <tr>
@@ -940,7 +940,7 @@ Exception Value: {{ exception_value|force_escape }}
 """
 
 TECHNICAL_500_TEXT_TEMPLATE = """{% load firstof from future %}{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
-{% firstof exception_value 'No exception supplied' %}
+{% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
 Request URL: {{ request.build_absolute_uri }}{% endif %}
