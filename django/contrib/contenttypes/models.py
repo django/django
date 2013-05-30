@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_text, force_text, force_str
 from django.utils.encoding import python_2_unicode_compatible
 
 class ContentTypeManager(models.Manager):
@@ -152,6 +152,9 @@ class ContentType(models.Model):
             return self.name
         else:
             return force_text(model._meta.verbose_name)
+
+    def __repr__(self):
+        return force_str('<%s: %s.%s>' % (self.__class__.__name__, self.app_label, self.model))
 
     def model_class(self):
         "Returns the Python model class for this type of content."
