@@ -17,6 +17,12 @@ class GraphTests(TestCase):
         """
         # Build graph
         graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_node(("app_a", "0003"), None)
+        graph.add_node(("app_a", "0004"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
         graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
@@ -64,6 +70,14 @@ class GraphTests(TestCase):
         """
         # Build graph
         graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_node(("app_a", "0003"), None)
+        graph.add_node(("app_a", "0004"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
+        graph.add_node(("app_c", "0001"), None)
+        graph.add_node(("app_c", "0002"), None)
         graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
@@ -104,6 +118,11 @@ class GraphTests(TestCase):
         """
         # Build graph
         graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_node(("app_a", "0003"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_node(("app_b", "0002"), None)
         graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
         graph.add_dependency(("app_a", "0001"), ("app_b", "0002"))
