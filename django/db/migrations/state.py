@@ -47,6 +47,10 @@ class ModelState(object):
     Represents a Django Model. We don't use the actual Model class
     as it's not designed to have its options changed - instead, we
     mutate this one and then render it into a Model as required.
+
+    Note that while you are allowed to mutate .fields, you are not allowed
+    to mutate the Field instances inside there themselves - you must instead
+    assign new ones, as these are not detached during a clone.
     """
 
     def __init__(self, app_label, name, fields, options=None, bases=None):
@@ -92,8 +96,8 @@ class ModelState(object):
         return self.__class__(
             app_label = self.app_label,
             name = self.name,
-            fields = self.fields,
-            options = self.options,
+            fields = list(self.fields),
+            options = dict(self.options),
             bases = self.bases,
         )
 
