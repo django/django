@@ -774,6 +774,13 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
+.. versionadded:: 1.6
+
+If you need to clear the list of related fields added by past calls of
+``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
+
+   >>> without_relations = queryset.select_related(None)
+
 .. deprecated:: 1.5
     The ``depth`` parameter to ``select_related()`` has been deprecated. You
     should replace it with the use of the ``(*fields)`` listing specific
