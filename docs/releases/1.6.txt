@@ -616,6 +616,12 @@ Miscellaneous
   stored as ``null``. Previously, storing a ``blank`` value in a field which
   did not allow ``null`` would cause a database exception at runtime.
 
+* If a :class:`~django.core.urlresolvers.NoReverseMatch` exception is risen
+  from a method when rendering a template it is not silenced. For example
+  {{ obj.view_href }} will cause template rendering to fail if view_href()
+  raises NoReverseMatch. There is no change to {% url %} tag, it causes
+  template rendering to fail like always when NoReverseMatch is risen.
+
 Features deprecated in 1.6
 ==========================
 

@@ -444,6 +444,15 @@ class Templates(TestCase):
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
+    def test_super_errors(self):
+        """
+        Test behavior of the raise errors into included blocks.
+        See #18169
+        """
+        t = loader.get_template('included_content.html')
+        with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(Context({}))
+
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
