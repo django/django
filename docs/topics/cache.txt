@@ -997,8 +997,8 @@ produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
 
-To do this in Django, use the convenient ``vary_on_headers`` view decorator,
-like so::
+To do this in Django, use the convenient
+:func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
 
     from django.views.decorators.vary import vary_on_headers
 
@@ -1027,8 +1027,9 @@ the user-agent ``Mozilla`` and the cookie value ``foo=bar`` will be considered
 different from a request with the user-agent ``Mozilla`` and the cookie value
 ``foo=ham``.
 
-Because varying on cookie is so common, there's a ``vary_on_cookie``
-decorator. These two views are equivalent::
+Because varying on cookie is so common, there's a
+:func:`django.views.decorators.vary.vary_on_cookie` decorator. These two views
+are equivalent::
 
     @vary_on_cookie
     def my_view(request):
@@ -1041,7 +1042,7 @@ decorator. These two views are equivalent::
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
-You can also use a helper function, ``django.utils.cache.patch_vary_headers``,
+You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
     from django.utils.cache import patch_vary_headers
@@ -1090,8 +1091,9 @@ exclusive. The decorator ensures that the "public" directive is removed if
 "private" should be set (and vice versa). An example use of the two directives
 would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
-``patch_cache_control``, the manual way to modify the cache control header
-(it is internally called by the ``cache_control`` decorator)::
+:func:`django.utils.cache.patch_cache_control`, the manual way to modify the
+cache control header (it is internally called by the ``cache_control``
+decorator)::
 
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie
