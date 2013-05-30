@@ -278,3 +278,11 @@ class ConnectionRouter(object):
                 if allow is not None:
                     return allow
         return True
+
+    def get_migratable_models(self, app, db, include_auto_created=False):
+        """
+        Return app models allowed to be synchronized on provided db.
+        """
+        from .models import get_models
+        return [model for model in get_models(app, include_auto_created=include_auto_created)
+                if self.allow_migrate(db, model)]
