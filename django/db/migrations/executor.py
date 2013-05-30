@@ -49,20 +49,16 @@ class MigrationExecutor(object):
         """
         Runs a migration forwards.
         """
-        print "Applying %s" % migration
         with self.connection.schema_editor() as schema_editor:
             project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
             migration.apply(project_state, schema_editor)
         self.recorder.record_applied(migration.app_label, migration.name)
-        print "Finished %s" % migration
 
     def unapply_migration(self, migration):
         """
         Runs a migration backwards.
         """
-        print "Unapplying %s" % migration
         with self.connection.schema_editor() as schema_editor:
             project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
             migration.unapply(project_state, schema_editor)
         self.recorder.record_unapplied(migration.app_label, migration.name)
-        print "Finished %s" % migration
