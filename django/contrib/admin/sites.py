@@ -1,3 +1,4 @@
+import urlparse
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
@@ -314,10 +315,18 @@ class AdminSite(object):
         Displays the login form for the given HttpRequest.
         """
         from django.contrib.auth.views import login
+        redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+        if redirect_to:
+            # security check -- don't allow redirection to a different host
+            netloc = urlparse.urlparse(redirect_to)[1]
+            if netloc and netloc != request.get_host():
+                redirect_to = ''
+        if not redirect_to:
+            redirect_to = request.get_full_path()
         context = {
             'title': _('Log in'),
             'app_path': request.get_full_path(),
-            REDIRECT_FIELD_NAME: request.get_full_path(),
+            REDIRECT_FIELD_NAME: redirect_to,
         }
         context.update(extra_context or {})
 
