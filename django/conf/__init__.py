@@ -110,7 +110,7 @@ class BaseSettings(object):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
-                "to a tuple, not a string.")
+                "to a list, not a string.")
         object.__setattr__(self, name, value)
 
 
@@ -132,19 +132,19 @@ class Settings(BaseSettings):
                 % (self.SETTINGS_MODULE, e)
             )
 
-        # Settings that should be converted into tuples if they're mistakenly entered
-        # as strings.
-        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+        # Settings that should be converted into lists if they're mistakenly
+        # entered as strings.
+        list_settings = ["INSTALLED_APPS", "TEMPLATE_DIRS"]
 
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
-                if setting in tuple_settings and \
+                if setting in list_settings and \
                         isinstance(setting_value, six.string_types):
-                    warnings.warn("The %s setting must be a tuple. Please fix your "
+                    warnings.warn("The %s setting must be a list. Please fix your "
                                   "settings, as auto-correction is now deprecated." % setting,
                                   DeprecationWarning, stacklevel=2)
-                    setting_value = (setting_value,) # In case the user forgot the comma.
+                    setting_value = [setting_value]  # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:

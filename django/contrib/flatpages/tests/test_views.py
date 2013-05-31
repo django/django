@@ -9,17 +9,17 @@ from django.test.utils import override_settings
 
 @override_settings(
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-    ),
-    TEMPLATE_DIRS=(
+    ],
+    TEMPLATE_DIRS=[
         os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    ],
     SITE_ID=1,
 )
 class FlatpageViewTests(TestCase):
@@ -77,17 +77,17 @@ class FlatpageViewTests(TestCase):
 @override_settings(
     APPEND_SLASH = True,
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=(
+    MIDDLEWARE_CLASSES=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-    ),
-    TEMPLATE_DIRS=(
+    ],
+    TEMPLATE_DIRS=[
         os.path.join(os.path.dirname(__file__), 'templates'),
-    ),
+    ],
     SITE_ID=1,
 )
 class FlatpageViewAppendSlashTests(TestCase):

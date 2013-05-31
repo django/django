@@ -469,7 +469,8 @@ class CSRFEnabledClientTests(TestCase):
         self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
         csrf_middleware_class = 'django.middleware.csrf.CsrfViewMiddleware'
         if csrf_middleware_class not in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES += (csrf_middleware_class,)
+            settings.MIDDLEWARE_CLASSES = (list(settings.MIDDLEWARE_CLASSES) +
+                                           [csrf_middleware_class])
 
     def tearDown(self):
         settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES

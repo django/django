@@ -201,7 +201,7 @@ For example::
             'there is %(count)d object',
             'there are %(count)d objects',
         count) % {
-            'count': count,
+            'count': count
         }
         return HttpResponse(page)
 
@@ -883,11 +883,11 @@ URL. Paths listed in :setting:`LOCALE_PATHS` are also included.
 You hook it up like this::
 
     js_info_dict = {
-        'packages': ('your.app.package',),
+        'packages': ('your.app.package',)
     }
 
     urlpatterns = patterns('',
-        (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+        (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict)
     )
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
@@ -907,7 +907,7 @@ changed by altering the ``domain`` argument.
 You can make the view dynamic by putting the packages into the URL pattern::
 
     urlpatterns = patterns('',
-        (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
+        (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog')
     )
 
 With this, you specify the packages as a list of package names delimited by '+'
@@ -1067,18 +1067,18 @@ prepend the current active language code to all url patterns defined within
     from django.conf.urls.i18n import i18n_patterns
 
     urlpatterns = patterns('',
-        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml')
     )
 
     news_patterns = patterns('',
         url(r'^$', 'news.views.index', name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail')
     )
 
     urlpatterns += i18n_patterns('',
         url(r'^about/$', 'about.view', name='about'),
-        url(r'^news/', include(news_patterns, namespace='news')),
+        url(r'^news/', include(news_patterns, namespace='news'))
     )
 
 
@@ -1122,18 +1122,18 @@ URL patterns can also be marked translatable using the
     from django.utils.translation import ugettext_lazy as _
 
     urlpatterns = patterns(''
-        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml')
     )
 
     news_patterns = patterns(''
         url(r'^$', 'news.views.index', name='index'),
         url(_(r'^category/(?P<slug>[\w-]+)/$'), 'news.views.category', name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail')
     )
 
     urlpatterns += i18n_patterns('',
         url(_(r'^about/$'), 'about.view', name='about'),
-        url(_(r'^news/'), include(news_patterns, namespace='news')),
+        url(_(r'^news/'), include(news_patterns, namespace='news'))
     )
 
 
@@ -1436,7 +1436,7 @@ Make sure that the following item is in your
 
 Activate this view by adding the following line to your URLconf::
 
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    (r'^i18n/', include('django.conf.urls.i18n'))
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
@@ -1579,11 +1579,11 @@ Because middleware order matters, you should follow these guidelines:
 
 For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
        'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
-       'django.middleware.common.CommonMiddleware',
-    )
+       'django.middleware.common.CommonMiddleware'
+    ]
 
 (For more on middleware, see the :doc:`middleware documentation
 </topics/http/middleware>`.)
@@ -1629,10 +1629,10 @@ Notes:
   languages (because your application doesn't provide all those languages),
   set :setting:`LANGUAGES` to a list of languages. For example::
 
-      LANGUAGES = (
-        ('de', _('German')),
-        ('en', _('English')),
-      )
+      LANGUAGES = [
+          ('de', _('German')),
+          ('en', _('English'))
+      ]
 
   This example restricts languages that are available for automatic
   selection to German and English (and any sublanguage, like de-ch or
@@ -1651,10 +1651,10 @@ Notes:
 
       ugettext = lambda s: s
 
-      LANGUAGES = (
+      LANGUAGES = [
           ('de', ugettext('German')),
-          ('en', ugettext('English')),
-      )
+          ('en', ugettext('English'))
+      ]
 
   With this arrangement, :djadmin:`django-admin.py makemessages <makemessages>`
   will still find and mark these strings for translation, but the translation

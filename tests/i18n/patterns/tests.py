@@ -13,22 +13,22 @@ from django.utils import translation
 
 @override_settings(
     USE_I18N=True,
-    LOCALE_PATHS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
-    ),
-    TEMPLATE_DIRS=(
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-    ),
+    LOCALE_PATHS=[
+        os.path.join(os.path.dirname(upath(__file__)), 'locale')
+    ],
+    TEMPLATE_DIRS=[
+        os.path.join(os.path.dirname(upath(__file__)), 'templates')
+    ],
     LANGUAGE_CODE='en-us',
-    LANGUAGES=(
+    LANGUAGES=[
         ('nl', 'Dutch'),
         ('en', 'English'),
-        ('pt-br', 'Brazilian Portuguese'),
-    ),
-    MIDDLEWARE_CLASSES=(
+        ('pt-br', 'Brazilian Portuguese')
+    ],
+    MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
-    ),
+        'django.middleware.common.CommonMiddleware'
+    ]
 )
 class URLTestCaseBase(TestCase):
     """
@@ -183,7 +183,7 @@ class URLRedirectTests(URLTestCaseBase):
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
     Tests that 'Accept-Language' is not added to the Vary header when using
-    prefixed URLs. 
+    prefixed URLs.
     """
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')
