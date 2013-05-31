@@ -724,6 +724,55 @@ patterns.
     **Template context:**
 
     * ``form``: The password change form (see ``password_change_form`` above).
+    
+    Here's a sample template:
+    
+    .. code-block:: html+django
+    
+        {% extends "base.html" %}
+
+        {% block content %}
+
+            {% if form.errors %}
+
+                <ul>
+                    {% for field in form %}
+                        <li>{{ field.errors }}</li>
+                    {% endfor %}
+                </ul>
+
+            {% endif %}
+
+            <form method="post" action="{% url 'django.contrib.auth.views.password_change' %}">
+                <div>
+                    {% csrf_token %}
+                </div>
+
+                <table>
+                    <tr>
+                        <td>{{ form.old_password.label_tag }}</td>
+                        <td>{{ form.old_password }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>{{ form.new_password1.label_tag }}</td>
+                        <td>{{ form.new_password1 }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>{{ form.new_password2.label_tag }}</td>
+                        <td>{{ form.new_password2 }}</td>
+                    </tr>
+
+                </table>
+
+                <input type="submit" value="change" />
+                <input type="hidden" name="next" value="{{ next }}" />
+
+            </form>
+
+
+        {% endblock %}
 
 .. function:: password_change_done(request[, template_name])
 
@@ -798,6 +847,43 @@ patterns.
     * ``form``: The form (see ``password_reset_form`` above) for resetting
       the user's password.
 
+    Here's a sample template:
+    
+    .. code-block:: html+django
+    
+        {% extends "base.html" %}
+
+        {% block content %}
+
+            {% if form.errors %}
+
+                <ul>
+                    {% for field in form %}
+                        <li>{{ field.errors }}</li>
+                    {% endfor %}
+                </ul>
+
+            {% endif %}
+
+            <form method="post" action="{% url 'django.contrib.auth.views.password_reset' %}">
+
+                <div>
+                    {% csrf_token %}
+                </div>
+
+                <table>
+                    <tr>
+                        <td>{{ form.email.label_tag }}</td>
+                        <td>{{ form.email }}</td>
+                    </tr>
+                </table>
+
+                <input type="submit" value="Send" />
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+
+        {% endblock %}
+      
     **Email template context:**
 
     * ``email``: An alias for ``user.email``
@@ -880,6 +966,63 @@ patterns.
     * ``validlink``: Boolean, True if the link (combination of uidb36 and
       token) is valid or unused yet.
 
+    Here's a sample url:
+    
+        url('^accounts/password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', { 'template_name': 'accounts/password_reset_confirm.html', 'post_reset_redirect': '/accounts/password_reset_complete/' }),
+        
+    and a sample template:
+    
+    .. code-block:: html+django
+    
+        {% extends "base.html" %}
+
+        {% block content %}
+
+            {% if validlink %}
+
+                {% if form.errors %}
+
+                    <ul>
+                        {% for field in form %}
+                            <li>{{ field.errors }}</li>
+                        {% endfor %}
+                    </ul>
+
+                {% endif %}
+
+
+                <form method="post" action="">
+
+                    <div>
+                        {% csrf_token %}
+                    </div>
+
+                    <table>
+                        <tr>
+                            <td>{{ form.new_password1.label_tag }}</td>
+                            <td>{{ form.new_password1 }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>{{ form.new_password2.label_tag }}</td>
+                            <td>{{ form.new_password2 }}</td>
+                        </tr>
+                    </table>
+
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                </form>
+
+            {% else %}
+
+                <p>
+                    The password reset link was invalid, possibly because it has already been used. Request a new password reset.
+                </p>
+
+            {% endif %}
+
+        {% endblock %}
+      
 .. function:: password_reset_complete(request[,template_name])
 
    Presents a view which informs the user that the password has been
