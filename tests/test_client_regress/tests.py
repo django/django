@@ -707,10 +707,6 @@ class ContextTests(TestCase):
             self.assertEqual(e.args[0], 'does-not-exist')
 
     def test_context_keys_method(self):
-        """It's useful to be able to list all the (flattened) keys of a
-        ContextList, to help you figure out why the variable that's supposed
-        to be there is not."""
-        
         c1 = Context()
         c1.update({'hello': 'world', 'goodbye': 'john'})
         c1.update({'hello': 'dolly', 'dolly': 'parton'})
@@ -719,6 +715,8 @@ class ContextTests(TestCase):
         c2.update({'goodbye': 'dolly'})
         
         l = ContextList([c1, c2])
+        # None, True and False are builtins of BaseContext, and present
+        # in every Context without needing to be added.
         self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
             'python', 'dolly']), l.keys())
 

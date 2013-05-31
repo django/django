@@ -58,6 +58,10 @@ class ContextList(list):
         return True
 
     def keys(self):
+        """It's useful to be able to list all the (flattened) keys of a
+        ContextList, to help you (in a debugger) figure out why the
+        variable that's supposed to be there is not."""
+        
         keys = set()
         for subcontext in self:
             for dict in subcontext:
