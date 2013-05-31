@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.contrib import auth
 # UNUSABLE_PASSWORD is still imported here for backwards compatibility
 from django.contrib.auth.hashers import (
-    check_password, make_password, is_password_usable, UNUSABLE_PASSWORD)
+    check_password, make_password, is_password_usable)
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import python_2_unicode_compatible
