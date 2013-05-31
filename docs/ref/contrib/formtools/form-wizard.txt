@@ -394,8 +394,10 @@ Advanced ``WizardView`` methods
 .. method:: WizardView.get_form(step=None, data=None, files=None)
 
     This method constructs the form for a given ``step``. If no ``step`` is
-    defined, the current step will be determined automatically.
-    The method gets three arguments:
+    defined, the current step will be determined automatically. If you override
+    ``get_form``, however, you will need to set ``step`` yourself using
+    ``self.steps.current`` as in the example below. The method gets three
+    arguments:
 
     * ``step`` -- The step for which the form instance should be generated.
     * ``data`` -- Gets passed to the form's data argument
@@ -407,6 +409,11 @@ Advanced ``WizardView`` methods
 
         def get_form(self, step=None, data=None, files=None):
             form = super(MyWizard, self).get_form(step, data, files)
+
+            # determine the step if not given
+            if step is None:
+                step = self.steps.current
+
             if step == '1':
                 form.user = self.request.user
             return form
