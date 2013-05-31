@@ -403,7 +403,7 @@ address as your identification token instead of a username.
 Django allows you to override the default User model by providing a value for
 the :setting:`AUTH_USER_MODEL` setting that references a custom model::
 
-     AUTH_USER_MODEL = 'myapp.MyUser'
+     AUTH_USER_MODEL = 'myapp.User'
 
 This dotted pair describes the name of the Django app (which must be in your
 :setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
@@ -501,7 +501,7 @@ password resets. You must then provide some key implementation details:
         In the following example, the field ``identifier`` is used
         as the identifying field::
 
-            class MyUser(AbstractBaseUser):
+            class User(AbstractBaseUser):
                 identifier = models.CharField(max_length=40, unique=True, db_index=True)
                 ...
                 USERNAME_FIELD = 'identifier'
@@ -519,7 +519,7 @@ password resets. You must then provide some key implementation details:
         For example, here is the partial definition for a ``User`` model that
         defines two required fields - a date of birth and height::
 
-            class MyUser(AbstractBaseUser):
+            class User(AbstractBaseUser):
                 ...
                 date_of_birth = models.DateField()
                 height = models.FloatField()
@@ -833,6 +833,14 @@ methods and attributes:
     model doesn't provide  those fields, you will receive database errors when
     you check permissions.
 
+.. warning::
+
+    The `PermissionsMixin` defines relationships away from the `User` class. In
+    order for the automatic naming of the reverse relationships to remain
+    consistent, you should also name your swappable model `User` (ie
+    `myapp.models.User` not `myapp.models.MyUser`). This allows for maximum
+    pluggabilty with external applications.
+
 Custom users and Proxy models
 -----------------------------
 
@@ -929,7 +937,7 @@ authentication app::
     )
 
 
-    class MyUserManager(BaseUserManager):
+    class UserManager(BaseUserManager):
         def create_user(self, email, date_of_birth, password=None):
             """
             Creates and saves a User with the given email, date of
@@ -939,7 +947,7 @@ authentication app::
                 raise ValueError('Users must have an email address')
 
             user = self.model(
-                email=MyUserManager.normalize_email(email),
+                email=UserManager.normalize_email(email),
                 date_of_birth=date_of_birth,
             )
 
@@ -961,7 +969,7 @@ authentication app::
             return user
 
 
-    class MyUser(AbstractBaseUser):
+    class User(AbstractBaseUser):
         email = models.EmailField(
             verbose_name='email address',
             max_length=255,
@@ -972,7 +980,7 @@ authentication app::
         is_active = models.BooleanField(default=True)
         is_admin = models.BooleanField(default=False)
 
-        objects = MyUserManager()
+        objects = UserManager()
 
         USERNAME_FIELD = 'email'
         REQUIRED_FIELDS = ['date_of_birth']
@@ -1010,10 +1018,10 @@ code would be required in the app's ``admin.py`` file::
     from django import forms
     from django.contrib import admin
     from django.contrib.auth.models import Group
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-    from customauth.models import MyUser
+    from customauth.models import User
 
 
     class UserCreationForm(forms.ModelForm):
@@ -1023,7 +1031,7 @@ code would be required in the app's ``admin.py`` file::
         password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
         class Meta:
-            model = MyUser
+            model = User
             fields = ('email', 'date_of_birth')
 
         def clean_password2(self):
@@ -1051,7 +1059,7 @@ code would be required in the app's ``admin.py`` file::
         password = ReadOnlyPasswordHashField()
 
         class Meta:
-            model = MyUser
+            model = User
             fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
 
         def clean_password(self):
@@ -1061,7 +1069,7 @@ code would be required in the app's ``admin.py`` file::
             return self.initial["password"]
 
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         # The forms to add and change user instances
         form = UserChangeForm
         add_form = UserCreationForm
@@ -1087,7 +1095,7 @@ code would be required in the app's ``admin.py`` file::
         filter_horizontal = ()
 
     # Now register the new UserAdmin...
-    admin.site.register(MyUser, MyUserAdmin)
+    admin.site.register(User, UserAdmin)
     # ... and, since we're not using Django's builtin permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
@@ -1095,4 +1103,4 @@ code would be required in the app's ``admin.py`` file::
 Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
-    AUTH_USER_MODEL = 'customauth.MyUser'
+    AUTH_USER_MODEL = 'customauth.User'
