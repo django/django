@@ -1235,19 +1235,8 @@ class ForeignKey(ForeignObject):
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
-        # The database column type of a ForeignKey is the column type
-        # of the field to which it points. An exception is if the ForeignKey
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        # If the database needs similar types for key fields however, the only
-        # thing we can do is making AutoField an IntegerField.
         rel_field = self.related_field
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+        return rel_field.rel_db_type(connection=connection)
 
 
 class OneToOneField(ForeignKey):

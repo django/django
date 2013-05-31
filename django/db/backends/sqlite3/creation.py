@@ -8,6 +8,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # thing" given more verbose field definitions, so leave them as is so that
     # schema inspection is more useful.
     data_types = {
+        'UnsignedAutoField':            'integer',
         'AutoField':                    'integer',
         'BinaryField':                  'BLOB',
         'BooleanField':                 'bool',

@@ -14,11 +14,12 @@ from django.db.models.fields.files import ImageFieldFile, ImageField
 
 
 class Foo(models.Model):
+    c = models.AutoField(primary_key=True, unsigned=True)
     a = models.CharField(max_length=10)
     d = models.DecimalField(max_digits=5, decimal_places=3)
 
 def get_foo():
-    return Foo.objects.get(id=1)
+    return Foo.objects.get(pk=1)
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)

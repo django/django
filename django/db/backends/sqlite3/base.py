@@ -253,8 +253,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
             return util.typecast_decimal(field.format_number(value))
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
-            return int(value)
         elif internal_type == 'DateField':
             return parse_date(value)
         elif internal_type == 'DateTimeField':
@@ -263,7 +261,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return parse_time(value)
 
         # No field, or the field isn't known to be a decimal or integer
-        return value
+        return super(DatabaseOperations, self).convert_values(value, field)
 
     def bulk_insert_sql(self, fields, num_values):
         res = []
