@@ -113,6 +113,15 @@ class FileUploadHandler(object):
         """
         raise NotImplementedError()
 
+    def variable_complete(self, variable_name, variable_value):
+        """
+        Signal that a new variable has been parsed from the multipart request.
+
+        :param variable_name: name of the variable
+        :param variable_value: value of the multipart variable
+        """
+        pass
+
     def upload_complete(self):
         """
         Signal that the upload is complete. Subclasses should perform cleanup
