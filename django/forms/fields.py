@@ -242,6 +242,8 @@ class IntegerField(Field):
         Validates that int() can be called on the input. Returns the result
         of int(). Returns None for empty values.
         """
+        if isinstance(value, basestring):
+            value = value.strip()
         value = super(IntegerField, self).to_python(value)
         if value in self.empty_values:
             return None
@@ -273,6 +275,8 @@ class FloatField(IntegerField):
         Validates that float() can be called on the input. Returns the result
         of float(). Returns None for empty values.
         """
+        if isinstance(value, basestring):
+            value = value.strip()
         value = super(IntegerField, self).to_python(value)
         if value in self.empty_values:
             return None

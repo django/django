@@ -174,6 +174,7 @@ class FieldsTests(SimpleTestCase):
     def test_integerfield_2(self):
         f = IntegerField(required=False)
         self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(' '))
         self.assertEqual('None', repr(f.clean('')))
         self.assertEqual(None, f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
@@ -258,6 +259,7 @@ class FieldsTests(SimpleTestCase):
     def test_floatfield_2(self):
         f = FloatField(required=False)
         self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(' '))
         self.assertEqual(None, f.clean(None))
         self.assertEqual(1.0, f.clean('1'))
         self.assertEqual(f.max_value, None)
