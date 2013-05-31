@@ -897,6 +897,20 @@ class ContextTests(TestCase):
         except KeyError as e:
             self.assertEqual(e.args[0], 'does-not-exist')
 
+    def test_context_keys_method(self):
+        c1 = Context()
+        c1.update({'hello': 'world', 'goodbye': 'john'})
+        c1.update({'hello': 'dolly', 'dolly': 'parton'})
+        c2 = Context()
+        c2.update({'goodbye': 'world', 'python': 'rocks'})
+        c2.update({'goodbye': 'dolly'})
+        
+        l = ContextList([c1, c2])
+        # None, True and False are builtins of BaseContext, and present
+        # in every Context without needing to be added.
+        self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
+            'python', 'dolly']), l.keys())
+
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of
