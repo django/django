@@ -371,6 +371,7 @@ class Client(RequestFactory):
         super(Client, self).__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.exc_info = None
+        self._session_store = None
 
     def store_exc_info(self, **kwargs):
         """
@@ -382,12 +383,23 @@ class Client(RequestFactory):
         """
         Obtains the current session variables.
         """
+        if self._session_store:
+            return self._session_store
+
         if 'django.contrib.sessions' in settings.INSTALLED_APPS:
             engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
+            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
             if cookie:
-                return engine.SessionStore(cookie.value)
-        return {}
+                session_store = engine.SessionStore(cookie.value)
+            else:
+                session_store = engine.SessionStore()
+                session_store.save()
+                self.cookies[settings.SESSION_COOKIE_NAME] = session_store.session_key
+            self._session_store = session_store
+            return session_store
+        else:
+            return {}
+
     session = property(_session)
 
 
@@ -399,6 +411,17 @@ class Client(RequestFactory):
         using the arguments to the request.
         """
         environ = self._base_environ(**request)
+
+        if self._session_store:
+            if getattr(self._session_store, 'modified'):
+                self._session_store.save()
+
+            if 'django.contrib.sessions.middleware.SessionMiddleware' in settings.MIDDLEWARE_CLASSES:
+                # Update the session cookie since the session key can change
+                # due to login or logout and force the session to be reloaded
+                # on next access.
+                self.cookies[settings.SESSION_COOKIE_NAME] = self._session_store.session_key
+                self._session_store = None
 
         # Curry a data dictionary into an instance of the template renderer
         # callback function.
@@ -536,14 +559,10 @@ class Client(RequestFactory):
         user = authenticate(**credentials)
         if user and user.is_active \
                 and 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request to store login details.
             request = HttpRequest()
-            if self.session:
-                request.session = self.session
-            else:
-                request.session = engine.SessionStore()
+            request.session = self.session
             login(request, user)
 
             # Save the session values.
@@ -576,6 +595,7 @@ class Client(RequestFactory):
         if session_cookie:
             session.delete(session_key=session_cookie.value)
         self.cookies = SimpleCookie()
+        self._session_store = None
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."

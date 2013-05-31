@@ -947,6 +947,40 @@ class SessionTests(TestCase):
         self.client.logout()
         self.client.logout()
 
+    def test_session_manipulation(self):
+        # Check that the session can be edited as documented before #10899.
+        session = self.client.session
+        session['session_var'] = b'foo'
+        session.save()
+
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'foo')
+
+    def test_direct_session_manipulation(self):
+        # Add a value to the session
+        self.client.session['session_var'] = b'bar'
+        self.assertEqual(self.client.session['session_var'], b'bar')
+
+        # Check that the session has been modified
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'bar')
+
+        # Check that the session variable persists over login
+        # when cycle_key() is called
+        self.client.login(username='testclient', password='password')
+        self.assertEqual(self.client.session['session_var'], b'bar')
+
+        response = self.client.get('/test_client_regress/check_session/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'bar')
+
+        # Check that new session is started after logout
+        self.client.logout()
+        self.assertEqual(self.client.session.get('session_var'), None)
+
+
 class RequestMethodTests(TestCase):
     def test_get(self):
         "Request a view via request method GET"

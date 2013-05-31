@@ -2628,7 +2628,7 @@ class AdminCustomQuerysetTest(TestCase):
 
         # 4 queries are expected: 1 for the session, 1 for the user,
         # 1 for the count and 1 for the objects on the page
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             resp = self.client.get('/test_admin/admin/admin_views/person/')
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
@@ -3697,7 +3697,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_queries = 10
+        expected_queries = 12
         # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
         if connection.vendor == 'oracle':
             expected_queries -= 1
@@ -3740,7 +3740,7 @@ class GroupAdminTest(TestCase):
     def test_group_permission_performance(self):
         g = Group.objects.create(name="test_group")
 
-        expected_queries = 8
+        expected_queries = 10
         # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
         if connection.vendor == 'oracle':
             expected_queries -= 1
