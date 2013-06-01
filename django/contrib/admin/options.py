@@ -1516,6 +1516,10 @@ class InlineModelAdmin(BaseModelAdmin):
         """Hook for customizing the number of extra inline forms."""
         return self.extra
 
+    def get_max_num(self, request, obj=None, **kwargs):
+        """Hook for customizing the max number of extra inline forms."""
+        return self.max_num
+
     def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
         if 'fields' in kwargs:
@@ -1543,7 +1547,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "exclude": exclude,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
             "extra": self.get_extra(request, obj, **kwargs),
-            "max_num": self.max_num,
+            "max_num": self.get_max_num(request, obj, **kwargs),
             "can_delete": can_delete,
         }
 

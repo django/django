@@ -197,12 +197,18 @@ class TestInline(TestCase):
         bt_head = BinaryTree.objects.create(name="Tree Head")
         bt_child = BinaryTree.objects.create(name="First Child", parent=bt_head)
 
+        # The maximum number of forms should respect 'get_max_num' on the
+        # ModelAdmin
+        max_forms_input = '<input id="id_binarytree_set-MAX_NUM_FORMS" name="binarytree_set-MAX_NUM_FORMS" type="hidden" value="%d" />'
         # The total number of forms will remain the same in either case
         total_forms_hidden = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
+
         response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertContains(response, max_forms_input % 3)
         self.assertContains(response, total_forms_hidden)
 
         response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, max_forms_input % 2)
         self.assertContains(response, total_forms_hidden)
 
 

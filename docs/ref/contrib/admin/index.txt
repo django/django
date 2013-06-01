@@ -1728,6 +1728,11 @@ The ``InlineModelAdmin`` class adds:
     doesn't directly correlate to the number of objects, but can if the value
     is small enough. See :ref:`model-formsets-max-num` for more information.
 
+    .. versionadded:: 1.6
+
+    :meth:`InlineModelAdmin.get_max_num` also allows you to customize the
+    maximum number of extra forms.
+
 .. attribute:: InlineModelAdmin.raw_id_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -1786,6 +1791,27 @@ The ``InlineModelAdmin`` class adds:
                 if obj:
                     return extra - obj.binarytree_set.count()
                 return extra
+
+.. method:: InlineModelAdmin.get_max_num(self, request, obj=None, **kwargs)
+
+    .. versionadded:: 1.6
+
+    Returns the maximum number of extra inline forms to use. By default,
+    returns the :attr:`InlineModelAdmin.max_num` attribute.
+
+    Override this method to programmatically determine the maximum number of
+    inline forms. For example, this may be based on the model instance
+    (passed as the keyword argument ``obj``)::
+
+        class BinaryTreeAdmin(admin.TabularInline):
+            model = BinaryTree
+
+            def get_max_num(self, request, obj=None, **kwargs):
+                max_num = 10
+                if obj.parent:
+                    return max_num - 5
+                return max_num
+
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------

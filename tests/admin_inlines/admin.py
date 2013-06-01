@@ -129,7 +129,7 @@ class ChildModel1Inline(admin.TabularInline):
 class ChildModel2Inline(admin.StackedInline):
     model = ChildModel2
 
-# admin for #19425
+# admin for #19425 and #18388
 class BinaryTreeAdmin(admin.TabularInline):
     model = BinaryTree
 
@@ -137,8 +137,13 @@ class BinaryTreeAdmin(admin.TabularInline):
         extra = 2
         if obj:
             return extra - obj.binarytree_set.count()
-
         return extra
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        max_num = 3
+        if obj:
+            return max_num - obj.binarytree_set.count()
+        return max_num
 
 # admin for #19524
 class SightingInline(admin.TabularInline):

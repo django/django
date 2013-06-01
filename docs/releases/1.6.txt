@@ -292,9 +292,10 @@ Minor features
   :meth:`~django.db.models.query.QuerySet.select_related` can be cleared using
   ``select_related(None)``.
 
-* The :meth:`~django.contrib.admin.InlineModelAdmin.get_extra` method on
+* The :meth:`~django.contrib.admin.InlineModelAdmin.get_extra` and
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num` methods on
   :class:`~django.contrib.admin.InlineModelAdmin` may be overridden to
-  customize the number of extra inline forms.
+  customize the extra and maximum number of inline forms.
 
 Backwards incompatible changes in 1.6
 =====================================
