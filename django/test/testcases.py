@@ -6,6 +6,7 @@ import errno
 from functools import wraps
 import json
 import os
+import posixpath
 import re
 import sys
 import select
@@ -15,14 +16,14 @@ import unittest
 from unittest import skipIf         # Imported here for backward compatibility
 from unittest.util import safe_repr
 try:
-    from urllib.parse import urlsplit, urlunsplit
+    from urllib.parse import urlsplit, urlunsplit, unquote
 except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
+    from urlparse import urlsplit, urlunsplit, unquote
 
 from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.handlers.fs import FSFilesHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
@@ -33,7 +34,7 @@ from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.db.models.loading import cache
 from django.forms.fields import CharField
-from django.http import QueryDict
+from django.http import QueryDict, Http404
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -1022,7 +1023,7 @@ class StoppableWSGIServer(WSGIServer):
                 self.close_request(request)
 
 
-class _MediaFilesHandler(StaticFilesHandler):
+class _MediaFilesHandler(FSFilesHandler):
     """
     Handler for serving the media files. This is a private class that is
     meant to be used solely as a convenience by LiveServerThread.
@@ -1037,6 +1038,45 @@ class _MediaFilesHandler(StaticFilesHandler):
     def serve(self, request):
         relative_url = request.path[len(self.base_url[2]):]
         return serve(request, relative_url, document_root=self.get_base_dir())
+
+
+class _StaticFilesHandler(FSFilesHandler):
+    """
+    Handler for serving the static files. This is an alter ego of
+    django.contrib.staticfiles.handlers.StaticFilesHandler but implemented here
+    as a private class that is meant to be used solely as a convenience by
+    LiveServerThread and to avoid such core->contrib dependency.
+    """
+
+    def get_base_dir(self):
+        return settings.STATIC_ROOT
+
+    def get_base_url(self):
+        self.check_settings()
+        return settings.STATIC_URL
+
+    def check_settings(self):
+        base_url = settings.STATIC_URL
+        if not base_url:
+            raise ImproperlyConfigured(
+                "You're using the staticfiles app "
+                "without having set the required STATIC_URL setting.")
+        if settings.MEDIA_URL == base_url:
+            raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
+                                    "settings must have different values")
+        if (settings.MEDIA_ROOT and settings.STATIC_ROOT and
+                settings.MEDIA_ROOT == settings.STATIC_ROOT):
+            raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
+                                    "settings must have different values")
+
+    def serve(self, request):
+        path = self.file_path(request.path)
+        normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
+        absolute_path = finders.find(normalized_path)
+        if not absolute_path:
+            raise Http404("'%s' could not be found" % path)
+        document_root, path = os.path.split(absolute_path)
+        return serve(request, path, document_root=document_root)
 
 
 class LiveServerThread(threading.Thread):
@@ -1065,7 +1105,7 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            handler = _StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
