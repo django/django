@@ -2861,5 +2861,5 @@ class Ticket18785Tests(unittest.TestCase):
         ).filter(
             name='something', creator__extra__isnull=True
         ).order_by()
-        self.assertEquals(1, str(qs.query).count('INNER JOIN'))
-        self.assertEquals(0, str(qs.query).count('OUTER JOIN'))
+        self.assertEqual(1, str(qs.query).count('INNER JOIN'))
+        self.assertEqual(0, str(qs.query).count('OUTER JOIN'))
