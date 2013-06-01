@@ -7,16 +7,16 @@
 &rsaquo; {% trans 'Documentation' %}</a>
 </div>
 {% endblock %}
-{% block title %}Please install docutils{% endblock %}
+{% block title %}{% trans 'Please install docutils' %}{% endblock %}
 
 {% block content %}
 
-<h1>Documentation</h1>
+<h1>{% trans 'Documentation' %}</h1>
 
 <div id="content-main">
-  <h3>The admin documentation system requires Python's <a href="http://docutils.sf.net/">docutils</a> library.</h3>
+  <h3>{% blocktrans with "http://docutils.sf.net/" as link %}The admin documentation system requires Python's <a href="{{ link }}">docutils</a> library.{% endblocktrans %}</h3>
 
-  <p>Please ask your administrators to install <a href="http://docutils.sf.net/">docutils</a>.</p>
+  <p>{% blocktrans with "http://docutils.sf.net/" as link %}Please ask your administrators to install <a href="{{ link }}">docutils</a>.{% endblocktrans %}</p>
 </div>
 
 {% endblock %}
