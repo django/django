@@ -139,7 +139,7 @@ msgstr ""
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
-msgstr "Mostar ID de objeto"
+msgstr "Mostrar ID de objeto"
 
 #: templates/admin_doc/bookmarklets.html:29
 msgid ""
