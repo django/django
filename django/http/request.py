@@ -238,11 +238,17 @@ class HttpRequest(object):
 
     def read(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.read(*args, **kwargs)
+        try:
+            return self._stream.read(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def readline(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.readline(*args, **kwargs)
+        try:
+            return self._stream.readline(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def xreadlines(self):
         while True:
