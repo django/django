@@ -450,7 +450,7 @@ class TestFixtures(TestCase):
                 commit=False,
                 stdout=stdout_output,
             )
-        self.assertTrue("No xml fixture 'this_fixture_doesnt_exist' in" in
+        self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
             force_text(stdout_output.getvalue()))
 
 
