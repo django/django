@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-01 12:08+0200\n"
+"POT-Creation-Date: 2013-06-02 00:30-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -97,7 +97,7 @@ msgstr ""
 msgid "Documentation"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr ""
 
@@ -152,8 +152,18 @@ msgstr ""
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 
+#: templates/admin_doc/index.html:17
+#: templates/admin_doc/template_tag_index.html:9
+msgid "Tags"
+msgstr ""
+
 #: templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
+msgstr ""
+
+#: templates/admin_doc/index.html:20
+#: templates/admin_doc/template_filter_index.html:9
+msgid "Filters"
 msgstr ""
 
 #: templates/admin_doc/index.html:21
@@ -162,11 +172,23 @@ msgid ""
 "the output."
 msgstr ""
 
+#: templates/admin_doc/index.html:23 templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/model_index.html:14
+msgid "Models"
+msgstr ""
+
 #: templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
+msgstr ""
+
+#: templates/admin_doc/index.html:26 templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
+#: templates/admin_doc/view_index.html:12
+msgid "Views"
 msgstr ""
 
 #: templates/admin_doc/index.html:27
@@ -195,12 +217,6 @@ msgstr ""
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr ""
-
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/model_index.html:14
-msgid "Models"
 msgstr ""
 
 #: templates/admin_doc/model_detail.html:21
@@ -259,10 +275,6 @@ msgstr ""
 msgid "Back to Documentation"
 msgstr ""
 
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr ""
-
 #: templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
 msgstr ""
@@ -281,10 +293,6 @@ msgstr ""
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
-msgstr ""
-
-#: templates/admin_doc/template_tag_index.html:9
-msgid "Tags"
 msgstr ""
 
 #: templates/admin_doc/template_tag_index.html:12
@@ -307,14 +315,9 @@ msgid ""
 "the tag."
 msgstr ""
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
-#: templates/admin_doc/view_index.html:12
-msgid "Views"
-msgstr ""
-
 #: templates/admin_doc/view_detail.html:12
-msgid "View: {{ name }}"
+#, python-format
+msgid "View: %(name)s"
 msgstr ""
 
 #: templates/admin_doc/view_detail.html:23
