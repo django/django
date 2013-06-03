@@ -438,7 +438,8 @@ class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
     pass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
-                      formfield_callback=None, widgets=None, localized_fields=None):
+                      formfield_callback=None, widgets=None, localized_fields=None,
+                      labels=None, help_texts=None, error_messages=None):
     """
     Returns a ModelForm containing form fields for the given model.
 
@@ -456,6 +457,13 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
+
+    ``labels`` is a dictionary of model field names mapped to a label.
+
+    ``help_texts`` is a dictionary of model field names mapped to a help text.
+
+    ``error_messages`` is a dictionary of model field names mapped to a
+    dictionary of error messages.
     """
     # Create the inner Meta class. FIXME: ideally, we should be able to
     # construct a ModelForm without creating and passing in a temporary
@@ -471,6 +479,12 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
         attrs['widgets'] = widgets
     if localized_fields is not None:
         attrs['localized_fields'] = localized_fields
+    if labels is not None:
+        attrs['labels'] = labels
+    if help_texts is not None:
+        attrs['help_texts'] = help_texts
+    if error_messages is not None:
+        attrs['error_messages'] = error_messages
 
     # If parent form class already has an inner Meta, the Meta we're
     # creating needs to inherit from the parent's inner meta.
@@ -760,7 +774,8 @@ class BaseModelFormSet(BaseFormSet):
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
                          can_order=False, max_num=None, fields=None, exclude=None,
-                         widgets=None, validate_max=False, localized_fields=None):
+                         widgets=None, validate_max=False, localized_fields=None,
+                         labels=None, help_texts=None, error_messages=None):
     """
     Returns a FormSet class for the given Django model class.
     """
@@ -781,7 +796,8 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
 
     form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
                              formfield_callback=formfield_callback,
-                             widgets=widgets, localized_fields=localized_fields)
+                             widgets=widgets, localized_fields=localized_fields,
+                             labels=labels, help_texts=help_texts, error_messages=error_messages)
     FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
                               can_order=can_order, can_delete=can_delete,
                               validate_max=validate_max)
@@ -920,7 +936,8 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None, extra=3, can_order=False,
                           can_delete=True, max_num=None, formfield_callback=None,
-                          widgets=None, validate_max=False, localized_fields=None):
+                          widgets=None, validate_max=False, localized_fields=None,
+                          labels=None, help_texts=None, error_messages=None):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 
@@ -944,6 +961,9 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
         'widgets': widgets,
         'validate_max': validate_max,
         'localized_fields': localized_fields,
+        'labels': labels,
+        'help_texts': help_texts,
+        'error_messages': error_messages,
     }
     FormSet = modelformset_factory(model, **kwargs)
     FormSet.fk = fk

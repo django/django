@@ -5,7 +5,7 @@ Model Form Functions
 .. module:: django.forms.models
    :synopsis: Django's functions for building model forms and formsets.
 
-.. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None,  widgets=None, localized_fields=None)
+.. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None, widgets=None, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
     Returns a :class:`~django.forms.ModelForm` class for the given ``model``.
     You can optionally pass a ``form`` argument to use as a starting point for
@@ -20,10 +20,17 @@ Model Form Functions
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
-    ``localized_fields`` is a list of names of fields which should be localized.
-
     ``formfield_callback`` is a callable that takes a model field and returns
     a form field.
+
+    ``localized_fields`` is a list of names of fields which should be localized.
+
+    ``labels`` is a dictionary of model field names mapped to a label.
+
+    ``help_texts`` is a dictionary of model field names mapped to a help text.
+
+    ``error_messages`` is a dictionary of model field names mapped to a
+    dictionary of error messages.
 
     See :ref:`modelforms-factory` for example usage.
 
@@ -35,14 +42,16 @@ Model Form Functions
     information. Omitting any definition of the fields to use will result in all
     fields being used, but this behavior is deprecated.
 
-    The ``localized_fields`` parameter was added.
+    The ``localized_fields``, ``labels``, ``help_texts``, and
+    ``error_messages`` parameters were added.
 
-.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None)
+.. function:: modelformset_factory(model, form=ModelForm, formfield_callback=None, formset=BaseModelFormSet, extra=1, can_delete=False, can_order=False, max_num=None, fields=None, exclude=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
     Returns a ``FormSet`` class for the given ``model`` class.
 
     Arguments ``model``, ``form``, ``fields``, ``exclude``,
-    ``formfield_callback``, ``widgets`` and ``localized_fields`` are all passed through to
+    ``formfield_callback``, ``widgets``, ``localized_fields``, ``labels``,
+    ``help_texts``, and ``error_messages`` are all passed through to
     :func:`~django.forms.models.modelform_factory`.
 
     Arguments ``formset``, ``extra``, ``max_num``, ``can_order``,
@@ -54,9 +63,10 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-        The ``widgets``, ``validate_max`` and ``localized_fields`` parameters were added.
+        The ``widgets``, ``validate_max``, ``localized_fields``, ``labels``,
+        ``help_texts``, and ``error_messages`` parameters were added.
 
-.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None)
+.. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
     defaults of ``formset=BaseInlineFormSet``, ``can_delete=True``, and
@@ -69,4 +79,5 @@ Model Form Functions
 
     .. versionchanged:: 1.6
 
-        The ``widgets``, ``validate_max`` and ``localized_fields`` parameters were added.
+        The ``widgets``, ``validate_max`` and ``localized_fields``, ``labels``,
+        ``help_texts``, and ``error_messages`` parameters were added.

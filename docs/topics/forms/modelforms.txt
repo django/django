@@ -388,6 +388,8 @@ include that field.
 
 .. _section on saving forms: `The save() method`_
 
+.. _modelforms-overriding-default-fields:
+
 Overriding the default fields
 -----------------------------
 
@@ -620,7 +622,7 @@ example by specifying the widgets to be used for a given field::
 
     >>> from django.forms import Textarea
     >>> Form = modelform_factory(Book, form=BookForm,
-                                 widgets={"title": Textarea()})
+    ...                          widgets={"title": Textarea()})
 
 The fields to include can be specified using the ``fields`` and ``exclude``
 keyword arguments, or the corresponding attributes on the ``ModelForm`` inner

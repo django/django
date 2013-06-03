@@ -236,9 +236,14 @@ Minor features
 .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 .. _`PIL`: https://pypi.python.org/pypi/PIL
 
-* :doc:`ModelForm </topics/forms/modelforms/>` accepts a new
-  Meta option: ``localized_fields``. Fields included in this list will be localized
-  (by setting ``localize`` on the form field).
+* :class:`~django.forms.ModelForm` accepts several new ``Meta``
+  options.
+
+  * Fields included in the ``localized_fields`` list will be localized
+    (by setting ``localize`` on the form field).
+  * The  ``labels``, ``help_texts`` and ``error_messages`` options may be used
+    to customize the default fields, see
+    :ref:`modelforms-overriding-default-fields` for details.
 
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
@@ -302,9 +307,6 @@ Minor features
   :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num` methods on
   :class:`~django.contrib.admin.InlineModelAdmin` may be overridden to
   customize the extra and maximum number of inline forms.
-
-* ``ModelForm`` inner ``Meta`` now accepts ``labels``, ``help_texts``
-  and ``error_messages`` to customize the default fields.
 
 Backwards incompatible changes in 1.6
 =====================================
