@@ -36,7 +36,6 @@ FormView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.FormView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseFormView``
     * :class:`django.views.generic.edit.FormMixin`
@@ -83,7 +82,6 @@ CreateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.CreateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseCreateView``
@@ -126,7 +124,6 @@ UpdateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.UpdateView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseUpdateView``
@@ -169,7 +166,6 @@ DeleteView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.edit.DeleteView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * ``django.views.generic.edit.BaseDeleteView``
