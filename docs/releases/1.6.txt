@@ -78,10 +78,10 @@ location of tests. The previous runner
 ``models.py`` and ``tests.py`` modules of a Python package in
 :setting:`INSTALLED_APPS`.
 
-The new runner (``django.test.runner.DjangoTestDiscoverRunner``) uses the test
-discovery features built into unittest2 (the version of unittest in the Python
-2.7+ standard library, and bundled with Django). With test discovery, tests can
-be located in any module whose name matches the pattern ``test*.py``.
+The new runner (``django.test.runner.DiscoverRunner``) uses the test discovery
+features built into unittest2 (the version of unittest in the Python 2.7+
+standard library, and bundled with Django). With test discovery, tests can be
+located in any module whose name matches the pattern ``test*.py``.
 
 In addition, the test labels provided to ``./manage.py test`` to nominate
 specific tests to run must now be full Python dotted paths (or directory
