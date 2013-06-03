@@ -28,7 +28,8 @@ from django.contrib.sites.models import get_current_site
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          current_app=None, extra_context=None):
+          current_app=None, extra_context=None,
+          redirect_hosts=None):
     """
     Displays the login form and handles the login action.
     """
@@ -39,7 +40,10 @@ def login(request, template_name='registration/login.html',
         if form.is_valid():
 
             # Ensure the user-originating redirection url is safe.
-            if not is_safe_url(url=redirect_to, host=request.get_host()):
+            host_list = [request.get_host(),]
+            if redirect_hosts:
+                host_list.extend(redirect_hosts)
+            if not is_safe_url(url=redirect_to, host=redirect_hosts):
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security check complete. Log the user in.

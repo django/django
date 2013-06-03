@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import calendar
+import collections
 import datetime
 import re
 import sys
@@ -241,4 +242,10 @@ def is_safe_url(url, host=None):
     if not url:
         return False
     netloc = urllib_parse.urlparse(url)[1]
-    return not netloc or netloc == host
+    if not netloc:
+        return True
+
+    if isinstance(host, collections.Iterable):
+        return netloc in host
+    else:
+        return netloc == host
