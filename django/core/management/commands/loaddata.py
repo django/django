@@ -16,6 +16,7 @@ from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
 from django.db.models import get_app_paths
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property, memoize
+from django.utils._os import upath
 from itertools import product
 
 try:
@@ -237,7 +238,7 @@ class Command(BaseCommand):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))
         dirs.append('')
-        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
+        dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]
         return dirs
 
     def parse_name(self, fixture_name):
