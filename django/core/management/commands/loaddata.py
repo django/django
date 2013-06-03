@@ -172,7 +172,7 @@ class Command(BaseCommand):
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
 
         # Check kept for backwards-compatibility; it doesn't look very useful.
-        if '.' in fixture_name:
+        if '.' in os.path.basename(fixture_name):
             raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
                     "serialization format." % tuple(fixture_name.rsplit('.')))
