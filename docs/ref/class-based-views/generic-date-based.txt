@@ -33,7 +33,6 @@ ArchiveIndexView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.ArchiveIndexView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseArchiveIndexView`
@@ -100,7 +99,6 @@ YearArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.YearArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseYearArchiveView`
@@ -216,7 +214,6 @@ MonthArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.MonthArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseMonthArchiveView`
@@ -317,7 +314,6 @@ WeekArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.WeekArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseWeekArchiveView`
@@ -422,7 +418,6 @@ DayArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.DayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseDayArchiveView`
@@ -526,7 +521,6 @@ TodayArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.TodayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseTodayArchiveView`
@@ -585,7 +579,6 @@ DateDetailView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.DateDetailView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseDateDetailView`

@@ -77,7 +77,6 @@ ListView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.list.ListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.list.BaseListView`

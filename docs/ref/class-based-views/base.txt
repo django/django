@@ -113,7 +113,6 @@ TemplateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
 
