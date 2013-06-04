@@ -91,8 +91,7 @@ class DatabaseErrorWrapper(object):
                 except AttributeError:
                     args = (exc_value,)
                 dj_exc_value = dj_exc_type(*args)
-                if six.PY3:
-                    dj_exc_value.__cause__ = exc_value
+                dj_exc_value.__cause__ = exc_value
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
