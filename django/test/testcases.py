@@ -28,6 +28,7 @@ from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
+from django.db.models.loading import cache
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
@@ -725,6 +726,9 @@ class TransactionTestCase(SimpleTestCase):
     # test case
     reset_sequences = False
 
+    # Subclasses can enable only a subset of apps for faster tests
+    available_apps = None
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -733,7 +737,14 @@ class TransactionTestCase(SimpleTestCase):
              named fixtures.
         """
         super(TransactionTestCase, self)._pre_setup()
-        self._fixture_setup()
+        if self.available_apps is not None:
+            cache.set_available_apps(self.available_apps)
+        try:
+            self._fixture_setup()
+        except Exception:
+            if self.available_apps is not None:
+                cache.unset_available_apps()
+            raise
 
     def _databases_names(self, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
@@ -775,22 +786,27 @@ class TransactionTestCase(SimpleTestCase):
            * Force closing the connection, so that the next test gets
              a clean cursor.
         """
-        self._fixture_teardown()
-        super(TransactionTestCase, self)._post_teardown()
-        # Some DB cursors include SQL statements as part of cursor
-        # creation. If you have a test that does rollback, the effect
-        # of these statements is lost, which can effect the operation
-        # of tests (e.g., losing a timezone setting causing objects to
-        # be created with the wrong time).
-        # To make sure this doesn't happen, get a clean connection at the
-        # start of every test.
-        for conn in connections.all():
-            conn.close()
+        try:
+            self._fixture_teardown()
+            super(TransactionTestCase, self)._post_teardown()
+            # Some DB cursors include SQL statements as part of cursor
+            # creation. If you have a test that does rollback, the effect of
+            # these statements is lost, which can effect the operation of
+            # tests (e.g., losing a timezone setting causing objects to be
+            # created with the wrong time). To make sure this doesn't happen,
+            # get a clean connection at the start of every test.
+            for conn in connections.all():
+                conn.close()
+        finally:
+            cache.unset_available_apps()
 
     def _fixture_teardown(self):
+        # Allow TRUNCATE ... CASCADE when flushing only a subset of the apps
+        allow_cascade = self.available_apps is not None
         for db_name in self._databases_names(include_mirrors=False):
-            call_command('flush', verbosity=0, interactive=False, database=db_name,
-                         skip_validation=True, reset_sequences=False)
+            call_command('flush', verbosity=0, interactive=False,
+                         database=db_name, skip_validation=True,
+                         reset_sequences=False, allow_cascade=allow_cascade)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
