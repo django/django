@@ -23,6 +23,8 @@ requires_threading = unittest.skipUnless(threading, 'requires threading')
 
 class SelectForUpdateTests(TransactionTestCase):
 
+    available_apps = ['select_for_update']
+
     def setUp(self):
         transaction.enter_transaction_management()
         self.person = Person.objects.create(name='Reinhardt')

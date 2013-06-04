@@ -94,6 +94,8 @@ class GetOrCreateTests(TestCase):
 
 class GetOrCreateTransactionTests(TransactionTestCase):
 
+    available_apps = ['get_or_create']
+
     def test_get_or_create_integrityerror(self):
         # Regression test for #15117. Requires a TransactionTestCase on
         # databases that delay integrity checks until the end of transactions,

@@ -1474,6 +1474,13 @@ class ArgumentOrder(AdminScriptTestCase):
 
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
+    available_apps = [
+        'admin_scripts',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+    ]
+
     def test_wrong_args(self):
         "Make sure passing the wrong kinds of arguments raises a CommandError"
         out, err = self.run_django_admin(['startproject'])

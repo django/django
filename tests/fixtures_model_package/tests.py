@@ -26,6 +26,9 @@ class SampleTestCase(TestCase):
 
 
 class TestNoInitialDataLoading(TransactionTestCase):
+
+    available_apps = ['fixtures_model_package']
+
     def test_syncdb(self):
         transaction.set_autocommit(False)
         try:

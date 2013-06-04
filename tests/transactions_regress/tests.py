@@ -10,6 +10,9 @@ from django.utils.unittest import skipIf, skipUnless
 from .models import Mod, M2mA, M2mB, SubMod
 
 class ModelInheritanceTests(TransactionTestCase):
+
+    available_apps = ['transactions_regress']
+
     def test_save(self):
         # First, create a SubMod, then try to save another with conflicting
         # cnt field. The problem was that transactions were committed after
@@ -33,6 +36,13 @@ class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionT
     when they should be, and aren't left pending after operations
     have been performed in them. Refs #9964.
     """
+
+    available_apps = [
+        'transactions_regress',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
+
     def test_raw_committed_on_success(self):
         """
         Make sure a transaction consisting of raw SQL execution gets
@@ -188,6 +198,9 @@ class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCa
     """
     Check that new connections don't have special behaviour.
     """
+
+    available_apps = ['transactions_regress']
+
     def setUp(self):
         self._old_backend = connections[DEFAULT_DB_ALIAS]
         settings = self._old_backend.settings_dict.copy()
@@ -235,6 +248,9 @@ class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, 
     is restored after entering and leaving transaction management.
     Refs #16047, #18130.
     """
+
+    available_apps = ['transactions_regress']
+
     def setUp(self):
         from psycopg2.extensions import (ISOLATION_LEVEL_AUTOCOMMIT,
                                          ISOLATION_LEVEL_SERIALIZABLE,
@@ -311,6 +327,9 @@ class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, 
 
 
 class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions_regress']
+
     def test_manyrelated_add_commit(self):
         "Test for https://code.djangoproject.com/ticket/16818"
         a = M2mA.objects.create()
@@ -326,6 +345,8 @@ class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, Transa
 
 
 class SavepointTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions_regress']
 
     @skipIf(connection.vendor == 'sqlite',
             "SQLite doesn't support savepoints in managed mode")
