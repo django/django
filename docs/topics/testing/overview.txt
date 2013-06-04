@@ -696,7 +696,7 @@ Use the ``django.test.client.Client`` class to make requests.
 
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
-        to come from an AnonymousUser.
+        to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
 
 Testing responses
 ~~~~~~~~~~~~~~~~~

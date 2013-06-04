@@ -623,6 +623,10 @@ Miscellaneous
   raises NoReverseMatch. There is no change to {% url %} tag, it causes
   template rendering to fail like always when NoReverseMatch is risen.
 
+* :meth:`django.test.client.Client.logout` now calls
+  :meth:`django.contrib.auth.logout` which will send the
+  :func:`~django.contrib.auth.signals.user_logged_out` signal.
+
 Features deprecated in 1.6
 ==========================
 

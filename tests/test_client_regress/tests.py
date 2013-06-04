@@ -17,7 +17,10 @@ from django.template.response import SimpleTemplateResponse
 from django.utils._os import upath
 from django.utils.translation import ugettext_lazy
 from django.http import HttpResponse
+from django.contrib.auth.signals import user_logged_out, user_logged_in
+from django.contrib.auth.models import User
 
+from .models import CustomUser
 from .views import CustomTestException
 
 @override_settings(
@@ -960,6 +963,76 @@ class SessionTests(TestCase):
         self.assertTrue(login, 'Could not log in')
         self.client.logout()
         self.client.logout()
+
+    def test_logout_with_user(self):
+        """Logout should send user_logged_out signal if user was logged in."""
+        def listener(*args, **kwargs):
+            listener.executed = True
+            self.assertEqual(kwargs['sender'], User)
+        listener.executed = False
+
+        user_logged_out.connect(listener)
+        self.client.login(username='testclient', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+        self.assertTrue(listener.executed)
+
+    @override_settings(AUTH_USER_MODEL='test_client_regress.CustomUser')
+    def test_logout_with_custom_user(self):
+        """Logout should send user_logged_out signal if custom user was logged in."""
+        def listener(*args, **kwargs):
+            self.assertEqual(kwargs['sender'], CustomUser)
+            listener.executed = True
+        listener.executed = False
+        u = CustomUser.custom_objects.create(email='test@test.com')
+        u.set_password('password')
+        u.save()
+
+        user_logged_out.connect(listener)
+        self.client.login(username='test@test.com', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+        self.assertTrue(listener.executed)
+
+    def test_logout_without_user(self):
+        """Logout should send signal even if user not authenticated."""
+        def listener(user, *args, **kwargs):
+            listener.user = user
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_out.connect(listener)
+        self.client.login(username='incorrect', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+
+        self.assertTrue(listener.executed)
+        self.assertIsNone(listener.user)
+
+    def test_login_with_user(self):
+        """Login should send user_logged_in signal on successful login."""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_in.connect(listener)
+        self.client.login(username='testclient', password='password')
+        user_logged_out.disconnect(listener)
+
+        self.assertTrue(listener.executed)
+
+    def test_login_without_signal(self):
+        """Login shouldn't send signal if user wasn't logged in"""
+        def listener(*args, **kwargs):
+            listener.executed = True
+        listener.executed = False
+
+        user_logged_in.connect(listener)
+        self.client.login(username='incorrect', password='password')
+        user_logged_in.disconnect(listener)
+
+        self.assertFalse(listener.executed)
+
 
 class RequestMethodTests(TestCase):
     def test_get(self):
