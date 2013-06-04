@@ -18,7 +18,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin, DynamicListFilterChildAdmin)
+    SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject, CustomIdUser)
@@ -46,9 +46,32 @@ class ChangeListTests(TestCase):
         m = ChildAdmin(Child, admin.site)
         request = self.factory.get('/child/')
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
-        self.assertEqual(cl.queryset.query.select_related, {'parent': {'name': {}}})
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_max_show_all, m.list_editable, m)
+        self.assertEqual(cl.queryset.query.select_related, {
+            'parent': {'name': {}}
+        })
+
+    def test_select_related_as_tuple(self):
+        ia = InvitationAdmin(Invitation, admin.site)
+        request = self.factory.get('/invitation/')
+        cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
+                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
+                        ia.list_select_related, ia.list_per_page,
+                        ia.list_max_show_all, ia.list_editable, ia)
+        self.assertEqual(cl.queryset.query.select_related, {'player': {}})
+
+    def test_select_related_as_empty_tuple(self):
+        ia = InvitationAdmin(Invitation, admin.site)
+        ia.list_select_related = ()
+        request = self.factory.get('/invitation/')
+        cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
+                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
+                        ia.list_select_related, ia.list_per_page,
+                        ia.list_max_show_all, ia.list_editable, ia)
+        self.assertEqual(cl.queryset.query.select_related, False)
+
 
     def test_result_list_empty_changelist_value(self):
         """

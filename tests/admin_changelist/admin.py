@@ -67,6 +67,11 @@ class ChordsBandAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
 
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ('band', 'player')
+    list_select_related = ('player',)
+
+
 class DynamicListDisplayChildAdmin(admin.ModelAdmin):
     list_display = ('parent', 'name', 'age')
 

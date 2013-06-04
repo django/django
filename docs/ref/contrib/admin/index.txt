@@ -812,12 +812,24 @@ subclass::
     the list of objects on the admin change list page. This can save you a
     bunch of database queries.
 
-    The value should be either ``True`` or ``False``. Default is ``False``.
+    .. versionchanged:: dev
 
-    Note that Django will use
-    :meth:`~django.db.models.query.QuerySet.select_related`,
-    regardless of this setting if one of the ``list_display`` fields is a
-    ``ForeignKey``.
+    The value should be either a boolean, a list or a tuple. Default is
+    ``False``.
+
+    When value is ``True``, ``select_related()`` will always be called. When
+    value is set to ``False``, Django will look at ``list_display`` and call
+    ``select_related()`` if any ``ForeignKey`` is present.
+
+    If you need more fine-grained control, use a tuple (or list) as value for
+    ``list_select_related``. Empty tuple will prevent Django from calling
+    ``select_related`` at all. Any other tuple will be passed directly to
+    ``select_related`` as parameters. For example::
+
+        class ArticleAdmin(admin.ModelAdmin):
+            list_select_related = ('author', 'category')
+
+    will call ``select_related('author', 'category')``.
 
 .. attribute:: ModelAdmin.ordering
 
