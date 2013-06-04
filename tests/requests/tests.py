@@ -683,6 +683,8 @@ class RequestsTests(SimpleTestCase):
         "Cannot establish two connections to an in-memory SQLite database.")
 class DatabaseConnectionHandlingTests(TransactionTestCase):
 
+    available_apps = []
+
     def setUp(self):
         # Use a temporary connection to avoid messing with the main one.
         self._old_default_connection = connections['default']

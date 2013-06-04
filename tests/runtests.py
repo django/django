@@ -72,6 +72,15 @@ def get_installed():
 def setup(verbosity, test_labels):
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
+    from django.test.testcases import TransactionTestCase, TestCase
+
+    # Force declaring available_apps in TransactionTestCase for faster tests.
+    def no_available_apps(self):
+        raise Exception("Please define available_apps in TransactionTestCase "
+                        "and its subclasses.")
+    TransactionTestCase.available_apps = property(no_available_apps)
+    TestCase.available_apps = None
+
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),

@@ -259,6 +259,9 @@ class SerializersTestBase(object):
 
 
 class SerializersTransactionTestBase(object):
+
+    available_apps = ['serializers']
+
     def test_forward_refs(self):
         """
         Tests that objects ids can be referenced before they are

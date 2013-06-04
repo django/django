@@ -621,6 +621,8 @@ class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
+
+    available_apps = []
     urls = 'file_storage.urls'
 
     def setUp(self):
