@@ -85,11 +85,11 @@ class Field(object):
     }
 
     # Generic field type description, usually overriden by subclasses
-    def _description(self):
+    @property
+    def description(self):
         return _('Field of type: %(field_type)s') % {
             'field_type': self.__class__.__name__
         }
-    description = property(_description)
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
@@ -453,16 +453,11 @@ class Field(object):
         first_choice = blank_choice if include_blank else []
         if self.choices:
             return first_choice + list(self.choices)
-        rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
-                        smart_text(x))
-                   for x in rel_model._default_manager.complex_filter(
-                       self.rel.limit_choices_to)]
+                    smart_text(x)) for x in self.queryset]
         else:
-            lst = [(x._get_pk_val(), smart_text(x))
-                   for x in rel_model._default_manager.complex_filter(
-                       self.rel.limit_choices_to)]
+            lst = [(x._get_pk_val(), smart_text(x)) for x in self.queryset]
         return first_choice + lst
 
     def get_choices_default(self):
@@ -492,15 +487,16 @@ class Field(object):
     def bind(self, fieldmapping, original, bound_field_class):
         return bound_field_class(self, fieldmapping, original)
 
-    def _get_choices(self):
+    @property
+    def choices(self):
         if is_iterator(self._choices):
             choices, self._choices = tee(self._choices)
             return choices
         else:
             return self._choices
-    choices = property(_get_choices)
 
-    def _get_flatchoices(self):
+    @property
+    def flatchoices(self):
         """Flattened version of choices tuple."""
         flat = []
         for choice, value in self.choices:
@@ -509,7 +505,13 @@ class Field(object):
             else:
                 flat.append((choice,value))
         return flat
-    flatchoices = property(_get_flatchoices)
+
+    @property
+    def queryset(self):
+        if hasattr(self, '_queryset') and callable(self._queryset):
+            return self._queryset()
+        return self.rel.to._default_manager.complex_filter(
+            self.rel.limit_choices_to)
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)

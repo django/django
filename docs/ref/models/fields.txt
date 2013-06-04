@@ -1067,6 +1067,11 @@ define the details of how the relation works.
     will only have an effect on the choices available in the admin when the
     field is not listed in ``raw_id_fields`` in the ``ModelAdmin`` for the model.
 
+    .. seealso::
+
+        For extended filtering, use the
+        :attr:`~django.db.models.Model.choices_for_FOO` method.
+
 .. attribute:: ForeignKey.related_name
 
     The name to use for the relation from the related object back to this one.
