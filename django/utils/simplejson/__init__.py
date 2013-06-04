@@ -120,6 +120,7 @@ except ImportError:
 
 if not use_system_version:
     try:
+        import json
         from json import *      # Python 2.6 preferred over local copy.
 
         # There is a "json" package around that is not Python's "json", so we
