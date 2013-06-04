@@ -590,25 +590,26 @@ Selector and checkbox widgets
     .. code-block:: html
 
         <div class="myradio">
-            <label><input type="radio" name="beatles" value="john" /> John</label>
+            <label for="id_beatles_0"><input id="id_beatles_0" name="beatles" type="radio" value="john" /> John</label>
         </div>
         <div class="myradio">
-            <label><input type="radio" name="beatles" value="paul" /> Paul</label>
+            <label for="id_beatles_1"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /> Paul</label>
         </div>
         <div class="myradio">
-            <label><input type="radio" name="beatles" value="george" /> George</label>
+            <label for="id_beatles_2"><input id="id_beatles_2" name="beatles" type="radio" value="george" /> George</label>
         </div>
         <div class="myradio">
-            <label><input type="radio" name="beatles" value="ringo" /> Ringo</label>
+            <label for="id_beatles_3"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /> Ringo</label>
         </div>
 
     That included the ``<label>`` tags. To get more granular, you can use each
-    radio button's ``tag`` and ``choice_label`` attributes. For example, this template...
+    radio button's ``tag``, ``choice_label`` and ``id_for_label`` attributes.
+    For example, this template...
 
     .. code-block:: html+django
 
         {% for radio in myform.beatles %}
-            <label>
+            <label for="{{ radio.id_for_label }}">
                 {{ radio.choice_label }}
                 <span class="radio">{{ radio.tag }}</span>
             </label>
@@ -618,30 +619,40 @@ Selector and checkbox widgets
 
     .. code-block:: html
 
-            <label>
-                John
-                <span class="radio"><input type="radio" name="beatles" value="john" /></span>
-            </label>
-            <label>
-                Paul
-                <span class="radio"><input type="radio" name="beatles" value="paul" /></span>
-            </label>
-            <label>
-                George
-                <span class="radio"><input type="radio" name="beatles" value="george" /></span>
-            </label>
-            <label>
-                Ringo
-                <span class="radio"><input type="radio" name="beatles" value="ringo" /></span>
-            </label>
+        <label for="id_beatles_0">
+            John
+            <span class="radio"><input id="id_beatles_0" name="beatles" type="radio" value="john" /></span>
+        </label>
 
-    If you decide not to loop over the radio buttons -- e.g., if your template simply includes
-    ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with ``<li>`` tags, as above.
+        <label for="id_beatles_1">
+            Paul
+            <span class="radio"><input id="id_beatles_1" name="beatles" type="radio" value="paul" /></span>
+        </label>
+
+        <label for="id_beatles_2">
+            George
+            <span class="radio"><input id="id_beatles_2" name="beatles" type="radio" value="george" /></span>
+        </label>
+
+        <label for="id_beatles_3">
+            Ringo
+            <span class="radio"><input id="id_beatles_3" name="beatles" type="radio" value="ringo" /></span>
+        </label>
+
+    If you decide not to loop over the radio buttons -- e.g., if your template
+    simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
+    with ``<li>`` tags, as above.
 
 .. versionchanged:: 1.6
 
 The outer ``<ul>`` container will now receive the ``id`` attribute defined on
 the widget.
+
+.. versionchanged:: 1.7
+
+    When looping over the radio buttons, the ``label`` and ``input`` tags include
+    ``for`` and ``id`` attributes, respectively. Each radio button has an
+    ``id_for_label`` attribute to output the element's ID.
 
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -665,6 +676,12 @@ the widget.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.
+
+.. versionchanged:: 1.7
+
+    When looping over the checkboxes, the ``label`` and ``input`` tags include
+    ``for`` and ``id`` attributes, respectively. Each checkbox has an
+    ``id_for_label`` attribute to output the element's ID.
 
 .. _file-upload-widgets:
 

@@ -145,6 +145,13 @@ Minor features
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
 
+* The ``<label>`` and ``<input>`` tags rendered by
+  :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
+  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
+  Each radio button or checkbox includes an ``id_for_label`` attribute to
+  output the element's ID.
+
 Backwards incompatible changes in 1.7
 =====================================
 
