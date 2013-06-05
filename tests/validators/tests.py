@@ -214,8 +214,8 @@ class TestSimpleValidators(TestCase):
 
     def test_message_dict(self):
         v = ValidationError({'first': ['First Problem']})
-        self.assertEqual(str(v), str_prefix("{%(_)s'first': %(_)s'First Problem'}"))
-        self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': %(_)s'First Problem'})"))
+        self.assertEqual(str(v), str_prefix("{%(_)s'first': [%(_)s'First Problem']}"))
+        self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import os
 import tempfile
 
+from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -286,3 +287,12 @@ class ColourfulItem(models.Model):
 class ArticleStatusNote(models.Model):
     name = models.CharField(max_length=20)
     status = models.ManyToManyField(ArticleStatus)
+
+class CustomErrorMessage(models.Model):
+    name1 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})
+
+    name2 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})

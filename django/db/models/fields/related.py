@@ -1173,8 +1173,11 @@ class ForeignKey(ForeignObject):
              )
         qs = qs.complex_filter(self.rel.limit_choices_to)
         if not qs.exists():
-            raise exceptions.ValidationError(self.error_messages['invalid'] % {
-                'model': self.rel.to._meta.verbose_name, 'pk': value})
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'model': self.rel.to._meta.verbose_name, 'pk': value},
+            )
 
     def get_attname(self):
         return '%s_id' % self.name

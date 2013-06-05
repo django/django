@@ -77,7 +77,7 @@ class Field(object):
     auto_creation_counter = -1
     default_validators = [] # Default set of validators
     default_error_messages = {
-        'invalid_choice': _('Value %r is not a valid choice.'),
+        'invalid_choice': _('Value %(value)r is not a valid choice.'),
         'null': _('This field cannot be null.'),
         'blank': _('This field cannot be blank.'),
         'unique': _('%(model_name)s with this %(field_label)s '
@@ -233,14 +233,17 @@ class Field(object):
                             return
                 elif value == option_key:
                     return
-            msg = self.error_messages['invalid_choice'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_choice'],
+                code='invalid_choice',
+                params={'value': value},
+            )
 
         if value is None and not self.null:
-            raise exceptions.ValidationError(self.error_messages['null'])
+            raise exceptions.ValidationError(self.error_messages['null'], code='null')
 
         if not self.blank and value in self.empty_values:
-            raise exceptions.ValidationError(self.error_messages['blank'])
+            raise exceptions.ValidationError(self.error_messages['blank'], code='blank')
 
     def clean(self, value, model_instance):
         """
@@ -568,7 +571,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be an integer."),
+        'invalid': _("'%(value)s' value must be an integer."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -586,8 +589,11 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def validate(self, value, model_instance):
         pass
@@ -616,7 +622,7 @@ class AutoField(Field):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be either True or False."),
+        'invalid': _("'%(value)s' value must be either True or False."),
     }
     description = _("Boolean (Either True or False)")
 
@@ -636,8 +642,11 @@ class BooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        msg = self.error_messages['invalid'] % value
-        raise exceptions.ValidationError(msg)
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a Web request (e.g. the
@@ -709,9 +718,9 @@ class CommaSeparatedIntegerField(CharField):
 class DateField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value has an invalid date format. It must be "
+        'invalid': _("'%(value)s' value has an invalid date format. It must be "
                      "in YYYY-MM-DD format."),
-        'invalid_date': _("'%s' value has the correct format (YYYY-MM-DD) "
+        'invalid_date': _("'%(value)s' value has the correct format (YYYY-MM-DD) "
                           "but it is an invalid date."),
     }
     description = _("Date (without time)")
@@ -745,11 +754,17 @@ class DateField(Field):
             if parsed is not None:
                 return parsed
         except ValueError:
-            msg = self.error_messages['invalid_date'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_date'],
+                code='invalid_date',
+                params={'value': value},
+            )
 
-        msg = self.error_messages['invalid'] % value
-        raise exceptions.ValidationError(msg)
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
@@ -797,11 +812,11 @@ class DateField(Field):
 class DateTimeField(DateField):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value has an invalid format. It must be in "
+        'invalid': _("'%(value)s' value has an invalid format. It must be in "
                      "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
-        'invalid_date': _("'%s' value has the correct format "
+        'invalid_date': _("'%(value)s' value has the correct format "
                           "(YYYY-MM-DD) but it is an invalid date."),
-        'invalid_datetime': _("'%s' value has the correct format "
+        'invalid_datetime': _("'%(value)s' value has the correct format "
                               "(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
                               "but it is an invalid date/time."),
     }
@@ -836,19 +851,28 @@ class DateTimeField(DateField):
             if parsed is not None:
                 return parsed
         except ValueError:
-            msg = self.error_messages['invalid_datetime'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_datetime'],
+                code='invalid_datetime',
+                params={'value': value},
+            )
 
         try:
             parsed = parse_date(value)
             if parsed is not None:
                 return datetime.datetime(parsed.year, parsed.month, parsed.day)
         except ValueError:
-            msg = self.error_messages['invalid_date'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_date'],
+                code='invalid_date',
+                params={'value': value},
+            )
 
-        msg = self.error_messages['invalid'] % value
-        raise exceptions.ValidationError(msg)
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
@@ -894,7 +918,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be a decimal number."),
+        'invalid': _("'%(value)s' value must be a decimal number."),
     }
     description = _("Decimal number")
 
@@ -912,8 +936,11 @@ class DecimalField(Field):
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
-            msg = self.error_messages['invalid'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def _format(self, value):
         if isinstance(value, six.string_types) or value is None:
@@ -999,7 +1026,7 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be a float."),
+        'invalid': _("'%(value)s' value must be a float."),
     }
     description = _("Floating point number")
 
@@ -1017,8 +1044,11 @@ class FloatField(Field):
         try:
             return float(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FloatField}
@@ -1028,7 +1058,7 @@ class FloatField(Field):
 class IntegerField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be an integer."),
+        'invalid': _("'%(value)s' value must be an integer."),
     }
     description = _("Integer")
 
@@ -1052,8 +1082,11 @@ class IntegerField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.IntegerField}
@@ -1135,7 +1168,7 @@ class GenericIPAddressField(Field):
 class NullBooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value must be either None, True or False."),
+        'invalid': _("'%(value)s' value must be either None, True or False."),
     }
     description = _("Boolean (Either True, False or None)")
 
@@ -1158,8 +1191,11 @@ class NullBooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        msg = self.error_messages['invalid'] % value
-        raise exceptions.ValidationError(msg)
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a Web request (e.g. the
@@ -1251,9 +1287,9 @@ class TextField(Field):
 class TimeField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%s' value has an invalid format. It must be in "
+        'invalid': _("'%(value)s' value has an invalid format. It must be in "
                      "HH:MM[:ss[.uuuuuu]] format."),
-        'invalid_time': _("'%s' value has the correct format "
+        'invalid_time': _("'%(value)s' value has the correct format "
                           "(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
     }
     description = _("Time")
@@ -1285,11 +1321,17 @@ class TimeField(Field):
             if parsed is not None:
                 return parsed
         except ValueError:
-            msg = self.error_messages['invalid_time'] % value
-            raise exceptions.ValidationError(msg)
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_time'],
+                code='invalid_time',
+                params={'value': value},
+            )
 
-        msg = self.error_messages['invalid'] % value
-        raise exceptions.ValidationError(msg)
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):

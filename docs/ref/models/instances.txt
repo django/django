@@ -84,12 +84,18 @@ need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
-.. method:: Model.full_clean(exclude=None)
+.. method:: Model.full_clean(exclude=None, validate_unique=True)
+
+.. versionchanged:: 1.6
+
+  The ``validate_unique`` parameter was added to allow skipping
+  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
+  was always called by ``full_clean``.
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()`, in that order and raises a
-:exc:`~django.core.exceptions.ValidationError` that has a ``message_dict``
-attribute containing errors from all three stages.
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
+``message_dict`` attribute containing errors from all three stages.
 
 The optional ``exclude`` argument can be used to provide a list of field names
 that can be excluded from validation and cleaning.
