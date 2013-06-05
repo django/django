@@ -5,7 +5,7 @@ from django.test import TestCase, skipIfDBFeature
 from .models import (
     Address, Place, Restaurant, Link, CharLink, TextLink,
     Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board, HasLinkThing)
+    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D)
 
 
 class GenericRelationTests(TestCase):
@@ -156,3 +156,59 @@ class GenericRelationTests(TestCase):
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l1),
             [hs2], lambda x: x)
+
+    def test_ticket_20564(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        c1 = C.objects.create(b=b1)
+        c2 = C.objects.create(b=b2)
+        c3 = C.objects.create(b=b3)
+        A.objects.create(flag=None, content_object=b1)
+        A.objects.create(flag=True, content_object=b2)
+        self.assertQuerysetEqual(
+            C.objects.filter(b__a__flag=None),
+            [c1, c3], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            C.objects.exclude(b__a__flag=None),
+            [c2], lambda x: x
+        )
+
+    def test_ticket_20564_nullable_fk(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        d1 = D.objects.create(b=b1)
+        d2 = D.objects.create(b=b2)
+        d3 = D.objects.create(b=b3)
+        d4 = D.objects.create()
+        A.objects.create(flag=None, content_object=b1)
+        A.objects.create(flag=True, content_object=b1)
+        A.objects.create(flag=True, content_object=b2)
+        self.assertQuerysetEqual(
+            D.objects.exclude(b__a__flag=None),
+            [d2], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            D.objects.filter(b__a__flag=None),
+            [d1, d3, d4], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            B.objects.filter(a__flag=None),
+            [b1, b3], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            B.objects.exclude(a__flag=None),
+            [b2], lambda x: x
+        )
+
+    def test_extra_join_condition(self):
+        # A crude check that content_type_id is taken in account in the
+        # join/subquery condition.
+        self.assertIn("content_type_id", str(B.objects.exclude(a__flag=None).query).lower())
+        # No need for any joins - the join from inner query can be trimmed in
+        # this case (but not in the above case as no a objects at all for given
+        # B would then fail).
+        self.assertNotIn(" join ", str(B.objects.exclude(a__flag=True).query).lower())
+        self.assertIn("content_type_id", str(B.objects.exclude(a__flag=True).query).lower())

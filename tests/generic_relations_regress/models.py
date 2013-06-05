@@ -131,3 +131,27 @@ class HasLinks(models.Model):
 
 class HasLinkThing(HasLinks):
     pass
+
+class A(models.Model):
+    flag = models.NullBooleanField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+class B(models.Model):
+    a = generic.GenericRelation(A)
+
+    class Meta:
+        ordering = ('id',)
+
+class C(models.Model):
+    b = models.ForeignKey(B)
+
+    class Meta:
+        ordering = ('id',)
+
+class D(models.Model):
+    b = models.ForeignKey(B, null=True)
+
+    class Meta:
+        ordering = ('id',)
