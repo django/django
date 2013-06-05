@@ -953,7 +953,7 @@ to test the effects of commit and rollback:
     key values started at one in :class:`~django.test.TransactionTestCase`
     tests.
 
-    Tests should not depend on this behaviour, but for legacy tests that do, the
+    Tests should not depend on this behavior, but for legacy tests that do, the
     :attr:`~TransactionTestCase.reset_sequences` attribute can be used until
     the test has been properly updated.
 

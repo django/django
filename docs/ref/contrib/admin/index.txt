@@ -1026,8 +1026,9 @@ subclass::
         Performs a full-text match. This is like the default search method but
         uses an index. Currently this is only available for MySQL.
 
-    If you need to customize search you can use :meth:`ModelAdmin.get_search_results` to provide additional or alternate
-    search behaviour.
+    If you need to customize search you can use
+    :meth:`ModelAdmin.get_search_results` to provide additional or alternate
+    search behavior.
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~

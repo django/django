@@ -344,9 +344,9 @@ CSRF_COOKIE_HTTPONLY
 
 Default: ``False``
 
-Whether to use HttpOnly flag on the CSRF cookie. If this is set to ``True``,
-client-side JavaScript will not to be able to access the CSRF cookie. See
-:setting:`SESSION_COOKIE_HTTPONLY` for details on HttpOnly.
+Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -2315,7 +2315,7 @@ SESSION_COOKIE_HTTPONLY
 
 Default: ``True``
 
-Whether to use HTTPOnly flag on the session cookie. If this is set to
+Whether to use ``HTTPOnly`` flag on the session cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the
 session cookie.
 

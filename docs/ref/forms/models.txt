@@ -33,7 +33,7 @@ Model Form Functions
     ``fields`` or ``exclude``, or the corresponding attributes on the form's
     inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for more
     information. Omitting any definition of the fields to use will result in all
-    fields being used, but this behaviour is deprecated.
+    fields being used, but this behavior is deprecated.
 
     The ``localized_fields`` parameter was added.
 

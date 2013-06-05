@@ -135,6 +135,8 @@ configuration in :setting:`DATABASES`::
 Since Django 1.6, autocommit is turned on by default. This configuration is
 ignored and can be safely removed.
 
+.. _database-isolation-level:
+
 Isolation level
 ---------------
 

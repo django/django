@@ -125,7 +125,7 @@ ModelFormMixin
 
         This is a required attribute if you are generating the form class
         automatically (e.g. using ``model``). Omitting this attribute will
-        result in all fields being used, but this behaviour is deprecated
+        result in all fields being used, but this behavior is deprecated
         and will be removed in Django 1.8.
 
     .. attribute:: success_url
