@@ -122,10 +122,6 @@ def sanitize_address(addr, encoding):
 
 
 class SafeMIMEMessage(MIMEMessage):
-
-    def __init__(self, text, subtype):
-        MIMEMessage.__init__(self, text, subtype)
-
     def __setitem__(self, name, val):
         # message/rfc822 attachments must be ASCII
         name, val = forbid_multi_line_headers(name, val, 'ascii')
@@ -140,7 +136,7 @@ class SafeMIMEMessage(MIMEMessage):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_ = False)
+        g = Generator(fp, mangle_from_=False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 
@@ -164,7 +160,7 @@ class SafeMIMEText(MIMEText):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_ = False)
+        g = Generator(fp, mangle_from_=False)
         if sys.version_info < (2, 6, 6) and isinstance(self._payload, six.text_type):
             # Workaround for http://bugs.python.org/issue1368247
             self._payload = self._payload.encode(self._charset.output_charset)
@@ -191,7 +187,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_ = False)
+        g = Generator(fp, mangle_from_=False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 

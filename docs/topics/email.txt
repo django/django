@@ -310,11 +310,10 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
        
-  .. versionchanged:: dev
+  .. versionchanged:: 1.6
   
   If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-  :py:class:`django.core.mail.EmailMessage` and 
-  :py:class:`email.message.Message`.
+  :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
   In addition, ``message/rfc822`` attachments will no longer be
   base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
