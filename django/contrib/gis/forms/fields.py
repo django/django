@@ -50,7 +50,7 @@ class GeometryField(forms.Field):
         try:
             return GEOSGeometry(value)
         except (GEOSException, ValueError, TypeError):
-            raise forms.ValidationError(self.error_messages['invalid_geom'])
+            raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
 
     def clean(self, value):
         """
@@ -65,7 +65,7 @@ class GeometryField(forms.Field):
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).
         if str(geom.geom_type).upper() != self.geom_type and not self.geom_type == 'GEOMETRY':
-            raise forms.ValidationError(self.error_messages['invalid_geom_type'])
+            raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
 
         # Transforming the geometry if the SRID was set.
         if self.srid:
@@ -76,7 +76,7 @@ class GeometryField(forms.Field):
                 try:
                     geom.transform(self.srid)
                 except:
-                    raise forms.ValidationError(self.error_messages['transform_error'])
+                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
 
         return geom
 

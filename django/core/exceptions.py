@@ -117,9 +117,7 @@ class ValidationError(Exception):
                 message = message.message
                 if params:
                     message %= params
-                message = force_text(message)
-            else:
-                message = force_text(message)
+            message = force_text(message)
             messages.append(message)
         return messages
 

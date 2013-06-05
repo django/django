@@ -12,13 +12,11 @@ validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
 In general, any cleaning method can raise ``ValidationError`` if there is a
-problem with the data it is processing, passing the relevant error message to
-the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
-method should return the cleaned (normalized) data as a Python object.
-
-If you detect multiple errors during a cleaning method and wish to signal all
-of them to the form submitter, it is possible to pass a list of errors to the
-``ValidationError`` constructor.
+problem with the data it is processing, passing the relevant information to
+the ``ValidationError`` constructor. :ref:`See below <raising-validation-error>`
+for the best practice in raising ``ValidationError``. If no ``ValidationError``
+is raised, the method should return the cleaned (normalized) data as a Python
+object.
 
 Most validation can be done using `validators`_ - simple helpers that can be
 reused easily. Validators are simple functions (or callables) that take a single
@@ -87,7 +85,8 @@ overridden:
   "field" (called ``__all__``), which you can access via the
   ``non_field_errors()`` method if you need to. If you want to attach
   errors to a specific field in the form, you will need to access the
-  ``_errors`` attribute on the form, which is `described later`_.
+  ``_errors`` attribute on the form, which is
+  :ref:`described later <modifying-field-errors>`.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
@@ -116,7 +115,100 @@ should iterate through ``self.cleaned_data.items()``, possibly considering the
 ``_errors`` dictionary attribute on the form as well. In this way, you will
 already know which fields have passed their individual validation requirements.
 
-.. _described later:
+.. _raising-validation-error:
+
+Raising ``ValidationError``
+---------------------------
+
+.. versionchanged:: 1.6
+
+In order to make error messages flexible and easy to override, consider the
+following guidelines:
+
+* Provide a descriptive error ``code`` to the constructor::
+
+      # Good
+      ValidationError(_('Invalid value'), code='invalid')
+
+      # Bad
+      ValidationError(_('Invalid value'))
+
+* Don't coerce variables into the message; use placeholders and the ``params``
+  argument of the constructor::
+
+      # Good
+      ValidationError(
+          _('Invalid value: %(value)s'),
+          params={'value': '42'},
+      )
+
+      # Bad
+      ValidationError(_('Invalid value: %s') % value)
+
+* Use mapping keys instead of positional formatting. This enables putting
+  the variables in any order or omitting them altogether when rewriting the
+  message::
+
+      # Good
+      ValidationError(
+          _('Invalid value: %(value)s'),
+          params={'value': '42'},
+      )
+
+      # Bad
+      ValidationError(
+          _('Invalid value: %s'),
+          params=('42',),
+      )
+
+* Wrap the message with ``gettext`` to enable translation::
+
+      # Good
+      ValidationError(_('Invalid value'))
+
+      # Bad
+      ValidationError('Invalid value')
+
+Putting it all together::
+
+    raise ValidationErrror(
+        _('Invalid value: %(value)s'),
+        code='invalid',
+        params={'value': '42'},
+    )
+
+Following these guidelines is particularly necessary if you write reusable
+forms, form fields, and model fields.
+
+While not recommended, if you are at the end of the validation chain
+(i.e. your form ``clean()`` method) and you know you will *never* need
+to override your error message you can still opt for the less verbose::
+
+    ValidationError(_('Invalid value: %s') % value)
+
+Raising multiple errors
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you detect multiple errors during a cleaning method and wish to signal all
+of them to the form submitter, it is possible to pass a list of errors to the
+``ValidationError`` constructor.
+
+As above, it is recommended to pass a list of ``ValidationError`` instances
+with ``code``\s and ``params`` but a list of strings will also work::
+
+    # Good
+    raise ValidationError([
+        ValidationError(_('Error 1'), code='error1'),
+        ValidationError(_('Error 2'), code='error2'),
+    ])
+
+    # Bad
+    raise ValidationError([
+        _('Error 1'),
+        _('Error 2'),
+    ])
+
+.. _modifying-field-errors:
 
 Form subclasses and modifying field errors
 ------------------------------------------
