@@ -17,6 +17,11 @@ Here are a couple of example settings::
     DEFAULT_FROM_EMAIL = 'webmaster@example.com'
     TEMPLATE_DIRS = ('/home/templates/mike', '/home/templates/john')
 
+.. note::
+
+    If you set :setting:`DEBUG` to ``False``, you also need to properly set
+    the :setting:`ALLOWED_HOSTS` setting.
+
 Because a settings file is a Python module, the following apply:
 
 * It doesn't allow for Python syntax errors.

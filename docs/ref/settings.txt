@@ -852,6 +852,10 @@ It is also important to remember that when running with :setting:`DEBUG`
 turned on, Django will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
+Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
+the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
+requests being returned as "Bad Request (400)".
+
 .. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
