@@ -310,8 +310,14 @@ class ModelAdminValidator(BaseValidator):
                                 % (cls.__name__, idx, field))
 
     def validate_list_select_related(self, cls, model):
-        " Validate that list_select_related is a boolean. "
-        check_type(cls, 'list_select_related', bool)
+        " Validate that list_select_related is a boolean, a list or a tuple. "
+        list_select_related = getattr(cls, 'list_select_related', None)
+        if list_select_related:
+            types = (bool, tuple, list)
+            if not isinstance(list_select_related, types):
+                raise ImproperlyConfigured("'%s.list_select_related' should be "
+                                           "either a bool, a tuple or a list" %
+                                           cls.__name__)
 
     def validate_list_per_page(self, cls, model):
         " Validate that list_per_page is an integer. "
