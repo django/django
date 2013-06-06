@@ -356,35 +356,45 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             # ValueError, ValidationError, or ?.
             raise IncorrectLookupParameters(e)
 
-        # Use select_related() if one of the list_display options is a field
-        # with a relationship and the provided queryset doesn't already have
-        # select_related defined.
         if not qs.query.select_related:
-            if self.list_select_related:
-                qs = qs.select_related()
-            else:
-                for field_name in self.list_display:
-                    try:
-                        field = self.lookup_opts.get_field(field_name)
-                    except models.FieldDoesNotExist:
-                        pass
-                    else:
-                        if isinstance(field.rel, models.ManyToOneRel):
-                            qs = qs.select_related()
-                            break
+            qs = self.apply_select_related(qs)
 
         # Set ordering.
         ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
         # Apply search results
-        qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
+        qs, search_use_distinct = self.model_admin.get_search_results(
+            request, qs, self.query)
 
-        # Remove duplicates from results, if neccesary
+        # Remove duplicates from results, if necessary
         if filters_use_distinct | search_use_distinct:
             return qs.distinct()
         else:
             return qs
+
+    def apply_select_related(self, qs):
+        if self.list_select_related is True:
+            return qs.select_related()
+
+        if self.list_select_related is False:
+            if self.has_related_field_in_list_display():
+                return qs.select_related()
+
+        if self.list_select_related:
+            return qs.select_related(*self.list_select_related)
+        return qs
+
+    def has_related_field_in_list_display(self):
+        for field_name in self.list_display:
+            try:
+                field = self.lookup_opts.get_field(field_name)
+            except models.FieldDoesNotExist:
+                pass
+            else:
+                if isinstance(field.rel, models.ManyToOneRel):
+                    return True
+        return False
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)

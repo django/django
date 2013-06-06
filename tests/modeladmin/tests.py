@@ -1161,9 +1161,11 @@ class ValidationTests(unittest.TestCase):
         class ValidationTestModelAdmin(ModelAdmin):
             list_select_related = 1
 
-        six.assertRaisesRegex(self,
+        six.assertRaisesRegex(
+            self,
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.list_select_related' should be a bool.",
+            "'ValidationTestModelAdmin.list_select_related' should be either a "
+            "bool, a tuple or a list",
             ValidationTestModelAdmin.validate,
             ValidationTestModel,
         )
