@@ -8,9 +8,10 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy, override
 
 from forms_tests.models import Cheese
+from i18n import TransRealMixin
 
 
-class FormsRegressionsTestCase(TestCase):
+class FormsRegressionsTestCase(TransRealMixin, TestCase):
     def test_class(self):
         # Tests to prevent against recurrences of earlier bugs.
         extra_attrs = {'class': 'special'}

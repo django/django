@@ -19,6 +19,8 @@ from django.utils.translation import ugettext as _
 from django.utils import tzinfo
 from django.utils.unittest import skipIf
 
+from i18n import TransRealMixin
+
 
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in
@@ -36,7 +38,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
-class HumanizeTests(TestCase):
+class HumanizeTests(TransRealMixin, TestCase):
 
     def humanize_tester(self, test_list, result_list, method):
         for test_content, result in zip(test_list, result_list):
