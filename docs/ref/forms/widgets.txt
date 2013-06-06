@@ -163,6 +163,9 @@ Django will then include the extra attributes in the rendered output:
     <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
 
+You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
+:attr:`BoundField.id_for_label` for an example.
+
 .. _styling-widget-classes:
 
 Styling widget classes
@@ -251,7 +254,7 @@ foundation for custom widgets.
         into two separate values::
 
             from django.forms import MultiWidget
-            
+
             class SplitDateTimeWidget(MultiWidget):
 
                 # ...
