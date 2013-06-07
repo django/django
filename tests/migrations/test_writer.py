@@ -1,5 +1,6 @@
 # encoding: utf8
 import datetime
+from django.utils import six
 from django.test import TransactionTestCase
 from django.db.migrations.writer import MigrationWriter
 from django.db import models, migrations
@@ -10,23 +11,33 @@ class WriterTests(TransactionTestCase):
     Tests the migration writer (makes migration files from Migration instances)
     """
 
-    def safe_exec(self, value, string):
+    def safe_exec(self, string, value=None):
         l = {}
         try:
-            exec(string, {}, l)
-        except:
-            self.fail("Could not serialize %r: failed to exec %r" % (value, string.strip()))
+            exec(string, globals(), l)
+        except Exception as e:
+            if value:
+                self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
+            else:
+                self.fail("Could not exec %r: %s" % (string.strip(), e))
         return l
 
-    def assertSerializedEqual(self, value):
+    def serialize_round_trip(self, value):
         string, imports = MigrationWriter.serialize(value)
-        new_value = self.safe_exec(value, "%s\ntest_value_result = %s" % ("\n".join(imports), string))['test_value_result']
-        self.assertEqual(new_value, value)
+        return self.safe_exec("%s\ntest_value_result = %s" % ("\n".join(imports), string), value)['test_value_result']
+
+    def assertSerializedEqual(self, value):
+        self.assertEqual(self.serialize_round_trip(value), value)
 
     def assertSerializedIs(self, value):
-        string, imports = MigrationWriter.serialize(value)
-        new_value = self.safe_exec(value, "%s\ntest_value_result = %s" % ("\n".join(imports), string))['test_value_result']
-        self.assertIs(new_value, value)
+        self.assertIs(self.serialize_round_trip(value), value)
+
+    def assertSerializedFieldEqual(self, value):
+        new_value = self.serialize_round_trip(value)
+        self.assertEqual(value.__class__, new_value.__class__)
+        self.assertEqual(value.max_length, new_value.max_length)
+        self.assertEqual(value.null, new_value.null)
+        self.assertEqual(value.unique, new_value.unique)
 
     def test_serialize(self):
         """
@@ -48,6 +59,9 @@ class WriterTests(TransactionTestCase):
         self.assertSerializedEqual(datetime.datetime.utcnow)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        # Django fields
+        self.assertSerializedFieldEqual(models.CharField(max_length=255))
+        self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
 
     def test_simple_migration(self):
         """
@@ -62,4 +76,9 @@ class WriterTests(TransactionTestCase):
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        print output
+        # It should NOT be unicode.
+        self.assertIsInstance(output, six.binary_type, "Migration as_string returned unicode")
+        # We don't test the output formatting - that's too fragile.
+        # Just make sure it runs for now, and that things look alright.
+        result = self.safe_exec(output)
+        self.assertIn("Migration", result)

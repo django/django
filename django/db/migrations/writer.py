@@ -1,5 +1,7 @@
+from __future__ import unicode_literals
 import datetime
 import types
+from django.utils import six
 from django.db import models
 
 
@@ -36,11 +38,12 @@ class MigrationWriter(object):
             operation_strings.append("migrations.%s(%s\n        )" % (name, "".join("\n            %s," % arg for arg in arg_strings)))
         items["operations"] = "[%s\n    ]" % "".join("\n        %s," % s for s in operation_strings)
         # Format imports nicely
+        imports.discard("from django.db import models")
         if not imports:
             items["imports"] = ""
         else:
             items["imports"] = "\n".join(imports) + "\n"
-        return MIGRATION_TEMPLATE % items
+        return (MIGRATION_TEMPLATE % items).encode("utf8")
 
     @property
     def filename(self):
@@ -84,16 +87,17 @@ class MigrationWriter(object):
         elif isinstance(value, (datetime.datetime, datetime.date)):
             return repr(value), set(["import datetime"])
         # Simple types
-        elif isinstance(value, (int, long, float, str, unicode, bool, types.NoneType)):
+        elif isinstance(value, (int, long, float, six.binary_type, six.text_type, bool, types.NoneType)):
             return repr(value), set()
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
             module, name = path.rsplit(".", 1)
             if module == "django.db.models":
-                imports = set()
+                imports = set(["from django.db import models"])
+                name = "models.%s" % name
             else:
-                imports = set("import %s" % module)
+                imports = set(["import %s" % module])
                 name = path
             arg_strings = []
             for arg in args:
