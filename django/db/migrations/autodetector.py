@@ -2,7 +2,7 @@ from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 
 
-class AutoDetector(object):
+class MigrationAutodetector(object):
     """
     Takes a pair of ProjectStates, and compares them to see what the
     first would need doing to make it match the second (the second
@@ -27,9 +27,9 @@ class AutoDetector(object):
         # We'll store migrations as lists by app names for now
         self.migrations = {}
         # Stage one: Adding models.
-        added_models = set(self.to_state.keys()) - set(self.from_state.keys())
+        added_models = set(self.to_state.models.keys()) - set(self.from_state.models.keys())
         for app_label, model_name in added_models:
-            model_state = self.to_state[app_label, model_name]
+            model_state = self.to_state.models[app_label, model_name]
             self.add_to_migration(
                 app_label,
                 operations.CreateModel(
@@ -40,9 +40,9 @@ class AutoDetector(object):
                 )
             )
         # Removing models
-        removed_models = set(self.from_state.keys()) - set(self.to_state.keys())
+        removed_models = set(self.from_state.models.keys()) - set(self.to_state.models.keys())
         for app_label, model_name in removed_models:
-            model_state = self.from_state[app_label, model_name]
+            model_state = self.from_state.models[app_label, model_name]
             self.add_to_migration(
                 app_label,
                 operations.DeleteModel(
@@ -59,11 +59,11 @@ class AutoDetector(object):
             for migration in migrations:
                 subclass = type("Migration", (Migration,), migration)
                 instance = subclass(migration['name'], app_label)
-                result.append(instance)
+                result.add(instance)
         return result
 
     def add_to_migration(self, app_label, operation):
         migrations = self.migrations.setdefault(app_label, [])
         if not migrations:
-            migrations.append({"name": "temp-%i" % len(migrations) + 1, "operations": [], "dependencies": []})
-        migrations[-1].operations.append(operation)
+            migrations.append({"name": "auto_%i" % (len(migrations) + 1), "operations": [], "dependencies": []})
+        migrations[-1]['operations'].append(operation)

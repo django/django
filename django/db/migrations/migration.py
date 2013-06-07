@@ -47,6 +47,9 @@ class Migration(object):
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)
 
+    def __hash__(self):
+        return hash("%s.%s" % (self.app_label, self.name))
+
     def mutate_state(self, project_state):
         """
         Takes a ProjectState and returns a new one with the migration's
