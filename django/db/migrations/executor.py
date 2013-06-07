@@ -8,10 +8,12 @@ class MigrationExecutor(object):
     up or down to a specified set of targets.
     """
 
-    def __init__(self, connection):
+    def __init__(self, connection, progress_callback=None):
         self.connection = connection
         self.loader = MigrationLoader(self.connection)
+        self.loader.load_disk()
         self.recorder = MigrationRecorder(self.connection)
+        self.progress_callback = progress_callback
 
     def migration_plan(self, targets):
         """
@@ -34,11 +36,12 @@ class MigrationExecutor(object):
                         applied.add(migration)
         return plan
 
-    def migrate(self, targets):
+    def migrate(self, targets, plan=None):
         """
         Migrates the database up to the given targets.
         """
-        plan = self.migration_plan(targets)
+        if plan is None:
+            plan = self.migration_plan(targets)
         for migration, backwards in plan:
             if not backwards:
                 self.apply_migration(migration)
@@ -49,16 +52,24 @@ class MigrationExecutor(object):
         """
         Runs a migration forwards.
         """
+        if self.progress_callback:
+            self.progress_callback("apply_start", migration)
         with self.connection.schema_editor() as schema_editor:
             project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
             migration.apply(project_state, schema_editor)
         self.recorder.record_applied(migration.app_label, migration.name)
+        if self.progress_callback:
+            self.progress_callback("apply_success", migration)
 
     def unapply_migration(self, migration):
         """
         Runs a migration backwards.
         """
+        if self.progress_callback:
+            self.progress_callback("unapply_start", migration)
         with self.connection.schema_editor() as schema_editor:
             project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
             migration.unapply(project_state, schema_editor)
         self.recorder.record_unapplied(migration.app_label, migration.name)
+        if self.progress_callback:
+            self.progress_callback("unapply_success", migration)

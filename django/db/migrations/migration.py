@@ -47,6 +47,9 @@ class Migration(object):
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)
 
+    def __str__(self):
+        return "%s.%s" % (self.app_label, self.name)
+
     def __hash__(self):
         return hash("%s.%s" % (self.app_label, self.name))
 

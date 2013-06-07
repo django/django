@@ -41,6 +41,7 @@ class MigrationLoader(object):
         Loads the migrations from all INSTALLED_APPS from disk.
         """
         self.disk_migrations = {}
+        self.unmigrated_apps = set()
         for app in cache.get_apps():
             # Get the migrations module directory
             module_name = ".".join(app.__name__.split(".")[:-1] + ["migrations"])
@@ -50,7 +51,8 @@ class MigrationLoader(object):
             except ImportError as e:
                 # I hate doing this, but I don't want to squash other import errors.
                 # Might be better to try a directory check directly.
-                if "No module named migrations" in str(e):
+                if "No module named" in str(e) and "migrations" in str(e):
+                    self.unmigrated_apps.add(app_label)
                     continue
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
