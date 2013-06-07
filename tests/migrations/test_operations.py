@@ -68,6 +68,12 @@ class OperationTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_crmo", editor, new_state, project_state)
         self.assertTableNotExists("test_crmo_pony")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "CreateModel")
+        self.assertEqual(len(definition[1]), 2)
+        self.assertEqual(len(definition[2]), 0)
+        self.assertEqual(definition[1][0], "Pony")
 
     def test_delete_model(self):
         """

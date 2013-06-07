@@ -15,6 +15,24 @@ class Operation(object):
     # Some operations are impossible to reverse, like deleting data.
     reversible = True
 
+    def __new__(cls, *args, **kwargs):
+        # We capture the arguments to make returning them trivial
+        self = object.__new__(cls)
+        self._constructor_args = (args, kwargs)
+        return self
+
+    def deconstruct(self):
+        """
+        Returns a 3-tuple of class import path (or just name if it lives
+        under django.db.migrations), positional arguments, and keyword
+        arguments.
+        """
+        return (
+            self.__class__.__name__,
+            self._constructor_args[0],
+            self._constructor_args[1],
+        )
+
     def state_forwards(self, app_label, state):
         """
         Takes the state from the previous migration, and mutates it
