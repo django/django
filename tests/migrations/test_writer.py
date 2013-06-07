@@ -2,7 +2,7 @@
 import datetime
 from django.test import TransactionTestCase
 from django.db.migrations.writer import MigrationWriter
-from django.db import migrations
+from django.db import models, migrations
 
 
 class WriterTests(TransactionTestCase):
@@ -56,6 +56,7 @@ class WriterTests(TransactionTestCase):
         migration = type("Migration", (migrations.Migration,), {
             "operations": [
                 migrations.DeleteModel("MyModel"),
+                migrations.AddField("OtherModel", "field_name", models.DateTimeField(default=datetime.datetime.utcnow))
             ],
             "dependencies": [("testapp", "some_other_one")],
         })

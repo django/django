@@ -1,5 +1,6 @@
 import datetime
 import types
+from django.db import models
 
 
 class MigrationWriter(object):
@@ -85,6 +86,25 @@ class MigrationWriter(object):
         # Simple types
         elif isinstance(value, (int, long, float, str, unicode, bool, types.NoneType)):
             return repr(value), set()
+        # Django fields
+        elif isinstance(value, models.Field):
+            attr_name, path, args, kwargs = value.deconstruct()
+            module, name = path.rsplit(".", 1)
+            if module == "django.db.models":
+                imports = set()
+            else:
+                imports = set("import %s" % module)
+                name = path
+            arg_strings = []
+            for arg in args:
+                arg_string, arg_imports = cls.serialize(arg)
+                arg_strings.append(arg_string)
+                imports.update(arg_imports)
+            for kw, arg in kwargs.items():
+                arg_string, arg_imports = cls.serialize(arg)
+                imports.update(arg_imports)
+                arg_strings.append("%s=%s" % (kw, arg_string))
+            return "%s(%s)" % (name, ", ".join(arg_strings)), imports
         # Functions
         elif isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
             # Special-cases, as these don't have im_class
