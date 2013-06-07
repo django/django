@@ -279,17 +279,22 @@ class IgnoredExtractorTests(ExtractorTests):
 
     def test_ignore_option(self):
         os.chdir(self.test_dir)
-        pattern1 = os.path.join('ignore_dir', '*')
+        ignore_patterns = [
+            os.path.join('ignore_dir', '*'),
+            'xxx_*',
+        ]
         stdout = StringIO()
         management.call_command('makemessages', locale=LOCALE, verbosity=2,
-            ignore_patterns=[pattern1], stdout=stdout)
+            ignore_patterns=ignore_patterns, stdout=stdout)
         data = stdout.getvalue()
         self.assertTrue("ignoring directory ignore_dir" in data)
+        self.assertTrue("ignoring file xxx_ignored.html" in data)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should be included.', po_contents)
             self.assertNotMsgId('This should be ignored.', po_contents)
+            self.assertNotMsgId('This should be ignored too.', po_contents)
 
 
 class SymlinkExtractorTests(ExtractorTests):

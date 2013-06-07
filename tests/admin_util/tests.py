@@ -11,8 +11,7 @@ from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
 from django import forms
-from django.test import TestCase
-from django.utils import unittest
+from django.test import SimpleTestCase, TestCase
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -82,7 +81,7 @@ class NestedObjectsTests(TestCase):
             # One for Location, one for Guest, and no query for EventGuide
             n.collect(objs)
 
-class UtilTests(unittest.TestCase):
+class UtilTests(SimpleTestCase):
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
@@ -151,7 +150,7 @@ class UtilTests(unittest.TestCase):
         # handling.
         display_value = display_for_field(None, models.NullBooleanField())
         expected = '<img src="%sadmin/img/icon-unknown.gif" alt="None" />' % settings.STATIC_URL
-        self.assertEqual(display_value, expected)
+        self.assertHTMLEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
@@ -236,6 +235,20 @@ class UtilTests(unittest.TestCase):
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 
+    def test_label_for_property(self):
+        # NOTE: cannot use @property decorator, because of
+        # AttributeError: 'property' object has no attribute 'short_description'
+        class MockModelAdmin(object):
+            def my_property(self):
+                return "this if from property"
+            my_property.short_description = 'property short description'
+            test_from_property = property(my_property)
+
+        self.assertEqual(
+            label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
+            'property short description'
+        )
+
     def test_related_name(self):
         """
         Regression test for #13963
@@ -285,10 +298,10 @@ class UtilTests(unittest.TestCase):
             cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
 
         form = MyForm()
-        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                         '<label for="id_text" class="required inline"><i>text</i>:</label>')
-        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                             '<label for="id_text" class="required inline"><i>text</i>:</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                             '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
 
         # normal strings needs to be escaped
         class MyForm(forms.Form):
@@ -296,10 +309,10 @@ class UtilTests(unittest.TestCase):
             cb   = forms.BooleanField(label='&cb')
 
         form = MyForm()
-        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
-                         '<label for="id_text" class="required inline">&amp;text:</label>')
-        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                             '<label for="id_text" class="required inline">&amp;text:</label>')
+        self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                             '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
 
     def test_flatten_fieldsets(self):
         """

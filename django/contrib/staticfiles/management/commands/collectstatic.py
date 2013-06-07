@@ -175,11 +175,9 @@ Type 'yes' to continue, or 'no' to cancel: """
             summary = template % {
                 'modified_count': modified_count,
                 'identifier': 'static file' + ('' if modified_count == 1 else 's'),
-                'action': self.symlink and 'symlinked' or 'copied',
-                'destination': (destination_path and " to '%s'"
-                                % destination_path or ''),
-                'unmodified': (collected['unmodified'] and ', %s unmodified'
-                               % unmodified_count or ''),
+                'action': 'symlinked' if self.symlink else 'copied',
+                'destination': (" to '%s'" % destination_path if destination_path else ''),
+                'unmodified': (', %s unmodified' % unmodified_count if collected['unmodified'] else ''),
                 'post_processed': (collected['post_processed'] and
                                    ', %s post-processed'
                                    % post_processed_count or ''),

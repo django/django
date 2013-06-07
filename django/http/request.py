@@ -14,7 +14,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.utils import six
@@ -72,7 +72,7 @@ class HttpRequest(object):
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
                 msg += "You may need to add %r to ALLOWED_HOSTS." % domain
-            raise SuspiciousOperation(msg)
+            raise DisallowedHost(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -238,11 +238,17 @@ class HttpRequest(object):
 
     def read(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.read(*args, **kwargs)
+        try:
+            return self._stream.read(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def readline(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.readline(*args, **kwargs)
+        try:
+            return self._stream.readline(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def xreadlines(self):
         while True:

@@ -4,6 +4,7 @@ import datetime
 
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -17,7 +18,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin, DynamicListFilterChildAdmin)
+    SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject, CustomIdUser)
@@ -45,9 +46,32 @@ class ChangeListTests(TestCase):
         m = ChildAdmin(Child, admin.site)
         request = self.factory.get('/child/')
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
-        self.assertEqual(cl.queryset.query.select_related, {'parent': {'name': {}}})
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_max_show_all, m.list_editable, m)
+        self.assertEqual(cl.queryset.query.select_related, {
+            'parent': {'name': {}}
+        })
+
+    def test_select_related_as_tuple(self):
+        ia = InvitationAdmin(Invitation, admin.site)
+        request = self.factory.get('/invitation/')
+        cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
+                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
+                        ia.list_select_related, ia.list_per_page,
+                        ia.list_max_show_all, ia.list_editable, ia)
+        self.assertEqual(cl.queryset.query.select_related, {'player': {}})
+
+    def test_select_related_as_empty_tuple(self):
+        ia = InvitationAdmin(Invitation, admin.site)
+        ia.list_select_related = ()
+        request = self.factory.get('/invitation/')
+        cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
+                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
+                        ia.list_select_related, ia.list_per_page,
+                        ia.list_max_show_all, ia.list_editable, ia)
+        self.assertEqual(cl.queryset.query.select_related, False)
+
 
     def test_result_list_empty_changelist_value(self):
         """
@@ -563,6 +587,44 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))
+
+    def test_pagination_page_range(self):
+        """
+        Regression tests for ticket #15653: ensure the number of pages
+        generated for changelist views are correct.
+        """
+        # instantiating and setting up ChangeList object
+        m = GroupAdmin(Group, admin.site)
+        request = self.factory.get('/group/')
+        cl = ChangeList(request, Group, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+        per_page = cl.list_per_page = 10
+
+        for page_num, objects_count, expected_page_range in [
+            (0, per_page, []),
+            (0, per_page * 2, list(range(2))),
+            (5, per_page * 11, list(range(11))),
+            (5, per_page * 12, [0, 1, 2, 3, 4, 5, 6, 7, 8, '.', 10, 11]),
+            (6, per_page * 12, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            (6, per_page * 13, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
+        ]:
+            # assuming we have exactly `objects_count` objects
+            Group.objects.all().delete()
+            for i in range(objects_count):
+                Group.objects.create(name='test band')
+
+            # setting page number and calculating page range
+            cl.page_num = page_num
+            cl.get_results(request)
+            real_page_range = pagination(cl)['page_range']
+
+            self.assertListEqual(
+                expected_page_range,
+                list(real_page_range),
+            )
+
 
 class AdminLogNodeTestCase(TestCase):
 

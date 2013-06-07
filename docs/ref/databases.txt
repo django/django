@@ -135,16 +135,17 @@ configuration in :setting:`DATABASES`::
 Since Django 1.6, autocommit is turned on by default. This configuration is
 ignored and can be safely removed.
 
+.. _database-isolation-level:
+
 Isolation level
 ---------------
 
 .. versionadded:: 1.6
 
 Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
-level <postgresql-isolation-levels>`_. If you need a higher isolation level
-such as ``REPEATABLE READ`` or ``SERIALIZABLE``, set it in the
-:setting:`OPTIONS` part of your database configuration in
-:setting:`DATABASES`::
+level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
+``SERIALIZABLE``, set it in the :setting:`OPTIONS` part of your database
+configuration in :setting:`DATABASES`::
 
     import psycopg2.extensions
 
@@ -161,7 +162,7 @@ such as ``REPEATABLE READ`` or ``SERIALIZABLE``, set it in the
     handle exceptions raised on serialization failures. This option is
     designed for advanced uses.
 
-.. _postgresql-isolation-levels: http://www.postgresql.org/docs/current/static/transaction-iso.html
+.. _isolation level: http://www.postgresql.org/docs/current/static/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -803,5 +804,5 @@ the support channels provided by each 3rd party project.
 .. _IBM DB2: http://code.google.com/p/ibm-db/
 .. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: http://code.google.com/p/django-pyodbc/
+.. _ODBC: https://github.com/aurorasoftware/django-pyodbc/
 .. _ADSDB: http://code.google.com/p/adsdb-django/

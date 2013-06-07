@@ -729,7 +729,8 @@ class SQLCompiler(object):
                     row = self.resolve_columns(row, fields)
 
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
+                    loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
+                    aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.query.resolve_aggregate(value, aggregate, self.connection)
@@ -786,8 +787,7 @@ class SQLCompiler(object):
             return list(result)
         return result
 
-    def as_subquery_condition(self, alias, columns):
-        qn = self.quote_name_unless_alias
+    def as_subquery_condition(self, alias, columns, qn):
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()

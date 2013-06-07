@@ -54,6 +54,8 @@ FAQ <time-zones-faq>`.
 Concepts
 ========
 
+.. _naive_vs_aware_datetimes:
+
 Naive and aware datetime objects
 --------------------------------
 

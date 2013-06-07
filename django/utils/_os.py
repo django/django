@@ -38,7 +38,7 @@ def upath(path):
     """
     Always return a unicode path.
     """
-    if not six.PY3:
+    if not six.PY3 and not isinstance(path, six.text_type):
         return path.decode(fs_encoding)
     return path
 

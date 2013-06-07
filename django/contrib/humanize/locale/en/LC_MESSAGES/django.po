@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"POT-Creation-Date: 2013-05-18 23:10+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -237,54 +237,60 @@ msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr ""
 
-#: templatetags/humanize.py:194 templatetags/humanize.py:216
+#: templatetags/humanize.py:194 templatetags/humanize.py:219
 msgid "now"
 msgstr ""
 
-#: templatetags/humanize.py:197
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:198
 #, python-format
 msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
+msgid_plural "%(count)s\\u00a0seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:202
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:204
 #, python-format
 msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
+msgid_plural "%(count)s\\u00a0minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:207
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:210
 #, python-format
 msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
+msgid_plural "%(count)s\\u00a0hours ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:213
+#: templatetags/humanize.py:216
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr ""
 
-#: templatetags/humanize.py:219
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:223
 #, python-format
 msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
+msgid_plural "%(count)s\\u00a0seconds from now"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:224
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-
+#. Translators: \\u00a0 is non-breaking space
 #: templatetags/humanize.py:229
 #, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s\\u00a0minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: \\u00a0 is non-breaking space
+#: templatetags/humanize.py:235
+#, python-format
 msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
+msgid_plural "%(count)s\\u00a0hours from now"
 msgstr[0] ""
 msgstr[1] ""

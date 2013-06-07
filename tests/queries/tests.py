@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
-from django.db.models.query import ITER_CHUNK_SIZE
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
@@ -18,7 +17,7 @@ from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
 from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
-    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ,
+    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, Join, LeafB, LoopX, LoopZ,
     ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
@@ -1112,6 +1111,17 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Report: r1>']
         )
 
+    def test_ticket_20250(self):
+        # A negated Q along with an annotated queryset failed in Django 1.4
+        qs = Author.objects.annotate(Count('item'))
+        qs = qs.filter(~Q(extra__value=0))
+
+        self.assertTrue('SELECT' in str(qs.query))
+        self.assertQuerysetEqual(
+            qs,
+            ['<Author: a1>', '<Author: a2>', '<Author: a3>', '<Author: a4>']
+        )
+
 
 class Queries2Tests(TestCase):
     def setUp(self):
@@ -1210,16 +1220,6 @@ class Queries2Tests(TestCase):
             ['<Number: 4>', '<Number: 8>', '<Number: 12>'],
             ordered=False
         )
-
-    def test_ticket7411(self):
-        # Saving to db must work even with partially read result set in another
-        # cursor.
-        for num in range(2 * ITER_CHUNK_SIZE + 1):
-            _ = Number.objects.create(num=num)
-
-        for i, obj in enumerate(Number.objects.all()):
-            obj.save()
-            if i > 10: break
 
     def test_ticket7759(self):
         # Count should work with a partially read result set.
@@ -1699,31 +1699,6 @@ class Queries6Tests(TestCase):
         ann1 = Annotation.objects.create(name='a1', tag=t1)
         ann1.notes.add(n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
-
-    # This next test used to cause really weird PostgreSQL behavior, but it was
-    # only apparent much later when the full test suite ran.
-    #  - Yeah, it leaves global ITER_CHUNK_SIZE to 2 instead of 100...
-    #@unittest.expectedFailure
-    def test_slicing_and_cache_interaction(self):
-        # We can do slicing beyond what is currently in the result cache,
-        # too.
-
-        # We need to mess with the implementation internals a bit here to decrease the
-        # cache fill size so that we don't read all the results at once.
-        from django.db.models import query
-        query.ITER_CHUNK_SIZE = 2
-        qs = Tag.objects.all()
-
-        # Fill the cache with the first chunk.
-        self.assertTrue(bool(qs))
-        self.assertEqual(len(qs._result_cache), 2)
-
-        # Query beyond the end of the cache and check that it is filled out as required.
-        self.assertEqual(repr(qs[4]), '<Tag: t5>')
-        self.assertEqual(len(qs._result_cache), 5)
-
-        # But querying beyond the end of the result set will fail.
-        self.assertRaises(IndexError, lambda: qs[100])
 
     def test_parallel_iterators(self):
         # Test that parallel iterators work.
@@ -2533,6 +2508,21 @@ class WhereNodeTest(TestCase):
         w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
         self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
 
+
+class IteratorExceptionsTest(TestCase):
+    def test_iter_exceptions(self):
+        qs = ExtraInfo.objects.only('author')
+        with self.assertRaises(AttributeError):
+            list(qs)
+
+    def test_invalid_qs_list(self):
+        # Test for #19895 - second iteration over invalid queryset
+        # raises errors.
+        qs = Article.objects.order_by('invalid_column')
+        self.assertRaises(FieldError, list, qs)
+        self.assertRaises(FieldError, list, qs)
+
+
 class NullJoinPromotionOrTest(TestCase):
     def setUp(self):
         self.d1 = ModelD.objects.create(name='foo')
@@ -2831,3 +2821,45 @@ class EmptyStringPromotionTests(TestCase):
             self.assertIn('LEFT OUTER JOIN', str(qs.query))
         else:
             self.assertNotIn('LEFT OUTER JOIN', str(qs.query))
+
+class ValuesSubqueryTests(TestCase):
+    def test_values_in_subquery(self):
+        # Check that if a values() queryset is used, then the given values
+        # will be used instead of forcing use of the relation's field.
+        o1 = Order.objects.create(id=-2)
+        o2 = Order.objects.create(id=-1)
+        oi1 = OrderItem.objects.create(order=o1, status=0)
+        oi1.status = oi1.pk
+        oi1.save()
+        OrderItem.objects.create(order=o2, status=0)
+
+        # The query below should match o1 as it has related order_item
+        # with id == status.
+        self.assertQuerysetEqual(
+            Order.objects.filter(items__in=OrderItem.objects.values_list('status')),
+            [o1.pk], lambda x: x.pk)
+
+class DoubleInSubqueryTests(TestCase):
+    def test_double_subquery_in(self):
+        lfa1 = LeafA.objects.create(data='foo')
+        lfa2 = LeafA.objects.create(data='bar')
+        lfb1 = LeafB.objects.create(data='lfb1')
+        lfb2 = LeafB.objects.create(data='lfb2')
+        Join.objects.create(a=lfa1, b=lfb1)
+        Join.objects.create(a=lfa2, b=lfb2)
+        leaf_as = LeafA.objects.filter(data='foo').values_list('pk', flat=True)
+        joins = Join.objects.filter(a__in=leaf_as).values_list('b__id', flat=True)
+        qs = LeafB.objects.filter(pk__in=joins)
+        self.assertQuerysetEqual(
+            qs, [lfb1], lambda x: x)
+
+class Ticket18785Tests(unittest.TestCase):
+    def test_ticket_18785(self):
+        # Test join trimming from ticket18785
+        qs = Item.objects.exclude(
+            note__isnull=False
+        ).filter(
+            name='something', creator__extra__isnull=True
+        ).order_by()
+        self.assertEqual(1, str(qs.query).count('INNER JOIN'))
+        self.assertEqual(0, str(qs.query).count('OUTER JOIN'))

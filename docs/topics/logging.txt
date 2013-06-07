@@ -394,7 +394,7 @@ requirements of logging in Web server environment.
 Loggers
 -------
 
-Django provides three built-in loggers.
+Django provides four built-in loggers.
 
 ``django``
 ~~~~~~~~~~
@@ -433,6 +433,35 @@ Messages to this logger have the following extra context:
 For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging
 level or handlers that are installed.
+
+``django.security.*``
+~~~~~~~~~~~~~~~~~~~~~~
+
+The security loggers will receive messages on any occurrence of
+:exc:`~django.core.exceptions.SuspiciousOperation`. There is a sub-logger for
+each sub-type of SuspiciousOperation. The level of the log event depends on
+where the exception is handled.  Most occurrences are logged as a warning, while
+any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
+error. For example, when an HTTP ``Host`` header is included in a request from
+a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
+response, and an error message will be logged to the
+``django.security.DisallowedHost`` logger.
+
+Only the parent ``django.security`` logger is configured by default, and all
+child loggers will propagate to the parent logger. The ``django.security``
+logger is configured the same as the ``django.request`` logger, and any error
+events will be mailed to admins. Requests resulting in a 400 response due to
+a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
+but only to the ``django.security`` logger.
+
+To silence a particular type of SuspiciousOperation, you can override that
+specific logger following this example::
+
+        'loggers': {
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
 
 Handlers
 --------

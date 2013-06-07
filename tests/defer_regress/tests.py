@@ -8,8 +8,9 @@ from django.db.models import Count
 from django.db.models.loading import cache
 from django.test import TestCase
 
-from .models import (ResolveThis, Item, RelatedItem, Child, Leaf, Proxy,
-    SimpleItem, Feature, ItemAndSimpleItem, OneToOneItem, SpecialFeature)
+from .models import (
+    ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
+    ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request)
 
 
 class DeferRegressionTest(TestCase):
@@ -76,7 +77,9 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
-        results = Leaf.objects.only("name", "child", "second_child", "child__name", "second_child__name").select_related()
+        results = Leaf.objects.only(
+            "name", "child", "second_child", "child__name", "second_child__name"
+        ).select_related()
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
@@ -98,29 +101,36 @@ class DeferRegressionTest(TestCase):
         i2 = s["item"]
         self.assertFalse(i2._deferred)
 
+        # Regression for #16409 - make sure defer() and only() work with annotate()
+        self.assertIsInstance(
+            list(SimpleItem.objects.annotate(Count('feature')).defer('name')),
+            list)
+        self.assertIsInstance(
+            list(SimpleItem.objects.annotate(Count('feature')).only('name')),
+            list)
+
+    def test_ticket_11936(self):
         # Regression for #11936 - loading.get_models should not return deferred
         # models by default.
-        klasses = sorted(
-            cache.get_models(cache.get_app("defer_regress")),
-            key=lambda klass: klass.__name__
+        # Run a couple of defer queries so that app-cache must contain some
+        # deferred classes. It might contain a lot more classes depending on
+        # the order the tests are ran.
+        list(Item.objects.defer("name"))
+        list(Child.objects.defer("value"))
+        klasses = set(
+            map(
+                attrgetter("__name__"),
+                cache.get_models(cache.get_app("defer_regress"))
+            )
         )
-        self.assertEqual(
-            klasses, [
-                Child,
-                Feature,
-                Item,
-                ItemAndSimpleItem,
-                Leaf,
-                OneToOneItem,
-                Proxy,
-                RelatedItem,
-                ResolveThis,
-                SimpleItem,
-                SpecialFeature,
-            ]
-        )
+        self.assertIn("Child", klasses)
+        self.assertIn("Item", klasses)
+        self.assertNotIn("Child_Deferred_value", klasses)
+        self.assertNotIn("Item_Deferred_name", klasses)
+        self.assertFalse(any(
+            k._deferred for k in cache.get_models(cache.get_app("defer_regress"))))
 
-        klasses = sorted(
+        klasses_with_deferred = set(
             map(
                 attrgetter("__name__"),
                 cache.get_models(
@@ -128,40 +138,22 @@ class DeferRegressionTest(TestCase):
                 ),
             )
         )
-        # FIXME: This is dependent on the order in which tests are run --
-        # this test case has to be the first, otherwise a LOT more classes
-        # appear.
-        self.assertEqual(
-            klasses, [
-                "Child",
-                "Child_Deferred_value",
-                "Feature",
-                "Item",
-                "ItemAndSimpleItem",
-                "Item_Deferred_name",
-                "Item_Deferred_name_other_value_text",
-                "Item_Deferred_name_other_value_value",
-                "Item_Deferred_other_value_text_value",
-                "Item_Deferred_text_value",
-                "Leaf",
-                "Leaf_Deferred_child_id_second_child_id_value",
-                "Leaf_Deferred_name_value",
-                "Leaf_Deferred_second_child_id_value",
-                "Leaf_Deferred_value",
-                "OneToOneItem",
-                "Proxy",
-                "RelatedItem",
-                "RelatedItem_Deferred_",
-                "RelatedItem_Deferred_item_id",
-                "ResolveThis",
-                "SimpleItem",
-                "SpecialFeature",
-            ]
+        self.assertIn("Child", klasses_with_deferred)
+        self.assertIn("Item", klasses_with_deferred)
+        self.assertIn("Child_Deferred_value", klasses_with_deferred)
+        self.assertIn("Item_Deferred_name", klasses_with_deferred)
+        self.assertTrue(any(
+            k._deferred for k in cache.get_models(
+                cache.get_app("defer_regress"), include_deferred=True))
         )
 
         # Regression for #16409 - make sure defer() and only() work with annotate()
-        self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).defer('name')), list)
-        self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).only('name')), list)
+        self.assertIsInstance(
+            list(SimpleItem.objects.annotate(Count('feature')).defer('name')),
+            list)
+        self.assertIsInstance(
+            list(SimpleItem.objects.annotate(Count('feature')).only('name')),
+            list)
 
     def test_only_and_defer_usage_on_proxy_models(self):
         # Regression for #15790 - only() broken for proxy models
@@ -179,7 +171,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(dp.value, proxy.value, msg=msg)
 
     def test_resolve_columns(self):
-        rt = ResolveThis.objects.create(num=5.0, name='Foobar')
+        ResolveThis.objects.create(num=5.0, name='Foobar')
         qs = ResolveThis.objects.defer('num')
         self.assertEqual(1, qs.count())
         self.assertEqual('Foobar', qs[0].name)
@@ -215,7 +207,7 @@ class DeferRegressionTest(TestCase):
         item1 = Item.objects.create(name="first", value=47)
         item2 = Item.objects.create(name="second", value=42)
         simple = SimpleItem.objects.create(name="simple", value="23")
-        related = ItemAndSimpleItem.objects.create(item=item1, simple=simple)
+        ItemAndSimpleItem.objects.create(item=item1, simple=simple)
 
         obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
         self.assertEqual(obj.item, item1)
@@ -242,7 +234,23 @@ class DeferRegressionTest(TestCase):
 
     def test_deferred_class_factory(self):
         from django.db.models.query_utils import deferred_class_factory
-        new_class = deferred_class_factory(Item,
+        new_class = deferred_class_factory(
+            Item,
             ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))
-        self.assertEqual(new_class.__name__,
+        self.assertEqual(
+            new_class.__name__,
             'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
+
+class DeferAnnotateSelectRelatedTest(TestCase):
+    def test_defer_annotate_select_related(self):
+        location = Location.objects.create()
+        Request.objects.create(location=location)
+        self.assertIsInstance(list(Request.objects
+            .annotate(Count('items')).select_related('profile', 'location')
+            .only('profile', 'location')), list)
+        self.assertIsInstance(list(Request.objects
+            .annotate(Count('items')).select_related('profile', 'location')
+            .only('profile__profile1', 'location__location1')), list)
+        self.assertIsInstance(list(Request.objects
+            .annotate(Count('items')).select_related('profile', 'location')
+            .defer('request1', 'request2', 'request3', 'request4')), list)

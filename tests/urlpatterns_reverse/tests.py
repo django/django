@@ -246,7 +246,7 @@ class ResolverTests(unittest.TestCase):
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
+                    self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
@@ -278,11 +278,11 @@ class ReverseShortcutTests(TestCase):
                 return "/hi-there/"
 
         res = redirect(FakeObj())
-        self.assertTrue(isinstance(res, HttpResponseRedirect))
+        self.assertIsInstance(res, HttpResponseRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
         res = redirect(FakeObj(), permanent=True)
-        self.assertTrue(isinstance(res, HttpResponsePermanentRedirect))
+        self.assertIsInstance(res, HttpResponsePermanentRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
     def test_redirect_to_view_name(self):
@@ -516,7 +516,7 @@ class RequestURLconfTests(TestCase):
             b''.join(self.client.get('/second_test/'))
 
 class ErrorHandlerResolutionTests(TestCase):
-    """Tests for handler404 and handler500"""
+    """Tests for handler400, handler404 and handler500"""
 
     def setUp(self):
         from django.core.urlresolvers import RegexURLResolver
@@ -528,12 +528,14 @@ class ErrorHandlerResolutionTests(TestCase):
     def test_named_handlers(self):
         from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.resolver.resolve400(), handler)
         self.assertEqual(self.resolver.resolve404(), handler)
         self.assertEqual(self.resolver.resolve500(), handler)
 
     def test_callable_handers(self):
         from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.callable_resolver.resolve400(), handler)
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 

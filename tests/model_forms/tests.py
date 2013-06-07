@@ -24,7 +24,7 @@ from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    test_images)
+    ArticleStatusNote, DateTimePost, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -73,6 +73,12 @@ class ExplicitPKForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
+        fields = '__all__'
+
+
+class DateTimePostForm(forms.ModelForm):
+    class Meta:
+        model = DateTimePost
         fields = '__all__'
 
 
@@ -234,6 +240,20 @@ class ColourfulItemForm(forms.ModelForm):
         model = ColourfulItem
         fields = '__all__'
 
+# model forms for testing work on #9321:
+
+class StatusNoteForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+
+
+class StatusNoteCBM2mForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+        widgets = {'status': forms.CheckboxSelectMultiple}
+
 
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
@@ -274,8 +294,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = '__all__'
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -287,8 +307,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url']
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -300,8 +320,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = [] # url will still appear, since it is explicit above
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_override_field(self):
         class AuthorForm(forms.ModelForm):
@@ -667,6 +687,23 @@ class UniqueTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
+
+    def test_unique_for_date_in_exclude(self):
+        """If the date for unique_for_* constraints is excluded from the
+        ModelForm (in this case 'posted' has editable=False, then the
+        constraint should be ignored."""
+        p = DateTimePost.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally",
+            posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
+        # 'title' has unique_for_date='posted'
+        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        self.assertTrue(form.is_valid())
+        # 'slug' has unique_for_year='posted'
+        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        self.assertTrue(form.is_valid())
+        # 'subtitle' has unique_for_month='posted'
+        form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+        self.assertTrue(form.is_valid())
 
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
@@ -1677,3 +1714,22 @@ class OldFormForXTests(TestCase):
         <option value="%(blue_pk)s">Blue</option>
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
+
+
+class M2mHelpTextTest(TestCase):
+    """Tests for ticket #9321."""
+    def test_multiple_widgets(self):
+        """Help text of different widgets for ManyToManyFields model fields"""
+        dreaded_help_text = '<span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span>'
+
+        # Default widget (SelectMultiple):
+        std_form = StatusNoteForm()
+        self.assertInHTML(dreaded_help_text, std_form.as_p())
+
+        # Overridden widget (CheckboxSelectMultiple, a subclass of
+        # SelectMultiple but with a UI that doesn't involve Control/Command
+        # keystrokes to extend selection):
+        form = StatusNoteCBM2mForm()
+        html = form.as_p()
+        self.assertInHTML('<ul id="id_status">', html)
+        self.assertInHTML(dreaded_help_text, html, count=0)

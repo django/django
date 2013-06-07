@@ -237,7 +237,7 @@ class PasswordResetForm(forms.Form):
                 'uid': int_to_base36(user.pk),
                 'user': user,
                 'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
+                'protocol': 'https' if use_https else 'http',
             }
             subject = loader.render_to_string(subject_template_name, c)
             # Email subject *must not* contain newlines

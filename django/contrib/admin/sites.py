@@ -66,12 +66,6 @@ class AdminSite(object):
         if not admin_class:
             admin_class = ModelAdmin
 
-        # Don't import the humongous validation code unless required
-        if admin_class and settings.DEBUG:
-            from django.contrib.admin.validation import validate
-        else:
-            validate = lambda model, adminclass: None
-
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -94,8 +88,8 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                # Validate (which might be a no-op)
-                validate(admin_class, model)
+                if admin_class is not ModelAdmin and settings.DEBUG:
+                    admin_class.validate(model)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)

@@ -27,15 +27,13 @@ Quickstart
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides a
 sample settings module that uses the SQLite database. To run the tests
-with this sample ``settings`` module, ``cd`` into the Django
-``tests/`` directory and run:
+with this sample ``settings`` module:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite
-
-If you get an ``ImportError: No module named django.contrib`` error,
-you need to add your install of Django to your ``PYTHONPATH``.
+    git clone git@github.com:django/django.git django-repo
+    cd django-repo/tests
+    PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
 .. _running-unit-tests-settings:
 
@@ -47,14 +45,10 @@ SQLite. If you want to test behavior using a different database (and
 if you're proposing patches for Django, it's a good idea to test
 across databases), you may need to define your own settings file.
 
-To run the tests with different settings, ``cd`` to the ``tests/`` directory
-and type:
+To run the tests with different settings, ensure that the module is on your
+``PYTHONPATH`` and pass the module with ``--settings``.
 
-.. code-block:: bash
-
-    ./runtests.py --settings=path.to.django.settings
-
-The :setting:`DATABASES` setting in this test settings module needs to define
+The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
 
 * A ``default`` database. This database should use the backend that

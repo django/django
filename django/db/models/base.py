@@ -632,15 +632,7 @@ class Model(six.with_metaclass(ModelBase)):
             base_qs = cls._base_manager.using(using)
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
-            if not values:
-                # We can end up here when saving a model in inheritance chain where
-                # update_fields doesn't target any field in current model. In that
-                # case we just say the update succeeded. Another case ending up here
-                # is a model with just PK - in that case check that the PK still
-                # exists.
-                updated = update_fields is not None or base_qs.filter(pk=pk_val).exists()
-            else:
-                updated = self._do_update(base_qs, using, pk_val, values)
+            updated = self._do_update(base_qs, using, pk_val, values, update_fields)
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
@@ -664,13 +656,21 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, meta.pk.attname, result)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields):
         """
         This method will try to update the model. If the model was updated (in
         the sense that an update query was done and a matching row was found
         from the DB) the method will return True.
         """
-        return base_qs.filter(pk=pk_val)._update(values) > 0
+        if not values:
+            # We can end up here when saving a model in inheritance chain where
+            # update_fields doesn't target any field in current model. In that
+            # case we just say the update succeeded. Another case ending up here
+            # is a model with just PK - in that case check that the PK still
+            # exists.
+            return update_fields is not None or base_qs.filter(pk=pk_val).exists()
+        else:
+            return base_qs.filter(pk=pk_val)._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
         """

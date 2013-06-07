@@ -39,7 +39,7 @@ def bookmarklets(request):
     admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
-        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root),
+        'admin_url': "%s://%s%s" % ('https' if request.is_secure() else 'http', request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
 
 @staff_member_required
@@ -267,6 +267,7 @@ def model_detail(request, app_label, model_name):
     return render_to_response('admin_doc/model_detail.html', {
         'root_path': urlresolvers.reverse('admin:index'),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
+        # Translators: %s is an object type name
         'summary': _("Attributes on %s objects") % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
@@ -286,7 +287,7 @@ def template_detail(request, template):
             templates.append({
                 'file': template_file,
                 'exists': os.path.exists(template_file),
-                'contents': lambda: os.path.exists(template_file) and open(template_file).read() or '',
+                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
                 'site_id': settings_mod.SITE_ID,
                 'site': site_obj,
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),

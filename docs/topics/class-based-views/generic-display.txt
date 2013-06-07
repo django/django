@@ -248,7 +248,7 @@ specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Publisher
 
     class PublisherDetail(DetailView):
 
@@ -326,6 +326,7 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
+    from django.conf.urls import patterns
     from books.views import PublisherBookList
 
     urlpatterns = patterns('',
@@ -375,6 +376,7 @@ Imagine we had a ``last_accessed`` field on our ``Author`` object that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
+    from django.db import models
 
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
@@ -390,6 +392,7 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
+    from django.conf.urls import patterns, url
     from books.views import AuthorDetailView
 
     urlpatterns = patterns('',
@@ -401,7 +404,6 @@ Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
     from django.views.generic import DetailView
-    from django.shortcuts import get_object_or_404
     from django.utils import timezone
     from books.models import Author
 

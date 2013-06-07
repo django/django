@@ -154,7 +154,7 @@ requests. These include:
   requests in tests.
 
 * A new test assertion --
-  :meth:`~django.test.TestCase.assertNumQueries` -- making it
+  :meth:`~django.test.TransactionTestCase.assertNumQueries` -- making it
   easier to test the database activity associated with a view.
 
 

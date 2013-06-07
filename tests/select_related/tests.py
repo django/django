@@ -172,3 +172,7 @@ class SelectRelatedTests(TestCase):
                 Species.objects.select_related,
                 'genus__family__order', depth=4
             )
+
+    def test_none_clears_list(self):
+        queryset = Species.objects.select_related('genus').select_related(None)
+        self.assertEqual(queryset.query.select_related, False)

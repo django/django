@@ -35,8 +35,20 @@ Configuring static files
 4. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/myimage.jpg``.
 
-Now, if you use ``./manage.py runserver``, all static files should be served
-automatically at the :setting:`STATIC_URL` and be shown correctly.
+.. admonition:: Serving the files
+
+    In addition to these configuration steps, you'll also need to actually
+    serve the static files.
+
+    During development, this will be done automatically if you use
+    :djadmin:`runserver` and :setting:`DEBUG` is set to ``True`` (see
+    :func:`django.contrib.staticfiles.views.serve`).
+
+    This method is **grossly inefficient** and probably **insecure**,
+    so it is **unsuitable for production**.
+
+    See :doc:`/howto/static-files/deployment` for proper strategies to serve
+    static files in production environments.
 
 Your project will probably also have static assets that aren't tied to a
 particular app. In addition to using a ``static/`` directory inside your apps,

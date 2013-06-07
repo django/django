@@ -5,11 +5,13 @@ import pickle
 from operator import attrgetter
 import warnings
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
+from django.db.utils import ConnectionRouter
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
@@ -918,6 +920,7 @@ class QueryTestCase(TestCase):
                                   published=datetime.date(2009, 5, 4),
                                   extra_arg=True)
 
+
 class TestRouter(object):
     # A test router. The behavior is vaguely master/slave, but the
     # databases aren't assumed to propagate changes.
@@ -971,6 +974,30 @@ class WriteRouter(object):
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'
+
+
+class ConnectionRouterTestCase(TestCase):
+    @override_settings(DATABASE_ROUTERS=[
+        'multiple_database.tests.TestRouter',
+        'multiple_database.tests.WriteRouter'])
+    def test_router_init_default(self):
+        router = ConnectionRouter()
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
+    def test_router_init_arg(self):
+        router = ConnectionRouter([
+            'multiple_database.tests.TestRouter',
+            'multiple_database.tests.WriteRouter'
+        ])
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
+        # Init with instances instead of strings
+        router = ConnectionRouter([TestRouter(), WriteRouter()])
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
 
 class RouterTestCase(TestCase):
     multi_db = True

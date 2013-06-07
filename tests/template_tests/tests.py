@@ -36,6 +36,7 @@ from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.tzinfo import LocalTimezone
 
+from i18n import TransRealMixin
 
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
@@ -154,8 +155,8 @@ class UTF8Class:
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
-@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
-class Templates(TestCase):
+
+class TemplateLoaderTests(TestCase):
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
@@ -347,6 +348,9 @@ class Templates(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+
+class TemplateRegressionTests(TestCase):
+
     def test_token_smart_split(self):
         # Regression test for #7027
         token = template.Token(template.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
@@ -444,6 +448,18 @@ class Templates(TestCase):
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
+    def test_super_errors(self):
+        """
+        Test behavior of the raise errors into included blocks.
+        See #18169
+        """
+        t = loader.get_template('included_content.html')
+        with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(Context({}))
+
+
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
+class TemplateTests(TransRealMixin, TestCase):
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()

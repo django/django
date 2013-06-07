@@ -9,11 +9,13 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
+from django.core.servers.basehttp import FileWrapper
 from django.conf.urls import patterns, url
 from django.db import models
 from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
+from django.utils.six import StringIO
 
 from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -24,7 +26,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
     WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
+    Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
@@ -149,7 +151,7 @@ class InquisitionAdmin(admin.ModelAdmin):
 
 
 class SketchAdmin(admin.ModelAdmin):
-    raw_id_fields = ('inquisition',)
+    raw_id_fields = ('inquisition', 'defendant0', 'defendant1')
 
 
 class FabricAdmin(admin.ModelAdmin):
@@ -238,8 +240,20 @@ def redirect_to(modeladmin, request, selected):
 redirect_to.short_description = 'Redirect to (Awesome action)'
 
 
+def download(modeladmin, request, selected):
+    buf = StringIO('This is the content of the file')
+    return StreamingHttpResponse(FileWrapper(buf))
+download.short_description = 'Download subscription'
+
+
+def no_perm(modeladmin, request, selected):
+    return HttpResponse(content='No permission to perform this action',
+                        status=403)
+no_perm.short_description = 'No permission to run'
+
+
 class ExternalSubscriberAdmin(admin.ModelAdmin):
-    actions = [redirect_to, external_mail]
+    actions = [redirect_to, external_mail, download, no_perm]
 
 
 class Podcast(Media):
@@ -530,6 +544,20 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
     colored_name.admin_order_field = 'name'
 
 
+class PluggableSearchPersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age')
+    search_fields = ('name',)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(request, queryset, search_term)
+        try:
+            search_term_as_int = int(search_term)
+            queryset |= self.model.objects.filter(age=search_term_as_int)
+        except:
+            pass
+        return queryset, use_distinct
+
+
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
@@ -733,6 +761,7 @@ site.register(Question)
 site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
+site.register(PluggableSearchPerson, PluggableSearchPersonAdmin)
 site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
 site.register(AdminOrderedField, AdminOrderedFieldAdmin)
 site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)

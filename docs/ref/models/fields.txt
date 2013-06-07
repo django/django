@@ -80,9 +80,10 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-field. If this is given, the default form widget will be a select box with
-these choices instead of the standard text field.
+An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
+two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
+this is given, the default form widget will be a select box with these choices
+instead of the standard text field.
 
 The first element in each tuple is the actual value to be stored, and the
 second element is the human-readable name. For example::
@@ -96,6 +97,8 @@ second element is the human-readable name. For example::
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
+
+    from django.db import models
 
     class Student(models.Model):
         FRESHMAN = 'FR'
@@ -290,7 +293,12 @@ records with the same ``title`` and ``pub_date``.
 Note that if you set this to point to a :class:`DateTimeField`, only the date
 portion of the field will be considered.
 
-This is enforced by model validation but not at the database level.
+This is enforced by :meth:`Model.validate_unique()` during model validation
+but not at the database level. If any :attr:`~Field.unique_for_date` constraint
+involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+example, if one of the fields is listed in ``exclude`` or has
+:attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
+skip validation for that particular constraint.
 
 ``unique_for_month``
 --------------------
@@ -365,7 +373,7 @@ to filter a queryset on a ``BinaryField`` value.
 
     Although you might think about storing files in the database, consider that
     it is bad design in 99% of the cases. This field is *not* a replacement for
-    proper :doc`static files </howto/static-files>` handling.
+    proper :doc:`static files </howto/static-files/index>` handling.
 
 ``BooleanField``
 ----------------
@@ -889,7 +897,8 @@ The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField([**options])
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values up to 32767 are safe in all databases
+supported by Django.
 
 ``SlugField``
 -------------
@@ -917,7 +926,8 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values from -32768 to 32767 are safe in all databases
+supported by Django.
 
 ``TextField``
 -------------
@@ -994,12 +1004,15 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
+    from django.db import models
+
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
         # ...
 
     class Manufacturer(models.Model):
         # ...
+        pass
 
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
@@ -1132,6 +1145,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     necessary to avoid executing queries at the time your models.py is
     imported::
 
+        from django.db import models
+        from django.contrib.auth.models import User
+
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
 
@@ -1203,6 +1219,8 @@ that control how the relationship functions.
 
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
+
+        from django.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")

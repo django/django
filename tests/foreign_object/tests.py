@@ -316,6 +316,11 @@ class MultiColumnFKTests(TestCase):
             list(Article.objects.filter(active_translation__abstract=None)),
             [a1, a2])
 
+    def test_foreign_key_raises_informative_does_not_exist(self):
+        referrer = ArticleTranslation()
+        with self.assertRaisesMessage(Article.DoesNotExist, 'ArticleTranslation has no article'):
+            referrer.article
+
 class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs
     # to manually deal with the foreignobject relation.

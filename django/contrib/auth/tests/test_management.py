@@ -7,6 +7,7 @@ from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.test_custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
@@ -195,6 +196,7 @@ class PermissionDuplicationTestCase(TestCase):
 
     def tearDown(self):
         models.Permission._meta.permissions = self._original_permissions
+        ContentType.objects.clear_cache()
 
     def test_duplicated_permissions(self):
         """

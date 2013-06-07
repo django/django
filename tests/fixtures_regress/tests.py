@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
+import warnings
 
 from django.core.serializers.base import DeserializationError
 from django.core import management
@@ -441,14 +442,15 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_existant_fixture_file(self):
         stdout_output = StringIO()
-        management.call_command(
-            'loaddata',
-            'this_fixture_doesnt_exist',
-            verbosity=2,
-            commit=False,
-            stdout=stdout_output,
-        )
-        self.assertTrue("No xml fixture 'this_fixture_doesnt_exist' in" in
+        with warnings.catch_warnings(record=True):
+            management.call_command(
+                'loaddata',
+                'this_fixture_doesnt_exist',
+                verbosity=2,
+                commit=False,
+                stdout=stdout_output,
+            )
+        self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
             force_text(stdout_output.getvalue()))
 
 

@@ -152,7 +152,9 @@ class BaseAppCache(object):
         return self.loaded
 
     def get_apps(self):
-        "Returns a list of all installed modules that contain models."
+        """
+        Returns a list of all installed modules that contain models.
+        """
         self._populate()
 
         # Ensure the returned list is always in the same order (with new apps
@@ -161,6 +163,23 @@ class BaseAppCache(object):
         apps = [(v, k) for k, v in self.app_store.items()]
         apps.sort()
         return [elt[1] for elt in apps]
+
+    def get_app_paths(self):
+        """
+        Returns a list of paths to all installed apps.
+
+        Useful for discovering files at conventional locations inside apps
+        (static files, templates, etc.)
+        """
+        self._populate()
+
+        app_paths = []
+        for app in self.get_apps():
+            if hasattr(app, '__path__'):        # models/__init__.py package
+                app_paths.extend([upath(path) for path in app.__path__])
+            else:                               # models.py module
+                app_paths.append(upath(app.__file__))
+        return app_paths
 
     def get_app(self, app_label, emptyOK=False):
         """
@@ -302,6 +321,7 @@ cache = AppCache()
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
 get_apps = cache.get_apps
+get_app_paths = cache.get_app_paths
 get_app = cache.get_app
 get_app_errors = cache.get_app_errors
 get_models = cache.get_models

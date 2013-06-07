@@ -373,6 +373,7 @@ these changes.
 
 * The following private APIs will be removed:
 
+  - ``django.db.backend``
   - ``django.db.close_connection()``
   - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
   - ``django.db.transaction.is_managed()``
@@ -385,10 +386,15 @@ these changes.
   ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
   ``django.test.runner.DiscoverRunner``.
 
-* The module ``django.test._doctest`` and the classes
-  ``django.test.testcases.DocTestRunner`` and
-  ``django.test.testcases.OutputChecker`` will be removed. Instead use the
-  doctest module from the Python standard library.
+* The module ``django.test._doctest`` will be removed. Instead use the doctest
+  module from the Python standard library.
+
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
+
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ManyToMany model fields will not be performed by Django anymore
+  either at the model or forms layer.
 
 2.0
 ---

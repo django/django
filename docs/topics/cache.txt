@@ -443,15 +443,9 @@ Then, add the following required settings to your Django settings file:
 The cache middleware caches GET and HEAD responses with status 200, where the request
 and response headers allow. Responses to requests for the same URL with different
 query parameters are considered to be unique pages and are cached separately.
-Optionally, if the :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
-setting is ``True``, only anonymous requests (i.e., not those made by a
-logged-in user) will be cached. This is a simple and effective way of disabling
-caching for any user-specific pages (including Django's admin interface). Note
-that if you use :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`, you should make
-sure you've activated ``AuthenticationMiddleware``. The cache middleware
-expects that a HEAD request is answered with the same response headers as
-the corresponding GET request; in which case it can return a cached GET
-response for HEAD request.
+The cache middleware expects that a HEAD request is answered with the same
+response headers as the corresponding GET request; in which case it can return
+a cached GET response for HEAD request.
 
 Additionally, the cache middleware automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
@@ -707,10 +701,15 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     >>> cache.get('my_key')
     'hello, world!'
 
-The ``timeout`` argument is optional and defaults to the ``timeout``
-argument of the appropriate backend in the :setting:`CACHES` setting
-(explained above). It's the number of seconds the value should be stored
-in the cache.
+The ``timeout`` argument is optional and defaults to the ``timeout`` argument
+of the appropriate backend in the :setting:`CACHES` setting (explained above).
+It's the number of seconds the value should be stored in the cache. Passing in
+``None`` for ``timeout`` will cache the value forever.
+
+.. versionchanged:: 1.6
+
+    Previously, passing ``None`` explicitly would use the default timeout
+    value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
@@ -998,8 +997,8 @@ produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
 
-To do this in Django, use the convenient ``vary_on_headers`` view decorator,
-like so::
+To do this in Django, use the convenient
+:func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
 
     from django.views.decorators.vary import vary_on_headers
 
@@ -1028,8 +1027,9 @@ the user-agent ``Mozilla`` and the cookie value ``foo=bar`` will be considered
 different from a request with the user-agent ``Mozilla`` and the cookie value
 ``foo=ham``.
 
-Because varying on cookie is so common, there's a ``vary_on_cookie``
-decorator. These two views are equivalent::
+Because varying on cookie is so common, there's a
+:func:`django.views.decorators.vary.vary_on_cookie` decorator. These two views
+are equivalent::
 
     @vary_on_cookie
     def my_view(request):
@@ -1042,7 +1042,7 @@ decorator. These two views are equivalent::
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
-You can also use a helper function, ``django.utils.cache.patch_vary_headers``,
+You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
     from django.utils.cache import patch_vary_headers
@@ -1091,8 +1091,9 @@ exclusive. The decorator ensures that the "public" directive is removed if
 "private" should be set (and vice versa). An example use of the two directives
 would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
-``patch_cache_control``, the manual way to modify the cache control header
-(it is internally called by the ``cache_control`` decorator)::
+:func:`django.utils.cache.patch_cache_control`, the manual way to modify the
+cache control header (it is internally called by the ``cache_control``
+decorator)::
 
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie

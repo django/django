@@ -232,6 +232,7 @@ the model field that is being aggregated.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -544,6 +545,11 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+Note that this method returns a ``ValuesListQuerySet``. This class behaves
+like a list. Most of the time this is enough, but if you require an actual
+Python list object, you can simply call ``list()`` on it, which will evaluate
+the queryset.
+
 dates
 ~~~~~
 
@@ -694,6 +700,8 @@ And here's ``select_related`` lookup::
 ``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
 
+    from django.db import models
+
     class City(models.Model):
         # ...
         pass
@@ -766,6 +774,13 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
+.. versionadded:: 1.6
+
+If you need to clear the list of related fields added by past calls of
+``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
+
+   >>> without_relations = queryset.select_related(None)
+
 .. deprecated:: 1.5
     The ``depth`` parameter to ``select_related()`` has been deprecated. You
     should replace it with the use of the ``(*fields)`` listing specific
@@ -808,6 +823,8 @@ that are supported by ``select_related``. It also supports prefetching of
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
 
 For example, suppose you have these models::
+
+    from django.db import models
 
     class Topping(models.Model):
         name = models.CharField(max_length=30)
@@ -1333,8 +1350,12 @@ get_or_create
 
 .. method:: get_or_create(**kwargs)
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+A convenience method for looking up an object with the given kwargs (may be
+empty if your model has defaults for all fields), creating one if necessary.
+
+.. versionchanged:: 1.6
+
+    Older versions of Django required ``kwargs``.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
@@ -1398,6 +1419,41 @@ shouldn't have any effect on data; use ``POST`` whenever a request to a page
 has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+
+.. warning::
+
+  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  attributes and reverse relations. In that case you will restrict the queries
+  inside the context of that relation. That could lead you to some integrity
+  problems if you don't use it consistently.
+
+  Being the following models::
+
+      class Chapter(models.Model):
+          title = models.CharField(max_length=255, unique=True)
+
+      class Book(models.Model):
+          title = models.CharField(max_length=256)
+          chapters = models.ManyToManyField(Chapter)
+
+  You can use ``get_or_create()`` through Book's chapters field, but it only
+  fetches inside the context of that book::
+
+      >>> book = Book.objects.create(title="Ulysses")
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, True)
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, False)
+      >>> Chapter.objects.create(title="Chapter 1")
+      <Chapter: Chapter 1>
+      >>> book.chapters.get_or_create(title="Chapter 1")
+      # Raises IntegrityError
+
+  This is happening because it's trying to get or create "Chapter 1" through the
+  book "Ulysses", but it can't do any of them: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
+
 
 bulk_create
 ~~~~~~~~~~~
@@ -1540,6 +1596,36 @@ earliest
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
+first
+~~~~~
+.. method:: first()
+
+.. versionadded:: 1.6
+
+Returns the first object matched by the queryset, or ``None`` if there
+is no matching object. If the ``QuerySet`` has no ordering defined, then the
+queryset is automatically ordered by the primary key.
+
+Example::
+
+    p = Article.objects.order_by('title', 'pub_date').first()
+
+Note that ``first()`` is a convenience method, the following code sample is
+equivalent to the above example::
+
+    try:
+        p = Article.objects.order_by('title', 'pub_date')[0]
+    except IndexError:
+        p = None
+
+last
+~~~~
+.. method:: last()
+
+.. versionadded:: 1.6
+
+Works like  :meth:`first()`, but returns the last object in the queryset.
+
 aggregate
 ~~~~~~~~~
 
@@ -1560,6 +1646,7 @@ aggregated.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -2037,6 +2124,7 @@ Range test (inclusive).
 
 Example::
 
+    import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))

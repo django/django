@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail import mail_managers
 from django.core import urlresolvers
 from django import http
+from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
 
@@ -84,7 +85,7 @@ class CommonMiddleware(object):
             return
         if new_url[0]:
             newurl = "%s://%s%s" % (
-                request.is_secure() and 'https' or 'http',
+                'https' if request.is_secure() else 'http',
                 new_url[0], urlquote(new_url[1]))
         else:
             newurl = urlquote(new_url[1])
@@ -140,16 +141,18 @@ class BrokenLinkEmailsMiddleware(object):
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = request.META.get('HTTP_REFERER', '')
-            is_internal = self.is_internal_request(domain, referer)
-            is_not_search_engine = '?' not in referer
-            is_ignorable = self.is_ignorable_404(path)
-            if referer and (is_internal or is_not_search_engine) and not is_ignorable:
+            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+
+            if not self.is_ignorable_request(request, path, domain, referer):
                 ua = request.META.get('HTTP_USER_AGENT', '<none>')
                 ip = request.META.get('REMOTE_ADDR', '<none>')
                 mail_managers(
-                    "Broken %slink on %s" % (('INTERNAL ' if is_internal else ''), domain),
-                    "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" % (referer, path, ua, ip),
+                    "Broken %slink on %s" % (
+                        ('INTERNAL ' if self.is_internal_request(domain, referer) else ''),
+                        domain
+                    ),
+                    "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
+                    "IP address: %s\n" % (referer, path, ua, ip),
                     fail_silently=True)
         return response
 
@@ -158,10 +161,14 @@ class BrokenLinkEmailsMiddleware(object):
         Returns True if the referring URL is the same domain as the current request.
         """
         # Different subdomains are treated as different domains.
-        return re.match("^https?://%s/" % re.escape(domain), referer)
+        return bool(re.match("^https?://%s/" % re.escape(domain), referer))
 
-    def is_ignorable_404(self, uri):
+    def is_ignorable_request(self, request, uri, domain, referer):
         """
-        Returns True if a 404 at the given URL *shouldn't* notify the site managers.
+        Returns True if the given request *shouldn't* notify the site managers.
         """
+        # '?' in referer is identified as search engine source
+        if (not referer or
+                (not self.is_internal_request(domain, referer) and '?' in referer)):
+            return True
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

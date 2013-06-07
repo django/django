@@ -1,24 +1,19 @@
 import warnings
 
-from django.conf import settings
 from django.core import signals
-from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import (DEFAULT_DB_ALIAS,
     DataError, OperationalError, IntegrityError, InternalError,
     ProgrammingError, NotSupportedError, DatabaseError,
     InterfaceError, Error,
     load_backend, ConnectionHandler, ConnectionRouter)
+from django.utils.functional import cached_property
 
 __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'DEFAULT_DB_ALIAS')
 
+connections = ConnectionHandler()
 
-if settings.DATABASES and DEFAULT_DB_ALIAS not in settings.DATABASES:
-    raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
-
-connections = ConnectionHandler(settings.DATABASES)
-
-router = ConnectionRouter(settings.DATABASE_ROUTERS)
+router = ConnectionRouter()
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
@@ -45,7 +40,28 @@ class DefaultConnectionProxy(object):
         return delattr(connections[DEFAULT_DB_ALIAS], name)
 
 connection = DefaultConnectionProxy()
-backend = load_backend(connection.settings_dict['ENGINE'])
+
+class DefaultBackendProxy(object):
+    """
+    Temporary proxy class used during deprecation period of the `backend` module
+    variable.
+    """
+    @cached_property
+    def _backend(self):
+        warnings.warn("Accessing django.db.backend is deprecated.",
+            PendingDeprecationWarning, stacklevel=2)
+        return load_backend(connections[DEFAULT_DB_ALIAS].settings_dict['ENGINE'])
+
+    def __getattr__(self, item):
+        return getattr(self._backend, item)
+
+    def __setattr__(self, name, value):
+        return setattr(self._backend, name, value)
+
+    def __delattr__(self, name):
+        return delattr(self._backend, name)
+
+backend = DefaultBackendProxy()
 
 def close_connection(**kwargs):
     warnings.warn(

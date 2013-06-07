@@ -83,7 +83,7 @@ class CursorDebugWrapper(CursorWrapper):
 ###############################################
 
 def typecast_date(s):
-    return s and datetime.date(*map(int, s.split('-'))) or None # returns None if s is null
+    return datetime.date(*map(int, s.split('-'))) if s else None # returns None if s is null
 
 def typecast_time(s): # does NOT store time zone information
     if not s: return None

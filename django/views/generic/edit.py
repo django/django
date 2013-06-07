@@ -136,20 +136,6 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        """
-        If an object has been supplied, inject it into the context with the
-        supplied context_object_name name.
-        """
-        context = {}
-        if self.object:
-            context['object'] = self.object
-            context_object_name = self.get_context_object_name(self.object)
-            if context_object_name:
-                context[context_object_name] = self.object
-        context.update(kwargs)
-        return super(ModelFormMixin, self).get_context_data(**context)
-
 
 class ProcessFormView(View):
     """

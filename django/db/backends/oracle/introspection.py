@@ -1,4 +1,5 @@
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 import cx_Oracle
 import re
 
@@ -48,7 +49,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            description.append(FieldInfo(*((desc[0].lower(),) + desc[1:])))
+            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
+            name = name % {} # cx_Oracle, for some reason, doubles percent signs.
+            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 
     def table_name_converter(self, name):
@@ -86,6 +89,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for row in cursor.fetchall():
             relations[row[0]] = (row[2], row[1].lower())
         return relations
+
+    def get_key_columns(self, cursor, table_name):
+        cursor.execute("""
+            SELECT ccol.column_name, rcol.table_name AS referenced_table, rcol.column_name AS referenced_column
+            FROM user_constraints c
+            JOIN user_cons_columns ccol
+              ON ccol.constraint_name = c.constraint_name 
+            JOIN user_cons_columns rcol
+              ON rcol.constraint_name = c.r_constraint_name 
+            WHERE c.table_name = %s AND c.constraint_type = 'R'""" , [table_name.upper()])
+        return [tuple(cell.lower() for cell in row) 
+                for row in cursor.fetchall()]
 
     def get_indexes(self, cursor, table_name):
         sql = """

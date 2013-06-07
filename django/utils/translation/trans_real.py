@@ -10,7 +10,9 @@ from threading import local
 import warnings
 
 from django.utils.importlib import import_module
+from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_str, force_text
+from django.utils.functional import memoize
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
@@ -29,6 +31,7 @@ _default = None
 # This is a cache for normalized accept-header languages to prevent multiple
 # file lookups when checking the same locale on repeated requests.
 _accepted = {}
+_checked_languages = {}
 
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
@@ -77,7 +80,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
         self.set_output_charset('utf-8')
-        self.django_output_charset = 'utf-8'
         self.__language = '??'
 
     def merge(self, other):
@@ -140,7 +142,7 @@ def translation(language):
         # doesn't affect en-gb), even though they will both use the core "en"
         # translation. So we have to subvert Python's internal gettext caching.
         base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in _translations]:
+        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
             res._info = res._info.copy()
             res._catalog = res._catalog.copy()
 
@@ -355,34 +357,54 @@ def check_for_language(lang_code):
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
     return False
+check_for_language = memoize(check_for_language, _checked_languages, 1)
 
-def get_supported_language_variant(lang_code, supported=None):
+def get_supported_language_variant(lang_code, supported=None, strict=False):
     """
     Returns the language-code that's listed in supported languages, possibly
     selecting a more generic variant. Raises LookupError if nothing found.
+
+    If `strict` is False (the default), the function will look for an alternative
+    country-specific variant when the currently checked is not found.
     """
     if supported is None:
         from django.conf import settings
-        supported = dict(settings.LANGUAGES)
-    if lang_code and lang_code not in supported:
-        lang_code = lang_code.split('-')[0] # e.g. if fr-ca is not supported fallback to fr
-    if lang_code and lang_code in supported and check_for_language(lang_code):
-        return lang_code
+        supported = SortedDict(settings.LANGUAGES)
+    if lang_code:
+        # if fr-CA is not supported, try fr-ca; if that fails, fallback to fr.
+        generic_lang_code = lang_code.split('-')[0]
+        variants = (lang_code, lang_code.lower(), generic_lang_code,
+                    generic_lang_code.lower())
+        for code in variants:
+            if code in supported and check_for_language(code):
+                return code
+        if not strict:
+            # if fr-fr is not supported, try fr-ca.
+            for supported_code in supported:
+                if supported_code.startswith((generic_lang_code + '-',
+                                              generic_lang_code.lower() + '-')):
+                    return supported_code
     raise LookupError(lang_code)
 
-def get_language_from_path(path, supported=None):
+def get_language_from_path(path, supported=None, strict=False):
     """
     Returns the language-code if there is a valid language-code
     found in the `path`.
+
+    If `strict` is False (the default), the function will look for an alternative
+    country-specific variant when the currently checked is not found.
     """
     if supported is None:
         from django.conf import settings
-        supported = dict(settings.LANGUAGES)
+        supported = SortedDict(settings.LANGUAGES)
     regex_match = language_code_prefix_re.match(path)
-    if regex_match:
-        lang_code = regex_match.group(1)
-        if lang_code in supported and check_for_language(lang_code):
-            return lang_code
+    if not regex_match:
+        return None
+    lang_code = regex_match.group(1)
+    try:
+        return get_supported_language_variant(lang_code, supported, strict=strict)
+    except LookupError:
+        return None
 
 def get_language_from_request(request, check_path=False):
     """
@@ -396,7 +418,7 @@ def get_language_from_request(request, check_path=False):
     """
     global _accepted
     from django.conf import settings
-    supported = dict(settings.LANGUAGES)
+    supported = SortedDict(settings.LANGUAGES)
 
     if check_path:
         lang_code = get_language_from_path(request.path_info, supported)
@@ -420,11 +442,6 @@ def get_language_from_request(request, check_path=False):
         if accept_lang == '*':
             break
 
-        # We have a very restricted form for our language files (no encoding
-        # specifier, since they all must be UTF-8 and only one possible
-        # language each time. So we avoid the overhead of gettext.find() and
-        # work out the MO file manually.
-
         # 'normalized' is the root name of the locale in POSIX format (which is
         # the format used for the directories holding the MO files).
         normalized = locale.locale_alias.get(to_locale(accept_lang, True))
@@ -438,14 +455,13 @@ def get_language_from_request(request, check_path=False):
             # need to check again.
             return _accepted[normalized]
 
-        for lang, dirname in ((accept_lang, normalized),
-                (accept_lang.split('-')[0], normalized.split('_')[0])):
-            if lang.lower() not in supported:
-                continue
-            for path in all_locale_paths():
-                if os.path.exists(os.path.join(path, dirname, 'LC_MESSAGES', 'django.mo')):
-                    _accepted[normalized] = lang
-                    return lang
+        try:
+            accept_lang = get_supported_language_variant(accept_lang, supported)
+        except LookupError:
+            continue
+        else:
+            _accepted[normalized] = accept_lang
+            return accept_lang
 
     try:
         return get_supported_language_variant(settings.LANGUAGE_CODE, supported)

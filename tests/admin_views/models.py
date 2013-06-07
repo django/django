@@ -137,6 +137,7 @@ class Thing(models.Model):
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
+    title = models.CharField(max_length=50, null=True)
     def __str__(self):
         return self.name
 
@@ -158,6 +159,8 @@ class Sketch(models.Model):
                                                                    'leader__age': 27,
                                                                    'expected': False,
                                                                    })
+    defendant0 = models.ForeignKey(Actor, limit_choices_to={'title__isnull': False}, related_name='as_defendant0')
+    defendant1 = models.ForeignKey(Actor, limit_choices_to={'title__isnull': True}, related_name='as_defendant1')
 
     def __str__(self):
         return self.title
@@ -590,6 +593,12 @@ class ComplexSortedPerson(models.Model):
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
     is_employee = models.NullBooleanField()
+
+
+class PluggableSearchPerson(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
+
 
 class PrePopulatedPostLargeSlug(models.Model):
     """

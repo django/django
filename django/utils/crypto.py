@@ -28,10 +28,6 @@ from django.utils import six
 from django.utils.six.moves import xrange
 
 
-_trans_5c = bytearray([(x ^ 0x5C) for x in xrange(256)])
-_trans_36 = bytearray([(x ^ 0x36) for x in xrange(256)])
-
-
 def salted_hmac(key_salt, value, secret=None):
     """
     Returns the HMAC-SHA1 of 'value', using a key generated from key_salt and a
@@ -130,9 +126,9 @@ def _fast_hmac(key, msg, digest):
     if len(key) > dig1.block_size:
         key = digest(key).digest()
     key += b'\x00' * (dig1.block_size - len(key))
-    dig1.update(key.translate(_trans_36))
+    dig1.update(key.translate(hmac.trans_36))
     dig1.update(msg)
-    dig2.update(key.translate(_trans_5c))
+    dig2.update(key.translate(hmac.trans_5C))
     dig2.update(dig1.digest())
     return dig2
 

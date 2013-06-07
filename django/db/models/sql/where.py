@@ -174,6 +174,8 @@ class WhereNode(tree.Node):
         it.
         """
         lvalue, lookup_type, value_annotation, params_or_value = child
+        field_internal_type = lvalue.field.get_internal_type() if lvalue.field else None
+        
         if isinstance(lvalue, Constraint):
             try:
                 lvalue, params = lvalue.process(lookup_type, params_or_value, connection)
@@ -187,7 +189,7 @@ class WhereNode(tree.Node):
 
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
-            field_sql, field_params = self.sql_for_columns(lvalue, qn, connection), []
+            field_sql, field_params = self.sql_for_columns(lvalue, qn, connection, field_internal_type), []
         else:
             # A smart object with an as_sql() method.
             field_sql, field_params = lvalue.as_sql(qn, connection)
@@ -257,7 +259,7 @@ class WhereNode(tree.Node):
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
-    def sql_for_columns(self, data, qn, connection):
+    def sql_for_columns(self, data, qn, connection, internal_type=None):
         """
         Returns the SQL fragment used for the left-hand side of a column
         constraint (for example, the "T1.foo" portion in the clause
@@ -268,7 +270,7 @@ class WhereNode(tree.Node):
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
             lhs = qn(name)
-        return connection.ops.field_cast_sql(db_type) % lhs
+        return connection.ops.field_cast_sql(db_type, internal_type) % lhs
 
     def relabel_aliases(self, change_map):
         """
@@ -397,13 +399,21 @@ class SubqueryConstraint(object):
         if hasattr(query, 'values'):
             if query._db and connection.alias != query._db:
                 raise ValueError("Can't do subqueries with queries on different DBs.")
-            query = query.values(*self.targets).query
+            # Do not override already existing values.
+            if not hasattr(query, 'field_names'):
+                query = query.values(*self.targets)
+            else:
+                query = query._clone()
+            query = query.query
             query.clear_ordering(True)
 
         query_compiler = query.get_compiler(connection=connection)
-        return query_compiler.as_subquery_condition(self.alias, self.columns)
+        return query_compiler.as_subquery_condition(self.alias, self.columns, qn)
 
-    def relabeled_clone(self, relabels):
+    def relabel_aliases(self, change_map):
+        self.alias = change_map.get(self.alias, self.alias)
+
+    def clone(self):
         return self.__class__(
-            relabels.get(self.alias, self.alias),
-            self.columns, self.query_object)
+            self.alias, self.columns, self.targets,
+            self.query_object)

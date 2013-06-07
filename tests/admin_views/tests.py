@@ -11,7 +11,6 @@ except ImportError:  # Python 2
 
 from django.conf import settings, global_settings
 from django.core import mail
-from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
@@ -30,6 +29,7 @@ from django.db import connection
 from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
+from django.test.utils import patch_logger
 from django.utils import formats, translation, unittest
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
@@ -46,7 +46,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     DooHickey, FancyDoodad, Whatsit, Category, Post, Plot, FunkyTag, Chapter,
     Book, Promo, WorkHour, Employee, Question, Answer, Inquisition, Actor,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
-    OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
+    OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, Choice, ShortMessage, Telegram)
@@ -468,7 +468,11 @@ class AdminViewBasicTest(TestCase):
         self.assertContains(response, '4 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'false'})
         self.assertContains(response, '3 articles')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '0'})
+        self.assertContains(response, '3 articles')
         response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': 'true'})
+        self.assertContains(response, '1 article')
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'section__isnull': '1'})
         self.assertContains(response, '1 article')
 
     def testLogoutAndPasswordChangeURLs(self):
@@ -543,20 +547,21 @@ class AdminViewBasicTest(TestCase):
                 self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
-        self.assertRaises(SuspiciousOperation,
-            self.client.get, "/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy"
-        )
+        with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/album/?owner__email__startswith=fuzzy")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
 
-        try:
-            self.client.get("/test_admin/admin/admin_views/thing/?color__value__startswith=red")
-            self.client.get("/test_admin/admin/admin_views/thing/?color__value=red")
-        except SuspiciousOperation:
-            self.fail("Filters are allowed if explicitly included in list_filter")
+        # Filters are allowed if explicitly included in list_filter
+        response = self.client.get("/test_admin/admin/admin_views/thing/?color__value__startswith=red")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/test_admin/admin/admin_views/thing/?color__value=red")
+        self.assertEqual(response.status_code, 200)
 
-        try:
-            self.client.get("/test_admin/admin/admin_views/person/?age__gt=30")
-        except SuspiciousOperation:
-            self.fail("Filters should be allowed if they involve a local field without the need to whitelist them in list_filter or date_hierarchy.")
+        # Filters should be allowed if they involve a local field without the
+        # need to whitelist them in list_filter or date_hierarchy.
+        response = self.client.get("/test_admin/admin/admin_views/person/?age__gt=30")
+        self.assertEqual(response.status_code, 200)
 
         e1 = Employee.objects.create(name='Anonymous', gender=1, age=22, alive=True, code='123')
         e2 = Employee.objects.create(name='Visitor', gender=2, age=19, alive=True, code='124')
@@ -574,10 +579,9 @@ class AdminViewBasicTest(TestCase):
         ForeignKey 'limit_choices_to' should be allowed, otherwise raw_id_fields
         can break.
         """
-        try:
-            self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
-        except SuspiciousOperation:
-            self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
+        # Filters should be allowed if they are defined on a ForeignKey pointing to this model
+        response = self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
+        self.assertEqual(response.status_code, 200)
 
     def test_hide_change_password(self):
         """
@@ -1995,7 +1999,7 @@ class AdminViewListEditable(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/person/', data)
         non_form_errors = response.context['cl'].formset.non_form_errors()
-        self.assertTrue(isinstance(non_form_errors, ErrorList))
+        self.assertIsInstance(non_form_errors, ErrorList)
         self.assertEqual(str(non_form_errors), str(ErrorList(["Grace is not a Zombie"])))
 
     def test_list_editable_ordering(self):
@@ -2201,6 +2205,20 @@ class AdminSearchTest(TestCase):
         # confirm the search returned zero objects
         self.assertContains(response, "\n0 persons\n")
         self.assertNotContains(response, "Guido")
+
+    def test_pluggable_search(self):
+        p1 = PluggableSearchPerson.objects.create(name="Bob", age=10)
+        p2 = PluggableSearchPerson.objects.create(name="Amy", age=20)
+
+        response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=Bob')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 pluggable search person\n")
+        self.assertContains(response, "Bob")
+
+        response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=20')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 pluggable search person\n")
+        self.assertContains(response, "Amy")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -2414,6 +2432,29 @@ class AdminActionsTest(TestCase):
         response = self.client.post(url, action_data)
         self.assertRedirects(response, url)
 
+    def test_custom_function_action_streaming_response(self):
+        """Tests a custom action that returns a StreamingHttpResponse."""
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'download',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        content = b''.join(response.streaming_content)
+        self.assertEqual(content, b'This is the content of the file')
+        self.assertEqual(response.status_code, 200)
+
+    def test_custom_function_action_no_perm_response(self):
+        """Tests a custom action that returns an HttpResponse with 403 code."""
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'no_perm',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.content, b'No permission to perform this action')
+
     def test_actions_ordering(self):
         """
         Ensure that actions are ordered as expected.
@@ -2422,9 +2463,13 @@ class AdminActionsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/externalsubscriber/')
         self.assertContains(response, '''<label>Action: <select name="action">
 <option value="" selected="selected">---------</option>
-<option value="delete_selected">Delete selected external subscribers</option>
+<option value="delete_selected">Delete selected external
+subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
-<option value="external_mail">External mail (Another awesome action)</option>
+<option value="external_mail">External mail (Another awesome
+action)</option>
+<option value="download">Download subscription</option>
+<option value="no_perm">No permission to run</option>
 </select>''', html=True)
 
     def test_model_without_action(self):
@@ -3494,7 +3539,6 @@ class RawIdFieldsTest(TestCase):
 
     def test_limit_choices_to(self):
         """Regression test for 14880"""
-        # This includes tests integers, strings and booleans in the lookup query string
         actor = Actor.objects.create(name="Palin", age=27)
         inquisition1 = Inquisition.objects.create(expected=True,
                                                   leader=actor,
@@ -3510,10 +3554,56 @@ class RawIdFieldsTest(TestCase):
 
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
-        # Get the popup
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step also tests integers, strings and booleans in the
+        # lookup query string; in model we define inquisition field to have a
+        # limit_choices_to option that includes a filter on a string field
+        # (inquisition__actor__name), a filter on an integer field
+        # (inquisition__actor__age), and a filter on a boolean field
+        # (inquisition__expected).
         response2 = self.client.get(popup_url)
         self.assertContains(response2, "Spain")
         self.assertNotContains(response2, "England")
+
+    def test_limit_choices_to_isnull_false(self):
+        """Regression test for 20182"""
+        Actor.objects.create(name="Palin", age=27)
+        Actor.objects.create(name="Kilbraken", age=50, title="Judge")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant0"', response.content)
+        self.assertTrue(m)  # Got a match
+        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step tests field__isnull=0 gets parsed correctly from the
+        # lookup query string; in model we define defendant0 field to have a
+        # limit_choices_to option that includes "actor__title__isnull=False".
+        response2 = self.client.get(popup_url)
+        self.assertContains(response2, "Kilbraken")
+        self.assertNotContains(response2, "Palin")
+
+    def test_limit_choices_to_isnull_true(self):
+        """Regression test for 20182"""
+        Actor.objects.create(name="Palin", age=27)
+        Actor.objects.create(name="Kilbraken", age=50, title="Judge")
+        response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
+        # Find the link
+        m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant1"', response.content)
+        self.assertTrue(m)  # Got a match
+        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+
+        # Handle relative links
+        popup_url = urljoin(response.request['PATH_INFO'], popup_url)
+        # Get the popup and verify the correct objects show up in the resulting
+        # page. This step tests field__isnull=1 gets parsed correctly from the
+        # lookup query string; in model we define defendant1 field to have a
+        # limit_choices_to option that includes "actor__title__isnull=True".
+        response2 = self.client.get(popup_url)
+        self.assertNotContains(response2, "Kilbraken")
+        self.assertContains(response2, "Palin")
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

@@ -1,8 +1,11 @@
 import re
 
-from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.utils.module_loading import import_by_path
+from django.middleware.csrf import rotate_token
+
+from .signals import user_logged_in, user_logged_out, user_login_failed
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -14,7 +17,6 @@ def load_backend(path):
 
 
 def get_backends():
-    from django.conf import settings
     backends = []
     for backend_path in settings.AUTHENTICATION_BACKENDS:
         backends.append(load_backend(backend_path))
@@ -83,6 +85,7 @@ def login(request, user):
     request.session[BACKEND_SESSION_KEY] = user.backend
     if hasattr(request, 'user'):
         request.user = user
+    rotate_token(request)
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 
@@ -106,7 +109,6 @@ def logout(request):
 
 def get_user_model():
     "Return the User model that is active in this project"
-    from django.conf import settings
     from django.db.models import get_model
 
     try:
@@ -120,12 +122,13 @@ def get_user_model():
 
 
 def get_user(request):
-    from django.contrib.auth.models import AnonymousUser
+    from .models import AnonymousUser
     try:
         user_id = request.session[SESSION_KEY]
         backend_path = request.session[BACKEND_SESSION_KEY]
+        assert backend_path in settings.AUTHENTICATION_BACKENDS
         backend = load_backend(backend_path)
         user = backend.get_user(user_id) or AnonymousUser()
-    except KeyError:
+    except (KeyError, AssertionError):
         user = AnonymousUser()
     return user

@@ -19,6 +19,8 @@ from django.utils.translation import ugettext as _
 from django.utils import tzinfo
 from django.utils.unittest import skipIf
 
+from i18n import TransRealMixin
+
 
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in
@@ -36,7 +38,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
-class HumanizeTests(TestCase):
+class HumanizeTests(TransRealMixin, TestCase):
 
     def humanize_tester(self, test_list, result_list, method):
         for test_content, result in zip(test_list, result_list):
@@ -195,22 +197,22 @@ class HumanizeTests(TestCase):
         result_list = [
             'now',
             'a second ago',
-            '30 seconds ago',
+            '30\xa0seconds ago',
             'a minute ago',
-            '2 minutes ago',
+            '2\xa0minutes ago',
             'an hour ago',
-            '23 hours ago',
-            '1 day ago',
-            '1 year, 4 months ago',
+            '23\xa0hours ago',
+            '1\xa0day ago',
+            '1\xa0year, 4\xa0months ago',
             'a second from now',
-            '30 seconds from now',
+            '30\xa0seconds from now',
             'a minute from now',
-            '2 minutes from now',
+            '2\xa0minutes from now',
             'an hour from now',
-            '23 hours from now',
-            '1 day from now',
-            '2 days, 6 hours from now',
-            '1 year, 4 months from now',
+            '23\xa0hours from now',
+            '1\xa0day from now',
+            '2\xa0days, 6\xa0hours from now',
+            '1\xa0year, 4\xa0months from now',
             'now',
             'now',
         ]
@@ -218,8 +220,8 @@ class HumanizeTests(TestCase):
         # date in naive arithmetic is only 2 days and 5 hours after in
         # aware arithmetic.
         result_list_with_tz_support = result_list[:]
-        assert result_list_with_tz_support[-4] == '2 days, 6 hours from now'
-        result_list_with_tz_support[-4] == '2 days, 5 hours from now'
+        assert result_list_with_tz_support[-4] == '2\xa0days, 6\xa0hours from now'
+        result_list_with_tz_support[-4] == '2\xa0days, 5\xa0hours from now'
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:

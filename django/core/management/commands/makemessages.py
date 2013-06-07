@@ -250,18 +250,6 @@ class Command(NoArgsCommand):
                     "if you want to enable i18n for your project or application.")
 
         check_programs('xgettext')
-        # We require gettext version 0.15 or newer.
-        output, errors, status = popen_wrapper(['xgettext', '--version'])
-        if status != STATUS_OK:
-            raise CommandError("Error running xgettext. Note that Django "
-                        "internationalization requires GNU gettext 0.15 or newer.")
-        match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
-        if match:
-            xversion = (int(match.group('major')), int(match.group('minor')))
-            if xversion < (0, 15):
-                raise CommandError("Django internationalization requires GNU "
-                        "gettext 0.15 or newer. You are using version %s, please "
-                        "upgrade your gettext toolset." % match.group())
 
         potfile = self.build_pot_file(localedir)
 
@@ -309,10 +297,9 @@ class Command(NoArgsCommand):
             """
             Check if the given path should be ignored or not.
             """
-            for pattern in ignore_patterns:
-                if fnmatch.fnmatchcase(path, pattern):
-                    return True
-            return False
+            filename = os.path.basename(path)
+            ignore = lambda pattern: fnmatch.fnmatchcase(filename, pattern)
+            return any(ignore(pattern) for pattern in ignore_patterns)
 
         dir_suffix = '%s*' % os.sep
         norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in self.ignore_patterns]

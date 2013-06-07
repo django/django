@@ -11,7 +11,7 @@ from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
 from django import forms
@@ -199,7 +199,9 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None:
-            raise self.related.model.DoesNotExist
+            raise self.related.model.DoesNotExist("%s has no %s." % (
+                                                  instance.__class__.__name__,
+                                                  self.related.get_accessor_name()))
         else:
             return rel_obj
 
@@ -224,8 +226,7 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
             elif value._state.db is not None and instance._state.db is not None:
                 if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is on database "%s"' %
-                                        (value, instance._state.db, value._state.db))
+                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         related_pk = tuple([getattr(instance, field.attname) for field in self.related.field.foreign_related_fields])
         if None in related_pk:
@@ -302,7 +303,8 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                     setattr(rel_obj, self.field.related.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
         if rel_obj is None and not self.field.null:
-            raise self.field.rel.to.DoesNotExist
+            raise self.field.rel.to.DoesNotExist(
+                "%s has no %s." % (self.field.model.__name__, self.field.name))
         else:
             return rel_obj
 
@@ -323,8 +325,7 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                 value._state.db = router.db_for_write(value.__class__, instance=instance)
             elif value._state.db is not None and instance._state.db is not None:
                 if not router.allow_relation(value, instance):
-                    raise ValueError('Cannot assign "%r": instance is on database "%s", value is on database "%s"' %
-                                        (value, instance._state.db, value._state.db))
+                    raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         # If we're setting the value of a OneToOneField to None, we need to clear
         # out the cache on any old related object. Otherwise, deleting the
@@ -1378,9 +1379,6 @@ class ManyToManyField(RelatedField):
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
 
         super(ManyToManyField, self).__init__(**kwargs)
-
-        msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
-        self.help_text = string_concat(self.help_text, ' ', msg)
 
     def deconstruct(self):
         name, path, args, kwargs = super(ManyToManyField, self).deconstruct()

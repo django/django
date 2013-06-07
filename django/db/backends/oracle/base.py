@@ -44,6 +44,11 @@ except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.oracle.client import DatabaseClient
@@ -78,6 +83,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
+    has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
     can_defer_constraint_checks = True
     ignores_nulls_in_unique_constraints = False
@@ -243,9 +249,6 @@ WHEN (new.%(col_name)s IS NULL)
                 value = value.date()
         return value
 
-    def datetime_cast_sql(self):
-        return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
-
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
@@ -255,7 +258,7 @@ WHEN (new.%(col_name)s IS NULL)
     def fetch_returned_insert_id(self, cursor):
         return int(cursor._insert_id_var.getvalue())
 
-    def field_cast_sql(self, db_type):
+    def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
         else:
@@ -433,6 +436,17 @@ WHEN (new.%(col_name)s IS NULL)
         first = '%s-01-01'
         second = '%s-12-31'
         return [first % value, second % value]
+
+    def year_lookup_bounds_for_datetime_field(self, value):
+        # The default implementation uses datetime objects for the bounds.
+        # This must be overridden here, to use a formatted date (string) as
+        # 'second' instead -- cx_Oracle chops the fraction-of-second part
+        # off of datetime objects, leaving almost an entire second out of
+        # the year under the default implementation.
+        bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
+        if settings.USE_TZ:
+            bounds = [b.astimezone(timezone.utc).replace(tzinfo=None) for b in bounds]
+        return [b.isoformat(b' ') for b in bounds]
 
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"

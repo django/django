@@ -9,7 +9,7 @@ import warnings
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, IntegrityError
+from django.db import connections, router, transaction, DatabaseError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -19,11 +19,6 @@ from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
-
-# Used to control how many objects are worked with at once in some cases (e.g.
-# when deleting objects).
-CHUNK_SIZE = 100
-ITER_CHUNK_SIZE = CHUNK_SIZE
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
@@ -41,7 +36,6 @@ class QuerySet(object):
         self._db = using
         self.query = query or sql.Query(self.model)
         self._result_cache = None
-        self._iter = None
         self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = []
@@ -57,8 +51,8 @@ class QuerySet(object):
         Deep copy of a QuerySet doesn't populate the cache
         """
         obj = self.__class__()
-        for k,v in self.__dict__.items():
-            if k in ('_iter','_result_cache'):
+        for k, v in self.__dict__.items():
+            if k == '_result_cache':
                 obj.__dict__[k] = None
             else:
                 obj.__dict__[k] = copy.deepcopy(v, memo)
@@ -69,10 +63,8 @@ class QuerySet(object):
         Allows the QuerySet to be pickled.
         """
         # Force the cache to be fully populated.
-        len(self)
-
+        self._fetch_all()
         obj_dict = self.__dict__.copy()
-        obj_dict['_iter'] = None
         return obj_dict
 
     def __repr__(self):
@@ -82,95 +74,31 @@ class QuerySet(object):
         return repr(data)
 
     def __len__(self):
-        # Since __len__ is called quite frequently (for example, as part of
-        # list(qs), we make some effort here to be as efficient as possible
-        # whilst not messing up any existing iterators against the QuerySet.
-        if self._result_cache is None:
-            if self._iter:
-                self._result_cache = list(self._iter)
-            else:
-                self._result_cache = list(self.iterator())
-        elif self._iter:
-            self._result_cache.extend(self._iter)
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            self._prefetch_related_objects()
+        self._fetch_all()
         return len(self._result_cache)
 
     def __iter__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is None:
-            self._iter = self.iterator()
-            self._result_cache = []
-        if self._iter:
-            return self._result_iter()
-        # Python's list iterator is better than our version when we're just
-        # iterating over the cache.
+        """
+        The queryset iterator protocol uses three nested iterators in the
+        default case:
+            1. sql.compiler:execute_sql()
+               - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
+                 using cursor.fetchmany(). This part is responsible for
+                 doing some column masking, and returning the rows in chunks.
+            2. sql/compiler.results_iter()
+               - Returns one row at time. At this point the rows are still just
+                 tuples. In some cases the return values are converted to
+                 Python values at this location (see resolve_columns(),
+                 resolve_aggregate()).
+            3. self.iterator()
+               - Responsible for turning the rows into model objects.
+        """
+        self._fetch_all()
         return iter(self._result_cache)
 
-    def _result_iter(self):
-        pos = 0
-        while 1:
-            upper = len(self._result_cache)
-            while pos < upper:
-                yield self._result_cache[pos]
-                pos = pos + 1
-            if not self._iter:
-                raise StopIteration
-            if len(self._result_cache) <= pos:
-                self._fill_cache()
-
-    def __bool__(self):
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            # We need all the results in order to be able to do the prefetch
-            # in one go. To minimize code duplication, we use the __len__
-            # code path which also forces this, and also does the prefetch
-            len(self)
-
-        if self._result_cache is not None:
-            return bool(self._result_cache)
-        try:
-            next(iter(self))
-        except StopIteration:
-            return False
-        return True
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
-    def __contains__(self, val):
-        # The 'in' operator works without this method, due to __iter__. This
-        # implementation exists only to shortcut the creation of Model
-        # instances, by bailing out early if we find a matching element.
-        pos = 0
-        if self._result_cache is not None:
-            if val in self._result_cache:
-                return True
-            elif self._iter is None:
-                # iterator is exhausted, so we have our answer
-                return False
-            # remember not to check these again:
-            pos = len(self._result_cache)
-        else:
-            # We need to start filling the result cache out. The following
-            # ensures that self._iter is not None and self._result_cache is not
-            # None
-            it = iter(self)
-
-        # Carry on, one result at a time.
-        while True:
-            if len(self._result_cache) <= pos:
-                self._fill_cache(num=1)
-            if self._iter is None:
-                # we ran out of items
-                return False
-            if self._result_cache[pos] == val:
-                return True
-            pos += 1
+    def __nonzero__(self):
+        self._fetch_all()
+        return bool(self._result_cache)
 
     def __getitem__(self, k):
         """
@@ -184,19 +112,6 @@ class QuerySet(object):
                 "Negative indexing is not supported."
 
         if self._result_cache is not None:
-            if self._iter is not None:
-                # The result cache has only been partially populated, so we may
-                # need to fill it out a bit more.
-                if isinstance(k, slice):
-                    if k.stop is not None:
-                        # Some people insist on passing in strings here.
-                        bound = int(k.stop)
-                    else:
-                        bound = None
-                else:
-                    bound = k + 1
-                if len(self._result_cache) < bound:
-                    self._fill_cache(bound - len(self._result_cache))
             return self._result_cache[k]
 
         if isinstance(k, slice):
@@ -210,7 +125,7 @@ class QuerySet(object):
             else:
                 stop = None
             qs.query.set_limits(start, stop)
-            return k.step and list(qs)[::k.step] or qs
+            return list(qs)[::k.step] if k.step else qs
 
         qs = self._clone()
         qs.query.set_limits(k, k + 1)
@@ -370,7 +285,7 @@ class QuerySet(object):
         If the QuerySet is already fully cached this simply returns the length
         of the cached results set to avoid multiple SELECT COUNT(*) calls.
         """
-        if self._result_cache is not None and not self._iter:
+        if self._result_cache is not None:
             return len(self._result_cache)
 
         return self.query.get_count(using=self.db)
@@ -388,13 +303,11 @@ class QuerySet(object):
             return clone._result_cache[0]
         if not num:
             raise self.model.DoesNotExist(
-                "%s matching query does not exist. "
-                "Lookup parameters were %s" %
-                (self.model._meta.object_name, kwargs))
+                "%s matching query does not exist." %
+                self.model._meta.object_name)
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s! "
-            "Lookup parameters were %s" %
-            (self.model._meta.object_name, num, kwargs))
+            "get() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num))
 
     def create(self, **kwargs):
         """
@@ -450,8 +363,6 @@ class QuerySet(object):
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        assert kwargs, \
-                'get_or_create() must be passed at least one keyword argument'
         defaults = kwargs.pop('defaults', {})
         lookup = kwargs.copy()
         for f in self.model._meta.fields:
@@ -469,13 +380,13 @@ class QuerySet(object):
                 obj.save(force_insert=True, using=self.db)
                 transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
-            except IntegrityError:
+            except DatabaseError:
                 transaction.savepoint_rollback(sid, using=self.db)
                 exc_info = sys.exc_info()
                 try:
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
-                    # Re-raise the IntegrityError with its original traceback.
+                    # Re-raise the DatabaseError with its original traceback.
                     six.reraise(*exc_info)
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
@@ -499,6 +410,26 @@ class QuerySet(object):
 
     def latest(self, field_name=None):
         return self._earliest_or_latest(field_name=field_name, direction="-")
+
+    def first(self):
+        """
+        Returns the first object of a query, returns None if no match is found.
+        """
+        qs = self if self.ordered else self.order_by('pk')
+        try:
+            return qs[0]
+        except IndexError:
+            return None
+
+    def last(self):
+        """
+        Returns the last object of a query, returns None if no match is found.
+        """
+        qs = self.reverse() if self.ordered else self.order_by('-pk')
+        try:
+            return qs[0]
+        except IndexError:
+            return None
 
     def in_bulk(self, id_list):
         """
@@ -714,6 +645,8 @@ class QuerySet(object):
 
         If fields are specified, they must be ForeignKey fields and only those
         related objects are included in the selection.
+
+        If select_related(None) is called, the list is cleared.
         """
         if 'depth' in kwargs:
             warnings.warn('The "depth" keyword argument has been deprecated.\n'
@@ -723,7 +656,9 @@ class QuerySet(object):
             raise TypeError('Unexpected keyword arguments to select_related: %s'
                     % (list(kwargs),))
         obj = self._clone()
-        if fields:
+        if fields == (None,):
+            obj.query.select_related = False
+        elif fields:
             if depth:
                 raise TypeError('Cannot pass both "depth" and fields to select_related()')
             obj.query.add_select_related(fields)
@@ -915,17 +850,11 @@ class QuerySet(object):
             c._setup_query()
         return c
 
-    def _fill_cache(self, num=None):
-        """
-        Fills the result cache with 'num' more entries (or until the results
-        iterator is exhausted).
-        """
-        if self._iter:
-            try:
-                for i in range(num or ITER_CHUNK_SIZE):
-                    self._result_cache.append(next(self._iter))
-            except StopIteration:
-                self._iter = None
+    def _fetch_all(self):
+        if self._result_cache is None:
+            self._result_cache = list(self.iterator())
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
 
     def _next_is_sticky(self):
         """
@@ -1618,8 +1547,18 @@ def prefetch_related_objects(result_cache, related_lookups):
             if len(obj_list) == 0:
                 break
 
+            current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
+            if current_lookup in done_queries:
+                # Skip any prefetching, and any object preparation
+                obj_list = done_queries[current_lookup]
+                continue
+
+            # Prepare objects:
             good_objects = True
             for obj in obj_list:
+                # Since prefetching can re-use instances, it is possible to have
+                # the same instance multiple times in obj_list, so obj might
+                # already be prepared.
                 if not hasattr(obj, '_prefetched_objects_cache'):
                     try:
                         obj._prefetched_objects_cache = {}
@@ -1630,9 +1569,6 @@ def prefetch_related_objects(result_cache, related_lookups):
                         # now.
                         good_objects = False
                         break
-                else:
-                    # We already did this list
-                    break
             if not good_objects:
                 break
 
@@ -1657,23 +1593,18 @@ def prefetch_related_objects(result_cache, related_lookups):
                                  "prefetch_related()." % lookup)
 
             if prefetcher is not None and not is_fetched:
-                # Check we didn't do this already
-                current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
-                if current_lookup in done_queries:
-                    obj_list = done_queries[current_lookup]
-                else:
-                    obj_list, additional_prl = prefetch_one_level(obj_list, prefetcher, attr)
-                    # We need to ensure we don't keep adding lookups from the
-                    # same relationships to stop infinite recursion. So, if we
-                    # are already on an automatically added lookup, don't add
-                    # the new lookups from relationships we've seen already.
-                    if not (lookup in auto_lookups and
-                            descriptor in followed_descriptors):
-                        for f in additional_prl:
-                            new_prl = LOOKUP_SEP.join([current_lookup, f])
-                            auto_lookups.append(new_prl)
-                        done_queries[current_lookup] = obj_list
-                    followed_descriptors.add(descriptor)
+                obj_list, additional_prl = prefetch_one_level(obj_list, prefetcher, attr)
+                # We need to ensure we don't keep adding lookups from the
+                # same relationships to stop infinite recursion. So, if we
+                # are already on an automatically added lookup, don't add
+                # the new lookups from relationships we've seen already.
+                if not (lookup in auto_lookups and
+                        descriptor in followed_descriptors):
+                    for f in additional_prl:
+                        new_prl = LOOKUP_SEP.join([current_lookup, f])
+                        auto_lookups.append(new_prl)
+                    done_queries[current_lookup] = obj_list
+                followed_descriptors.add(descriptor)
             else:
                 # Either a singly related object that has already been fetched
                 # (e.g. via select_related), or hopefully some other property

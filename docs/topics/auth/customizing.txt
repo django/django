@@ -939,7 +939,7 @@ authentication app::
                 raise ValueError('Users must have an email address')
 
             user = self.model(
-                email=MyUserManager.normalize_email(email),
+                email=self.normalize_email(email),
                 date_of_birth=date_of_birth,
             )
 
@@ -1075,7 +1075,6 @@ code would be required in the app's ``admin.py`` file::
             (None, {'fields': ('email', 'password')}),
             ('Personal info', {'fields': ('date_of_birth',)}),
             ('Permissions', {'fields': ('is_admin',)}),
-            ('Important dates', {'fields': ('last_login',)}),
         )
         add_fieldsets = (
             (None, {
@@ -1092,3 +1091,8 @@ code would be required in the app's ``admin.py`` file::
     # ... and, since we're not using Django's builtin permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
+
+Finally, specify the custom model as the default user model for your project
+using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
+
+    AUTH_USER_MODEL = 'customauth.MyUser'

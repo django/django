@@ -48,6 +48,7 @@ By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
 ``clean()`` will raise a ``ValidationError`` exception::
 
+    >>> from django import forms
     >>> f = forms.CharField()
     >>> f.clean('foo')
     u'foo'
@@ -107,6 +108,7 @@ behavior doesn't result in an adequate label.
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
     ...     url = forms.URLField(label='Your Web site', required=False)
@@ -130,6 +132,7 @@ To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 The use-case for this is when you want to display an "empty" form in which a
 field is initialized to a particular value. For example::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
     ...     url = forms.URLField(initial='http://')
@@ -205,6 +208,7 @@ methods (e.g., ``as_ul()``).
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
@@ -236,6 +240,7 @@ The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override. For example, here is the default error message::
 
+    >>> from django import forms
     >>> generic = forms.CharField()
     >>> generic.clean('')
     Traceback (most recent call last):
@@ -853,6 +858,7 @@ Slightly complex built-in ``Field`` classes
         The list of fields that should be used to validate the field's value (in
         the order in which they are provided).
 
+            >>> from django.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
             >>> f.clean('test@example.com')
             u'test@example.com'
@@ -1000,6 +1006,8 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     and override ``label_from_instance``. This method will receive a model
     object, and should return a string suitable for representing it. For
     example::
+
+        from django.forms import ModelChoiceField
 
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):

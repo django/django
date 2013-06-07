@@ -37,9 +37,9 @@ def prepare_lookup_value(key, value):
     # if key ends with __in, split parameter into separate values
     if key.endswith('__in'):
         value = value.split(',')
-    # if key ends with __isnull, special case '' and false
+    # if key ends with __isnull, special case '' and the string literals 'false' and '0'
     if key.endswith('__isnull'):
-        if value.lower() in ('', 'false'):
+        if value.lower() in ('', 'false', '0'):
             value = False
         else:
             value = True
@@ -269,8 +269,9 @@ def lookup_field(name, obj, model_admin=None):
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
-    Returns a sensible label for a field name. The name can be a callable or the
-    name of an object attributes, as well as a genuine fields. If return_attr is
+    Returns a sensible label for a field name. The name can be a callable,
+    property (but not created with @property decorator) or the name of an
+    object's attribute, as well as a genuine fields. If return_attr is
     True, the resolved attribute (which could be a callable) is also returned.
     This will be None if (and only if) the name refers to a field.
     """
@@ -303,6 +304,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 
             if hasattr(attr, "short_description"):
                 label = attr.short_description
+            elif (isinstance(attr, property) and
+                  hasattr(attr, "fget") and
+                  hasattr(attr.fget, "short_description")):
+                label = attr.fget.short_description
             elif callable(attr):
                 if attr.__name__ == "<lambda>":
                     label = "--"
@@ -314,6 +319,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         return (label, attr)
     else:
         return label
+
 
 def help_text_for_field(name, model):
     try:

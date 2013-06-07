@@ -207,7 +207,17 @@ class Post(models.Model):
     posted = models.DateField()
 
     def __str__(self):
-        return self.name
+        return self.title
+
+@python_2_unicode_compatible
+class DateTimePost(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateTimeField(editable=False)
+
+    def __str__(self):
+        return self.title
 
 class DerivedPost(Post):
     pass
@@ -255,3 +265,7 @@ class Colour(models.Model):
 class ColourfulItem(models.Model):
     name = models.CharField(max_length=50)
     colours = models.ManyToManyField(Colour)
+
+class ArticleStatusNote(models.Model):
+    name = models.CharField(max_length=20)
+    status = models.ManyToManyField(ArticleStatus)

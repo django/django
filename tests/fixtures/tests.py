@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import warnings
+
 from django.contrib.sites.models import Site
 from django.core import management
 from django.db import connection, IntegrityError
@@ -25,14 +27,15 @@ class TestCaseFixtureLoadingTests(TestCase):
 class DumpDataAssertMixin(object):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
-                         use_base_manager=False, exclude_list=[]):
+                         use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
                                                       'use_natural_keys': natural_keys,
                                                       'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list})
+                                                      'exclude': exclude_list,
+                                                      'primary_keys': primary_keys})
         command_output = new_io.getvalue().strip()
         if format == "json":
             self.assertJSONEqual(command_output, output)
@@ -137,8 +140,19 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Book: Music for all ages by Artist formerly known as "Prince" and Django Reinhardt>'
         ])
 
-        # Load a fixture that doesn't exist
-        management.call_command('loaddata', 'unknown.json', verbosity=0, commit=False)
+        # Loading a fixture that doesn't exist emits a warning
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            management.call_command('loaddata', 'unknown.json', verbosity=0,
+                commit=False)
+        self.assertEqual(len(w), 1)
+        self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
+
+        # An attempt to load a nonexistent 'initial_data' fixture isn't an error
+        with warnings.catch_warnings(record=True) as w:
+            management.call_command('loaddata', 'initial_data.json', verbosity=0,
+                commit=False)
+        self.assertEqual(len(w), 0)
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -211,6 +225,45 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # even those normally filtered by the manager
         self._dumpdata_assert(['fixtures.Spy'], '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": true}}, {"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % (spy2.pk, spy1.pk), use_base_manager=True)
 
+    def test_dumpdata_with_pks(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture2.json', verbosity=0, commit=False)
+        self._dumpdata_assert(
+            ['fixtures.Article'],
+            '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+            primary_keys='2,3'
+        )
+
+        self._dumpdata_assert(
+            ['fixtures.Article'],
+            '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}]',
+            primary_keys='2'
+        )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                ['fixtures'],
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                '',
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
+
+        with six.assertRaisesRegex(self, management.CommandError,
+                "You can only use --pks option with one model"):
+            self._dumpdata_assert(
+                ['fixtures.Article', 'fixtures.category'],
+                '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                primary_keys='2,3'
+            )
+
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command('loaddata', 'fixture4.json', verbosity=0, commit=False)
@@ -273,10 +326,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
-        self.assertQuerysetEqual(Article.objects.all(), [])
+        with warnings.catch_warnings(record=True):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
 
-        management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
+        with warnings.catch_warnings(record=True):
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):

@@ -243,6 +243,8 @@ class Field(object):
         obj = copy.copy(self)
         if self.rel:
             obj.rel = copy.copy(self.rel)
+            if hasattr(self.rel, 'field') and self.rel.field is self:
+                obj.rel.field = obj
         memodict[id(self)] = obj
         return obj
 

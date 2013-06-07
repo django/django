@@ -183,13 +183,46 @@ OK, this is the fun part, where we actually push out a release!
         $ md5sum dist/Django-*
         $ sha1sum dist/Django-*
 
-   *FIXME: perhaps we should switch to sha256?*
-
 #. Create a "checksums" file containing the hashes and release information.
-   You can start with `a previous checksums file`__ and replace the
-   dates, keys, links, and checksums. *FIXME: make a template file.*
+   Start with this template and insert the correct version, date, release URL
+   and checksums::
 
-   __ https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt
+    This file contains MD5 and SHA1 checksums for the source-code tarball
+    of Django <<VERSION>>, released <<DATE>>.
+
+    To use this file, you will need a working install of PGP or other
+    compatible public-key encryption software. You will also need to have
+    the Django release manager's public key in your keyring; this key has
+    the ID ``0x3684C0C08C8B2AE1`` and can be imported from the MIT
+    keyserver. For example, if using the open-source GNU Privacy Guard
+    implementation of PGP::
+
+        gpg --keyserver pgp.mit.edu --recv-key 0x3684C0C08C8B2AE1
+
+    Once the key is imported, verify this file::
+
+        gpg --verify <<THIS FILENAME>>
+
+    Once you have verified this file, you can use normal MD5 and SHA1
+    checksumming applications to generate the checksums of the Django
+    package and compare them to the checksums listed below.
+
+
+    Release package:
+    ================
+
+    Django <<VERSION>>: https://www.djangoproject.com/m/releases/<<URL>>
+
+
+    MD5 checksum:
+    =============
+
+    MD5(<<RELEASE TAR.GZ FILENAME>>)= <<MD5SUM>>
+
+    SHA1 checksum:
+    ==============
+
+    SHA1(<<RELEASE TAR.GZ FILENAME>>)= <<SHA1SUM>>
 
 #. Sign the checksum file (``gpg --clearsign
    Django-<version>.checksum.txt``). This generates a signed document,
@@ -268,8 +301,7 @@ Now you're ready to actually put the release out there. To do this:
    of the docs by flipping the ``is_default`` flag to ``True`` on the
    appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database (this will automatically flip it to ``False`` for all
-   others). *FIXME: I had to do this via fab managepy:shell,docs but we should
-   probably make it possible to do via the admin.*
+   others); you can do this using the site's admin.
 
 #. Post the release announcement to the django-announce,
    django-developers and django-users mailing lists. This should
@@ -289,7 +321,8 @@ You're almost done! All that's left to do now is:
    ``stable/1.?.x`` git branch), you'll want to create a new
    ``DocumentRelease`` object in the ``docs.djangoproject.com`` database for
    the new version's docs, and update the ``docs/fixtures/doc_releases.json``
-   JSON fixture. *FIXME: what is the purpose of maintaining this fixture?*
+   JSON fixture, so people without access to the production DB can still
+   run an up-to-date copy of the docs site.
 
 #. Add the release in `Trac's versions list`_ if necessary. Not all versions
    are declared; take example on previous releases.

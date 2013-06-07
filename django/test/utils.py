@@ -1,4 +1,7 @@
+from contextlib import contextmanager
+import logging
 import re
+import sys
 import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
@@ -56,6 +59,16 @@ class ContextList(list):
         except KeyError:
             return False
         return True
+
+    def keys(self):
+        """
+        Flattened keys of subcontexts.
+        """
+        keys = set()
+        for subcontext in self:
+            for dict in subcontext:
+                keys |= set(dict.keys())
+        return keys
 
 
 def instrumented_test_render(self, context):
@@ -380,3 +393,41 @@ class CaptureQueriesContext(object):
         if exc_type is not None:
             return
         self.final_queries = len(self.connection.queries)
+
+
+class IgnoreDeprecationWarningsMixin(object):
+
+    warning_class = DeprecationWarning
+
+    def setUp(self):
+        super(IgnoreDeprecationWarningsMixin, self).setUp()
+        self.catch_warnings = warnings.catch_warnings()
+        self.catch_warnings.__enter__()
+        warnings.filterwarnings("ignore", category=self.warning_class)
+
+    def tearDown(self):
+        self.catch_warnings.__exit__(*sys.exc_info())
+        super(IgnoreDeprecationWarningsMixin, self).tearDown()
+
+
+class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
+
+        warning_class = PendingDeprecationWarning
+
+
+@contextmanager
+def patch_logger(logger_name, log_level):
+    """
+    Context manager that takes a named logger and the logging level
+    and provides a simple mock-like list of messages received
+    """
+    calls = []
+    def replacement(msg):
+        calls.append(msg)
+    logger = logging.getLogger(logger_name)
+    orig = getattr(logger, log_level)
+    setattr(logger, log_level, replacement)
+    try:
+        yield calls
+    finally:
+        setattr(logger, log_level, orig)

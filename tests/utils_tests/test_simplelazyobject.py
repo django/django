@@ -68,7 +68,7 @@ class TestUtilsSimpleLazyObject(TestCase):
 
         # Second, for an evaluated SimpleLazyObject
         name = x.name  # evaluate
-        self.assertTrue(isinstance(x._wrapped, _ComplexObject))
+        self.assertIsInstance(x._wrapped, _ComplexObject)
         # __repr__ contains __repr__ of wrapped object
         self.assertEqual("<SimpleLazyObject: %r>" % x._wrapped, repr(x))
 
@@ -161,3 +161,25 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertNotEqual(lazy1, lazy3)
         self.assertTrue(lazy1 != lazy3)
         self.assertFalse(lazy1 != lazy2)
+
+    def test_pickle_py2_regression(self):
+        from django.contrib.auth.models import User
+
+        # See ticket #20212
+        user = User.objects.create_user('johndoe', 'john@example.com', 'pass')
+        x = SimpleLazyObject(lambda: user)
+
+        # This would fail with "TypeError: can't pickle instancemethod objects",
+        # only on Python 2.X.
+        pickled = pickle.dumps(x)
+
+        # Try the variant protocol levels.
+        pickled = pickle.dumps(x, 0)
+        pickled = pickle.dumps(x, 1)
+        pickled = pickle.dumps(x, 2)
+
+        if not six.PY3:
+            import cPickle
+
+            # This would fail with "TypeError: expected string or Unicode object, NoneType found".
+            pickled = cPickle.dumps(x)

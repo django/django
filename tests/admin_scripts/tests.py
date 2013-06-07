@@ -1305,13 +1305,15 @@ class CommandTypes(AdminScriptTestCase):
         sys.stderr = err = StringIO()
         try:
             command.execute = lambda args: args  # This will trigger TypeError
-            with self.assertRaises(SystemExit):
-                command.run_from_argv(['', ''])
-            err_message = err.getvalue()
-            # Exceptions other than CommandError automatically output the traceback
-            self.assertIn("Traceback", err_message)
-            self.assertIn("TypeError", err_message)
 
+            # If the Exception is not CommandError it should always
+            # raise the original exception.
+            with self.assertRaises(TypeError):
+                command.run_from_argv(['', ''])
+
+            # If the Exception is CommandError and --traceback is not present
+            # this command should raise a SystemExit and don't print any
+            # traceback to the stderr.
             command.execute = raise_command_error
             err.truncate(0)
             with self.assertRaises(SystemExit):
@@ -1320,12 +1322,12 @@ class CommandTypes(AdminScriptTestCase):
             self.assertNotIn("Traceback", err_message)
             self.assertIn("CommandError", err_message)
 
+            # If the Exception is CommandError and --traceback is present
+            # this command should raise the original CommandError as if it
+            # were not a CommandError.
             err.truncate(0)
-            with self.assertRaises(SystemExit):
+            with self.assertRaises(CommandError):
                 command.run_from_argv(['', '', '--traceback'])
-            err_message = err.getvalue()
-            self.assertIn("Traceback (most recent call last)", err_message)
-            self.assertIn("CommandError", err_message)
         finally:
             sys.stderr = old_stderr
 
@@ -1680,3 +1682,22 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "### STATIC_URL = None")
+
+class Dumpdata(AdminScriptTestCase):
+    """Tests for dumpdata management command."""
+
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_pks_parsing(self):
+        """Regression for #20509
+
+        Test would raise an exception rather than printing an error message.
+        """
+        args = ['dumpdata', '--pks=1']
+        out, err = self.run_manage(args)
+        self.assertOutput(err, "You can only use --pks option with one model")
+        self.assertNoOutput(out)

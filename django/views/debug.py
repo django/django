@@ -218,6 +218,15 @@ class ExceptionReporter(object):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
+    def format_path_status(self, path):
+        if not os.path.exists(path):
+            return "File does not exist"
+        if not os.path.isfile(path):
+            return "Not a file"
+        if not os.access(path, os.R_OK):
+            return "File is not readable"
+        return "File exists"
+
     def get_traceback_data(self):
         "Return a Context instance containing traceback information."
 
@@ -230,8 +239,10 @@ class ExceptionReporter(object):
                     source_list_func = loader.get_template_sources
                     # NOTE: This assumes exc_value is the name of the template that
                     # the loader attempted to load.
-                    template_list = [{'name': t, 'exists': os.path.exists(t)} \
-                        for t in source_list_func(str(self.exc_value))]
+                    template_list = [{
+                        'name': t,
+                        'status': self.format_path_status(t),
+                    } for t in source_list_func(str(self.exc_value))]
                 except AttributeError:
                     template_list = []
                 loader_name = loader.__module__ + '.' + loader.__class__.__name__
@@ -347,7 +358,7 @@ class ExceptionReporter(object):
         if source is None:
             try:
                 with open(filename, 'rb') as fp:
-                    source = fp.readlines()
+                    source = fp.read().splitlines()
             except (OSError, IOError):
                 pass
         if source is None:
@@ -370,9 +381,9 @@ class ExceptionReporter(object):
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
 
-        pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
-        context_line = source[lineno].strip('\n')
-        post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
+        pre_context = source[lower_bound:lineno]
+        context_line = source[lineno]
+        post_context = source[lineno+1:upper_bound]
 
         return lower_bound, pre_context, context_line, post_context
 
@@ -394,7 +405,7 @@ class ExceptionReporter(object):
             if pre_context_lineno is not None:
                 frames.append({
                     'tb': tb,
-                    'type': module_name.startswith('django.') and 'django' or 'user',
+                    'type': 'django' if module_name.startswith('django.') else 'user',
                     'filename': filename,
                     'function': function,
                     'lineno': lineno + 1,
@@ -584,7 +595,7 @@ TECHNICAL_500_TEMPLATE = """
 <body>
 <div id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
-  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception supplied{% endif %}</pre>
+  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
     <tr>
@@ -650,7 +661,9 @@ TECHNICAL_500_TEMPLATE = """
         <ul>
         {% for loader in loader_debug_info %}
             <li>Using loader <code>{{ loader.loader }}</code>:
-                <ul>{% for t in loader.templates %}<li><code>{{ t.name }}</code> (File {% if t.exists %}exists{% else %}does not exist{% endif %})</li>{% endfor %}</ul>
+                <ul>
+                {% for t in loader.templates %}<li><code>{{ t.name }}</code> ({{ t.status }})</li>{% endfor %}
+                </ul>
             </li>
         {% endfor %}
         </ul>
@@ -753,7 +766,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template Loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
 {% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
 {% endif %}
@@ -927,7 +940,7 @@ Exception Value: {{ exception_value|force_escape }}
 """
 
 TECHNICAL_500_TEXT_TEMPLATE = """{% load firstof from future %}{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
-{% firstof exception_value 'No exception supplied' %}
+{% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
 Request URL: {{ request.build_absolute_uri }}{% endif %}
@@ -943,7 +956,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
 {% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
-{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% for t in loader.templates %}{{ t.name }} ({{ t.status }})
 {% endfor %}{% endfor %}
 {% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
 {% endif %}

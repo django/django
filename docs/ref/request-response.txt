@@ -578,20 +578,27 @@ streaming response if (and only if) no middleware accesses the
     instantiated with an iterator. Django will consume and save the content of
     the iterator on first access.
 
-Setting headers
-~~~~~~~~~~~~~~~
+Setting header fields
+~~~~~~~~~~~~~~~~~~~~~
 
-To set or remove a header in your response, treat it like a dictionary::
+To set or remove a header field in your response, treat it like a dictionary::
 
     >>> response = HttpResponse()
-    >>> response['Cache-Control'] = 'no-cache'
-    >>> del response['Cache-Control']
+    >>> response['Age'] = 120
+    >>> del response['Age']
 
 Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
-doesn't exist.
+field doesn't exist.
 
-HTTP headers cannot contain newlines. An attempt to set a header containing a
-newline character (CR or LF) will raise ``BadHeaderError``
+For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
+to use the :func:`~django.utils.cache.patch_cache_control` and
+:func:`~django.utils.cache.patch_vary_headers` methods from
+:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
+values. The "patch" methods ensure that other values, e.g. added by a
+middleware, are not removed.
+
+HTTP header fields cannot contain newlines. An attempt to set a header field
+containing a newline character (CR or LF) will raise ``BadHeaderError``
 
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -616,7 +623,13 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP Status code`_ for the response.
+    The `HTTP status code`_ for the response.
+
+.. attribute:: HttpResponse.reason_phrase
+
+    .. versionadded:: 1.6
+
+    The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
 
@@ -628,7 +641,7 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200)
+.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
@@ -646,8 +659,12 @@ Methods
 
     Historically, this parameter was called ``mimetype`` (now deprecated).
 
-    ``status`` is the `HTTP Status code`_ for the response.
+    ``status`` is the `HTTP status code`_ for the response.
 
+    .. versionadded:: 1.6
+
+    ``reason`` is the HTTP response phrase. If not provided, a default phrase
+    will be used.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -727,8 +744,7 @@ Methods
 
     This method makes an :class:`HttpResponse` instance a file-like object.
 
-.. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
-
+.. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 .. _ref-httpresponse-subclasses:
 
@@ -851,7 +867,13 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP Status code`_ for the response.
+    The `HTTP status code`_ for the response.
+
+.. attribute:: HttpResponse.reason_phrase
+
+    .. versionadded:: 1.6
+
+    The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
 

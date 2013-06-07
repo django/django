@@ -11,7 +11,7 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
@@ -48,9 +48,9 @@ class MultiPartParser(object):
             The standard ``META`` dictionary in Django request objects.
         :input_data:
             The raw post data, as a file-like object.
-        :upload_handler:
-            An UploadHandler instance that performs operations on the uploaded
-            data.
+        :upload_handlers:
+            A list of UploadHandler instances that perform operations on the uploaded
+            data. 
         :encoding:
             The encoding with which to treat the incoming data.
         """
@@ -113,14 +113,15 @@ class MultiPartParser(object):
         if self._content_length == 0:
             return QueryDict('', encoding=self._encoding), MultiValueDict()
 
-        # See if the handler will want to take care of the parsing.
-        # This allows overriding everything if somebody wants it.
+        # See if any of the handlers take care of the parsing.
+        # This allows overriding everything if need be.
         for handler in handlers:
             result = handler.handle_raw_input(self._input_data,
                                               self._meta,
                                               self._content_length,
                                               self._boundary,
                                               encoding)
+            #Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
 
@@ -369,7 +370,7 @@ class LazyStream(six.Iterator):
                             if current_number == num_bytes])
 
         if number_equal > 40:
-            raise SuspiciousOperation(
+            raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
                 " if there is none, report this to the Django developers."

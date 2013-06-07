@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.forms import (CharField, DateField, FileField, Form, IntegerField,
-    ValidationError, formsets)
+    SplitDateTimeField, ValidationError, formsets)
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.util import ErrorList
 from django.test import TestCase
@@ -43,6 +45,13 @@ class EmptyFsetWontValidate(BaseFormSet):
 # ``test_regression_6926`` & ``test_regression_12878``.
 FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm,
     formset=BaseFavoriteDrinksFormSet, extra=3)
+
+
+# Used in ``test_formset_splitdatetimefield``.
+class SplitDateTimeForm(Form):
+    when = SplitDateTimeField(initial=datetime.datetime.now)
+
+SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
 class FormsFormsetTestCase(TestCase):
@@ -882,6 +891,19 @@ class FormsFormsetTestCase(TestCase):
         self.assertEqual(len(formset.forms), 0)
         self.assertTrue(formset)
 
+    def test_formset_splitdatetimefield(self):
+        """
+        Formset should also work with SplitDateTimeField(initial=datetime.datetime.now).
+        Regression test for #18709.
+        """
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-when_0': '1904-06-16',
+            'form-0-when_1': '15:51:33',
+        }
+        formset = SplitDateTimeFormSet(data)
+        self.assertTrue(formset.is_valid())
 
     def test_formset_error_class(self):
         # Regression tests for #16479 -- formsets form use ErrorList instead of supplied error_class
@@ -971,6 +993,38 @@ class FormsFormsetTestCase(TestCase):
             self.assertEqual(len(formset.forms), 4)
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
+
+    def test_non_form_errors_run_full_clean(self):
+        # Regression test for #11160
+        # If non_form_errors() is called without calling is_valid() first,
+        # it should ensure that full_clean() is called.
+        class BaseCustomFormSet(BaseFormSet):
+            def clean(self):
+                raise ValidationError("This is a non-form error")
+
+        ChoiceFormSet = formset_factory(Choice, formset=BaseCustomFormSet)
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertIsInstance(formset.non_form_errors(), ErrorList)
+        self.assertEqual(list(formset.non_form_errors()),
+            ['This is a non-form error'])
+
+    def test_validate_max_ignores_forms_marked_for_deletion(self):
+        class CheckForm(Form):
+           field = IntegerField()
+
+        data = {
+            'check-TOTAL_FORMS': '2',
+            'check-INITIAL_FORMS': '0',
+            'check-MAX_NUM_FORMS': '1',
+            'check-0-field': '200',
+            'check-0-DELETE': '',
+            'check-1-field': '50',
+            'check-1-DELETE': 'on',
+        }
+        CheckFormSet = formset_factory(CheckForm, max_num=1, validate_max=True,
+                                       can_delete=True)
+        formset = CheckFormSet(data, prefix='check')
+        self.assertTrue(formset.is_valid())
 
 
 data = {

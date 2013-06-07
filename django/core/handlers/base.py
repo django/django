@@ -8,7 +8,7 @@ from django import http
 from django.conf import settings
 from django.core import urlresolvers
 from django.core import signals
-from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
+from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
@@ -66,10 +66,11 @@ class BaseHandler(object):
         self._request_middleware = request_middleware
 
     def make_view_atomic(self, view):
-        if getattr(view, 'transactions_per_request', True):
-            for db in connections.all():
-                if db.settings_dict['ATOMIC_REQUESTS']:
-                    view = transaction.atomic(using=db.alias)(view)
+        non_atomic_requests = getattr(view, '_non_atomic_requests', set())
+        for db in connections.all():
+            if (db.settings_dict['ATOMIC_REQUESTS']
+                    and db.alias not in non_atomic_requests):
+                view = transaction.atomic(using=db.alias)(view)
         return view
 
     def get_response(self, request):
@@ -169,11 +170,27 @@ class BaseHandler(object):
                 response = self.handle_uncaught_exception(request,
                         resolver, sys.exc_info())
 
+        except SuspiciousOperation as e:
+            # The request logger receives events for any problematic request
+            # The security logger receives events for all SuspiciousOperations
+            security_logger = logging.getLogger('django.security.%s' %
+                            e.__class__.__name__)
+            security_logger.error(force_text(e))
+
+            try:
+                callback, param_dict = resolver.resolve400()
+                response = callback(request, **param_dict)
+            except:
+                signals.got_request_exception.send(
+                        sender=self.__class__, request=request)
+                response = self.handle_uncaught_exception(request,
+                        resolver, sys.exc_info())
+
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except: # Handle everything else, including SuspiciousOperation, etc.
+        except: # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())

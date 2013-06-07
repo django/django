@@ -177,7 +177,7 @@ class UserManager(BaseUserManager):
         now = timezone.now()
         if not username:
             raise ValueError('The given username must be set')
-        email = UserManager.normalize_email(email)
+        email = self.normalize_email(email)
         user = self.model(username=username, email=email,
                           is_staff=False, is_active=True, is_superuser=False,
                           last_login=now, date_joined=now, **extra_fields)

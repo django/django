@@ -113,7 +113,8 @@ two databases.
 Controlling creation order for test databases
 ---------------------------------------------
 
-By default, Django will always create the ``default`` database first.
+By default, Django will assume all databases depend on the ``default``
+database and therefore always create the ``default`` database first.
 However, no guarantees are made on the creation order of any other
 databases in your test setup.
 
@@ -129,6 +130,7 @@ can specify the dependencies that exist using the
         },
         'diamonds': {
             # ... db settings
+             'TEST_DEPENDENCIES': []
         },
         'clubs': {
             # ... db settings

@@ -1,7 +1,5 @@
-import operator
 import sys
 import warnings
-from functools import reduce
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
@@ -16,6 +14,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
+from django.contrib.admin.exceptions import DisallowedModelAdminLookup
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
@@ -130,7 +129,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 lookup_params[force_str(key)] = value
 
             if not self.model_admin.lookup_allowed(key, value):
-                raise SuspiciousOperation("Filtering by %s not allowed" % key)
+                raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
         if self.list_filter:
@@ -331,7 +330,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
-         use_distinct) = self.get_filters(request)
+         filters_use_distinct) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
@@ -357,55 +356,45 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             # ValueError, ValidationError, or ?.
             raise IncorrectLookupParameters(e)
 
-        # Use select_related() if one of the list_display options is a field
-        # with a relationship and the provided queryset doesn't already have
-        # select_related defined.
         if not qs.query.select_related:
-            if self.list_select_related:
-                qs = qs.select_related()
-            else:
-                for field_name in self.list_display:
-                    try:
-                        field = self.lookup_opts.get_field(field_name)
-                    except models.FieldDoesNotExist:
-                        pass
-                    else:
-                        if isinstance(field.rel, models.ManyToOneRel):
-                            qs = qs.select_related()
-                            break
+            qs = self.apply_select_related(qs)
 
         # Set ordering.
         ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+        # Apply search results
+        qs, search_use_distinct = self.model_admin.get_search_results(
+            request, qs, self.query)
 
-        if self.search_fields and self.query:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in self.search_fields]
-            for bit in self.query.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                qs = qs.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.lookup_opts, search_spec):
-                        use_distinct = True
-                        break
-
-        if use_distinct:
+        # Remove duplicates from results, if necessary
+        if filters_use_distinct | search_use_distinct:
             return qs.distinct()
         else:
             return qs
+
+    def apply_select_related(self, qs):
+        if self.list_select_related is True:
+            return qs.select_related()
+
+        if self.list_select_related is False:
+            if self.has_related_field_in_list_display():
+                return qs.select_related()
+
+        if self.list_select_related:
+            return qs.select_related(*self.list_select_related)
+        return qs
+
+    def has_related_field_in_list_display(self):
+        for field_name in self.list_display:
+            try:
+                field = self.lookup_opts.get_field(field_name)
+            except models.FieldDoesNotExist:
+                pass
+            else:
+                if isinstance(field.rel, models.ManyToOneRel):
+                    return True
+        return False
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)

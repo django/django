@@ -70,6 +70,8 @@ documentation.  Just return an instance of one of those subclasses instead of
 a normal :class:`~django.http.HttpResponse` in order to signify an error. For
 example::
 
+    from django.http import HttpResponse, HttpResponseNotFound
+
     def my_view(request):
         # ...
         if foo:
@@ -82,6 +84,8 @@ since many of them aren't going to be that common. However, as documented in
 the :class:`~django.http.HttpResponse` documentation, you can also pass the
 HTTP status code into the constructor for :class:`~django.http.HttpResponse`
 to create a return class for any status code you like. For example::
+
+    from django.http import HttpResponse
 
     def my_view(request):
         # ...
@@ -110,6 +114,8 @@ standard error page for your application, along with an HTTP error code 404.
 Example usage::
 
     from django.http import Http404
+    from django.shortcuts import render_to_response
+    from polls.models import Poll
 
     def detail(request, poll_id):
         try:
@@ -225,3 +231,25 @@ same way you can for the 404 and 500 views by specifying a ``handler403`` in
 your URLconf::
 
     handler403 = 'mysite.views.my_custom_permission_denied_view'
+
+.. _http_bad_request_view:
+
+The 400 (bad request) view
+--------------------------
+
+When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
+the it may be handled by a component of Django (for example resetting the
+session data). If not specifically handled, Django will consider the current
+request a 'bad request' instead of a server error.
+
+The view ``django.views.defaults.bad_request``, is otherwise very similar to
+the ``server_error`` view, but returns with the status code 400 indicating that
+the error condition was the result of a client operation.
+
+Like the ``server_error`` view, the default ``bad_request`` should suffice for
+99% of Web applications, but if you want to override the view, you can specify
+``handler400`` in your URLconf, like so::
+
+    handler400 = 'mysite.views.my_custom_bad_request_view'
+
+``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.

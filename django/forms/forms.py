@@ -134,7 +134,7 @@ class BaseForm(object):
 
         Subclasses may wish to override.
         """
-        return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
+        return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
         """
@@ -342,6 +342,8 @@ class BaseForm(object):
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
                 if not field.show_hidden_initial:
                     initial_value = self.initial.get(name, field.initial)
+                    if callable(initial_value):
+                        initial_value = initial_value()
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
@@ -523,10 +525,11 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
+            id_for_label = widget.id_for_label(id_)
+            if id_for_label:
+                attrs = dict(attrs or {}, **{'for': id_for_label})
             attrs = flatatt(attrs) if attrs else ''
-            contents = format_html('<label for="{0}"{1}>{2}</label>',
-                                   widget.id_for_label(id_), attrs, contents
-                                   )
+            contents = format_html('<label{0}>{1}</label>', attrs, contents)
         else:
             contents = conditional_escape(contents)
         return mark_safe(contents)

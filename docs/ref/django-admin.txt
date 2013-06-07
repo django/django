@@ -227,6 +227,15 @@ a natural key definition. If you are dumping ``contrib.auth`` ``Permission``
 objects or ``contrib.contenttypes`` ``ContentType`` objects, you should
 probably be using this flag.
 
+.. versionadded:: 1.6
+
+.. django-admin-option:: --pks
+
+By default, ``dumpdata`` will output all the records of the model, but
+you can use the ``--pks`` option to specify a comma seperated list of
+primary keys on which to filter.  This is only available when dumping
+one model.
+
 flush
 -----
 
@@ -1313,6 +1322,8 @@ clearsessions
 ~~~~~~~~~~~~~~~
 
 .. django-admin:: clearsessions
+
+.. versionadded:: 1.5
 
 Can be run as a cron job or directly to clean out expired sessions.
 

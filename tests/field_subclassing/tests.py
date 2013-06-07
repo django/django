@@ -11,21 +11,21 @@ class CustomField(TestCase):
     def test_defer(self):
         d = DataModel.objects.create(data=[1, 2, 3])
 
-        self.assertTrue(isinstance(d.data, list))
+        self.assertIsInstance(d.data, list)
 
         d = DataModel.objects.get(pk=d.pk)
-        self.assertTrue(isinstance(d.data, list))
+        self.assertIsInstance(d.data, list)
         self.assertEqual(d.data, [1, 2, 3])
 
         d = DataModel.objects.defer("data").get(pk=d.pk)
-        self.assertTrue(isinstance(d.data, list))
+        self.assertIsInstance(d.data, list)
         self.assertEqual(d.data, [1, 2, 3])
         # Refetch for save
         d = DataModel.objects.defer("data").get(pk=d.pk)
         d.save()
 
         d = DataModel.objects.get(pk=d.pk)
-        self.assertTrue(isinstance(d.data, list))
+        self.assertIsInstance(d.data, list)
         self.assertEqual(d.data, [1, 2, 3])
 
     def test_custom_field(self):
@@ -44,7 +44,7 @@ class CustomField(TestCase):
         # The data loads back from the database correctly and 'data' has the
         # right type.
         m1 = MyModel.objects.get(pk=m.pk)
-        self.assertTrue(isinstance(m1.data, Small))
+        self.assertIsInstance(m1.data, Small)
         self.assertEqual(str(m1.data), "12")
 
         # We can do normal filtering on the custom field (and will get an error

@@ -13,7 +13,7 @@ except ImportError:     # Python 2
     from urlparse import urlparse, urlsplit
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -571,11 +571,17 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
-        session = import_module(settings.SESSION_ENGINE).SessionStore()
-        session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_cookie:
-            session.delete(session_key=session_cookie.value)
-        self.cookies = SimpleCookie()
+        request = HttpRequest()
+        engine = import_module(settings.SESSION_ENGINE)
+        UserModel = get_user_model()
+        if self.session:
+            request.session = self.session
+            uid = self.session.get("_auth_user_id")
+            if uid:
+                request.user = UserModel._default_manager.get(pk=uid)
+        else:
+            request.session = engine.SessionStore()
+        logout(request)
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."

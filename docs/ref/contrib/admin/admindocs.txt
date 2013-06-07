@@ -30,8 +30,8 @@ the following:
 * Install the docutils Python module (http://docutils.sf.net/).
 * **Optional:** Linking to templates requires the :setting:`ADMIN_FOR`
   setting to be configured.
-* **Optional:** Using the admindocs bookmarklets requires the
-  :mod:`XViewMiddleware<django.middleware.doc>` to be installed.
+* **Optional:** Using the admindocs bookmarklets requires
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` to be installed.
 
 Once those steps are complete, you can start browsing the documentation by
 going to your admin interface and clicking the "Documentation" link in the
@@ -156,7 +156,6 @@ Edit this object
 Using these bookmarklets requires that you are either logged into the
 :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or
-that the :mod:`django.middleware.doc` middleware and
-:mod:`XViewMiddleware <django.middleware.doc>` are installed and you
-are accessing the site from an IP address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or that the
+``XViewMiddleware`` is installed and you are accessing the site from an IP
+address listed in :setting:`INTERNAL_IPS`.

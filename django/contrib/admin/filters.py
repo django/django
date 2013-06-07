@@ -216,7 +216,7 @@ class RelatedFieldListFilter(FieldListFilter):
             }
 
 FieldListFilter.register(lambda f: (
-        hasattr(f, 'rel') and bool(f.rel) or
+        bool(f.rel) if hasattr(f, 'rel') else
         isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
 
 

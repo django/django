@@ -129,6 +129,22 @@ class ChildModel1Inline(admin.TabularInline):
 class ChildModel2Inline(admin.StackedInline):
     model = ChildModel2
 
+# admin for #19425 and #18388
+class BinaryTreeAdmin(admin.TabularInline):
+    model = BinaryTree
+
+    def get_extra(self, request, obj=None, **kwargs):
+        extra = 2
+        if obj:
+            return extra - obj.binarytree_set.count()
+        return extra
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        max_num = 3
+        if obj:
+            return max_num - obj.binarytree_set.count()
+        return max_num
+
 # admin for #19524
 class SightingInline(admin.TabularInline):
     model = Sighting
@@ -150,4 +166,5 @@ site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline, ReadOnlyInlineInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
+site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])

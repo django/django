@@ -198,14 +198,15 @@ class Field(object):
         result.validators = self.validators[:]
         return result
 
+
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
-            self.validators.append(validators.MinLengthValidator(min_length))
+            self.validators.append(validators.MinLengthValidator(int(min_length)))
         if max_length is not None:
-            self.validators.append(validators.MaxLengthValidator(max_length))
+            self.validators.append(validators.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
         "Returns a Unicode object."
@@ -219,6 +220,7 @@ class CharField(Field):
             # The HTML attribute is maxlength, not max_length.
             attrs.update({'maxlength': str(self.max_length)})
         return attrs
+
 
 class IntegerField(Field):
     default_error_messages = {
@@ -444,6 +446,7 @@ class TimeField(BaseTemporalField):
     def strptime(self, value, format):
         return datetime.datetime.strptime(force_str(value), format).time()
 
+
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
     input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
@@ -482,6 +485,7 @@ class DateTimeField(BaseTemporalField):
     def strptime(self, value, format):
         return datetime.datetime.strptime(force_str(value), format)
 
+
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
         """
@@ -511,6 +515,7 @@ class RegexField(CharField):
 
     regex = property(_get_regex, _set_regex)
 
+
 class EmailField(CharField):
     widget = EmailInput
     default_validators = [validators.validate_email]
@@ -518,6 +523,7 @@ class EmailField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(EmailField, self).clean(value)
+
 
 class FileField(Field):
     widget = ClearableFileInput
@@ -626,6 +632,7 @@ class ImageField(FileField):
             f.seek(0)
         return f
 
+
 class URLField(CharField):
     widget = URLInput
     default_error_messages = {
@@ -669,6 +676,10 @@ class URLField(CharField):
                 url_fields[2] = '/'
             value = urlunsplit(url_fields)
         return value
+
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(URLField, self).clean(value)
 
 
 class BooleanField(Field):
@@ -788,6 +799,7 @@ class ChoiceField(Field):
                     return True
         return False
 
+
 class TypedChoiceField(ChoiceField):
     def __init__(self, *args, **kwargs):
         self.coerce = kwargs.pop('coerce', lambda val: val)
@@ -898,6 +910,7 @@ class ComboField(Field):
         for field in self.fields:
             value = field.clean(value)
         return value
+
 
 class MultiValueField(Field):
     """
@@ -1043,6 +1056,7 @@ class FilePathField(ChoiceField):
 
         self.widget.choices = self.choices
 
+
 class SplitDateTimeField(MultiValueField):
     widget = SplitDateTimeWidget
     hidden_widget = SplitHiddenDateTimeWidget
@@ -1105,3 +1119,7 @@ class GenericIPAddressField(CharField):
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
+
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(SlugField, self).clean(value)

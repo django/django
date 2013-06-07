@@ -5,7 +5,7 @@ import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.forms import Form, ModelForm, FileField, ModelChoiceField
+from django.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
 from django.utils import six
@@ -24,6 +24,14 @@ class OptionalMultiChoiceModelForm(ModelForm):
     class Meta:
         model = OptionalMultiChoiceModel
         fields = '__all__'
+
+
+class ChoiceFieldExclusionForm(ModelForm):
+    multi_choice = CharField(max_length=50)
+
+    class Meta:
+        exclude = ['multi_choice']
+        model = ChoiceFieldModel
 
 
 class FileForm(Form):
@@ -52,9 +60,9 @@ class TestTicket14567(TestCase):
         form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': [option.pk]})
         self.assertTrue(form.is_valid())
         # Check that the empty value is a QuerySet
-        self.assertTrue(isinstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet))
+        self.assertIsInstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet)
         # While we're at it, test whether a QuerySet is returned if there *is* a value.
-        self.assertTrue(isinstance(form.cleaned_data['multi_choice'], models.query.QuerySet))
+        self.assertIsInstance(form.cleaned_data['multi_choice'], models.query.QuerySet)
 
 
 class ModelFormCallableModelDefault(TestCase):
@@ -221,3 +229,31 @@ class RelatedModelFormTests(TestCase):
             model=A
 
         self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))
+
+
+class ManyToManyExclusionTestCase(TestCase):
+    def test_m2m_field_exclusion(self):
+        # Issue 12337. save_instance should honor the passed-in exclude keyword.
+        opt1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        opt2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
+        opt3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
+        initial = {
+            'choice': opt1,
+            'choice_int': opt1,
+        }
+        data = {
+            'choice': opt2.pk,
+            'choice_int': opt2.pk,
+            'multi_choice': 'string data!',
+            'multi_choice_int': [opt1.pk],
+        }
+        instance = ChoiceFieldModel.objects.create(**initial)
+        instance.multi_choice = instance.multi_choice_int = [opt2, opt3]
+        form = ChoiceFieldExclusionForm(data=data, instance=instance)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['multi_choice'], data['multi_choice'])
+        form.save()
+        self.assertEqual(form.instance.choice.pk, data['choice'])
+        self.assertEqual(form.instance.choice_int.pk, data['choice_int'])
+        self.assertEqual(list(form.instance.multi_choice.all()), [opt2, opt3])
+        self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])

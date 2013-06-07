@@ -137,25 +137,29 @@ into those elements.
 
   See `a complex example`_ below that uses a description template.
 
-  There is also a way to pass additional information to title and description
-  templates, if you need to supply more than the two variables mentioned
-  before. You can provide your implementation of ``get_context_data`` method
-  in your Feed subclass. For example::
+  .. method:: Feed.get_context_data(self, **kwargs)
 
-    from mysite.models import Article
-    from django.contrib.syndication.views import Feed
+    .. versionadded:: 1.6
 
-    class ArticlesFeed(Feed):
-        title = "My articles"
-        description_template = "feeds/articles.html"
+      There is also a way to pass additional information to title and description
+      templates, if you need to supply more than the two variables mentioned
+      before. You can provide your implementation of ``get_context_data`` method
+      in your ``Feed`` subclass. For example::
 
-        def items(self):
-            return Article.objects.order_by('-pub_date')[:5]
+        from mysite.models import Article
+        from django.contrib.syndication.views import Feed
 
-        def get_context_data(self, **kwargs):
-            context = super(ArticlesFeed, self).get_context_data(**kwargs)
-            context['foo'] = 'bar'
-            return context
+        class ArticlesFeed(Feed):
+            title = "My articles"
+            description_template = "feeds/articles.html"
+
+            def items(self):
+                return Article.objects.order_by('-pub_date')[:5]
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticlesFeed, self).get_context_data(**kwargs)
+                context['foo'] = 'bar'
+                return context
 
   And the template:
 

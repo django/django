@@ -131,7 +131,7 @@ class AdminField(object):
             classes.append('required')
         if not self.is_first:
             classes.append('inline')
-        attrs = classes and {'class': ' '.join(classes)} or {}
+        attrs = {'class': ' '.join(classes)} if classes else {}
         return self.field.label_tag(contents=mark_safe(contents), attrs=attrs)
 
     def errors(self):
@@ -144,7 +144,7 @@ class AdminReadonlyField(object):
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
         if callable(field):
-            class_name = field.__name__ != '<lambda>' and field.__name__ or ''
+            class_name = field.__name__ if field.__name__ != '<lambda>' else ''
         else:
             class_name = field
         self.field = {

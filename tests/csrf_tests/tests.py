@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import logging
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -78,18 +79,18 @@ class CsrfViewMiddlewareTest(TestCase):
     def _check_token_present(self, response, csrf_id=None):
         self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
 
-    def test_process_view_token_too_long(self): 
-        """ 
-        Check that if the token is longer than expected, it is ignored and 
-        a new token is created. 
-        """ 
-        req = self._get_GET_no_csrf_cookie_request() 
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000 
-        CsrfViewMiddleware().process_view(req, token_view, (), {}) 
-        resp = token_view(req) 
-        resp2 = CsrfViewMiddleware().process_response(req, resp) 
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False) 
-        self.assertEqual(len(csrf_cookie.value), CSRF_KEY_LENGTH) 
+    def test_process_view_token_too_long(self):
+        """
+        Check that if the token is longer than expected, it is ignored and
+        a new token is created.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000
+        CsrfViewMiddleware().process_view(req, token_view, (), {})
+        resp = token_view(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        self.assertEqual(len(csrf_cookie.value), CSRF_KEY_LENGTH)
 
     def test_process_response_get_token_used(self):
         """
@@ -284,6 +285,19 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertEqual(403, req2.status_code)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    def test_https_malformed_referer(self):
+        """
+        Test that a POST HTTPS request with a bad referer is rejected
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'http://http://www.example.com/'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertNotEqual(None, req2)
+        self.assertEqual(403, req2.status_code)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
         """
         Test that a POST HTTPS request with a good referer is accepted
@@ -340,3 +354,29 @@ class CsrfViewMiddlewareTest(TestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
+
+    def test_ensures_csrf_cookie_no_logging(self):
+        """
+        Tests that ensure_csrf_cookie doesn't log warnings. See #19436.
+        """
+        @ensure_csrf_cookie
+        def view(request):
+            # Doesn't insert a token or anything
+            return HttpResponse(content="")
+
+        class TestHandler(logging.Handler):
+            def emit(self, record):
+                raise Exception("This shouldn't have happened!")
+
+        logger = logging.getLogger('django.request')
+        test_handler = TestHandler()
+        old_log_level = logger.level
+        try:
+            logger.addHandler(test_handler)
+            logger.setLevel(logging.WARNING)
+
+            req = self._get_GET_no_csrf_cookie_request()
+            resp = view(req)
+        finally:
+            logger.removeHandler(test_handler)
+            logger.setLevel(old_log_level)

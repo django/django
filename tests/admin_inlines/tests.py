@@ -12,7 +12,7 @@ from .admin import InnerInline, TitleInline, site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Title, Novel, Chapter, FootNote)
+    Sighting, Title, Novel, Chapter, FootNote, BinaryTree)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -192,6 +192,24 @@ class TestInline(TestCase):
         response = self.client.post('/admin/admin_inlines/extraterrestrial/add/', data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Sighting.objects.filter(et__name='Martian').count(), 1)
+
+    def test_custom_get_extra_form(self):
+        bt_head = BinaryTree.objects.create(name="Tree Head")
+        bt_child = BinaryTree.objects.create(name="First Child", parent=bt_head)
+
+        # The maximum number of forms should respect 'get_max_num' on the
+        # ModelAdmin
+        max_forms_input = '<input id="id_binarytree_set-MAX_NUM_FORMS" name="binarytree_set-MAX_NUM_FORMS" type="hidden" value="%d" />'
+        # The total number of forms will remain the same in either case
+        total_forms_hidden = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
+
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertContains(response, max_forms_input % 3)
+        self.assertContains(response, total_forms_hidden)
+
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, max_forms_input % 2)
+        self.assertContains(response, total_forms_hidden)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

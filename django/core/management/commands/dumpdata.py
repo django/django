@@ -21,6 +21,9 @@ class Command(BaseCommand):
             help='Use natural keys if they are available.'),
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
+        make_option('--pks', dest='primary_keys', help="Only dump objects with "
+            "given primary keys. Accepts a comma seperated list of keys. "
+            "This option will only work when you specify one model."),
     )
     help = ("Output the contents of the database as a fixture of the given "
             "format (using each model's default manager unless --all is "
@@ -37,6 +40,12 @@ class Command(BaseCommand):
         show_traceback = options.get('traceback')
         use_natural_keys = options.get('use_natural_keys')
         use_base_manager = options.get('use_base_manager')
+        pks = options.get('primary_keys')
+
+        if pks:
+            primary_keys = pks.split(',')
+        else:
+            primary_keys = []
 
         excluded_apps = set()
         excluded_models = set()
@@ -55,8 +64,12 @@ class Command(BaseCommand):
                     raise CommandError('Unknown app in excludes: %s' % exclude)
 
         if len(app_labels) == 0:
+            if primary_keys:
+                raise CommandError("You can only use --pks option with one model")
             app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
         else:
+            if len(app_labels) > 1 and primary_keys:
+                raise CommandError("You can only use --pks option with one model")
             app_list = SortedDict()
             for label in app_labels:
                 try:
@@ -77,6 +90,8 @@ class Command(BaseCommand):
                     else:
                         app_list[app] = [model]
                 except ValueError:
+                    if primary_keys:
+                        raise CommandError("You can only use --pks option with one model")
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
@@ -107,8 +122,11 @@ class Command(BaseCommand):
                         objects = model._base_manager
                     else:
                         objects = model._default_manager
-                    for obj in objects.using(using).\
-                            order_by(model._meta.pk.name).iterator():
+
+                    queryset = objects.using(using).order_by(model._meta.pk.name)
+                    if primary_keys:
+                        queryset = queryset.filter(pk__in=primary_keys)
+                    for obj in queryset.iterator():
                         yield obj
 
         try:

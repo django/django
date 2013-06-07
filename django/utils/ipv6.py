@@ -138,8 +138,7 @@ def _unpack_ipv4(ip_str):
     if not ip_str.lower().startswith('0000:0000:0000:0000:0000:ffff:'):
         return None
 
-    hextets = ip_str.split(':')
-    return hextets[-1]
+    return ip_str.rsplit(':', 1)[1]
 
 def is_valid_ipv6_address(ip_str):
     """

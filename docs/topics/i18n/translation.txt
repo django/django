@@ -80,6 +80,7 @@ In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
     from django.utils.translation import ugettext as _
+    from django.http import HttpResponse
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -89,6 +90,7 @@ Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
     from django.utils.translation import ugettext
+    from django.http import HttpResponse
 
     def my_view(request):
         output = ugettext("Welcome to my site.")
@@ -192,6 +194,7 @@ of its value.)
 For example::
 
     from django.utils.translation import ungettext
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         page = ungettext(
@@ -208,6 +211,7 @@ languages as the ``count`` variable.
 Lets see a slightly more complex usage example::
 
     from django.utils.translation import ungettext
+    from myapp.models import Report
 
     count = Report.objects.count()
     if count == 1:
@@ -283,6 +287,7 @@ For example::
 
 or::
 
+    from django.db import models
     from django.utils.translation import pgettext_lazy
 
     class MyThing(models.Model):
@@ -328,6 +333,7 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -335,8 +341,6 @@ model, do the following::
 
 You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
 relationship as translatable by using their ``verbose_name`` options::
-
-    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
@@ -355,6 +359,7 @@ It is recommended to always provide explicit
 relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs by looking at the model's class name::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -370,6 +375,7 @@ Model methods ``short_description`` attribute values
 For model methods, you can provide translations to Django and the admin site
 with the ``short_description`` attribute::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -404,6 +410,7 @@ If you ever see output that looks like ``"hello
 If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -428,6 +435,9 @@ generally don't know the ``number`` argument at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
+
+    from django import forms
+    from django.utils.translation import ugettext_lazy
 
     class MyForm(forms.Form):
         error_message = ungettext_lazy("You only provided %(num)d argument",
@@ -461,6 +471,7 @@ that concatenates its contents *and* converts them to strings only when the
 result is included in a string. For example::
 
     from django.utils.translation import string_concat
+    from django.utils.translation import ugettext_lazy
     ...
     name = ugettext_lazy('John Lennon')
     instrument = ugettext_lazy('guitar')
@@ -687,7 +698,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
 
 .. code-block:: html+django
 
-    {# Translators: Label of a button that triggers search{% endcomment #}
+    {# Translators: Label of a button that triggers search #}
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
@@ -721,6 +732,31 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
         # path/to/template/file.html:103
         msgid "Ambiguous translatable block of text"
         msgstr ""
+
+.. templatetag:: language
+
+Switching language in templates
+-------------------------------
+
+If you want to select a language within a template, you can use the
+``language`` template tag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    <!-- Current language: {{ LANGUAGE_CODE }} -->
+    <p>{% trans "Welcome to our page" %}</p>
+
+    {% language 'en' %}
+        {% get_current_language as LANGUAGE_CODE %}
+        <!-- Current language: {{ LANGUAGE_CODE }} -->
+        <p>{% trans "Welcome to our page" %}</p>
+    {% endlanguage %}
+
+While the first occurrence of "Welcome to our page" uses the current language,
+the second will always be in English.
 
 .. _template-translation-vars:
 
@@ -1126,13 +1162,11 @@ active language. Example::
 
 .. _reversing_in_templates:
 
-.. templatetag:: language
-
 Reversing in templates
 ----------------------
 
 If localized URLs get reversed in templates they always use the current
-language. To link to a URL in another language use the ``language``
+language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
 .. code-block:: html+django
@@ -1639,6 +1673,8 @@ Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
 :class:`~django.http.HttpRequest`. Feel free to read this value in your view
 code. Here's a simple example::
+
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':

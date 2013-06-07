@@ -8,7 +8,8 @@ from django.utils import six
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
-    BookWithYear, BookReview, Person, House, Room, Employee, Comment)
+    BookWithYear, BookReview, Person, House, Room, Employee, Comment,
+    LessonEntry, WordEntry)
 
 
 class PrefetchRelatedTests(TestCase):
@@ -105,6 +106,16 @@ class PrefetchRelatedTests(TestCase):
         with self.assertNumQueries(2):
             qs = Book.objects.prefetch_related('first_time_authors')
             [b.first_time_authors.exists() for b in qs]
+
+    def test_in_and_prefetch_related(self):
+        """
+        Regression test for #20242 - QuerySet "in" didn't work the first time
+        when using prefetch_related. This was fixed by the removal of chunked
+        reads from QuerySet iteration in
+        70679243d1786e03557c28929f9762a119e3ac14.
+        """
+        qs = Book.objects.prefetch_related('first_time_authors')
+        self.assertTrue(qs[0] in qs)
 
     def test_clear(self):
         """
@@ -618,3 +629,25 @@ class MultiDbTests(TestCase):
             ages = ", ".join(str(a.authorwithage.age) for a in A.prefetch_related('authorwithage'))
 
         self.assertEqual(ages, "50, 49")
+
+
+class Ticket19607Tests(TestCase):
+
+    def setUp(self):
+
+        for id, name1, name2 in [
+            (1, 'einfach', 'simple'),
+            (2, 'schwierig', 'difficult'),
+            ]:
+            LessonEntry.objects.create(id=id, name1=name1, name2=name2)
+
+        for id, lesson_entry_id, name in [
+            (1, 1, 'einfach'),
+            (2, 1, 'simple'),
+            (3, 2, 'schwierig'),
+            (4, 2, 'difficult'),
+            ]:
+            WordEntry.objects.create(id=id, lesson_entry_id=lesson_entry_id, name=name)
+
+    def test_bug(self):
+        list(WordEntry.objects.prefetch_related('lesson_entry', 'lesson_entry__wordentry_set'))

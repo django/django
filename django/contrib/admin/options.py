@@ -1,5 +1,6 @@
 import copy
-from functools import update_wrapper, partial
+import operator
+from functools import partial, reduce, update_wrapper
 
 from django import forms
 from django.conf import settings
@@ -9,7 +10,8 @@ from django.forms.models import (modelform_factory, modelformset_factory,
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
-    model_format_dict, NestedObjects)
+    model_format_dict, NestedObjects, lookup_needs_distinct)
+from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
@@ -22,6 +24,7 @@ from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.decorators import method_decorator
@@ -86,6 +89,14 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+
+    # validation
+    validator_class = validation.BaseValidator
+
+    @classmethod
+    def validate(cls, model):
+        validator = cls.validator_class()
+        validator.validate(cls, model)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
@@ -246,6 +257,34 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         """
         return self.prepopulated_fields
 
+    def get_search_results(self, request, queryset, search_term):
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        if self.search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in self.search_fields]
+            for bit in search_term.split():
+                or_queries = [models.Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+            if not use_distinct:
+                for search_spec in orm_lookups:
+                    if lookup_needs_distinct(self.opts, search_spec):
+                        use_distinct = True
+                        break
+
+        return queryset, use_distinct
+
     def get_queryset(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
@@ -371,6 +410,9 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_bottom = False
     actions_selection_counter = True
 
+    # validation
+    validator_class = validation.ModelAdminValidator
+
     def __init__(self, model, admin_site):
         self.model = model
         self.opts = model._meta
@@ -456,7 +498,7 @@ class ModelAdmin(BaseModelAdmin):
         "Hook for specifying fieldsets for the add form."
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.get_form(request, obj)
+        form = self.get_form(request, obj, fields=None)
         fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
@@ -465,10 +507,10 @@ class ModelAdmin(BaseModelAdmin):
         Returns a Form class for use in the admin add view. This is used by
         add_view and change_view.
         """
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
+        if 'fields' in kwargs:
+            fields = kwargs.pop('fields')
         else:
-            fields = None
+            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         if self.exclude is None:
             exclude = []
         else:
@@ -985,10 +1027,10 @@ class ModelAdmin(BaseModelAdmin):
 
             response = func(self, request, queryset)
 
-            # Actions may return an HttpResponse, which will be used as the
-            # response from the POST. If not, we'll be a good little HTTP
-            # citizen and redirect back to the changelist page.
-            if isinstance(response, HttpResponse):
+            # Actions may return an HttpResponse-like object, which will be
+            # used as the response from the POST. If not, we'll be a good
+            # little HTTP citizen and redirect back to the changelist page.
+            if isinstance(response, HttpResponseBase):
                 return response
             else:
                 return HttpResponseRedirect(request.get_full_path())
@@ -1447,6 +1489,9 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name_plural = None
     can_delete = True
 
+    # validation
+    validator_class = validation.InlineValidator
+
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
         self.parent_model = parent_model
@@ -1467,12 +1512,20 @@ class InlineModelAdmin(BaseModelAdmin):
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
+    def get_extra(self, request, obj=None, **kwargs):
+        """Hook for customizing the number of extra inline forms."""
+        return self.extra
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        """Hook for customizing the max number of extra inline forms."""
+        return self.max_num
+
     def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
+        if 'fields' in kwargs:
+            fields = kwargs.pop('fields')
         else:
-            fields = None
+            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         if self.exclude is None:
             exclude = []
         else:
@@ -1493,8 +1546,8 @@ class InlineModelAdmin(BaseModelAdmin):
             "fields": fields,
             "exclude": exclude,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
-            "extra": self.extra,
-            "max_num": self.max_num,
+            "extra": self.get_extra(request, obj, **kwargs),
+            "max_num": self.get_max_num(request, obj, **kwargs),
             "can_delete": can_delete,
         }
 
@@ -1544,7 +1597,7 @@ class InlineModelAdmin(BaseModelAdmin):
     def get_fieldsets(self, request, obj=None):
         if self.declared_fieldsets:
             return self.declared_fieldsets
-        form = self.get_formset(request, obj).form
+        form = self.get_formset(request, obj, fields=None).form
         fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
