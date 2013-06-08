@@ -37,7 +37,7 @@ and time availability), claim it by following these steps:
   `ticket tracker`_.
 
 * If a ticket for this issue already exists, make sure nobody else has
-  claimed it. To do this, look at the "Assigned to" section of the ticket.
+  claimed it. To do this, look at the "Owned by" section of the ticket.
   If it's assigned to "nobody," then it's available to be claimed.
   Otherwise, somebody else is working on this ticket, and you either find
   another bug/feature to work on, or contact the developer working on the
@@ -48,7 +48,7 @@ and time availability), claim it by following these steps:
 
 * Claim the ticket:
 
-  1. click the "accept" radio button under "Action" near the bottom of the
+  1. click the "assign to myself" radio button under "Action" near the bottom of the
      page,
   2. then click "Submit changes."
 
