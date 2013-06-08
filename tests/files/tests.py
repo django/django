@@ -6,6 +6,7 @@ import tempfile
 
 from django.core.cache import cache
 from django.core.files import File
+from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -146,3 +147,21 @@ class FileTests(unittest.TestCase):
         file = SimpleUploadedFile("mode_test.txt", b"content")
         self.assertFalse(hasattr(file, 'mode'))
         g = gzip.GzipFile(fileobj=file)
+
+
+class FileMoveSafeTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+    def test_file_move_overwrite(self):
+        (handle_a, self.file_a) = tempfile.mkstemp(dir=self.tmp_dir)
+        (handle_b, self.file_b) = tempfile.mkstemp(dir=self.tmp_dir)
+
+        # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
+        self.assertRaises(IOError, lambda: file_move_safe(self.file_a, self.file_b, allow_overwrite=False))
+
+        # should allow it and continue on if allow_overwrite is True
+        self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))
