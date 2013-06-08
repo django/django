@@ -363,6 +363,33 @@ class BadIndexTogether1(models.Model):
             ["field_that_does_not_exist"],
         ]
 
+class InvalidFieldNames(models.Model):
+    pk = models.IntegerField()
+    some__field = models.IntegerField()
+
+
+class FirstParent(models.Model):
+    somef_id = models.IntegerField()
+    someotherf = models.IntegerField()
+
+
+class SecondParent(models.Model):
+    somef_id = models.IntegerField()
+
+
+class ChildShadowingField(FirstParent):
+    somef = models.ForeignKey(SecondParent)
+
+
+class MultiInheritanceClash(FirstParent, SecondParent):
+    # Here we have two clashed: id (automatic field) and somef, because
+    # both parents define these fields.
+    pass
+
+class InternalClashingNames(models.Model):
+    # fk.attname must not clash with fk_id.name
+    fk = models.ForeignKey(FirstParent)
+    fk_id = models.IntegerField()
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
@@ -480,6 +507,12 @@ invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'in
 invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
+invalid_models.invalidfieldnames: "pk": You can't use "pk" as a field name. It is a reserved name.
+invalid_models.invalidfieldnames: "some__field": Field's name must not contain "__".
+invalid_models.childshadowingfield: "somef": This field clashes with field "somef_id" from "invalid_models.firstparent"
+invalid_models.multiinheritanceclash: The field "id" from parent model "invalid_models.secondparent" clashes with the field "id" from another parent model "invalid_models.firstparent"
+invalid_models.multiinheritanceclash: The field "somef_id" from parent model "invalid_models.secondparent" clashes with the field "somef_id" from another parent model "invalid_models.firstparent"
+invalid_models.internalclashingnames: "fk_id": This field clashes with field "fk" from "invalid_models.internalclashingnames"
 """
 
 if not connection.features.interprets_empty_strings_as_nulls:
