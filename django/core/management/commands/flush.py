@@ -32,8 +32,9 @@ class Command(NoArgsCommand):
         connection = connections[db]
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
-        # 'reset_sequences' is a stealth option
+        # 'reset_sequences' and 'allow_cascade' are stealth options
         reset_sequences = options.get('reset_sequences', True)
+        allow_cascade = options.get('allow_cascade', False)
 
         self.style = no_style()
 
@@ -45,7 +46,9 @@ class Command(NoArgsCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style, connection, only_django=True, reset_sequences=reset_sequences)
+        sql_list = sql_flush(self.style, connection, only_django=True,
+                             reset_sequences=reset_sequences,
+                             allow_cascade=allow_cascade)
 
         if interactive:
             confirm = input("""You have requested a flush of the database.
