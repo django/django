@@ -473,6 +473,13 @@ template for all 404 errors when :setting:`DEBUG` is set to ``False`` (in your
 settings module). If you do create the template, add at least some dummy
 content like "Page not found".
 
+.. warning::
+
+    If :setting:`DEBUG` is set to ``False``, all responses will be
+    "Bad Request (400)" unless you specify the proper :setting:`ALLOWED_HOSTS`
+    as well (something like ``['localhost', '127.0.0.1']`` for
+    local development).
+
 A couple more things to note about 404 views:
 
 * If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
