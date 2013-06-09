@@ -49,7 +49,7 @@ define the media requirements.
 
 Here's a simple example::
 
-    from django import froms
+    from django import forms
 
     class CalendarWidget(forms.TextInput):
         class Media:
