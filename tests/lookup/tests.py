@@ -9,7 +9,7 @@ from django.utils import six
 
 from shared_models.models import Author, Book
 
-from .models import Tag, Game, Season, Player
+from .models import Tag, Game, Season, Player, RegexTestModel
 
 
 class LookupTests(TestCase):
@@ -608,6 +608,21 @@ class LookupTests(TestCase):
         b16.save()
         self.assertQuerysetEqual(Book.objects.filter(title__regex=r'b(.).*b\1'),
             ['<Book: barfoobaz>', '<Book: bazbaRFOO>', '<Book: foobarbaz>'])
+
+    def test_regex_null(self):
+        '''
+        Ensure that a regex lookup does not fail on null/None values
+        '''
+        RegexTestModel.objects.create(name=None)
+        self.assertQuerysetEqual(RegexTestModel.objects.filter(name__regex=r'^$'), [])
+
+    def test_regex_non_string(self):
+        '''
+        Ensure that a regex lookup does not fail on non string fields
+        '''
+        RegexTestModel.objects.create(name='test', integer=5)
+        self.assertQuerysetEqual(RegexTestModel.objects.filter(integer__regex=r'^5$'),
+            ['<RegexTestModel: test>'])
 
     def test_nonfield_lookups(self):
         """
