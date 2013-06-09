@@ -39,7 +39,7 @@ class AppCache(object):
 
         # -- Everything below here is only used when populating the cache --
         loaded=False,
-        handled={},
+        handled=set(),
         postponed=[],
         nesting_level=0,
         _get_models_cache={},
@@ -89,7 +89,7 @@ class AppCache(object):
         Loads the app with the provided fully qualified name, and returns the
         model module.
         """
-        self.handled[app_name] = None
+        self.handled.add(app_name)
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
