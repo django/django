@@ -423,9 +423,9 @@ object -- so we simply override it and wrap the call::
 .. note::
 
     The URLconf here uses the named group ``pk`` - this name is the default
-    name that ``DetailView`` uses to find the value of the primary key used to
+    name that ``DetailView`` uses to find the value of the field used to
     filter the queryset.
 
-    If you want to call the group something else, you can set ``pk_url_kwarg``
+    If you want to call the group something else, you can set ``lookup_field``
     on the view. More details can be found in the reference for
     :class:`~django.views.generic.detail.DetailView`

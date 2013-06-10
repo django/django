@@ -373,6 +373,21 @@ but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
+Simplified DetailView object lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions, object lookup in the :class:`DetailView` was controlled
+by the ``pk_url_kwarg``, ``slug_field``, and ``slug_url_kwarg`` attributes.
+These have now been replaced with a single ``lookup_field`` attribute.
+
+The ``lookup_field`` attribute should correspond with the model field that
+is used for object lookups, and should also correspond with a named argument
+in the URLconf.
+
+The default value for the ``lookup_field`` attribute is ``'pk'``.  If you are
+using ``slug`` lookups for a :class:`DetailView`, you should now explicitly
+specify ``lookup_field='slug'`` on the view class.
+
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
