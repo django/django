@@ -3308,9 +3308,11 @@ class PrePopulatedTest(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
-    urls = "admin_views.urls"
+
+    available_apps = ['admin_views'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-views-users.xml']
+    urls = "admin_views.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_prepopulated_fields(self):
         """
