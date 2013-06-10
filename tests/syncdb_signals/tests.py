@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core import management
 from django.utils import six
 
-from shared_models import models
+from . import models
 
 
 PRE_SYNCDB_ARGS = ['app', 'create_models', 'verbosity', 'interactive', 'db']

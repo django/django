@@ -29,7 +29,6 @@ SUBDIRS_TO_SKIP = [
 ]
 
 ALWAYS_INSTALLED_APPS = [
-    'shared_models',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
