@@ -5,7 +5,6 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from shared_models.models import Author, Book
 
@@ -21,19 +20,19 @@ class LookupTests(TestCase):
         self.au2 = Author(name='Author 2')
         self.au2.save()
         # Create a couple of Books.
-        self.b1 = Book(title='Book 1', pubdate=datetime(2005, 7, 26), author=self.au1)
+        self.b1 = Book(name='Book 1', pubdate=datetime(2005, 7, 26), author=self.au1)
         self.b1.save()
-        self.b2 = Book(title='Book 2', pubdate=datetime(2005, 7, 27), author=self.au1)
+        self.b2 = Book(name='Book 2', pubdate=datetime(2005, 7, 27), author=self.au1)
         self.b2.save()
-        self.b3 = Book(title='Book 3', pubdate=datetime(2005, 7, 27), author=self.au1)
+        self.b3 = Book(name='Book 3', pubdate=datetime(2005, 7, 27), author=self.au1)
         self.b3.save()
-        self.b4 = Book(title='Book 4', pubdate=datetime(2005, 7, 28), author=self.au1)
+        self.b4 = Book(name='Book 4', pubdate=datetime(2005, 7, 28), author=self.au1)
         self.b4.save()
-        self.b5 = Book(title='Book 5', pubdate=datetime(2005, 8, 1, 9, 0), author=self.au2)
+        self.b5 = Book(name='Book 5', pubdate=datetime(2005, 8, 1, 9, 0), author=self.au2)
         self.b5.save()
-        self.b6 = Book(title='Book 6', pubdate=datetime(2005, 8, 1, 8, 0), author=self.au2)
+        self.b6 = Book(name='Book 6', pubdate=datetime(2005, 8, 1, 8, 0), author=self.au2)
         self.b6.save()
-        self.b7 = Book(title='Book 7', pubdate=datetime(2005, 7, 27), author=self.au2)
+        self.b7 = Book(name='Book 7', pubdate=datetime(2005, 7, 27), author=self.au2)
         self.b7.save()
         # Create a few Tags.
         self.t1 = Tag(name='Tag 1')
@@ -86,18 +85,18 @@ class LookupTests(TestCase):
                 'Book 7',
                 'Book 1',
             ],
-            transform=attrgetter('title'))
+            transform=attrgetter('name'))
         # iterator() can be used on any QuerySet.
         self.assertQuerysetEqual(
-            Book.objects.filter(title__endswith='4').iterator(),
+            Book.objects.filter(name__endswith='4').iterator(),
             ['Book 4'],
-            transform=attrgetter('title'))
+            transform=attrgetter('name'))
 
     def test_count(self):
         # count() returns the number of objects matching search criteria.
         self.assertEqual(Book.objects.count(), 7)
         self.assertEqual(Book.objects.filter(pubdate__exact=datetime(2005, 7, 27)).count(), 3)
-        self.assertEqual(Book.objects.filter(title__startswith='Blah blah').count(), 0)
+        self.assertEqual(Book.objects.filter(name__startswith='Blah blah').count(), 0)
 
         # count() should respect sliced query sets.
         articles = Book.objects.all()
@@ -129,43 +128,43 @@ class LookupTests(TestCase):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
         identity = lambda x:x
-        self.assertQuerysetEqual(Book.objects.values('title'),
+        self.assertQuerysetEqual(Book.objects.values('name'),
             [
-                {'title': 'Book 5'},
-                {'title': 'Book 6'},
-                {'title': 'Book 4'},
-                {'title': 'Book 2'},
-                {'title': 'Book 3'},
-                {'title': 'Book 7'},
-                {'title': 'Book 1'},
+                {'name': 'Book 5'},
+                {'name': 'Book 6'},
+                {'name': 'Book 4'},
+                {'name': 'Book 2'},
+                {'name': 'Book 3'},
+                {'name': 'Book 7'},
+                {'name': 'Book 1'},
             ],
             transform=identity)
         self.assertQuerysetEqual(
             Book.objects.filter(pubdate__exact=datetime(2005, 7, 27)).values('id'),
             [{'id': self.b2.id}, {'id': self.b3.id}, {'id': self.b7.id}],
             transform=identity)
-        self.assertQuerysetEqual(Book.objects.values('id', 'title'),
+        self.assertQuerysetEqual(Book.objects.values('id', 'name'),
             [
-                {'id': self.b5.id, 'title': 'Book 5'},
-                {'id': self.b6.id, 'title': 'Book 6'},
-                {'id': self.b4.id, 'title': 'Book 4'},
-                {'id': self.b2.id, 'title': 'Book 2'},
-                {'id': self.b3.id, 'title': 'Book 3'},
-                {'id': self.b7.id, 'title': 'Book 7'},
-                {'id': self.b1.id, 'title': 'Book 1'},
+                {'id': self.b5.id, 'name': 'Book 5'},
+                {'id': self.b6.id, 'name': 'Book 6'},
+                {'id': self.b4.id, 'name': 'Book 4'},
+                {'id': self.b2.id, 'name': 'Book 2'},
+                {'id': self.b3.id, 'name': 'Book 3'},
+                {'id': self.b7.id, 'name': 'Book 7'},
+                {'id': self.b1.id, 'name': 'Book 1'},
             ],
             transform=identity)
         # You can use values() with iterator() for memory savings,
         # because iterator() uses database-level iteration.
-        self.assertQuerysetEqual(Book.objects.values('id', 'title').iterator(),
+        self.assertQuerysetEqual(Book.objects.values('id', 'name').iterator(),
             [
-                {'title': 'Book 5', 'id': self.b5.id},
-                {'title': 'Book 6', 'id': self.b6.id},
-                {'title': 'Book 4', 'id': self.b4.id},
-                {'title': 'Book 2', 'id': self.b2.id},
-                {'title': 'Book 3', 'id': self.b3.id},
-                {'title': 'Book 7', 'id': self.b7.id},
-                {'title': 'Book 1', 'id': self.b1.id},
+                {'name': 'Book 5', 'id': self.b5.id},
+                {'name': 'Book 6', 'id': self.b6.id},
+                {'name': 'Book 4', 'id': self.b4.id},
+                {'name': 'Book 2', 'id': self.b2.id},
+                {'name': 'Book 3', 'id': self.b3.id},
+                {'name': 'Book 7', 'id': self.b7.id},
+                {'name': 'Book 1', 'id': self.b1.id},
             ],
             transform=identity)
         # The values() method works with "extra" fields specified in extra(select).
@@ -205,39 +204,39 @@ class LookupTests(TestCase):
             }], transform=identity)
         # You can specify fields from forward and reverse relations, just like filter().
         self.assertQuerysetEqual(
-            Book.objects.values('title', 'author__name'),
+            Book.objects.values('name', 'author__name'),
             [
-                {'title': self.b5.title, 'author__name': self.au2.name},
-                {'title': self.b6.title, 'author__name': self.au2.name},
-                {'title': self.b4.title, 'author__name': self.au1.name},
-                {'title': self.b2.title, 'author__name': self.au1.name},
-                {'title': self.b3.title, 'author__name': self.au1.name},
-                {'title': self.b7.title, 'author__name': self.au2.name},
-                {'title': self.b1.title, 'author__name': self.au1.name},
+                {'name': self.b5.name, 'author__name': self.au2.name},
+                {'name': self.b6.name, 'author__name': self.au2.name},
+                {'name': self.b4.name, 'author__name': self.au1.name},
+                {'name': self.b2.name, 'author__name': self.au1.name},
+                {'name': self.b3.name, 'author__name': self.au1.name},
+                {'name': self.b7.name, 'author__name': self.au2.name},
+                {'name': self.b1.name, 'author__name': self.au1.name},
             ], transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values('name', 'book__title').order_by('name', 'book__title'),
+            Author.objects.values('name', 'book__name').order_by('name', 'book__name'),
             [
-                {'name': self.au1.name, 'book__title': self.b1.title},
-                {'name': self.au1.name, 'book__title': self.b2.title},
-                {'name': self.au1.name, 'book__title': self.b3.title},
-                {'name': self.au1.name, 'book__title': self.b4.title},
-                {'name': self.au2.name, 'book__title': self.b5.title},
-                {'name': self.au2.name, 'book__title': self.b6.title},
-                {'name': self.au2.name, 'book__title': self.b7.title},
+                {'name': self.au1.name, 'book__name': self.b1.name},
+                {'name': self.au1.name, 'book__name': self.b2.name},
+                {'name': self.au1.name, 'book__name': self.b3.name},
+                {'name': self.au1.name, 'book__name': self.b4.name},
+                {'name': self.au2.name, 'book__name': self.b5.name},
+                {'name': self.au2.name, 'book__name': self.b6.name},
+                {'name': self.au2.name, 'book__name': self.b7.name},
             ], transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values('name', 'book__title', 'book__tag__name').order_by('name', 'book__title', 'book__tag__name'),
+            Author.objects.values('name', 'book__name', 'book__tag__name').order_by('name', 'book__name', 'book__tag__name'),
             [
-                {'name': self.au1.name, 'book__title': self.b1.title, 'book__tag__name': self.t1.name},
-                {'name': self.au1.name, 'book__title': self.b2.title, 'book__tag__name': self.t1.name},
-                {'name': self.au1.name, 'book__title': self.b3.title, 'book__tag__name': self.t1.name},
-                {'name': self.au1.name, 'book__title': self.b3.title, 'book__tag__name': self.t2.name},
-                {'name': self.au1.name, 'book__title': self.b4.title, 'book__tag__name': self.t2.name},
-                {'name': self.au2.name, 'book__title': self.b5.title, 'book__tag__name': self.t2.name},
-                {'name': self.au2.name, 'book__title': self.b5.title, 'book__tag__name': self.t3.name},
-                {'name': self.au2.name, 'book__title': self.b6.title, 'book__tag__name': self.t3.name},
-                {'name': self.au2.name, 'book__title': self.b7.title, 'book__tag__name': self.t3.name},
+                {'name': self.au1.name, 'book__name': self.b1.name, 'book__tag__name': self.t1.name},
+                {'name': self.au1.name, 'book__name': self.b2.name, 'book__tag__name': self.t1.name},
+                {'name': self.au1.name, 'book__name': self.b3.name, 'book__tag__name': self.t1.name},
+                {'name': self.au1.name, 'book__name': self.b3.name, 'book__tag__name': self.t2.name},
+                {'name': self.au1.name, 'book__name': self.b4.name, 'book__tag__name': self.t2.name},
+                {'name': self.au2.name, 'book__name': self.b5.name, 'book__tag__name': self.t2.name},
+                {'name': self.au2.name, 'book__name': self.b5.name, 'book__tag__name': self.t3.name},
+                {'name': self.au2.name, 'book__name': self.b6.name, 'book__tag__name': self.t3.name},
+                {'name': self.au2.name, 'book__name': self.b7.name, 'book__tag__name': self.t3.name},
             ], transform=identity)
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
@@ -250,7 +249,7 @@ class LookupTests(TestCase):
             [{
                 'id': self.b5.id,
                 'author_id': self.au2.id,
-                'title': 'Book 5',
+                'name': 'Book 5',
                 'pages': 0,
                 'pubdate': datetime(2005, 8, 1, 9, 0)
             }], transform=identity)
@@ -261,7 +260,7 @@ class LookupTests(TestCase):
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
         identity = lambda x:x
-        self.assertQuerysetEqual(Book.objects.values_list('title'),
+        self.assertQuerysetEqual(Book.objects.values_list('name'),
             [
                 ('Book 5',),
                 ('Book 6',),
@@ -310,19 +309,19 @@ class LookupTests(TestCase):
             ],
             transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values_list('name', 'book__title', 'book__tag__name').order_by('name', 'book__title', 'book__tag__name'),
+            Author.objects.values_list('name', 'book__name', 'book__tag__name').order_by('name', 'book__name', 'book__tag__name'),
             [
-                (self.au1.name, self.b1.title, self.t1.name),
-                (self.au1.name, self.b2.title, self.t1.name),
-                (self.au1.name, self.b3.title, self.t1.name),
-                (self.au1.name, self.b3.title, self.t2.name),
-                (self.au1.name, self.b4.title, self.t2.name),
-                (self.au2.name, self.b5.title, self.t2.name),
-                (self.au2.name, self.b5.title, self.t3.name),
-                (self.au2.name, self.b6.title, self.t3.name),
-                (self.au2.name, self.b7.title, self.t3.name),
+                (self.au1.name, self.b1.name, self.t1.name),
+                (self.au1.name, self.b2.name, self.t1.name),
+                (self.au1.name, self.b3.name, self.t1.name),
+                (self.au1.name, self.b3.name, self.t2.name),
+                (self.au1.name, self.b4.name, self.t2.name),
+                (self.au2.name, self.b5.name, self.t2.name),
+                (self.au2.name, self.b5.name, self.t3.name),
+                (self.au2.name, self.b6.name, self.t3.name),
+                (self.au2.name, self.b7.name, self.t3.name),
             ], transform=identity)
-        self.assertRaises(TypeError, Book.objects.values_list, 'id', 'title', flat=True)
+        self.assertRaises(TypeError, Book.objects.values_list, 'id', 'name', flat=True)
 
     def test_get_next_previous_by(self):
         # Every DateField and DateTimeField creates get_next_by_FOO() and
@@ -333,7 +332,7 @@ class LookupTests(TestCase):
                          '<Book: Book 2>')
         self.assertEqual(repr(self.b2.get_next_by_pubdate()),
                          '<Book: Book 3>')
-        self.assertEqual(repr(self.b2.get_next_by_pubdate(title__endswith='6')),
+        self.assertEqual(repr(self.b2.get_next_by_pubdate(name__endswith='6')),
                          '<Book: Book 6>')
         self.assertEqual(repr(self.b3.get_next_by_pubdate()),
                          '<Book: Book 7>')
@@ -361,9 +360,9 @@ class LookupTests(TestCase):
     def test_escaping(self):
         # Underscores, percent signs and backslashes have special meaning in the
         # underlying SQL code, but Django handles the quoting of them automatically.
-        b8 = Book(title='Book_ with underscore', pubdate=datetime(2005, 11, 20))
+        b8 = Book(name='Book_ with underscore', pubdate=datetime(2005, 11, 20))
         b8.save()
-        self.assertQuerysetEqual(Book.objects.filter(title__startswith='Book'),
+        self.assertQuerysetEqual(Book.objects.filter(name__startswith='Book'),
             [
                 '<Book: Book_ with underscore>',
                 '<Book: Book 5>',
@@ -374,11 +373,11 @@ class LookupTests(TestCase):
                 '<Book: Book 7>',
                 '<Book: Book 1>',
             ])
-        self.assertQuerysetEqual(Book.objects.filter(title__startswith='Book_'),
+        self.assertQuerysetEqual(Book.objects.filter(name__startswith='Book_'),
                                  ['<Book: Book_ with underscore>'])
-        b9 = Book(title='Book% with percent sign', pubdate=datetime(2005, 11, 21))
+        b9 = Book(name='Book% with percent sign', pubdate=datetime(2005, 11, 21))
         b9.save()
-        self.assertQuerysetEqual(Book.objects.filter(title__startswith='Book'),
+        self.assertQuerysetEqual(Book.objects.filter(name__startswith='Book'),
             [
                 '<Book: Book% with percent sign>',
                 '<Book: Book_ with underscore>',
@@ -390,21 +389,21 @@ class LookupTests(TestCase):
                 '<Book: Book 7>',
                 '<Book: Book 1>',
             ])
-        self.assertQuerysetEqual(Book.objects.filter(title__startswith='Book%'),
+        self.assertQuerysetEqual(Book.objects.filter(name__startswith='Book%'),
                                  ['<Book: Book% with percent sign>'])
-        b10 = Book(title='Book with \\ backslash', pubdate=datetime(2005, 11, 22))
+        b10 = Book(name='Book with \\ backslash', pubdate=datetime(2005, 11, 22))
         b10.save()
-        self.assertQuerysetEqual(Book.objects.filter(title__contains='\\'),
+        self.assertQuerysetEqual(Book.objects.filter(name__contains='\\'),
                                  ['<Book: Book with \ backslash>'])
 
     def test_exclude(self):
-        b8 = Book.objects.create(title='Book_ with underscore', pubdate=datetime(2005, 11, 20))
-        b9 = Book.objects.create(title='Book% with percent sign', pubdate=datetime(2005, 11, 21))
-        b10 = Book.objects.create(title='Book with \\ backslash', pubdate=datetime(2005, 11, 22))
+        b8 = Book.objects.create(name='Book_ with underscore', pubdate=datetime(2005, 11, 20))
+        b9 = Book.objects.create(name='Book% with percent sign', pubdate=datetime(2005, 11, 21))
+        b10 = Book.objects.create(name='Book with \\ backslash', pubdate=datetime(2005, 11, 22))
 
         # exclude() is the opposite of filter() when doing lookups:
         self.assertQuerysetEqual(
-            Book.objects.filter(title__contains='Book').exclude(title__contains='with'),
+            Book.objects.filter(name__contains='Book').exclude(name__contains='with'),
             [
                 '<Book: Book 5>',
                 '<Book: Book 6>',
@@ -414,7 +413,7 @@ class LookupTests(TestCase):
                 '<Book: Book 7>',
                 '<Book: Book 1>',
             ])
-        self.assertQuerysetEqual(Book.objects.exclude(title__startswith="Book_"),
+        self.assertQuerysetEqual(Book.objects.exclude(name__startswith="Book_"),
             [
                 '<Book: Book with \\ backslash>',
                 '<Book: Book% with percent sign>',
@@ -426,7 +425,7 @@ class LookupTests(TestCase):
                 '<Book: Book 7>',
                 '<Book: Book 1>',
             ])
-        self.assertQuerysetEqual(Book.objects.exclude(title="Book 7"),
+        self.assertQuerysetEqual(Book.objects.exclude(name="Book 7"),
             [
                 '<Book: Book with \\ backslash>',
                 '<Book: Book% with percent sign>',
@@ -443,12 +442,12 @@ class LookupTests(TestCase):
        # none() returns a QuerySet that behaves like any other QuerySet object
         self.assertQuerysetEqual(Book.objects.none(), [])
         self.assertQuerysetEqual(
-            Book.objects.none().filter(title__startswith='Book'), [])
+            Book.objects.none().filter(name__startswith='Book'), [])
         self.assertQuerysetEqual(
-            Book.objects.filter(title__startswith='Book').none(), [])
+            Book.objects.filter(name__startswith='Book').none(), [])
         self.assertEqual(Book.objects.none().count(), 0)
         self.assertEqual(
-            Book.objects.none().update(title="This should not take effect"), 0)
+            Book.objects.none().update(name="This should not take effect"), 0)
         self.assertQuerysetEqual(
             [article for article in Book.objects.none().iterator()],
             [])
@@ -469,41 +468,46 @@ class LookupTests(TestCase):
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
-        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword 'pubdate_year' "
-             "into field. Choices are: .+"):
-                Book.objects.filter(pubdate_year='2005').count()
-
-        with self.assertRaises(FieldError, msg="Join on field 'title' not permitted. "
-             "Did you misspell 'starts' for the lookup type?"):
-                Book.objects.filter(title__starts='Book')
+        try:
+            Book.objects.filter(pubdate_year='2005').count()
+            self.fail('FieldError not raised')
+        except FieldError as ex:
+            self.assertEqual(str(ex), "Cannot resolve keyword 'pubdate_year' "
+                             "into field. Choices are: author, id, name, pages, pubdate, tag, tags")
+        try:
+            Book.objects.filter(name__starts='Book')
+            self.fail('FieldError not raised')
+        except FieldError as ex:
+            self.assertEqual(str(ex), "Join on field 'name' not permitted. "
+                             "Did you misspell 'starts' for the lookup type?")
 
     def test_regex(self):
         # Create some articles with a bit more interesting names for testing field lookups:
         for a in Book.objects.all():
             a.delete()
         now = datetime.now()
-        b1 = Book(pubdate=now, title='f')
+        b1 = Book(pubdate=now, name='f')
         b1.save()
-        b2 = Book(pubdate=now, title='fo')
+        b2 = Book(pubdate=now, name='fo')
         b2.save()
-        b3 = Book(pubdate=now, title='foo')
+        b3 = Book(pubdate=now, name='foo')
         b3.save()
-        b4 = Book(pubdate=now, title='fooo')
+        b4 = Book(pubdate=now, name='fooo')
         b4.save()
-        b5 = Book(pubdate=now, title='hey-Foo')
+        b5 = Book(pubdate=now, name='hey-Foo')
         b5.save()
-        b6 = Book(pubdate=now, title='bar')
+        b6 = Book(pubdate=now, name='bar')
         b6.save()
-        b7 = Book(pubdate=now, title='AbBa')
+        b7 = Book(pubdate=now, name='AbBa')
         b7.save()
-        b8 = Book(pubdate=now, title='baz')
+        b8 = Book(pubdate=now, name='baz')
         b8.save()
-        b9 = Book(pubdate=now, title='baxZ')
+        b9 = Book(pubdate=now, name='baxZ')
         b9.save()
         # zero-or-more
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'fo*'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'fo*'),
             ['<Book: f>', '<Book: fo>', '<Book: foo>', '<Book: fooo>'])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'fo*'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'fo*'),
             [
                 '<Book: f>',
                 '<Book: fo>',
@@ -512,54 +516,54 @@ class LookupTests(TestCase):
                 '<Book: hey-Foo>',
             ])
         # one-or-more
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'fo+'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'fo+'),
             ['<Book: fo>', '<Book: foo>', '<Book: fooo>'])
         # wildcard
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'fooo?'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'fooo?'),
             ['<Book: foo>', '<Book: fooo>'])
         # leading anchor
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'^b'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'^b'),
             ['<Book: bar>', '<Book: baxZ>', '<Book: baz>'])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'^a'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'^a'),
             ['<Book: AbBa>'])
         # trailing anchor
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'z$'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'z$'),
             ['<Book: baz>'])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'z$'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'z$'),
             ['<Book: baxZ>', '<Book: baz>'])
         # character sets
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'ba[rz]'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'ba[rz]'),
             ['<Book: bar>', '<Book: baz>'])
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'ba.[RxZ]'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'ba.[RxZ]'),
             ['<Book: baxZ>'])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'ba[RxZ]'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'ba[RxZ]'),
             ['<Book: bar>', '<Book: baxZ>', '<Book: baz>'])
 
         # and more articles:
-        b10 = Book(pubdate=now, title='foobar')
+        b10 = Book(pubdate=now, name='foobar')
         b10.save()
-        b11 = Book(pubdate=now, title='foobaz')
+        b11 = Book(pubdate=now, name='foobaz')
         b11.save()
-        b12 = Book(pubdate=now, title='ooF')
+        b12 = Book(pubdate=now, name='ooF')
         b12.save()
-        b13 = Book(pubdate=now, title='foobarbaz')
+        b13 = Book(pubdate=now, name='foobarbaz')
         b13.save()
-        b14 = Book(pubdate=now, title='zoocarfaz')
+        b14 = Book(pubdate=now, name='zoocarfaz')
         b14.save()
-        b15 = Book(pubdate=now, title='barfoobaz')
+        b15 = Book(pubdate=now, name='barfoobaz')
         b15.save()
-        b16 = Book(pubdate=now, title='bazbaRFOO')
+        b16 = Book(pubdate=now, name='bazbaRFOO')
         b16.save()
 
         # alternation
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'oo(f|b)'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'oo(f|b)'),
             [
                 '<Book: barfoobaz>',
                 '<Book: foobar>',
                 '<Book: foobarbaz>',
                 '<Book: foobaz>',
             ])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'oo(f|b)'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'oo(f|b)'),
             [
                 '<Book: barfoobaz>',
                 '<Book: foobar>',
@@ -567,11 +571,11 @@ class LookupTests(TestCase):
                 '<Book: foobaz>',
                 '<Book: ooF>',
             ])
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'^foo(f|b)'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'^foo(f|b)'),
             ['<Book: foobar>', '<Book: foobarbaz>', '<Book: foobaz>'])
 
         # greedy matching
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'b.*az'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'b.*az'),
             [
                 '<Book: barfoobaz>',
                 '<Book: baz>',
@@ -579,7 +583,7 @@ class LookupTests(TestCase):
                 '<Book: foobarbaz>',
                 '<Book: foobaz>',
             ])
-        self.assertQuerysetEqual(Book.objects.filter(title__iregex=r'b.*ar'),
+        self.assertQuerysetEqual(Book.objects.filter(name__iregex=r'b.*ar'),
             [
                 '<Book: bar>',
                 '<Book: barfoobaz>',
@@ -592,21 +596,21 @@ class LookupTests(TestCase):
     def test_regex_backreferencing(self):
         # grouping and backreferences
         now = datetime.now()
-        b10 = Book(pubdate=now, title='foobar')
+        b10 = Book(pubdate=now, name='foobar')
         b10.save()
-        b11 = Book(pubdate=now, title='foobaz')
+        b11 = Book(pubdate=now, name='foobaz')
         b11.save()
-        b12 = Book(pubdate=now, title='ooF')
+        b12 = Book(pubdate=now, name='ooF')
         b12.save()
-        b13 = Book(pubdate=now, title='foobarbaz')
+        b13 = Book(pubdate=now, name='foobarbaz')
         b13.save()
-        b14 = Book(pubdate=now, title='zoocarfaz')
+        b14 = Book(pubdate=now, name='zoocarfaz')
         b14.save()
-        b15 = Book(pubdate=now, title='barfoobaz')
+        b15 = Book(pubdate=now, name='barfoobaz')
         b15.save()
-        b16 = Book(pubdate=now, title='bazbaRFOO')
+        b16 = Book(pubdate=now, name='bazbaRFOO')
         b16.save()
-        self.assertQuerysetEqual(Book.objects.filter(title__regex=r'b(.).*b\1'),
+        self.assertQuerysetEqual(Book.objects.filter(name__regex=r'b(.).*b\1'),
             ['<Book: barfoobaz>', '<Book: bazbaRFOO>', '<Book: foobarbaz>'])
 
     def test_nonfield_lookups(self):
