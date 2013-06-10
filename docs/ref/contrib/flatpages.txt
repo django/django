@@ -47,7 +47,7 @@ Then either:
 3. Add an entry in your URLconf. For example::
 
     urlpatterns = patterns('',
-        ('^pages/', include('django.contrib.flatpages.urls')),
+        (r'^pages/', include('django.contrib.flatpages.urls')),
     )
 
 or:
@@ -74,7 +74,7 @@ There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
     urlpatterns = patterns('',
-        ('^pages/', include('django.contrib.flatpages.urls')),
+        (r'^pages/', include('django.contrib.flatpages.urls')),
     )
 
 You can also set it up as a "catchall" pattern. In this case, it is important
