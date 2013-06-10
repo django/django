@@ -16,6 +16,9 @@ from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
 # Can't run this test under SQLite, because you can't
 # get two connections to an in-memory database.
 class DeleteLockingTest(TransactionTestCase):
+
+    available_apps = ['delete_regress']
+
     def setUp(self):
         # Create a second connection to the default database
         new_connections = ConnectionHandler(settings.DATABASES)
@@ -107,6 +110,9 @@ class DeleteCascadeTests(TestCase):
 
 
 class DeleteCascadeTransactionTests(TransactionTestCase):
+
+    available_apps = ['delete_regress']
+
     def test_inheritance(self):
         """
         Auto-created many-to-many through tables referencing a parent model are

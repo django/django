@@ -318,6 +318,8 @@ class AutoIncrementResetTest(TransactionTestCase):
     that AutoField values start from 1 for each transactional test case.
     """
 
+    available_apps = ['test_runner']
+
     reset_sequences = True
 
     @skipUnlessDBFeature('supports_sequence_reset')

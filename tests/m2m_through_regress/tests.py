@@ -10,6 +10,7 @@ from .models import (Person, Group, Membership, UserMembership, Car, Driver,
 
 
 class M2MThroughTestCase(TestCase):
+
     def test_everything(self):
         bob = Person.objects.create(name="Bob")
         jim = Person.objects.create(name="Jim")

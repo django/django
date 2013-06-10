@@ -985,6 +985,34 @@ to test the effects of commit and rollback:
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is an relatively expensive database operation.
 
+.. attribute:: TransactionTestCase.available_apps
+
+    .. warning::
+
+        This attribute is a private API. It may be changed or removed without
+        a deprecation period in the future, for instance to accomodate changes
+        in application loading.
+
+        It's used to optimize Django's own test suite, which contains hundreds
+        of models but no relations between models in different applications.
+
+    .. versionadded:: 1.6
+
+    By default, ``available_apps`` is set to ``None`` and has no effect.
+    Setting it to a list of applications tells Django to behave as if only the
+    models from these applications were available:
+
+    - Before each test, Django creates content types and permissions only for
+      these models.
+    - After each test, Django flushes only the corresponding tables. However,
+      at the database level, truncation may cascade to other related models,
+      even if they aren't in ``available_apps``.
+
+    Since the database isn't fully flushed, if a test creates instances of
+    models not included in ``available_apps``, they will leak and they may
+    cause unrelated tests to fail. Be careful with tests that use sessions;
+    the default session engine stores them in the database.
+
 TestCase
 ~~~~~~~~
 
