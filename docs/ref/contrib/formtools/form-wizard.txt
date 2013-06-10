@@ -166,7 +166,7 @@ This template expects a ``wizard`` object that has various items attached to
 it:
 
 * ``form`` -- The :class:`~django.forms.Form` or
-  :class:`~django.forms.formset.BaseFormSet` instance for the current step
+  :class:`~django.forms.formsets.BaseFormSet` instance for the current step
   (either empty or with errors).
 
 * ``steps`` -- A helper object to access the various steps related data:
