@@ -1913,5 +1913,7 @@ def alias_diff(refcounts_before, refcounts_after):
     Given the before and after copies of refcounts works out which aliases
     have been added to the after copy.
     """
+    # Use -1 as default value so that any join that is created, then trimmed
+    # is seen as added.
     return set(t for t in refcounts_after
-               if refcounts_after[t] > refcounts_before.get(t, 0))
+               if refcounts_after[t] > refcounts_before.get(t, -1))
