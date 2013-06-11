@@ -155,6 +155,80 @@ If there are any circular dependencies in the
 :setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
 exception will be raised.
 
+Advanced features of ``TransactionTestCase``
+============================================
+
+.. currentmodule:: django.test
+
+.. attribute:: TransactionTestCase.available_apps
+
+    .. versionadded:: 1.6
+
+    .. warning::
+
+        This attribute is a private API. It may be changed or removed without
+        a deprecation period in the future, for instance to accomodate changes
+        in application loading.
+
+        It's used to optimize Django's own test suite, which contains hundreds
+        of models but no relations between models in different applications.
+
+    By default, ``available_apps`` is set to ``None``. After each test, Django
+    calls :djadmin:`flush` to reset the database state. This empties all tables
+    and emits the :data:`~django.db.models.signals.post_syncdb` signal, which
+    re-creates one content type and three permissions for each model. This
+    operation gets expensive proportionally to the number of models.
+
+    Setting ``available_apps`` to a list of applications instructs Django to
+    behave as if only the models from these applications were available. The
+    behavior of ``TransactionTestCase`` changes as follows:
+
+    - :data:`~django.db.models.signals.post_syncdb` is fired before each
+      test to create the content types and permissions for each model in
+      available apps, in case they're missing.
+    - After each test, Django empties only tables corresponding to models in
+      available apps. However, at the database level, truncation may cascade to
+      related models in unavailable apps. Furthermore
+      :data:`~django.db.models.signals.post_syncdb` isn't fired; it will be
+      fired by the next ``TransactionTestCase``, after the correct set of
+      applications is selected.
+
+    Since the database isn't fully flushed, if a test creates instances of
+    models not included in ``available_apps``, they will leak and they may
+    cause unrelated tests to fail. Be careful with tests that use sessions;
+    the default session engine stores them in the database.
+
+    Since :data:`~django.db.models.signals.post_syncdb` isn't emitted after
+    flushing the database, its state after a ``TransactionTestCase`` isn't the
+    same as after a ``TestCase``: it's missing the rows created by listeners
+    to :data:`~django.db.models.signals.post_syncdb`. Considering the
+    :ref:`order in which tests are executed <order-of-tests>`, this isn't an
+    issue, provided either all ``TransactionTestCase`` in a given test suite
+    declare ``available_apps``, or none of them.
+
+    ``available_apps`` is mandatory in Django's own test suite.
+
+.. attribute:: TransactionTestCase.reset_sequences
+
+    .. versionadded:: 1.5
+
+    Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
+    sure sequences are always reset before the test run::
+
+        class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
+            reset_sequences = True
+
+            def test_animal_pk(self):
+                lion = Animal.objects.create(name="lion", sound="roar")
+                # lion.pk is guaranteed to always be 1
+                self.assertEqual(lion.pk, 1)
+
+    Unless you are explicitly testing primary keys sequence numbers, it is
+    recommended that you do not hard code primary key values in tests.
+
+    Using ``reset_sequences = True`` will slow down the test, since the primary
+    key reset is an relatively expensive database operation.
+
 Running tests outside the test runner
 =====================================
 
