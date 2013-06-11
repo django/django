@@ -242,8 +242,8 @@ class DeletionMixin(object):
         return HttpResponseRedirect(success_url)
 
     # Add support for browsers which only accept GET and POST for now.
-    def post(self, *args, **kwargs):
-        return self.delete(*args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
 
     def get_success_url(self):
         if self.success_url:
