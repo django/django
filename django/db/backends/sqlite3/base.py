@@ -519,4 +519,4 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     return str(dt)
 
 def _sqlite_regexp(re_pattern, re_string):
-    return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
+    return bool(re.search(re_pattern, re_string))

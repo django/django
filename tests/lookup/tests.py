@@ -6,7 +6,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Author, Article, Tag, Game, Season, Player, RegexTestModel
+from .models import Author, Article, Tag, Game, Season, Player
 
 
 class LookupTests(TestCase):
@@ -609,21 +609,6 @@ class LookupTests(TestCase):
         a16.save()
         self.assertQuerysetEqual(Article.objects.filter(headline__regex=r'b(.).*b\1'),
             ['<Article: barfoobaz>', '<Article: bazbaRFOO>', '<Article: foobarbaz>'])
-
-    def test_regex_null(self):
-        """
-        Ensure that a regex lookup does not fail on null/None values
-        """
-        RegexTestModel.objects.create(name=None)
-        self.assertQuerysetEqual(RegexTestModel.objects.filter(name__regex=r'^$'), [])
-
-    def test_regex_non_string(self):
-        """
-        Ensure that a regex lookup does not fail on non-string fields
-        """
-        RegexTestModel.objects.create(name='test', integer=5)
-        self.assertQuerysetEqual(RegexTestModel.objects.filter(integer__regex=r'^5$'),
-            ['<RegexTestModel: test>'])
 
     def test_nonfield_lookups(self):
         """
