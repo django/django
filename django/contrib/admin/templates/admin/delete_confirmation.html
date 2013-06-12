@@ -36,6 +36,7 @@
     <form action="" method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes" />
+    {% if changelist_filters %}<input type="hidden" name="_changelist_filters" value="{{ changelist_filters }}" />{% endif %}
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
     </div>
     </form>

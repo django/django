@@ -4157,3 +4157,97 @@ class AdminUserMessageTest(TestCase):
         self.assertContains(response,
                             '<li class="extra_tag info">Test tags</li>',
                             html=True)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminChangeListRedirectionTests(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users']
+
+    def setUp(self):
+        Person.objects.create(name="Chris", gender=1, alive=True, age=25)
+        Person.objects.create(name="Jack", gender=2, alive=False, age=47)
+        Person.objects.create(name="Bob", gender=1, alive=True, age=36)
+
+        self.client.login(username='super', password='secret')
+
+    def get_data(self):
+        return {
+            'name': 'Joe', 'gender': '1', 'alive': '1', 'age': '58'
+        }
+
+    def tearDown(self):
+        self.client.logout()
+
+    def get_filters_querystring(self):
+        return urlencode({
+                'alive': 1,
+            })
+
+    def get_filtered_changelist_url(self):
+        return "%s%s?%s" % ('http://testserver', reverse('admin:admin_views_person_changelist'), self.get_filters_querystring())
+
+    def test_change_redirect(self):
+        """
+        Ensure that we're correctly redirected to the filtered changelist
+        after an existing object is saved.
+        Refs #6903.
+        """
+        person = Person.objects.get(name='Chris')
+        change_url = reverse('admin:admin_views_person_change', args=(person.pk,))
+
+        # Simulate clicking an object from a filtered changelist
+        response = self.client.get(change_url, HTTP_REFERER=self.get_filtered_changelist_url())
+        self.assertContains(response, '_changelist_filters')
+        self.assertContains(response, self.get_filters_querystring())
+
+        # Save the object
+        data = self.get_data()
+        data['_save'] = 1
+        data['_changelist_filters'] = self.get_filters_querystring()
+        response = self.client.post(change_url, data)
+
+        # Check that we return to the filtered changelist
+        self.assertRedirects(response, self.get_filtered_changelist_url())
+
+    def test_add_redirect(self):
+        """
+        Ensure that we're correctly redirected to the non-filtered changelist
+        after a new object is added.
+        Refs #6903.
+        """
+        add_url = reverse('admin:admin_views_person_add')
+
+        response = self.client.get(add_url, HTTP_REFERER=self.get_filtered_changelist_url())
+        self.assertNotContains(response, '_changelist_filters')
+        self.assertNotContains(response, self.get_filters_querystring())
+
+        # Add a new object
+        data = self.get_data()
+        data['_save'] = 1
+        data['_changelist_filters'] = self.get_filters_querystring()
+        response = self.client.post(add_url, data)
+
+        # Check that we return to the non-filtered changelist
+        self.assertRedirects(response, reverse('admin:admin_views_person_changelist'))
+
+    def test_delete_redirect(self):
+        """
+        Ensure that we're correctly redirected to the filtered changelist
+        after an existing object is deleted.
+        Refs #6903.
+        """
+        person = Person.objects.get(name='Chris')
+        delete_url = reverse('admin:admin_views_person_delete', args=(person.pk,))
+
+        response = self.client.get(delete_url + '?_changelist_filters=%s' % self.get_filters_querystring())
+        self.assertContains(response, '_changelist_filters')
+        self.assertContains(response, self.get_filters_querystring())
+
+        # Delete the object
+        data = {'post': 'yes', '_changelist_filters': self.get_filters_querystring()}
+        response = self.client.post(delete_url, data)
+
+        # Check that we return to the filtered changelist
+        self.assertRedirects(response, self.get_filtered_changelist_url())
+
