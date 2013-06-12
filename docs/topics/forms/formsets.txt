@@ -247,8 +247,7 @@ is where you define your own validation that works at the formset level::
     ...             # Don't bother validating the formset unless each form is valid on its own
     ...             return
     ...         titles = []
-    ...         for i in range(0, self.total_form_count()):
-    ...             form = self.forms[i]
+    ...         for form in self.forms:
     ...             title = form.cleaned_data['title']
     ...             if title in titles:
     ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
