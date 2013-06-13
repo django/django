@@ -192,6 +192,20 @@ class URLPatternReverse(TestCase):
         self.assertEqual('/%7Eme/places/1/',
                 reverse('places', args=[1], prefix='/~me/'))
 
+    def test_patterns_reported(self):
+        # Regression for #17076
+        try:
+            # this url exists, but requires an argument
+            reverse("people", args=[])
+        except NoReverseMatch as e:
+            pattern_description = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+            self.assertIn(pattern_description, str(e))
+        else:
+            # we can't use .assertRaises, since we want to inspect the
+            # exception
+            self.fail("Expected a NoReverseMatch, but none occurred.")
+
+
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
         """
