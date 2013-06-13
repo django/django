@@ -422,8 +422,11 @@ class RegexURLResolver(LocaleRegexProvider):
             lookup_view_s = "%s.%s" % (m, n)
         else:
             lookup_view_s = lookup_view
+
+        patterns = [pattern for (possibility, pattern, defaults) in possibilities]
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
-                "arguments '%s' not found." % (lookup_view_s, args, kwargs))
+                "arguments '%s' not found. %d pattern(s) tried: %s" %
+                             (lookup_view_s, args, kwargs, len(patterns), patterns))
 
 class LocaleRegexURLResolver(RegexURLResolver):
     """
