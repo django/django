@@ -19,6 +19,7 @@ class ModelToValidate(models.Model):
     email = models.EmailField(blank=True)
     url = models.URLField(blank=True)
     f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])
+    slug = models.SlugField(blank=True)
 
     def clean(self):
         super(ModelToValidate, self).clean()

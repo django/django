@@ -1211,6 +1211,7 @@ class PositiveSmallIntegerField(IntegerField):
         return super(PositiveSmallIntegerField, self).formfield(**defaults)
 
 class SlugField(CharField):
+    default_validators = [validators.validate_slug]
     description = _("Slug (up to %(max_length)s)")
 
     def __init__(self, *args, **kwargs):
@@ -1320,12 +1321,12 @@ class TimeField(Field):
         return super(TimeField, self).formfield(**defaults)
 
 class URLField(CharField):
+    default_validators = [validators.URLValidator()]
     description = _("URL")
 
     def __init__(self, verbose_name=None, name=None, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         CharField.__init__(self, verbose_name, name, **kwargs)
-        self.validators.append(validators.URLValidator())
 
     def formfield(self, **kwargs):
         # As with CharField, this will cause URL validation to be performed
