@@ -236,9 +236,14 @@ Minor features
 .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 .. _`PIL`: https://pypi.python.org/pypi/PIL
 
-* :doc:`ModelForm </topics/forms/modelforms/>` accepts a new
-  Meta option: ``localized_fields``. Fields included in this list will be localized
-  (by setting ``localize`` on the form field).
+* :class:`~django.forms.ModelForm` accepts several new ``Meta``
+  options.
+
+  * Fields included in the ``localized_fields`` list will be localized
+    (by setting ``localize`` on the form field).
+  * The  ``labels``, ``help_texts`` and ``error_messages`` options may be used
+    to customize the default fields, see
+    :ref:`modelforms-overriding-default-fields` for details.
 
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
