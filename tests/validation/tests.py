@@ -53,7 +53,11 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)
-        self.assertFailsValidation(mtv.full_clean, ['name',])
+        self.assertFailsValidation(mtv.full_clean, ['name'])
+
+    def test_malformed_slug_raises_error(self):
+        mtv = ModelToValidate(number=10, name='Some Name', slug='##invalid##')
+        self.assertFailsValidation(mtv.full_clean, ['slug'])
 
 
 class ArticleForm(forms.ModelForm):

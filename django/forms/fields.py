@@ -638,10 +638,7 @@ class URLField(CharField):
     default_error_messages = {
         'invalid': _('Enter a valid URL.'),
     }
-
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        super(URLField, self).__init__(max_length, min_length, *args, **kwargs)
-        self.validators.append(validators.URLValidator())
+    default_validators = [validators.URLValidator()]
 
     def to_python(self, value):
 
