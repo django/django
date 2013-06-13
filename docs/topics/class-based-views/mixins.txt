@@ -233,7 +233,7 @@ We'll demonstrate this with the publisher modelling we used in the
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Author
 
-    class RecordInterest(View, SingleObjectMixin):
+    class RecordInterest(SingleObjectMixin, View):
         """Records the current user's interest in an author."""
         model = Author
 
@@ -446,7 +446,7 @@ Our new ``AuthorDetail`` looks like this::
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
 
-    class AuthorDetail(DetailView, FormMixin):
+    class AuthorDetail(FormMixin, DetailView):
         model = Author
         form_class = AuthorInterestForm
 
@@ -553,7 +553,7 @@ template as ``AuthorDisplay`` is using on ``GET``.
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
 
-    class AuthorInterest(FormView, SingleObjectMixin):
+    class AuthorInterest(SingleObjectMixin, FormView):
         template_name = 'books/author_detail.html'
         form_class = AuthorInterestForm
         model = Author
