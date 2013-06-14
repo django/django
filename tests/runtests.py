@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import warnings
 
 from django import contrib
 from django.utils._os import upath
@@ -107,7 +108,9 @@ def setup(verbosity, test_labels):
         logger.addHandler(handler)
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    get_apps()
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', PendingDeprecationWarning)
+        get_apps()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
