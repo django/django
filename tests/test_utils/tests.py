@@ -8,8 +8,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.simple import make_doctest
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, IgnorePendingDeprecationWarningsMixin
 from django.utils import six
 from django.utils import unittest
 from django.utils.unittest import skip
@@ -624,9 +623,10 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(SimpleTestCase):
+class DoctestNormalizerTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 
     def test_normalizer(self):
+        from django.test.simple import make_doctest
         suite = make_doctest("test_utils.doctest_output")
         failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
         self.assertEqual(failures.failures, [])

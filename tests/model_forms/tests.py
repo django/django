@@ -52,12 +52,15 @@ class PriceForm(forms.ModelForm):
 
 class BookForm(forms.ModelForm):
     class Meta:
-       model = Book
+        model = Book
+        fields = '__all__'
 
 
 class DerivedBookForm(forms.ModelForm):
     class Meta:
         model = DerivedBook
+        fields = '__all__'
+
 
 
 class ExplicitPKForm(forms.ModelForm):
