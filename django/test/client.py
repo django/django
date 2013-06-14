@@ -272,7 +272,6 @@ class RequestFactory(object):
 
         parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
             'REQUEST_METHOD':  str('GET'),
@@ -303,7 +302,6 @@ class RequestFactory(object):
 
         parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
             'REQUEST_METHOD':  str('HEAD'),
