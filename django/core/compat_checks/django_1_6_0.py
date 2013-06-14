@@ -10,19 +10,19 @@ def check_test_runner():
     doing & avoid generating a message.
     """
     from django.conf import settings
-    new_default = u'django.test.runner.DiscoverRunner'
-    test_runner_setting = getattr(settings, u'TEST_RUNNER', new_default)
+    new_default = 'django.test.runner.DiscoverRunner'
+    test_runner_setting = getattr(settings, 'TEST_RUNNER', new_default)
 
     if test_runner_setting == new_default:
         message = [
-            u"You have not explicitly set 'TEST_RUNNER'. In Django 1.6,",
-            u"there is a new test runner ('%s')" % new_default,
-            u"by default. You should ensure your tests are still all",
-            u"running & behaving as expected. See",
-            u"https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module",
-            u"for more information.",
+            "You have not explicitly set 'TEST_RUNNER'. In Django 1.6,",
+            "there is a new test runner ('%s')" % new_default,
+            "by default. You should ensure your tests are still all",
+            "running & behaving as expected. See",
+            "https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module",
+            "for more information.",
         ]
-        return u' '.join(message)
+        return ' '.join(message)
 
 
 def run_checks():

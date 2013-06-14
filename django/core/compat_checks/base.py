@@ -25,12 +25,12 @@ def check_compatibility():
     messages = []
 
     for check_module in COMPAT_CHECKS:
-        check = getattr(check_module, u'run_checks', None)
+        check = getattr(check_module, 'run_checks', None)
 
         if check is None:
             warnings.warn(
-                u"The '%s' module lacks a " % check_module.__name__ +
-                u"'run_checks' method, which is needed to verify compatibility."
+                "The '%s' module lacks a " % check_module.__name__ +
+                "'run_checks' method, which is needed to verify compatibility."
             )
             continue
 
