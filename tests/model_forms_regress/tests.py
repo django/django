@@ -97,12 +97,14 @@ class PartiallyLocalizedTripleForm(forms.ModelForm):
     class Meta:
         model = Triple
         localized_fields = ('left', 'right',)
+        fields = '__all__'
 
 
 class FullyLocalizedTripleForm(forms.ModelForm):
     class Meta:
         model = Triple
-        localized_fields = "__all__"
+        localized_fields = '__all__'
+        fields = '__all__'
 
 class LocalizedModelFormTest(TestCase):
     def test_model_form_applies_localize_to_some_fields(self):

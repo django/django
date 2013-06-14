@@ -208,7 +208,8 @@ class RelatedModelFormTests(TestCase):
             ref = models.ForeignKey("B")
 
         class Meta:
-            model=A
+            model = A
+            fields = '__all__'
 
         self.assertRaises(ValueError, ModelFormMetaclass, str('Form'), (ModelForm,), {'Meta': Meta})
 
@@ -226,7 +227,8 @@ class RelatedModelFormTests(TestCase):
             pass
 
         class Meta:
-            model=A
+            model = A
+            fields = '__all__'
 
         self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))
 
