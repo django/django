@@ -1943,6 +1943,12 @@ class SyncOnlyDefaultDatabaseRouter(object):
 
 
 class SyncDBTestCase(TestCase):
+
+    available_apps  = [
+        'multiple_database',
+        'django.contrib.auth',
+        'django.contrib.contenttypes'
+    ]
     multi_db = True
 
     def test_syncdb_to_other_database(self):

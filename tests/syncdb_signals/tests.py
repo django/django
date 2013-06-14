@@ -55,6 +55,11 @@ signals.pre_syncdb.connect(pre_syncdb_receiver, sender=models)
 
 
 class SyncdbSignalTests(TestCase):
+
+    available_apps = [
+        'syncdb_signals',
+    ]
+
     def test_pre_syncdb_call_time(self):
         self.assertEqual(pre_syncdb_receiver.call_counter, 1)
 
