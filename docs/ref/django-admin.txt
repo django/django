@@ -89,6 +89,17 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
+checksetup
+----------
+
+.. django-admin:: checksetup
+
+Performs a series of checks to verify a given setup (settings/application code)
+is compatible with the current version of Django.
+
+Upon finding things that are incompatible or require notifying the user, it
+issues a series of warnings.
+
 cleanup
 -------
 
