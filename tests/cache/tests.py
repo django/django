@@ -828,7 +828,7 @@ def custom_key_func(key, key_prefix, version):
 
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
-    available_apps = []
+    available_apps = ['cache']
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
