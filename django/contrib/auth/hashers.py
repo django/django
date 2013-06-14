@@ -171,12 +171,12 @@ class BasePasswordHasher(object):
                 name = mod_path = self.library
             try:
                 module = importlib.import_module(mod_path)
-            except ImportError:
-                raise ValueError("Couldn't load %s password algorithm "
-                                 "library" % name)
+            except ImportError as e:
+                raise ValueError("Couldn't load %r algorithm library: %s" %
+                                 (self.__class__.__name__, e))
             return module
-        raise ValueError("Hasher '%s' doesn't specify a library attribute" %
-                         self.__class__)
+        raise ValueError("Hasher %r doesn't specify a library attribute" %
+                         self.__class__.__name__)
 
     def salt(self):
         """

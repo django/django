@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
-from django.contrib.auth.hashers import (is_password_usable,
+from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
     check_password, make_password, PBKDF2PasswordHasher, load_hashers,
     PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
 from django.utils import unittest
@@ -128,9 +128,8 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(ValueError, identify_hasher, encoded)
 
     def test_bad_algorithm(self):
-        def doit():
+        with self.assertRaises(ValueError):
             make_password('lètmein', hasher='lolcat')
-        self.assertRaises(ValueError, doit)
         self.assertRaises(ValueError, identify_hasher, "lolcat$salt$hash")
 
     def test_bad_encoded(self):
@@ -178,3 +177,17 @@ class TestUtilsHashPass(unittest.TestCase):
                 state['upgraded'] = True
             self.assertFalse(check_password('WRONG', encoded, setter))
             self.assertFalse(state['upgraded'])
+
+    def test_load_library_no_algorithm(self):
+        with self.assertRaises(ValueError) as e:
+            BasePasswordHasher()._load_library()
+        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a "
+                         "library attribute", str(e.exception))
+
+    def test_load_library_importerror(self):
+        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,),
+                           {'algorithm': 'plain', 'library': 'plain'})
+        with self.assertRaises(ValueError) as e:
+            PlainHasher()._load_library()
+        self.assertEqual("Couldn't load 'PlainHasher' algorithm library: "
+                         "No module named plain", str(e.exception))
