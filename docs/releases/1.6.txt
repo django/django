@@ -688,6 +688,9 @@ Miscellaneous
 
     url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
 
+* :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
+  attribute which allows it to choose the target by reversing the URL.
+
 Features deprecated in 1.6
 ==========================
 
