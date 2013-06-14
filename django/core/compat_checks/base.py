@@ -20,7 +20,7 @@ def check_compatibility():
     per release of Django) & must have a ``run_checks`` function that runs
     all the checks.
 
-    Returns a list of information messages about incompatibilities.
+    Returns a list of informational messages about incompatibilities.
     """
     messages = []
 
@@ -29,8 +29,8 @@ def check_compatibility():
 
         if check is None:
             warnings.warn(
-                u"The '%s' module lacks a 'run_checks' method, which is " +
-                u"needed to verify compatibility."
+                u"The '%s' module lacks a " % check_module.__name__ +
+                u"'run_checks' method, which is needed to verify compatibility."
             )
             continue
 
