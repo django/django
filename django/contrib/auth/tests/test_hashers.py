@@ -5,6 +5,7 @@ from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
 from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
     check_password, make_password, PBKDF2PasswordHasher, load_hashers,
     PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
+from django.utils import six
 from django.utils import unittest
 from django.utils.unittest import skipUnless
 
@@ -187,7 +188,7 @@ class TestUtilsHashPass(unittest.TestCase):
     def test_load_library_importerror(self):
         PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,),
                            {'algorithm': 'plain', 'library': 'plain'})
-        with self.assertRaises(ValueError) as e:
+        # Python 3.3 adds quotes around module name
+        with six.assertRaisesRegex(self, ValueError,
+                "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"):
             PlainHasher()._load_library()
-        self.assertEqual("Couldn't load 'PlainHasher' algorithm library: "
-                         "No module named plain", str(e.exception))
