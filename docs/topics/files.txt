@@ -85,9 +85,9 @@ The following approach may be used to close files automatically::
 
     # Create a Python file object using open() and the with statement
     >>> with open('/tmp/hello.world', 'w') as f:
-    >>>     myfile = File(f)
-    >>>     for line in myfile:
-    >>>         print line
+    ...     myfile = File(f)
+    ...     myfile.write('Hello World')
+    ...
     >>> myfile.closed
     True
     >>> f.closed
