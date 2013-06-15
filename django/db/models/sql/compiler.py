@@ -631,12 +631,10 @@ class SQLCompiler(object):
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
-            table = f.rel.to._meta.db_table
             promote = nullable or f.null
-            alias = self.query.join_parent_model(opts, model, root_alias, {})
-            join_cols = f.get_joining_columns()
-            alias = self.query.join((alias, table, join_cols),
-                    outer_if_first=promote, join_field=f)
+            _, _, _, joins, _ = self.query.setup_joins(
+                [f.name], opts, root_alias, outer_if_first=promote)
+            alias = joins[-1]
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
@@ -660,12 +658,9 @@ class SQLCompiler(object):
                                               only_load.get(model), reverse=True):
                     continue
 
-                alias = self.query.join_parent_model(opts, f.rel.to, root_alias, {})
-                table = model._meta.db_table
-                alias = self.query.join(
-                    (alias, table, f.get_joining_columns(reverse_join=True)),
-                    outer_if_first=True, join_field=f
-                )
+                _, _, _, joins, _ = self.query.setup_joins(
+                    [f.related_query_name()], opts, root_alias, outer_if_first=True)
+                alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
                 columns, aliases = self.get_default_columns(start_alias=alias,
@@ -677,7 +672,7 @@ class SQLCompiler(object):
                 # Use True here because we are looking at the _reverse_ side of
                 # the relation, which is always nullable.
                 new_nullable = True
-
+                table = model._meta.db_table
                 self.fill_related_selections(model._meta, table, cur_depth+1,
                     next, restricted, new_nullable)
 

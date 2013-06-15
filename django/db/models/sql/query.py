@@ -926,10 +926,10 @@ class Query(object):
         """
         if model in seen:
             return seen[model]
-        int_opts = opts
         chain = opts.get_base_chain(model)
         if chain is None:
             return alias
+        curr_opts = opts
         for int_model in chain:
             if int_model in seen:
                 return seen[int_model]
@@ -937,14 +937,14 @@ class Query(object):
             # with no parents, assign the new options
             # object and skip to the next base in that
             # case
-            if not int_opts.parents[int_model]:
-                int_opts = int_model._meta
+            if not curr_opts.parents[int_model]:
+                curr_opts = int_model._meta
                 continue
-            link_field = int_opts.get_ancestor_link(int_model)
-            int_opts = int_model._meta
-            connection = (alias, int_opts.db_table, link_field.get_joining_columns())
-            alias = seen[int_model] = self.join(connection, nullable=False,
-                                                join_field=link_field)
+            link_field = curr_opts.get_ancestor_link(int_model)
+            _, _, _, joins, _ = self.setup_joins(
+                [link_field.name], curr_opts, alias)
+            curr_opts = int_model._meta
+            alias = seen[int_model] = joins[-1]
         return alias or seen[None]
 
     def remove_inherited_models(self):
@@ -1321,7 +1321,7 @@ class Query(object):
         return path, final_field, targets
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
-                    allow_explicit_fk=False):
+                    allow_explicit_fk=False, outer_if_first=False):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1364,8 +1364,9 @@ class Query(object):
                 nullable = True
             connection = alias, opts.db_table, join.join_field.get_joining_columns()
             reuse = can_reuse if join.m2m else None
-            alias = self.join(connection, reuse=reuse,
-                              nullable=nullable, join_field=join.join_field)
+            alias = self.join(
+                connection, reuse=reuse, nullable=nullable, join_field=join.join_field,
+                outer_if_first=outer_if_first)
             joins.append(alias)
         if hasattr(final_field, 'field'):
             final_field = final_field.field
