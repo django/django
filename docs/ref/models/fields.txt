@@ -1031,15 +1031,23 @@ avoid the overhead of an index if you are creating a foreign key for
 consistency rather than joins, or if you will be creating an alternative index
 like a partial or multiple column index.
 
-Database Representation
+Internal Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django appends ``"_id"`` to the field name to create its
-database column name. In the above example, the database table for the ``Car``
-model will have a ``manufacturer_id`` column. (You can change this explicitly by
-specifying :attr:`~Field.db_column`) However, your code should never have to
-deal with the database column name, unless you write custom SQL. You'll always
-deal with the field names of your model object.
+.. versionchanged:: 1.7
+
+Behind the scenes, Django appends ``"_id"`` to the field name to create an
+extra auxiliary model field to store the raw value.  In the above example,
+the ``Car`` model will have a ``manufacturer_id`` field holding the value
+of the primary key of the related object.
+
+You can customize its database column by specifying
+:attr:`~Field.db_column` on the ``ForeignKey``.  In case you need to
+customize the auxiliary field further, you can create the field explicitly
+and set the :attr:`~ForeignKey.aux_field` argument of your ``ForeignKey``
+to its name.  However, keep in mind that if you use this option, it is
+your responsibility to make sure the type of the auxiliary field is
+compatible with the target field.
 
 .. _foreign-key-arguments:
 
@@ -1160,6 +1168,20 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
     you manually add a SQL ``ON DELETE`` constraint to the database field
     (perhaps using :ref:`initial sql<initial-sql>`).
+
+.. attribute:: ForeignKey.aux_field
+
+    .. versionadded:: 1.7
+
+    Every ``ForeignKey`` uses an auxiliary model field to take care of its
+    raw value.  By default, this auxiliary field is created automatically
+    with the same type as the target field and its name is derived from
+    the name of the ``ForeignKey`` by appending ``"_id"`` to it.
+
+    It is possible to create the auxiliary field explicitly and set the
+    value of this argument to its name.  When using this option, it is
+    your responsibility to make sure the auxiliary field's type is
+    compatible with the target field.
 
 .. _ref-manytomany:
 
