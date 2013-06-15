@@ -371,7 +371,7 @@ displayed if the given array is empty or could not be found::
     {% for athlete in athlete_list %}
         <li>{{ athlete.name }}</li>
     {% empty %}
-        <li>Sorry, no athlete in this list!</li>
+        <li>Sorry, no athletes in this list.</li>
     {% endfor %}
     <ul>
 
