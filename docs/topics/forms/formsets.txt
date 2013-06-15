@@ -164,6 +164,23 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
+.. currentmodule:: django.forms.formsets.BaseFormSet
+
+.. method:: total_error_count(self)
+
+.. versionadded:: 1.6
+
+To check how many errors there are in the formset, we can use the
+``total_error_count`` method::
+
+    >>> # Using the previous example
+    >>> formset.errors
+    [{}, {'pub_date': [u'This field is required.']}]
+    >>> len(formset.errors)
+    2
+    >>> formset.total_error_count()
+    1
+
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
 

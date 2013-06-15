@@ -263,6 +263,13 @@ class BaseFormSet(object):
             self.full_clean()
         return self._errors
 
+    def total_error_count(self):
+        """
+        Returns the number of errors across all forms in the formset.
+        """
+        return len(self.non_form_errors()) +\
+            sum(len(form_errors) for form_errors in self.errors)
+
     def _should_delete_form(self, form):
         """
         Returns whether or not the form was marked for deletion.

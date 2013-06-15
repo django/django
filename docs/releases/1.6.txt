@@ -315,6 +315,9 @@ Minor features
   :class:`~django.contrib.admin.InlineModelAdmin` may be overridden to
   customize the extra and maximum number of inline forms.
 
+* Formsets now have a
+  :meth:`~django.forms.formsets.BaseFormSet.total_error_count` method.
+
 Backwards incompatible changes in 1.6
 =====================================
 
