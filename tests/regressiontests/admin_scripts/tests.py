@@ -920,6 +920,13 @@ class ManageAlternateSettings(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_style', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', '1')]")
         self.assertNoOutput(err)
 
+    def test_custom_command_output_style(self):
+        "alternate: manage.py output syntax color can be deactivated with the `--no-style` option"
+        args = ['noargs_command', '--no-style', '--settings=alternate_settings']
+        out, err = self.run_manage(args)
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_style', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', '1')]")
+        self.assertNoOutput(err)
+
 
 class ManageMultipleSettings(AdminScriptTestCase):
     """A series of tests for manage.py when multiple settings files
