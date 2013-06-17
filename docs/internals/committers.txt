@@ -526,6 +526,17 @@ Marc Tamlyn
 .. _CCBV: http://ccbv.co.uk/
 .. _Incuna Ltd: http://incuna.com/
 
+Baptiste Mispelon
+    Baptiste discovered Django around the 1.2 version and promptly switched away
+    from his homegrown PHP framework. He started getting more involved in the
+    project after attending DjangoCon EU 2012, mostly by triaging tickets and
+    submitting small patches.
+
+    Baptiste currently lives in Budapest, Hungary and works for `M2BPO`_,
+    a small French company providing services to architects.
+
+.. _M2BPO: http://www.m2bpo.fr
+
 Developers Emeritus
 ===================
 
