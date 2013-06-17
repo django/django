@@ -677,6 +677,7 @@ Miscellaneous
   needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
+
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by
   ``&`` and ``|``. These operators are now available using ``.bitand()`` and
   ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be consistent with
