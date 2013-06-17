@@ -47,7 +47,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     If setter is specified, it'll be called when you need to
     regenerate the password.
     """
-    if not password or not is_password_usable(encoded):
+    if not is_password_usable(encoded):
         return False
 
     preferred = get_hasher(preferred)
@@ -65,10 +65,10 @@ def make_password(password, salt=None, hasher='default'):
     Turn a plain-text password into a hash for database storage
 
     Same as encode() but generates a new random salt.  If
-    password is None or blank then UNUSABLE_PASSWORD will be
+    password is None then UNUSABLE_PASSWORD will be
     returned which disallows logins.
     """
-    if not password:
+    if password is None:
         return UNUSABLE_PASSWORD
 
     hasher = get_hasher(hasher)
@@ -222,7 +222,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         if not iterations:
             iterations = self.iterations
@@ -350,7 +350,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     algorithm = "sha1"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
@@ -378,7 +378,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     algorithm = "md5"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)

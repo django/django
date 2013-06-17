@@ -132,11 +132,27 @@ Methods
         password hashing. Doesn't save the
         :class:`~django.contrib.auth.models.User` object.
 
+        When the ``raw_password`` is ``None``, the password will be set to an
+        unusable password, as if
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        were used.
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally stored
+            as an unsable password.
+
     .. method:: check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally
+            considered to be an unusable password, resulting in this method
+            returning ``False`` for such a password.
 
     .. method:: set_unusable_password()
 

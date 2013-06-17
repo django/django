@@ -701,6 +701,15 @@ Miscellaneous
 * :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
   attribute which allows it to choose the target by reversing the URL.
 
+* In Django 1.4 and 1.5, a blank string was unintentionally not considered to
+  be a valid password. This meant
+  :meth:`~django.contrib.auth.models.User.set_password()` would save a blank
+  password as an unusable password like
+  :meth:`~django.contrib.auth.models.User.set_unusable_password()` does, and
+  thus :meth:`~django.contrib.auth.models.User.check_password()` always
+  returned ``False`` for blank passwords. This has been corrected in this
+  release: blank passwords are now valid.
+
 Features deprecated in 1.6
 ==========================
 
