@@ -15,7 +15,7 @@ def has_bom(fn):
             sample.startswith(codecs.BOM_UTF16_LE) or \
             sample.startswith(codecs.BOM_UTF16_BE)
 
-def compile_messages(stdout, locale=None):
+def compile_messages(stdout, locale=None, fuzzy=False):
     program = 'msgfmt'
     if find_command(program) is None:
         raise CommandError("Can't find %s. Make sure you have GNU gettext tools 0.15 or newer installed." % program)
@@ -47,6 +47,8 @@ def compile_messages(stdout, locale=None):
                         raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
                     pf = os.path.splitext(fn)[0]
                     args = [program, '--check-format', '-o', npath(pf + '.mo'), npath(pf + '.po')]
+                    if fuzzy:
+                        args.insert(1, '--use-fuzzy')
                     output, errors, status = popen_wrapper(args)
                     if status:
                         if errors:
@@ -60,6 +62,8 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--locale', '-l', dest='locale', action='append',
                     help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times, accepts a comma-separated list of locale names.'),
+        make_option('--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+                    help='pass --use-fuzzy option to msgfmt')
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
@@ -68,4 +72,5 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         locale = options.get('locale')
-        compile_messages(self.stdout, locale=locale)
+        fuzzy = options.get('fuzzy')
+        compile_messages(self.stdout, locale=locale, fuzzy=fuzzy)

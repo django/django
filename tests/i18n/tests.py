@@ -43,7 +43,7 @@ if find_command('xgettext'):
 if find_command('msgfmt'):
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
-        CompilationErrorHandling)
+        CompilationErrorHandling, FuzzyTranslationTest)
 from . import TransRealMixin
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel

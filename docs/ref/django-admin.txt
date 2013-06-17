@@ -125,18 +125,21 @@ the builtin gettext support. See :doc:`/topics/i18n/index`.
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process. If not provided, all locales are processed.
 
+You can pass ``--use-fuzzy`` option (or ``-f``) to include fuzzy
+translations into compiled file.
+
 Example usage::
 
     django-admin.py compilemessages --locale=pt_BR
     django-admin.py compilemessages --locale=pt_BR --locale=fr
-    django-admin.py compilemessages -l pt_BR
+    django-admin.py compilemessages -f -l pt_BR
     django-admin.py compilemessages -l pt_BR -l fr
-    django-admin.py compilemessages --locale=pt_BR,fr
+    django-admin.py compilemessages --locale=pt_BR,fr --use-fuzzy
     django-admin.py compilemessages -l pt_BR,fr
 
 .. versionchanged:: 1.6
 
-    Added the ability to specify multiple locales.
+Added the ability to specify multiple locales and ``--use-fuzzy`` option.
 
 createcachetable
 ----------------
