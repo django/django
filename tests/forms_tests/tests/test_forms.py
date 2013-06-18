@@ -1863,3 +1863,10 @@ class FormsTestCase(TestCase):
         form = SomeForm()
         self.assertHTMLEqual(form['custom'].label_tag(), '<label for="custom_id_custom">Custom:</label>')
         self.assertHTMLEqual(form['empty'].label_tag(), '<label>Empty:</label>')
+
+    def test_boundfield_empty_label(self):
+        class SomeForm(Form):
+            field = CharField(label='')
+        boundfield = SomeForm()['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')

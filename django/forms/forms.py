@@ -518,9 +518,8 @@ class BoundField(object):
         """
         contents = contents or self.label
         # Only add the suffix if the label does not end in punctuation.
-        if self.form.label_suffix:
-            if contents[-1] not in ':?.!':
-                contents = format_html('{0}{1}', contents, self.form.label_suffix)
+        if self.form.label_suffix and contents and contents[-1] not in ':?.!':
+            contents = format_html('{0}{1}', contents, self.form.label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
