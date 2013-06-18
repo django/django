@@ -1091,8 +1091,7 @@ class Query(object):
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                    parts, opts, alias, can_reuse, allow_many,
-                    allow_explicit_fk=True)
+                    parts, opts, alias, can_reuse, allow_many,)
             if can_reuse is not None:
                 can_reuse.update(join_list)
         except MultiJoin as e:
@@ -1237,15 +1236,14 @@ class Query(object):
                                      len(q_object.children))
         return target_clause
 
-    def names_to_path(self, names, opts, allow_many, allow_explicit_fk):
+    def names_to_path(self, names, opts, allow_many):
         """
         Walks the names path and turns them PathInfo tuples. Note that a
         single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
         'names' is the path of names to travle, 'opts' is the model Options we
-        start the name resolving from, 'allow_many' and 'allow_explicit_fk'
-        are as for setup_joins().
+        start the name resolving from, 'allow_many' is as for setup_joins().
 
         Returns a list of PathInfo tuples. In addition returns the final field
         (the last used join field), and target (which is a field guaranteed to
@@ -1258,17 +1256,9 @@ class Query(object):
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
-                for f in opts.fields:
-                    if allow_explicit_fk and name == f.attname:
-                        # XXX: A hack to allow foo_id to work in values() for
-                        # backwards compatibility purposes. If we dropped that
-                        # feature, this could be removed.
-                        field, model, direct, m2m = opts.get_field_by_name(f.name)
-                        break
-                else:
-                    available = opts.get_all_field_names() + list(self.aggregate_select)
-                    raise FieldError("Cannot resolve keyword %r into field. "
-                                     "Choices are: %s" % (name, ", ".join(available)))
+                available = opts.get_all_field_names() + list(self.aggregate_select)
+                raise FieldError("Cannot resolve keyword %r into field. "
+                                 "Choices are: %s" % (name, ", ".join(available)))
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
@@ -1314,7 +1304,7 @@ class Query(object):
         return path, final_field, targets
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
-                    allow_explicit_fk=False, outer_if_first=False):
+                    outer_if_first=False):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1329,9 +1319,6 @@ class Query(object):
         If 'allow_many' is False, then any reverse foreign key seen will
         generate a MultiJoin exception.
 
-        The 'allow_explicit_fk' controls if field.attname is allowed in the
-        lookups.
-
         Returns the final field involved in the joins, the target field (used
         for any 'where' constraint), the final 'opts' value, the joins and the
         field path travelled to generate the joins.
@@ -1345,7 +1332,7 @@ class Query(object):
         joins = [alias]
         # First, generate the path for the names
         path, final_field, targets = self.names_to_path(
-            names, opts, allow_many, allow_explicit_fk)
+            names, opts, allow_many)
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.

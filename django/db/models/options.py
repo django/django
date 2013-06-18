@@ -404,12 +404,13 @@ class Options(object):
         for f, model in self.get_all_related_objects_with_model():
             cache[f.field.related_query_name()] = (f, model, False, False)
         for f, model in self.get_m2m_with_model():
-            cache[f.name] = (f, model, True, True)
+            cache[f.name] = cache[f.attname] = (f, model, True, True)
         for f, model in self.get_fields_with_model():
-            cache[f.name] = (f, model, True, False)
+            cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
             if hasattr(f, 'related'):
-                cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
+                cache[f.name] = cache[f.attname] = (
+                    f.related, None if f.model == self.model else f.model, True, False)
         if app_cache_ready():
             self._name_map = cache
         return cache
