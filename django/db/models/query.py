@@ -941,8 +941,17 @@ class ValuesQuerySet(QuerySet):
 
         names = extra_names + field_names + aggregate_names
 
+        # If a field list has been specified, use it. Otherwise, use the
+        # full list of fields, including extras and aggregates.
+        if self._fields:
+            fields = list(self._fields) + [f for f in aggregate_names if f not in self._fields]
+        else:
+            fields = names
+
         for row in self.query.get_compiler(self.db).results_iter():
-            yield dict(zip(names, row))
+            # removes the non-necessary fields in the intersection
+            # between names and fields
+            yield dict((key, elem) for key, elem in zip(names, row) if key in fields)
 
     def delete(self):
         # values().delete() doesn't work currently - make sure it raises an
@@ -988,8 +997,13 @@ class ValuesQuerySet(QuerySet):
             self.aggregate_names = None
 
         self.query.select = []
+        # add fields that are required by order_by or extra_order_by and
+        # present in extra_select to extra_mask
+        order_by_fields = list(self.query.order_by or []) + list(self.query.extra_order_by or [])
+        extra_mask_names = list(self.extra_names or []) + \
+            [n for n in order_by_fields if n in self.query.extra_select]
         if self.extra_names is not None:
-            self.query.set_extra_mask(self.extra_names)
+            self.query.set_extra_mask(extra_mask_names)
         self.query.add_fields(self.field_names, True)
         if self.aggregate_names is not None:
             self.query.set_aggregate_mask(self.aggregate_names)
@@ -1063,8 +1077,12 @@ class ValuesQuerySet(QuerySet):
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
         if self.flat and len(self._fields) == 1:
+            # get fields that were added to extra_select_mask but are not
+            # expected in the value_list (e.g: a field was added to
+            # extra_select_mask because it was needed be an order by clause)
+            extra_fields = [f for f in self.query.extra_select_mask if f not in self._fields]
             for row in self.query.get_compiler(self.db).results_iter():
-                yield row[0]
+                yield row[len(extra_fields)]
         elif not self.query.extra_select and not self.query.aggregate_select:
             for row in self.query.get_compiler(self.db).results_iter():
                 yield tuple(row)
