@@ -67,9 +67,18 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
     }
     if thing_being_parsed:
         thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)
-    parts = docutils.core.publish_parts(text, source_path=thing_being_parsed,
-                destination_path=None, writer_name='html',
-                settings_overrides=overrides)
+    # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
+    # then restores it.
+    source = """
+.. default-role:: cmsreference
+
+%s
+
+.. default-role::
+"""
+    parts = docutils.core.publish_parts(source % text,
+                source_path=thing_being_parsed, destination_path=None,
+                writer_name='html', settings_overrides=overrides)
     return mark_safe(parts['fragment'])
 
 #
@@ -100,7 +109,6 @@ def default_reference_role(name, rawtext, text, lineno, inliner, options=None, c
 
 if docutils_is_available:
     docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
-    docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
 
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
