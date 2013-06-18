@@ -641,19 +641,20 @@ Oracle notes
 Django supports `Oracle Database Server`_ versions 9i and
 higher. Oracle version 10g or later is required to use Django's
 ``regex`` and ``iregex`` query operators. You will also need at least
-version 4.3.1 of the `cx_Oracle`_ Python driver.
+version 5.0.1 of the `cx_Oracle`_ Python driver.
 
-Note that due to a Unicode-corruption bug in ``cx_Oracle`` 5.0, that
-version of the driver should **not** be used with Django;
-``cx_Oracle`` 5.0.1 resolved this issue, so if you'd like to use a
-more recent ``cx_Oracle``, use version 5.0.1.
-
-``cx_Oracle`` 5.0.1 or greater can optionally be compiled with the
+``cx_Oracle`` can optionally be compiled with the
 ``WITH_UNICODE`` environment variable.  This is recommended but not
 required.
 
+.. versionchanged:: 1.6
+
+With Django 1.6, the required `cx_Oracle`_ version changed from 4.3.1 to 5.0.1.
+
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
+
+
 
 In order for the ``python manage.py syncdb`` command to work, your Oracle
 database user must have privileges to run the following commands:
