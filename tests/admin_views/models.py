@@ -687,3 +687,13 @@ class Simple(models.Model):
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
+
+
+class EmptyModelVisible(models.Model):
+    """ See ticket #11277. """
+
+class EmptyModelHidden(models.Model):
+    """ See ticket #11277. """
+
+class EmptyModelMixin(models.Model):
+    """ See ticket #11277. """
