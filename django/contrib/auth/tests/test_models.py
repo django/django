@@ -87,7 +87,7 @@ class UserManagerTestCase(TestCase):
         user = User.objects.create_user('user', email_lowercase)
         self.assertEqual(user.email, email_lowercase)
         self.assertEqual(user.username, 'user')
-        self.assertEqual(user.password, '!')
+        self.assertFalse(user.has_usable_password())
 
     def test_create_user_email_domain_normalize_rfc3696(self):
         # According to  http://tools.ietf.org/html/rfc3696#section-3

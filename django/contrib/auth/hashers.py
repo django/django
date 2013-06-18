@@ -17,7 +17,8 @@ from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_noop as _
 
 
-UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
 
@@ -30,7 +31,7 @@ def reset_hashers(**kwargs):
 
 
 def is_password_usable(encoded):
-    if encoded is None or encoded == UNUSABLE_PASSWORD:
+    if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
         return False
     try:
         hasher = identify_hasher(encoded)
@@ -64,13 +65,15 @@ def make_password(password, salt=None, hasher='default'):
     """
     Turn a plain-text password into a hash for database storage
 
-    Same as encode() but generates a new random salt.  If
-    password is None then UNUSABLE_PASSWORD will be
-    returned which disallows logins.
+    Same as encode() but generates a new random salt.
+    If password is None then a concatenation of
+    UNUSABLE_PASSWORD_PREFIX and a random string will be returned
+    which disallows logins. Additional random string reduces chances
+    of gaining access to staff or superuser accounts.
+    See ticket #20079 for more info.
     """
     if password is None:
-        return UNUSABLE_PASSWORD
-
+        return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
     hasher = get_hasher(hasher)
 
     if not salt:
