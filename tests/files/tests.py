@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import os
 import gzip
 import shutil
 import tempfile
@@ -150,15 +151,9 @@ class FileTests(unittest.TestCase):
 
 
 class FileMoveSafeTests(unittest.TestCase):
-    def setUp(self):
-        self.tmp_dir = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.tmp_dir)
-
     def test_file_move_overwrite(self):
-        (handle_a, self.file_a) = tempfile.mkstemp(dir=self.tmp_dir)
-        (handle_b, self.file_b) = tempfile.mkstemp(dir=self.tmp_dir)
+        handle_a, self.file_a = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        handle_b, self.file_b = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 
         # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
         self.assertRaises(IOError, lambda: file_move_safe(self.file_a, self.file_b, allow_overwrite=False))

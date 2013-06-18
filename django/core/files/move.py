@@ -51,9 +51,9 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         return
 
     try:
-        # If the destination file exists and allow_overwrite is False then issue an IOError
+        # If the destination file exists and allow_overwrite is False then raise an IOError
         if not allow_overwrite and os.access(new_file_name, os.F_OK):
-            raise IOError
+            raise IOError("Destination file %s exists and allow_overwrite is False" % new_file_name)
 
         os.rename(old_file_name, new_file_name)
         return
