@@ -406,6 +406,8 @@ class Options(object):
             cache[f.name] = (f, model, True, True)
         for f, model in self.get_fields_with_model():
             cache[f.name] = (f, model, True, False)
+            if f.attname != f.name:
+                cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
             if hasattr(f, 'related'):
                 cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
