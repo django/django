@@ -14,7 +14,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -29,7 +29,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if not encoded or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -231,7 +231,7 @@ class PasswordResetForm(forms.Form):
         for user in users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
-            if user.password == UNUSABLE_PASSWORD:
+            if not user.has_usable_password():
                 continue
             if not domain_override:
                 current_site = get_current_site(request)

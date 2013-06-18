@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
 from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
-    check_password, make_password, PBKDF2PasswordHasher, load_hashers,
-    PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
+    check_password, make_password, PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher,
+    get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
 from django.utils import six
 from django.utils import unittest
 from django.utils.unittest import skipUnless
@@ -173,13 +173,18 @@ class TestUtilsHashPass(unittest.TestCase):
 
     def test_unusable(self):
         encoded = make_password(None)
+        self.assertEqual(len(encoded), len(UNUSABLE_PASSWORD_PREFIX) + UNUSABLE_PASSWORD_SUFFIX_LENGTH)
         self.assertFalse(is_password_usable(encoded))
         self.assertFalse(check_password(None, encoded))
-        self.assertFalse(check_password(UNUSABLE_PASSWORD, encoded))
+        self.assertFalse(check_password(encoded, encoded))
+        self.assertFalse(check_password(UNUSABLE_PASSWORD_PREFIX, encoded))
         self.assertFalse(check_password('', encoded))
         self.assertFalse(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertRaises(ValueError, identify_hasher, encoded)
+        # Assert that the unusable passwords actually contain a random part.
+        # This might fail one day due to a hash collision.
+        self.assertNotEqual(encoded, make_password(None), "Random password collision?")
 
     def test_bad_algorithm(self):
         with self.assertRaises(ValueError):
