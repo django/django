@@ -22,7 +22,7 @@ from django.contrib.admin.util import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
+from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -3632,7 +3632,7 @@ class UserAdminTest(TestCase):
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
         self.assertEqual(User.objects.count(), user_count + 1)
-        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
+        self.assertTrue(new_user.has_usable_password())
 
     def test_save_continue_editing_button(self):
         user_count = User.objects.count()
@@ -3645,7 +3645,7 @@ class UserAdminTest(TestCase):
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/%s/' % new_user.pk)
         self.assertEqual(User.objects.count(), user_count + 1)
-        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
+        self.assertTrue(new_user.has_usable_password())
 
     def test_password_mismatch(self):
         response = self.client.post('/test_admin/admin/auth/user/add/', {
@@ -3691,7 +3691,7 @@ class UserAdminTest(TestCase):
         new_user = User.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
         self.assertEqual(User.objects.count(), user_count + 1)
-        self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
+        self.assertTrue(new_user.has_usable_password())
 
     def test_user_permission_performance(self):
         u = User.objects.all()[0]
