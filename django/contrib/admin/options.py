@@ -14,6 +14,7 @@ from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_o
 from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
+from django.utils.http import is_safe_url
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from django.core.paginator import Paginator
@@ -33,6 +34,7 @@ from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.http import urllib_parse
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -963,10 +965,17 @@ class ModelAdmin(BaseModelAdmin):
         when editing an existing object.
         """
         opts = self.model._meta
+        changelist_url = reverse('admin:%s_%s_changelist' %
+                                 (opts.app_label, opts.model_name),
+                                 current_app=self.admin_site.name)
+
+        changelist_filters = request.POST.get('_changelist_filters')
+        if changelist_filters:
+            return HttpResponseRedirect(
+                '%s?%s' % (changelist_url, changelist_filters))
+
         if self.has_change_permission(request, None):
-            post_url = reverse('admin:%s_%s_changelist' %
-                               (opts.app_label, opts.model_name),
-                               current_app=self.admin_site.name)
+            post_url = changelist_url
         else:
             post_url = reverse('admin:index',
                                current_app=self.admin_site.name)
@@ -1149,7 +1158,9 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = self.get_form(request, obj)
         formsets = []
         inline_instances = self.get_inline_instances(request, obj)
+        changelist_filters = None
         if request.method == 'POST':
+            changelist_filters = request.POST.get('_changelist_filters')
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
                 form_validated = True
@@ -1188,6 +1199,15 @@ class ModelAdmin(BaseModelAdmin):
                                   queryset=inline.get_queryset(request))
                 formsets.append(formset)
 
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                referer = urllib_parse.urlparse(referer)
+                changelist_url = reverse('admin:%s_%s_changelist' %
+                                         (opts.app_label, opts.model_name))
+                if is_safe_url(url=referer.geturl(), host=request.get_host()) \
+                        and referer.path.startswith(changelist_url):
+                    changelist_filters = referer.query
+
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
             self.get_prepopulated_fields(request, obj),
             self.get_readonly_fields(request, obj),
@@ -1214,6 +1234,7 @@ class ModelAdmin(BaseModelAdmin):
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
             'app_label': opts.app_label,
+            'changelist_filters': changelist_filters,
         }
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj, form_url=form_url)
@@ -1406,12 +1427,23 @@ class ModelAdmin(BaseModelAdmin):
                                        'obj': force_text(obj_display)},
                               messages.SUCCESS)
 
+            changelist_url = reverse('admin:%s_%s_changelist' %
+                                     (opts.app_label, opts.model_name),
+                                     current_app=self.admin_site.name)
+
+            changelist_filters = request.POST.get('_changelist_filters')
+            if changelist_filters:
+                return HttpResponseRedirect(
+                    '%s?%s' % (changelist_url, changelist_filters))
+
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect(reverse('admin:index',
                                                     current_app=self.admin_site.name))
-            return HttpResponseRedirect(reverse('admin:%s_%s_changelist' %
-                                        (opts.app_label, opts.model_name),
-                                        current_app=self.admin_site.name))
+            return HttpResponseRedirect(changelist_url)
+        else:
+            changelist_filters = request.GET.get('_changelist_filters')
+            if changelist_filters:
+                changelist_filters = unquote(changelist_filters)
 
         object_name = force_text(opts.verbose_name)
 
@@ -1429,6 +1461,7 @@ class ModelAdmin(BaseModelAdmin):
             "protected": protected,
             "opts": opts,
             "app_label": app_label,
+            "changelist_filters": changelist_filters,
         }
         context.update(extra_context or {})
 
