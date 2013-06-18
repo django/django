@@ -325,6 +325,11 @@ Minor features
   :ref:`see the updated recommendation <raising-validation-error>` for raising
   a ``ValidationError``.
 
+* :class:`~django.contrib.admin.ModelAdmin` now preserves filters on the list view
+  after creating, editing or deleting an object. It's possible to restore the previous
+  behavior of clearing filters by setting the
+  :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -633,6 +638,16 @@ will render something like:
 
 If you want to keep the current behavior of rendering ``label_tag`` without
 the ``label_suffix``, instantiate the form ``label_suffix=''``.
+
+Admin views ``_changelist_filters`` GET parameter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To achieve preserving and restoring list view filters, admin views now
+pass around the `_changelist_filters` GET parameter. It's important that you
+account for that change if you have custom admin templates or if your tests
+rely on the previous URLs. If you want to revert to the original behavior you
+can set the
+:attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
 
 Miscellaneous
 ~~~~~~~~~~~~~

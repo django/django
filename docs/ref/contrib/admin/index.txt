@@ -870,6 +870,14 @@ subclass::
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     nor ``ManyToManyField`` fields.
 
+.. attribute:: ModelAdmin.preserve_filters
+
+    .. versionadded:: 1.6
+
+    The admin now preserves filters on the list view after creating, editing
+    or deleting an object. You can restore the previous behavior of clearing
+    filters by setting this attribute to ``False``.
+
 .. attribute:: ModelAdmin.radio_fields
 
     By default, Django's admin uses a select-box interface (<select>) for

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.util import (lookup_field, display_for_field,
     display_for_value, label_for_field)
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
@@ -217,6 +218,7 @@ def items_for_result(cl, result, form):
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
+            url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
             # Convert the pk to something that can be used in Javascript.
             # Problem cases are long ints (23L) and non-ASCII strings.
             if cl.to_field:
