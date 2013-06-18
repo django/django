@@ -4157,3 +4157,156 @@ class AdminUserMessageTest(TestCase):
         self.assertContains(response,
                             '<li class="extra_tag info">Test tags</li>',
                             html=True)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminKeepChangeListFiltersTests(TestCase):
+    urls = "admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def get_changelist_filters_querystring(self):
+        return urlencode({
+            'is_superuser__exact': 0,
+            'is_staff__exact': 0,
+        })
+
+    def get_preserved_filters_querystring(self):
+        return urlencode({
+            '_changelist_filters': self.get_changelist_filters_querystring()
+        })
+
+    def get_sample_user_id(self):
+        return 104
+
+    def get_changelist_url(self):
+        return '%s?%s' % (
+            reverse('admin:auth_user_changelist'),
+            self.get_changelist_filters_querystring(),
+        )
+
+    def get_add_url(self):
+        return '%s?%s' % (
+            reverse('admin:auth_user_add'),
+            self.get_preserved_filters_querystring(),
+        )
+
+    def get_change_url(self, user_id=None):
+        if user_id is None:
+            user_id = self.get_sample_user_id()
+        return "%s?%s" % (
+            reverse('admin:auth_user_change', args=(user_id,)),
+            self.get_preserved_filters_querystring(),
+        )
+
+    def get_history_url(self, user_id=None):
+        if user_id is None:
+            user_id = self.get_sample_user_id()
+        return "%s?%s" % (
+            reverse('admin:auth_user_history', args=(user_id,)),
+            self.get_preserved_filters_querystring(),
+        )
+
+    def get_delete_url(self, user_id=None):
+        if user_id is None:
+            user_id = self.get_sample_user_id()
+        return "%s?%s" % (
+            reverse('admin:auth_user_delete', args=(user_id,)),
+            self.get_preserved_filters_querystring(),
+        )
+
+    def test_changelist_view(self):
+        response = self.client.get(self.get_changelist_url())
+        self.assertEqual(response.status_code, 200)
+
+        # Check the `change_view` link has the correct querystring.
+        detail_link = """<a href="%s">joepublic</a>""" % self.get_change_url()
+        self.assertContains(response, detail_link, count=1)
+
+    def test_change_view(self):
+        # Get the `change_view`.
+        response = self.client.get(self.get_change_url())
+        self.assertEqual(response.status_code, 200)
+
+        # Check the form action.
+        form_action = """<form enctype="multipart/form-data" action="?%s" method="post" id="user_form">""" % self.get_preserved_filters_querystring()
+        self.assertContains(response, form_action, count=1)
+
+        # Check the history link.
+        history_link = """<a href="%s" class="historylink">History</a>""" % self.get_history_url()
+        self.assertContains(response, history_link, count=1)
+
+        # Check the delete link.
+        delete_link = """<a href="%s" class="deletelink">Delete</a>""" % (self.get_delete_url())
+        self.assertContains(response, delete_link, count=1)
+
+        # Test redirect on "Save".
+        post_data = {
+            'username': 'joepublic',
+            'last_login_0': '2007-05-30',
+            'last_login_1': '13:20:10',
+            'date_joined_0': '2007-05-30',
+            'date_joined_1': '13:20:10',
+        }
+
+        post_data['_save'] = 1
+        response = self.client.post(self.get_change_url(), data=post_data)
+        self.assertRedirects(response, self.get_changelist_url())
+        post_data.pop('_save')
+
+        # Test redirect on "Save and continue".
+        post_data['_continue'] = 1
+        response = self.client.post(self.get_change_url(), data=post_data)
+        self.assertRedirects(response, self.get_change_url())
+        post_data.pop('_continue')
+
+        # Test redirect on "Save and add new".
+        post_data['_addanother'] = 1
+        response = self.client.post(self.get_change_url(), data=post_data)
+        self.assertRedirects(response, self.get_add_url())
+        post_data.pop('_addanother')
+
+    def test_add_view(self):
+        # Get the `add_view`.
+        response = self.client.get(self.get_add_url())
+        self.assertEqual(response.status_code, 200)
+    
+        # Check the form action.
+        form_action = """<form enctype="multipart/form-data" action="?%s" method="post" id="user_form">""" % self.get_preserved_filters_querystring()
+        self.assertContains(response, form_action, count=1)
+
+        # Test redirect on "Save".
+        post_data = {
+            'username': 'dummy',
+            'password1': 'test',
+            'password2': 'test',
+        }
+
+        post_data['_save'] = 1
+        response = self.client.post(self.get_add_url(), data=post_data)
+        self.assertRedirects(response, self.get_change_url(self.get_sample_user_id() + 1))
+        post_data.pop('_save')
+
+        # Test redirect on "Save and continue".
+        post_data['username'] = 'dummy2'
+        post_data['_continue'] = 1
+        response = self.client.post(self.get_add_url(), data=post_data)
+        self.assertRedirects(response, self.get_change_url(self.get_sample_user_id() + 2))
+        post_data.pop('_continue')
+
+        # Test redirect on "Save and add new".
+        post_data['username'] = 'dummy3'
+        post_data['_addanother'] = 1
+        response = self.client.post(self.get_add_url(), data=post_data)
+        self.assertRedirects(response, self.get_add_url())
+        post_data.pop('_addanother')
+
+    def test_delete_view(self):
+        # Test redirect on "Delete".
+        response = self.client.post(self.get_delete_url(), {'post': 'yes'})
+        self.assertRedirects(response, self.get_changelist_url())

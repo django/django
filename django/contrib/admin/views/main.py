@@ -59,6 +59,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
+        self.preserved_filters = model_admin.get_preserved_filters(request)
 
         # Get search parameters from the query string.
         try:
