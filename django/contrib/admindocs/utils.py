@@ -67,7 +67,8 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
     }
     if thing_being_parsed:
         thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)
-    parts = docutils.core.publish_parts(text, source_path=thing_being_parsed,
+    source = '.. default-role:: cmsreference\n\n%s' % text
+    parts = docutils.core.publish_parts(source, source_path=thing_being_parsed,
                 destination_path=None, writer_name='html',
                 settings_overrides=overrides)
     return mark_safe(parts['fragment'])
@@ -94,16 +95,12 @@ def create_reference_role(rolename, urlbase):
 def default_reference_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     if options is None: options = {}
     if content is None: content = []
-    context = getattr(inliner.document.settings, 'default_reference_context', None)
-    if context is None:
-        return _DOCUTILS_DEFAULT_INTERPRETED_ROLE(name, rawtext, text, lineno, inliner, options=options, content=content)
+    context = inliner.document.settings.default_reference_context
     node = docutils.nodes.reference(rawtext, text, refuri=(ROLES[context] % (inliner.document.settings.link_base, text.lower())), **options)
     return [node], []
 
 if docutils_is_available:
-    _DOCUTILS_DEFAULT_INTERPRETED_ROLE = docutils.parsers.rst.roles._role_registry[docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE]
     docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)
-    docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE = 'cmsreference'
 
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
