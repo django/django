@@ -40,6 +40,8 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.utils.encoding import force_text
 
+IS_POPUP_VAR = '_popup'
+
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
 get_ul_class = lambda x: 'radiolist%s' % (' inline' if x == HORIZONTAL else '')
@@ -660,8 +662,8 @@ class ModelAdmin(BaseModelAdmin):
         """
         # If self.actions is explicitly set to None that means that we don't
         # want *any* actions enabled on this page.
-        from django.contrib.admin.views.main import IS_POPUP_VAR
-        if self.actions is None or IS_POPUP_VAR in request.GET:
+        from django.contrib.admin.views.main import _is_changelist_popup
+        if self.actions is None or _is_changelist_popup(request):
             return SortedDict()
 
         actions = []
@@ -908,7 +910,7 @@ class ModelAdmin(BaseModelAdmin):
         msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
-        if "_popup" in request.POST:
+        if IS_POPUP_VAR in request.POST:
             return HttpResponse(
                 '<!DOCTYPE html><html><head><title></title></head><body>'
                 '<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script></body></html>' % \
@@ -1158,7 +1160,7 @@ class ModelAdmin(BaseModelAdmin):
         context = {
             'title': _('Add %s') % force_text(opts.verbose_name),
             'adminform': adminForm,
-            'is_popup': "_popup" in request.REQUEST,
+            'is_popup': IS_POPUP_VAR in request.REQUEST,
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
@@ -1251,7 +1253,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
-            'is_popup': "_popup" in request.REQUEST,
+            'is_popup': IS_POPUP_VAR in request.REQUEST,
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),

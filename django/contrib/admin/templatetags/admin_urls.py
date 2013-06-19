@@ -1,5 +1,3 @@
-from django.utils.http import urlencode
-
 try:
     from urllib.parse import parse_qsl, urlparse, urlunparse
 except ImportError:
@@ -8,6 +6,7 @@ except ImportError:
 from django import template
 from django.contrib.admin.util import quote
 from django.core.urlresolvers import resolve, Resolver404
+from django.utils.http import urlencode
 
 register = template.Library()
 
@@ -47,7 +46,8 @@ def add_preserved_filters(context, url, popup=False):
         merged_qs.update(preserved_filters)
 
     if popup:
-        merged_qs['_popup'] = 1
+        from django.contrib.admin.options import IS_POPUP_VAR
+        merged_qs[IS_POPUP_VAR] = 1
 
     merged_qs.update(parsed_qs)
 

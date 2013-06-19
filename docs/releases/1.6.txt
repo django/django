@@ -725,6 +725,12 @@ Miscellaneous
   returned ``False`` for blank passwords. This has been corrected in this
   release: blank passwords are now valid.
 
+* The admin :attr:`~django.contrib.admin.ModelAdmin.changelist_view` previously
+  accepted a ``pop`` GET parameter to signify it was to be displayed in a popup.
+  This parameter has been renamed to ``_popup`` to be consistent with the rest
+  of the admin views. You should update your custom templates if they use the
+  previous parameter name.
+
 Features deprecated in 1.6
 ==========================
 
