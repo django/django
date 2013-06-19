@@ -56,12 +56,26 @@ _error_files = []
 
 def code_changed():
     global _mtimes, _win
+    from django.conf import settings
     filenames = []
     for m in sys.modules.values():
         try:
             filenames.append(m.__file__)
         except AttributeError:
             pass
+
+    # Add the names of the .mo files that can be generated
+    # by compilemessages management command to the list of files watched.
+    basedirs = [os.path.join('conf', 'locale'), 'locale']
+    basedirs.extend(settings.LOCALE_PATHS)
+    basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
+    for basedir in basedirs:
+        for dirpath, dirnames, locale_filenames in os.walk(basedir):
+            for f in locale_filenames:
+                if f.endswith('.mo'):
+                    fn = os.path.join(dirpath, f)
+                    filenames.append(fn)
+
     for filename in filenames + _error_files:
         if not filename:
             continue

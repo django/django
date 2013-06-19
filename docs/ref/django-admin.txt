@@ -732,6 +732,8 @@ Django.)
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
+You also don't need to restart the server after running
+``django-admin.py compilemessages`` for translation changes to take effect.
 
 When you start the server, and each time you change Python code while the
 server is running, the server will validate all of your installed models. (See
