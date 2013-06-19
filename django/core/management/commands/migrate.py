@@ -5,7 +5,7 @@ import traceback
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
@@ -32,6 +32,7 @@ class Command(NoArgsCommand):
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
+        self.test_database = options.get('test_database', False)
 
         self.style = color_style()
 
@@ -144,14 +145,14 @@ class Command(NoArgsCommand):
                     # Create the model's database table, if it doesn't already exist.
                     if self.verbosity >= 3:
                         self.stdout.write("    Processing %s.%s model\n" % (app_name, model._meta.object_name))
-                    sql, references = connection.creation.sql_create_model(model, self.style, seen_models)
+                    sql, references = connection.creation.sql_create_model(model, no_style(), seen_models)
                     seen_models.add(model)
                     created_models.add(model)
                     for refto, refs in references.items():
                         pending_references.setdefault(refto, []).extend(refs)
                         if refto in seen_models:
-                            sql.extend(connection.creation.sql_for_pending_references(refto, self.style, pending_references))
-                    sql.extend(connection.creation.sql_for_pending_references(model, self.style, pending_references))
+                            sql.extend(connection.creation.sql_for_pending_references(refto, no_style(), pending_references))
+                    sql.extend(connection.creation.sql_for_pending_references(model, no_style(), pending_references))
                     if self.verbosity >= 1 and sql:
                         self.stdout.write("    Creating table %s\n" % model._meta.db_table)
                     for statement in sql:
@@ -172,7 +173,7 @@ class Command(NoArgsCommand):
         for app_name, model_list in manifest.items():
             for model in model_list:
                 if model in created_models:
-                    custom_sql = custom_sql_for_model(model, self.style, connection)
+                    custom_sql = custom_sql_for_model(model, no_style(), connection)
                     if custom_sql:
                         if self.verbosity >= 2:
                             self.stdout.write("    Installing custom SQL for %s.%s model\n" % (app_name, model._meta.object_name))
@@ -194,7 +195,7 @@ class Command(NoArgsCommand):
         for app_name, model_list in manifest.items():
             for model in model_list:
                 if model in created_models:
-                    index_sql = connection.creation.sql_indexes_for_model(model, self.style)
+                    index_sql = connection.creation.sql_indexes_for_model(model, no_style())
                     if index_sql:
                         if self.verbosity >= 2:
                             self.stdout.write("    Installing index for %s.%s model\n" % (app_name, model._meta.object_name))

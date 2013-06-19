@@ -1,12 +1,12 @@
 # encoding: utf8
-from django.test import TransactionTestCase
-from django.db.migrations.autodetector import MigrationAutodetector
+from django.test import TestCase
+from django.db.migrations.autodetector import MigrationAutodetector, MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
 from django.db import models
 
 
-class AutodetectorTests(TransactionTestCase):
+class AutodetectorTests(TestCase):
     """
     Tests the migration autodetector.
     """
@@ -14,6 +14,7 @@ class AutodetectorTests(TransactionTestCase):
     author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
+    third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
 
     def make_project_state(self, model_states):
         "Shortcut to make ProjectStates from lists of predefined models"
@@ -43,6 +44,23 @@ class AutodetectorTests(TransactionTestCase):
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
         self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
+
+    def test_trim_apps(self):
+        "Tests that trim does not remove dependencies but does remove unwanted apps"
+        # Use project state to make a new migration change set
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable, self.third_thing])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_initial": True}))
+        changes = autodetector.changes()
+        # Run through arrange_for_graph
+        graph = MigrationGraph()
+        changes = autodetector.arrange_for_graph(changes, graph)
+        changes["testapp"][0].dependencies.append(("otherapp", "0001_initial"))
+        changes = autodetector.trim_to_apps(changes, set(["testapp"]))
+        # Make sure there's the right set of migrations
+        self.assertEqual(changes["testapp"][0].name, "0001_initial")
+        self.assertEqual(changes["otherapp"][0].name, "0001_initial")
+        self.assertNotIn("thirdapp", changes)
 
     def test_new_model(self):
         "Tests autodetection of new models"

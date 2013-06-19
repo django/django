@@ -49,7 +49,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % node)
+            raise ValueError("Node %r not a valid node" % (node, ))
         return self.dfs(node, lambda x: self.dependencies.get(x, set()))
 
     def backwards_plan(self, node):
@@ -60,7 +60,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % node)
+            raise ValueError("Node %r not a valid node" % (node, ))
         return self.dfs(node, lambda x: self.dependents.get(x, set()))
 
     def root_nodes(self):
@@ -120,11 +120,16 @@ class MigrationGraph(object):
     def __str__(self):
         return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
 
-    def project_state(self, nodes, at_end=True):
+    def project_state(self, nodes=None, at_end=True):
         """
         Given a migration node or nodes, returns a complete ProjectState for it.
         If at_end is False, returns the state before the migration has run.
+        If nodes is not provided, returns the overall most current project state.
         """
+        if nodes is None:
+            nodes = list(self.leaf_nodes())
+        if len(nodes) == 0:
+            return ProjectState()
         if not isinstance(nodes[0], tuple):
             nodes = [nodes]
         plan = []

@@ -60,3 +60,10 @@ class MigrationRecorder(object):
         """
         self.ensure_schema()
         self.Migration.objects.filter(app=app, name=name).delete()
+
+    @classmethod
+    def flush(cls):
+        """
+        Deletes all migration records. Useful if you're testing migrations.
+        """
+        cls.Migration.objects.all().delete()

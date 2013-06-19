@@ -17,6 +17,8 @@ class SchemaTests(TransactionTestCase):
     as sometimes the code to check if a test has worked is almost as complex
     as the code it is testing.
     """
+    
+    available_apps = []
 
     models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest]
     no_table_strings = ["no such table", "unknown table", "does not exist"]

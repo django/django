@@ -1,6 +1,8 @@
 import re
+from django.utils.six.moves import input
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
+from django.db.models.loading import cache
 
 
 class MigrationAutodetector(object):
@@ -16,9 +18,10 @@ class MigrationAutodetector(object):
     if it wishes, with the caveat that it may not always be possible.
     """
 
-    def __init__(self, from_state, to_state):
+    def __init__(self, from_state, to_state, questioner=None):
         self.from_state = from_state
         self.to_state = to_state
+        self.questioner = questioner or MigrationQuestioner()
 
     def changes(self):
         """
@@ -54,7 +57,7 @@ class MigrationAutodetector(object):
                     model_state.name,
                 )
             )
-        # Alright, now sort out and return the migrations
+        # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):
                 m2.dependencies.append((app_label, m1.name))
@@ -67,6 +70,77 @@ class MigrationAutodetector(object):
             instance = subclass("auto_%i" % (len(migrations) + 1), app_label)
             migrations.append(instance)
         migrations[-1].operations.append(operation)
+
+    def arrange_for_graph(self, changes, graph):
+        """
+        Takes in a result from changes() and a MigrationGraph,
+        and fixes the names and dependencies of the changes so they
+        extend the graph from the leaf nodes for each app.
+        """
+        leaves = graph.leaf_nodes()
+        name_map = {}
+        for app_label, migrations in list(changes.items()):
+            if not migrations:
+                continue
+            # Find the app label's current leaf node
+            app_leaf = None
+            for leaf in leaves:
+                if leaf[0] == app_label:
+                    app_leaf = leaf
+                    break
+            # Do they want an initial migration for this app?
+            if app_leaf is None and not self.questioner.ask_initial(app_label):
+                # They don't.
+                for migration in migrations:
+                    name_map[(app_label, migration.name)] = (app_label, "__first__")
+                del changes[app_label]
+            # Work out the next number in the sequence
+            if app_leaf is None:
+                next_number = 1
+            else:
+                next_number = (self.parse_number(app_leaf[1]) or 0) + 1
+            # Name each migration
+            for i, migration in enumerate(migrations):
+                if i == 0 and app_leaf:
+                    migration.dependencies.append(app_leaf)
+                if i == 0 and not app_leaf:
+                    new_name = "0001_initial"
+                else:
+                    new_name = "%04i_%s" % (next_number, self.suggest_name(migration.operations))
+                name_map[(app_label, migration.name)] = (app_label, new_name)
+                migration.name = new_name
+        # Now fix dependencies
+        for app_label, migrations in changes.items():
+            for migration in migrations:
+                migration.dependencies = [name_map.get(d, d) for d in migration.dependencies]
+        return changes
+
+    def trim_to_apps(self, changes, app_labels):
+        """
+        Takes changes from arrange_for_graph and set of app labels and
+        returns a modified set of changes which trims out as many migrations
+        that are not in app_labels as possible.
+        Note that some other migrations may still be present, as they may be
+        required dependencies.
+        """
+        # Gather other app dependencies in a first pass
+        app_dependencies = {}
+        for app_label, migrations in changes.items():
+            for migration in migrations:
+                for dep_app_label, name in migration.dependencies:
+                    app_dependencies.setdefault(app_label, set()).add(dep_app_label)
+        required_apps = set(app_labels)
+        # Keep resolving till there's no change
+        old_required_apps = None
+        while old_required_apps != required_apps:
+            old_required_apps = set(required_apps)
+            for app_label in list(required_apps):
+                required_apps.update(app_dependencies.get(app_label, set()))
+        # Remove all migrations that aren't needed
+        for app_label in list(changes.keys()):
+            if app_label not in required_apps:
+                del changes[app_label]
+        return changes
 
     @classmethod
     def suggest_name(cls, ops):
@@ -94,41 +168,40 @@ class MigrationAutodetector(object):
             return int(name.split("_")[0])
         return None
 
-    @classmethod
-    def arrange_for_graph(cls, changes, graph):
-        """
-        Takes in a result from changes() and a MigrationGraph,
-        and fixes the names and dependencies of the changes so they
-        extend the graph from the leaf nodes for each app.
-        """
-        leaves = graph.leaf_nodes()
-        name_map = {}
-        for app_label, migrations in changes.items():
-            if not migrations:
-                continue
-            # Find the app label's current leaf node
-            app_leaf = None
-            for leaf in leaves:
-                if leaf[0] == app_label:
-                    app_leaf = leaf
-                    break
-            # Work out the next number in the sequence
-            if app_leaf is None:
-                next_number = 1
-            else:
-                next_number = (cls.parse_number(app_leaf[1]) or 0) + 1
-            # Name each migration
-            for i, migration in enumerate(migrations):
-                if i == 0 and app_leaf:
-                    migration.dependencies.append(app_leaf)
-                if i == 0 and not app_leaf:
-                    new_name = "0001_initial"
-                else:
-                    new_name = "%04i_%s" % (next_number, cls.suggest_name(migration.operations))
-                name_map[(app_label, migration.name)] = (app_label, new_name)
-                migration.name = new_name
-        # Now fix dependencies
-        for app_label, migrations in changes.items():
-            for migration in migrations:
-                migration.dependencies = [name_map.get(d, d) for d in migration.dependencies]
-        return changes
+
+class MigrationQuestioner(object):
+    """
+    Gives the autodetector responses to questions it might have.
+    This base class has a built-in noninteractive mode, but the
+    interactive subclass is what the command-line arguments will use.
+    """
+
+    def __init__(self, defaults=None):
+        self.defaults = defaults or {}
+
+    def ask_initial(self, app_label):
+        "Should we create an initial migration for the app?"
+        return self.defaults.get("ask_initial", False)
+
+
+class InteractiveMigrationQuestioner(MigrationQuestioner):
+
+    def __init__(self, specified_apps=set()):
+        self.specified_apps = specified_apps
+
+    def _boolean_input(self, question):
+        result = input("%s " % question)
+        while len(result) < 1 or result[0].lower() not in "yn":
+            result = input("Please answer yes or no: ")
+        return result[0].lower() == "y"
+
+    def ask_initial(self, app_label):
+        # Don't ask for django.contrib apps
+        app = cache.get_app(app_label)
+        if app.__name__.startswith("django.contrib"):
+            return False
+        # If it was specified on the command line, definitely true
+        if app_label in self.specified_apps:
+            return True
+        # Now ask
+        return self._boolean_input("Do you want to enable migrations for app '%s'?" % app_label)
