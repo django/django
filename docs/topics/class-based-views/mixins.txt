@@ -559,9 +559,11 @@ template as ``AuthorDisplay`` is using on ``GET``.
         model = Author
 
         def get_context_data(self, **kwargs):
+            self.object = self.get_object()
             context = {
-                'object': self.get_object(),
+                'object': self.object,
             }
+            context.update(**kwargs)
             return super(AuthorInterest, self).get_context_data(**context)
 
         def get_success_url(self):
