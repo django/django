@@ -37,7 +37,7 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the `authentication backend reference
+See the :ref:`authentication backend reference
 <authentication-backends-reference>` for information on the authentication
 backends included with Django.
 
