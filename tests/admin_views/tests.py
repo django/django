@@ -4289,14 +4289,14 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         post_data['_save'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertRedirects(response, self.get_change_url(self.get_sample_user_id() + 1))
+        self.assertRedirects(response, self.get_change_url(User.objects.latest('pk').pk))
         post_data.pop('_save')
 
         # Test redirect on "Save and continue".
         post_data['username'] = 'dummy2'
         post_data['_continue'] = 1
         response = self.client.post(self.get_add_url(), data=post_data)
-        self.assertRedirects(response, self.get_change_url(self.get_sample_user_id() + 2))
+        self.assertRedirects(response, self.get_change_url(User.objects.latest('pk').pk))
         post_data.pop('_continue')
 
         # Test redirect on "Save and add new".
