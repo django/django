@@ -4,6 +4,7 @@ from django.utils.functional import cached_property
 from django.db.models.loading import cache
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
+from django.conf import settings
 
 
 class MigrationLoader(object):
@@ -36,6 +37,12 @@ class MigrationLoader(object):
         self.disk_migrations = None
         self.applied_migrations = None
 
+    def migration_module(self, app_label):
+        if app_label in settings.MIGRATION_MODULES:
+            return settings.MIGRATION_MODULES[app_label]
+        app = cache.get_app(app_label)
+        return ".".join(app.__name__.split(".")[:-1] + ["migrations"])
+
     def load_disk(self):
         """
         Loads the migrations from all INSTALLED_APPS from disk.
@@ -44,8 +51,8 @@ class MigrationLoader(object):
         self.unmigrated_apps = set()
         for app in cache.get_apps():
             # Get the migrations module directory
-            module_name = ".".join(app.__name__.split(".")[:-1] + ["migrations"])
-            app_label = module_name.split(".")[-2]
+            app_label = app.__name__.split(".")[-2]
+            module_name = self.migration_module(app_label)
             try:
                 module = import_module(module_name)
             except ImportError as e:

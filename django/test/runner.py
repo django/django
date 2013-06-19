@@ -266,7 +266,7 @@ def setup_databases(verbosity, interactive, **kwargs):
     # Second pass -- actually create the databases.
     old_names = []
     mirrors = []
-
+    
     for signature, (db_name, aliases) in dependency_ordered(
         test_databases.items(), dependencies):
         test_db_name = None

@@ -1,4 +1,5 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
+from django.test.utils import override_settings
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -30,12 +31,13 @@ class RecorderTests(TestCase):
         )
 
 
-class LoaderTests(TransactionTestCase):
+class LoaderTests(TestCase):
     """
     Tests the disk and database loader, and running through migrations
     in memory.
     """
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_load(self):
         """
         Makes sure the loader can load the migrations for the test apps,

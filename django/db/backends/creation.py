@@ -331,14 +331,15 @@ class BaseDatabaseCreation(object):
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
-        # Report syncdb messages at one level lower than that requested.
+        # Report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded)
-        call_command('syncdb',
+        call_command('migrate',
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias,
-            load_initial_data=False)
+            load_initial_data=False,
+            test_database=True)
 
         # We need to then do a flush to ensure that any data installed by
         # custom SQL has been removed. The only test data should come from

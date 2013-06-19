@@ -1,4 +1,5 @@
 from django.test import TransactionTestCase
+from django.test.utils import override_settings
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
@@ -11,6 +12,9 @@ class ExecutorTests(TransactionTestCase):
     test failures first, as they may be propagating into here.
     """
 
+    available_apps = ["migrations"]
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
         """
         Tests running a simple set of migrations.

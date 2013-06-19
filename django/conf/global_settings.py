@@ -602,3 +602,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+##############
+# MIGRATIONS #
+##############
+
+# Migration module overrides for apps, by app label.
+MIGRATION_MODULES = {}

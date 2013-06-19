@@ -1,12 +1,12 @@
 # encoding: utf8
 import datetime
 from django.utils import six
-from django.test import TransactionTestCase
+from django.test import TestCase
 from django.db.migrations.writer import MigrationWriter
 from django.db import models, migrations
 
 
-class WriterTests(TransactionTestCase):
+class WriterTests(TestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
     """

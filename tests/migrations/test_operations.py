@@ -1,9 +1,9 @@
-from django.test import TransactionTestCase
+from django.test import TestCase
 from django.db import connection, models, migrations
 from django.db.migrations.state import ProjectState
 
 
-class OperationTests(TransactionTestCase):
+class OperationTests(TestCase):
     """
     Tests running the operations and making sure they do what they say they do.
     Each test looks at their state changing, and then their database operation -
