@@ -5,7 +5,6 @@ HTML Widget classes
 from __future__ import absolute_import, unicode_literals
 
 import copy
-import datetime
 from itertools import chain
 try:
     from urllib.parse import urljoin
@@ -16,8 +15,8 @@ import warnings
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.html import conditional_escape, format_html, format_html_join
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.html import conditional_escape, format_html
+from django.utils.translation import ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six

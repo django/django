@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-from datetime import date
-
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, oracle, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase

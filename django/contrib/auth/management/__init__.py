@@ -4,7 +4,6 @@ Creates permissions for all installed apps that need permissions.
 from __future__ import unicode_literals
 
 import getpass
-import locale
 import unicodedata
 
 from django.contrib.auth import models as auth_app, get_user_model

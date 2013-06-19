@@ -13,7 +13,6 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
-from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils._os import upath
 from django.test import TestCase
@@ -23,7 +22,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
-                SetPasswordForm, PasswordResetForm)
+                SetPasswordForm)
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.views import login as login_view
 

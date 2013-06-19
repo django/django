@@ -17,7 +17,6 @@ from django.utils.importlib import import_module
 from django.utils._os import upath
 from django.utils import six
 from django.utils.translation import ugettext as _
-from django.utils.safestring import mark_safe
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')

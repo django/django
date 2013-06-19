@@ -1,4 +1,3 @@
-import os
 from optparse import make_option
 from django.contrib.gis import gdal
 from django.core.management.base import LabelCommand, CommandError

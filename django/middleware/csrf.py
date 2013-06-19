@@ -6,10 +6,8 @@ against request forgeries from other sites.
 """
 from __future__ import unicode_literals
 
-import hashlib
 import logging
 import re
-import random
 
 from django.conf import settings
 from django.core.urlresolvers import get_callable
