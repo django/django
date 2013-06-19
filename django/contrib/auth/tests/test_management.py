@@ -174,6 +174,13 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 
 class CustomUserModelValidationTestCase(TestCase):
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    def test_required_fields_is_list(self):
+        "REQUIRED_FIELDS should be a list."
+        new_io = StringIO()
+        get_validation_errors(new_io, get_app('auth'))
+        self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
+
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."

@@ -121,6 +121,13 @@ GeoDjango now provides :ref:`form fields and widgets <ref-gis-forms-api>` for
 its geo-specialized fields. They are OpenLayers-based by default, but they can
 be customized to use any other JS framework.
 
+``checksetup`` management command added for verifying compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``checksetup`` management command was added, enabling you to verify if your
+current configuration (currently oriented at settings) is compatible with the
+current version of Django.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -236,9 +243,14 @@ Minor features
 .. _`Pillow`: https://pypi.python.org/pypi/Pillow
 .. _`PIL`: https://pypi.python.org/pypi/PIL
 
-* :doc:`ModelForm </topics/forms/modelforms/>` accepts a new
-  Meta option: ``localized_fields``. Fields included in this list will be localized
-  (by setting ``localize`` on the form field).
+* :class:`~django.forms.ModelForm` accepts several new ``Meta``
+  options.
+
+  * Fields included in the ``localized_fields`` list will be localized
+    (by setting ``localize`` on the form field).
+  * The  ``labels``, ``help_texts`` and ``error_messages`` options may be used
+    to customize the default fields, see
+    :ref:`modelforms-overriding-default-fields` for details.
 
 * The ``choices`` argument to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
@@ -302,6 +314,21 @@ Minor features
   :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num` methods on
   :class:`~django.contrib.admin.InlineModelAdmin` may be overridden to
   customize the extra and maximum number of inline forms.
+
+* Formsets now have a
+  :meth:`~django.forms.formsets.BaseFormSet.total_error_count` method.
+
+* :class:`~django.forms.ModelForm` fields can now override error messages
+  defined in model fields by using the
+  :attr:`~django.forms.Field.error_messages` argument of a ``Field``'s
+  constructor. To take advantage of this new feature with your custom fields,
+  :ref:`see the updated recommendation <raising-validation-error>` for raising
+  a ``ValidationError``.
+
+* :class:`~django.contrib.admin.ModelAdmin` now preserves filters on the list view
+  after creating, editing or deleting an object. It's possible to restore the previous
+  behavior of clearing filters by setting the
+  :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
 
 Backwards incompatible changes in 1.6
 =====================================
@@ -581,6 +608,47 @@ It is still possible to convert the fetched rows to ``Model`` objects
 lazily by using the :meth:`~django.db.models.query.QuerySet.iterator()`
 method.
 
+:meth:`BoundField.label_tag<django.forms.BoundField.label_tag>` now includes the form's :attr:`~django.forms.Form.label_suffix`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is consistent with how methods like
+:meth:`Form.as_p<django.forms.Form.as_p>` and
+:meth:`Form.as_ul<django.forms.Form.as_ul>` render labels.
+
+If you manually render ``label_tag`` in your templates:
+
+.. code-block:: html+django
+
+    {{ form.my_field.label_tag }}: {{ form.my_field }}
+
+you'll want to remove the semicolon (or whatever other separator you may be
+using) to avoid duplicating it when upgrading to Django 1.6. The following
+template in Django 1.6 will render identically to the above template in Django
+1.5, except that the semicolon will appear inside the ``<label>`` element.
+
+.. code-block:: html+django
+
+     {{ form.my_field.label_tag }} {{ form.my_field }}
+
+will render something like:
+
+.. code-block:: html
+
+    <label for="id_my_field">My Field:</label> <input id="id_my_field" type="text" name="my_field" />
+
+If you want to keep the current behavior of rendering ``label_tag`` without
+the ``label_suffix``, instantiate the form ``label_suffix=''``.
+
+Admin views ``_changelist_filters`` GET parameter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To achieve preserving and restoring list view filters, admin views now
+pass around the `_changelist_filters` GET parameter. It's important that you
+account for that change if you have custom admin templates or if your tests
+rely on the previous URLs. If you want to revert to the original behavior you
+can set the
+:attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -633,6 +701,29 @@ Miscellaneous
 * :meth:`django.test.client.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the
   :func:`~django.contrib.auth.signals.user_logged_out` signal.
+
+* :ref:`Authentication views <built-in-auth-views>` are now reversed by name,
+  not their locations in ``django.contrib.auth.views``. If you are using the
+  views without a ``name``, you should update your ``urlpatterns`` to use
+  :meth:`~django.conf.urls.url` with the ``name`` parameter. For example::
+
+    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete')
+
+  becomes::
+
+    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
+
+* :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
+  attribute which allows it to choose the target by reversing the URL.
+
+* In Django 1.4 and 1.5, a blank string was unintentionally not considered to
+  be a valid password. This meant
+  :meth:`~django.contrib.auth.models.User.set_password()` would save a blank
+  password as an unusable password like
+  :meth:`~django.contrib.auth.models.User.set_unusable_password()` does, and
+  thus :meth:`~django.contrib.auth.models.User.check_password()` always
+  returned ``False`` for blank passwords. This has been corrected in this
+  release: blank passwords are now valid.
 
 Features deprecated in 1.6
 ==========================

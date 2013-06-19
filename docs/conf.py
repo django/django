@@ -77,6 +77,9 @@ django_next_version = '1.6'
 # for a list of supported languages.
 #language = None
 
+# Location for .po/.mo translation files used when language is set
+locale_dirs = ['locale/']
+
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
 #today = ''

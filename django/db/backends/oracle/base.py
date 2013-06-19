@@ -340,17 +340,17 @@ WHEN (new.%(col_name)s IS NULL)
     def savepoint_rollback_sql(self, sid):
         return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
         # 'TRUNCATE z;'... style SQL statements
         if tables:
             # Oracle does support TRUNCATE, but it seems to get us into
             # FK referential trouble, whereas DELETE FROM table works.
-            sql = ['%s %s %s;' % \
-                    (style.SQL_KEYWORD('DELETE'),
-                     style.SQL_KEYWORD('FROM'),
-                     style.SQL_FIELD(self.quote_name(table)))
-                    for table in tables]
+            sql = ['%s %s %s;' % (
+                style.SQL_KEYWORD('DELETE'),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_FIELD(self.quote_name(table))
+            ) for table in tables]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))

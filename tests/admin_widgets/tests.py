@@ -470,9 +470,11 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
     urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_show_hide_date_time_picker_widgets(self):
         """
@@ -526,9 +528,11 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
     urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
         self.lisa = models.Student.objects.create(name='Lisa')

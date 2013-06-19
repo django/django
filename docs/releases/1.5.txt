@@ -440,7 +440,15 @@ generation.
 This signal is now sent after the content is fully consumed by the WSGI
 gateway. This might be backwards incompatible if you rely on the signal being
 fired before sending the response content to the client. If you do, you should
-consider using a middleware instead.
+consider using :doc:`middleware </topics/http/middleware>` instead.
+
+.. note::
+
+    Some WSGI servers and middleware do not always call ``close`` on the
+    response object after handling a request, most notably uWSGI prior to 1.2.6
+    and Sentry's error reporting middleware up to 2.0.7. In those cases the
+    ``request_finished`` signal isn't sent at all. This can result in idle
+    connections to database and memcache servers.
 
 OPTIONS, PUT and DELETE requests in the test client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

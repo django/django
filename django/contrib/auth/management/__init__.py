@@ -11,7 +11,7 @@ from django.contrib.auth import models as auth_app, get_user_model
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import get_models, signals
+from django.db.models import get_model, get_models, signals, UnavailableApp
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
 from django.utils.six.moves import input
@@ -60,6 +60,11 @@ def _check_permission_clashing(custom, builtin, ctype):
         pool.add(codename)
 
 def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kwargs):
+    try:
+        get_model('auth', 'Permission')
+    except UnavailableApp:
+        return
+
     if not router.allow_syncdb(db, auth_app.Permission):
         return
 
@@ -101,9 +106,13 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):
-    from django.core.management import call_command
+    try:
+        get_model('auth', 'Permission')
+        UserModel = get_user_model()
+    except UnavailableApp:
+        return
 
-    UserModel = get_user_model()
+    from django.core.management import call_command
 
     if UserModel in created_models and kwargs.get('interactive', True):
         msg = ("\nYou just installed Django's auth system, which means you "

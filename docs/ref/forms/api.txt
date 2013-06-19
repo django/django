@@ -498,6 +498,8 @@ include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
 
+.. attribute:: Form.label_suffix
+
 Normally, a colon (``:``) will be appended after any label name when a form is
 rendered. It's possible to change the colon to another character, or omit it
 entirely, using the ``label_suffix`` parameter::
@@ -650,11 +652,16 @@ To separately render the label tag of a form field, you can call its
 
     >>> f = ContactForm(data)
     >>> print(f['message'].label_tag())
-    <label for="id_message">Message</label>
+    <label for="id_message">Message:</label>
 
 Optionally, you can provide the ``contents`` parameter which will replace the
 auto-generated label tag. An optional ``attrs`` dictionary may contain
 additional attributes for the ``<label>`` tag.
+
+.. versionchanged:: 1.6
+
+    The label now includes the form's :attr:`~django.forms.Form.label_suffix`
+    (a semicolon, by default).
 
 .. method:: BoundField.css_classes()
 
@@ -687,6 +694,29 @@ by a ``Widget``::
     welcome
     >>> print(bound_form['subject'].value())
     hi
+
+.. attribute:: BoundField.id_for_label
+
+Use this property to render the ID of this field. For example, if you are
+manually constructing a ``<label>`` in your template (despite the fact that
+:meth:`~BoundField.label_tag` will do this for you):
+
+.. code-block:: html+django
+
+    <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
+
+By default, this will be the field's name prefixed by ``id_``
+("``id_my_field``" for the example above). You may modify the ID by setting
+:attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+declaring a field like this::
+
+    my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
+
+and using the template above, would render something like:
+
+.. code-block:: html
+
+    <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
 
 .. _binding-uploaded-files:
 

@@ -3,7 +3,7 @@
 Formsets
 ========
 
-.. class:: django.forms.formset.BaseFormSet
+.. class:: django.forms.formsets.BaseFormSet
 
 A formset is a layer of abstraction to work with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
@@ -164,6 +164,23 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
+.. currentmodule:: django.forms.formsets.BaseFormSet
+
+.. method:: total_error_count(self)
+
+.. versionadded:: 1.6
+
+To check how many errors there are in the formset, we can use the
+``total_error_count`` method::
+
+    >>> # Using the previous example
+    >>> formset.errors
+    [{}, {'pub_date': [u'This field is required.']}]
+    >>> len(formset.errors)
+    2
+    >>> formset.total_error_count()
+    1
+
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
 
@@ -247,8 +264,7 @@ is where you define your own validation that works at the formset level::
     ...             # Don't bother validating the formset unless each form is valid on its own
     ...             return
     ...         titles = []
-    ...         for i in range(0, self.total_form_count()):
-    ...             form = self.forms[i]
+    ...         for form in self.forms:
     ...             title = form.cleaned_data['title']
     ...             if title in titles:
     ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")

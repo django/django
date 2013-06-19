@@ -12,6 +12,8 @@ from django.utils import unittest, six
 @override_settings(TEST='override')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
+    available_apps = []
+
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
 

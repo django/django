@@ -13,6 +13,13 @@ from swappable_models.models import Article
 
 
 class SwappableModelTests(TestCase):
+
+    available_apps = [
+        'swappable_models',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
+
     def setUp(self):
         # This test modifies the installed apps, so we need to make sure
         # we're not dealing with a cached app list.

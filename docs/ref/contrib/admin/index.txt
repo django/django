@@ -870,6 +870,14 @@ subclass::
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     nor ``ManyToManyField`` fields.
 
+.. attribute:: ModelAdmin.preserve_filters
+
+    .. versionadded:: 1.6
+
+    The admin now preserves filters on the list view after creating, editing
+    or deleting an object. You can restore the previous behavior of clearing
+    filters by setting this attribute to ``False``.
+
 .. attribute:: ModelAdmin.radio_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -2269,9 +2277,9 @@ your URLconf. Specifically, add these four patterns:
 .. code-block:: python
 
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
-    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+    url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', name='password_reset_confirm'),
+    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app

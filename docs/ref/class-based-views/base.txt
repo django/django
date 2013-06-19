@@ -192,22 +192,24 @@ RedirectView
 
             permanent = False
             query_string = True
+            pattern_name = 'article-detail'
 
-            def get_redirect_url(self, pk):
+            def get_redirect_url(self, *args, **kwargs):
                 article = get_object_or_404(Article, pk=pk)
                 article.update_counter()
-                return reverse('product_detail', args=(pk,))
+                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView
+        from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = patterns('',
 
-            url(r'^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
@@ -217,6 +219,11 @@ RedirectView
 
         The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
         HTTP error.
+
+    .. attribute:: pattern_name
+
+        The name of the URL pattern to redirect to. Reversing will be done
+        using the same args and kwargs as are passed in for this view.
 
     .. attribute:: permanent
 

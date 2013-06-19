@@ -1589,9 +1589,9 @@ class FormsTestCase(TestCase):
         # Recall from above that passing the "auto_id" argument to a Form gives each
         # field an "id" attribute.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1601,18 +1601,18 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
-<p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
-<p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
-<p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
+<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
+<p><label for="id_password1">Password1:</label> <input type="password" name="password1" id="id_password1" /></p>
+<p><label for="id_password2">Password2:</label> <input type="password" name="password2" id="id_password2" /></p>
 <input type="submit" />
 </form>""")
 
         # User form.[field].help_text to output a field's help text. If the given field
         # does not have help text, nothing will be output.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}<br />{{ form.username.help_text }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1819,17 +1819,17 @@ class FormsTestCase(TestCase):
 
         testcases = [  # (args, kwargs, expected)
             # without anything: just print the <label>
-            ((), {}, '<label for="id_field">Field</label>'),
+            ((), {}, '<label for="id_field">Field:</label>'),
 
             # passing just one argument: overrides the field's label
-            (('custom',), {}, '<label for="id_field">custom</label>'),
+            (('custom',), {}, '<label for="id_field">custom:</label>'),
 
             # the overriden label is escaped
-            (('custom&',), {}, '<label for="id_field">custom&amp;</label>'),
-            ((mark_safe('custom&'),), {}, '<label for="id_field">custom&</label>'),
+            (('custom&',), {}, '<label for="id_field">custom&amp;:</label>'),
+            ((mark_safe('custom&'),), {}, '<label for="id_field">custom&:</label>'),
 
             # Passing attrs to add extra attributes on the <label>
-            ((), {'attrs': {'class': 'pretty'}}, '<label for="id_field" class="pretty">Field</label>')
+            ((), {'attrs': {'class': 'pretty'}}, '<label for="id_field" class="pretty">Field:</label>')
         ]
 
         for args, kwargs, expected in testcases:
@@ -1844,8 +1844,8 @@ class FormsTestCase(TestCase):
             field = CharField()
         boundfield = SomeForm(auto_id='')['field']
 
-        self.assertHTMLEqual(boundfield.label_tag(), 'Field')
-        self.assertHTMLEqual(boundfield.label_tag('Custom&'), 'Custom&amp;')
+        self.assertHTMLEqual(boundfield.label_tag(), 'Field:')
+        self.assertHTMLEqual(boundfield.label_tag('Custom&'), 'Custom&amp;:')
 
     def test_boundfield_label_tag_custom_widget_id_for_label(self):
         class CustomIdForLabelTextInput(TextInput):
@@ -1861,5 +1861,12 @@ class FormsTestCase(TestCase):
             empty = CharField(widget=EmptyIdForLabelTextInput)
 
         form = SomeForm()
-        self.assertHTMLEqual(form['custom'].label_tag(), '<label for="custom_id_custom">Custom</label>')
-        self.assertHTMLEqual(form['empty'].label_tag(), '<label>Empty</label>')
+        self.assertHTMLEqual(form['custom'].label_tag(), '<label for="custom_id_custom">Custom:</label>')
+        self.assertHTMLEqual(form['empty'].label_tag(), '<label>Empty:</label>')
+
+    def test_boundfield_empty_label(self):
+        class SomeForm(Form):
+            field = CharField(label='')
+        boundfield = SomeForm()['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')

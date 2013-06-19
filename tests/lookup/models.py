@@ -10,15 +10,28 @@ from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
-from shared_models.models import Author, Book
 
-
-class Tag(models.Model):
-    articles = models.ManyToManyField(Book)
+class Author(models.Model):
     name = models.CharField(max_length=100)
     class Meta:
         ordering = ('name', )
 
+@python_2_unicode_compatible
+class Article(models.Model):
+    headline = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+    author = models.ForeignKey(Author, blank=True, null=True)
+    class Meta:
+        ordering = ('-pub_date', 'headline')
+
+    def __str__(self):
+        return self.headline
+
+class Tag(models.Model):
+    articles = models.ManyToManyField(Article)
+    name = models.CharField(max_length=100)
+    class Meta:
+        ordering = ('name', )
 
 @python_2_unicode_compatible
 class Season(models.Model):
@@ -28,7 +41,6 @@ class Season(models.Model):
     def __str__(self):
         return six.text_type(self.year)
 
-
 @python_2_unicode_compatible
 class Game(models.Model):
     season = models.ForeignKey(Season, related_name='games')
@@ -37,7 +49,6 @@ class Game(models.Model):
 
     def __str__(self):
         return "%s at %s" % (self.away, self.home)
-
 
 @python_2_unicode_compatible
 class Player(models.Model):

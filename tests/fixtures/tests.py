@@ -354,6 +354,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
+    available_apps = [
+        'fixtures',
+        'django.contrib.contenttypes',
+        'django.contrib.auth',
+        'django.contrib.sites',
+    ]
+
     @skipUnlessDBFeature('supports_forward_references')
     def test_format_discovery(self):
         # Load fixture 1 again, using format discovery

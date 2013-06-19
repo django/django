@@ -685,6 +685,12 @@ class NaturalKeyFixtureTests(TestCase):
 
 class TestTicket11101(TransactionTestCase):
 
+    available_apps = [
+        'fixtures_regress',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
+
     def ticket_11101(self):
         management.call_command(
             'loaddata',

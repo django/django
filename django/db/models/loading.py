@@ -15,6 +15,8 @@ import os
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+class UnavailableApp(Exception):
+    pass
 
 def _initialize():
     """
@@ -40,11 +42,12 @@ def _initialize():
 
         # -- Everything below here is only used when populating the cache --
         loads_installed = True,
-        loaded = False,
-        handled = {},
-        postponed = [],
-        nesting_level = 0,
-        _get_models_cache = {},
+        loaded=False,
+        handled=set(),
+        postponed=[],
+        nesting_level=0,
+        _get_models_cache={},
+        available_apps=None,
     )
 
 
@@ -111,7 +114,7 @@ class BaseAppCache(object):
         Loads the app with the provided fully qualified name, and returns the
         model module.
         """
-        self.handled[app_name] = None
+        self.handled.add(app_name)
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
@@ -157,12 +160,17 @@ class BaseAppCache(object):
         """
         self._populate()
 
+        apps = self.app_store.items()
+        if self.available_apps is not None:
+            apps = [elt for elt in apps
+                    if self._label_for(elt[0]) in self.available_apps]
+
         # Ensure the returned list is always in the same order (with new apps
         # added at the end). This avoids unstable ordering on the admin app
         # list page, for example.
-        apps = [(v, k) for k, v in self.app_store.items()]
-        apps.sort()
-        return [elt[1] for elt in apps]
+        apps = sorted(apps, key=lambda elt: elt[1])
+
+        return [elt[0] for elt in apps]
 
     def get_app_paths(self):
         """
@@ -183,8 +191,12 @@ class BaseAppCache(object):
 
     def get_app(self, app_label, emptyOK=False):
         """
-        Returns the module containing the models for the given app_label. If
-        the app has no models in it and 'emptyOK' is True, returns None.
+        Returns the module containing the models for the given app_label.
+
+        Returns None if the app has no models in it and emptyOK is True.
+
+        Raises UnavailableApp when set_available_apps() in in effect and
+        doesn't include app_label.
         """
         self._populate()
         imp.acquire_lock()
@@ -192,12 +204,11 @@ class BaseAppCache(object):
             for app_name in settings.INSTALLED_APPS:
                 if app_label == app_name.split('.')[-1]:
                     mod = self.load_app(app_name, False)
-                    if mod is None:
-                        if emptyOK:
-                            return None
+                    if mod is None and not emptyOK:
                         raise ImproperlyConfigured("App with label %s is missing a models.py module." % app_label)
-                    else:
-                        return mod
+                    if self.available_apps is not None and app_label not in self.available_apps:
+                        raise UnavailableApp("App with label %s isn't available." % app_label)
+                    return mod
             raise ImproperlyConfigured("App with label %s could not be found" % app_label)
         finally:
             imp.release_lock()
@@ -234,8 +245,13 @@ class BaseAppCache(object):
         if not self.loads_installed:
             only_installed = False
         cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
+        model_list = None
         try:
-            return self._get_models_cache[cache_key]
+            model_list = self._get_models_cache[cache_key]
+            if self.available_apps is not None and only_installed:
+                model_list = [m for m in model_list
+                                if m._meta.app_label in self.available_apps]
+            return model_list
         except KeyError:
             pass
         self._populate()
@@ -260,6 +276,9 @@ class BaseAppCache(object):
                     (not model._meta.swapped or include_swapped))
             )
         self._get_models_cache[cache_key] = model_list
+        if self.available_apps is not None and only_installed:
+            model_list = [m for m in model_list
+                            if m._meta.app_label in self.available_apps]
         return model_list
 
     def get_model(self, app_label, model_name,
@@ -269,6 +288,9 @@ class BaseAppCache(object):
         model_name.
 
         Returns None if no model is found.
+
+        Raises UnavailableApp when set_available_apps() in in effect and
+        doesn't include app_label.
         """
         if not self.loads_installed:
             only_installed = False
@@ -276,7 +298,13 @@ class BaseAppCache(object):
             self._populate()
         if only_installed and app_label not in self.app_labels:
             return None
-        return self.app_models.get(app_label, SortedDict()).get(model_name.lower())
+        if (self.available_apps is not None and only_installed
+                and app_label not in self.available_apps):
+            raise UnavailableApp("App with label %s isn't available." % app_label)
+        try:
+            return self.app_models[app_label][model_name.lower()]
+        except KeyError:
+            return None
 
     def register_models(self, app_label, *models):
         """
@@ -301,6 +329,16 @@ class BaseAppCache(object):
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
+    def set_available_apps(self, available):
+        if not set(available).issubset(set(settings.INSTALLED_APPS)):
+            extra = set(available) - set(settings.INSTALLED_APPS)
+            raise ValueError("Available apps isn't a subset of installed "
+                "apps, extra apps: " + ", ".join(extra))
+        self.available_apps = set(app.rsplit('.', 1)[-1] for app in available)
+
+    def unset_available_apps(self):
+        self.available_apps = None
+
 
 class AppCache(BaseAppCache):
     """
@@ -314,6 +352,7 @@ class AppCache(BaseAppCache):
 
     def __init__(self):
         self.__dict__ = self.__shared_state
+
 
 cache = AppCache()
 

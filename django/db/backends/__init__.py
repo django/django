@@ -390,7 +390,7 @@ class BaseDatabaseWrapper(object):
     def disable_constraint_checking(self):
         """
         Backends can implement as needed to temporarily disable foreign key
-        constraint checking. Should return True if the constraints were 
+        constraint checking. Should return True if the constraints were
         disabled and will need to be reenabled.
         """
         return False
@@ -966,7 +966,7 @@ class BaseDatabaseOperations(object):
         """
         return ''
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         """
         Returns a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
@@ -977,6 +977,10 @@ class BaseDatabaseOperations(object):
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
+
+        The `allow_cascade` argument determines whether truncation may cascade
+        to tables with foreign keys pointing the tables being truncated.
+        PostgreSQL requires a cascade even if these tables are empty.
         """
         raise NotImplementedError()
 

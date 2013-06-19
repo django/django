@@ -213,6 +213,8 @@ advanced settings.
 
     The :ref:`advanced multi-db testing topics <topics-testing-advanced-multidb>`.
 
+.. _order-of-tests:
+
 Order in which tests are executed
 ---------------------------------
 
@@ -908,8 +910,8 @@ TransactionTestCase
 
 .. class:: TransactionTestCase()
 
-Django ``TestCase`` classes make use of database transaction facilities, if
-available, to speed up the process of resetting the database to a known state
+Django's ``TestCase`` class (described below) makes use of database transaction
+facilities to speed up the process of resetting the database to a known state
 at the beginning of each test. A consequence of this, however, is that the
 effects of transaction commit and rollback cannot be tested by a Django
 ``TestCase`` class. If your test requires testing of such transactional
@@ -927,9 +929,9 @@ to test the effects of commit and rollback:
   Instead, it encloses the test code in a database transaction that is rolled
   back at the end of the test. Both explicit commits like
   ``transaction.commit()`` and implicit ones that may be caused by
-  ``Model.save()`` are replaced with a ``nop`` operation. This guarantees that
-  the rollback at the end of the test restores the database to its initial
-  state.
+  ``transaction.atomic()`` are replaced with a ``nop`` operation. This
+  guarantees that the rollback at the end of the test restores the database to
+  its initial state.
 
   When running on a database that does not support rollback (e.g. MySQL with the
   MyISAM storage engine), ``TestCase`` falls back to initializing the database
@@ -940,22 +942,21 @@ to test the effects of commit and rollback:
     While ``commit`` and ``rollback`` operations still *appear* to work when
     used in ``TestCase``, no actual commit or rollback will be performed by the
     database. This can cause your tests to pass or fail unexpectedly. Always
-    use ``TransactionalTestCase`` when testing transactional behavior.
+    use ``TransactionTestCase`` when testing transactional behavior.
 
-.. note::
+.. versionchanged:: 1.5
 
-    .. versionchanged:: 1.5
-
-    Prior to 1.5, ``TransactionTestCase`` flushed the database tables *before*
-    each test. In Django 1.5, this is instead done *after* the test has been run.
+    Prior to 1.5, :class:`~django.test.TransactionTestCase` flushed the
+    database tables *before* each test. In Django 1.5, this is instead done
+    *after* the test has been run.
 
     When the flush took place before the test, it was guaranteed that primary
     key values started at one in :class:`~django.test.TransactionTestCase`
     tests.
 
-    Tests should not depend on this behavior, but for legacy tests that do, the
-    :attr:`~TransactionTestCase.reset_sequences` attribute can be used until
-    the test has been properly updated.
+    Tests should not depend on this behavior, but for legacy tests that do,
+    the :attr:`~TransactionTestCase.reset_sequences` attribute can be used
+    until the test has been properly updated.
 
 .. versionchanged:: 1.5
 
@@ -963,27 +964,6 @@ to test the effects of commit and rollback:
     executed`_.
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
-
-.. attribute:: TransactionTestCase.reset_sequences
-
-    .. versionadded:: 1.5
-
-    Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
-    sure sequences are always reset before the test run::
-
-        class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
-            reset_sequences = True
-
-            def test_animal_pk(self):
-                lion = Animal.objects.create(name="lion", sound="roar")
-                # lion.pk is guaranteed to always be 1
-                self.assertEqual(lion.pk, 1)
-
-    Unless you are explicitly testing primary keys sequence numbers, it is
-    recommended that you do not hard code primary key values in tests.
-
-    Using ``reset_sequences = True`` will slow down the test, since the primary
-    key reset is an relatively expensive database operation.
 
 TestCase
 ~~~~~~~~
@@ -1467,7 +1447,7 @@ Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you use any of Django's custom ``TestCase`` classes, the test runner will
-clear thecontents of the test email outbox at the start of each test case.
+clear the contents of the test email outbox at the start of each test case.
 
 For more detail on email services during tests, see `Email services`_ below.
 

@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core import management
 from django.utils import six
 
-from shared_models import models
+from . import models
 
 
 PRE_SYNCDB_ARGS = ['app', 'create_models', 'verbosity', 'interactive', 'db']
@@ -55,6 +55,11 @@ signals.pre_syncdb.connect(pre_syncdb_receiver, sender=models)
 
 
 class SyncdbSignalTests(TestCase):
+
+    available_apps = [
+        'syncdb_signals',
+    ]
+
     def test_pre_syncdb_call_time(self):
         self.assertEqual(pre_syncdb_receiver.call_counter, 1)
 

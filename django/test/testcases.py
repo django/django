@@ -24,10 +24,12 @@ from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
+from django.core.management.commands import flush
 from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
     WSGIServerException)
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
+from django.db.models.loading import cache
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.test.client import Client
@@ -195,9 +197,9 @@ class SimpleTestCase(ut2.TestCase):
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
-           * If the Test Case class has a 'urls' member, replace the
-             ROOT_URLCONF with it.
-           * Clearing the mail test outbox.
+        * Creating a test client.
+        * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
+        * Clearing the mail test outbox.
         """
         self.client = self.client_class()
         self._urlconf_setup()
@@ -211,6 +213,10 @@ class SimpleTestCase(ut2.TestCase):
             clear_url_caches()
 
     def _post_teardown(self):
+        """Performs any post-test things. This includes:
+
+        * Putting back the original ROOT_URLCONF if it was changed.
+        """
         self._urlconf_teardown()
 
     def _urlconf_teardown(self):
@@ -725,15 +731,29 @@ class TransactionTestCase(SimpleTestCase):
     # test case
     reset_sequences = False
 
+    # Subclasses can enable only a subset of apps for faster tests
+    available_apps = None
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
-           * Flushing the database.
-           * If the Test Case class has a 'fixtures' member, installing the
-             named fixtures.
+        * If the class has an 'available_apps' attribute, restricting the app
+          cache to these applications, then firing post_syncdb -- it must run
+          with the correct set of applications for the test case.
+        * If the class has a 'fixtures' attribute, installing these fixtures.
         """
         super(TransactionTestCase, self)._pre_setup()
-        self._fixture_setup()
+        if self.available_apps is not None:
+            cache.set_available_apps(self.available_apps)
+            for db_name in self._databases_names(include_mirrors=False):
+                flush.Command.emit_post_syncdb(
+                        verbosity=0, interactive=False, database=db_name)
+        try:
+            self._fixture_setup()
+        except Exception:
+            if self.available_apps is not None:
+                cache.unset_available_apps()
+            raise
 
     def _databases_names(self, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
@@ -771,26 +791,33 @@ class TransactionTestCase(SimpleTestCase):
     def _post_teardown(self):
         """Performs any post-test things. This includes:
 
-           * Putting back the original ROOT_URLCONF if it was changed.
-           * Force closing the connection, so that the next test gets
-             a clean cursor.
+        * Flushing the contents of the database, to leave a clean slate. If
+          the class has an 'available_apps' attribute, post_syncdb isn't fired.
+        * Force-closing the connection, so the next test gets a clean cursor.
         """
-        self._fixture_teardown()
-        super(TransactionTestCase, self)._post_teardown()
-        # Some DB cursors include SQL statements as part of cursor
-        # creation. If you have a test that does rollback, the effect
-        # of these statements is lost, which can effect the operation
-        # of tests (e.g., losing a timezone setting causing objects to
-        # be created with the wrong time).
-        # To make sure this doesn't happen, get a clean connection at the
-        # start of every test.
-        for conn in connections.all():
-            conn.close()
+        try:
+            self._fixture_teardown()
+            super(TransactionTestCase, self)._post_teardown()
+            # Some DB cursors include SQL statements as part of cursor
+            # creation. If you have a test that does rollback, the effect of
+            # these statements is lost, which can effect the operation of
+            # tests (e.g., losing a timezone setting causing objects to be
+            # created with the wrong time). To make sure this doesn't happen,
+            # get a clean connection at the start of every test.
+            for conn in connections.all():
+                conn.close()
+        finally:
+            cache.unset_available_apps()
 
     def _fixture_teardown(self):
+        # Allow TRUNCATE ... CASCADE and don't emit the post_syncdb signal
+        # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
-            call_command('flush', verbosity=0, interactive=False, database=db_name,
-                         skip_validation=True, reset_sequences=False)
+            call_command('flush', verbosity=0, interactive=False,
+                         database=db_name, skip_validation=True,
+                         reset_sequences=False,
+                         allow_cascade=self.available_apps is not None,
+                         inhibit_post_syncdb=self.available_apps is not None)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)

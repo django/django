@@ -450,16 +450,18 @@ class Model(six.with_metaclass(ModelBase)):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
-        if not self._deferred:
-            return super(Model, self).__reduce__()
         data = self.__dict__
+        if not self._deferred:
+            class_id = self._meta.app_label, self._meta.object_name
+            return model_unpickle, (class_id, [], simple_class_factory), data
         defers = []
         for field in self._meta.fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
-                    DeferredAttribute):
+                          DeferredAttribute):
                 defers.append(field.attname)
         model = self._meta.proxy_for_model
-        return (model_unpickle, (model, defers), data)
+        class_id = model._meta.app_label, model._meta.object_name
+        return (model_unpickle, (class_id, defers, deferred_class_factory), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -907,7 +909,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'field_label': six.text_type(field_labels)
             }
 
-    def full_clean(self, exclude=None):
+    def full_clean(self, exclude=None, validate_unique=True):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
         and raises a ``ValidationError`` for any errors that occurred.
@@ -929,13 +931,14 @@ class Model(six.with_metaclass(ModelBase)):
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
-        for name in errors.keys():
-            if name != NON_FIELD_ERRORS and name not in exclude:
-                exclude.append(name)
-        try:
-            self.validate_unique(exclude=exclude)
-        except ValidationError as e:
-            errors = e.update_error_dict(errors)
+        if validate_unique:
+            for name in errors.keys():
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.append(name)
+            try:
+                self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
 
         if errors:
             raise ValidationError(errors)
@@ -960,7 +963,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
             except ValidationError as e:
-                errors[f.name] = e.messages
+                errors[f.name] = e.error_list
 
         if errors:
             raise ValidationError(errors)
@@ -1007,12 +1010,22 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
+def simple_class_factory(model, attrs):
+    """
+    Needed for dynamic classes.
+    """
+    return model
 
-def model_unpickle(model, attrs):
+def model_unpickle(model_id, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    cls = deferred_class_factory(model, attrs)
+    if isinstance(model_id, tuple):
+        model = get_model(*model_id)
+    else:
+        # Backwards compat - the model was cached directly in earlier versions.
+        model = model_id
+    cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

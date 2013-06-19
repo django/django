@@ -1192,6 +1192,21 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
 
+class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py', sdict={
+            'ALLOWED_HOSTS': [],
+            'DEBUG': False,
+        })
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_empty_allowed_hosts_error(self):
+        out, err = self.run_manage(['runserver'])
+        self.assertNoOutput(out)
+        self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
 
 ##########################################################################
 # COMMAND PROCESSING TESTS
@@ -1458,6 +1473,13 @@ class ArgumentOrder(AdminScriptTestCase):
 
 
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
+
+    available_apps = [
+        'admin_scripts',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+    ]
 
     def test_wrong_args(self):
         "Make sure passing the wrong kinds of arguments raises a CommandError"

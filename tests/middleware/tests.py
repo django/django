@@ -707,6 +707,9 @@ class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, Transacti
     """
     Test the transaction middleware.
     """
+
+    available_apps = ['middleware']
+
     def setUp(self):
         super(TransactionMiddlewareTest, self).setUp()
         self.request = HttpRequest()

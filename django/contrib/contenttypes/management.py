@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import get_apps, get_models, signals
+from django.db.models import get_apps, get_model, get_models, signals, UnavailableApp
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
@@ -11,6 +11,11 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    try:
+        get_model('contenttypes', 'ContentType')
+    except UnavailableApp:
+        return
+
     if not router.allow_syncdb(db, ContentType):
         return
 

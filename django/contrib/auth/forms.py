@@ -14,7 +14,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -29,7 +29,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = value
         final_attrs = self.build_attrs(attrs)
 
-        if not encoded or encoded == UNUSABLE_PASSWORD:
+        if not encoded or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
             summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
         else:
             try:
@@ -97,14 +97,19 @@ class UserCreationForm(forms.ModelForm):
             User._default_manager.get(username=username)
         except User.DoesNotExist:
             return username
-        raise forms.ValidationError(self.error_messages['duplicate_username'])
+        raise forms.ValidationError(
+            self.error_messages['duplicate_username'],
+            code='duplicate_username',
+        )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError(
-                self.error_messages['password_mismatch'])
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
         return password2
 
     def save(self, commit=True):
@@ -183,11 +188,15 @@ class AuthenticationForm(forms.Form):
                                            password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
-                    self.error_messages['invalid_login'] % {
-                        'username': self.username_field.verbose_name
-                    })
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
             elif not self.user_cache.is_active:
-                raise forms.ValidationError(self.error_messages['inactive'])
+                raise forms.ValidationError(
+                    self.error_messages['inactive'],
+                    code='inactive',
+                )
         return self.cleaned_data
 
     def check_for_test_cookie(self):
@@ -222,7 +231,7 @@ class PasswordResetForm(forms.Form):
         for user in users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
-            if user.password == UNUSABLE_PASSWORD:
+            if not user.has_usable_password():
                 continue
             if not domain_override:
                 current_site = get_current_site(request)
@@ -269,7 +278,9 @@ class SetPasswordForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise forms.ValidationError(
-                    self.error_messages['password_mismatch'])
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
         return password2
 
     def save(self, commit=True):
@@ -298,7 +309,9 @@ class PasswordChangeForm(SetPasswordForm):
         old_password = self.cleaned_data["old_password"]
         if not self.user.check_password(old_password):
             raise forms.ValidationError(
-                self.error_messages['password_incorrect'])
+                self.error_messages['password_incorrect'],
+                code='password_incorrect',
+            )
         return old_password
 
 PasswordChangeForm.base_fields = SortedDict([
@@ -329,7 +342,9 @@ class AdminPasswordChangeForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise forms.ValidationError(
-                    self.error_messages['password_mismatch'])
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
         return password2
 
     def save(self, commit=True):

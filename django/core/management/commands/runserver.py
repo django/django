@@ -40,6 +40,11 @@ class Command(BaseCommand):
         return get_internal_wsgi_application()
 
     def handle(self, addrport='', *args, **options):
+        from django.conf import settings
+
+        if not settings.DEBUG and not settings.ALLOWED_HOSTS:
+            raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')

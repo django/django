@@ -42,7 +42,7 @@ FormView
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
 
-    **Example forms.py**::
+    **Example myapp/forms.py**::
 
         from django import forms
 
@@ -54,7 +54,7 @@ FormView
                 # send email using the self.cleaned_data dictionary
                 pass
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from myapp.forms import ContactForm
         from django.views.generic.edit import FormView
@@ -69,6 +69,16 @@ FormView
                 # It should return an HttpResponse.
                 form.send_email()
                 return super(ContactView, self).form_valid(form)
+
+    **Example myapp/contact.html**:
+
+    .. code-block:: html+django
+
+        <form action="" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Send message" />
+        </form>
+
 
 CreateView
 ----------
@@ -101,7 +111,7 @@ CreateView
         creating objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_create_form.html'``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.edit import CreateView
         from myapp.models import Author
@@ -109,6 +119,15 @@ CreateView
         class AuthorCreate(CreateView):
             model = Author
             fields = ['name']
+
+    **Example myapp/author_form.html**:
+
+    .. code-block:: html+django
+
+        <form action="" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Create" />
+        </form>
 
 UpdateView
 ----------
@@ -143,7 +162,7 @@ UpdateView
         updating objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_update_form.html'``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.edit import UpdateView
         from myapp.models import Author
@@ -151,6 +170,16 @@ UpdateView
         class AuthorUpdate(UpdateView):
             model = Author
             fields = ['name']
+            template_name_suffix = '_update_form'
+
+    **Example myapp/author_update_form.html**:
+
+    .. code-block:: html+django
+
+        <form action="" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Update" />
+        </form>
 
 DeleteView
 ----------
@@ -184,8 +213,7 @@ DeleteView
         deleting objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_check_delete.html'``.
 
-
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.edit import DeleteView
         from django.core.urlresolvers import reverse_lazy
@@ -194,3 +222,12 @@ DeleteView
         class AuthorDelete(DeleteView):
             model = Author
             success_url = reverse_lazy('author-list')
+
+    **Example myapp/author_confirm_delete.html**:
+
+    .. code-block:: html+django
+
+        <form action="" method="post">{% csrf_token %}
+            <p>Are you sure you want to delete "{{ object }}"?</p>
+            <input type="submit" value="Confirm" />
+        </form>

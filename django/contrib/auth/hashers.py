@@ -17,7 +17,8 @@ from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_noop as _
 
 
-UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
 
@@ -30,7 +31,7 @@ def reset_hashers(**kwargs):
 
 
 def is_password_usable(encoded):
-    if encoded is None or encoded == UNUSABLE_PASSWORD:
+    if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
         return False
     try:
         hasher = identify_hasher(encoded)
@@ -47,7 +48,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     If setter is specified, it'll be called when you need to
     regenerate the password.
     """
-    if not password or not is_password_usable(encoded):
+    if not is_password_usable(encoded):
         return False
 
     preferred = get_hasher(preferred)
@@ -64,13 +65,15 @@ def make_password(password, salt=None, hasher='default'):
     """
     Turn a plain-text password into a hash for database storage
 
-    Same as encode() but generates a new random salt.  If
-    password is None or blank then UNUSABLE_PASSWORD will be
-    returned which disallows logins.
+    Same as encode() but generates a new random salt.
+    If password is None then a concatenation of
+    UNUSABLE_PASSWORD_PREFIX and a random string will be returned
+    which disallows logins. Additional random string reduces chances
+    of gaining access to staff or superuser accounts.
+    See ticket #20079 for more info.
     """
-    if not password:
-        return UNUSABLE_PASSWORD
-
+    if password is None:
+        return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
     hasher = get_hasher(hasher)
 
     if not salt:
@@ -171,12 +174,12 @@ class BasePasswordHasher(object):
                 name = mod_path = self.library
             try:
                 module = importlib.import_module(mod_path)
-            except ImportError:
-                raise ValueError("Couldn't load %s password algorithm "
-                                 "library" % name)
+            except ImportError as e:
+                raise ValueError("Couldn't load %r algorithm library: %s" %
+                                 (self.__class__.__name__, e))
             return module
-        raise ValueError("Hasher '%s' doesn't specify a library attribute" %
-                         self.__class__)
+        raise ValueError("Hasher %r doesn't specify a library attribute" %
+                         self.__class__.__name__)
 
     def salt(self):
         """
@@ -222,7 +225,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         if not iterations:
             iterations = self.iterations
@@ -350,7 +353,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     algorithm = "sha1"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
@@ -378,7 +381,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     algorithm = "md5"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)

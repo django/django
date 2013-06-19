@@ -345,6 +345,8 @@ class PostgresNewConnectionTest(TestCase):
 # connection would implicitly rollback and cause problems during teardown.
 class ConnectionCreatedSignalTest(TransactionTestCase):
 
+    available_apps = []
+
     # Unfortunately with sqlite3 the in-memory test database cannot be closed,
     # and so it cannot be re-opened during testing.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
@@ -513,6 +515,8 @@ class BackendTestCase(TestCase):
 #   preference.
 # verify if its type is django.database.db.IntegrityError.
 class FkConstraintsTests(TransactionTestCase):
+
+    available_apps = ['backends']
 
     def setUp(self):
         # Create a Reporter.
@@ -777,6 +781,9 @@ class MySQLPKZeroTests(TestCase):
 
 
 class DBConstraintTestCase(TransactionTestCase):
+
+    available_apps = ['backends']
+
     def test_can_reference_existant(self):
         obj = models.Object.objects.create()
         ref = models.ObjectReference.objects.create(obj=obj)

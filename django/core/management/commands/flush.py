@@ -32,8 +32,10 @@ class Command(NoArgsCommand):
         connection = connections[db]
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
-        # 'reset_sequences' is a stealth option
+        # The following are stealth options used by Django's internals.
         reset_sequences = options.get('reset_sequences', True)
+        allow_cascade = options.get('allow_cascade', False)
+        inhibit_post_syncdb = options.get('inhibit_post_syncdb', False)
 
         self.style = no_style()
 
@@ -45,7 +47,9 @@ class Command(NoArgsCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style, connection, only_django=True, reset_sequences=reset_sequences)
+        sql_list = sql_flush(self.style, connection, only_django=True,
+                             reset_sequences=reset_sequences,
+                             allow_cascade=allow_cascade)
 
         if interactive:
             confirm = input("""You have requested a flush of the database.
@@ -72,16 +76,9 @@ Are you sure you want to do this?
                     "Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.\n"
                     "The full error: %s") % (connection.settings_dict['NAME'], e)
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
-            # Emit the post sync signal. This allows individual
-            # applications to respond as if the database had been
-            # sync'd from scratch.
-            all_models = []
-            for app in models.get_apps():
-                all_models.extend([
-                    m for m in models.get_models(app, include_auto_created=True)
-                    if router.allow_syncdb(db, m)
-                ])
-            emit_post_sync_signal(set(all_models), verbosity, interactive, db)
+
+            if not inhibit_post_syncdb:
+                self.emit_post_syncdb(verbosity, interactive, db)
 
             # Reinstall the initial_data fixture.
             if options.get('load_initial_data'):
@@ -90,3 +87,15 @@ Are you sure you want to do this?
 
         else:
             self.stdout.write("Flush cancelled.\n")
+
+    @staticmethod
+    def emit_post_syncdb(verbosity, interactive, database):
+        # Emit the post sync signal. This allows individual applications to
+        # respond as if the database had been sync'd from scratch.
+        all_models = []
+        for app in models.get_apps():
+            all_models.extend([
+                m for m in models.get_models(app, include_auto_created=True)
+                if router.allow_syncdb(database, m)
+            ])
+        emit_post_sync_signal(set(all_models), verbosity, interactive, database)

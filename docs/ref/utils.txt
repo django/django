@@ -659,6 +659,8 @@ Functions for working with Python modules.
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
+    .. versionadded:: 1.6
+
     Imports a dotted module path and returns the attribute/class designated by
     the last name in the path. Raises
     :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes

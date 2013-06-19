@@ -7,6 +7,10 @@ import shutil
 import sys
 import tempfile
 import time
+try:
+    from urllib.request import urlopen
+except ImportError:     # Python 2
+    from urllib2 import urlopen
 import zlib
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -22,12 +26,11 @@ from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
-from django.test import SimpleTestCase
+from django.test import LiveServerTestCase, SimpleTestCase
 from django.utils import six
 from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
-from servers.tests import LiveServerBase
 
 try:
     from django.utils.image import Image
@@ -613,10 +616,15 @@ class NoNameFileTestCase(unittest.TestCase):
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
 
-class FileLikeObjectTestCase(LiveServerBase):
+
+class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
+
+    available_apps = []
+    urls = 'file_storage.urls'
+
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(location=self.temp_dir)
@@ -628,12 +636,10 @@ class FileLikeObjectTestCase(LiveServerBase):
         """
         Test the File storage API with a file like object coming from urllib2.urlopen()
         """
-
-        file_like_object = self.urlopen('/example_view/')
+        file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)
         stored_filename = self.storage.save("remote_file.html", f)
 
-        remote_file = self.urlopen('/example_view/')
-
+        remote_file = urlopen(self.live_server_url + '/')
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())

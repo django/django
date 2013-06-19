@@ -170,11 +170,6 @@ class BaseForm(object):
 
                 if bf.label:
                     label = conditional_escape(force_text(bf.label))
-                    # Only add the suffix if the label does not end in
-                    # punctuation.
-                    if self.label_suffix:
-                        if label[-1] not in ':?.!':
-                            label = format_html('{0}{1}', label, self.label_suffix)
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
@@ -522,6 +517,9 @@ class BoundField(object):
         If attrs are given, they're used as HTML attributes on the <label> tag.
         """
         contents = contents or self.label
+        # Only add the suffix if the label does not end in punctuation.
+        if self.form.label_suffix and contents and contents[-1] not in ':?.!':
+            contents = format_html('{0}{1}', contents, self.form.label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:

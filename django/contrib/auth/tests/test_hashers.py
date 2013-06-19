@@ -2,9 +2,10 @@
 from __future__ import unicode_literals
 
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
-from django.contrib.auth.hashers import (is_password_usable,
-    check_password, make_password, PBKDF2PasswordHasher, load_hashers,
-    PBKDF2SHA1PasswordHasher, get_hasher, identify_hasher, UNUSABLE_PASSWORD)
+from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
+    check_password, make_password, PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher,
+    get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
+from django.utils import six
 from django.utils import unittest
 from django.utils.unittest import skipUnless
 
@@ -31,6 +32,12 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
+        # Blank passwords
+        blank_encoded = make_password('')
+        self.assertTrue(blank_encoded.startswith('pbkdf2_sha256$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_pkbdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
@@ -40,6 +47,12 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "pbkdf2_sha256")
+        # Blank passwords
+        blank_encoded = make_password('', 'seasalt', 'pbkdf2_sha256')
+        self.assertTrue(blank_encoded.startswith('pbkdf2_sha256$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_sha1(self):
         encoded = make_password('lètmein', 'seasalt', 'sha1')
@@ -49,6 +62,12 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "sha1")
+        # Blank passwords
+        blank_encoded = make_password('', 'seasalt', 'sha1')
+        self.assertTrue(blank_encoded.startswith('sha1$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
@@ -58,6 +77,12 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "md5")
+        # Blank passwords
+        blank_encoded = make_password('', 'seasalt', 'md5')
+        self.assertTrue(blank_encoded.startswith('md5$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_unsalted_md5(self):
         encoded = make_password('lètmein', '', 'unsalted_md5')
@@ -71,6 +96,11 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(alt_encoded))
         self.assertTrue(check_password('lètmein', alt_encoded))
         self.assertFalse(check_password('lètmeinz', alt_encoded))
+        # Blank passwords
+        blank_encoded = make_password('', '', 'unsalted_md5')
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_unsalted_sha1(self):
         encoded = make_password('lètmein', '', 'unsalted_sha1')
@@ -82,6 +112,12 @@ class TestUtilsHashPass(unittest.TestCase):
         # Raw SHA1 isn't acceptable
         alt_encoded = encoded[6:]
         self.assertFalse(check_password('lètmein', alt_encoded))
+        # Blank passwords
+        blank_encoded = make_password('', '', 'unsalted_sha1')
+        self.assertTrue(blank_encoded.startswith('sha1$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
@@ -91,6 +127,12 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password('lètmei', encoded))
         self.assertFalse(check_password('lètmeiz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "crypt")
+        # Blank passwords
+        blank_encoded = make_password('', 'ab', 'crypt')
+        self.assertTrue(blank_encoded.startswith('crypt$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
@@ -107,6 +149,12 @@ class TestUtilsHashPass(unittest.TestCase):
         encoded = make_password(password, hasher='bcrypt_sha256')
         self.assertTrue(check_password(password, encoded))
         self.assertFalse(check_password(password[:72], encoded))
+        # Blank passwords
+        blank_encoded = make_password('', hasher='bcrypt_sha256')
+        self.assertTrue(blank_encoded.startswith('bcrypt_sha256$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt(self):
@@ -116,21 +164,31 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "bcrypt")
+        # Blank passwords
+        blank_encoded = make_password('', hasher='bcrypt')
+        self.assertTrue(blank_encoded.startswith('bcrypt$'))
+        self.assertTrue(is_password_usable(blank_encoded))
+        self.assertTrue(check_password('', blank_encoded))
+        self.assertFalse(check_password(' ', blank_encoded))
 
     def test_unusable(self):
         encoded = make_password(None)
+        self.assertEqual(len(encoded), len(UNUSABLE_PASSWORD_PREFIX) + UNUSABLE_PASSWORD_SUFFIX_LENGTH)
         self.assertFalse(is_password_usable(encoded))
         self.assertFalse(check_password(None, encoded))
-        self.assertFalse(check_password(UNUSABLE_PASSWORD, encoded))
+        self.assertFalse(check_password(encoded, encoded))
+        self.assertFalse(check_password(UNUSABLE_PASSWORD_PREFIX, encoded))
         self.assertFalse(check_password('', encoded))
         self.assertFalse(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertRaises(ValueError, identify_hasher, encoded)
+        # Assert that the unusable passwords actually contain a random part.
+        # This might fail one day due to a hash collision.
+        self.assertNotEqual(encoded, make_password(None), "Random password collision?")
 
     def test_bad_algorithm(self):
-        def doit():
+        with self.assertRaises(ValueError):
             make_password('lètmein', hasher='lolcat')
-        self.assertRaises(ValueError, doit)
         self.assertRaises(ValueError, identify_hasher, "lolcat$salt$hash")
 
     def test_bad_encoded(self):
@@ -178,3 +236,17 @@ class TestUtilsHashPass(unittest.TestCase):
                 state['upgraded'] = True
             self.assertFalse(check_password('WRONG', encoded, setter))
             self.assertFalse(state['upgraded'])
+
+    def test_load_library_no_algorithm(self):
+        with self.assertRaises(ValueError) as e:
+            BasePasswordHasher()._load_library()
+        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a "
+                         "library attribute", str(e.exception))
+
+    def test_load_library_importerror(self):
+        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,),
+                           {'algorithm': 'plain', 'library': 'plain'})
+        # Python 3.3 adds quotes around module name
+        with six.assertRaisesRegex(self, ValueError,
+                "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"):
+            PlainHasher()._load_library()

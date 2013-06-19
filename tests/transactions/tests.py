@@ -26,6 +26,8 @@ class AtomicTests(TransactionTestCase):
     syntax and the bulk of the tests use the context manager syntax.
     """
 
+    available_apps = ['transactions']
+
     def test_decorator_syntax_commit(self):
         @transaction.atomic
         def make_reporter():
@@ -232,6 +234,8 @@ class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
 
+    available_apps = ['transactions']
+
     def test_merged_outer_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
@@ -286,6 +290,8 @@ class AtomicMergeTests(TransactionTestCase):
         "'atomic' requires transactions and savepoints.")
 class AtomicErrorsTests(TransactionTestCase):
 
+    available_apps = []
+
     def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
@@ -311,6 +317,8 @@ class AtomicErrorsTests(TransactionTestCase):
 
 class AtomicMiscTests(TransactionTestCase):
 
+    available_apps = []
+
     def test_wrap_callable_instance(self):
         # Regression test for #20028
         class Callable(object):
@@ -321,6 +329,8 @@ class AtomicMiscTests(TransactionTestCase):
 
 
 class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
 
     def create_a_reporter_then_fail(self, first, last):
         a = Reporter(first_name=first, last_name=last)
@@ -477,6 +487,9 @@ class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCas
 
 
 class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
+
     def execute_bad_sql(self):
         cursor = connection.cursor()
         cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
@@ -494,6 +507,9 @@ class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, Transactio
         transaction.rollback()
 
 class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
+
     def create_reporter_and_fail(self):
         Reporter.objects.create(first_name="Bob", last_name="Holtzman")
         raise Exception

@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import warnings
 
 from django import contrib
 from django.utils._os import upath
@@ -29,7 +30,6 @@ SUBDIRS_TO_SKIP = [
 ]
 
 ALWAYS_INSTALLED_APPS = [
-    'shared_models',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -72,6 +72,15 @@ def get_installed():
 def setup(verbosity, test_labels):
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
+    from django.test.testcases import TransactionTestCase, TestCase
+
+    # Force declaring available_apps in TransactionTestCase for faster tests.
+    def no_available_apps(self):
+        raise Exception("Please define available_apps in TransactionTestCase "
+                        "and its subclasses.")
+    TransactionTestCase.available_apps = property(no_available_apps)
+    TestCase.available_apps = None
+
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
@@ -99,7 +108,9 @@ def setup(verbosity, test_labels):
         logger.addHandler(handler)
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    get_apps()
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', PendingDeprecationWarning)
+        get_apps()
 
     # Load all the test model apps.
     test_modules = get_test_modules()

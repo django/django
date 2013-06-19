@@ -85,7 +85,10 @@ class BaseFormSet(object):
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
-                raise ValidationError('ManagementForm data is missing or has been tampered with')
+                raise ValidationError(
+                    _('ManagementForm data is missing or has been tampered with'),
+                    code='missing_management_form',
+                )
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -263,6 +266,13 @@ class BaseFormSet(object):
             self.full_clean()
         return self._errors
 
+    def total_error_count(self):
+        """
+        Returns the number of errors across all forms in the formset.
+        """
+        return len(self.non_form_errors()) +\
+            sum(len(form_errors) for form_errors in self.errors)
+
     def _should_delete_form(self, form):
         """
         Returns whether or not the form was marked for deletion.
@@ -308,7 +318,9 @@ class BaseFormSet(object):
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
-                    "Please submit %d or fewer forms.", self.max_num) % self.max_num)
+                    "Please submit %d or fewer forms.", self.max_num) % self.max_num,
+                    code='too_many_forms',
+                )
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
