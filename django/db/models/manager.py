@@ -121,9 +121,26 @@ class Manager(six.with_metaclass(RenameManagerMethods)):
     #######################
 
     def get_queryset(self):
-        """Returns a new QuerySet object.  Subclasses can override this method
-        to easily customize the behavior of the Manager.
         """
+        Returns a new QuerySet object.  Subclasses can override this method
+        to customize the behavior of the Manager.
+        
+        Methods that have a 'chainable' attribute set to 'True' are copied
+        onto the retruned 'QuerySet'; this allows for the proxies to be
+        chainable without the need to duplicate proxies in a custom QuerySet.
+        """
+        chainable_queryset_list = [(m, getattr(self, m)) for m in dir(self) if not m.startswith('__') \
+                                    and callable(getattr(self, m)) and hasattr(getattr(self, m), 'chainable') \
+                                    and getattr(self, m).chainable == True]
+        # create a dynamically defined QuerySet if needed otherwise return a plain QuerySet for backward compatibility 
+        if len(chainable_queryset_list) > 0:
+            class QuerySetDynamicallyCreated(QuerySet):
+                pass
+            for method_name, method in chainable_queryset_list: 
+                setattr(QuerySetDynamicallyCreated, method_name, method)
+            QuerySetDynamicallyCreated.__name__ = '{0}QuerySetDynamicallyCreated'.format(self.model.__name__)
+            return QuerySetDynamicallyCreated(self.model, using=self._db)
+        
         return QuerySet(self.model, using=self._db)
 
     def none(self):
