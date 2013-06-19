@@ -15,7 +15,7 @@ from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import DisallowedModelAdminLookup
-from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
 
@@ -26,7 +26,6 @@ ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
 TO_FIELD_VAR = 't'
-IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (
@@ -34,6 +33,29 @@ IGNORED_PARAMS = (
 
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
+
+
+def _is_changelist_popup(request):
+    """
+    Returns True if the popup GET parameter is set.
+
+    This function is introduced to facilitate deprecating the legacy
+    value for IS_POPUP_VAR and should be removed at the end of the
+    deprecation cycle.
+    """
+
+    if IS_POPUP_VAR in request.GET:
+        return True
+
+    IS_LEGACY_POPUP_VAR = 'pop'
+    if IS_LEGACY_POPUP_VAR in request.GET:
+        warnings.warn(
+        "The `%s` GET parameter has been renamed to `%s`." %
+        (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
+        PendingDeprecationWarning, 2)
+        return True
+
+    return False
 
 
 class RenameChangeListMethods(RenameMethodsBase):
@@ -67,7 +89,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         except ValueError:
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
-        self.is_popup = IS_POPUP_VAR in request.GET
+        self.is_popup = _is_changelist_popup(request)
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
