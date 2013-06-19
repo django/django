@@ -34,7 +34,7 @@ class MigrationAutodetector(object):
         """
         # We'll store migrations as lists by app names for now
         self.migrations = {}
-        # Stage one: Adding models.
+        # Adding models.
         added_models = set(self.to_state.models.keys()) - set(self.from_state.models.keys())
         for app_label, model_name in added_models:
             model_state = self.to_state.models[app_label, model_name]
@@ -57,6 +57,32 @@ class MigrationAutodetector(object):
                     model_state.name,
                 )
             )
+        # Changes within models
+        kept_models = set(self.from_state.models.keys()).intersection(self.to_state.models.keys())
+        for app_label, model_name in kept_models:
+            old_model_state = self.from_state.models[app_label, model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            # New fields
+            old_field_names = set([x for x, y in old_model_state.fields])
+            new_field_names = set([x for x, y in new_model_state.fields])
+            for field_name in new_field_names - old_field_names:
+                self.add_to_migration(
+                    app_label,
+                    operations.AddField(
+                        model_name = model_name,
+                        name = field_name,
+                        field = [y for x, y in new_model_state.fields if x == field_name][0],
+                    )
+                )
+            # Old fields
+            for field_name in old_field_names - new_field_names:
+                self.add_to_migration(
+                    app_label,
+                    operations.RemoveField(
+                        model_name = model_name,
+                        name = field_name,
+                    )
+                )
         # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):

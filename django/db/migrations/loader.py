@@ -50,6 +50,7 @@ class MigrationLoader(object):
         """
         self.disk_migrations = {}
         self.unmigrated_apps = set()
+        self.migrated_apps = set()
         for app in cache.get_apps():
             # Get the migrations module directory
             app_label = app.__name__.split(".")[-2]
@@ -62,6 +63,7 @@ class MigrationLoader(object):
                 if "No module named" in str(e) and "migrations" in str(e):
                     self.unmigrated_apps.add(app_label)
                     continue
+            self.migrated_apps.add(app_label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
             migration_names = set()

@@ -72,7 +72,7 @@ class Command(NoArgsCommand):
         plan = executor.migration_plan(targets)
 
         if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_LABEL("  Apps with migrations:    ") + (", ".join(executor.loader.disk_migrations) or "(none)"))
+            self.stdout.write(self.style.MIGRATE_LABEL("  Apps with migrations:    ") + (", ".join(executor.loader.migrated_apps) or "(none)"))
 
         # Run the syncdb phase.
         # If you ever manage to get rid of this, I owe you many, many drinks.
