@@ -41,10 +41,10 @@ class MigrationAutodetector(object):
             self.add_to_migration(
                 app_label,
                 operations.CreateModel(
-                    model_state.name,
-                    model_state.fields,
-                    model_state.options,
-                    model_state.bases,
+                    name = model_state.name,
+                    fields = model_state.fields,
+                    options = model_state.options,
+                    bases = model_state.bases,
                 )
             )
         # Removing models

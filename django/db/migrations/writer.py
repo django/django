@@ -1,8 +1,12 @@
 from __future__ import unicode_literals
 import datetime
 import types
+import os
 from django.utils import six
+from django.utils.importlib import import_module
 from django.db import models
+from django.db.models.loading import cache
+from django.db.migrations.loader import MigrationLoader
 
 
 class MigrationWriter(object):
@@ -48,6 +52,24 @@ class MigrationWriter(object):
     @property
     def filename(self):
         return "%s.py" % self.migration.name
+
+    @property
+    def path(self):
+        migrations_module_name = MigrationLoader.migrations_module(self.migration.app_label)
+        app_module = cache.get_app(self.migration.app_label)
+        # See if we can import the migrations module directly
+        try:
+            migrations_module = import_module(migrations_module_name)
+            basedir = os.path.dirname(migrations_module.__file__)
+        except ImportError:
+            # Alright, see if it's a direct submodule of the app
+            oneup = ".".join(migrations_module_name.split(".")[:-1])
+            app_oneup = ".".join(app_module.__name__.split(".")[:-1])
+            if oneup == app_oneup:
+                basedir = os.path.join(os.path.dirname(app_module.__file__), migrations_module_name.split(".")[-1])
+            else:
+                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_module_name, self.migration.app_label))
+        return os.path.join(basedir, self.filename)
 
     @classmethod
     def serialize(cls, value):
@@ -129,6 +151,17 @@ class MigrationWriter(object):
                 module = value.__module__
                 if module is None:
                     raise ValueError("Cannot serialize function %r: No module" % value)
+                return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+        # Classes
+        elif isinstance(value, type):
+            special_cases = [
+                (models.Model, "models.Model", []),
+            ]
+            for case, string, imports in special_cases:
+                if case is value:
+                    return string, set(imports)
+            if hasattr(value, "__module__"):
+                module = value.__module__
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Uh oh.
         else:

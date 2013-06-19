@@ -54,3 +54,9 @@ class Operation(object):
         drop the model's table.
         """
         raise NotImplementedError()
+
+    def describe(self):
+        """
+        Outputs a brief summary of what the action does.
+        """
+        return "%s: %s" % (self.__class__.__name__, self._constructor_args)

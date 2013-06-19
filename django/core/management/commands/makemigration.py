@@ -1,4 +1,5 @@
 import sys
+import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -8,6 +9,7 @@ from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector, InteractiveMigrationQuestioner
 from django.db.migrations.state import ProjectState
+from django.db.migrations.writer import MigrationWriter
 from django.db.models.loading import cache
 
 
@@ -49,4 +51,30 @@ class Command(BaseCommand):
         if app_labels:
             changes = autodetector.trim_to_apps(changes, app_labels)
 
-        print changes
+        # No changes? Tell them.
+        if not changes:
+            if len(app_labels) == 1:
+                self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+            elif len(app_labels) > 1:
+                self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+            else:
+                self.stdout.write("No changes detected")
+            return
+
+        for app_label, migrations in changes.items():
+            self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
+            for migration in migrations:
+                # Describe the migration
+                writer = MigrationWriter(migration)
+                self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
+                for operation in migration.operations:
+                    self.stdout.write("    - %s\n" % operation.describe())
+                # Write it
+                migrations_directory = os.path.dirname(writer.path)
+                if not os.path.isdir(migrations_directory):
+                    os.mkdir(migrations_directory)
+                init_path = os.path.join(migrations_directory, "__init__.py")
+                if not os.path.isfile(init_path):
+                    open(init_path, "w").close()
+                with open(writer.path, "w") as fh:
+                    fh.write(writer.as_string())

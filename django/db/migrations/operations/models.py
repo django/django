@@ -25,6 +25,9 @@ class CreateModel(Operation):
         app_cache = from_state.render()
         schema_editor.delete_model(app_cache.get_model(app, self.name))
 
+    def describe(self):
+        return "Create model %s" % (self.name, )
+
 
 class DeleteModel(Operation):
     """
@@ -44,3 +47,6 @@ class DeleteModel(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = to_state.render()
         schema_editor.create_model(app_cache.get_model(app_label, self.name))
+
+    def describe(self):
+        return "Delete model %s" % (self.name, )

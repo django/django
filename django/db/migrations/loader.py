@@ -37,7 +37,8 @@ class MigrationLoader(object):
         self.disk_migrations = None
         self.applied_migrations = None
 
-    def migration_module(self, app_label):
+    @classmethod
+    def migrations_module(cls, app_label):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         app = cache.get_app(app_label)
@@ -52,7 +53,7 @@ class MigrationLoader(object):
         for app in cache.get_apps():
             # Get the migrations module directory
             app_label = app.__name__.split(".")[-2]
-            module_name = self.migration_module(app_label)
+            module_name = self.migrations_module(app_label)
             try:
                 module = import_module(module_name)
             except ImportError as e:

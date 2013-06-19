@@ -23,6 +23,9 @@ class AddField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
 
+    def describe(self):
+        return "Add field %s to %s" % (self.name, self.model_name)
+
 
 class RemoveField(Operation):
     """
@@ -48,3 +51,6 @@ class RemoveField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
+
+    def describe(self):
+        return "Remove field %s from %s" % (self.name, self.model_name)
