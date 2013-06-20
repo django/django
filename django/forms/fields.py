@@ -525,6 +525,18 @@ class EmailField(CharField):
     widget = EmailInput
     default_validators = [validators.validate_email]
 
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = kwargs.get('max_length', 254)
+        super(EmailField, self).__init__(*args, **kwargs)
+        if not self.has_max_length_validator():
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def has_max_length_validator(self):
+        for validator in self.validators:
+            if isinstance(validator, validators.MaxLengthValidator):
+                return True
+        return False
+
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(EmailField, self).clean(value)
