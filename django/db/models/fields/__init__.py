@@ -994,7 +994,6 @@ class EmailField(CharField):
         # twice.
         defaults = {
             'form_class': forms.EmailField,
-            'max_length': self.max_length,
         }
         defaults.update(kwargs)
         return super(EmailField, self).formfield(**defaults)
