@@ -435,7 +435,7 @@ This covers the basics, but forms can do a whole lot more:
 
    formsets
    modelforms
-   media
+   assets
 
 .. seealso::
 
