@@ -1554,13 +1554,13 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
 
-.. _modeladmin-media-definitions:
+.. _modeladmin-asset-definitions:
 
-``ModelAdmin`` media definitions
+``ModelAdmin`` asset definitions
 --------------------------------
 
 There are times where you would like add a bit of CSS and/or JavaScript to
-the add/change views. This can be accomplished by using a Media inner class
+the add/change views. This can be accomplished by using a ``Media`` inner class
 on your ``ModelAdmin``::
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -1572,8 +1572,8 @@ on your ``ModelAdmin``::
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
-``None``) to any media paths. The same rules apply as :ref:`regular media
-definitions on forms <form-media-paths>`.
+``None``) to any asset paths. The same rules apply as :ref:`regular asset
+definitions on forms <form-asset-paths>`.
 
 jQuery
 ~~~~~~

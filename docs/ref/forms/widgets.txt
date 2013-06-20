@@ -171,16 +171,15 @@ You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 Styling widget classes
 ^^^^^^^^^^^^^^^^^^^^^^
 
-With widgets, it is possible to add media (``css`` and ``javascript``)
+With widgets, it is possible to add assets (``css`` and ``javascript``)
 and more deeply customize their appearance and behavior.
 
 In a nutshell, you will need to subclass the widget and either
-:ref:`define a class "Media" <media-as-a-static-definition>` as a member of the
-subclass, or :ref:`create a property "media" <dynamic-property>`, returning an
-instance of that class.
+:ref:`define a "Media" inner class  <assets-as-a-static-definition>` or
+:ref:`create a "media" property <dynamic-property>`.
 
 These methods involve somewhat advanced Python programming and are described in
-detail in the :doc:`Form Media </topics/forms/media>` topic guide.
+detail in the :doc:`Form Assets </topics/forms/media>` topic guide.
 
 .. _base-widget-classes:
 

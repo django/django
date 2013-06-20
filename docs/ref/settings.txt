@@ -2475,7 +2475,7 @@ URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
-:ref:`media definitions<form-media-paths>` and the
+:ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.

@@ -116,7 +116,7 @@ As a result, we took the following steps to rectify the issue:
   (``django.core.context_processors.static``) and renamed to
   :func:`~django.core.context_processors.static`.
 
-* :ref:`form-media-paths` now uses :setting:`STATIC_URL` as the prefix
+* :ref:`form-asset-paths` now uses :setting:`STATIC_URL` as the prefix
   **if the value is not None**, and falls back to the previously used
   :setting:`MEDIA_URL` setting otherwise.
 
