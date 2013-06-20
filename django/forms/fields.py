@@ -16,6 +16,7 @@ except ImportError:     # Python 2
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
@@ -526,7 +527,7 @@ class EmailField(CharField):
     default_validators = [validators.validate_email]
 
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 254)
+        kwargs['max_length'] = kwargs.get('max_length', settings.EMAIL_MAX_LENGTH)
         super(EmailField, self).__init__(*args, **kwargs)
         if not self.has_max_length_validator():
             self.validators.append(validators.MaxLengthValidator(self.max_length))
