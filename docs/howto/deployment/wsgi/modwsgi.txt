@@ -25,7 +25,8 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-``httpd.conf`` file and add
+``httpd.conf`` file and add the following. If you are using a version of Apache
+older than 2.4, replace ``Require all granted`` with ``Allow from all``.
 
 .. code-block:: apache
 
@@ -35,7 +36,7 @@ Once you've got mod_wsgi installed and activated, edit your Apache server's
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
     Order deny,allow
-    Allow from all
+    Require all granted
     </Files>
     </Directory>
 
