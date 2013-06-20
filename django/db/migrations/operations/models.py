@@ -50,3 +50,31 @@ class DeleteModel(Operation):
 
     def describe(self):
         return "Delete model %s" % (self.name, )
+
+
+class AlterModelTable(Operation):
+    """
+    Renames a model's table
+    """
+
+    def __init__(self, name, table):
+        self.name = name
+        self.table = table
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.name.lower()].options["db_table"] = self.table
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        old_app_cache = from_state.render()
+        new_app_cache = to_state.render()
+        schema_editor.alter_db_table(
+            new_app_cache.get_model(app_label, self.name),
+            old_app_cache.get_model(app_label, self.name)._meta.db_table,
+            new_app_cache.get_model(app_label, self.name)._meta.db_table,
+        )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def describe(self):
+        return "Rename table for %s to %s" % (self.name, self.table)

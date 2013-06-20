@@ -114,3 +114,46 @@ class OperationTests(TestCase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+
+    def test_remove_field(self):
+        """
+        Tests the RemoveField operation.
+        """
+        project_state = self.set_up_test_model("test_rmfl")
+        # Test the state alteration
+        operation = migrations.RemoveField("Pony", "pink")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmfl", new_state)
+        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 1)
+        # Test the database alteration
+        self.assertColumnExists("test_rmfl_pony", "pink")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rmfl", editor, project_state, new_state)
+        self.assertColumnNotExists("test_rmfl_pony", "pink")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rmfl", editor, new_state, project_state)
+        self.assertColumnExists("test_rmfl_pony", "pink")
+
+    def test_alter_model_table(self):
+        """
+        Tests the AlterModelTable operation.
+        """
+        project_state = self.set_up_test_model("test_almota")
+        # Test the state alteration
+        operation = migrations.AlterModelTable("Pony", "test_almota_pony_2")
+        new_state = project_state.clone()
+        operation.state_forwards("test_almota", new_state)
+        self.assertEqual(new_state.models["test_almota", "pony"].options["db_table"], "test_almota_pony_2")
+        # Test the database alteration
+        self.assertTableExists("test_almota_pony")
+        self.assertTableNotExists("test_almota_pony_2")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_almota", editor, project_state, new_state)
+        self.assertTableNotExists("test_almota_pony")
+        self.assertTableExists("test_almota_pony_2")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_almota", editor, new_state, project_state)
+        self.assertTableExists("test_almota_pony")
+        self.assertTableNotExists("test_almota_pony_2")

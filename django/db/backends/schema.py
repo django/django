@@ -362,9 +362,9 @@ class BaseDatabaseSchemaEditor(object):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
             raise ValueError("Cannot alter field %s into %s - they are not compatible types (probably means only one is an M2M with implicit through model)" % (
-                    old_field,
-                    new_field,
-                ))
+                old_field,
+                new_field,
+            ))
         # Has unique been removed?
         if old_field.unique and not new_field.unique:
             # Find the unique constraint for this field

@@ -12,6 +12,7 @@ class AutodetectorTests(TestCase):
     """
 
     author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
+    author_name = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
@@ -95,3 +96,37 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "DeleteModel")
         self.assertEqual(action.name, "Author")
+
+    def test_add_field(self):
+        "Tests autodetection of new fields"
+        # Make state
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector.changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AddField")
+        self.assertEqual(action.name, "name")
+
+    def test_remove_field(self):
+        "Tests autodetection of removed fields"
+        # Make state
+        before = self.make_project_state([self.author_name])
+        after = self.make_project_state([self.author_empty])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector.changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "RemoveField")
+        self.assertEqual(action.name, "name")
