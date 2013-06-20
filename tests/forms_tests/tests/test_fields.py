@@ -296,7 +296,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
-        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" maxlength="6" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(f.clean('1'), Decimal("1"))
@@ -342,7 +342,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" maxlength="6" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(f.clean('1.5'), Decimal("1.5"))
