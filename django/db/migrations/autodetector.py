@@ -68,7 +68,26 @@ class MigrationAutodetector(object):
             old_field_names = set([x for x, y in old_model_state.fields])
             new_field_names = set([x for x, y in new_model_state.fields])
             for field_name in new_field_names - old_field_names:
-                field = [y for x, y in new_model_state.fields if x == field_name][0]
+                field = new_model_state.get_field_by_name(field_name)
+                # Scan to see if this is actually a rename!
+                field_dec = field.deconstruct()[1:]
+                found_rename = False
+                for removed_field_name in (old_field_names - new_field_names):
+                    if old_model_state.get_field_by_name(removed_field_name).deconstruct()[1:] == field_dec:
+                        self.add_to_migration(
+                            app_label,
+                            operations.RenameField(
+                                model_name = model_name,
+                                old_name = removed_field_name,
+                                new_name = field_name,
+                            )
+                        )
+                        old_field_names.remove(removed_field_name)
+                        new_field_names.remove(field_name)
+                        found_rename = True
+                        break
+                if found_rename:
+                    continue
                 # You can't just add NOT NULL fields with no default
                 if not field.null and not field.has_default():
                     field.default = self.questioner.ask_not_null_addition(field_name, model_name)
