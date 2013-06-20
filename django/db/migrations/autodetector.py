@@ -89,6 +89,20 @@ class MigrationAutodetector(object):
                         name = field_name,
                     )
                 )
+            # The same fields
+            for field_name in old_field_names.intersection(new_field_names):
+                # Did the field change?
+                old_field_dec = old_model_state.get_field_by_name(field_name).deconstruct()
+                new_field_dec = new_model_state.get_field_by_name(field_name).deconstruct()
+                if old_field_dec != new_field_dec:
+                    self.add_to_migration(
+                        app_label,
+                        operations.AlterField(
+                            model_name = model_name,
+                            name = field_name,
+                            field = new_model_state.get_field_by_name(field_name),
+                        )
+                    )
         # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):

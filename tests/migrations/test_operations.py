@@ -173,8 +173,8 @@ class OperationTests(TestCase):
         operation = migrations.AlterField("Pony", "pink", models.IntegerField(null=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
-        self.assertEqual([f for n, f in project_state.models["test_alfl", "pony"].fields if n == "pink"][0].null, False)
-        self.assertEqual([f for n, f in new_state.models["test_alfl", "pony"].fields if n == "pink"][0].null, True)
+        self.assertEqual(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
+        self.assertEqual(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
         # Test the database alteration
         self.assertColumnNotNull("test_alfl_pony", "pink")
         with connection.schema_editor() as editor:

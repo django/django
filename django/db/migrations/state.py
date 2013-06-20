@@ -126,3 +126,9 @@ class ModelState(object):
             tuple(self.bases),
             body,
         )
+
+    def get_field_by_name(self, name):
+        for fname, field in self.fields:
+            if fname == name:
+                return field
+        raise ValueError("No field called %s on model %s" % (name, self.name))
