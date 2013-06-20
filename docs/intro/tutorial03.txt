@@ -339,14 +339,14 @@ Put the following code in that template:
 Now let's update our ``index`` view in ``polls/views.py`` to use the template::
 
     from django.http import HttpResponse
-    from django.template import Context, loader
+    from django.template import RequestContext, loader
 
     from polls.models import Poll
 
     def index(request):
         latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
         template = loader.get_template('polls/index.html')
-        context = Context({
+        context = RequestContext({
             'latest_poll_list': latest_poll_list,
         })
         return HttpResponse(template.render(context))
@@ -377,7 +377,7 @@ rewritten::
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
-:mod:`~django.template.loader`, :class:`~django.template.Context` and
+:mod:`~django.template.loader`, :class:`~django.template.RequestContext` and
 :class:`~django.http.HttpResponse` (you'll want to keep ``HttpResponse`` if you
 still have the stub methods for ``detail``, ``results``, and ``vote``).
 
