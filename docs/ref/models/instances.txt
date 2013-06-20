@@ -661,8 +661,11 @@ For every :class:`~django.db.models.DateField` and
 returns the next and previous object with respect to the date field, raising
 a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
 
-Both methods accept optional keyword arguments, which should be in the format
-described in :ref:`Field lookups <field-lookups>`.
+Both of these methods will perform their queries using the default
+manager for the model. If you need to emulate filtering used by a
+custom manager, or want to perform one-off custom filtering, both
+methods also accept optional keyword arguments, which should be in the
+format described in :ref:`Field lookups <field-lookups>`.
 
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
