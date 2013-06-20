@@ -346,7 +346,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template::
     def index(request):
         latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
         template = loader.get_template('polls/index.html')
-        context = RequestContext({
+        context = RequestContext(request, {
             'latest_poll_list': latest_poll_list,
         })
         return HttpResponse(template.render(context))
