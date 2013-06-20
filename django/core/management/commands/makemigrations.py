@@ -20,7 +20,7 @@ class Command(BaseCommand):
     )
 
     help = "Creates new migration(s) for apps."
-    usage_str = "Usage: ./manage.py createmigration [--empty] [app [app ...]]"
+    usage_str = "Usage: ./manage.py makemigrations [--empty] [app [app ...]]"
 
     def handle(self, *app_labels, **options):
 
