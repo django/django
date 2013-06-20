@@ -22,6 +22,12 @@ class OperationTests(TestCase):
     def assertColumnNotExists(self, table, column):
         self.assertNotIn(column, [c.name for c in connection.introspection.get_table_description(connection.cursor(), table)])
 
+    def assertColumnNull(self, table, column):
+        self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(connection.cursor(), table) if c.name == column][0], True)
+
+    def assertColumnNotNull(self, table, column):
+        self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(connection.cursor(), table) if c.name == column][0], False)
+
     def set_up_test_model(self, app_label):
         """
         Creates a test model state and database table.
@@ -50,7 +56,7 @@ class OperationTests(TestCase):
             "Pony",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("pink", models.BooleanField(default=True)),
+                ("pink", models.IntegerField(default=1)),
             ],
         )
         # Test the state alteration
@@ -157,3 +163,48 @@ class OperationTests(TestCase):
             operation.database_backwards("test_almota", editor, new_state, project_state)
         self.assertTableExists("test_almota_pony")
         self.assertTableNotExists("test_almota_pony_2")
+
+    def test_alter_field(self):
+        """
+        Tests the AlterField operation.
+        """
+        project_state = self.set_up_test_model("test_alfl")
+        # Test the state alteration
+        operation = migrations.AlterField("Pony", "pink", models.IntegerField(null=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_alfl", new_state)
+        self.assertEqual([f for n, f in project_state.models["test_alfl", "pony"].fields if n == "pink"][0].null, False)
+        self.assertEqual([f for n, f in new_state.models["test_alfl", "pony"].fields if n == "pink"][0].null, True)
+        # Test the database alteration
+        self.assertColumnNotNull("test_alfl_pony", "pink")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alfl", editor, project_state, new_state)
+        self.assertColumnNull("test_alfl_pony", "pink")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alfl", editor, new_state, project_state)
+        self.assertColumnNotNull("test_alfl_pony", "pink")
+
+    def test_rename_field(self):
+        """
+        Tests the RenameField operation.
+        """
+        project_state = self.set_up_test_model("test_rnfl")
+        # Test the state alteration
+        operation = migrations.RenameField("Pony", "pink", "blue")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rnfl", new_state)
+        self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        self.assertNotIn("pink", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        # Test the database alteration
+        self.assertColumnExists("test_rnfl_pony", "pink")
+        self.assertColumnNotExists("test_rnfl_pony", "blue")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rnfl", editor, project_state, new_state)
+        self.assertColumnExists("test_rnfl_pony", "blue")
+        self.assertColumnNotExists("test_rnfl_pony", "pink")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rnfl", editor, new_state, project_state)
+        self.assertColumnExists("test_rnfl_pony", "pink")
+        self.assertColumnNotExists("test_rnfl_pony", "blue")

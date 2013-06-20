@@ -93,10 +93,17 @@ class ModelState(object):
 
     def clone(self):
         "Returns an exact copy of this ModelState"
+        # We deep-clone the fields using deconstruction
+        fields = []
+        for name, field in self.fields:
+            _, path, args, kwargs = field.deconstruct()
+            field_class = import_by_path(path)
+            fields.append((name, field_class(*args, **kwargs)))
+        # Now make a copy
         return self.__class__(
             app_label = self.app_label,
             name = self.name,
-            fields = list(self.fields),
+            fields = fields,
             options = dict(self.options),
             bases = self.bases,
         )

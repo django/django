@@ -1,2 +1,2 @@
 from .models import CreateModel, DeleteModel, AlterModelTable
-from .fields import AddField, RemoveField
+from .fields import AddField, RemoveField, AlterField, RenameField
