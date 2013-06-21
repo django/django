@@ -155,7 +155,7 @@ class AutodetectorTests(TestCase):
         # Make state
         before = self.make_project_state([self.author_name])
         after = self.make_project_state([self.author_name_renamed])
-        autodetector = MigrationAutodetector(before, after)
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
         changes = autodetector.changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)

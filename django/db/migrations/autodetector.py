@@ -74,18 +74,19 @@ class MigrationAutodetector(object):
                 found_rename = False
                 for removed_field_name in (old_field_names - new_field_names):
                     if old_model_state.get_field_by_name(removed_field_name).deconstruct()[1:] == field_dec:
-                        self.add_to_migration(
-                            app_label,
-                            operations.RenameField(
-                                model_name = model_name,
-                                old_name = removed_field_name,
-                                new_name = field_name,
+                        if self.questioner.ask_rename(model_name, removed_field_name, field_name, field):
+                            self.add_to_migration(
+                                app_label,
+                                operations.RenameField(
+                                    model_name = model_name,
+                                    old_name = removed_field_name,
+                                    new_name = field_name,
+                                )
                             )
-                        )
-                        old_field_names.remove(removed_field_name)
-                        new_field_names.remove(field_name)
-                        found_rename = True
-                        break
+                            old_field_names.remove(removed_field_name)
+                            new_field_names.remove(field_name)
+                            found_rename = True
+                            break
                 if found_rename:
                     continue
                 # You can't just add NOT NULL fields with no default
@@ -257,6 +258,10 @@ class MigrationQuestioner(object):
         # None means quit
         return None
 
+    def ask_rename(self, model_name, old_name, new_name, field_instance):
+        "Was this field really renamed?"
+        return self.defaults.get("ask_rename", False)
+
 
 class InteractiveMigrationQuestioner(MigrationQuestioner):
 
@@ -323,3 +328,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                         print("Invalid input: %s" % e)
                     else:
                         break
+
+    def ask_rename(self, model_name, old_name, new_name, field_instance):
+        "Was this field really renamed?"
+        return self._boolean_input("Did you rename %s.%s to %s.%s (a %s)?" % (model_name, old_name, model_name, new_name, field_instance.__class__.__name__))
