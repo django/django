@@ -564,7 +564,6 @@ class MembershipMissingFK(models.Model):
     person = models.ForeignKey(Person)
 
 class PersonSelfRefM2M(models.Model):
-    name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="Relationship")
     too_many_friends = models.ManyToManyField('self', through="RelationshipTripleFK")
 
@@ -578,7 +577,6 @@ class RelationshipTripleFK(models.Model):
     third = models.ForeignKey(PersonSelfRefM2M, related_name="too_many_by_far")
 
 class PersonSelfRefM2MExplicit(models.Model):
-    name = models.CharField(max_length=5)
     friends = models.ManyToManyField('self', through="ExplicitRelationship", symmetrical=True)
 
 class ExplicitRelationship(models.Model):
