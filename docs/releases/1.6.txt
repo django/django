@@ -656,6 +656,59 @@ rely on the previous URLs. If you want to revert to the original behavior you
 can set the
 :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
 
+``django.contrib.auth`` password reset uses base 64 encoding of ``User`` PK
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Past versions of Django used base 36 encoding of the ``User`` primary key in
+the password reset views and URLs
+(:func:`django.contrib.auth.views.password_reset_confirm`). Base 36 encoding is
+sufficient if the user primary key is an integer, however, with the
+introduction of custom user models in Django 1.5, that assumption may no longer
+be true.
+
+:func:`django.contrib.auth.views.password_reset_confirm` has been modified to
+take a ``uidb64`` parameter instead of ``uidb36``. If you are reversing this
+view, for example in a custom ``password_reset_email.html`` template, be sure
+to update your code.
+
+A temporary shim for :func:`django.contrib.auth.views.password_reset_confirm`
+that will allow password reset links generated prior to Django 1.6 to continue
+to work has been added to provide backwards compatibility; this will be removed
+in Django 1.7. Thus, as long as your site has been running Django 1.6 for more
+than :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect.
+If not (for example, if you upgrade directly from Django 1.5 to Django 1.7),
+then any password reset links generated before you upgrade to Django 1.7 or
+later won't work after the upgrade.
+
+In addition, if you have any custom password reset URLs, you will need to
+update them by replacing ``uidb36`` with ``uidb64`` and the dash that follows
+that pattern with a slash. Also add ``_\-`` to the list of characters that may
+match the ``uidb64`` pattern.
+
+For example::
+
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        name='password_reset_confirm'),
+
+becomes::
+
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        name='password_reset_confirm'),
+
+You may also want to add the shim to support the old style reset links. Using
+the example above, you would modify the existing url by replacing
+``django.contrib.auth.views.password_reset_confirm`` with
+``django.contrib.auth.views.password_reset_confirm_uidb36`` and also remove
+the ``name`` argument so it doesn't conflict with the new url::
+
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm_uidb36'),
+
+You can remove this url pattern after your app has been deployed with Django
+1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
