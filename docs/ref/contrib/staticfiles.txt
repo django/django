@@ -106,7 +106,9 @@ various locations.
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
 (using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+files with the same name are present, the first file that is found will be
+used.
 
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to

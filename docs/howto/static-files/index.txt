@@ -68,7 +68,7 @@ details on how ``staticfiles`` finds your files.
     Now we *might* be able to get away with putting our static files directly
     in ``my_app/static/`` (rather than creating another ``my_app``
     subdirectory), but it would actually be a bad idea. Django will use the
-    last static file it finds whose name matches, and if you had a static file
+    first static file it finds whose name matches, and if you had a static file
     with the same name in a *different* application, Django would be unable to
     distinguish between them. We need to be able to point Django at the right
     one, and the easiest way to ensure this is by *namespacing* them. That is,
