@@ -198,15 +198,12 @@ provided by the generic view. For example, think of showing a list of
 all the books on each publisher detail page. The
 :class:`~django.views.generic.detail.DetailView` generic view provides
 the publisher to the context, but how do we get additional information
-in that template.
+in that template?
 
-However, there is; you can subclass
-:class:`~django.views.generic.detail.DetailView` and provide your own
-implementation of the ``get_context_data`` method. The default
-implementation of this that comes with
-:class:`~django.views.generic.detail.DetailView` simply adds in the
-object being displayed to the template, but you can override it to send
-more::
+The answer is to subclass :class:`~django.views.generic.detail.DetailView`
+and provide your own implementation of the ``get_context_data`` method.
+The default implementation simply adds the object being displayed to the
+template, but you can override it to send more::
 
     from django.views.generic import DetailView
     from books.models import Publisher, Book
