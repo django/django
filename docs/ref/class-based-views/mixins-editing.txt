@@ -37,6 +37,8 @@ FormMixin
 
     .. attribute:: prefix
 
+        .. versionadded:: 1.6
+
         Sets the :attr:`~django.forms.Form.prefix` for the generated form.
 
     .. method:: get_initial()
