@@ -8,7 +8,7 @@ from decimal import Decimal
 from django import forms
 from django.db import models
 from django.forms.models import (_get_foreign_key, inlineformset_factory,
-    modelformset_factory)
+    modelformset_factory, BaseModelFormSet)
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -385,6 +385,23 @@ class ModelFormsetTest(TestCase):
         PostFormSet = modelformset_factory(Post, form=PostForm2)
         formset = PostFormSet()
         self.assertFalse("subtitle" in formset.forms[0].fields)
+
+    def test_custom_queryset_init(self):
+        """
+        Test that a queryset can be overriden in the __init__ method.
+        https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
+        """
+        author1 = Author.objects.create(name='Charles Baudelaire')
+        author2 = Author.objects.create(name='Paul Verlaine')
+
+        class BaseAuthorFormSet(BaseModelFormSet):
+            def __init__(self, *args, **kwargs):
+                super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+                self.queryset = Author.objects.filter(name__startswith='Charles')
+
+        AuthorFormSet = modelformset_factory(Author, formset=BaseAuthorFormSet)
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset.get_queryset()), 1)
 
     def test_model_inheritance(self):
         BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields="__all__")

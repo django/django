@@ -6,6 +6,7 @@ from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
@@ -55,8 +56,6 @@ class BaseFormSet(object):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
-        # construct the forms in the formset
-        self._construct_forms()
 
     def __str__(self):
         return self.as_table()
@@ -125,12 +124,14 @@ class BaseFormSet(object):
             initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
-    def _construct_forms(self):
-        # instantiate all the forms and put them in self.forms
-        self.forms = []
+    @cached_property
+    def forms(self):
+        """
+        Instantiate forms at first property access.
+        """
         # DoS protection is included in total_form_count()
-        for i in xrange(self.total_form_count()):
-            self.forms.append(self._construct_form(i))
+        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        return forms
 
     def _construct_form(self, i, **kwargs):
         """
