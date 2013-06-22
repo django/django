@@ -70,7 +70,7 @@ class ModelState(object):
         """
         # Deconstruct the fields
         fields = []
-        for field in model._meta.local_fields:
+        for field in model._meta.fields:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
             fields.append((name, field_class(*args, **kwargs)))
@@ -83,12 +83,15 @@ class ModelState(object):
             if name in model._meta.original_attrs:
                 options[name] = model._meta.original_attrs[name]
         # Make our record
+        bases = tuple(model for model in model.__bases__ if (not hasattr(model, "_meta") or not model._meta.abstract))
+        if not bases:
+            bases = (models.Model, )
         return cls(
             model._meta.app_label,
             model._meta.object_name,
             fields,
             options,
-            model.__bases__,
+            bases,
         )
 
     def clone(self):

@@ -36,19 +36,87 @@ class MigrationAutodetector(object):
         """
         # We'll store migrations as lists by app names for now
         self.migrations = {}
-        # Adding models.
+        old_app_cache = self.from_state.render()
+        new_app_cache = self.to_state.render()
+        # Adding models. Phase 1 is adding models with no outward relationships.
         added_models = set(self.to_state.models.keys()) - set(self.from_state.models.keys())
+        pending_add = {}
         for app_label, model_name in added_models:
+            model_state = self.to_state.models[app_label, model_name]
+            # Are there any relationships out from this model? if so, punt it to the next phase.
+            related_fields = []
+            for field in new_app_cache.get_model(app_label, model_name)._meta.fields:
+                if hasattr(field, "rel"):
+                    if hasattr(field.rel, "to"):
+                        related_fields.append((field.name, field.rel.to._meta.app_label.lower(), field.rel.to._meta.object_name.lower()))
+                    if hasattr(field.rel, "through") and not field.rel.though._meta.auto_created:
+                        related_fields.append((field.name, field.rel.through._meta.app_label.lower(), field.rel.through._meta.object_name.lower()))
+            if related_fields:
+                pending_add[app_label, model_name] = related_fields
+            else:
+                self.add_to_migration(
+                    app_label,
+                    operations.CreateModel(
+                        name = model_state.name,
+                        fields = model_state.fields,
+                        options = model_state.options,
+                        bases = model_state.bases,
+                    )
+                )
+        # Phase 2 is progressively adding pending models, splitting up into two
+        # migrations if required.
+        pending_new_fks = []
+        while pending_add:
+            # Is there one we can add that has all dependencies satisfied?
+            satisfied = [(m, rf) for m, rf in pending_add.items() if all((al, mn) not in pending_add for f, al, mn in rf)]
+            if satisfied:
+                (app_label, model_name), related_fields = sorted(satisfied)[0]
+                model_state = self.to_state.models[app_label, model_name]
+                self.add_to_migration(
+                    app_label,
+                    operations.CreateModel(
+                        name = model_state.name,
+                        fields = model_state.fields,
+                        options = model_state.options,
+                        bases = model_state.bases,
+                    )
+                )
+                for field_name, other_app_label, other_model_name in related_fields:
+                    self.add_dependency(app_label, other_app_label)
+                del pending_add[app_label, model_name]
+            # Ah well, we'll need to split one. Pick deterministically.
+            else:
+                (app_label, model_name), related_fields = sorted(pending_add.items())[0]
+                model_state = self.to_state.models[app_label, model_name]
+                # Work out the fields that need splitting out
+                bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
+                # Create the model, without those
+                self.add_to_migration(
+                    app_label,
+                    operations.CreateModel(
+                        name = model_state.name,
+                        fields = [(n, f) for n, f in model_state.fields if n not in bad_fields],
+                        options = model_state.options,
+                        bases = model_state.bases,
+                    )
+                )
+                # Add the bad fields to be made in a phase 3
+                for field_name, (other_app_label, other_model_name) in bad_fields.items():
+                    pending_new_fks.append((app_label, model_name, field_name, other_app_label))
+                del pending_add[app_label, model_name]
+        # Phase 3 is adding the final set of FKs as separate new migrations
+        for app_label, model_name, field_name, other_app_label in pending_new_fks:
             model_state = self.to_state.models[app_label, model_name]
             self.add_to_migration(
                 app_label,
-                operations.CreateModel(
-                    name = model_state.name,
-                    fields = model_state.fields,
-                    options = model_state.options,
-                    bases = model_state.bases,
-                )
+                operations.AddField(
+                    model_name = model_name,
+                    name = field_name,
+                    field = model_state.get_field_by_name(field_name),
+                ),
+                new = True,
             )
+            self.add_dependency(app_label, other_app_label)
         # Removing models
         removed_models = set(self.from_state.models.keys()) - set(self.to_state.models.keys())
         for app_label, model_name in removed_models:
@@ -127,15 +195,30 @@ class MigrationAutodetector(object):
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):
                 m2.dependencies.append((app_label, m1.name))
+        # Clean up dependencies
+        for app_label, migrations in self.migrations.items():
+            for migration in migrations:
+                migration.dependencies = list(set(migration.dependencies))
         return self.migrations
 
-    def add_to_migration(self, app_label, operation):
+    def add_to_migration(self, app_label, operation, new=False):
         migrations = self.migrations.setdefault(app_label, [])
-        if not migrations:
+        if not migrations or new:
             subclass = type("Migration", (Migration,), {"operations": [], "dependencies": []})
             instance = subclass("auto_%i" % (len(migrations) + 1), app_label)
             migrations.append(instance)
         migrations[-1].operations.append(operation)
+
+    def add_dependency(self, app_label, other_app_label):
+        """
+        Adds a dependency to app_label's newest migration on
+        other_app_label's latest migration.
+        """
+        if self.migrations.get(other_app_label, []):
+            dependency = (other_app_label, self.migrations[other_app_label][-1].name)
+        else:
+            dependency = (other_app_label, "__first__")
+        self.migrations[app_label][-1].dependencies.append(dependency)
 
     def arrange_for_graph(self, changes, graph):
         """
