@@ -11,9 +11,12 @@ from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
+from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.util import format_number
 from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.models.fields import (AutoField, DateField, DateTimeField,
+    DecimalField, IntegerField, TimeField)
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
@@ -402,7 +405,7 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class SqlliteAggregationTests(TestCase):
+class SqliteAggregationTests(TestCase):
     """
     #19360: Raise NotImplementedError when aggregating on date/time fields.
     """
@@ -416,6 +419,38 @@ class SqlliteAggregationTests(TestCase):
                 models.Item.objects.all().aggregate, aggregate('date'))
             self.assertRaises(NotImplementedError,
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
+
+
+class SqliteChecks(TestCase):
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "No need to do SQLite checks")
+    def test_convert_values_to_handle_null_value(self):
+        database_operations = DatabaseOperations(connection)
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, AutoField(primary_key=True))
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateTimeField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DecimalField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, IntegerField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, TimeField())
+        )
 
 
 class BackendTestCase(TestCase):

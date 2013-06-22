@@ -250,6 +250,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         and gets dates and datetimes wrong.
         For consistency with other backends, coerce when required.
         """
+        if value is None:
+            return None
+
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
             return util.typecast_decimal(field.format_number(value))
