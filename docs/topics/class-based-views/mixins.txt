@@ -285,12 +285,17 @@ One way to do this is to combine :class:`ListView` with
 for the paginated list of books can hang off the publisher found as the single
 object. In order to do this, we need to have two different querysets:
 
-**Publisher queryset for use in get_object**
-    We'll set that up directly when we call ``get_object()``.
+**``Publisher`` queryset for use in ``get_object``**
+    We'll set the ``model`` attribute on the view and rely on the default
+    implementation of ``get_object()`` to fetch the correct ``Publisher``
+    object.
 
-**Book queryset for use by ListView**
-    We'll figure that out ourselves in ``get_queryset()`` so we
-    can take into account the ``Publisher`` we're looking at.
+**``Book`` queryset for use by ``ListView``**
+    The default implementation of ``get_queryset`` uses the ``model`` attribute
+    to construct the queryset. This conflicts with our use of this attribute
+    for ``get_object`` so we'll override that method and have it return
+    the queryset of ``Book`` objects linked to the ``Publisher`` we're looking
+    at.
 
 .. note::
 
@@ -299,7 +304,7 @@ object. In order to do this, we need to have two different querysets:
     :class:`ListView` will
     put things in the context data under the value of
     ``context_object_name`` if it's set, we'll instead explictly
-    ensure the Publisher is in the context data. :class:`ListView`
+    ensure the ``Publisher`` is in the context data. :class:`ListView`
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.
 
@@ -310,31 +315,36 @@ Now we can write a new ``PublisherDetail``::
     from books.models import Publisher
 
     class PublisherDetail(SingleObjectMixin, ListView):
+        model = Publisher  # for SingleObjectMixin.get_object
         paginate_by = 2
         template_name = "books/publisher_detail.html"
 
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            return super(PublisherDetail, self).get(request, *args, **kwargs)
+
         def get_context_data(self, **kwargs):
-            kwargs['publisher'] = self.object
-            return super(PublisherDetail, self).get_context_data(**kwargs)
+            context = super(PublisherDetail, self).get_context_data(**kwargs)
+            context['publisher'] = self.object
+            return context
 
         def get_queryset(self):
-            self.object = self.get_object(Publisher.objects.all())
             return self.object.book_set.all()
 
-Notice how we set ``self.object`` within ``get_queryset()`` so we
-can use it again later in ``get_context_data()``. If you don't set
-``template_name``, the template will default to the normal
+Notice how we set ``self.object`` within ``get()`` so we
+can use it again later in ``get_context_data()`` and ``get_queryset()``.
+If you don't set ``template_name``, the template will default to the normal
 :class:`ListView` choice, which in this case would be
 ``"books/book_list.html"`` because it's a list of books;
 :class:`ListView` knows nothing about
 :class:`~django.views.generic.detail.SingleObjectMixin`, so it doesn't have
-any clue this view is anything to do with a Publisher.
-
-.. highlightlang:: html+django
+any clue this view is anything to do with a ``Publisher``.
 
 The ``paginate_by`` is deliberately small in the example so you don't
 have to create lots of books to see the pagination working! Here's the
-template you'd want to use::
+template you'd want to use:
+
+.. code-block: html+django
 
     {% extends "base.html" %}
 
@@ -426,8 +436,6 @@ code so that on ``POST`` the form gets called appropriately.
     both of the views implement ``get()``, and things would get much more
     confusing.
 
-.. highlightlang:: python
-
 Our new ``AuthorDetail`` looks like this::
 
     # CAUTION: you almost certainly do not want to do this.
@@ -449,21 +457,18 @@ Our new ``AuthorDetail`` looks like this::
         form_class = AuthorInterestForm
 
         def get_success_url(self):
-            return reverse(
-                'author-detail',
-                kwargs = {'pk': self.object.pk},
-            )
+            return reverse('author-detail', kwargs={'pk': self.object.pk})
 
         def get_context_data(self, **kwargs):
+            context = super(AuthorDetail, self).get_context_data(**kwargs)
             form_class = self.get_form_class()
-            form = self.get_form(form_class)
-            context = {
-                'form': form
-            }
-            context.update(kwargs)
-            return super(AuthorDetail, self).get_context_data(**context)
+            context['form'] = self.get_form(form_class)
+            return context
 
         def post(self, request, *args, **kwargs):
+            if not request.user.is_authenticated():
+                return HttpResponseForbidden()
+            self.object = self.get_object()
             form_class = self.get_form_class()
             form = self.get_form(form_class)
             if form.is_valid():
@@ -472,10 +477,8 @@ Our new ``AuthorDetail`` looks like this::
                 return self.form_invalid(form)
 
         def form_valid(self, form):
-            if not self.request.user.is_authenticated():
-                return HttpResponseForbidden()
-            self.object = self.get_object()
-            # record the interest using the message in form.cleaned_data
+            # Here, we would record the user's interest using the message
+            # passed in form.cleaned_data['message']
             return super(AuthorDetail, self).form_valid(form)
 
 ``get_success_url()`` is just providing somewhere to redirect to,
@@ -528,15 +531,12 @@ write our own ``get_context_data()`` to make the
         message = forms.CharField()
 
     class AuthorDisplay(DetailView):
-
-        queryset = Author.objects.all()
+        model = Author
 
         def get_context_data(self, **kwargs):
-            context = {
-                'form': AuthorInterestForm(),
-            }
-            context.update(kwargs)
-            return super(AuthorDisplay, self).get_context_data(**context)
+            context = super(AuthorDisplay, self).get_context_data(**kwargs)
+            context['form'] = AuthorInterestForm()
+            return context
 
 Then the ``AuthorInterest`` is a simple :class:`FormView`, but we
 have to bring in :class:`~django.views.generic.detail.SingleObjectMixin` so we
@@ -554,24 +554,14 @@ template as ``AuthorDisplay`` is using on ``GET``.
         form_class = AuthorInterestForm
         model = Author
 
-        def get_context_data(self, **kwargs):
-            context = {
-                'object': self.get_object(),
-            }
-            return super(AuthorInterest, self).get_context_data(**context)
-
-        def get_success_url(self):
-            return reverse(
-                'author-detail',
-                kwargs = {'pk': self.object.pk},
-            )
-
-        def form_valid(self, form):
-            if not self.request.user.is_authenticated():
+        def post(self, request, *args, **kwargs):
+            if not request.user.is_authenticated():
                 return HttpResponseForbidden()
             self.object = self.get_object()
-            # record the interest using the message in form.cleaned_data
-            return super(AuthorInterest, self).form_valid(form)
+            return super(AuthorInterest, self).post(request, *args, **kwargs)
+
+        def get_success_url(self):
+            return reverse('author-detail', kwargs={'pk': self.object.pk})
 
 Finally we bring this together in a new ``AuthorDetail`` view. We
 already know that calling :meth:`~django.views.generic.base.View.as_view()` on
