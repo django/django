@@ -35,6 +35,10 @@ FormMixin
 
         The URL to redirect to when the form is successfully processed.
 
+    .. attribute:: prefix
+
+        Sets the :attr:`~django.forms.Form.prefix` for the generated form.
+
     .. method:: get_initial()
 
         Retrieve initial data for the form. By default, returns a copy of
