@@ -731,6 +731,9 @@ Miscellaneous
   of the admin views. You should update your custom templates if they use the
   previous parameter name.
 
+* Added :attr:`~django.views.generic.edit.FormMixin.prefix` to allow you to
+  customize the prefix on the form.
+
 Features deprecated in 1.6
 ==========================
 

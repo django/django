@@ -17,12 +17,19 @@ class FormMixin(ContextMixin):
     initial = {}
     form_class = None
     success_url = None
+    prefix = None
 
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
         return self.initial.copy()
+
+    def get_prefix(self):
+        """
+        Returns the prefix to use for forms on this view
+        """
+        return self.prefix
 
     def get_form_class(self):
         """
@@ -40,7 +47,11 @@ class FormMixin(ContextMixin):
         """
         Returns the keyword arguments for instantiating the form.
         """
-        kwargs = {'initial': self.get_initial()}
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,

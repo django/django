@@ -7,8 +7,9 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
+from django.test.client import RequestFactory
 from django.views.generic.base import View
-from django.views.generic.edit import FormMixin, CreateView, UpdateView
+from django.views.generic.edit import FormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
@@ -21,6 +22,24 @@ class FormMixinTests(TestCase):
         initial_1['foo'] = 'bar'
         initial_2 = FormMixin().get_initial()
         self.assertNotEqual(initial_1, initial_2)
+
+    def test_get_prefix(self):
+        """ Test prefix can be set (see #18872) """
+        test_string = 'test'
+
+        rf = RequestFactory()
+        get_request = rf.get('/')
+
+        class TestFormMixin(FormMixin):
+            request = get_request
+
+        default_kwargs = TestFormMixin().get_form_kwargs()
+        self.assertEqual(None, default_kwargs.get('prefix'))
+
+        set_mixin = TestFormMixin()
+        set_mixin.prefix = test_string
+        set_kwargs = set_mixin.get_form_kwargs()
+        self.assertEqual(test_string, set_kwargs.get('prefix'))
 
 
 class BasicFormTests(TestCase):
