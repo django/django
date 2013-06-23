@@ -213,7 +213,7 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    email = forms.EmailField(label=_("Email"), max_length=254)
+    email = forms.EmailField(label=_("Email"))
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',

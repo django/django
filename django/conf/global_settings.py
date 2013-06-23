@@ -185,6 +185,12 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 
+# Max length of the E-mails, it should be 254 but this is not possible because
+# At present we do not have the ability to make schema changes in core and
+# so we cannot change the underlying database field of any given model field
+
+EMAIL_MAX_LENGTH = 75
+
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
 

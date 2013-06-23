@@ -986,7 +986,7 @@ class EmailField(CharField):
         # max_length should be overridden to 254 characters to be fully
         # compliant with RFCs 3696 and 5321
 
-        kwargs['max_length'] = kwargs.get('max_length', 75)
+        kwargs['max_length'] = kwargs.get('max_length', settings.EMAIL_MAX_LENGTH)
         CharField.__init__(self, *args, **kwargs)
 
     def formfield(self, **kwargs):

@@ -16,6 +16,7 @@ except ImportError:     # Python 2
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList, from_current_timezone, to_current_timezone
@@ -518,6 +519,10 @@ class RegexField(CharField):
 class EmailField(CharField):
     widget = EmailInput
     default_validators = [validators.validate_email]
+
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = kwargs.get('max_length', settings.EMAIL_MAX_LENGTH)
+        super(EmailField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
         value = self.to_python(value).strip()
