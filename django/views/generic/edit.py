@@ -89,6 +89,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
     """
     A mixin that provides a way to show and handle a modelform in a request.
     """
+    fields = None
 
     def get_form_class(self):
         """
@@ -109,13 +110,12 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 # from that
                 model = self.get_queryset().model
 
-            fields = getattr(self, 'fields', None)
-            if fields is None:
+            if self.fields is None:
                 warnings.warn("Using ModelFormMixin (base class of %s) without "
                               "the 'fields' attribute is deprecated." % self.__class__.__name__,
                               PendingDeprecationWarning)
 
-            return model_forms.modelform_factory(model, fields=fields)
+            return model_forms.modelform_factory(model, fields=self.fields)
 
     def get_form_kwargs(self):
         """
