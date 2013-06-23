@@ -414,12 +414,36 @@ class Options(object):
         return cache
 
     def get_add_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_add_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            PendingDeprecationWarning, stacklevel=2)
         return 'add_%s' % self.model_name
 
     def get_change_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_change_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            PendingDeprecationWarning, stacklevel=2)
         return 'change_%s' % self.model_name
 
     def get_delete_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_delete_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            PendingDeprecationWarning, stacklevel=2)
         return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,

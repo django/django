@@ -4,18 +4,15 @@ from functools import partial, reduce, update_wrapper
 
 from django import forms
 from django.conf import settings
-from django.forms.formsets import all_valid, DELETION_FIELD_NAME
-from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
-from django.contrib.contenttypes.models import ContentType
+from django.contrib import messages
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
     model_format_dict, NestedObjects, lookup_needs_distinct)
 from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib import messages
-from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth import get_permission_codename
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
@@ -24,6 +21,9 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
+from django.forms.formsets import all_valid, DELETION_FIELD_NAME
+from django.forms.models import (modelform_factory, modelformset_factory,
+    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
@@ -39,6 +39,8 @@ from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.utils.encoding import force_text
+from django.views.decorators.csrf import csrf_protect
+
 
 IS_POPUP_VAR = '_popup'
 
@@ -58,15 +60,15 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
         'form_class': forms.SplitDateTimeField,
         'widget': widgets.AdminSplitDateTime
     },
-    models.DateField:       {'widget': widgets.AdminDateWidget},
-    models.TimeField:       {'widget': widgets.AdminTimeWidget},
-    models.TextField:       {'widget': widgets.AdminTextareaWidget},
-    models.URLField:        {'widget': widgets.AdminURLFieldWidget},
-    models.IntegerField:    {'widget': widgets.AdminIntegerFieldWidget},
+    models.DateField: {'widget': widgets.AdminDateWidget},
+    models.TimeField: {'widget': widgets.AdminTimeWidget},
+    models.TextField: {'widget': widgets.AdminTextareaWidget},
+    models.URLField: {'widget': widgets.AdminURLFieldWidget},
+    models.IntegerField: {'widget': widgets.AdminIntegerFieldWidget},
     models.BigIntegerField: {'widget': widgets.AdminBigIntegerFieldWidget},
-    models.CharField:       {'widget': widgets.AdminTextInputWidget},
-    models.ImageField:      {'widget': widgets.AdminFileWidget},
-    models.FileField:       {'widget': widgets.AdminFileWidget},
+    models.CharField: {'widget': widgets.AdminTextInputWidget},
+    models.ImageField: {'widget': widgets.AdminFileWidget},
+    models.FileField: {'widget': widgets.AdminFileWidget},
 }
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -352,7 +354,8 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         Can be overridden by the user in subclasses.
         """
         opts = self.opts
-        return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
+        codename = get_permission_codename('add', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
     def has_change_permission(self, request, obj=None):
         """
@@ -366,7 +369,8 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         request has permission to change *any* object of the given type.
         """
         opts = self.opts
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        codename = get_permission_codename('change', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -380,7 +384,9 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         request has permission to delete *any* object of the given type.
         """
         opts = self.opts
-        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+        codename = get_permission_codename('delete', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
@@ -608,11 +614,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, ADDITION
         LogEntry.objects.log_action(
-            user_id         = request.user.pk,
-            content_type_id = ContentType.objects.get_for_model(object).pk,
-            object_id       = object.pk,
-            object_repr     = force_text(object),
-            action_flag     = ADDITION
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=force_text(object),
+            action_flag=ADDITION
         )
 
     def log_change(self, request, object, message):
@@ -623,12 +629,12 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, CHANGE
         LogEntry.objects.log_action(
-            user_id         = request.user.pk,
-            content_type_id = ContentType.objects.get_for_model(object).pk,
-            object_id       = object.pk,
-            object_repr     = force_text(object),
-            action_flag     = CHANGE,
-            change_message  = message
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=force_text(object),
+            action_flag=CHANGE,
+            change_message=message
         )
 
     def log_deletion(self, request, object, object_repr):
@@ -640,11 +646,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
-            user_id         = request.user.pk,
-            content_type_id = ContentType.objects.get_for_model(self.model).pk,
-            object_id       = object.pk,
-            object_repr     = object_repr,
-            action_flag     = DELETION
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(self.model).pk,
+            object_id=object.pk,
+            object_repr=object_repr,
+            action_flag=DELETION
         )
 
     def action_checkbox(self, obj):
@@ -880,7 +886,7 @@ class ModelAdmin(BaseModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'has_change_permission': self.has_change_permission(request, obj),
             'has_delete_permission': self.has_delete_permission(request, obj),
-            'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
+            'has_file_field': True,  # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
             'form_url': form_url,
             'opts': opts,
@@ -1050,7 +1056,7 @@ class ModelAdmin(BaseModelAdmin):
         if action_form.is_valid():
             action = action_form.cleaned_data['action']
             select_across = action_form.cleaned_data['select_across']
-            func, name, description = self.get_actions(request)[action]
+            func = self.get_actions(request)[action][0]
 
             # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail. Except we want to perform
@@ -1281,7 +1287,7 @@ class ModelAdmin(BaseModelAdmin):
         actions = self.get_actions(request)
         if actions:
             # Add the action checkboxes if there are any actions available.
-            list_display = ['action_checkbox'] +  list(list_display)
+            list_display = ['action_checkbox'] + list(list_display)
 
         ChangeList = self.get_changelist(request)
         try:
@@ -1430,7 +1436,10 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+            raise Http404(
+                _('%(name)s object with primary key %(key)r does not exist.') %
+                    {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
+            )
 
         using = router.db_for_write(self.model)
 
@@ -1439,7 +1448,7 @@ class ModelAdmin(BaseModelAdmin):
         (deleted_objects, perms_needed, protected) = get_deleted_objects(
             [obj], opts, request.user, self.admin_site, using)
 
-        if request.POST: # The user has already confirmed the deletion.
+        if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
             obj_display = force_text(obj)
@@ -1457,7 +1466,9 @@ class ModelAdmin(BaseModelAdmin):
                                    (opts.app_label, opts.model_name),
                                    current_app=self.admin_site.name)
                 preserved_filters = self.get_preserved_filters(request)
-                post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
+                post_url = add_preserved_filters(
+                    {'preserved_filters': preserved_filters, 'opts': opts}, post_url
+                )
             else:
                 post_url = reverse('admin:index',
                                    current_app=self.admin_site.name)
@@ -1522,6 +1533,7 @@ class ModelAdmin(BaseModelAdmin):
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
+
 
 class InlineModelAdmin(BaseModelAdmin):
     """
@@ -1666,8 +1678,7 @@ class InlineModelAdmin(BaseModelAdmin):
             # to have the change permission for the related model in order to
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request)
-        return request.user.has_perm(
-            self.opts.app_label + '.' + self.opts.get_add_permission())
+        return super(InlineModelAdmin, self).has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         opts = self.opts
@@ -1678,8 +1689,8 @@ class InlineModelAdmin(BaseModelAdmin):
                 if field.rel and field.rel.to != self.parent_model:
                     opts = field.rel.to._meta
                     break
-        return request.user.has_perm(
-            opts.app_label + '.' + opts.get_change_permission())
+        codename = get_permission_codename('change', opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
     def has_delete_permission(self, request, obj=None):
         if self.opts.auto_created:
@@ -1688,8 +1699,7 @@ class InlineModelAdmin(BaseModelAdmin):
             # to have the change permission for the related model in order to
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
-        return request.user.has_perm(
-            self.opts.app_label + '.' + self.opts.get_delete_permission())
+        return super(InlineModelAdmin, self).has_delete_permission(request, obj)
 
 
 class StackedInline(InlineModelAdmin):

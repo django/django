@@ -855,6 +855,13 @@ on a widget, you should now define this method on the form field itself.
 ``Model._meta.module_name`` was renamed to ``model_name``. Despite being a
 private API, it will go through a regular deprecation path.
 
+``get_(add|change|delete)_permission`` model _meta methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Model._meta.get_(add|change|delete)_permission`` methods were deprecated.
+Even if they were not part of the public API they'll also go through
+a regular deprecation path.
+
 ``get_query_set`` and similar methods renamed to ``get_queryset``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
