@@ -194,9 +194,6 @@ class Options(object):
         if hasattr(self, '_name_map'):
             del self._name_map
 
-    def add_virtual_field(self, field):
-        self.virtual_fields.append(field)
-
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
             self.pk = field

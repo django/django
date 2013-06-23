@@ -29,22 +29,24 @@ class RenameGenericForeignKeyMethods(RenameMethodsBase):
     )
 
 
-class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
+class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
+                                           models.VirtualField)):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
 
-    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
+    def __init__(self, ct_field="content_type", fk_field="object_id",
+                 for_concrete_model=True, **kwargs):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        super(GenericForeignKey, self).__init__(**kwargs)
 
     def contribute_to_class(self, cls, name):
-        self.name = name
-        self.model = cls
+        super(GenericForeignKey, self).contribute_to_class(cls, name)
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self)
 
         # For some reason I don't totally understand, using weakrefs here doesn't work.
         signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
@@ -201,7 +203,7 @@ class GenericRelation(ForeignObject):
         return super(GenericRelation, self).get_joining_columns(reverse_join)
 
     def contribute_to_class(self, cls, name):
-        super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
+        super(GenericRelation, self).contribute_to_class(cls, name)
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation

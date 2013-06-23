@@ -290,17 +290,15 @@ class Field(object):
     def set_attributes_from_name(self, name):
         if not self.name:
             self.name = name
-        self.attname, self.column = self.get_attname_column()
+        self.attname = self.get_attname()
+        self.column = self.get_column()
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name):
         self.set_attributes_from_name(name)
         self.model = cls
-        if virtual_only:
-            cls._meta.add_virtual_field(self)
-        else:
-            cls._meta.add_field(self)
+        cls._meta.add_field(self)
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
@@ -308,10 +306,8 @@ class Field(object):
     def get_attname(self):
         return self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return self.db_column or self.attname
 
     def get_cache_name(self):
         return '_%s_cache' % self.name

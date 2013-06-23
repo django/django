@@ -98,14 +98,14 @@ class RelatedField(Field):
            as it relates columns to another table'''
         return None
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
 
         # Store the opts for related_query_name()
         self.opts = cls._meta
 
         if hasattr(sup, 'contribute_to_class'):
-            sup.contribute_to_class(cls, name, virtual_only=virtual_only)
+            sup.contribute_to_class(cls, name)
 
         if not cls._meta.abstract and self.rel.related_name:
             related_name = self.rel.related_name % {
@@ -983,9 +983,8 @@ class ForeignObject(RelatedField):
     def get_instance_value_for_fields(instance, fields):
         return tuple([getattr(instance, field.attname) for field in fields])
 
-    def get_attname_column(self):
-        attname, column = super(ForeignObject, self).get_attname_column()
-        return attname, None
+    def get_column(self):
+        return None
 
     def get_joining_columns(self, reverse_join=False):
         source = self.reverse_related_fields if reverse_join else self.related_fields
@@ -1100,8 +1099,8 @@ class ForeignObject(RelatedField):
     def get_defaults(self):
         return tuple([field.get_default() for field in self.local_related_fields])
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+    def contribute_to_class(self, cls, name):
+        super(ForeignObject, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
@@ -1182,10 +1181,8 @@ class ForeignKey(ForeignObject):
     def get_attname(self):
         return '%s_id' % self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return self.db_column or self.attname
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.related_field.name)
