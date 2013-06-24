@@ -4,6 +4,7 @@ from xml.dom.minidom import parseString, Node
 
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
+from django.http import request
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.test.signals import template_rendered, setting_changed
@@ -72,13 +73,16 @@ def setup_test_environment():
         - Set the email backend to the locmem email backend.
         - Setting the active locale to match the LANGUAGE_CODE setting.
     """
-    Template.original_render = Template._render
+    Template._original_render = Template._render
     Template._render = instrumented_test_render
 
-    mail.original_email_backend = settings.EMAIL_BACKEND
+    # Storing previous values in the settings module itself is problematic.
+    # Store them in arbitrary (but related) modules instead. See #20636.
+
+    mail._original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-    settings._original_allowed_hosts = settings.ALLOWED_HOSTS
+    request._original_allowed_hosts = settings.ALLOWED_HOSTS
     settings.ALLOWED_HOSTS = ['*']
 
     mail.outbox = []
@@ -93,14 +97,14 @@ def teardown_test_environment():
         - Restoring the email sending functions
 
     """
-    Template._render = Template.original_render
-    del Template.original_render
+    Template._render = Template._original_render
+    del Template._original_render
 
-    settings.EMAIL_BACKEND = mail.original_email_backend
-    del mail.original_email_backend
+    settings.EMAIL_BACKEND = mail._original_email_backend
+    del mail._original_email_backend
 
-    settings.ALLOWED_HOSTS = settings._original_allowed_hosts
-    del settings._original_allowed_hosts
+    settings.ALLOWED_HOSTS = request._original_allowed_hosts
+    del request._original_allowed_hosts
 
     del mail.outbox
 
