@@ -275,8 +275,8 @@ will be raised if more than one object is found.
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
-   given model manager, raising :class:`~django.http.Http404` if the resulting
-   list is empty.
+   given model manager cast to a list, raising :class:`~django.http.Http404` if
+   the resulting list is empty.
 
 Required arguments
 ------------------
