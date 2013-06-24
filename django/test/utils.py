@@ -3,8 +3,8 @@ from __future__ import with_statement
 import warnings
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
+from django import http
 from django.test.signals import template_rendered, setting_changed
-from django.http import request
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.utils.translation import deactivate
@@ -79,7 +79,7 @@ def setup_test_environment():
     mail._original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-    request._original_allowed_hosts = settings.ALLOWED_HOSTS
+    http._original_allowed_hosts = settings.ALLOWED_HOSTS
     settings.ALLOWED_HOSTS = ['*']
 
     mail.outbox = []
@@ -100,8 +100,8 @@ def teardown_test_environment():
     settings.EMAIL_BACKEND = mail._original_email_backend
     del mail._original_email_backend
 
-    settings.ALLOWED_HOSTS = request._original_allowed_hosts
-    del request._original_allowed_hosts
+    settings.ALLOWED_HOSTS = http._original_allowed_hosts
+    del http._original_allowed_hosts
 
     del mail.outbox
 
