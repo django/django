@@ -617,15 +617,13 @@ For example, a simple JSON mixin might look something like this::
         """
         A mixin that can be used to render a JSON response.
         """
-        response_class = HttpResponse
-
-        def render_to_response(self, context, **response_kwargs):
+        def render_to_json_response(self, context, **response_kwargs):
             """
             Returns a JSON response, transforming 'context' to make the payload.
             """
-            response_kwargs['content_type'] = 'application/json'
-            return self.response_class(
+            return HttpResponse(
                 self.convert_context_to_json(context),
+                content_type='application/json',
                 **response_kwargs
             )
 
@@ -637,12 +635,22 @@ For example, a simple JSON mixin might look something like this::
             # -- can be serialized as JSON.
             return json.dumps(context)
 
-Now we mix this into the base TemplateView::
+.. note::
+
+    Check out the :doc:`/topics/serialization` documentation for more
+    information on how to correctly transform Django models and querysets into
+    JSON.
+
+This mixin provides a ``render_to_json_response`` method with the same signature
+as :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`.
+To use it, we simply need to mix it into a ``TemplateView`` for example,
+and override ``render_to_response`` to call ``render_to_json_response`` instead::
 
     from django.views.generic import TemplateView
 
     class JSONView(JSONResponseMixin, TemplateView):
-        pass
+        def render_to_response(self, context, **response_kwargs):
+            return self.render_to_json_response(context, **response_kwargs)
 
 Equally we could use our mixin with one of the generic views. We can make our
 own version of :class:`~django.views.generic.detail.DetailView` by mixing
@@ -654,7 +662,8 @@ rendering behavior has been mixed in)::
     from django.views.generic.detail import BaseDetailView
 
     class JSONDetailView(JSONResponseMixin, BaseDetailView):
-        pass
+        def render_to_response(self, context, **response_kwargs):
+            return self.render_to_json_response(context, **response_kwargs)
 
 This view can then be deployed in the same way as any other
 :class:`~django.views.generic.detail.DetailView`, with exactly the
@@ -668,20 +677,21 @@ in both the ``JSONResponseMixin`` and a
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
 and override the implementation of
 :func:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
-to defer to the appropriate subclass depending on the type of response that the
-user requested::
+to defer to the appropriate rendering method depending on the type of response
+that the user requested::
 
     from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
     class HybridDetailView(JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView):
         def render_to_response(self, context):
             # Look for a 'format=json' GET argument
-            if self.request.GET.get('format','html') == 'json':
-                return JSONResponseMixin.render_to_response(self, context)
+            if self.request.GET.get('format') == 'json':
+                return self.render_to_json_response(context)
             else:
-                return SingleObjectTemplateResponseMixin.render_to_response(self, context)
+                return super(HybridDetailView, self).render_to_response(context)
 
-Because of the way that Python resolves method overloading, the local
-``render_to_response()`` implementation will override the versions provided by
-``JSONResponseMixin`` and
-:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+Because of the way that Python resolves method overloading, the call to
+``super(HybridDetailView, self).render_to_response(context)`` ends up
+calling the
+:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+implementation of :class:`~django.views.generic.base.TemplateResponseMixin`.
