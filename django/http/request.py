@@ -34,20 +34,19 @@ class UnreadablePostError(IOError):
 class HttpRequest(object):
     """A basic HTTP request."""
 
-    # The encoding used in GET/POST dicts. None means use default setting.
-    _encoding = None
-    _upload_handlers = []
-
     def __init__(self):
-        # WARNING: The `WSGIRequest` subclass doesn't call `super`.
-        # Any variable assignment made here should also happen in
-        # `WSGIRequest.__init__()`.
+        self.META = {}
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET, self.POST, self.FILES, self.REQUEST, self.COOKIES = {}, {}, {}, {}, {}
+
         self.path = ''
         self.path_info = ''
         self.method = None
         self.resolver_match = None
+        self.encoding = None
+        self.upload_handlers = [uploadhandler.load_handler(handler, self)
+                                for handler in settings.FILE_UPLOAD_HANDLERS]
+
         self._post_parse_error = False
 
     def __repr__(self):
@@ -140,40 +139,6 @@ class HttpRequest(object):
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-    @property
-    def encoding(self):
-        return self._encoding
-
-    @encoding.setter
-    def encoding(self, val):
-        """
-        Sets the encoding used for GET/POST accesses. If the GET or POST
-        dictionary has already been created, it is removed and recreated on the
-        next access (so that it is decoded correctly).
-        """
-        self._encoding = val
-        if hasattr(self, '_get'):
-            del self._get
-        if hasattr(self, '_post'):
-            del self._post
-
-    def _initialize_handlers(self):
-        self._upload_handlers = [uploadhandler.load_handler(handler, self)
-                                 for handler in settings.FILE_UPLOAD_HANDLERS]
-
-    @property
-    def upload_handlers(self):
-        if not self._upload_handlers:
-            # If there are no upload handlers defined, initialize them from settings.
-            self._initialize_handlers()
-        return self._upload_handlers
-
-    @upload_handlers.setter
-    def upload_handlers(self, upload_handlers):
-        if hasattr(self, '_files'):
-            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
-        self._upload_handlers = upload_handlers
-
     def parse_file_upload(self, META, post_data):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
@@ -194,43 +159,6 @@ class HttpRequest(object):
                 six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
         return self._body
-
-    def _mark_post_parse_error(self):
-        self._post = QueryDict('')
-        self._files = MultiValueDict()
-        self._post_parse_error = True
-
-    def _load_post_and_files(self):
-        """Populate self._post and self._files if the content-type is a form type"""
-        if self.method != 'POST':
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
-            return
-        if self._read_started and not hasattr(self, '_body'):
-            self._mark_post_parse_error()
-            return
-
-        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
-            if hasattr(self, '_body'):
-                # Use already read data
-                data = BytesIO(self._body)
-            else:
-                data = self
-            try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
-            except:
-                # An error occured while parsing POST data. Since when
-                # formatting the error the request handler might access
-                # self.POST, set self._post and self._file to prevent
-                # attempts to parse POST data again.
-                # Mark that an error occured. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
-                self._mark_post_parse_error()
-                raise
-        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
-            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
-        else:
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
 
     ## File-like and iterator interface.
     ##

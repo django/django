@@ -11,7 +11,8 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_str, force_text, iri_to_uri
+from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import force_str
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
@@ -72,7 +73,24 @@ class LimitedStream(object):
 
 
 class WSGIRequest(http.HttpRequest):
+    _post_loaded = False
+
+    @property
+    def encoding(self):
+        return self._encoding
+
+    @encoding.setter
+    def encoding(self, val):
+        self._encoding = val
+
+        self._load_get()
+        self._post_loaded = False
+
     def __init__(self, environ):
+        self.environ = environ
+
+        super(WSGIRequest, self).__init__()
+
         script_name = base.get_script_name(environ)
         path_info = base.get_path_info(environ)
         if not path_info:
@@ -81,14 +99,16 @@ class WSGIRequest(http.HttpRequest):
             # operate as if they'd requested '/'. Not amazingly nice to force
             # the path like this, but should be harmless.
             path_info = '/'
-        self.environ = environ
         self.path_info = path_info
         self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
+
         self.META = environ
-        self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
+        self.META['PATH_INFO'] = path_info
+
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = self._parse_content_type(self.META.get('CONTENT_TYPE', ''))
+
+        content_params = self._parse_content_type(self.META.get('CONTENT_TYPE', ''))[1]
         if 'charset' in content_params:
             try:
                 codecs.lookup(content_params['charset'])
@@ -96,14 +116,69 @@ class WSGIRequest(http.HttpRequest):
                 pass
             else:
                 self.encoding = content_params['charset']
-        self._post_parse_error = False
+
         try:
             content_length = int(self.environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
-        self.resolver_match = None
+
+        # `self.GET` and `self.COOKIES` get their data from the environ, so we can
+        # safely load them here. `self.POST`, `self.FILES` and `self.REQUEST` need
+        # to consume the stream so we lazy load them in `__getattribute__()`.
+        self._load_get()
+        self._load_cookies()
+
+    def __getattribute__(self, name):
+        _post_loaded = super(WSGIRequest, self).__getattribute__('_post_loaded')
+        if _post_loaded is False and name in set(['POST', 'FILES', 'REQUEST']):
+            self._post_loaded = True
+            self._load_post_and_files()
+            self._load_request()
+        return super(WSGIRequest, self).__getattribute__(name)
+
+    def _load_get(self):
+        # The WSGI spec says 'QUERY_STRING' may be absent.
+        self.GET = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self.encoding)
+
+    def _load_post_and_files(self):
+        """Populate self.POST and self.FILES if the content-type is a form type"""
+
+        if self.method != 'POST':
+            self.POST, self.FILES = http.QueryDict('', encoding=self.encoding), MultiValueDict()
+            return
+        if self._read_started and not hasattr(self, '_body'):
+            self._post_parse_error = True
+            self.POST, self.FILES = http.QueryDict(''), MultiValueDict()
+            return
+
+        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
+            if hasattr(self, '_body'):
+                # Use already read data
+                data = BytesIO(self._body)
+            else:
+                data = self
+            try:
+                self.POST, self.FILES = self.parse_file_upload(self.META, data)
+            except:
+                # An error occured while parsing POST data.
+                # Mark that an error occured. This allows self.__repr__ to
+                # be explicit about it instead of simply representing an
+                # empty POST
+                self._post_parse_error = True
+                self.POST, self.FILES = http.QueryDict(''), MultiValueDict()
+                raise
+        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
+            self.POST, self.FILES = http.QueryDict(self.body, encoding=self.encoding), MultiValueDict()
+        else:
+            self.POST, self.FILES = http.QueryDict('', encoding=self.encoding), MultiValueDict()
+
+    def _load_request(self):
+        self.REQUEST = datastructures.MergeDict(self.POST, self.GET)
+
+    def _load_cookies(self):
+        self.COOKIES = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
 
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
@@ -122,47 +197,6 @@ class WSGIRequest(http.HttpRequest):
             k, _, v = parameter.strip().partition('=')
             content_params[k] = v
         return content_type, content_params
-
-    def _get_request(self):
-        if not hasattr(self, '_request'):
-            self._request = datastructures.MergeDict(self.POST, self.GET)
-        return self._request
-
-    def _get_get(self):
-        if not hasattr(self, '_get'):
-            # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self._encoding)
-        return self._get
-
-    def _set_get(self, get):
-        self._get = get
-
-    def _get_post(self):
-        if not hasattr(self, '_post'):
-            self._load_post_and_files()
-        return self._post
-
-    def _set_post(self, post):
-        self._post = post
-
-    def _get_cookies(self):
-        if not hasattr(self, '_cookies'):
-            self._cookies = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
-        return self._cookies
-
-    def _set_cookies(self, cookies):
-        self._cookies = cookies
-
-    def _get_files(self):
-        if not hasattr(self, '_files'):
-            self._load_post_and_files()
-        return self._files
-
-    GET = property(_get_get, _set_get)
-    POST = property(_get_post, _set_post)
-    COOKIES = property(_get_cookies, _set_cookies)
-    FILES = property(_get_files)
-    REQUEST = property(_get_request)
 
 
 class WSGIHandler(base.BaseHandler):
