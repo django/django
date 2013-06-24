@@ -369,8 +369,8 @@ Custom file upload handlers **must** define the following methods:
     ``receive_data_chunk`` methods. In this way, one handler can be a
     "filter" for other handlers.
 
-    Return ``None`` from ``receive_data_chunk`` to sort-circuit remaining
-    upload handlers from getting this chunk.. This is useful if you're
+    Return ``None`` from ``receive_data_chunk`` to short-circuit remaining
+    upload handlers from getting this chunk. This is useful if you're
     storing the uploaded data yourself and don't want future handlers to
     store a copy of the data.
 
