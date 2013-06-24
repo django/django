@@ -7,9 +7,10 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import is_safe_url, urlsafe_base64_decode
+from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 from django.shortcuts import resolve_url
+from django.utils.encoding import force_bytes
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -227,6 +228,14 @@ def password_reset_confirm(request, uidb64=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+def password_reset_confirm_uidb36(request, uidb36=None, **kwargs):
+    # Support old password reset URLs that used base36 encoded user IDs.
+    # Remove in Django 1.7
+    try:
+      uidb64 = urlsafe_base64_encode(force_bytes(base36_to_int(uidb36)))
+    except ValueError:
+      uidb64 = '1' # dummy invalid ID (incorrect padding for base64)
+    return password_reset_confirm(request, uidb64=uidb64, **kwargs)
 
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
