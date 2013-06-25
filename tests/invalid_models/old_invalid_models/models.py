@@ -11,9 +11,6 @@ from django.db import connection, models
 
 
 class FieldErrors(models.Model):
-    charfield = models.CharField()
-    charfield2 = models.CharField(max_length=-1)
-    charfield3 = models.CharField(max_length="bad")
     decimalfield = models.DecimalField()
     decimalfield2 = models.DecimalField(max_digits=-1, decimal_places=-1)
     decimalfield3 = models.DecimalField(max_digits="bad", decimal_places="bad")
@@ -365,9 +362,6 @@ class BadIndexTogether1(models.Model):
 
 
 model_errors = """
-old_invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
-old_invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
-old_invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
 old_invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 old_invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
 old_invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
@@ -492,9 +486,6 @@ if not connection.features.interprets_empty_strings_as_nulls:
 # - 'x' -- the test was rewritten
 # - 'm' -- the test is actually a model test, not a field test; not rewritten
 
-x invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
-x invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
-x invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
 x invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
 x invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
 x invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.

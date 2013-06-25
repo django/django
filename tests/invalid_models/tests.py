@@ -2,8 +2,8 @@ import copy
 import sys
 import unittest
 
-from django.core.management.validation import get_validation_errors
 from django.core.checks import Error
+from django.core.management.validation import get_validation_errors
 
 from django.db import connection, models
 from django.db.models.loading import cache, load_app
@@ -88,7 +88,8 @@ class CharFieldTests(TestCase):
         self.assertEqual(list(field.check()), [
             Error('Invalid "max_length" value.\n'
                 'CharFields require a "max_length" attribute that is '
-                'a positive integer. You passed "bad".',
+                'the maximum length (in characters) of the field '
+                'and is a positive integer.',
                 hint='Change "max_length" value to a positive integer.'),
         ])
 

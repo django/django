@@ -14,7 +14,7 @@ from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
-from django.core import exceptions, validators
+from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import curry, total_ordering, Promise
@@ -687,7 +687,10 @@ class Field(object):
         errors = []
         for function_name in (i for i in dir(self) if i.startswith('check_')):
             function = getattr(self, function_name)
-            errors.extend(list(function()))
+            new_errors = list(function())
+            for error in new_errors:
+                error.obj = self
+            errors.extend(new_errors)
         return errors
 
     def __repr__(self):
@@ -850,6 +853,25 @@ class CharField(Field):
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
+
+    def check_max_length_attibute(self, **kwargs):
+        try:
+            max_length = int(self.max_length)
+            if max_length <= 0:
+                raise ValueError()
+        except TypeError:
+            yield checks.Error(
+                'No "max_length" argument.\n'
+                'CharFields require "max_length" argument that is '
+                'the maximum length (in characters) of the field.',
+                hint='Set "max_length" argument.')
+        except ValueError:
+            yield checks.Error(
+                'Invalid "max_length" value.\n'
+                'CharFields require a "max_length" attribute that is '
+                'the maximum length (in characters) of the field '
+                'and is a positive integer.',
+                hint='Change "max_length" value to a positive integer.')
 
 
 # TODO: Maybe move this into contrib, because it's specialized.
