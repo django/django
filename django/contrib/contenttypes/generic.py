@@ -158,6 +158,7 @@ class GenericRelation(ForeignObject):
     # This doesn't generate an additional reverse link as this is one
     # already.
     generate_reverse_relation = False
+    clone_in_subclasses = True
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)

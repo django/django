@@ -145,7 +145,8 @@ class ModelBase(type):
 
         # All the fields of any type declared on this model
         new_fields = new_class._meta.local_fields + \
-                     new_class._meta.local_many_to_many
+                     new_class._meta.local_many_to_many + \
+                     new_class._meta.local_private_fields
         field_names = set([f.name for f in new_fields])
 
         # Basic setup for proxy models.
@@ -220,6 +221,16 @@ class ModelBase(type):
             # unless they have redefined any of them.
             if is_proxy:
                 new_class.copy_managers(original_base._meta.concrete_managers)
+
+            # Inherit virtual fields that have to be cloned (like
+            # GenericRelation).
+            for field in base._meta.local_private_fields:
+                if base._meta.abstract and field.name in field_names:
+                    raise FieldError('Local field %r in class %r clashes '
+                                     'with field of similar name from '
+                                     'abstract base class %r' %
+                                        (field.name, name, base.__name__))
+                new_class.add_to_class(field.name, copy.deepcopy(field))
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in

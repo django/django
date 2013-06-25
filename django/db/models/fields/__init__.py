@@ -70,6 +70,12 @@ class Field(object):
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
 
+    # If true, a separate instance of the field will be used in each
+    # subclass of the model to which it belongs. This only makes sense
+    # with virtual fields (and is only required by GenericRelation which
+    # relies on this).
+    clone_in_subclasses = False
+
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
     # creates, creation_counter is used for all user-specified fields.
