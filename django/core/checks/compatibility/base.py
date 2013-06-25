@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.core.compat_checks import django_1_6_0
+from django.core.checks.compatibility import django_1_6_0
 
 
 COMPAT_CHECKS = [
