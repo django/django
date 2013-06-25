@@ -3,9 +3,7 @@ import sys
 import unittest
 
 from django.core.management.validation import get_validation_errors
-#from django.core.checks import Error ## cannot import because not implemented yet
-## So we need `Error` mock:
-Error = lambda *args, **kwargs: None
+from django.core.checks import Error
 
 from django.db import connection, models
 from django.db.models.loading import cache, load_app
