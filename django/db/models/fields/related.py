@@ -924,6 +924,8 @@ class ManyToManyRel(object):
 class ForeignObject(RelatedField):
     requires_unique_target = True
     generate_reverse_relation = True
+    # GenericRelation is an example of a reverse link.
+    is_reverse_link = False
 
     def __init__(self, to, from_fields, to_fields, **kwargs):
         self.from_fields = from_fields

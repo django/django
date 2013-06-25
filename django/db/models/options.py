@@ -480,6 +480,10 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
+        # Collect locally defined reverse relations.
+        for f in self.local_fields:
+            if f.rel and f.is_reverse_link:
+                cache[f.related] = None
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in get_models(include_auto_created=True, only_installed=False):

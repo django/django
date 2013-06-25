@@ -154,6 +154,10 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    is_reverse_link = True
+    # This doesn't generate an additional reverse link as this is one
+    # already.
+    generate_reverse_relation = False
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
