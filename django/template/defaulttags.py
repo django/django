@@ -665,8 +665,9 @@ def do_filter(parser, token):
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
     for func, unused in filter_expr.filters:
-        if getattr(func, '_decorated_function', func).__name__ in ('escape', 'safe'):
-            raise TemplateSyntaxError('"filter %s" is not permitted.  Use the "autoescape" tag instead.' % func.__name__)
+        filter_name = getattr(func, '_filter_name', None)
+        if filter_name in ('escape', 'safe'):
+            raise TemplateSyntaxError('"filter %s" is not permitted.  Use the "autoescape" tag instead.' % filter_name)
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)
