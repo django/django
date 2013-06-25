@@ -13,9 +13,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
 
-#from .models import (Person, Group, FKTarget, PersonSelfRefM2M,
-#    PersonSelfRefM2MExplicit)
-
 
 class InvalidModelTestCase(TestCase):
     """Import an appliation with invalid models and test the exceptions."""
@@ -238,7 +235,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_ambiguous_relationship_model(self):
-        field = models.ManyToManyField(Person,
+        field = models.ManyToManyField('Person',
             through="RelationshipDoubleFK", related_name="tertiary")
         self.assertEqual(list(field.check()), [
             Error('More than one foreign key to Person in intermediary '
@@ -251,7 +248,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_relationship_model_with_foreign_key_to_wrong_model(self):
-        field = models.ManyToManyField(Person, through="Membership")
+        field = models.ManyToManyField('Person', through="Membership")
         self.assertEqual(list(field.check()), [
             Error('No foreign key to Person or GroupTwo '
                 'in intermediary Membership model.\n'
@@ -263,7 +260,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_relationship_model_missing_foreign_key(self):
-        field = models.ManyToManyField(Group, through="MembershipMissingFK")
+        field = models.ManyToManyField('Group', through="MembershipMissingFK")
         self.assertEqual(list(field.check()), [
             Error('No foreign key to Group or GroupTwo '
                 'in intermediary MembershipMissingFK model.\n'
@@ -275,7 +272,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_missing_relationship_model(self):
-        field = models.ManyToManyField(Person, through="MissingM2MModel")
+        field = models.ManyToManyField('Person', through="MissingM2MModel")
         self.assertEqual(list(field.check()), [
             Error('No intermediary model MissingM2MModel.\n'
                 'The field specifies a many-to-many relation through model '
@@ -286,6 +283,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_symetrical_self_referential_field(self):
+        from .invalid_models.models import PersonSelfRefM2M
         field = PersonSelfRefM2M.friends
         self.assertEqual(list(field.check()), [
             Error('Symmetrical m2m field with intermediate table.\n'
@@ -295,6 +293,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
+        from .invalid_models.models import PersonSelfRefM2M
         field = PersonSelfRefM2M.too_many_friends
         self.assertEqual(list(field.check()), [
             Error('More than two foreign keys to PersonSelfRefM2M '
@@ -306,6 +305,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):
+        from .invalid_models.models import PersonSelfRefM2MExplicit
         field = PersonSelfRefM2MExplicit.friends
         self.assertEqual(list(field.check()), [
             Error('Symetrical m2m field with intermediate table.\n'
@@ -338,7 +338,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_unique_m2m(self):
-        field = models.ManyToManyField(Person, unique=True)
+        field = models.ManyToManyField('Person', unique=True)
         self.assertEqual(list(field.check()), [
             Error('Unique m2m field.\n'
                 'ManyToManyFields cannot be unique.',
@@ -357,6 +357,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_foreign_key_to_non_unique_field_under_explicit_model(self):
+        from .invalid_models.models import FKTarget
         field = models.ForeignKey(FKTarget, to_field='bad')
         self.assertEqual(list(field.check()), [
             Error('No unique=True constraint on field "bad" under model '
@@ -368,7 +369,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_on_delete_set_null_on_non_nullable_field(self):
-        field = models.ForeignKey(Person, on_delete=models.SET_NULL)
+        field = models.ForeignKey('Person', on_delete=models.SET_NULL)
         self.assertEqual(list(field.check()), [
             Error('on_delete=SET_NULL but null forbidden.\n',
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
@@ -376,7 +377,7 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_on_delete_set_default_without_default_value(self):
-        field = models.ForeignKey(Person, on_delete=models.SET_DEFAULT)
+        field = models.ForeignKey('Person', on_delete=models.SET_DEFAULT)
         self.assertEqual(list(field.check()), [
             Error('on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
