@@ -415,6 +415,134 @@ class DuplicateColumnNameModel4(models.Model):
 
 
 model_errors = """
+invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
+invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
+invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
+invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
+invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
+invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
+invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
+invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
+invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
+invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.
+invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clash1: Reverse query name for field 'foreign' clashes with field 'Target.clash1'. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clash1: Accessor for m2m field 'm2m' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'm2m'.
+invalid_models.clash1: Accessor for m2m field 'm2m' clashes with related field 'Target.clash1_set'. Add a related_name argument to the definition for 'm2m'.
+invalid_models.clash1: Reverse query name for m2m field 'm2m' clashes with field 'Target.clash1'. Add a related_name argument to the definition for 'm2m'.
+invalid_models.clash2: Accessor for field 'foreign_1' clashes with field 'Target.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: Accessor for field 'foreign_1' clashes with related m2m field 'Target.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: Reverse query name for field 'foreign_1' clashes with field 'Target.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: Reverse query name for field 'foreign_1' clashes with related m2m field 'Target.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash2: Accessor for field 'foreign_2' clashes with related m2m field 'Target.src_safe'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash2: Reverse query name for field 'foreign_2' clashes with related m2m field 'Target.src_safe'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash2: Accessor for m2m field 'm2m_1' clashes with field 'Target.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: Accessor for m2m field 'm2m_1' clashes with related field 'Target.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: Reverse query name for m2m field 'm2m_1' clashes with field 'Target.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: Reverse query name for m2m field 'm2m_1' clashes with related field 'Target.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash2: Accessor for m2m field 'm2m_2' clashes with related field 'Target.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash2: Reverse query name for m2m field 'm2m_2' clashes with related field 'Target.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: Reverse query name for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: Reverse query name for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.clash3: Accessor for field 'foreign_2' clashes with m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: Accessor for field 'foreign_2' clashes with related m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: Reverse query name for field 'foreign_2' clashes with m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: Reverse query name for field 'foreign_2' clashes with related m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.clash3: Accessor for m2m field 'm2m_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: Accessor for m2m field 'm2m_1' clashes with related field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: Reverse query name for m2m field 'm2m_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: Reverse query name for m2m field 'm2m_1' clashes with related field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.clash3: Accessor for m2m field 'm2m_2' clashes with m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: Accessor for m2m field 'm2m_2' clashes with related field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: Reverse query name for m2m field 'm2m_2' clashes with m2m field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clash3: Reverse query name for m2m field 'm2m_2' clashes with related field 'Target2.m2m_tgt'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.clashforeign: Accessor for field 'foreign' clashes with field 'Target2.clashforeign_set'. Add a related_name argument to the definition for 'foreign'.
+invalid_models.clashm2m: Accessor for m2m field 'm2m' clashes with m2m field 'Target2.clashm2m_set'. Add a related_name argument to the definition for 'm2m'.
+invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
+invalid_models.target2: Accessor for field 'clashforeign_set' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: Accessor for field 'clashforeign_set' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: Accessor for field 'clashforeign_set' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'clashforeign_set'.
+invalid_models.target2: Accessor for m2m field 'm2m_tgt' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: Accessor for m2m field 'm2m_tgt' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: Accessor for m2m field 'm2m_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: Accessor for m2m field 'm2m_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: Accessor for m2m field 'm2m_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'm2m_tgt'.
+invalid_models.target2: Accessor for m2m field 'clashm2m_set' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: Accessor for m2m field 'clashm2m_set' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: Accessor for m2m field 'clashm2m_set' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: Accessor for m2m field 'clashm2m_set' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.target2: Accessor for m2m field 'clashm2m_set' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'clashm2m_set'.
+invalid_models.selfclashforeign: Accessor for field 'selfclashforeign_set' clashes with field 'SelfClashForeign.selfclashforeign_set'. Add a related_name argument to the definition for 'selfclashforeign_set'.
+invalid_models.selfclashforeign: Reverse query name for field 'selfclashforeign_set' clashes with field 'SelfClashForeign.selfclashforeign'. Add a related_name argument to the definition for 'selfclashforeign_set'.
+invalid_models.selfclashforeign: Accessor for field 'foreign_1' clashes with field 'SelfClashForeign.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.selfclashforeign: Reverse query name for field 'foreign_1' clashes with field 'SelfClashForeign.id'. Add a related_name argument to the definition for 'foreign_1'.
+invalid_models.selfclashforeign: Accessor for field 'foreign_2' clashes with field 'SelfClashForeign.src_safe'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.selfclashforeign: Reverse query name for field 'foreign_2' clashes with field 'SelfClashForeign.src_safe'. Add a related_name argument to the definition for 'foreign_2'.
+invalid_models.selfclashm2m: Accessor for m2m field 'selfclashm2m_set' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'selfclashm2m_set'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'selfclashm2m_set' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'selfclashm2m_set'.
+invalid_models.selfclashm2m: Accessor for m2m field 'selfclashm2m_set' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'selfclashm2m_set'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_1' clashes with field 'SelfClashM2M.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_2' clashes with field 'SelfClashM2M.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_1' clashes with field 'SelfClashM2M.id'. Add a related_name argument to the definition for 'm2m_1'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_2' clashes with field 'SelfClashM2M.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
+invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
+invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
+invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
+invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
+invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
+invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to Person, which is ambiguous and is not permitted.
+invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
+invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
+invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
+invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
+invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
+invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
+invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
+invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
+invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
+invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
+invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
+invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
+invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
+invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
+invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
+"""
+
+if not connection.features.interprets_empty_strings_as_nulls:
+    model_errors += """x invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
+"""
+
+
+"""
+# Error messages predated by a character:
+# - 'x' -- the test was rewritten
+# - 'm' -- the test is actually a model test, not a field test; not rewritten
+
 x invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 x invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 x invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
@@ -522,8 +650,8 @@ x invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the uniqu
 x invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 x invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
-xc invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
-xc invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
+x invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
+x invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
 m? invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 m? invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 m? invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
@@ -536,9 +664,6 @@ m invalid_models.duplicatecolumnnamemodel2: Field 'bar' has column name 'bar' th
 m invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' that is already used.
 """
 
-if not connection.features.interprets_empty_strings_as_nulls:
-    model_errors += """x invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
-"""
 
 ## These models are what the new tests need. All other models should be
 ## deleted or moved.
