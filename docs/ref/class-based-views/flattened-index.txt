@@ -151,6 +151,7 @@ FormView
 * :attr:`~django.views.generic.edit.FormMixin.form_class` [:meth:`~django.views.generic.edit.FormMixin.get_form_class`]
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.edit.FormMixin.initial` [:meth:`~django.views.generic.edit.FormMixin.get_initial`]
+* :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.edit.FormMixin.success_url` [:meth:`~django.views.generic.edit.FormMixin.get_success_url`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
@@ -183,6 +184,7 @@ CreateView
 * :attr:`~django.views.generic.edit.FormMixin.initial` [:meth:`~django.views.generic.edit.FormMixin.get_initial`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -223,6 +225,7 @@ UpdateView
 * :attr:`~django.views.generic.edit.FormMixin.initial` [:meth:`~django.views.generic.edit.FormMixin.get_initial`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]

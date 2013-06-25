@@ -330,6 +330,13 @@ Minor features
   behavior of clearing filters by setting the
   :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
 
+* Added
+  :meth:`FormMixin.get_prefix<django.views.generic.edit.FormMixin.get_prefix>`
+  (which returns
+  :attr:`FormMixin.prefix<django.views.generic.edit.FormMixin.prefix>` by
+  default) to allow customizing the :attr:`~django.forms.Form.prefix` of the
+  form.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -730,9 +737,6 @@ Miscellaneous
   This parameter has been renamed to ``_popup`` to be consistent with the rest
   of the admin views. You should update your custom templates if they use the
   previous parameter name.
-
-* Added :attr:`~django.views.generic.edit.FormMixin.prefix` to allow you to
-  customize the prefix on the form.
 
 Features deprecated in 1.6
 ==========================
