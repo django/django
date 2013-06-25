@@ -9,14 +9,15 @@ Error = lambda *args, **kwargs: None
 
 from django.db import connection, models
 from django.db.models.loading import cache, load_app
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
 
-from .models import (Person, Group, FKTarget, PersonSelfRefM2M,
-    PersonSelfRefM2MExplicit)
+#from .models import (Person, Group, FKTarget, PersonSelfRefM2M,
+#    PersonSelfRefM2MExplicit)
 
 
-class InvalidModelTestCase(unittest.TestCase):
+class InvalidModelTestCase(TestCase):
     """Import an appliation with invalid models and test the exceptions."""
 
     def setUp(self):
@@ -44,13 +45,13 @@ class InvalidModelTestCase(unittest.TestCase):
     # easier to set this up as an override than to require every developer
     # to specify a value in their test settings.
     @override_settings(
-        TEST_SWAPPED_MODEL='invalid_models.ReplacementModel',
+        TEST_SWAPPED_MODEL='old_invalid_models.ReplacementModel',
         TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model',
         TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
     )
     def test_invalid_models(self):
         try:
-            module = load_app("invalid_models.invalid_models")
+            module = load_app("invalid_models.old_invalid_models")
         except Exception:
             self.fail('Unable to load invalid model module')
 
@@ -66,9 +67,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.assertFalse(missing, "Missing Errors: " + '\n'.join(missing))
 
 
-# Models are verified only if DEBUG is set to True.
-@override_settings(DEBUG=True)
-class CharFieldTests(unittest.TestCase):
+class CharFieldTests(TestCase):
 
     def test_missing_max_length_argument(self):
         field = models.CharField()
@@ -133,9 +132,7 @@ class CharFieldTests(unittest.TestCase):
         ])
 
 
-# Models are verified only if DEBUG is set to True.
-@override_settings(DEBUG=True)
-class DecimalFieldTests(unittest.TestCase):
+class DecimalFieldTests(TestCase):
 
     def test_required_attributes(self):
         field = models.DecimalField()
@@ -216,9 +213,7 @@ class DecimalFieldTests(unittest.TestCase):
         self.assertEqual(list(field.check()), [])
 
 
-# Models are verified only if DEBUG is set to True.
-@override_settings(DEBUG=True)
-class RelativeFieldsTests(unittest.TestCase):
+class RelativeFieldsTests(TestCase):
 
     def test_foreign_key_to_missing_model(self):
         field = models.ForeignKey("Rel1")
@@ -402,9 +397,7 @@ class RelativeFieldsTests(unittest.TestCase):
             ])
 
 
-# Models are verified only if DEBUG is set to True.
-@override_settings(DEBUG=True)
-class OtherFieldTests(unittest.TestCase):
+class OtherFieldTests(TestCase):
 
     def test_missing_upload_to(self):
         field = models.FileField()
