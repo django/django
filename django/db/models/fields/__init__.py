@@ -683,6 +683,13 @@ class Field(object):
         """
         return getattr(obj, self.attname)
 
+    def check(self, **kwargs):
+        errors = []
+        for function_name in (i for i in dir(self) if i.startswith('check_')):
+            function = getattr(self, function_name)
+            errors.extend(list(function()))
+        return errors
+
     def __repr__(self):
         """
         Displays the module, class and name of the field.
