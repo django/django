@@ -216,6 +216,9 @@ class GenericRelation(ForeignObject):
     def contribute_to_related_class(self, cls, related):
         pass
 
+    def contribute_to_field_name_cache(self, cache, model):
+        cache[self.name] = (self.related, None if model == self.model else self.model, True, False)
+
     def set_attributes_from_rel(self):
         pass
 

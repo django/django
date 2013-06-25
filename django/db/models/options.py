@@ -393,19 +393,24 @@ class Options(object):
         Initialises the field name -> field object mapping.
         """
         cache = {}
+
+        def add_to_cache(field, key, value):
+            # This hook is used by GenericRelation
+            if hasattr(field, 'contribute_to_field_name_cache'):
+                field.contribute_to_field_name_cache(cache, self.model)
+            else:
+                cache[key] = value
+
         # We intentionally handle related m2m objects first so that symmetrical
         # m2m accessor names can be overridden, if necessary.
         for f, model in self.get_all_related_m2m_objects_with_model():
-            cache[f.field.related_query_name()] = (f, model, False, True)
+            add_to_cache(f, f.field.related_query_name(), (f, model, False, True))
         for f, model in self.get_all_related_objects_with_model():
-            cache[f.field.related_query_name()] = (f, model, False, False)
+            add_to_cache(f, f.field.related_query_name(), (f, model, False, False))
         for f, model in self.get_m2m_with_model():
-            cache[f.name] = (f, model, True, True)
+            add_to_cache(f, f.name, (f, model, True, True))
         for f, model in self.get_fields_with_model():
-            cache[f.name] = (f, model, True, False)
-        for f in self.virtual_fields:
-            if hasattr(f, 'related'):
-                cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
+            add_to_cache(f, f.name, (f, model, True, False))
         if app_cache_ready():
             self._name_map = cache
         return cache
