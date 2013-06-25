@@ -1101,6 +1101,7 @@ class Library(object):
                     # for decorators that need it e.g. stringfilter
                     if hasattr(filter_func, "_decorated_function"):
                         setattr(filter_func._decorated_function, attr, value)
+            filter_func._filter_name = name
             return filter_func
         else:
             raise InvalidTemplateLibrary("Unsupported arguments to "
