@@ -95,7 +95,7 @@ class CharFieldTests(TestCase):
     def test_non_iterable_choices(self):
         field = models.CharField(max_length=10, choices='bad')
         self.assertEqual(list(field.check()), [
-            Error('"choices" is not an iterable (e.g., a tuple or list).\n',
+            Error('"choices" is not an iterable (e.g., a tuple or list).\n'
                 '"choices" should be an iterable of pairs. The first element '
                 'in each pair is the actual value to be stored, and '
                 'the second element is the human-readable name. '
@@ -139,7 +139,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
                 hint='Set "decimal_places" argument.'),
-            Error('No "max_digits" attribute.\n',
+            Error('No "max_digits" attribute.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -159,7 +159,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
                 hint='Change "decimal_places" argument.'),
-            Error('Invalid "max_digits" value.\n',
+            Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -179,7 +179,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
                 hint='Change "decimal_places" argument.'),
-            Error('Invalid "max_digits" value.\n',
+            Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -282,7 +282,7 @@ class RelativeFieldsTests(TestCase):
 
     def test_symetrical_self_referential_field(self):
         from .invalid_models.models import PersonSelfRefM2M
-        field = PersonSelfRefM2M.friends
+        field = PersonSelfRefM2M.friends.field
         self.assertEqual(list(field.check()), [
             Error('Symmetrical m2m field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
@@ -292,7 +292,7 @@ class RelativeFieldsTests(TestCase):
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
         from .invalid_models.models import PersonSelfRefM2M
-        field = PersonSelfRefM2M.too_many_friends
+        field = PersonSelfRefM2M.too_many_friends.field
         self.assertEqual(list(field.check()), [
             Error('More than two foreign keys to PersonSelfRefM2M '
                 'in intermediary model RelationshipTripleFK.\n'
@@ -304,7 +304,7 @@ class RelativeFieldsTests(TestCase):
 
     def test_symmetric_self_reference_with_intermediate_table(self):
         from .invalid_models.models import PersonSelfRefM2MExplicit
-        field = PersonSelfRefM2MExplicit.friends
+        field = PersonSelfRefM2MExplicit.friends.field
         self.assertEqual(list(field.check()), [
             Error('Symetrical m2m field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
@@ -369,7 +369,7 @@ class RelativeFieldsTests(TestCase):
     def test_on_delete_set_null_on_non_nullable_field(self):
         field = models.ForeignKey('Person', on_delete=models.SET_NULL)
         self.assertEqual(list(field.check()), [
-            Error('on_delete=SET_NULL but null forbidden.\n',
+            Error('on_delete=SET_NULL but null forbidden.\n'
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field.'),
         ])
