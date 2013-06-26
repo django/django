@@ -625,6 +625,13 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'),
             ['<Season: 2013>'])
 
+    def test_regex_non_ascii(self):
+        """
+        Ensure that a regex lookup does not trip on non-ascii characters.
+        """
+        Player.objects.create(name='\u2660')
+        Player.objects.get(name__regex='\u2660')
+
     def test_nonfield_lookups(self):
         """
         Ensure that a lookup query containing non-fields raises the proper
