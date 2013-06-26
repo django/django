@@ -19,6 +19,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.models import fields
 from django.db.models.sql import aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
 from django.utils import six
@@ -522,4 +523,4 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     return str(dt)
 
 def _sqlite_regexp(re_pattern, re_string):
-    return bool(re.search(re_pattern, str(re_string))) if re_string is not None else False
+    return bool(re.search(re_pattern, force_text(re_string))) if re_string is not None else False
