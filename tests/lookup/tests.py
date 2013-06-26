@@ -610,6 +610,21 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(headline__regex=r'b(.).*b\1'),
             ['<Article: barfoobaz>', '<Article: bazbaRFOO>', '<Article: foobarbaz>'])
 
+    def test_regex_null(self):
+        """
+        Ensure that a regex lookup does not fail on null/None values
+        """
+        Season.objects.create(year=2012, gt=None)
+        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^$'), [])
+
+    def test_regex_non_string(self):
+        """
+        Ensure that a regex lookup does not fail on non-string fields
+        """
+        Season.objects.create(year=2013, gt=444)
+        self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'),
+            ['<Season: 2013>'])
+
     def test_nonfield_lookups(self):
         """
         Ensure that a lookup query containing non-fields raises the proper
