@@ -284,7 +284,7 @@ If we connected a handler like this::
 
 and then did something like this::
 
-    >>> p = Pizza.object.create(...)
+    >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
