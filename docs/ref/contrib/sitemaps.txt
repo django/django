@@ -318,7 +318,7 @@ with a caching decorator -- you must name your sitemap view and pass
     from django.views.decorators.cache import cache_page
 
     urlpatterns = patterns('',
-        url(r'^sitemap.xml$',
+        url(r'^sitemap\.xml$',
             cache_page(86400)(sitemaps_views.index),
             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
         url(r'^sitemap-(?P<section>.+)\.xml$',
