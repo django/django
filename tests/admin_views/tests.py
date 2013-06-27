@@ -583,6 +583,14 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
         self.assertEqual(response.status_code, 200)
 
+    def test_popup_dismiss_related(self):
+        """
+        Regression test for ticket 20664 - ensure the pk is properly quoted.
+        """
+        actor = Actor.objects.create(name="Palin", age=27)
+        response = self.client.get("/test_admin/admin/admin_views/actor/?%s" % IS_POPUP_VAR)
+        self.assertContains(response, "opener.dismissRelatedLookupPopup(window, &#39;%s&#39;)" % actor.pk)
+
     def test_hide_change_password(self):
         """
         Tests if the "change password" link in the admin is hidden if the User
