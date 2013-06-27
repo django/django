@@ -139,7 +139,7 @@ class RelatedField(Field):
         # related object in a table-spanning query. It uses the lower-cased
         # object_name by default, but this can be overridden with the
         # "related_name" option.
-        return self.rel.related_name or self.opts.model_name
+        return self.rel.related_query_name or self.rel.related_name or self.opts.model_name
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
@@ -826,7 +826,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 class ForeignObjectRel(object):
     def __init__(self, field, to, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None):
+                 parent_link=False, on_delete=None, related_query_name=None):
         try:
             to._meta
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -835,6 +835,7 @@ class ForeignObjectRel(object):
         self.field = field
         self.to = to
         self.related_name = related_name
+        self.related_query_name = related_query_name
         self.limit_choices_to = {} if limit_choices_to is None else limit_choices_to
         self.multiple = True
         self.parent_link = parent_link
@@ -862,10 +863,10 @@ class ForeignObjectRel(object):
 
 class ManyToOneRel(ForeignObjectRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None):
+                 parent_link=False, on_delete=None, related_query_name=None):
         super(ManyToOneRel, self).__init__(
             field, to, related_name=related_name, limit_choices_to=limit_choices_to,
-            parent_link=parent_link, on_delete=on_delete)
+            parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name)
         self.field_name = field_name
 
     def get_related_field(self):
@@ -885,21 +886,22 @@ class ManyToOneRel(ForeignObjectRel):
 
 class OneToOneRel(ManyToOneRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
-                 parent_link=False, on_delete=None):
+                 parent_link=False, on_delete=None, related_query_name=None):
         super(OneToOneRel, self).__init__(field, to, field_name,
                 related_name=related_name, limit_choices_to=limit_choices_to,
-                parent_link=parent_link, on_delete=on_delete
+                parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name,
         )
         self.multiple = False
 
 
 class ManyToManyRel(object):
     def __init__(self, to, related_name=None, limit_choices_to=None,
-                 symmetrical=True, through=None, db_constraint=True):
+                 symmetrical=True, through=None, db_constraint=True, related_query_name=None):
         if through and not db_constraint:
             raise ValueError("Can't supply a through model and db_constraint=False")
         self.to = to
         self.related_name = related_name
+        self.related_query_name = related_query_name
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
@@ -933,6 +935,7 @@ class ForeignObject(RelatedField):
             kwargs['rel'] = ForeignObjectRel(
                 self, to,
                 related_name=kwargs.pop('related_name', None),
+                related_query_name=kwargs.pop('related_query_name', None),
                 limit_choices_to=kwargs.pop('limit_choices_to', None),
                 parent_link=kwargs.pop('parent_link', False),
                 on_delete=kwargs.pop('on_delete', CASCADE),
@@ -1141,6 +1144,7 @@ class ForeignKey(ForeignObject):
         kwargs['rel'] = rel_class(
             self, to, to_field,
             related_name=kwargs.pop('related_name', None),
+            related_query_name=kwargs.pop('related_query_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
@@ -1340,6 +1344,7 @@ class ManyToManyField(RelatedField):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
             related_name=kwargs.pop('related_name', None),
+            related_query_name=kwargs.pop('related_query_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
             through=kwargs.pop('through', None),
