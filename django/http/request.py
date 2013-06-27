@@ -39,6 +39,10 @@ class HttpRequest(object):
     _upload_handlers = []
 
     def __init__(self):
+        # WARNING: The `WSGIRequest` subclass doesn't call `super`.
+        # Any variable assignment made here should also happen in
+        # `WSGIRequest.__init__()`.
+
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
         self.path_info = ''
