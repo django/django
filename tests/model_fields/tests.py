@@ -432,6 +432,17 @@ class FileFieldTests(unittest.TestCase):
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
 
+    def test_delete_when_file_unset(self):
+        """
+        Calling delete on an unset FileField should not call the file deletion
+        process, but fail silently (#20660).
+        """
+        d = Document()
+        try:
+            d.myfile.delete()
+        except OSError:
+            self.fail("Deleting an unset FileField should not raise OSError.")
+
 
 class BinaryFieldTests(test.TestCase):
     binary_data = b'\x00\x46\xFE'
