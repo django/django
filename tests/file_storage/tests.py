@@ -364,6 +364,14 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
 
+    def test_delete_no_name(self):
+        """
+        Calling delete with an empty name should not try to remove the base
+        storage directory, but fail loudly (#20660).
+        """
+        with self.assertRaises(AssertionError):
+            self.storage.delete('')
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
