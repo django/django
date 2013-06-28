@@ -20,12 +20,6 @@ def render_to_response(*args, **kwargs):
     """
     httpresponse_kwargs = {'content_type': kwargs.pop('content_type', None)}
 
-    mimetype = kwargs.pop('mimetype', None)
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        httpresponse_kwargs['content_type'] = mimetype
-
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
 
 def render(request, *args, **kwargs):

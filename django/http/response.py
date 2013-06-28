@@ -98,7 +98,7 @@ class HttpResponseBase(six.Iterator):
     status_code = 200
     reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, reason=None, mimetype=None):
+    def __init__(self, content_type=None, status=None, reason=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
@@ -108,11 +108,6 @@ class HttpResponseBase(six.Iterator):
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
         self._handler_class = None
-        if mimetype:
-            warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead",
-                          DeprecationWarning, stacklevel=2)
-            content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
