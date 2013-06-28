@@ -599,7 +599,7 @@ msgstr "Plik"
 
 #: db/models/fields/files.py:323
 msgid "Image"
-msgstr "Plik graficzny"
+msgstr "Obraz"
 
 #: db/models/fields/related.py:979
 #, python-format
@@ -693,7 +693,7 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Wgraj poprawny plik graficzny. Ten, który został wgrany, nie jest obrazem, "
+"Wgraj poprawny obraz. Ten, który został wgrany, nim nie jest, "
 "albo jest uszkodzony."
 
 #: forms/fields.py:580
