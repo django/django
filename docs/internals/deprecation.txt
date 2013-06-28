@@ -404,6 +404,9 @@ these changes.
   forms for ManyToMany model fields will not be performed by Django anymore
   either at the model or forms layer.
 
+* The ``Model._meta.get_(add|change|delete)_permission`` methods will
+  be removed.
+
 2.0
 ---
 
