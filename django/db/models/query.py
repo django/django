@@ -1445,7 +1445,10 @@ class RawQuerySet(object):
             yield instance
 
     def __repr__(self):
-        return "<RawQuerySet: %r>" % (self.raw_query % tuple(self.params))
+        text = self.raw_query
+        if self.params:
+            text = text % (self.params if hasattr(self.params, 'keys') else tuple(self.params))
+        return "<RawQuerySet: %r>" % text
 
     def __getitem__(self, k):
         return list(self)[k]
