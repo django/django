@@ -2049,22 +2049,6 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
-.. setting:: AUTH_PROFILE_MODULE
-
-AUTH_PROFILE_MODULE
--------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Default: Not defined
-
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
-
 .. setting:: AUTH_USER_MODEL
 
 AUTH_USER_MODEL

@@ -732,8 +732,8 @@ deprecation schedule. Direct use of python markup libraries or 3rd party tag
 libraries is preferred to Django maintaining this functionality in the
 framework.
 
-:setting:`AUTH_PROFILE_MODULE`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``AUTH_PROFILE_MODULE``
+~~~~~~~~~~~~~~~~~~~~~~~
 
 With the introduction of :ref:`custom User models <auth-custom-user>`, there is
 no longer any need for a built-in mechanism to store user profile data.
@@ -741,8 +741,8 @@ no longer any need for a built-in mechanism to store user profile data.
 You can still define user profiles models that have a one-to-one relation with
 the User model - in fact, for many applications needing to associate data with
 a User account, this will be an appropriate design pattern to follow. However,
-the :setting:`AUTH_PROFILE_MODULE` setting, and the
-:meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
+the ``AUTH_PROFILE_MODULE`` setting, and the
+``django.contrib.auth.models.User.get_profile()`` method for accessing
 the user profile model, should not be used any longer.
 
 Streaming behavior of :class:`~django.http.HttpResponse`

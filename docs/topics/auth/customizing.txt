@@ -354,40 +354,6 @@ model and adding the related fields may be your better option.  However
 existing links to the default User model within your project's apps may justify
 the extra database load.
 
-.. _auth-profiles:
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Prior to 1.5, a single profile model could be specified site-wide with the
-setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
-following items, separated by a dot:
-
-1. The name of the application (case sensitive) in which the user
-   profile model is defined (in other words, the
-   name which was passed to :djadmin:`manage.py startapp <startapp>` to create
-   the application).
-
-2. The name of the model (not case sensitive) class.
-
-For example, if the profile model was a class named ``UserProfile`` and was
-defined inside an application named ``accounts``, the appropriate setting would
-be::
-
-    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
-
-When a user profile model has been defined and specified in this manner, each
-:class:`~django.contrib.auth.models.User` object will have a method --
-:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
-instance of the user profile model associated with that
-:class:`~django.contrib.auth.models.User`.
-
-The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create a profile if one does not exist.
-
 .. _auth-custom-user:
 
 Substituting a custom User model
