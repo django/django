@@ -255,7 +255,7 @@ Arguments sent with this signal:
 
 ``pk_set``
     For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-    actions, this is a list of primary key values that have been added to
+    actions, this is a set of primary key values that have been added to
     or removed from the relation.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
@@ -284,7 +284,7 @@ If we connected a handler like this::
 
 and then did something like this::
 
-    >>> p = Pizza.object.create(...)
+    >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
@@ -307,7 +307,7 @@ Argument        Value
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
 
-``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``set([t.id])`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
@@ -334,7 +334,7 @@ Argument        Value
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)
 
-``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+``pk_set``      ``set([p.id])`` (since only ``Pizza p`` was removed from the
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)

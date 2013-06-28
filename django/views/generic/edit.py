@@ -17,12 +17,19 @@ class FormMixin(ContextMixin):
     initial = {}
     form_class = None
     success_url = None
+    prefix = None
 
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
         return self.initial.copy()
+
+    def get_prefix(self):
+        """
+        Returns the prefix to use for forms on this view
+        """
+        return self.prefix
 
     def get_form_class(self):
         """
@@ -40,7 +47,11 @@ class FormMixin(ContextMixin):
         """
         Returns the keyword arguments for instantiating the form.
         """
-        kwargs = {'initial': self.get_initial()}
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
@@ -78,6 +89,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
     """
     A mixin that provides a way to show and handle a modelform in a request.
     """
+    fields = None
 
     def get_form_class(self):
         """
@@ -98,13 +110,12 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 # from that
                 model = self.get_queryset().model
 
-            fields = getattr(self, 'fields', None)
-            if fields is None:
+            if self.fields is None:
                 warnings.warn("Using ModelFormMixin (base class of %s) without "
                               "the 'fields' attribute is deprecated." % self.__class__.__name__,
                               PendingDeprecationWarning)
 
-            return model_forms.modelform_factory(model, fields=fields)
+            return model_forms.modelform_factory(model, fields=self.fields)
 
     def get_form_kwargs(self):
         """

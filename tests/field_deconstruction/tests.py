@@ -108,7 +108,7 @@ class FieldDeconstructionTests(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.EmailField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {})
+        self.assertEqual(kwargs, {"max_length": 75})
         field = models.EmailField(max_length=255)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.EmailField")

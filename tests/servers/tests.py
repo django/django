@@ -96,6 +96,11 @@ class LiveServerAddress(LiveServerBase):
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
     @classmethod
+    def tearDownClass(cls):
+        # skip it, as setUpClass doesn't call its parent either
+        pass
+
+    @classmethod
     def raises_exception(cls, address, exception):
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
         try:

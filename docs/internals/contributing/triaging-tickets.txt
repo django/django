@@ -255,7 +255,11 @@ Keywords
 ~~~~~~~~
 
 With this field you may label a ticket with multiple keywords. This can be
-useful, for example, to group several tickets of a same theme.
+useful, for example, to group several tickets of a same theme. Keywords can
+either be comma or space separated. Keyword search finds the keyword string
+anywhere in the keywords. For example, clicking on a ticket with the keyword
+"form" will yield similar tickets tagged with keywords containing strings such
+as "formset", "modelformset", and "ManagementForm".
 
 .. _closing-tickets:
 

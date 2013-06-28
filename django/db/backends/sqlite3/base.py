@@ -20,6 +20,7 @@ from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.models import fields
 from django.db.models.sql import aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
 from django.utils import six
@@ -103,6 +104,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_foreign_keys = False
     supports_check_constraints = False
     autocommits_when_autocommit_is_off = True
+    supports_paramstyle_pyformat = False
 
     @cached_property
     def uses_savepoints(self):
@@ -253,6 +255,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         and gets dates and datetimes wrong.
         For consistency with other backends, coerce when required.
         """
+        if value is None:
+            return None
+
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
             return util.typecast_decimal(field.format_number(value))
@@ -526,4 +531,4 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     return str(dt)
 
 def _sqlite_regexp(re_pattern, re_string):
-    return bool(re.search(re_pattern, re_string))
+    return bool(re.search(re_pattern, force_text(re_string))) if re_string is not None else False

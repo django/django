@@ -389,6 +389,27 @@ The following example demonstrates the use of savepoints::
             transaction.savepoint_rollback(sid)
             # open transaction now contains only a.save()
 
+.. versionadded:: 1.6
+
+Savepoints may be used to recover from a database error by performing a partial
+rollback. If you're doing this inside an :func:`atomic` block, the entire block
+will still be rolled back, because it doesn't know you've handled the situation
+at a lower level! To prevent this, you can control the rollback behavior with
+the following functions.
+
+.. function:: get_rollback(using=None)
+
+.. function:: set_rollback(rollback, using=None)
+
+Setting the rollback flag to ``True`` forces a rollback when exiting the
+innermost atomic block. This may be useful to trigger a rollback without
+raising an exception.
+
+Setting it to ``False`` prevents such a rollback. Before doing that, make sure
+you've rolled back the transaction to a known-good savepoint within the current
+atomic block! Otherwise you're breaking atomicity and data corruption may
+occur.
+
 Database-specific notes
 =======================
 

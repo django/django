@@ -9,17 +9,19 @@ from django.test.utils import override_settings
 from django.utils import unittest, six
 
 
-@override_settings(TEST='override')
+@override_settings(TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     available_apps = []
 
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
+        self.assertEqual(settings.TEST_OUTER, 'outer')
 
     @override_settings(TEST='override2')
     def test_method_override(self):
         self.assertEqual(settings.TEST, 'override2')
+        self.assertEqual(settings.TEST_OUTER, 'outer')
 
     def test_decorated_testcase_name(self):
         self.assertEqual(FullyDecoratedTranTestCase.__name__, 'FullyDecoratedTranTestCase')
@@ -167,6 +169,29 @@ class SettingsTests(TestCase):
             del settings.USE_I18N
             self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
         self.assertEqual(settings.USE_I18N, previous_i18n)
+
+    def test_override_settings_nested(self):
+        """
+        Test that override_settings uses the actual _wrapped attribute at
+        runtime, not when it was instantiated.
+        """
+
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+
+        inner = override_settings(TEST2='override')
+        with override_settings(TEST='override'):
+            self.assertEqual('override', settings.TEST)
+            with inner:
+                self.assertEqual('override', settings.TEST)
+                self.assertEqual('override', settings.TEST2)
+            # inner's __exit__ should have restored the settings of the outer
+            # context manager, not those when the class was instantiated
+            self.assertEqual('override', settings.TEST)
+            self.assertRaises(AttributeError, getattr, settings, 'TEST2')
+
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
     def test_allowed_include_roots_string(self):
         """

@@ -1350,8 +1350,14 @@ A data structure containing configuration information. The contents of
 this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
-The default logging configuration passes HTTP 500 server errors to an
-email log handler; all other log messages are given to a NullHandler.
+Among other things, the default logging configuration passes HTTP 500 server
+errors to an email log handler when :setting:`DEBUG` is ``False``. See also
+:ref:`configuring-logging`.
+
+You can see the default logging configuration by looking in
+``django/utils/log.py`` (or view the `online source`__).
+
+__ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
@@ -2564,7 +2570,9 @@ various locations.
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
 (using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+files with the same name are present, the first file that is found will be
+used.
 
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to

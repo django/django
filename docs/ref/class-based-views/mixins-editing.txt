@@ -35,6 +35,12 @@ FormMixin
 
         The URL to redirect to when the form is successfully processed.
 
+    .. attribute:: prefix
+
+        .. versionadded:: 1.6
+
+        The :attr:`~django.forms.Form.prefix` for the generated form.
+
     .. method:: get_initial()
 
         Retrieve initial data for the form. By default, returns a copy of
@@ -57,6 +63,13 @@ FormMixin
         The ``initial`` argument is set to :meth:`.get_initial`. If the
         request is a ``POST`` or ``PUT``, the request data (``request.POST``
         and ``request.FILES``) will also be provided.
+
+    .. method:: get_prefix()
+
+        .. versionadded:: 1.6
+
+        Determine the :attr:`~django.forms.Form.prefix` for the generated form.
+        Returns :attr:`~django.views.generic.edit.FormMixin.prefix` by default.
 
     .. method:: get_success_url()
 

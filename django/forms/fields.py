@@ -370,14 +370,8 @@ class DecimalField(IntegerField):
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput):
-            if self.max_digits is not None:
-                max_length = self.max_digits + 1  # for the sign
-                if self.decimal_places is None or self.decimal_places > 0:
-                    max_length += 1  # for the dot
-                attrs['maxlength'] = max_length
-            if self.decimal_places:
-                attrs['step'] = '0.%s1' % ('0' * (self.decimal_places-1))
+        if isinstance(widget, NumberInput) and self.decimal_places:
+            attrs['step'] = '0.%s1' % ('0' * (self.decimal_places - 1))
         return attrs
 
 

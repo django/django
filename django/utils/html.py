@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import re
-import string
 try:
     from urllib.parse import quote, urlsplit, urlunsplit
 except ImportError:     # Python 2

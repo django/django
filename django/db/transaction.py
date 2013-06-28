@@ -171,6 +171,26 @@ def clean_savepoints(using=None):
     """
     get_connection(using).clean_savepoints()
 
+def get_rollback(using=None):
+    """
+    Gets the "needs rollback" flag -- for *advanced use* only.
+    """
+    return get_connection(using).needs_rollback
+
+def set_rollback(rollback, using=None):
+    """
+    Sets or unsets the "needs rollback" flag -- for *advanced use* only.
+
+    When `rollback` is `True`, it triggers a rollback when exiting the
+    innermost enclosing atomic block that has `savepoint=True` (that's the
+    default). Use this to force a rollback without raising an exception.
+
+    When `rollback` is `False`, it prevents such a rollback. Use this only
+    after rolling back to a known-good state! Otherwise, you break the atomic
+    block and data corruption may occur.
+    """
+    return get_connection(using).set_rollback(rollback)
+
 #################################
 # Decorators / context managers #
 #################################

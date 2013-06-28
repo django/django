@@ -11,9 +11,12 @@ from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
+from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.util import format_number
 from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.models.fields import (AutoField, DateField, DateTimeField,
+    DecimalField, IntegerField, TimeField)
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
@@ -402,7 +405,7 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class SqlliteAggregationTests(TestCase):
+class SqliteAggregationTests(TestCase):
     """
     #19360: Raise NotImplementedError when aggregating on date/time fields.
     """
@@ -418,16 +421,59 @@ class SqlliteAggregationTests(TestCase):
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
 
 
+class SqliteChecks(TestCase):
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "No need to do SQLite checks")
+    def test_convert_values_to_handle_null_value(self):
+        database_operations = DatabaseOperations(connection)
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, AutoField(primary_key=True))
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateTimeField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DecimalField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, IntegerField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, TimeField())
+        )
+
+
 class BackendTestCase(TestCase):
 
     def create_squares_with_executemany(self, args):
+        self.create_squares(args, 'format', True)
+
+    def create_squares(self, args, paramstyle, multiple):    
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
-        query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
-        cursor.executemany(query, args)
+        if paramstyle=='format':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+        elif paramstyle=='pyformat':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+        else:
+            raise ValueError("unsupported paramstyle in test")
+        if multiple:
+            cursor.executemany(query, args)
+        else:
+            cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
@@ -456,6 +502,35 @@ class BackendTestCase(TestCase):
             self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 9)
 
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_execute_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = {'root': 3, 'square': 9}
+        self.create_squares(args, 'pyformat', multiple=False)
+        self.assertEqual(models.Square.objects.count(), 1)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = [{'root': i, 'square': i**2} for i in range(-5, 6)]
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 11)
+        for i in range(-5, 6):
+            square = models.Square.objects.get(root=i)
+            self.assertEqual(square.square, i**2)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat_iterator(self):
+        args = iter({'root': i, 'square': i**2} for i in range(-3, 2))
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 5)
+
+        args = iter({'root': i, 'square': i**2} for i in range(3, 7))
+        with override_settings(DEBUG=True):
+            # same test for DebugCursorWrapper
+            self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 9)
+        
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects
         qn = connection.ops.quote_name

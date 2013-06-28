@@ -1,5 +1,4 @@
 import os
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client

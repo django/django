@@ -103,6 +103,7 @@ class WSGIRequest(http.HttpRequest):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
         self._read_started = False
+        self.resolver_match = None
 
     def _is_secure(self):
         return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'

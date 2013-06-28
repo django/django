@@ -1,6 +1,6 @@
-from django.core.compat_checks import base
-from django.core.compat_checks import django_1_6_0
-from django.core.management.commands import checksetup
+from django.core.checks.compatibility import base
+from django.core.checks.compatibility import django_1_6_0
+from django.core.management.commands import check
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -86,22 +86,22 @@ class CompatChecksTestCase(TestCase):
 
     def test_management_command(self):
         # Again, we unfortunately have to patch out ``warnings``. Different
-        old_warnings = checksetup.warnings
-        checksetup.warnings = FakeWarnings()
+        old_warnings = check.warnings
+        check.warnings = FakeWarnings()
 
-        self.assertEqual(len(checksetup.warnings._warnings), 0)
+        self.assertEqual(len(check.warnings._warnings), 0)
 
         # Should not produce any warnings.
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
-            call_command('checksetup')
+            call_command('check')
 
-        self.assertEqual(len(checksetup.warnings._warnings), 0)
+        self.assertEqual(len(check.warnings._warnings), 0)
 
         with self.settings(TEST_RUNNER='django.test.runner.DiscoverRunner'):
-            call_command('checksetup')
+            call_command('check')
 
-        self.assertEqual(len(checksetup.warnings._warnings), 1)
-        self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in checksetup.warnings._warnings[0])
+        self.assertEqual(len(check.warnings._warnings), 1)
+        self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in check.warnings._warnings[0])
 
         # Restore the ``warnings``.
         base.warnings = old_warnings

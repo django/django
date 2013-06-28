@@ -137,7 +137,7 @@ class Thing(models.Model):
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
-    title = models.CharField(max_length=50, null=True)
+    title = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return self.name
 

@@ -6,7 +6,6 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 import logging
 import sys
 
-from django.db import utils
 from django.db.backends import *
 from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
 from django.db.backends.postgresql_psycopg2.client import DatabaseClient
@@ -17,7 +16,6 @@ from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
-from django.utils import six
 from django.utils.timezone import utc
 
 try:

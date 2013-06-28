@@ -221,10 +221,12 @@ Order in which tests are executed
 In order to guarantee that all ``TestCase`` code starts with a clean database,
 the Django test runner reorders tests in the following way:
 
-* First, all unittests (including :class:`unittest.TestCase`,
-  :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
-  :class:`~django.test.TransactionTestCase`) are run with no particular ordering
-  guaranteed nor enforced among them.
+* All :class:`~django.test.TestCase` subclasses are run first.
+
+* Then, all other unittests (including :class:`unittest.TestCase`,
+  :class:`~django.test.SimpleTestCase` and
+  :class:`~django.test.TransactionTestCase`) are run with no particular
+  ordering guaranteed nor enforced among them.
 
 * Then any other tests (e.g. doctests) that may alter the database without
   restoring it to its original state are run.

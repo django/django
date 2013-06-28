@@ -1,7 +1,6 @@
 """
 Global Django exception and warning classes.
 """
-import logging
 from functools import reduce
 import operator
 

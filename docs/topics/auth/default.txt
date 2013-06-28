@@ -817,7 +817,7 @@ patterns.
 
     * ``protocol``: http or https
 
-    * ``uid``: The user's id encoded in base 36.
+    * ``uid``: The user's primary key encoded in base 64.
 
     * ``token``: Token to check that the reset link is valid.
 
@@ -826,7 +826,12 @@ patterns.
     .. code-block:: html+django
 
         Someone asked for password reset for email {{ email }}. Follow the link below:
-        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb36=uid token=token %}
+        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+    .. versionchanged:: 1.6
+
+      Reversing ``password_reset_confirm`` takes a ``uidb64`` argument instead
+      of ``uidb36``.
 
     The same template context is used for subject template. Subject must be
     single line plain text string.
@@ -846,7 +851,7 @@ patterns.
       Defaults to :file:`registration/password_reset_done.html` if not
       supplied.
 
-.. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
+.. function:: password_reset_confirm(request[, uidb64, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
 
@@ -854,7 +859,12 @@ patterns.
 
     **Optional arguments:**
 
-    * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+    * ``uidb64``: The user's id encoded in base 64. Defaults to ``None``.
+
+      .. versionchanged:: 1.6
+
+          The ``uidb64`` parameter was previously base 36 encoded and named
+          ``uidb36``.
 
     * ``token``: Token to check that the password is valid. Defaults to
       ``None``.
@@ -877,8 +887,8 @@ patterns.
     * ``form``: The form (see ``set_password_form`` above) for setting the
       new user's password.
 
-    * ``validlink``: Boolean, True if the link (combination of uidb36 and
-      token) is valid or unused yet.
+    * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
+      ``token``) is valid or unused yet.
 
 .. function:: password_reset_complete(request[,template_name])
 

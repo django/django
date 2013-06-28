@@ -1072,7 +1072,8 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 class TestIsBoundBehavior(TestCase):
     def test_no_data_raises_validation_error(self):
-        self.assertRaises(ValidationError, ArticleFormSet, {})
+        with self.assertRaises(ValidationError):
+            ArticleFormSet({}).is_valid()
 
     def test_with_management_data_attrs_work_fine(self):
         data = {

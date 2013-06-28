@@ -27,7 +27,7 @@ def check_test_runner():
 
 def run_checks():
     """
-    Required by the ``checksetup`` management command, this returns a list of
+    Required by the ``check`` management command, this returns a list of
     messages from all the relevant check functions for this version of Django.
     """
     checks = [

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.core.compat_checks.base import check_compatibility
+from django.core.checks.compatibility.base import check_compatibility
 from django.core.management.base import NoArgsCommand
 
 

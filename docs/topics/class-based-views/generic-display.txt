@@ -92,6 +92,15 @@ We'll be using these models::
         def __unicode__(self):
             return self.name
 
+    class Author(models.Model):
+        salutation = models.CharField(max_length=10)
+        name = models.CharField(max_length=200)
+        email = models.EmailField()
+        headshot = models.ImageField(upload_to='author_headshots')
+
+        def __unicode__(self):
+            return self.name
+
     class Book(models.Model):
         title = models.CharField(max_length=100)
         authors = models.ManyToManyField('Author')
@@ -132,11 +141,11 @@ bit is just the lowercased version of the model's name.
     enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
     /path/to/project/books/templates/books/publisher_list.html
 
-.. highlightlang:: html+django
-
 This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A very simple template
-might look like the following::
+might look like the following:
+
+.. code-block:: html+django
 
     {% extends "base.html" %}
 
@@ -158,8 +167,6 @@ consider some of the common ways you might customize and extend generic views.
 
 Making "friendly" template contexts
 -----------------------------------
-
-.. highlightlang:: python
 
 You might have noticed that our sample publisher list template stores all the
 publishers in a variable named ``object_list``. While this works just fine, it
@@ -198,15 +205,12 @@ provided by the generic view. For example, think of showing a list of
 all the books on each publisher detail page. The
 :class:`~django.views.generic.detail.DetailView` generic view provides
 the publisher to the context, but how do we get additional information
-in that template.
+in that template?
 
-However, there is; you can subclass
-:class:`~django.views.generic.detail.DetailView` and provide your own
-implementation of the ``get_context_data`` method. The default
-implementation of this that comes with
-:class:`~django.views.generic.detail.DetailView` simply adds in the
-object being displayed to the template, but you can override it to send
-more::
+The answer is to subclass :class:`~django.views.generic.detail.DetailView`
+and provide your own implementation of the ``get_context_data`` method.
+The default implementation simply adds the object being displayed to the
+template, but you can override it to send more::
 
     from django.views.generic import DetailView
     from books.models import Publisher, Book
@@ -224,10 +228,10 @@ more::
 
 .. note::
 
-    Generally, get_context_data will merge the context data of all parent
+    Generally, ``get_context_data`` will merge the context data of all parent
     classes with those of the current class. To preserve this behavior in your
     own classes where you want to alter the context, you should be sure to call
-    get_context_data on the super class. When no two classes try to define the
+    ``get_context_data`` on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
     to super), any children of that class will also need to explicitly set it
@@ -372,7 +376,7 @@ Performing extra work
 The last common pattern we'll look at involves doing some extra work before
 or after calling the generic view.
 
-Imagine we had a ``last_accessed`` field on our ``Author`` object that we were
+Imagine we had a ``last_accessed`` field on our ``Author`` model that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
@@ -382,7 +386,7 @@ using to keep track of the last time anybody looked at that author::
         salutation = models.CharField(max_length=10)
         name = models.CharField(max_length=200)
         email = models.EmailField()
-        headshot = models.ImageField(upload_to='/tmp')
+        headshot = models.ImageField(upload_to='author_headshots')
         last_accessed = models.DateTimeField()
 
 The generic ``DetailView`` class, of course, wouldn't know anything about this

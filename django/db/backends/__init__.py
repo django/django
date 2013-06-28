@@ -330,6 +330,15 @@ class BaseDatabaseWrapper(object):
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
+    def set_rollback(self, rollback):
+        """
+        Set or unset the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "needs_rollback doesn't work outside of an 'atomic' block.")
+        self.needs_rollback = rollback
+
     def validate_no_atomic_block(self):
         """
         Raise an error if an atomic block is active.
@@ -622,6 +631,11 @@ class BaseDatabaseFeatures(object):
 
     # Does it support CHECK constraints?
     supports_check_constraints = True
+
+    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # parameter passing? Note this can be provided by the backend even if not
+    # supported by the Python driver
+    supports_paramstyle_pyformat = True
 
     def __init__(self, connection):
         self.connection = connection

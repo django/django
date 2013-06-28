@@ -762,20 +762,37 @@ class FormatStylePlaceholderCursor(object):
         self.cursor.arraysize = 100
 
     def _format_params(self, params):
-        return tuple([OracleParam(p, self, True) for p in params])
+        try:
+            return dict((k,OracleParam(v, self, True)) for k,v in params.items())
+        except AttributeError:
+            return tuple([OracleParam(p, self, True) for p in params])
 
     def _guess_input_sizes(self, params_list):
-        sizes = [None] * len(params_list[0])
-        for params in params_list:
-            for i, value in enumerate(params):
-                if value.input_size:
-                    sizes[i] = value.input_size
-        self.setinputsizes(*sizes)
+        # Try dict handling; if that fails, treat as sequence
+        if hasattr(params_list[0], 'keys'):
+            sizes = {}
+            for params in params_list:
+                for k, value in params.items():
+                    if value.input_size:
+                        sizes[k] = value.input_size
+            self.setinputsizes(**sizes)
+        else:
+            # It's not a list of dicts; it's a list of sequences
+            sizes = [None] * len(params_list[0])
+            for params in params_list:
+                for i, value in enumerate(params):
+                    if value.input_size:
+                        sizes[i] = value.input_size
+            self.setinputsizes(*sizes)        
 
     def _param_generator(self, params):
-        return [p.force_bytes for p in params]
+        # Try dict handling; if that fails, treat as sequence
+        if hasattr(params, 'items'):
+            return dict((k, v.force_bytes) for k,v in params.items())
+        else:
+            return [p.force_bytes for p in params]
 
-    def execute(self, query, params=None):
+    def _fix_for_params(self, query, params):
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
@@ -785,10 +802,18 @@ class FormatStylePlaceholderCursor(object):
         if params is None:
             params = []
             query = convert_unicode(query, self.charset)
+        elif hasattr(params, 'keys'):
+            # Handle params as dict
+            args = dict((k, ":%s"%k) for k in params.keys())
+            query = convert_unicode(query % args, self.charset)
         else:
-            params = self._format_params(params)
+            # Handle params as sequence
             args = [(':arg%d' % i) for i in range(len(params))]
             query = convert_unicode(query % tuple(args), self.charset)
+        return query, self._format_params(params)
+        
+    def execute(self, query, params=None):
+        query, params = self._fix_for_params(query, params)
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
@@ -799,22 +824,15 @@ class FormatStylePlaceholderCursor(object):
             raise
 
     def executemany(self, query, params=None):
-        # cx_Oracle doesn't support iterators, convert them to lists
-        if params is not None and not isinstance(params, (list, tuple)):
-            params = list(params)
-        try:
-            args = [(':arg%d' % i) for i in range(len(params[0]))]
-        except (IndexError, TypeError):
+        if not params:
             # No params given, nothing to do
             return None
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
-        # it does want a trailing ';' but not a trailing '/'.  However, these
-        # characters must be included in the original query in case the query
-        # is being passed to SQL*Plus.
-        if query.endswith(';') or query.endswith('/'):
-            query = query[:-1]
-        query = convert_unicode(query % tuple(args), self.charset)
-        formatted = [self._format_params(i) for i in params]
+        # uniform treatment for sequences and iterables
+        params_iter = iter(params)
+        query, firstparams = self._fix_for_params(query, next(params_iter))
+        # we build a list of formatted params; as we're going to traverse it 
+        # more than once, we can't make it lazy by using a generator
+        formatted = [firstparams]+[self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         try:
             return self.cursor.executemany(query,
