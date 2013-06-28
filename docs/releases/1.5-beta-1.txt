@@ -689,7 +689,7 @@ framework.
 ``cleanup`` management command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :djadmin:`cleanup` management command has been deprecated and replaced by
+The ``cleanup`` management command has been deprecated and replaced by
 :djadmin:`clearsessions`.
 
 ``daily_cleanup.py`` script
