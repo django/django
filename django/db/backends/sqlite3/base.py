@@ -101,6 +101,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
     autocommits_when_autocommit_is_off = True
+    supports_paramstyle_pyformat = False
 
     @cached_property
     def uses_savepoints(self):

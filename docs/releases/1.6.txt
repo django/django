@@ -337,6 +337,12 @@ Minor features
   default) to allow customizing the :attr:`~django.forms.Form.prefix` of the
   form.
 
+* Raw queries (``Manager.raw()`` or ``cursor.execute()``) can now use the 
+  "pyformat" parameter style, where placeholders in the query are given as 
+  ``'%(name)s'`` and the parameters are passed as a dictionary rather than
+  a list (except on SQLite). This has long been possible (but not officially
+  supported) on MySQL and PostgreSQL, and is now also available on Oracle.
+
 Backwards incompatible changes in 1.6
 =====================================
 

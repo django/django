@@ -613,6 +613,11 @@ class BaseDatabaseFeatures(object):
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
+    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # parameter passing? Note this can be provided by the backend even if not
+    # supported by the Python driver
+    supports_paramstyle_pyformat = True
+
     def __init__(self, connection):
         self.connection = connection
 
