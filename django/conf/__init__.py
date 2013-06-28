@@ -132,19 +132,9 @@ class Settings(BaseSettings):
                 % (self.SETTINGS_MODULE, e)
             )
 
-        # Settings that should be converted into tuples if they're mistakenly entered
-        # as strings.
-        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
-                if setting in tuple_settings and \
-                        isinstance(setting_value, six.string_types):
-                    warnings.warn("The %s setting must be a tuple. Please fix your "
-                                  "settings, as auto-correction is now deprecated." % setting,
-                                  DeprecationWarning, stacklevel=2)
-                    setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:
