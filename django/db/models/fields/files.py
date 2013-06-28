@@ -227,6 +227,17 @@ class FileField(Field):
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(FileField, self).deconstruct()
+        if kwargs.get("max_length", None) != 100:
+            kwargs["max_length"] = 100
+        else:
+            del kwargs["max_length"]
+        kwargs['upload_to'] = self.upload_to
+        if self.storage is not default_storage:
+            kwargs['storage'] = self.storage
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "FileField"
 
@@ -325,6 +336,14 @@ class ImageField(FileField):
             height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         super(ImageField, self).__init__(verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(ImageField, self).deconstruct()
+        if self.width_field:
+            kwargs['width_field'] = self.width_field
+        if self.height_field:
+            kwargs['height_field'] = self.height_field
+        return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name):
         super(ImageField, self).contribute_to_class(cls, name)

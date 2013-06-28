@@ -99,7 +99,8 @@ class Field(object):
             db_tablespace=None, auto_created=False, validators=[],
             error_messages=None):
         self.name = name
-        self.verbose_name = verbose_name
+        self.verbose_name = verbose_name  # May be set by set_attributes_from_name
+        self._verbose_name = verbose_name  # Store original for deconstruction
         self.primary_key = primary_key
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
@@ -128,13 +129,98 @@ class Field(object):
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
+        self._validators = validators  # Store for deconstruction later
         self.validators = self.default_validators + validators
 
         messages = {}
         for c in reversed(self.__class__.__mro__):
             messages.update(getattr(c, 'default_error_messages', {}))
         messages.update(error_messages or {})
+        self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
+
+    def deconstruct(self):
+        """
+        Returns enough information to recreate the field as a 4-tuple:
+
+         * The name of the field on the model, if contribute_to_class has been run
+         * The import path of the field, including the class: django.db.models.IntegerField
+           This should be the most portable version, so less specific may be better.
+         * A list of positional arguments
+         * A dict of keyword arguments
+
+        Note that the positional or keyword arguments must contain values of the
+        following types (including inner values of collection types):
+
+         * None, bool, str, unicode, int, long, float, complex, set, frozenset, list, tuple, dict
+         * UUID
+         * datetime.datetime (naive), datetime.date
+         * top-level classes, top-level functions - will be referenced by their full import path
+         * Storage instances - these have their own deconstruct() method
+
+        This is because the values here must be serialised into a text format
+        (possibly new Python code, possibly JSON) and these are the only types
+        with encoding handlers defined.
+
+        There's no need to return the exact way the field was instantiated this time,
+        just ensure that the resulting field is the same - prefer keyword arguments
+        over positional ones, and omit parameters with their default values.
+        """
+        # Short-form way of fetching all the default parameters
+        keywords = {}
+        possibles = {
+            "verbose_name": None,
+            "primary_key": False,
+            "max_length": None,
+            "unique": False,
+            "blank": False,
+            "null": False,
+            "db_index": False,
+            "default": NOT_PROVIDED,
+            "editable": True,
+            "serialize": True,
+            "unique_for_date": None,
+            "unique_for_month": None,
+            "unique_for_year": None,
+            "choices": [],
+            "help_text": '',
+            "db_column": None,
+            "db_tablespace": settings.DEFAULT_INDEX_TABLESPACE,
+            "auto_created": False,
+            "validators": [],
+            "error_messages": None,
+        }
+        attr_overrides = {
+            "unique": "_unique",
+            "choices": "_choices",
+            "error_messages": "_error_messages",
+            "validators": "_validators",
+            "verbose_name": "_verbose_name",
+        }
+        equals_comparison = set(["choices", "validators", "db_tablespace"])
+        for name, default in possibles.items():
+            value = getattr(self, attr_overrides.get(name, name))
+            if name in equals_comparison:
+                if value != default:
+                    keywords[name] = value
+            else:
+                if value is not default:
+                    keywords[name] = value
+        # Work out path - we shorten it for known Django core fields
+        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        if path.startswith("django.db.models.fields.related"):
+            path = path.replace("django.db.models.fields.related", "django.db.models")
+        if path.startswith("django.db.models.fields.files"):
+            path = path.replace("django.db.models.fields.files", "django.db.models")
+        if path.startswith("django.db.models.fields"):
+            path = path.replace("django.db.models.fields", "django.db.models")
+        # Return basic info - other fields should override this.
+        return (
+            self.name,
+            path,
+            [],
+            keywords,
+        )
 
     def __eq__(self, other):
         # Needed for @total_ordering
@@ -566,6 +652,7 @@ class Field(object):
             return '<%s: %s>' % (path, name)
         return '<%s>' % path
 
+
 class AutoField(Field):
     description = _("Integer")
 
@@ -579,6 +666,12 @@ class AutoField(Field):
                "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(AutoField, self).deconstruct()
+        del kwargs['blank']
+        kwargs['primary_key'] = True
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "AutoField"
@@ -629,6 +722,11 @@ class BooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(BooleanField, self).deconstruct()
+        del kwargs['blank']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "BooleanField"
@@ -732,6 +830,18 @@ class DateField(Field):
             kwargs['editable'] = False
             kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(DateField, self).deconstruct()
+        if self.auto_now:
+            kwargs['auto_now'] = True
+            del kwargs['editable']
+            del kwargs['blank']
+        if self.auto_now_add:
+            kwargs['auto_now_add'] = True
+            del kwargs['editable']
+            del kwargs['blank']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "DateField"
@@ -927,6 +1037,14 @@ class DecimalField(Field):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         Field.__init__(self, verbose_name, name, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(DecimalField, self).deconstruct()
+        if self.max_digits:
+            kwargs['max_digits'] = self.max_digits
+        if self.decimal_places:
+            kwargs['decimal_places'] = self.decimal_places
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "DecimalField"
 
@@ -989,6 +1107,12 @@ class EmailField(CharField):
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(EmailField, self).deconstruct()
+        # We do not exclude max_length if it matches default as we want to change
+        # the default in future.
+        return name, path, args, kwargs
+
     def formfield(self, **kwargs):
         # As with CharField, this will cause email validation to be performed
         # twice.
@@ -1007,6 +1131,22 @@ class FilePathField(Field):
         self.allow_files, self.allow_folders =  allow_files, allow_folders
         kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(FilePathField, self).deconstruct()
+        if self.path != '':
+            kwargs['path'] = self.path
+        if self.match is not None:
+            kwargs['match'] = self.match
+        if self.recursive is not False:
+            kwargs['recursive'] = self.recursive
+        if self.allow_files is not True:
+            kwargs['allow_files'] = self.allow_files
+        if self.allow_folders is not False:
+            kwargs['allow_folders'] = self.allow_folders
+        if kwargs.get("max_length", None) == 100:
+            del kwargs["max_length"]
+        return name, path, args, kwargs
 
     def formfield(self, **kwargs):
         defaults = {
@@ -1115,6 +1255,11 @@ class IPAddressField(Field):
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(IPAddressField, self).deconstruct()
+        del kwargs['max_length']
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "IPAddressField"
 
@@ -1131,11 +1276,22 @@ class GenericIPAddressField(Field):
     def __init__(self, verbose_name=None, name=None, protocol='both',
                  unpack_ipv4=False, *args, **kwargs):
         self.unpack_ipv4 = unpack_ipv4
+        self.protocol = protocol
         self.default_validators, invalid_error_message = \
             validators.ip_address_validators(protocol, unpack_ipv4)
         self.default_error_messages['invalid'] = invalid_error_message
         kwargs['max_length'] = 39
         Field.__init__(self, verbose_name, name, *args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(GenericIPAddressField, self).deconstruct()
+        if self.unpack_ipv4 is not False:
+            kwargs['unpack_ipv4'] = self.unpack_ipv4
+        if self.protocol != "both":
+            kwargs['protocol'] = self.protocol
+        if kwargs.get("max_length", None) == 39:
+            del kwargs['max_length']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "GenericIPAddressField"
@@ -1176,6 +1332,12 @@ class NullBooleanField(Field):
         kwargs['null'] = True
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(NullBooleanField, self).deconstruct()
+        del kwargs['null']
+        del kwargs['blank']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "NullBooleanField"
@@ -1254,6 +1416,16 @@ class SlugField(CharField):
             kwargs['db_index'] = True
         super(SlugField, self).__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(SlugField, self).deconstruct()
+        if kwargs.get("max_length", None) == 50:
+            del kwargs['max_length']
+        if self.db_index is False:
+            kwargs['db_index'] = False
+        else:
+            del kwargs['db_index']
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "SlugField"
 
@@ -1301,6 +1473,14 @@ class TimeField(Field):
             kwargs['editable'] = False
             kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(TimeField, self).deconstruct()
+        if self.auto_now is not False:
+            kwargs["auto_now"] = self.auto_now
+        if self.auto_now_add is not False:
+            kwargs["auto_now_add"] = self.auto_now_add
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "TimeField"
@@ -1366,6 +1546,12 @@ class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         CharField.__init__(self, verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(URLField, self).deconstruct()
+        if kwargs.get("max_length", None) == 200:
+            del kwargs['max_length']
+        return name, path, args, kwargs
 
     def formfield(self, **kwargs):
         # As with CharField, this will cause URL validation to be performed
