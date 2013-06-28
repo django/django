@@ -77,15 +77,12 @@ Django version Python versions
 Can I use Django with Python 3?
 -------------------------------
 
-Django 1.5 introduces experimental support for Python 3.2.3 and above. However,
-we don't yet suggest that you use Django and Python 3 in production.
+Yes, you can!
 
-Python 3 support should be considered a "preview". It's offered to bootstrap
-the transition of the Django ecosystem to Python 3, and to help you start
-porting your apps for future Python 3 compatibility. But we're not yet
-confident enough to promise stability in production.
+Django 1.5 introduced experimental support for Python 3.2.3 and above.
 
-Our current plan is to make Django 1.6 suitable for general use with Python 3.
+As of Django 1.6, Python 3 support is considered stable and you can safely use
+it in production. See also :doc:`/topics/python3`.
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
