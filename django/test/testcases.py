@@ -162,10 +162,6 @@ class SimpleTestCase(ut2.TestCase):
     # Can be overridden in derived classes.
     client_class = Client
 
-    _warn_txt = ("save_warnings_state/restore_warnings_state "
-        "django.test.*TestCase methods are deprecated. Use Python's "
-        "warnings.catch_warnings context manager instead.")
-
     def __call__(self, result=None):
         """
         Wrapper around default __call__ method to perform common Django test
@@ -224,21 +220,6 @@ class SimpleTestCase(ut2.TestCase):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
-
-    def save_warnings_state(self):
-        """
-        Saves the state of the warnings module
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        self._warnings_state = warnings.filters[:]
-
-    def restore_warnings_state(self):
-        """
-        Restores the state of the warnings module to the state
-        saved by save_warnings_state()
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        warnings.filters = self._warnings_state[:]
 
     def settings(self, **kwargs):
         """
