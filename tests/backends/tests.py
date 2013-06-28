@@ -456,13 +456,24 @@ class SqliteChecks(TestCase):
 class BackendTestCase(TestCase):
 
     def create_squares_with_executemany(self, args):
+        self.create_squares(args, 'format', True)
+
+    def create_squares(self, args, paramstyle, multiple):    
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
-        query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
-        cursor.executemany(query, args)
+        if paramstyle=='format':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+        elif paramstyle=='pyformat':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+        else:
+            raise ValueError("unsupported paramstyle in test")
+        if multiple:
+            cursor.executemany(query, args)
+        else:
+            cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
@@ -491,6 +502,35 @@ class BackendTestCase(TestCase):
             self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 9)
 
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_execute_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = {'root': 3, 'square': 9}
+        self.create_squares(args, 'pyformat', multiple=False)
+        self.assertEqual(models.Square.objects.count(), 1)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = [{'root': i, 'square': i**2} for i in range(-5, 6)]
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 11)
+        for i in range(-5, 6):
+            square = models.Square.objects.get(root=i)
+            self.assertEqual(square.square, i**2)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat_iterator(self):
+        args = iter({'root': i, 'square': i**2} for i in range(-3, 2))
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 5)
+
+        args = iter({'root': i, 'square': i**2} for i in range(3, 7))
+        with override_settings(DEBUG=True):
+            # same test for DebugCursorWrapper
+            self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 9)
+        
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects
         qn = connection.ops.quote_name
