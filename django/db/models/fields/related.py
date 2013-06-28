@@ -1166,7 +1166,7 @@ class ForeignKey(ForeignObject):
         rel = self.rel
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
@@ -1393,7 +1393,7 @@ class ManyToManyField(RelatedField):
             del kwargs['help_text']
         # Rel needs more work.
         rel = self.rel
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
