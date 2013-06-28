@@ -57,7 +57,7 @@ for a staff account. Note that both fields may be case-sensitive."
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class AdminViewBasicTest(TestCase):
+class AdminViewBasicTestCase(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
 
@@ -92,6 +92,7 @@ class AdminViewBasicTest(TestCase):
             failing_msg
         )
 
+class AdminViewBasicTest(AdminViewBasicTestCase):
     def testTrailingSlashRequired(self):
         """
         If you leave off the trailing slash, app should redirect and add it.
@@ -761,7 +762,7 @@ class SaveAsTests(TestCase):
         self.assertEqual(response.context['form_url'], '/test_admin/admin/admin_views/person/add/')
 
 
-class CustomModelAdminTest(AdminViewBasicTest):
+class CustomModelAdminTest(AdminViewBasicTestCase):
     urls = "admin_views.urls"
     urlbit = "admin2"
 
