@@ -5,9 +5,7 @@ these implementations if necessary.
 """
 
 import collections
-import itertools
 import sys
-import warnings
 
 
 def is_iterable(x):
@@ -29,8 +27,3 @@ def is_iterator(x):
     if sys.version_info >= (2, 7):
         return isinstance(x, collections.Iterator)
     return isinstance(x, collections.Iterator) and hasattr(x, '__iter__')
-
-def product(*args, **kwds):
-    warnings.warn("django.utils.itercompat.product is deprecated; use the native version instead",
-                  DeprecationWarning, stacklevel=2)
-    return itertools.product(*args, **kwds)
