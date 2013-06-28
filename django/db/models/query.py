@@ -5,7 +5,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import itertools
 import sys
-import warnings
 
 from django.conf import settings
 from django.core import exceptions
@@ -648,10 +647,6 @@ class QuerySet(object):
 
         If select_related(None) is called, the list is cleared.
         """
-        if 'depth' in kwargs:
-            warnings.warn('The "depth" keyword argument has been deprecated.\n'
-                    'Use related field names instead.', DeprecationWarning, stacklevel=2)
-        depth = kwargs.pop('depth', 0)
         if kwargs:
             raise TypeError('Unexpected keyword arguments to select_related: %s'
                     % (list(kwargs),))
@@ -659,13 +654,9 @@ class QuerySet(object):
         if fields == (None,):
             obj.query.select_related = False
         elif fields:
-            if depth:
-                raise TypeError('Cannot pass both "depth" and fields to select_related()')
             obj.query.add_select_related(fields)
         else:
             obj.query.select_related = True
-        if depth:
-            obj.query.max_depth = depth
         return obj
 
     def prefetch_related(self, *lookups):
