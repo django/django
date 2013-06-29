@@ -13,7 +13,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import QueryDict, HttpRequest
 from django.utils.encoding import force_text
-from django.utils.http import int_to_base36, urlsafe_base64_decode, urlquote
+from django.utils.http import urlquote
 from django.utils._os import upath
 from django.test import TestCase
 from django.test.utils import override_settings, patch_logger
@@ -193,16 +193,6 @@ class PasswordResetTest(AuthViewsTestCase):
         # redirect to a 'complete' page:
         self.assertContains(response, "Please enter your new password")
 
-    def test_confirm_valid_base36(self):
-        # Remove in Django 1.7
-        url, path = self._test_confirm_start()
-        path_parts = path.strip("/").split("/")
-        # construct an old style (base36) URL by converting the base64 ID
-        path_parts[1] = int_to_base36(int(urlsafe_base64_decode(path_parts[1])))
-        response = self.client.get("/%s/%s-%s/" % tuple(path_parts))
-        # redirect to a 'complete' page:
-        self.assertContains(response, "Please enter your new password")
-
     def test_confirm_invalid(self):
         url, path = self._test_confirm_start()
         # Let's munge the token in the path, but keep the same length,
@@ -217,19 +207,9 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
-    def test_confirm_invalid_user_base36(self):
-        # Remove in Django 1.7
-        response = self.client.get('/reset/123456-1-1/')
-        self.assertContains(response, "The password reset link was invalid")
-
     def test_confirm_overflow_user(self):
         # Ensure that we get a 200 response for a base36 user id that overflows int
         response = self.client.get('/reset/zzzzzzzzzzzzz/1-1/')
-        self.assertContains(response, "The password reset link was invalid")
-
-    def test_confirm_overflow_user_base36(self):
-        # Remove in Django 1.7
-        response = self.client.get('/reset/zzzzzzzzzzzzz-1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_post(self):
