@@ -1,8 +1,6 @@
 from __future__ import unicode_literals
 import re
-import warnings
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.core import validators
 from django.db import models
@@ -29,10 +27,6 @@ def update_last_login(sender, user, **kwargs):
     user.last_login = timezone.now()
     user.save(update_fields=['last_login'])
 user_logged_in.connect(update_last_login)
-
-
-class SiteProfileNotAvailable(Exception):
-    pass
 
 
 class PermissionManager(models.Manager):

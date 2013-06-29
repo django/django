@@ -188,7 +188,7 @@ The functions defined in this module share the following properties:
 =========================
 
 .. module:: django.utils.encoding
-   :synopsis: A series of helper function to manage character encoding.
+   :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
 

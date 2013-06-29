@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-import warnings
 
 from django.db import connection
 from django.forms import EmailField, IntegerField

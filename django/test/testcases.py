@@ -15,7 +15,6 @@ except ImportError:     # Python 2
 import select
 import socket
 import threading
-import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler

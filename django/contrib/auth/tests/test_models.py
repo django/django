@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import (Group, User, UserManager)
+from django.contrib.auth.models import Group, User, UserManager
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.db.models.signals import post_save
 from django.test import TestCase

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader

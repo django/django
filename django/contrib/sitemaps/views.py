@@ -1,4 +1,3 @@
-import warnings
 from functools import wraps
 
 from django.contrib.sites.models import get_current_site
