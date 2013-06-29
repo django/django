@@ -268,12 +268,12 @@ class ManyToManyExclusionTestCase(TestCase):
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
 
 
-class EmptyLabelCharFieldTestCasse(TestCase):
+class EmptyLabelCharFieldTestCase(TestCase):
     def test_empty_field(self):
         f = EmptyLabelChoiceForm()
         self.assertEqual(f.as_p(),
             """<p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
 <option value="" selected="selected">Please select one</option>
-<option value="f">Foo</option>
-<option value="b">Bar</option>
+<option value="f">foo</option>
+<option value="b">bar</option>
 </select></p>""")

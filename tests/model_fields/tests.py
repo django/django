@@ -320,6 +320,17 @@ class ValidationTest(test.TestCase):
         f = models.CharField(choices=[('a','A'), ('b','B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
+    def test_charfield_get_choices_with_empty_label(self):
+        f = models.CharField(choices=[('a', 'A')],
+                             empty_label="<><>")
+        self.assertEqual(f.get_choices(True), [('', '<><>'), ('a', 'A')])
+
+    def test_charfield_get_choices_empty_label_override(self):
+        f = models.CharField(choices=[('a', 'A')],
+                             empty_label="<><>")
+        self.assertEqual(f.get_choices(True, [('', ':)')]),
+                         [('', ':)'), ('a', 'A')])
+
     def test_choices_validation_supports_named_groups(self):
         f = models.IntegerField(choices=(('group',((10,'A'),(20,'B'))),(30,'C')))
         self.assertEqual(10, f.clean(10, None))
