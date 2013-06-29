@@ -132,9 +132,17 @@ class Settings(BaseSettings):
                 % (self.SETTINGS_MODULE, e)
             )
 
+        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
+
+                if setting in tuple_settings and \
+                        isinstance(setting_value, six.string_types):
+                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                            "Please fix your settings." % setting)
+
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:
