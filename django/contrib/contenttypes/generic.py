@@ -25,7 +25,7 @@ from django.utils.encoding import smart_text
 
 class RenameGenericForeignKeyMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
     )
 
 

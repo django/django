@@ -21,7 +21,7 @@ __all__ = ('DjangoTestSuiteRunner',)
 warnings.warn(
     "The django.test.simple module and DjangoTestSuiteRunner are deprecated; "
     "use django.test.runner.DiscoverRunner instead.",
-    PendingDeprecationWarning)
+    DeprecationWarning)
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'

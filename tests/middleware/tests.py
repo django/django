@@ -18,7 +18,7 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.transaction import TransactionMiddleware
 from django.test import TransactionTestCase, TestCase, RequestFactory
-from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
@@ -249,7 +249,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('regular_url/that/does/not/exist')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 1)
@@ -261,7 +261,7 @@ class CommonMiddlewareTest(TestCase):
     def test_404_error_reporting_no_referer(self):
         request = self._get_request('regular_url/that/does/not/exist')
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -273,7 +273,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('foo_url/that/does/not/exist/either')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -703,7 +703,7 @@ class ETagGZipMiddlewareTest(TestCase):
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
 
-class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Test the transaction middleware.
     """

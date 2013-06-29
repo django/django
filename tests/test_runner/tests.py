@@ -11,7 +11,7 @@ from django.core.management import call_command
 from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import unittest
 from django.utils.importlib import import_module
 
@@ -225,7 +225,7 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
         self.assertNoOutput(err)
 
 
-class ModulesTestsPackages(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+class ModulesTestsPackages(IgnoreDeprecationWarningsMixin, unittest.TestCase):
     def test_get_tests(self):
         "Check that the get_tests helper function can find tests in a directory"
         from django.test.simple import get_tests

@@ -139,7 +139,7 @@ def _detect_image_library():
         warnings.warn(
             "Support for the PIL will be removed in Django 1.8. Please " +
             "uninstall it & install Pillow instead.",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
     return PILImage, PIL_imaging, PILImageFile

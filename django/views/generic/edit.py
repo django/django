@@ -113,7 +113,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             if self.fields is None:
                 warnings.warn("Using ModelFormMixin (base class of %s) without "
                               "the 'fields' attribute is deprecated." % self.__class__.__name__,
-                              PendingDeprecationWarning)
+                              DeprecationWarning)
 
             return model_forms.modelform_factory(model, fields=self.fields)
 

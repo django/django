@@ -130,7 +130,7 @@ class Options(object):
         """
         warnings.warn(
             "Options.module_name has been deprecated in favor of model_name",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return self.model_name
 
     def _prepare(self, model):
@@ -421,7 +421,7 @@ class Options(object):
         warnings.warn(
             "`Options.get_add_permission` has been deprecated in favor "
             "of `django.contrib.auth.get_permission_codename`.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return 'add_%s' % self.model_name
 
     def get_change_permission(self):
@@ -432,7 +432,7 @@ class Options(object):
         warnings.warn(
             "`Options.get_change_permission` has been deprecated in favor "
             "of `django.contrib.auth.get_permission_codename`.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return 'change_%s' % self.model_name
 
     def get_delete_permission(self):
@@ -443,7 +443,7 @@ class Options(object):
         warnings.warn(
             "`Options.get_delete_permission` has been deprecated in favor "
             "of `django.contrib.auth.get_permission_codename`.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,

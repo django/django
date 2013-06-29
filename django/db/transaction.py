@@ -101,19 +101,19 @@ def set_clean(using=None):
 
 def is_managed(using=None):
     warnings.warn("'is_managed' is deprecated.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def managed(flag=True, using=None):
     warnings.warn("'managed' no longer serves a purpose.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def commit_unless_managed(using=None):
     warnings.warn("'commit_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def rollback_unless_managed(using=None):
     warnings.warn("'rollback_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 ###############
 # Public APIs #
@@ -430,7 +430,7 @@ def autocommit(using=None):
     your settings file and want the default behavior in some view functions.
     """
     warnings.warn("autocommit is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(managed=False, using=using)
@@ -448,7 +448,7 @@ def commit_on_success(using=None):
     control in Web apps.
     """
     warnings.warn("commit_on_success is deprecated in favor of atomic.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -478,7 +478,7 @@ def commit_manually(using=None):
     themselves.
     """
     warnings.warn("commit_manually is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)

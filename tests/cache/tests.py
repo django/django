@@ -28,7 +28,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 from django.utils import six, timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
@@ -1594,7 +1594,7 @@ def hello_world_view(request, value):
             },
         },
 )
-class CacheMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TestCase):
+class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()

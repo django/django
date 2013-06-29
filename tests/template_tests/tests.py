@@ -534,7 +534,7 @@ class TemplateTests(TransRealMixin, TestCase):
                         try:
                             with warnings.catch_warnings():
                                 # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.template.base')
+                                warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
                                 test_template = loader.get_template(name)
                         except ShouldNotExecuteException:
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))

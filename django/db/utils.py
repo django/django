@@ -174,7 +174,7 @@ class ConnectionHandler(object):
         if settings.TRANSACTIONS_MANAGED:
             warnings.warn(
                 "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
             conn.setdefault('AUTOCOMMIT', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')

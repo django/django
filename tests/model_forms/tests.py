@@ -266,7 +266,7 @@ class ModelFormBaseTest(TestCase):
 
     def test_missing_fields_attribute(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
                 class Meta:
@@ -276,7 +276,7 @@ class ModelFormBaseTest(TestCase):
         # if a warning has been seen already, the catch_warnings won't
         # have recorded it. The following line therefore will not work reliably:
 
-        # self.assertEqual(w[0].category, PendingDeprecationWarning)
+        # self.assertEqual(w[0].category, DeprecationWarning)
 
         # Until end of the deprecation cycle, should still create the
         # form as before:

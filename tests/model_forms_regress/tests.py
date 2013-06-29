@@ -566,10 +566,10 @@ class CustomMetaclassTestCase(TestCase):
 class TestTicket19733(TestCase):
     def test_modelform_factory_without_fields(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
             # This should become an error once deprecation cycle is complete.
             form = modelform_factory(Person)
-        self.assertEqual(w[0].category, PendingDeprecationWarning)
+        self.assertEqual(w[0].category, DeprecationWarning)
 
     def test_modelform_factory_with_all_fields(self):
         form = modelform_factory(Person, fields="__all__")
