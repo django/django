@@ -615,7 +615,7 @@ explicitly.
 ``django.utils.encoding.StrAndUnicode``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~django.utils.encoding.StrAndUnicode` mix-in has been deprecated.
+The ``django.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
 :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
