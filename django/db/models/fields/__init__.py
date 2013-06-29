@@ -615,9 +615,14 @@ class Field(object):
                 defaults['initial'] = self.get_default()
         if self.choices:
             # Fields with choices get special treatment.
-            include_blank = (self.blank or
-                             not (self.has_default() or 'initial' in kwargs))
-            defaults['choices'] = self.get_choices(include_blank=include_blank)
+            choice_kwargs = {
+                'include_blank': (self.blank or
+                    not (self.has_default() or 'initial' in kwargs)),
+            }
+            if self.empty_label:
+                choice_kwargs['blank_choice'] = [('', self.empty_label)]
+
+            defaults['choices'] = self.get_choices(**choice_kwargs)
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
@@ -777,6 +782,8 @@ class CharField(Field):
     description = _("String (up to %(max_length)s)")
 
     def __init__(self, *args, **kwargs):
+        self.empty_label = kwargs.pop('empty_label', None)
+
         super(CharField, self).__init__(*args, **kwargs)
         self.validators.append(validators.MaxLengthValidator(self.max_length))
 
