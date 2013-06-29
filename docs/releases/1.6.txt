@@ -41,9 +41,9 @@ Simplified default project and app templates
 The default templates used by :djadmin:`startproject` and :djadmin:`startapp`
 have been simplified and modernized. The :doc:`admin
 </ref/contrib/admin/index>` is now enabled by default in new projects; the
-:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`Language
-detection <how-django-discovers-language-preference>` and :ref:`clickjacking
-prevention <clickjacking-prevention>` are turned on.
+:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`clickjacking
+prevention <clickjacking-prevention>` is now on and the database defaults to
+SQLite.
 
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
