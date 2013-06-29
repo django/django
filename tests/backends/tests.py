@@ -164,6 +164,17 @@ class DateQuotingTest(TestCase):
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
 
+    def test_last_executed_query(self):
+        """
+        last_executed_query should not raise an exception even if no previous
+        query has been run.
+        """
+        cursor = connection.cursor()
+        try:
+            connection.ops.last_executed_query(cursor, '', ())
+        except Exception:
+            self.fail("'last_executed_query' should not raise an exception.")
+
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]['sql'].lower()
