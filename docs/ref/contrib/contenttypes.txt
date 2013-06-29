@@ -497,8 +497,8 @@ information.
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.
 
-    You must provide ``ct_field`` and ``object_id`` if they different from the
-    defaults, ``content_type`` and ``object_id`` respectively. Other parameters
-    are similar to those documented in
+    You must provide ``ct_field`` and ``fk_field`` if they are different from
+    the defaults, ``content_type`` and ``object_id`` respectively. Other
+    parameters are similar to those documented in
     :func:`~django.forms.models.modelformset_factory` and
     :func:`~django.forms.models.inlineformset_factory`.
