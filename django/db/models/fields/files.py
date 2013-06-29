@@ -96,6 +96,8 @@ class FieldFile(File):
     save.alters_data = True
 
     def delete(self, save=True):
+        if not self:
+            return
         # Only close the file if it's already open, which we know by the
         # presence of self._file
         if hasattr(self, '_file'):
