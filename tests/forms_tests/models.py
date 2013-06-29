@@ -13,6 +13,11 @@ from django.utils.encoding import python_2_unicode_compatible
 temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
+CHOICES = [
+    ('f', 'foo'),
+    ('b', 'bar')
+]
+
 
 class BoundaryModel(models.Model):
     positive_integer = models.PositiveIntegerField(null=True, blank=True)
@@ -68,6 +73,11 @@ class OptionalMultiChoiceModel(models.Model):
                                           default=lambda: ChoiceOptionModel.objects.filter(name='default'))
     multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True, null=True,
                                                    related_name='not_relevant2')
+
+
+class EmptyLabelChoiceModel(models.Model):
+    choice = models.CharField(max_length=2, blank=True, choices=CHOICES,
+                              empty_label="Please select one")
 
 
 class FileModel(models.Model):
