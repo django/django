@@ -105,7 +105,8 @@ class CharFieldTests(TestCase):
                 'the second element is the human-readable name. '
                 'An example of a valid value is '
                 '[("1", "first choice"), ("2", "second choice")].',
-                hint='Convert "choices" into a list of pairs.'),
+                hint='Convert "choices" into a list of pairs.',
+                obj=field),
         ])
 
     def test_choices_containing_non_pairs(self):
@@ -117,7 +118,8 @@ class CharFieldTests(TestCase):
                 'the second element is the human-readable name. '
                 'An example of a valid value is '
                 '[("1", "first choice"), ("2", "second choice")].',
-                hint='Convert "choices" into a list of pairs.'),
+                hint='Convert "choices" into a list of pairs.',
+                obj=field),
         ])
 
     def test_bad_value_of_db_index(self):
