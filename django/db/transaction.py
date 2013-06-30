@@ -123,7 +123,7 @@ def get_autocommit(using=None):
     """
     Get the autocommit status of the connection.
     """
-    return get_connection(using).autocommit
+    return get_connection(using).get_autocommit()
 
 def set_autocommit(autocommit, using=None):
     """
@@ -175,7 +175,7 @@ def get_rollback(using=None):
     """
     Gets the "needs rollback" flag -- for *advanced use* only.
     """
-    return get_connection(using).needs_rollback
+    return get_connection(using).get_rollback()
 
 def set_rollback(rollback, using=None):
     """
@@ -229,15 +229,11 @@ class Atomic(object):
     def __enter__(self):
         connection = get_connection(self.using)
 
-        # Ensure we have a connection to the database before testing
-        # autocommit status.
-        connection.ensure_connection()
-
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
-            if not connection.autocommit:
+            if not connection.get_autocommit():
                 # Some database adapters (namely sqlite3) don't handle
                 # transactions and savepoints properly when autocommit is off.
                 # Turning autocommit back on isn't an option; it would trigger
@@ -500,7 +496,7 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
     legacy behavior.
     """
     connection = get_connection(using)
-    if connection.autocommit or connection.in_atomic_block:
+    if connection.get_autocommit() or connection.in_atomic_block:
         return atomic(using, savepoint)
     else:
         def entering(using):
