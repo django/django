@@ -862,6 +862,14 @@ class BooleanField(Field):
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
 
+    def check_null(self, **kwargs):
+        if getattr(self, 'null', False):
+            yield checks.Error('null=True for BooleanField.\n'
+                'BooleanFields do not accept null values. Use '
+                'a NullBooleanField instead.',
+                hint='Replace BooleanField with NullBooleanField.',
+                obj=self)
+
 
 class CharField(Field):
     description = _("String (up to %(max_length)s)")

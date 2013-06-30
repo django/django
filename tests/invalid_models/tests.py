@@ -427,7 +427,8 @@ class OtherFieldTests(TestCase):
             Error('null=True for BooleanField.\n'
                 'BooleanFields do not accept null values. Use '
                 'a NullBooleanField instead.',
-                hint='Replace BooleanField with NullBooleanField.'),
+                hint='Replace BooleanField with NullBooleanField.',
+                obj=field),
         ])
 
     def test_non_nullable_blank_GenericIPAddressField(self):
