@@ -133,8 +133,6 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
             if isinstance(f, models.GenericIPAddressField) and not getattr(f, 'null', False) and getattr(f, 'blank', False):
                 e.add(opts, '"%s": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.' % f.name)
-            if f.db_index not in (None, True, False):
-                e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
             # Perform any backend-specific field validation.
             connection.validation.validate_field(e, opts, f)

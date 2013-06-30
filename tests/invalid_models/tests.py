@@ -129,7 +129,8 @@ class CharFieldTests(TestCase):
                 'If set to True, a database index will be created for this '
                 'field. ',
                 hint='Set "db_index" to False or True '
-                'or remove this argument.'),
+                'or remove this argument.',
+                obj=field),
         ])
 
 

@@ -719,6 +719,16 @@ class Field(object):
                     hint='Convert "choices" into a list of pairs.',
                     obj=self)
 
+    def check_db_index(self, **kwargs):
+        if self.db_index not in (None, True, False):
+            yield checks.Error(
+                'Invalid "db_index" value (should be None, True or False).\n'
+                'If set to True, a database index will be created for this '
+                'field. ',
+                hint='Set "db_index" to False or True '
+                'or remove this argument.',
+                obj=self)
+
     def __repr__(self):
         """
         Displays the module, class and name of the field.

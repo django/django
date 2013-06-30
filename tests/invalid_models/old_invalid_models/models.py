@@ -17,7 +17,6 @@ class FieldErrors(models.Model):
     decimalfield4 = models.DecimalField(max_digits=9, decimal_places=10)
     decimalfield5 = models.DecimalField(max_digits=10, decimal_places=10)
     filefield = models.FileField()
-    index = models.CharField(max_length=10, db_index='bad')
     field_ = models.CharField(max_length=10)
     nullbool = models.BooleanField(null=True)
     generic_ip_notnull_blank = models.GenericIPAddressField(null=False, blank=True)
@@ -368,7 +367,6 @@ old_invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decima
 old_invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
 old_invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 old_invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
-old_invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
 old_invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 old_invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
 old_invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.
