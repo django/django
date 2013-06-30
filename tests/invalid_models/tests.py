@@ -417,7 +417,8 @@ class OtherFieldTests(TestCase):
         self.assertEqual(list(field.check()), [
             Error('No "upload_to" attribute.\n'
                 'FileFields require an "upload_to" attribute.',
-                hint='Set "upload_to" attribute.'),
+                hint='Set "upload_to" attribute.',
+                obj=field),
         ])
 
     def test_nullable_boolean_field(self):
