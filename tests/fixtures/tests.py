@@ -56,7 +56,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_loading_and_dumping(self):
         Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
-        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Time to reform copyright>',
             '<Article: Poker has no place on ESPN>',
@@ -87,7 +87,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(['fixtures.Category', 'sites'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]')
 
         # Load fixture 2. JSON file imported by default. Overwrites some existing objects
-        management.call_command('loaddata', 'fixture2.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture2.json', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django conquers world!>',
             '<Article: Copyright is fine the way it is>',
@@ -95,7 +95,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
         # Load fixture 3, XML format.
-        management.call_command('loaddata', 'fixture3.xml', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture3.xml', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: XML identified as leading cause of cancer>',
             '<Article: Django conquers world!>',
@@ -104,14 +104,14 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
         # Load fixture 6, JSON file with dynamic ContentType fields. Testing ManyToOne.
-        management.call_command('loaddata', 'fixture6.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture6.json', verbosity=0)
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
             '<Tag: <Article: Copyright is fine the way it is> tagged "law">',
         ], ordered=False)
 
         # Load fixture 7, XML file with dynamic ContentType fields. Testing ManyToOne.
-        management.call_command('loaddata', 'fixture7.xml', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture7.xml', verbosity=0)
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
             '<Tag: <Article: Copyright is fine the way it is> tagged "legal">',
@@ -120,7 +120,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ], ordered=False)
 
         # Load fixture 8, JSON file with dynamic Permission fields. Testing ManyToMany.
-        management.call_command('loaddata', 'fixture8.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture8.json', verbosity=0)
         self.assertQuerysetEqual(Visa.objects.all(), [
             '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user>',
@@ -128,7 +128,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ], ordered=False)
 
         # Load fixture 9, XML file with dynamic Permission fields. Testing ManyToMany.
-        management.call_command('loaddata', 'fixture9.xml', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture9.xml', verbosity=0)
         self.assertQuerysetEqual(Visa.objects.all(), [
             '<Visa: Django Reinhardt Can add user, Can change user, Can delete user>',
             '<Visa: Stephane Grappelli Can add user, Can delete user>',
@@ -143,15 +143,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Loading a fixture that doesn't exist emits a warning
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            management.call_command('loaddata', 'unknown.json', verbosity=0,
-                commit=False)
+            management.call_command('loaddata', 'unknown.json', verbosity=0)
         self.assertEqual(len(w), 1)
         self.assertTrue(w[0].message, "No fixture named 'unknown' found.")
 
         # An attempt to load a nonexistent 'initial_data' fixture isn't an error
         with warnings.catch_warnings(record=True) as w:
-            management.call_command('loaddata', 'initial_data.json', verbosity=0,
-                commit=False)
+            management.call_command('loaddata', 'initial_data.json', verbosity=0)
         self.assertEqual(len(w), 0)
 
         # object list is unaffected
@@ -178,7 +176,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_dumpdata_with_excludes(self):
         # Load fixture1 which has a site, two articles, and a category
         Site.objects.all().delete()
-        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
 
         # Excluding fixtures app should only leave sites
         self._dumpdata_assert(
@@ -226,8 +224,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(['fixtures.Spy'], '[{"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": true}}, {"pk": %d, "model": "fixtures.spy", "fields": {"cover_blown": false}}]' % (spy2.pk, spy1.pk), use_base_manager=True)
 
     def test_dumpdata_with_pks(self):
-        management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
-        management.call_command('loaddata', 'fixture2.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        management.call_command('loaddata', 'fixture2.json', verbosity=0)
         self._dumpdata_assert(
             ['fixtures.Article'],
             '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
@@ -266,21 +264,21 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
-        management.call_command('loaddata', 'fixture4.json', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture4.json', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django pets kitten>',
         ])
 
     def test_compressed_specified_loading(self):
         # Load fixture 5 (compressed), using format *and* compression specification
-        management.call_command('loaddata', 'fixture5.json.zip', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture5.json.zip', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: WoW subscribers now outnumber readers>',
         ])
 
     def test_compressed_loading(self):
         # Load fixture 5 (compressed), only compression specification
-        management.call_command('loaddata', 'fixture5.zip', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture5.zip', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: WoW subscribers now outnumber readers>',
         ])
@@ -288,13 +286,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_ambiguous_compressed_fixture(self):
         # The name "fixture5" is ambigous, so loading it will raise an error
         with self.assertRaises(management.CommandError) as cm:
-            management.call_command('loaddata', 'fixture5', verbosity=0, commit=False)
+            management.call_command('loaddata', 'fixture5', verbosity=0)
             self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])
 
     def test_db_loading(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
-        management.call_command('loaddata', 'db_fixture_1', verbosity=0, commit=False)
-        management.call_command('loaddata', 'db_fixture_2', verbosity=0, commit=False)
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0)
+        management.call_command('loaddata', 'db_fixture_2', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Who needs more than one database?>',
             '<Article: Who needs to use compressed data?>',
@@ -312,13 +310,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         if connection.vendor == 'mysql':
             connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
         with self.assertRaises(IntegrityError) as cm:
-            management.call_command('loaddata', 'invalid.json', verbosity=0, commit=False)
+            management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
-        management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default', commit=False)
-        management.call_command('loaddata', 'db_fixture_2', verbosity=0, using='default', commit=False)
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
+        management.call_command('loaddata', 'db_fixture_2', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Who needs more than one database?>',
             '<Article: Who needs to use compressed data?>',
@@ -327,18 +325,18 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
         with warnings.catch_warnings(record=True):
-            management.call_command('loaddata', 'db_fixture_3', verbosity=0, commit=False)
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0)
 
         with warnings.catch_warnings(record=True):
-            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default', commit=False)
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):
         # Load back in fixture 1, we need the articles from it
-        management.call_command('loaddata', 'fixture1', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture1', verbosity=0)
 
         # Try to load fixture 6 using format discovery
-        management.call_command('loaddata', 'fixture6', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture6', verbosity=0)
         self.assertQuerysetEqual(Tag.objects.all(), [
             '<Tag: <Article: Time to reform copyright> tagged "copyright">',
             '<Tag: <Article: Time to reform copyright> tagged "law">'
@@ -364,7 +362,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
     @skipUnlessDBFeature('supports_forward_references')
     def test_format_discovery(self):
         # Load fixture 1 again, using format discovery
-        management.call_command('loaddata', 'fixture1', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture1', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Time to reform copyright>',
             '<Article: Poker has no place on ESPN>',
@@ -386,7 +384,7 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]')
 
         # Load fixture 4 (compressed), using format discovery
-        management.call_command('loaddata', 'fixture4', verbosity=0, commit=False)
+        management.call_command('loaddata', 'fixture4', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django pets kitten>',
             '<Article: Time to reform copyright>',
