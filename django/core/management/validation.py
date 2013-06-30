@@ -89,8 +89,6 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
                 e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
-            if isinstance(f, models.GenericIPAddressField) and not getattr(f, 'null', False) and getattr(f, 'blank', False):
-                e.add(opts, '"%s": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.' % f.name)
 
             # Perform any backend-specific field validation.
             connection.validation.validate_field(e, opts, f)

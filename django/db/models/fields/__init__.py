@@ -1525,6 +1525,17 @@ class GenericIPAddressField(Field):
         defaults.update(kwargs)
         return super(GenericIPAddressField, self).formfield(**defaults)
 
+    def check_blank_and_null_values(self, **kwargs):
+        if not getattr(self, 'null', False) and getattr(self, 'blank', False):
+            yield checks.Error(
+                'null=False and blank=True for GenericIPAddressField.\n'
+                'GenericIPAddressField cannot accept blank values '
+                'if null values are not allowed, as blank values are stored '
+                'as null.',
+                hint='Allow to store null values (null=True) or '
+                'forbid blank values (blank=False).',
+                obj=self)
+
 
 class NullBooleanField(Field):
     empty_strings_allowed = False
