@@ -204,7 +204,7 @@ class BaseDatabaseWrapper(object):
 
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
-        return self.features.uses_savepoints and not self.autocommit
+        return self.features.uses_savepoints and not self.get_autocommit()
 
     ##### Generic savepoint management methods #####
 
@@ -279,15 +279,13 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_no_atomic_block()
 
-        self.ensure_connection()
-
         self.transaction_state.append(managed)
 
         if not managed and self.is_dirty() and not forced:
             self.commit()
             self.set_clean()
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
@@ -297,8 +295,6 @@ class BaseDatabaseWrapper(object):
         those from outside. (Commits are on connection level.)
         """
         self.validate_no_atomic_block()
-
-        self.ensure_connection()
 
         if self.transaction_state:
             del self.transaction_state[-1]
@@ -313,13 +309,20 @@ class BaseDatabaseWrapper(object):
 
         if self._dirty:
             self.rollback()
-            if managed == self.autocommit:
+            if managed == self.get_autocommit():
                 self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
+
+    def get_autocommit(self):
+        """
+        Check the autocommit state.
+        """
+        self.ensure_connection()
+        return self.autocommit
 
     def set_autocommit(self, autocommit):
         """
@@ -330,13 +333,22 @@ class BaseDatabaseWrapper(object):
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
+    def get_rollback(self):
+        """
+        Get the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        return self.needs_rollback
+
     def set_rollback(self, rollback):
         """
         Set or unset the "needs rollback" flag -- for *advanced use* only.
         """
         if not self.in_atomic_block:
             raise TransactionManagementError(
-                "needs_rollback doesn't work outside of an 'atomic' block.")
+                "The rollback flag doesn't work outside of an 'atomic' block.")
         self.needs_rollback = rollback
 
     def validate_no_atomic_block(self):
@@ -370,7 +382,7 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        if not self.autocommit:
+        if not self.get_autocommit():
             self._dirty = True
 
     def set_clean(self):
@@ -436,7 +448,7 @@ class BaseDatabaseWrapper(object):
         if self.connection is not None:
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
-            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+            if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
                 self.close()
                 return
 
