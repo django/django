@@ -439,5 +439,6 @@ class OtherFieldTests(TestCase):
                 'if null values are not allowed, as blank values are stored '
                 'as null.',
                 hint='Allow to store null values (null=True) or '
-                'forbid blank values (blank=False).'),
+                'forbid blank values (blank=False).',
+                obj=field),
         ])
