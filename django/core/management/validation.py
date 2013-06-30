@@ -82,8 +82,6 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, '"%s": CharFields require a "max_length" attribute that is a positive integer.' % f.name)
                 except (ValueError, TypeError):
                     e.add(opts, '"%s": CharFields require a "max_length" attribute that is a positive integer.' % f.name)
-            if isinstance(f, models.FileField) and not f.upload_to:
-                e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
                 try:
                     from django.utils.image import Image

@@ -3,6 +3,7 @@ import os
 
 from django import forms
 from django.db.models.fields import Field
+from django.core import checks
 from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -303,6 +304,13 @@ class FileField(Field):
             defaults['required'] = False
         defaults.update(kwargs)
         return super(FileField, self).formfield(**defaults)
+
+    def check_upload_to(self, **kwargs):
+        if not self.upload_to:
+            yield checks.Error('No "upload_to" attribute.\n'
+                'FileFields require an "upload_to" attribute.',
+                hint='Set "upload_to" attribute.',
+                obj=self)
 
 
 class ImageFileDescriptor(FileDescriptor):
