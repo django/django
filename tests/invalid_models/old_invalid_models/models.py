@@ -12,7 +12,6 @@ from django.db import connection, models
 
 class FieldErrors(models.Model):
     field_ = models.CharField(max_length=10)
-    nullbool = models.BooleanField(null=True)
     generic_ip_notnull_blank = models.GenericIPAddressField(null=False, blank=True)
 
 
@@ -354,7 +353,6 @@ class BadIndexTogether1(models.Model):
 
 model_errors = """
 old_invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
-old_invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
 old_invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.
 old_invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 old_invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
@@ -470,7 +468,6 @@ if not connection.features.interprets_empty_strings_as_nulls:
 # - 'm' -- the test is actually a model test, not a field test; not rewritten
 
 m invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
-x invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
 x invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.
 m invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 m invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
