@@ -1,21 +1,20 @@
 # -*- coding: utf8 -*-
 
 
-class _Error(object):
-    def __init__(self, msg, **kwargs):
-        assert 'hint' in kwargs
+class BaseError(object):
+    def __init__(self, msg, hint, obj=None):
         self.msg = msg
-        self.hint = kwargs['hint']
-        self.obj = None
+        self.hint = hint
+        self.obj = obj
 
     def __eq__(self, other):
         return all(getattr(self, attr) == getattr(other, attr)
-            for attr in ['msg', 'hint'])
+            for attr in ['msg', 'hint', 'obj'])
 
 
-class Error(_Error):
+class Error(BaseError):
     pass
 
 
-class Warning(_Error):
+class Warning(BaseError):
     pass

@@ -70,7 +70,8 @@ class CharFieldTests(TestCase):
             Error('No "max_length" argument.\n'
                 'CharFields require "max_length" argument that is '
                 'the maximum length (in characters) of the field.',
-                hint='Set "max_length" argument.'),
+                hint='Set "max_length" argument.',
+                obj=field),
         ])
 
     def test_negative_max_length(self):
@@ -80,7 +81,8 @@ class CharFieldTests(TestCase):
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.'),
+                hint='Change "max_length" value to a positive integer.',
+                obj=field),
         ])
 
     def test_bad_value_of_max_length(self):
@@ -90,7 +92,8 @@ class CharFieldTests(TestCase):
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.'),
+                hint='Change "max_length" value to a positive integer.',
+                obj=field),
         ])
 
     def test_non_iterable_choices(self):
