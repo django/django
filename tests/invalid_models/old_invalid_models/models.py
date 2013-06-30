@@ -11,11 +11,6 @@ from django.db import connection, models
 
 
 class FieldErrors(models.Model):
-    decimalfield = models.DecimalField()
-    decimalfield2 = models.DecimalField(max_digits=-1, decimal_places=-1)
-    decimalfield3 = models.DecimalField(max_digits="bad", decimal_places="bad")
-    decimalfield4 = models.DecimalField(max_digits=9, decimal_places=10)
-    decimalfield5 = models.DecimalField(max_digits=10, decimal_places=10)
     filefield = models.FileField()
     field_ = models.CharField(max_length=10)
     nullbool = models.BooleanField(null=True)
@@ -359,13 +354,6 @@ class BadIndexTogether1(models.Model):
 
 
 model_errors = """
-old_invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-old_invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
-old_invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-old_invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
-old_invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-old_invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
-old_invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 old_invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 old_invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 old_invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
@@ -479,18 +467,7 @@ if not connection.features.interprets_empty_strings_as_nulls:
 # - 'x' -- the test was rewritten
 # - 'm' -- the test is actually a model test, not a field test; not rewritten
 
-x invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-x invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute that is a positive integer.
-x invalid_models.fielderrors: "decimalfield2": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-x invalid_models.fielderrors: "decimalfield2": DecimalFields require a "max_digits" attribute that is a positive integer.
-x invalid_models.fielderrors: "decimalfield3": DecimalFields require a "decimal_places" attribute that is a non-negative integer.
-x invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits" attribute that is a positive integer.
-x invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 x invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
-x invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
-x invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
-x invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
-x invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
 m invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 x invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
 x invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.

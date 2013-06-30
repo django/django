@@ -1213,6 +1213,73 @@ class DecimalField(Field):
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
 
+    def check_decimal_places_and_max_digits(self, **kwargs):
+        errors = list(self._check_decimal_places())
+        errors += list(self._check_max_digits())
+        if not errors and int(self.decimal_places) > int(self.max_digits):
+            errors.append(checks.Error(
+                '"max_digits" smaller than "decimal_places".\n'
+                'DecimalFields require a "max_digits" argument that is '
+                'the maximum number of digits allowed in the number and '
+                'is a positive integer greater or equal to "decimal_places". '
+                'For example, if you set "decimal_places" to 2 and you '
+                'want to store numbers up to 999.99 then you should set '
+                '"max_digits" to 5.',
+                hint='Increase "max_digits" value to at least '
+                '"decimal_places" value.',
+                obj=self))
+        return errors
+
+    def _check_decimal_places(self):
+        try:
+            decimal_places = int(self.decimal_places)
+            if decimal_places < 0:
+                raise ValueError()
+        except TypeError:
+            yield checks.Error('No "decimal_places" attribute.\n'
+                'DecimalFields require a "decimal_places" attribute that is '
+                'the number of decimal places to store with the number and is '
+                'a non-negative integer smaller or equal to "max_digits". '
+                'For example, if you set "decimal_places" to 2 then 1.23456 '
+                'will be saved as 1.23.',
+                hint='Set "decimal_places" argument.',
+                obj=self)
+        except ValueError:
+            yield checks.Error('Invalid "decimal_places" value.\n'
+                'DecimalFields require a "decimal_places" attribute that is '
+                'the number of decimal places to store with the number and is '
+                'a non-negative integer smaller or equal to "max_digits". '
+                'For example, if you set "decimal_places" to 2 then 1.23456 '
+                'will be saved as 1.23.',
+                hint='Change "decimal_places" argument.',
+                obj=self)
+
+    def _check_max_digits(self):
+        try:
+            max_digits = int(self.max_digits)
+            if max_digits <= 0:
+                raise ValueError()
+        except TypeError:
+            yield checks.Error('No "max_digits" attribute.\n'
+                'DecimalFields require a "max_digits" attribute that is '
+                'the maximum number of digits allowed in the number and '
+                'is a positive integer greater or equal to "decimal_places". '
+                'For example, if you set "max_digits" to 5 and '
+                '"decimal_places" to 2 then 999.99 is the greatest number '
+                'that you can save.',
+                hint='Set "max_length" argument.',
+                obj=self)
+        except ValueError:
+            yield checks.Error('Invalid "max_digits" value.\n'
+                'DecimalFields require a "max_digits" attribute that is '
+                'the maximum number of digits allowed in the number and '
+                'is a positive integer greater or equal to "decimal_places". '
+                'For example, if you set "max_digits" to 5 '
+                'and "decimal_places" to 2 then 999.99 is the greatest number '
+                'that you can save.',
+                hint='Change "max_length" argument.',
+                obj=self)
+
 
 class EmailField(CharField):
     default_validators = [validators.validate_email]

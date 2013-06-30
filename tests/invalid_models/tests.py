@@ -145,7 +145,8 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Set "decimal_places" argument.'),
+                hint='Set "decimal_places" argument.',
+                obj=field),
             Error('No "max_digits" attribute.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -153,7 +154,8 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 and '
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Set "max_length" argument.'),
+                hint='Set "max_length" argument.',
+                obj=field),
         ])
 
     def test_negative_max_digits_and_decimal_places(self):
@@ -165,7 +167,8 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Change "decimal_places" argument.'),
+                hint='Change "decimal_places" argument.',
+                obj=field),
             Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -173,7 +176,8 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 '
                 'and "decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Change "max_length" argument.'),
+                hint='Change "max_length" argument.',
+                obj=field),
         ])
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
@@ -185,7 +189,8 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Change "decimal_places" argument.'),
+                hint='Change "decimal_places" argument.',
+                obj=field),
             Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -193,13 +198,14 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 and '
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Change "max_length" argument.'),
+                hint='Change "max_length" argument.',
+                obj=field),
         ])
 
     def test_decimal_places_greater_than_max_digits(self):
         field = models.DecimalField(max_digits=9, decimal_places=10)
         self.assertEqual(list(field.check()), [
-            Error('"max_digits" smaller then "decimal_places".\n'
+            Error('"max_digits" smaller than "decimal_places".\n'
                 'DecimalFields require a "max_digits" argument that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -207,7 +213,8 @@ class DecimalFieldTests(TestCase):
                 'want to store numbers up to 999.99 then you should set '
                 '"max_digits" to 5.',
                 hint='Increase "max_digits" value to at least '
-                '"decimal_places" value.'),
+                '"decimal_places" value.',
+                obj=field),
         ])
 
     def test_valid_field(self):
