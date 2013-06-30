@@ -24,6 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
+from django.utils.itercompat import is_iterable
 
 
 class Empty(object):
@@ -692,6 +693,31 @@ class Field(object):
                 error.obj = self
             errors.extend(new_errors)
         return errors
+
+    def check_chocies(self, **kwargs):
+        if self.choices:
+            if (isinstance(self.choices, six.string_types) or
+                not is_iterable(self.choices)):
+                yield checks.Error(
+                    '"choices" is not an iterable (e.g., a tuple or list).\n'
+                    '"choices" should be an iterable of pairs. The first '
+                    'element in each pair is the actual value to be stored, '
+                    'and the second element is the human-readable name. '
+                    'An example of a valid value is '
+                    '[("1", "first choice"), ("2", "second choice")].',
+                    hint='Convert "choices" into a list of pairs.',
+                    obj=self)
+            elif any(isinstance(choice, six.string_types) or
+                     not is_iterable(choice) or len(choice) != 2
+                     for choice in self.choices):
+                yield checks.Error('Some items of "choices" are not pairs.\n'
+                    '"choices" should be an iterable of pairs. The first '
+                    'element in each pair is the actual value to be stored, '
+                    'and the second element is the human-readable name. '
+                    'An example of a valid value is '
+                    '[("1", "first choice"), ("2", "second choice")].',
+                    hint='Convert "choices" into a list of pairs.',
+                    obj=self)
 
     def __repr__(self):
         """
