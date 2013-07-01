@@ -28,6 +28,15 @@ Backwards incompatible changes in 1.7
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The admin "today" and "now" shortcuts next to date and time input widgets are
+  now operating in the current time zone on the backend. They previously used
+  the browser time zone which could yield unpredictable outcome because the value
+  is interpreted by the backend in its own time zone. The widgets will display
+  a help message when the backend and browser time zone are different.
+
 Features deprecated in 1.7
 ==========================
 
