@@ -1,0 +1,9 @@
+docutils
+Markdown
+PIL
+py-bcrypt
+python-memcached
+pytz
+PyYAML
+selenium
+Textile
