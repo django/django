@@ -17,6 +17,19 @@ deprecation process for some features`_.
 What's new in Django 1.7
 ========================
 
+Admin shortcuts support time zones
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "today" and "now" shortcuts next to date and time input widgets in the
+admin are now operating in the :ref:`current time zone
+<default-current-time-zone>`. Previously, they used the browser time zone,
+which could result in saving the wrong value when it didn't match the current
+time zone on the server.
+
+In addition, the widgets now display a help message when the browser and
+server time zone are different, to clarify how the value inserted in the field
+will be interpreted.
+
 Backwards incompatible changes in 1.7
 =====================================
 

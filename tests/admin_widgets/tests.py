@@ -1,7 +1,7 @@
 # encoding: utf-8
 from __future__ import absolute_import, unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from django import forms
@@ -523,6 +523,64 @@ class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(TIME_ZONE='Asia/Singapore')
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_date_time_picker_shortcuts(self):
+        """
+        Ensure that date/time/datetime picker shortcuts work in the current time zone.
+        Refs #20663.
+
+        This test case is fairly tricky, it relies on selenium still running the browser
+        in the default time zone "America/Chicago" despite `override_settings` changing
+        the time zone to "Asia/Singapore".
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        now = datetime.now()
+        error_margin = timedelta(seconds=10)
+
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        self.selenium.find_element_by_id('id_name').send_keys('test')
+
+        # Click on the "today" and "now" shortcuts.
+        shortcuts = self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .datetimeshortcuts')
+
+        for shortcut in shortcuts:
+            shortcut.find_element_by_tag_name('a').click()
+
+        # Check that there is a time zone mismatch warning.
+        # Warning: This would effectively fail if the TIME_ZONE defined in the
+        # settings has the same UTC offset as "Asia/Singapore" because the
+        # mismatch warning would be rightfully missing from the page.
+        self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .timezonewarning')
+
+        # Submit the form.
+        self.selenium.find_element_by_tag_name('form').submit()
+        self.wait_page_loaded()
+
+        # Make sure that "now" in javascript is within 10 seconds
+        # from "now" on the server side.
+        member = models.Member.objects.get(name='test')
+        self.assertGreater(member.birthdate, now - error_margin)
+        self.assertLess(member.birthdate, now + error_margin)
+
+class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
