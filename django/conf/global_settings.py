@@ -562,7 +562,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 ###########
 
 # The callable to use to configure logging
-LOGGING_CONFIG = 'django.utils.log.dictConfig'
+LOGGING_CONFIG = 'logging.config.dictConfig'
 
 # Custom logging configuration.
 LOGGING = {}

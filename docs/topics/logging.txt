@@ -205,13 +205,6 @@ Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
 By default, Django uses the `dictConfig format`_.
 
-.. note::
-    ``logging.dictConfig`` is a builtin library in Python 2.7. In
-    order to make this library available for users of earlier Python
-    versions, Django includes a copy as part of ``django.utils.log``.
-    If you have Python 2.7 or later, the system native library will be used; if
-    you have Python 2.6, Django's copy will be used.
-
 In order to configure logging, you use :setting:`LOGGING` to define a
 dictionary of logging settings. These settings describes the loggers,
 handlers, filters and formatters that you want in your logging setup,
@@ -233,8 +226,6 @@ things that Django does, you can be certain that loggers are always ready for
 use in your project code.
 
 .. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
-
-.. _a third-party library: http://bitbucket.org/vinay.sajip/dictconfig
 
 An example
 ----------

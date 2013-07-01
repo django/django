@@ -410,6 +410,8 @@ these changes.
 1.9
 ---
 
+* ``django.utils.dictconfig`` will be removed.
+
 * ``django.utils.unittest`` will be removed.
 
 2.0
