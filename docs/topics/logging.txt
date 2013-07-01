@@ -255,7 +255,7 @@ complex logging setup, configured using :func:`logging.config.dictConfig`::
         'handlers': {
             'null': {
                 'level': 'DEBUG',
-                'class': 'django.utils.log.NullHandler',
+                'class': 'logging.NullHandler',
             },
             'console':{
                 'level': 'DEBUG',
