@@ -407,6 +407,11 @@ these changes.
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
+1.9
+---
+
+* ``django.utils.unittest`` will be removed.
+
 2.0
 ---
 
