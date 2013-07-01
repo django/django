@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import datetime
+import unittest
 try:
     from urllib.parse import urljoin
 except ImportError:  # Python 2
@@ -31,7 +32,8 @@ from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import patch_logger
-from django.utils import formats, translation, unittest
+from django.utils import formats
+from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape

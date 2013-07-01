@@ -6,13 +6,14 @@ from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
+import pickle
 import random
 import re
 import string
 import tempfile
 import time
+import unittest
 import warnings
-import pickle
 
 from django.conf import settings
 from django.core import management
@@ -29,7 +30,9 @@ from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
 from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
-from django.utils import six, timezone, translation, unittest
+from django.utils import six
+from django.utils import timezone
+from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.utils.encoding import force_text
