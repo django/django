@@ -1,0 +1,5 @@
+-r base.txt
+PIL
+py-bcrypt
+python-memcached
+Textile
