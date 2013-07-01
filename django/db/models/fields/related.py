@@ -91,7 +91,6 @@ def do_pending_lookups(sender, **kwargs):
 signals.class_prepared.connect(do_pending_lookups)
 
 
-#HACK
 class RelatedField(Field):
     def db_type(self, connection):
         '''By default related field will not have a column
