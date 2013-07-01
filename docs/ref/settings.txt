@@ -1364,7 +1364,7 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 LOGGING_CONFIG
 --------------
 
-Default: ``'django.utils.log.dictConfig'``
+Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
 Django project. Points at a instance of Python's `dictConfig`_
@@ -1372,6 +1372,10 @@ configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. versionchanged:: 1.7
+
+    Previously, the default value was ``'django.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
