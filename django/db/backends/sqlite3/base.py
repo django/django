@@ -78,14 +78,8 @@ Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-if Database.version_info >= (2, 4, 1):
-    # Starting in 2.4.1, the str type is not accepted anymore, therefore,
-    # we convert all str objects to Unicode
-    # As registering a adapter for a primitive type causes a small
-    # slow-down, this adapter is only registered for sqlite3 versions
-    # needing it (Python 2.6 and up).
-    Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
+Database.register_adapter(str, lambda s: s.decode('utf-8'))
+Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
