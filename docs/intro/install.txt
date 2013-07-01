@@ -9,9 +9,8 @@ that'll work while you walk through the introduction.
 Install Python
 --------------
 
-Being a Python Web framework, Django requires Python. It works with any Python
-version from 2.6.5 to 2.7. It also features experimental support for versions
-3.2 and 3.3. All these versions of Python include a lightweight database
+Being a Python Web framework, Django requires Python. It works with Python 2.6,
+2.7, 3.2 or 3.3. All these versions of Python include a lightweight database
 called SQLite_ so you won't need to set up a database just yet.
 
 .. _sqlite: http://sqlite.org/
