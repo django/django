@@ -12,6 +12,8 @@ from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test import runner
 from django.test.utils import compare_xml, strip_quotes
+# django.utils.unittest is deprecated, but so is django.test.simple,
+# and the latter will be removed before the former.
 from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule

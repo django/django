@@ -377,13 +377,14 @@ class CaptureQueriesContext(object):
 
 class IgnoreDeprecationWarningsMixin(object):
 
-    warning_class = DeprecationWarning
+    warning_classes = [DeprecationWarning]
 
     def setUp(self):
         super(IgnoreDeprecationWarningsMixin, self).setUp()
         self.catch_warnings = warnings.catch_warnings()
         self.catch_warnings.__enter__()
-        warnings.filterwarnings("ignore", category=self.warning_class)
+        for warning_class in self.warning_classes:
+            warnings.filterwarnings("ignore", category=warning_class)
 
     def tearDown(self):
         self.catch_warnings.__exit__(*sys.exc_info())
@@ -392,7 +393,12 @@ class IgnoreDeprecationWarningsMixin(object):
 
 class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
 
-        warning_class = PendingDeprecationWarning
+        warning_classes = [PendingDeprecationWarning]
+
+
+class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
+
+        warning_classes = [PendingDeprecationWarning, DeprecationWarning]
 
 
 @contextmanager
