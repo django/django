@@ -23,6 +23,7 @@ os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
     'data',
+    'requirements',
     'templates',
     'test_discovery_sample',
     'test_discovery_sample2',
