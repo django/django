@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-import time
-import warnings
 from datetime import datetime, timedelta
 from io import BytesIO
+import time
+from unittest import skipIf
+import warnings
 
 from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.core import signals
@@ -15,7 +16,6 @@ from django.test import SimpleTestCase, TransactionTestCase
 from django.test.client import FakePayload
 from django.test.utils import override_settings, str_prefix
 from django.utils import six
-from django.utils.unittest import skipIf
 from django.utils.http import cookie_date, urlencode
 from django.utils.timezone import utc
 

@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
 import warnings
+from unittest import expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
-from django.utils.unittest import expectedFailure
 from django.test.client import RequestFactory
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, CreateView

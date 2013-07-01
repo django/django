@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import tempfile as sys_tempfile
+import unittest
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,7 +17,6 @@ from django.test import TestCase, client
 from django.test.utils import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
-from django.utils import unittest
 
 from . import uploadhandler
 from .models import FileModel

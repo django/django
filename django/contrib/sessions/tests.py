@@ -4,6 +4,7 @@ import os
 import shutil
 import string
 import tempfile
+import unittest
 import warnings
 
 from django.conf import settings
@@ -22,7 +23,6 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings, patch_logger
 from django.utils import six
 from django.utils import timezone
-from django.utils import unittest
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 

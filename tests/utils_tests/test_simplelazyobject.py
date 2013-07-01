@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import copy
 import pickle
 import sys
+from unittest import TestCase
 
 from django.utils import six
-from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
 
 

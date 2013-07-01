@@ -1,10 +1,10 @@
+import imp
 import os
 import sys
-import imp
+import unittest
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import import_by_path, module_has_submodule
 from django.utils._os import upath

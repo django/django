@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import unittest
+from unittest import skipUnless
+
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
 from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
     check_password, make_password, PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher,
     get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
 from django.utils import six
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 
 try:

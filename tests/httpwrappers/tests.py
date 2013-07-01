@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import copy
 import os
 import pickle
+import unittest
 import warnings
 
 from django.core.exceptions import SuspiciousOperation
@@ -18,7 +19,6 @@ from django.test import TestCase
 from django.utils.encoding import smart_str
 from django.utils._os import upath
 from django.utils import six
-from django.utils import unittest
 
 
 class QueryDictTests(unittest.TestCase):

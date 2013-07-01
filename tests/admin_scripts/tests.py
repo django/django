@@ -6,13 +6,14 @@ and default settings.py files.
 """
 from __future__ import unicode_literals
 
+import codecs
 import os
 import re
 import shutil
 import socket
 import subprocess
 import sys
-import codecs
+import unittest
 
 import django
 from django import conf, get_version
@@ -20,7 +21,6 @@ from django.conf import settings
 from django.core.management import BaseCommand, CommandError
 from django.db import connection
 from django.test.runner import DiscoverRunner
-from django.utils import unittest
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.six import StringIO

@@ -5,6 +5,7 @@ import gzip
 from io import BytesIO
 import random
 import re
+from unittest import expectedFailure, skipIf
 import warnings
 
 from django.conf import settings
@@ -22,7 +23,6 @@ from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
-from django.utils.unittest import expectedFailure, skipIf
 
 from .models import Band
 

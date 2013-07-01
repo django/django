@@ -1,10 +1,10 @@
 from contextlib import contextmanager
 import os
 import sys
+from unittest import expectedFailure
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-from django.utils.unittest import expectedFailure
 
 try:
     import unittest2

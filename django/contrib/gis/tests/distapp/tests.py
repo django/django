@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from unittest import skipUnless
+
 from django.db import connection
 from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
@@ -8,7 +10,6 @@ from django.contrib.gis.tests.utils import (
     HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
 )
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis.geos import GEOSGeometry, LineString

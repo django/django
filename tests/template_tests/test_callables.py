@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from django import template
-from django.utils.unittest import TestCase
 
 class CallableVariablesTests(TestCase):
 

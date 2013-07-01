@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from django import forms
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.utils.unittest import TestCase
 
 
 class UserForm(forms.Form):

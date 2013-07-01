@@ -1,8 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
+import unittest
+
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils import unittest
 
 from .models import Reporter, Article
 

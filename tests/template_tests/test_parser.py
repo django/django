@@ -3,10 +3,11 @@ Testing some internals of the template processing. These are *not* examples to b
 """
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
     Template, TemplateSyntaxError)
 from django.test.utils import override_settings
-from django.utils.unittest import TestCase
 from django.utils import six
 
 

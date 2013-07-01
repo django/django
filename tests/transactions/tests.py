@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
 import sys
+from unittest import skipIf, skipUnless
 
 from django.db import connection, transaction, DatabaseError, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
-from django.utils.unittest import skipIf, skipUnless
 
 from .models import Reporter
 

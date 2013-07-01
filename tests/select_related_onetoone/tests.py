@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
+import unittest
+
 from django.test import TestCase
-from django.utils import unittest
 
 from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
     AdvancedUserStat, Image, Product, Parent1, Parent2, Child1, Child2, Child3,

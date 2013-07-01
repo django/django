@@ -1,17 +1,17 @@
 # coding: utf-8
 from __future__ import absolute_import, unicode_literals
 
-import os
 from copy import copy
 from decimal import Decimal
+import os
+import unittest
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
 from django.db import router
 from django.conf import settings
 from django.test import TestCase
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 from django.utils._os import upath
 
 if HAS_GDAL:

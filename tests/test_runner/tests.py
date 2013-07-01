@@ -3,8 +3,9 @@ Tests for django test runner
 """
 from __future__ import absolute_import, unicode_literals
 
-import sys
 from optparse import make_option
+import sys
+import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
@@ -12,7 +13,6 @@ from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
 from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils import unittest
 from django.utils.importlib import import_module
 
 from admin_scripts.tests import AdminScriptTestCase

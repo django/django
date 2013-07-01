@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
+from unittest import skipUnless
+
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, oracle, no_mysql, no_oracle, no_spatialite
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union

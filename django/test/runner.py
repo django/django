@@ -1,12 +1,12 @@
 import os
 from optparse import make_option
+import unittest
+from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.utils import unittest
-from django.utils.unittest import TestSuite, defaultTestLoader
 
 
 class DiscoverRunner(object):

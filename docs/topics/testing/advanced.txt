@@ -37,7 +37,7 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.utils import unittest
+    import unittest
     from django.test.client import RequestFactory
 
     class SimpleTest(unittest.TestCase):

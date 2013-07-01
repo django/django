@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
 try:
     from urllib.request import urlopen
 except ImportError:     # Python 2
@@ -28,7 +29,6 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.utils import six
-from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
 

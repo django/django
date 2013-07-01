@@ -9,15 +9,16 @@ from django.conf import settings
 if __name__ == '__main__':
     settings.configure()
 
-import sys
-import pkg_resources
 import imp
 import os.path
+import pkg_resources
+import sys
+import unittest
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.utils import unittest, six
+from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
 

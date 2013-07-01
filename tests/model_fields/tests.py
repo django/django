@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 from decimal import Decimal
+import unittest
 
 from django import test
 from django import forms
@@ -9,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db import connection, models, IntegrityError
 from django.db.models.fields.files import FieldFile
 from django.utils import six
-from django.utils import unittest
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,

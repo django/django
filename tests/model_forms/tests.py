@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import os
 from decimal import Decimal
+from unittest import skipUnless
 import warnings
 
 from django import forms
@@ -13,7 +14,6 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils._os import upath
-from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
 

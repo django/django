@@ -1,10 +1,11 @@
 import copy
 import datetime
 import pickle
+import unittest
+
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
-from django.utils import unittest
 
 
 EAT = FixedOffset(180)      # Africa/Nairobi

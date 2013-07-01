@@ -1,6 +1,7 @@
+import unittest
+
 from django.db.models import get_app
 from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils import unittest
 
 
 def suite():

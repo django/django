@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import unittest
 
 from django.template.defaultfilters import *
 from django.test import TestCase
 from django.utils import six
-from django.utils import unittest, translation
+from django.utils import translation
 from django.utils.safestring import SafeData
 from django.utils.encoding import python_2_unicode_compatible
 

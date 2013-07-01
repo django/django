@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import unittest
+from unittest import skip
+
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
@@ -9,8 +12,6 @@ from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, IgnoreDeprecationWarningsMixin
 from django.utils import six
-from django.utils import unittest
-from django.utils.unittest import skip
 
 from .models import Person
 
