@@ -252,10 +252,12 @@ class StatusNoteCBM2mForm(forms.ModelForm):
         fields = '__all__'
         widgets = {'status': forms.CheckboxSelectMultiple}
 
+
 class CustomErrorMessageForm(forms.ModelForm):
     name1 = forms.CharField(error_messages={'invalid': 'Form custom error message.'})
 
     class Meta:
+        fields = '__all__'
         model = CustomErrorMessage
 
 
