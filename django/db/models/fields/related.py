@@ -1651,8 +1651,22 @@ class ManyToManyField(RelatedField):
                     hint='Set symmetrical=False on the field.',
                     obj=self)
 
+            # Count foreign keys in intermediate model
             if self_referential:
-                pass
+                seen_self = sum(from_model == getattr(field.rel, 'to', None)
+                    for field in self.rel.through._meta.fields)
+
+                if seen_self > 2:
+                    yield checks.Error(
+                        'More than two foreign keys to %(from_model_name)s '
+                        'in intermediary model %(relationship_model_name)s.\n'
+                        '%(relationship_model_name)s has more than two '
+                        'foreign keys to %(from_model_name)s, which is '
+                        'ambiguous and is not permitted.' % locals(),
+                        hint='Remove excessive foreign keys to '
+                        '%(from_model_name)s in %(relationship_model_name)s.'
+                        % locals(),
+                        obj=self)
 
             else:
                 # Count foreign keys in relationship model

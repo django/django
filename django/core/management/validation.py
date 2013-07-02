@@ -163,20 +163,6 @@ def get_validation_errors(outfile, app=None):
 
             if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
                 from_model, to_model = cls, f.rel.to
-                seen_self = 0
-                for inter_field in f.rel.through._meta.fields:
-                    rel_to = getattr(inter_field.rel, 'to', None)
-                    if from_model == to_model:  # relation to self
-                        if rel_to == from_model:
-                            seen_self += 1
-                        if seen_self > 2:
-                            e.add(opts, "Intermediary model %s has more than "
-                                "two foreign keys to %s, which is ambiguous "
-                                "and is not permitted." % (
-                                    f.rel.through._meta.object_name,
-                                    from_model._meta.object_name
-                                )
-                            )
                 signature = (f.rel.to, cls, f.rel.through)
                 if signature in seen_intermediary_signatures:
                     e.add(opts, "The model %s has two manually-defined m2m "

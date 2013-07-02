@@ -138,25 +138,6 @@ class MembershipMissingFK(models.Model):
     person = models.ForeignKey(Person)
 
 
-class PersonSelfRefM2M(models.Model):
-    name = models.CharField(max_length=5)
-    too_many_friends = models.ManyToManyField('self', through="RelationshipTripleFK", symmetrical=False)
-
-
-class RelationshipTripleFK(models.Model):
-    first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set_2")
-    second = models.ForeignKey(PersonSelfRefM2M, related_name="rel_to_set_2")
-    third = models.ForeignKey(PersonSelfRefM2M, related_name="too_many_by_far")
-    date_added = models.DateTimeField()
-
-
-class RelationshipDoubleFK(models.Model):
-    first = models.ForeignKey(Person, related_name="first_related_name")
-    second = models.ForeignKey(Person, related_name="second_related_name")
-    third = models.ForeignKey(Group, related_name="rel_to_set")
-    date_added = models.DateTimeField()
-
-
 class AbstractModel(models.Model):
     name = models.CharField(max_length=10)
 
@@ -386,7 +367,6 @@ old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with rel
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-old_invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 old_invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
@@ -485,7 +465,6 @@ m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with relat
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-x? invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 x invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 x invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
