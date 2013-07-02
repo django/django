@@ -80,8 +80,11 @@ class ModelState(object):
             # Ignore some special options
             if name in ["app_cache", "app_label"]:
                 continue
-            if name in model._meta.original_attrs:
-                options[name] = model._meta.original_attrs[name]
+            elif name in model._meta.original_attrs:
+                if name == "unique_together":
+                    options[name] = set(model._meta.original_attrs["unique_together"])
+                else:
+                    options[name] = model._meta.original_attrs[name]
         # Make our record
         bases = tuple(model for model in model.__bases__ if (not hasattr(model, "_meta") or not model._meta.abstract))
         if not bases:
@@ -116,6 +119,8 @@ class ModelState(object):
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "app_cache": app_cache}
         meta_contents.update(self.options)
+        if "unique_together" in meta_contents:
+            meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
         # TODO: Use the actual bases

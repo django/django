@@ -7,7 +7,7 @@ class AddField(Operation):
     """
 
     def __init__(self, model_name, name, field):
-        self.model_name = model_name
+        self.model_name = model_name.lower()
         self.name = name
         self.field = field
 
@@ -33,7 +33,7 @@ class RemoveField(Operation):
     """
 
     def __init__(self, model_name, name):
-        self.model_name = model_name
+        self.model_name = model_name.lower()
         self.name = name
 
     def state_forwards(self, app_label, state):
@@ -62,7 +62,7 @@ class AlterField(Operation):
     """
 
     def __init__(self, model_name, name, field):
-        self.model_name = model_name
+        self.model_name = model_name.lower()
         self.name = name
         self.field = field
 
@@ -93,7 +93,7 @@ class RenameField(Operation):
     """
 
     def __init__(self, model_name, old_name, new_name):
-        self.model_name = model_name
+        self.model_name = model_name.lower()
         self.old_name = old_name
         self.new_name = new_name
 

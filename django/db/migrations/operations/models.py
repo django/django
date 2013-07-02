@@ -9,7 +9,7 @@ class CreateModel(Operation):
     """
 
     def __init__(self, name, fields, options=None, bases=None):
-        self.name = name
+        self.name = name.lower()
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
@@ -35,7 +35,7 @@ class DeleteModel(Operation):
     """
 
     def __init__(self, name):
-        self.name = name
+        self.name = name.lower()
 
     def state_forwards(self, app_label, state):
         del state.models[app_label, self.name.lower()]
@@ -58,7 +58,7 @@ class AlterModelTable(Operation):
     """
 
     def __init__(self, name, table):
-        self.name = name
+        self.name = name.lower()
         self.table = table
 
     def state_forwards(self, app_label, state):
@@ -78,3 +78,33 @@ class AlterModelTable(Operation):
 
     def describe(self):
         return "Rename table for %s to %s" % (self.name, self.table)
+
+
+class AlterUniqueTogether(Operation):
+    """
+    Changes the value of unique_together to the target one.
+    Input value of unique_together must be a set of tuples.
+    """
+
+    def __init__(self, name, unique_together):
+        self.name = name.lower()
+        self.unique_together = set(tuple(cons) for cons in unique_together)
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options["unique_together"] = self.unique_together
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        old_app_cache = from_state.render()
+        new_app_cache = to_state.render()
+        schema_editor.alter_unique_together(
+            new_app_cache.get_model(app_label, self.name),
+            getattr(old_app_cache.get_model(app_label, self.name)._meta, "unique_together", set()),
+            getattr(new_app_cache.get_model(app_label, self.name)._meta, "unique_together", set()),
+        )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def describe(self):
+        return "Alter unique_together for %s (%s constraints)" % (self.name, len(self.unique_together))

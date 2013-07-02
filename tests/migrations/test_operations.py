@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.db import connection, models, migrations
+from django.db.utils import IntegrityError
 from django.db.migrations.state import ProjectState
 
 
@@ -38,6 +39,7 @@ class OperationTests(TestCase):
             [
                 ("id", models.AutoField(primary_key=True)),
                 ("pink", models.BooleanField(default=True)),
+                ("weight", models.FloatField()),
             ],
         )
         project_state = ProjectState()
@@ -50,7 +52,7 @@ class OperationTests(TestCase):
     def test_create_model(self):
         """
         Tests the CreateModel operation.
-        Most other tests use this as part of setup, so check failures here first.
+        Most other tests use this operation as part of setup, so check failures here first.
         """
         operation = migrations.CreateModel(
             "Pony",
@@ -63,7 +65,7 @@ class OperationTests(TestCase):
         project_state = ProjectState()
         new_state = project_state.clone()
         operation.state_forwards("test_crmo", new_state)
-        self.assertEqual(new_state.models["test_crmo", "pony"].name, "Pony")
+        self.assertEqual(new_state.models["test_crmo", "pony"].name, "pony")
         self.assertEqual(len(new_state.models["test_crmo", "pony"].fields), 2)
         # Test the database alteration
         self.assertTableNotExists("test_crmo_pony")
@@ -110,7 +112,7 @@ class OperationTests(TestCase):
         operation = migrations.AddField("Pony", "height", models.FloatField(null=True))
         new_state = project_state.clone()
         operation.state_forwards("test_adfl", new_state)
-        self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 3)
+        self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
         # Test the database alteration
         self.assertColumnNotExists("test_adfl_pony", "height")
         with connection.schema_editor() as editor:
@@ -130,7 +132,7 @@ class OperationTests(TestCase):
         operation = migrations.RemoveField("Pony", "pink")
         new_state = project_state.clone()
         operation.state_forwards("test_rmfl", new_state)
-        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 1)
+        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 2)
         # Test the database alteration
         self.assertColumnExists("test_rmfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -208,3 +210,33 @@ class OperationTests(TestCase):
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
+
+    def test_alter_unique_together(self):
+        """
+        Tests the AlterUniqueTogether operation.
+        """
+        project_state = self.set_up_test_model("test_alunto")
+        # Test the state alteration
+        operation = migrations.AlterUniqueTogether("Pony", [("pink", "weight")])
+        new_state = project_state.clone()
+        operation.state_forwards("test_alunto", new_state)
+        self.assertEqual(len(project_state.models["test_alunto", "pony"].options.get("unique_together", set())), 0)
+        self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
+        # Make sure we can insert duplicate rows
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+        cursor.execute("DELETE FROM test_alunto_pony")
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alunto", editor, project_state, new_state)
+        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+        with self.assertRaises(IntegrityError):
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+        cursor.execute("DELETE FROM test_alunto_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alunto", editor, new_state, project_state)
+        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+        cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+        cursor.execute("DELETE FROM test_alunto_pony")
