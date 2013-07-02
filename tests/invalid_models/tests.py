@@ -274,15 +274,18 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_relationship_model_with_foreign_key_to_wrong_model(self):
-        field = models.ManyToManyField('Person', through="Membership")
-        self.assertEqual(list(field.check()), [
-            Error('No foreign key to Person or GroupTwo '
+        from .invalid_models.models import GroupTwo
+        field = GroupTwo.another.field
+        errors = list(field.check(from_model=GroupTwo))
+        self.assertEqual(errors, [
+            Error('No foreign key to GroupTwo or Person '
                 'in intermediary Membership model.\n'
                 'The field is a manually-defined many to many relation '
                 'through model Membership, which does not have foreign keys '
-                'to Person or GroupTwo.\n',
-                hint='Ensure that there are foreign keys to Person '
-                'and GroupTwo models in Membership model.'),
+                'to GroupTwo or Person.\n',
+                hint='Ensure that there are foreign keys to GroupTwo '
+                'and Person models in Membership model.',
+                obj=field),
         ])
 
     def test_relationship_model_missing_foreign_key(self):
