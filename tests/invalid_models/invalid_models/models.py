@@ -82,13 +82,17 @@ class RelationshipTripleFK(models.Model):
     third = models.ForeignKey(PersonSelfRefM2M, related_name="too_many_by_far")
 
 
-class PersonSelfRefM2MExplicit(models.Model):
-    friends = models.ManyToManyField('self', through="ExplicitRelationship", symmetrical=True)
+class PersonSelfRefSymmetricalM2M(models.Model):
+    """ Explicit symmetrical=True. """
+    friends = models.ManyToManyField('self',
+        through="SymmetricalRelationship", symmetrical=True)
 
 
-class ExplicitRelationship(models.Model):
-    first = models.ForeignKey(PersonSelfRefM2MExplicit, related_name="rel_from_set")
-    second = models.ForeignKey(PersonSelfRefM2MExplicit, related_name="rel_to_set")
+class SymmetricalRelationship(models.Model):
+    first = models.ForeignKey(PersonSelfRefSymmetricalM2M,
+        related_name="rel_from_set")
+    second = models.ForeignKey(PersonSelfRefSymmetricalM2M,
+        related_name="rel_to_set")
     date_added = models.DateTimeField()
 
 
