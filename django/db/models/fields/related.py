@@ -145,7 +145,7 @@ class RelatedField(Field):
         'has either not been installed or is abstract.'
     )
 
-    def check_relation_model_exists(self):
+    def check_relation_model_exists(self, **kwargs):
         from django.db import models
         if self.rel.to not in models.get_models():
             if (not isinstance(self.rel.to, six.string_types) and
@@ -1609,3 +1609,52 @@ class ManyToManyField(RelatedField):
                 'ManyToManyFields cannot be unique.',
                 hint='Remove the "unique" argument on the field.',
                 obj=self)
+
+    def check_relationship_model(self, from_model=None, **kwargs):
+        if (self.rel.through is not None and
+            not isinstance(self.rel.through, six.string_types)):
+            assert from_model is not None, \
+                "ManyToManyField with intermediate " \
+                "tables cannot be checked if you don't pass the model " \
+                "where the field is attached to."
+
+            to_model = self.rel.to
+            from_model_name = from_model._meta.object_name
+            if isinstance(to_model, six.string_types):
+                to_model_name = to_model
+            else:
+                to_model_name = to_model._meta.object_name
+            relationship_model_name = self.rel.through._meta.object_name
+            seen_from, seen_to, seen_self = 0, 0, 0
+            for inter_field in self.rel.through._meta.fields:
+                rel_to = getattr(inter_field.rel, 'to', None)
+                if from_model == to_model:  # relation to self
+                    pass
+                elif rel_to == from_model:
+                    seen_from += 1
+                elif rel_to == to_model:
+                    seen_to += 1
+
+            if seen_from > 1:
+                yield checks.Error(
+                    'More than one foreign key to %(from_model_name)s '
+                    'in intermediary %(relationship_model_name)s model.\n'
+                    '%(relationship_model_name)s has more than one foreign '
+                    'key to %(from_model_name)s, which is ambiguous '
+                    'and is not permitted.' % locals(),
+                    hint='If you want to create a recursive relationship, use '
+                    'ForeignKey("self", symmetrical=False, '
+                    'through="%s").' % relationship_model_name,
+                    obj=self)
+
+            if seen_to > 1:
+                yield checks.Error(
+                    'More than one foreign key to %(to_model_name)s '
+                    'in intermediary %(relationship_model_name)s model.\n'
+                    '%(relationship_model_name)s has more than one foreign '
+                    'key to %(to_model_name)s, which is ambiguous '
+                    'and is not permitted.' % locals(),
+                    hint='If you want to create a recursive relationship, use '
+                    'ForeignKey("self", symmetrical=False, '
+                    'through="%s").' % relationship_model_name,
+                    obj=self)

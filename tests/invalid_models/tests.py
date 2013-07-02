@@ -248,7 +248,7 @@ class RelativeFieldsTests(TestCase):
     def test_many_to_many_to_missing_model(self):
         from .invalid_models.models import M2MToMissingModel
         field = M2MToMissingModel.field.field
-        self.assertEqual(list(field.check()), [
+        self.assertEqual(list(field.check(from_model=M2MToMissingModel)), [
             Error('No Rel2 model or it is an abstract model.\n'
                 'The field has a many to many relation with model Rel2, '
                 'which has either not been installed or is abstract.',
@@ -259,9 +259,9 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_ambiguous_relationship_model(self):
-        field = models.ManyToManyField('Person',
-            through="RelationshipDoubleFK", related_name="tertiary")
-        self.assertEqual(list(field.check()), [
+        from .invalid_models.models import ModelWithAmbiguousRelationship
+        field = ModelWithAmbiguousRelationship.field.field
+        self.assertEqual(list(field.check(from_model=ModelWithAmbiguousRelationship)), [
             Error('More than one foreign key to Person in intermediary '
                 'RelationshipDoubleFK model.\n'
                 'RelationshipDoubleFK has more than one foreign key '
@@ -355,7 +355,7 @@ class RelativeFieldsTests(TestCase):
     def test_m2m_to_abstract_model(self):
         from .invalid_models.models import M2MToAbstractModel
         field = M2MToAbstractModel.field.field
-        self.assertEqual(list(field.check()), [
+        self.assertEqual(list(field.check(from_model=M2MToAbstractModel)), [
             Error('No AbstractModel model or it is an abstract model.\n'
                 'The field has a many to many relation with model '
                 'AbstractModel, which has either not been installed '
