@@ -87,6 +87,7 @@ class BaseDatabaseSchemaEditor(object):
         cursor = self.connection.cursor()
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
+        #print("%s; (params %r)" % (sql, params))
         cursor.execute(sql, params)
 
     def quote_name(self, name):
@@ -228,12 +229,12 @@ class BaseDatabaseSchemaEditor(object):
         Note: The input unique_togethers must be doubly-nested, not the single-
         nested ["foo", "bar"] format.
         """
-        olds = set(frozenset(fields) for fields in old_unique_together)
-        news = set(frozenset(fields) for fields in new_unique_together)
+        olds = set(tuple(fields) for fields in old_unique_together)
+        news = set(tuple(fields) for fields in new_unique_together)
         # Deleted uniques
         for fields in olds.difference(news):
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
-            constraint_names = self._constraint_names(model, list(columns), unique=True)
+            constraint_names = self._constraint_names(model, columns, unique=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
                     len(constraint_names),
@@ -261,8 +262,8 @@ class BaseDatabaseSchemaEditor(object):
         Note: The input index_togethers must be doubly-nested, not the single-
         nested ["foo", "bar"] format.
         """
-        olds = set(frozenset(fields) for fields in old_index_together)
-        news = set(frozenset(fields) for fields in new_index_together)
+        olds = set(tuple(fields) for fields in old_index_together)
+        news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
@@ -646,7 +647,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         Returns all constraint names matching the columns and conditions
         """
-        column_names = set(column_names) if column_names else None
+        column_names = list(column_names) if column_names else None
         constraints = self.connection.introspection.get_constraints(self.connection.cursor(), model._meta.db_table)
         result = []
         for name, infodict in constraints.items():

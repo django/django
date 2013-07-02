@@ -128,7 +128,7 @@ class SchemaTests(TransactionTestCase):
         # Make sure the new FK constraint is present
         constraints = connection.introspection.get_constraints(connection.cursor(), Book._meta.db_table)
         for name, details in constraints.items():
-            if details['columns'] == set(["author_id"]) and details['foreign_key']:
+            if details['columns'] == ["author_id"] and details['foreign_key']:
                 self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
                 break
         else:
@@ -285,7 +285,7 @@ class SchemaTests(TransactionTestCase):
         constraints = connection.introspection.get_constraints(connection.cursor(), BookWithM2M._meta.get_field_by_name("tags")[0].rel.through._meta.db_table)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
-                if details['columns'] == set(["tag_id"]) and details['foreign_key']:
+                if details['columns'] == ["tag_id"] and details['foreign_key']:
                     self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
                     break
             else:
@@ -306,7 +306,7 @@ class SchemaTests(TransactionTestCase):
             constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
             if connection.features.supports_foreign_keys:
                 for name, details in constraints.items():
-                    if details['columns'] == set(["uniquetest_id"]) and details['foreign_key']:
+                    if details['columns'] == ["uniquetest_id"] and details['foreign_key']:
                         self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
                         break
                 else:
@@ -327,7 +327,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the constraint exists
         constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
         for name, details in constraints.items():
-            if details['columns'] == set(["height"]) and details['check']:
+            if details['columns'] == ["height"] and details['check']:
                 break
         else:
             self.fail("No check constraint for height found")
@@ -343,7 +343,7 @@ class SchemaTests(TransactionTestCase):
             )
         constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
         for name, details in constraints.items():
-            if details['columns'] == set(["height"]) and details['check']:
+            if details['columns'] == ["height"] and details['check']:
                 self.fail("Check constraint for height found")
         # Alter the column to re-add it
         with connection.schema_editor() as editor:
@@ -355,7 +355,7 @@ class SchemaTests(TransactionTestCase):
             )
         constraints = connection.introspection.get_constraints(connection.cursor(), Author._meta.db_table)
         for name, details in constraints.items():
-            if details['columns'] == set(["height"]) and details['check']:
+            if details['columns'] == ["height"] and details['check']:
                 break
         else:
             self.fail("No check constraint for height found")
@@ -465,7 +465,7 @@ class SchemaTests(TransactionTestCase):
             any(
                 c["index"]
                 for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
-                if c['columns'] == set(["slug", "title"])
+                if c['columns'] == ["slug", "title"]
             ),
         )
         # Alter the model to add an index
@@ -481,7 +481,7 @@ class SchemaTests(TransactionTestCase):
             any(
                 c["index"]
                 for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
-                if c['columns'] == set(["slug", "title"])
+                if c['columns'] == ["slug", "title"]
             ),
         )
         # Alter it back
@@ -499,7 +499,7 @@ class SchemaTests(TransactionTestCase):
             any(
                 c["index"]
                 for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
-                if c['columns'] == set(["slug", "title"])
+                if c['columns'] == ["slug", "title"]
             ),
         )
 

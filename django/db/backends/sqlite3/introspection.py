@@ -197,14 +197,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             for index_rank, column_rank, column in cursor.fetchall():
                 if index not in constraints:
                     constraints[index] = {
-                        "columns": set(),
+                        "columns": [],
                         "primary_key": False,
                         "unique": bool(unique),
                         "foreign_key": False,
                         "check": False,
                         "index": True,
                     }
-                constraints[index]['columns'].add(column)
+                constraints[index]['columns'].append(column)
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:
@@ -213,7 +213,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # deletes PK constraints by name, as you can't delete constraints
             # in SQLite; we remake the table with a new PK instead.
             constraints["__primary__"] = {
-                "columns": set([pk_column]),
+                "columns": [pk_column],
                 "primary_key": True,
                 "unique": False,  # It's not actually a unique constraint.
                 "foreign_key": False,

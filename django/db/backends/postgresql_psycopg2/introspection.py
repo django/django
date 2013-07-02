@@ -140,7 +140,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
-                    "columns": set(),
+                    "columns": [],
                     "primary_key": kind.lower() == "primary key",
                     "unique": kind.lower() in ["primary key", "unique"],
                     "foreign_key": tuple(used_cols[0].split(".", 1)) if kind.lower() == "foreign key" else None,
@@ -148,7 +148,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "index": False,
                 }
             # Record the details
-            constraints[constraint]['columns'].add(column)
+            constraints[constraint]['columns'].append(column)
         # Now get CHECK constraint columns
         cursor.execute("""
             SELECT kc.constraint_name, kc.column_name
@@ -166,7 +166,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
-                    "columns": set(),
+                    "columns": [],
                     "primary_key": False,
                     "unique": False,
                     "foreign_key": False,
@@ -174,17 +174,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "index": False,
                 }
             # Record the details
-            constraints[constraint]['columns'].add(column)
+            constraints[constraint]['columns'].append(column)
         # Now get indexes
         cursor.execute("""
             SELECT
                 c2.relname,
                 ARRAY(
-                    SELECT attr.attname
-                    FROM unnest(idx.indkey) i, pg_catalog.pg_attribute attr
-                    WHERE
-                        attr.attnum = i AND
-                        attr.attrelid = c.oid
+                    SELECT (SELECT attname FROM pg_catalog.pg_attribute WHERE attnum = i AND attrelid = c.oid)
+                    FROM unnest(idx.indkey) i
                 ),
                 idx.indisunique,
                 idx.indisprimary
@@ -197,7 +194,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for index, columns, unique, primary in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": set(columns),
+                    "columns": list(columns),
                     "primary_key": primary,
                     "unique": unique,
                     "foreign_key": False,
