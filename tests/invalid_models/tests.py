@@ -344,13 +344,15 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):
-        from .invalid_models.models import PersonSelfRefM2MExplicit
-        field = PersonSelfRefM2MExplicit.friends.field
-        self.assertEqual(list(field.check()), [
-            Error('Symetrical m2m field with intermediate table.\n'
+        from .invalid_models.models import PersonSelfRefSymmetricalM2M
+        field = PersonSelfRefSymmetricalM2M.friends.field
+        errors = list(field.check(from_model=PersonSelfRefSymmetricalM2M))
+        self.assertEqual(errors, [
+            Error('Symmetrical m2m field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
-                hint='Set symmetrical=False.'),
+                hint='Set symmetrical=False on the field.',
+                obj=field),
         ])
 
     def test_foreign_key_to_abstract_model(self):
