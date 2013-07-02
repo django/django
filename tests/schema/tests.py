@@ -250,7 +250,6 @@ class SchemaTests(TransactionTestCase):
         try:
             # Ensure there's no m2m table there
             self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
-            connection.rollback()
             # Add the field
             with connection.schema_editor() as editor:
                 editor.add_field(
@@ -268,11 +267,9 @@ class SchemaTests(TransactionTestCase):
                 )
             # Ensure there's no m2m table there
             self.assertRaises(DatabaseError, self.column_classes, new_field.rel.through)
-            connection.rollback()
         finally:
             # Cleanup model states
             AuthorWithM2M._meta.local_many_to_many.remove(new_field)
-            del AuthorWithM2M._meta._m2m_cache
 
     def test_m2m_repoint(self):
         """
@@ -305,7 +302,6 @@ class SchemaTests(TransactionTestCase):
                 )
             # Ensure old M2M is gone
             self.assertRaises(DatabaseError, self.column_classes, BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
-            connection.rollback()
             # Ensure the new M2M exists and points to UniqueTest
             constraints = connection.introspection.get_constraints(connection.cursor(), new_field.rel.through._meta.db_table)
             if connection.features.supports_foreign_keys:
