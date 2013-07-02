@@ -1,10 +1,12 @@
 import sys
 import hashlib
+import operator
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 from django.utils.log import getLogger
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
+from django.utils.six.moves import reduce
 
 logger = getLogger('django.db.backends.schema')
 
@@ -525,7 +527,7 @@ class BaseDatabaseSchemaEditor(object):
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters:
                 sql, params = tuple(zip(*actions))
-                actions = [(", ".join(sql), params)]
+                actions = [(", ".join(sql), reduce(operator.add, params))]
             # Apply those actions
             for sql, params in actions:
                 self.execute(
