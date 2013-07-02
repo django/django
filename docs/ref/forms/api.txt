@@ -661,7 +661,7 @@ additional attributes for the ``<label>`` tag.
 .. versionchanged:: 1.6
 
     The label now includes the form's :attr:`~django.forms.Form.label_suffix`
-    (a semicolon, by default).
+    (a colon, by default).
 
 .. method:: BoundField.css_classes()
 

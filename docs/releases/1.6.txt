@@ -337,8 +337,8 @@ Minor features
   default) to allow customizing the :attr:`~django.forms.Form.prefix` of the
   form.
 
-* Raw queries (``Manager.raw()`` or ``cursor.execute()``) can now use the 
-  "pyformat" parameter style, where placeholders in the query are given as 
+* Raw queries (``Manager.raw()`` or ``cursor.execute()``) can now use the
+  "pyformat" parameter style, where placeholders in the query are given as
   ``'%(name)s'`` and the parameters are passed as a dictionary rather than
   a list (except on SQLite). This has long been possible (but not officially
   supported) on MySQL and PostgreSQL, and is now also available on Oracle.
@@ -634,10 +634,10 @@ If you manually render ``label_tag`` in your templates:
 
     {{ form.my_field.label_tag }}: {{ form.my_field }}
 
-you'll want to remove the semicolon (or whatever other separator you may be
+you'll want to remove the colon (or whatever other separator you may be
 using) to avoid duplicating it when upgrading to Django 1.6. The following
 template in Django 1.6 will render identically to the above template in Django
-1.5, except that the semicolon will appear inside the ``<label>`` element.
+1.5, except that the colon will appear inside the ``<label>`` element.
 
 .. code-block:: html+django
 
