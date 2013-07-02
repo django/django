@@ -19,6 +19,7 @@ class Group(models.Model):
 
 class GroupTwo(models.Model):
     field = models.ManyToManyField('Group', through="MembershipMissingFK")
+    another = models.ManyToManyField('Person', through="Membership")
 
 
 class Person(models.Model):
