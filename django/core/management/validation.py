@@ -115,8 +115,7 @@ def get_validation_errors(outfile, app=None):
                     # otherwise, the model just hasn't been installed.
                     if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
                         e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
-                    else:
-                        e.add(opts, "'%s' has a relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
+
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
@@ -170,8 +169,6 @@ def get_validation_errors(outfile, app=None):
                 # otherwise, the model just hasn't been installed.
                 if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
                     e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
-                else:
-                    e.add(opts, "'%s' has an m2m relation with model %s, which has either not been installed or is abstract." % (f.name, f.rel.to))
 
                 # it is a string and we could not find the model it refers to
                 # so skip the next section

@@ -118,11 +118,6 @@ class Car(models.Model):
     model = models.ForeignKey(Model)
 
 
-class MissingRelations(models.Model):
-    rel1 = models.ForeignKey("Rel1")
-    rel2 = models.ManyToManyField("Rel2")
-
-
 class MissingManualM2MModel(models.Model):
     name = models.CharField(max_length=5)
     missing_m2m = models.ManyToManyField(Model, through="MissingM2MModel")
@@ -206,7 +201,7 @@ class AbstractRelationModel(models.Model):
 
 class UniqueM2M(models.Model):
     """ Model to test for unique ManyToManyFields, which are invalid. """
-    unique_people = models.ManyToManyField(Person, unique=True)
+    unique_people = models.ManyToManyField('Person', unique=True)
 
 
 class NonUniqueFKTarget1(models.Model):
@@ -425,8 +420,6 @@ old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with rel
 old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
-old_invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
-old_invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
 old_invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
 old_invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 old_invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
@@ -435,8 +428,6 @@ old_invalid_models.group: Intermediary model RelationshipDoubleFK has more than 
 old_invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 old_invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 old_invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
-old_invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
-old_invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
 old_invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 old_invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
@@ -539,8 +530,6 @@ m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with relat
 m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
-x invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
-x invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
 x invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
 x invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 x invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
@@ -549,8 +538,6 @@ x invalid_models.group: Intermediary model RelationshipDoubleFK has more than on
 x? invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 x? invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 x? invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
-x invalid_models.abstractrelationmodel: 'fk1' has a relation with model AbstractModel, which has either not been installed or is abstract.
-x invalid_models.abstractrelationmodel: 'fk2' has an m2m relation with model AbstractModel, which has either not been installed or is abstract.
 x invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 x invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 x invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.

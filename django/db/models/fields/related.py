@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from django.core import checks
 from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import signals
@@ -136,6 +137,27 @@ class RelatedField(Field):
         # object_name by default, but this can be overridden with the
         # "related_name" option.
         return self.rel.related_query_name or self.rel.related_name or self.opts.model_name
+
+    MISSING_MODEL_MESSAGE = (
+        'No %(rel)s model or it is an abstract model.\n'
+        'The field has a relation with model %(rel)s, which '
+        'has either not been installed or is abstract.'
+    )
+
+    def check_relation_model_exists(self):
+        from django.db import models
+        if self.rel.to not in models.get_models():
+            if (not isinstance(self.rel.to, six.string_types) and
+                self.rel.to._meta.swapped):
+                pass
+            else:
+                yield checks.Error(
+                    self.MISSING_MODEL_MESSAGE
+                    % {'rel': self.rel.to},
+                    hint='Ensure that you did not misspell the model name and '
+                    'the model is not abstract. Does your INSTALLED_APPS '
+                    'setting contain the app where %s is defined?'
+                    % (self.rel.to,))
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
@@ -1617,3 +1639,10 @@ class ManyToManyField(RelatedField):
 
     def db_parameters(self, connection):
         return {"type": None, "check": None}
+
+    MISSING_MODEL_MESSAGE = (
+        'No %(rel)s model or it is an abstract model.\n'
+        'The field has a many to many relation with model '
+        '%(rel)s, which has either not been installed '
+        'or is abstract.'
+    )

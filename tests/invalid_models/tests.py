@@ -4,7 +4,6 @@ import unittest
 
 from django.core.checks import Error
 from django.core.management.validation import get_validation_errors
-
 from django.db import connection, models
 from django.db.models.loading import cache, load_app
 from django.test import TestCase
@@ -48,7 +47,7 @@ class InvalidModelTestCase(TestCase):
         try:
             module = load_app("invalid_models.old_invalid_models")
         except Exception:
-            self.fail('Unable to load invalid model module')
+            self.fail('Unable to load old_invalid_models module')
 
         get_validation_errors(self.stdout, module)
         self.stdout.seek(0)
@@ -224,26 +223,39 @@ class DecimalFieldTests(TestCase):
 
 class RelativeFieldsTests(TestCase):
 
+    def setUp(self):
+        try:
+            load_app("invalid_models.invalid_models")
+        except Exception:
+            self.fail('Unable to load invalid_models module')
+
     def test_foreign_key_to_missing_model(self):
-        field = models.ForeignKey("Rel1")
+        # We cannot check the field in isolation, because relative fields need
+        # to be attached to a model. When a model class is being created,
+        # `rel.to` attribute of relative fields is resolved.
+        from .invalid_models.models import ForeignKeyToMissingModel
+        field = ForeignKeyToMissingModel.field.field
         self.assertEqual(list(field.check()), [
             Error('No Rel1 model or it is an abstract model.\n'
                 'The field has a relation with model Rel1, which '
                 'has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
-                'contain the app where Rel1 is defined?'),
+                'contain the app where Rel1 is defined?',
+                obj=field),
         ])
 
     def test_many_to_many_to_missing_model(self):
-        field = models.ManyToManyField("Rel2")
+        from .invalid_models.models import M2MToMissingModel
+        field = M2MToMissingModel.field.field
         self.assertEqual(list(field.check()), [
             Error('No Rel2 model or it is an abstract model.\n'
                 'The field has a many to many relation with model Rel2, '
                 'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
-                'contain the app where Rel1 is defined?'),
+                'contain the app where Rel2 is defined?',
+                obj=field),
         ])
 
     def test_ambiguous_relationship_model(self):
@@ -256,7 +268,8 @@ class RelativeFieldsTests(TestCase):
                 'to Person, which is ambiguous and is not permitted.',
                 hint='If you want to create a recursive relationship, use '
                 'ForeignKey("self", symmetrical=False, '
-                'through="RelationshipDoubleFK").'),
+                'through="RelationshipDoubleFK").',
+                obj=field),
         ])
 
     def test_relationship_model_with_foreign_key_to_wrong_model(self):
@@ -327,26 +340,30 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_foreign_key_to_abstract_model(self):
-        field = models.ForeignKey('AbstractModel')
+        from .invalid_models.models import ForeignKeyToAbstractModel
+        field = ForeignKeyToAbstractModel.field.field
         self.assertEqual(list(field.check()), [
             Error('No AbstractModel model or it is an abstract model.\n'
                 'The field has a relation with model AbstractModel, which '
                 'has either not been installed or is abstract.',
-                hint='Ensure that you did not misspell the model name. '
-                'Does your INSTALLED_APPS setting contain '
-                'the app where AbstractModel is defined?'),
+                hint='Ensure that you did not misspell the model name and '
+                'the model is not abstract. Does your INSTALLED_APPS setting '
+                'contain the app where AbstractModel is defined?',
+                obj=field),
         ])
 
     def test_m2m_to_abstract_model(self):
-        field = models.ManyToManyField('AbstractModel')
+        from .invalid_models.models import M2MToAbstractModel
+        field = M2MToAbstractModel.field.field
         self.assertEqual(list(field.check()), [
             Error('No AbstractModel model or it is an abstract model.\n'
                 'The field has a many to many relation with model '
                 'AbstractModel, which has either not been installed '
                 'or is abstract.',
-                hint='Ensure that you did not misspell the model name. '
-                'Does your INSTALLED_APPS setting contain '
-                'the app where AbstractModel is defined?'),
+                hint='Ensure that you did not misspell the model name and '
+                'the model is not abstract. Does your INSTALLED_APPS setting '
+                'contain the app where AbstractModel is defined?',
+                obj=field),
         ])
 
     def test_unique_m2m(self):
