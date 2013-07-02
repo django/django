@@ -304,14 +304,17 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_missing_relationship_model(self):
-        field = models.ManyToManyField('Person', through="MissingM2MModel")
-        self.assertEqual(list(field.check()), [
+        from .invalid_models.models import Group
+        field = Group.missing_m2m_model.field
+        errors = list(field.check(from_model=Group))
+        self.assertEqual(errors, [
             Error('No intermediary model MissingM2MModel.\n'
                 'The field specifies a many-to-many relation through model '
                 'MissingM2MModel, which has not been installed.',
-                hint='Ensure that you did not misspell the model name. '
-                'Does your INSTALLED_APPS setting contain '
-                'the app where Rel1 is defined?'),
+                hint='Ensure that you did not misspell the model name and '
+                'the model is not abstract. Does your INSTALLED_APPS setting '
+                'contain the app where MissingM2MModel is defined?',
+                obj=field),
         ])
 
     def test_symetrical_self_referential_field(self):

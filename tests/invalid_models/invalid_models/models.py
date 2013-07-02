@@ -14,7 +14,7 @@ from django.db import models
 
 
 class Group(models.Model):
-    pass
+    missing_m2m_model = models.ManyToManyField('Person', through="MissingM2MModel")
 
 
 class GroupTwo(models.Model):
