@@ -128,31 +128,31 @@ class MissingManualM2MModel(models.Model):
     missing_m2m = models.ManyToManyField(Model, through="MissingM2MModel")
 
 
-class OldPerson(models.Model):
+class Person(models.Model):
     name = models.CharField(max_length=5)
 
 
 class Group(models.Model):
     name = models.CharField(max_length=5)
-    primary = models.ManyToManyField(OldPerson, through="Membership", related_name="primary")
-    secondary = models.ManyToManyField(OldPerson, through="Membership", related_name="secondary")
-    tertiary = models.ManyToManyField(OldPerson, through="RelationshipDoubleFK", related_name="tertiary")
+    primary = models.ManyToManyField(Person, through="Membership", related_name="primary")
+    secondary = models.ManyToManyField(Person, through="Membership", related_name="secondary")
+    tertiary = models.ManyToManyField(Person, through="RelationshipDoubleFK", related_name="tertiary")
 
 
 class GroupTwo(models.Model):
     name = models.CharField(max_length=5)
-    primary = models.ManyToManyField(OldPerson, through="Membership")
+    primary = models.ManyToManyField(Person, through="Membership")
     secondary = models.ManyToManyField(Group, through="MembershipMissingFK")
 
 
 class Membership(models.Model):
-    person = models.ForeignKey(OldPerson)
+    person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
     not_default_or_null = models.CharField(max_length=5)
 
 
 class MembershipMissingFK(models.Model):
-    person = models.ForeignKey(OldPerson)
+    person = models.ForeignKey(Person)
 
 
 class PersonSelfRefM2M(models.Model):
@@ -186,8 +186,8 @@ class RelationshipTripleFK(models.Model):
 
 
 class RelationshipDoubleFK(models.Model):
-    first = models.ForeignKey(OldPerson, related_name="first_related_name")
-    second = models.ForeignKey(OldPerson, related_name="second_related_name")
+    first = models.ForeignKey(Person, related_name="first_related_name")
+    second = models.ForeignKey(Person, related_name="second_related_name")
     third = models.ForeignKey(Group, related_name="rel_to_set")
     date_added = models.DateTimeField()
 
@@ -206,7 +206,7 @@ class AbstractRelationModel(models.Model):
 
 class UniqueM2M(models.Model):
     """ Model to test for unique ManyToManyFields, which are invalid. """
-    unique_people = models.ManyToManyField(OldPerson, unique=True)
+    unique_people = models.ManyToManyField(Person, unique=True)
 
 
 class NonUniqueFKTarget1(models.Model):
@@ -427,11 +427,11 @@ old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashe
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
 old_invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
-old_invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to OldPerson and GroupTwo
+old_invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
 old_invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 old_invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-old_invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to OldPerson, which is ambiguous and is not permitted.
+old_invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to Person, which is ambiguous and is not permitted.
 old_invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 old_invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 old_invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
@@ -541,11 +541,11 @@ m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes 
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 x invalid_models.missingrelations: 'rel1' has a relation with model Rel1, which has either not been installed or is abstract.
 x invalid_models.missingrelations: 'rel2' has an m2m relation with model Rel2, which has either not been installed or is abstract.
-x invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to OldPerson and GroupTwo
+x invalid_models.grouptwo: 'primary' is a manually-defined m2m relation through model Membership, which does not have foreign keys to Person and GroupTwo
 x invalid_models.grouptwo: 'secondary' is a manually-defined m2m relation through model MembershipMissingFK, which does not have foreign keys to Group and GroupTwo
 x invalid_models.missingmanualm2mmodel: 'missing_m2m' specifies an m2m relation through model MissingM2MModel, which has not been installed
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-x invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to OldPerson, which is ambiguous and is not permitted.
+x invalid_models.group: Intermediary model RelationshipDoubleFK has more than one foreign key to Person, which is ambiguous and is not permitted.
 x? invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 x? invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 x? invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
