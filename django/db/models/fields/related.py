@@ -1658,3 +1658,18 @@ class ManyToManyField(RelatedField):
                     'ForeignKey("self", symmetrical=False, '
                     'through="%s").' % relationship_model_name,
                     obj=self)
+
+            if (not self.rel.through._meta.auto_created and
+                (seen_from == 0 or seen_to == 0)):
+                yield checks.Error(
+                    'No foreign key to %(from_model_name)s or '
+                    '%(to_model_name)s in intermediary '
+                    '%(relationship_model_name)s model.\n'
+                    'The field is a manually-defined many to many relation '
+                    'through model %(relationship_model_name)s, which '
+                    'does not have foreign keys to %(from_model_name)s or '
+                    '%(to_model_name)s.\n' % locals(),
+                    hint='Ensure that there are foreign keys '
+                    'to %(from_model_name)s and %(to_model_name)s models '
+                    'in %(relationship_model_name)s model.' % locals(),
+                    obj=self)

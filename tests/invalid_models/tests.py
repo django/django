@@ -261,7 +261,8 @@ class RelativeFieldsTests(TestCase):
     def test_ambiguous_relationship_model(self):
         from .invalid_models.models import ModelWithAmbiguousRelationship
         field = ModelWithAmbiguousRelationship.field.field
-        self.assertEqual(list(field.check(from_model=ModelWithAmbiguousRelationship)), [
+        errors = list(field.check(from_model=ModelWithAmbiguousRelationship))
+        self.assertEqual(errors, [
             Error('More than one foreign key to Person in intermediary '
                 'RelationshipDoubleFK model.\n'
                 'RelationshipDoubleFK has more than one foreign key '
@@ -285,15 +286,18 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_relationship_model_missing_foreign_key(self):
-        field = models.ManyToManyField('Group', through="MembershipMissingFK")
-        self.assertEqual(list(field.check()), [
-            Error('No foreign key to Group or GroupTwo '
+        from .invalid_models.models import GroupTwo
+        field = GroupTwo.field.field
+        errors = list(field.check(from_model=GroupTwo))
+        self.assertEqual(errors, [
+            Error('No foreign key to GroupTwo or Group '
                 'in intermediary MembershipMissingFK model.\n'
                 'The field is a manually-defined many to many relation '
                 'through model MembershipMissingFK, which does not have '
-                'foreign keys to Group or GroupTwo.\n',
-                hint='Ensure that there are foreign keys to Person '
-                'and GroupTwo models in Membership model.'),
+                'foreign keys to GroupTwo or Group.\n',
+                hint='Ensure that there are foreign keys to GroupTwo '
+                'and Group models in MembershipMissingFK model.',
+                obj=field),
         ])
 
     def test_missing_relationship_model(self):
@@ -369,7 +373,7 @@ class RelativeFieldsTests(TestCase):
     def test_unique_m2m(self):
         from .invalid_models.models import UniqueM2M
         field = UniqueM2M.field.field
-        self.assertEqual(list(field.check()), [
+        self.assertEqual(list(field.check(from_model=UniqueM2M)), [
             Error('Unique m2m field.\n'
                 'ManyToManyFields cannot be unique.',
                 hint='Remove the "unique" argument on the field.',
