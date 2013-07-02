@@ -191,6 +191,15 @@ class MigrationAutodetector(object):
                             field = new_model_state.get_field_by_name(field_name),
                         )
                     )
+            # unique_together changes
+            if old_model_state.options.get("unique_together", set()) != new_model_state.options.get("unique_together", set()):
+                self.add_to_migration(
+                    app_label,
+                    operations.AlterUniqueTogether(
+                        name = model_name,
+                        unique_together = new_model_state.options.get("unique_together", set()),
+                    )
+                )
         # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):

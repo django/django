@@ -20,6 +20,8 @@ class AutodetectorTests(TestCase):
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
+    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
+    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
 
     def make_project_state(self, model_states):
@@ -234,3 +236,39 @@ class AutodetectorTests(TestCase):
         self.assertEqual(migration1.dependencies, [("otherapp", "auto_1")])
         self.assertEqual(migration2.dependencies, [])
         self.assertEqual(set(migration3.dependencies), set([("otherapp", "auto_1"), ("testapp", "auto_1")]))
+
+    def test_unique_together(self):
+        "Tests unique_together detection"
+        # Make state
+        before = self.make_project_state([self.author_empty, self.book])
+        after = self.make_project_state([self.author_empty, self.book_unique])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector.changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action.name, "book")
+        self.assertEqual(action.unique_together, set([("author", "title")]))
+
+    def test_unique_together_ordering(self):
+        "Tests that unique_together also triggers on ordering changes"
+        # Make state
+        before = self.make_project_state([self.author_empty, self.book_unique])
+        after = self.make_project_state([self.author_empty, self.book_unique_2])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector.changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action.name, "book")
+        self.assertEqual(action.unique_together, set([("title", "author")]))
