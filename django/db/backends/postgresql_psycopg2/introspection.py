@@ -177,26 +177,31 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             constraints[constraint]['columns'].add(column)
         # Now get indexes
         cursor.execute("""
-            SELECT c2.relname, attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+            SELECT
+                c2.relname,
+                ARRAY(
+                    SELECT attr.attname
+                    FROM unnest(idx.indkey) i, pg_catalog.pg_attribute attr
+                    WHERE
+                        attr.attnum = i AND
+                        attr.attrelid = c.oid
+                ),
+                idx.indisunique,
+                idx.indisprimary
             FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-                pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+                pg_catalog.pg_index idx
             WHERE c.oid = idx.indrelid
                 AND idx.indexrelid = c2.oid
-                AND attr.attrelid = c.oid
-                AND attr.attnum = idx.indkey[0]
                 AND c.relname = %s
         """, [table_name])
-        for index, column, coli, unique, primary in cursor.fetchall():
-            # If we're the first column, make the record
+        for index, columns, unique, primary in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": set(),
-                    "primary_key": False,
-                    "unique": False,
+                    "columns": set(columns),
+                    "primary_key": primary,
+                    "unique": unique,
                     "foreign_key": False,
                     "check": False,
                     "index": True,
                 }
-            # Record the details
-            constraints[index]['columns'].add(column)
         return constraints
