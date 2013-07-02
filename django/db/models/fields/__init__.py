@@ -773,10 +773,12 @@ class BooleanField(Field):
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
 
+
 class CharField(Field):
     description = _("String (up to %(max_length)s)")
 
     def __init__(self, *args, **kwargs):
+        self.empty_label = kwargs.pop('empty_label', None)
         super(CharField, self).__init__(*args, **kwargs)
         self.validators.append(validators.MaxLengthValidator(self.max_length))
 
@@ -798,6 +800,17 @@ class CharField(Field):
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
+
+    def get_choices(self, include_blank=True, blank_choice=None, **kwargs):
+        # Passing a blank_choice will override the empty label defined in
+        # the contructor.
+        kwargs["include_blank"] = include_blank
+        if not blank_choice and self.empty_label:
+            blank_choice = [('', self.empty_label)]
+        if blank_choice:
+            kwargs['blank_choice'] = blank_choice
+        return super(CharField, self).get_choices(**kwargs)
+
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):

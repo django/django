@@ -5,13 +5,15 @@ import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
+from django.forms import (Form, ModelForm, FileField, ModelChoiceField,
+    CharField)
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
 from django.utils import six
 
-from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
-    BoundaryModel, Defaults, OptionalMultiChoiceModel)
+from ..models import (BoundaryModel, ChoiceOptionModel, ChoiceFieldModel,
+    EmptyLabelChoiceModel, Defaults, FileModel, Group,
+    OptionalMultiChoiceModel)
 
 
 class ChoiceFieldForm(ModelForm):
@@ -32,6 +34,11 @@ class ChoiceFieldExclusionForm(ModelForm):
     class Meta:
         exclude = ['multi_choice']
         model = ChoiceFieldModel
+
+
+class EmptyLabelChoiceForm(ModelForm):
+    class Meta:
+        model = EmptyLabelChoiceModel
 
 
 class FileForm(Form):
@@ -259,3 +266,14 @@ class ManyToManyExclusionTestCase(TestCase):
         self.assertEqual(form.instance.choice_int.pk, data['choice_int'])
         self.assertEqual(list(form.instance.multi_choice.all()), [opt2, opt3])
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
+
+
+class EmptyLabelCharFieldTestCase(TestCase):
+    def test_empty_field(self):
+        f = EmptyLabelChoiceForm()
+        self.assertEqual(f.as_p(),
+            """<p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
+<option value="" selected="selected">Please select one</option>
+<option value="f">foo</option>
+<option value="b">bar</option>
+</select></p>""")
