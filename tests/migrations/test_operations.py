@@ -30,6 +30,19 @@ class OperationTests(TestCase):
     def assertColumnNotNull(self, table, column):
         self.assertEqual([c.null_ok for c in connection.introspection.get_table_description(connection.cursor(), table) if c.name == column][0], False)
 
+    def assertIndexExists(self, table, columns, value=True):
+        self.assertEqual(
+            value,
+            any(
+                c["index"]
+                for c in connection.introspection.get_constraints(connection.cursor(), table).values()
+                if c['columns'] == list(columns)
+            ),
+        )
+
+    def assertIndexNotExists(self, table, columns):
+        return self.assertIndexExists(table, columns, False)
+
     def set_up_test_model(self, app_label):
         """
         Creates a test model state and database table.
@@ -242,3 +255,25 @@ class OperationTests(TestCase):
         cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
         cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
         cursor.execute("DELETE FROM test_alunto_pony")
+
+    def test_alter_index_together(self):
+        """
+        Tests the AlterIndexTogether operation.
+        """
+        project_state = self.set_up_test_model("test_alinto")
+        # Test the state alteration
+        operation = migrations.AlterIndexTogether("Pony", [("pink", "weight")])
+        new_state = project_state.clone()
+        operation.state_forwards("test_alinto", new_state)
+        self.assertEqual(len(project_state.models["test_alinto", "pony"].options.get("index_together", set())), 0)
+        self.assertEqual(len(new_state.models["test_alinto", "pony"].options.get("index_together", set())), 1)
+        # Make sure there's no matching index
+        self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alinto", editor, project_state, new_state)
+        self.assertIndexExists("test_alinto_pony", ["pink", "weight"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alinto", editor, new_state, project_state)
+        self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])

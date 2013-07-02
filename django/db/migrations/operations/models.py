@@ -82,7 +82,7 @@ class AlterModelTable(Operation):
 
 class AlterUniqueTogether(Operation):
     """
-    Changes the value of unique_together to the target one.
+    Changes the value of index_together to the target one.
     Input value of unique_together must be a set of tuples.
     """
 
@@ -108,3 +108,33 @@ class AlterUniqueTogether(Operation):
 
     def describe(self):
         return "Alter unique_together for %s (%s constraints)" % (self.name, len(self.unique_together))
+
+
+class AlterIndexTogether(Operation):
+    """
+    Changes the value of index_together to the target one.
+    Input value of index_together must be a set of tuples.
+    """
+
+    def __init__(self, name, index_together):
+        self.name = name.lower()
+        self.index_together = set(tuple(cons) for cons in index_together)
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options["index_together"] = self.index_together
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        old_app_cache = from_state.render()
+        new_app_cache = to_state.render()
+        schema_editor.alter_index_together(
+            new_app_cache.get_model(app_label, self.name),
+            getattr(old_app_cache.get_model(app_label, self.name)._meta, "index_together", set()),
+            getattr(new_app_cache.get_model(app_label, self.name)._meta, "index_together", set()),
+        )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def describe(self):
+        return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))
