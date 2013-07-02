@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
 import sys
+from unittest import skipIf, skipUnless
 
 from django.db import connection, transaction, DatabaseError, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
-from django.utils.unittest import skipIf, skipUnless
 
 from .models import Reporter
 
@@ -350,7 +350,7 @@ class AtomicMiscTests(TransactionTestCase):
         transaction.atomic(Callable())
 
 
-class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 
@@ -508,7 +508,7 @@ class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCas
         )
 
 
-class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionRollbackTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 
@@ -528,7 +528,7 @@ class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, Transactio
         self.assertRaises(IntegrityError, execute_bad_sql)
         transaction.rollback()
 
-class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 

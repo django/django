@@ -1,4 +1,3 @@
-import warnings
 from functools import wraps
 
 from django.contrib.sites.models import get_current_site
@@ -19,13 +18,7 @@ def x_robots_tag(func):
 @x_robots_tag
 def index(request, sitemaps,
           template_name='sitemap_index.xml', content_type='application/xml',
-          sitemap_url_name='django.contrib.sitemaps.views.sitemap',
-          mimetype=None):
-
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
+          sitemap_url_name='django.contrib.sitemaps.views.sitemap'):
 
     req_protocol = 'https' if request.is_secure() else 'http'
     req_site = get_current_site(request)
@@ -47,13 +40,7 @@ def index(request, sitemaps,
 
 @x_robots_tag
 def sitemap(request, sitemaps, section=None,
-            template_name='sitemap.xml', content_type='application/xml',
-            mimetype=None):
-
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
+            template_name='sitemap.xml', content_type='application/xml'):
 
     req_protocol = 'https' if request.is_secure() else 'http'
     req_site = get_current_site(request)

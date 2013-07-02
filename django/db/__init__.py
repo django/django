@@ -49,7 +49,7 @@ class DefaultBackendProxy(object):
     @cached_property
     def _backend(self):
         warnings.warn("Accessing django.db.backend is deprecated.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return load_backend(connections[DEFAULT_DB_ALIAS].settings_dict['ENGINE'])
 
     def __getattr__(self, item):
@@ -66,7 +66,7 @@ backend = DefaultBackendProxy()
 def close_connection(**kwargs):
     warnings.warn(
         "close_connection is superseded by close_old_connections.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
     # Avoid circular imports
     from django.db import transaction
     for conn in connections:

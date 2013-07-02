@@ -1364,7 +1364,7 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 LOGGING_CONFIG
 --------------
 
-Default: ``'django.utils.log.dictConfig'``
+Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
 Django project. Points at a instance of Python's `dictConfig`_
@@ -1372,6 +1372,10 @@ configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. versionchanged:: 1.7
+
+    Previously, the default value was ``'django.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -2048,22 +2052,6 @@ Default: ``('django.contrib.auth.backends.ModelBackend',)``
 A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
-
-.. setting:: AUTH_PROFILE_MODULE
-
-AUTH_PROFILE_MODULE
--------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Default: Not defined
-
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
 
 .. setting:: AUTH_USER_MODEL
 

@@ -4,12 +4,12 @@ try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
+import unittest
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils.six.moves import xrange
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType,

@@ -8,14 +8,16 @@ import json
 import os
 import re
 import sys
+import select
+import socket
+import threading
+import unittest
+from unittest import skipIf         # Imported here for backward compatibility
+from unittest.util import safe_repr
 try:
     from urllib.parse import urlsplit, urlunsplit
 except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
-import select
-import socket
-import threading
-import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
@@ -37,10 +39,8 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml)
-from django.utils import six, unittest as ut2
+from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.unittest import skipIf # Imported here for backward compatibility
-from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
 
@@ -156,15 +156,11 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
-class SimpleTestCase(ut2.TestCase):
+class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
-
-    _warn_txt = ("save_warnings_state/restore_warnings_state "
-        "django.test.*TestCase methods are deprecated. Use Python's "
-        "warnings.catch_warnings context manager instead.")
 
     def __call__(self, result=None):
         """
@@ -224,21 +220,6 @@ class SimpleTestCase(ut2.TestCase):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
-
-    def save_warnings_state(self):
-        """
-        Saves the state of the warnings module
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        self._warnings_state = warnings.filters[:]
-
-    def restore_warnings_state(self):
-        """
-        Restores the state of the warnings module to the state
-        saved by save_warnings_state()
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        warnings.filters = self._warnings_state[:]
 
     def settings(self, **kwargs):
         """
@@ -906,7 +887,7 @@ def _deferredSkip(condition, reason):
             @wraps(test_func)
             def skip_wrapper(*args, **kwargs):
                 if condition():
-                    raise ut2.SkipTest(reason)
+                    raise unittest.SkipTest(reason)
                 return test_func(*args, **kwargs)
             test_item = skip_wrapper
         else:

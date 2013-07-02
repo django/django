@@ -636,7 +636,7 @@ class RadioChoiceInput(ChoiceInput):
 class RadioInput(RadioChoiceInput):
     def __init__(self, *args, **kwargs):
         msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
         super(RadioInput, self).__init__(*args, **kwargs)
 
 

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -34,10 +32,6 @@ class GeometryField(forms.Field):
         # defaults (e.g., allow None).
         self.srid = kwargs.pop('srid', None)
         self.geom_type = kwargs.pop('geom_type', self.geom_type)
-        if 'null' in kwargs:
-            kwargs.pop('null', True)
-            warnings.warn("Passing 'null' keyword argument to GeometryField is deprecated.",
-                DeprecationWarning, stacklevel=2)
         super(GeometryField, self).__init__(**kwargs)
         self.widget.attrs['geom_type'] = self.geom_type
 

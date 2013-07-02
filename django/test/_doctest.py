@@ -54,7 +54,7 @@ import warnings
 warnings.warn(
     "The django.test._doctest module is deprecated; "
     "use the doctest module from the Python standard library instead.",
-    PendingDeprecationWarning)
+    DeprecationWarning)
 
 
 __docformat__ = 'reStructuredText en'

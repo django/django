@@ -101,19 +101,19 @@ def set_clean(using=None):
 
 def is_managed(using=None):
     warnings.warn("'is_managed' is deprecated.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def managed(flag=True, using=None):
     warnings.warn("'managed' no longer serves a purpose.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def commit_unless_managed(using=None):
     warnings.warn("'commit_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 def rollback_unless_managed(using=None):
     warnings.warn("'rollback_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
 ###############
 # Public APIs #
@@ -123,7 +123,7 @@ def get_autocommit(using=None):
     """
     Get the autocommit status of the connection.
     """
-    return get_connection(using).autocommit
+    return get_connection(using).get_autocommit()
 
 def set_autocommit(autocommit, using=None):
     """
@@ -175,7 +175,7 @@ def get_rollback(using=None):
     """
     Gets the "needs rollback" flag -- for *advanced use* only.
     """
-    return get_connection(using).needs_rollback
+    return get_connection(using).get_rollback()
 
 def set_rollback(rollback, using=None):
     """
@@ -229,15 +229,11 @@ class Atomic(object):
     def __enter__(self):
         connection = get_connection(self.using)
 
-        # Ensure we have a connection to the database before testing
-        # autocommit status.
-        connection.ensure_connection()
-
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
-            if not connection.autocommit:
+            if not connection.get_autocommit():
                 # Some database adapters (namely sqlite3) don't handle
                 # transactions and savepoints properly when autocommit is off.
                 # Turning autocommit back on isn't an option; it would trigger
@@ -430,7 +426,7 @@ def autocommit(using=None):
     your settings file and want the default behavior in some view functions.
     """
     warnings.warn("autocommit is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(managed=False, using=using)
@@ -448,7 +444,7 @@ def commit_on_success(using=None):
     control in Web apps.
     """
     warnings.warn("commit_on_success is deprecated in favor of atomic.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -478,7 +474,7 @@ def commit_manually(using=None):
     themselves.
     """
     warnings.warn("commit_manually is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -500,7 +496,7 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
     legacy behavior.
     """
     connection = get_connection(using)
-    if connection.autocommit or connection.in_atomic_block:
+    if connection.get_autocommit() or connection.in_atomic_block:
         return atomic(using, savepoint)
     else:
         def entering(using):

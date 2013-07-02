@@ -2,8 +2,8 @@
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
 
-from django.utils import unittest
-from django.utils.unittest import skipUnless
+import unittest
+from unittest import skipUnless
 
 from .. import HAS_GEOS
 

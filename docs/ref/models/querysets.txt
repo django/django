@@ -764,8 +764,6 @@ You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
 passed to ``select_related()``. This includes foreign keys that have
 ``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
-It's an error to use both a list of fields and the ``depth`` parameter in the
-same ``select_related()`` call; they are conflicting options.
 
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
@@ -780,20 +778,6 @@ If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
 
    >>> without_relations = queryset.select_related(None)
-
-.. deprecated:: 1.5
-    The ``depth`` parameter to ``select_related()`` has been deprecated. You
-    should replace it with the use of the ``(*fields)`` listing specific
-    related fields instead as documented above.
-
-A depth limit of relationships to follow can also be specified::
-
-    b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
-
-A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
-direction if you are performing a depth-based ``select_related()`` call.
 
 prefetch_related
 ~~~~~~~~~~~~~~~~

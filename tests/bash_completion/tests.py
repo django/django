@@ -3,10 +3,10 @@ A series of tests to establish that the command-line bash completion works.
 """
 import os
 import sys
+import unittest
 
 from django.conf import settings
 from django.core.management import ManagementUtility
-from django.utils import unittest
 from django.utils.six import StringIO
 
 

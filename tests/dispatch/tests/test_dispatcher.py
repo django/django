@@ -1,9 +1,9 @@
 import gc
 import sys
 import time
+import unittest
 
 from django.dispatch import Signal, receiver
-from django.utils import unittest
 
 
 if sys.platform.startswith('java'):

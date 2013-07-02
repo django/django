@@ -1,10 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+import unittest
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import unittest
 
 from .models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
     UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost,

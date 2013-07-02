@@ -295,7 +295,7 @@ these changes.
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
   :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemamp views, :func:`~django.contrib.sitemaps.views.index` and
+  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
@@ -403,6 +403,16 @@ these changes.
   more than one.* string to override or append to user-provided ``help_text`` in
   forms for ManyToMany model fields will not be performed by Django anymore
   either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods will
+  be removed.
+
+1.9
+---
+
+* ``django.utils.dictconfig`` will be removed.
+
+* ``django.utils.unittest`` will be removed.
 
 2.0
 ---

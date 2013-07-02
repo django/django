@@ -8,7 +8,7 @@ from django.utils.deprecation import RenameMethodsBase
 
 class RenameManagerMethods(RenameMethodsBase):
     renamed_methods = (
-        ('old', 'new', PendingDeprecationWarning),
+        ('old', 'new', DeprecationWarning),
     )
 
 

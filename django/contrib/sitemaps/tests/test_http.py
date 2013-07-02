@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import os
 from datetime import date
+from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
-from django.utils.unittest import skipUnless
 from django.utils.formats import localize
 from django.utils._os import upath
 from django.utils.translation import activate, deactivate

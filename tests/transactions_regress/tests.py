@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
+from unittest import skipIf, skipUnless
+
 from django.db import (connection, connections, transaction, DEFAULT_DB_ALIAS, DatabaseError,
                        IntegrityError)
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
-from django.utils.unittest import skipIf, skipUnless
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 
 from .models import Mod, M2mA, M2mB, SubMod
 
@@ -30,7 +31,7 @@ class ModelInheritanceTests(TransactionTestCase):
         self.assertEqual(SubMod.objects.count(), 1)
         self.assertEqual(Mod.objects.count(), 1)
 
-class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TestTransactionClosing(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure that transactions are properly closed
     when they should be, and aren't left pending after operations
@@ -194,7 +195,7 @@ class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionT
         (connection.settings_dict['NAME'] == ':memory:' or
          not connection.settings_dict['NAME']),
         'Test uses multiple connections, but in-memory sqlite does not support this')
-class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TestNewConnection(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Check that new connections don't have special behaviour.
     """
@@ -242,7 +243,7 @@ class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCa
 
 @skipUnless(connection.vendor == 'postgresql',
             "This test only valid for PostgreSQL")
-class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TestPostgresAutocommitAndIsolation(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Tests to make sure psycopg2's autocommit mode and isolation level
     is restored after entering and leaving transaction management.
@@ -326,7 +327,7 @@ class TestPostgresAutocommitAndIsolation(IgnorePendingDeprecationWarningsMixin, 
         self.assertTrue(connection.autocommit)
 
 
-class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TestManyToManyAddTransaction(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions_regress']
 
@@ -344,7 +345,7 @@ class TestManyToManyAddTransaction(IgnorePendingDeprecationWarningsMixin, Transa
         self.assertEqual(a.others.count(), 1)
 
 
-class SavepointTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class SavepointTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions_regress']
 

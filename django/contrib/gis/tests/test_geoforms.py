@@ -1,14 +1,15 @@
+from unittest import skipUnless
+
 from django.forms import ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
 from django.test import SimpleTestCase
 from django.utils import six
-from django.utils.unittest import skipUnless
-
 
 if HAS_SPATIALREFSYS:
     from django.contrib.gis import forms
     from django.contrib.gis.geos import GEOSGeometry
+
 
 @skipUnless(HAS_GDAL and HAS_SPATIALREFSYS, "GeometryFieldTest needs gdal support and a spatial database")
 class GeometryFieldTest(SimpleTestCase):
@@ -143,7 +144,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def assertTextarea(self, geom, rendered):
         """Makes sure the wkt and a textarea are in the content"""
-        
+
         self.assertIn('<textarea ', rendered)
         self.assertIn('required', rendered)
         self.assertIn(geom.wkt, rendered)

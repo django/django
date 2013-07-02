@@ -107,20 +107,6 @@ to distinguish caches by the ``Accept-language`` header.
 
     The :class:`django.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
-    ``SortedDict`` adds two additional methods to the standard Python ``dict``
-    class:
-
-    .. method:: insert(index, key, value)
-
-        .. deprecated:: 1.5
-
-        Inserts the key, value pair before the item with the given index.
-
-    .. method:: value_for_index(index)
-
-        .. deprecated:: 1.5
-
-        Returns the value of the item at the given zero-based index.
 
 Creating a new SortedDict
 -------------------------
@@ -202,18 +188,7 @@ The functions defined in this module share the following properties:
 =========================
 
 .. module:: django.utils.encoding
-   :synopsis: A series of helper classes and function to manage character encoding.
-
-.. class:: StrAndUnicode
-
-    A class that derives ``__str__`` from ``__unicode__``.
-
-    On Python 2, ``__str__`` returns the output of ``__unicode__`` encoded as
-    a UTF-8 bytestring. On Python 3, ``__str__`` returns the output of
-    ``__unicode__``.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define ``__unicode__``.
+   :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
 

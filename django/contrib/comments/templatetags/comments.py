@@ -12,7 +12,7 @@ register = template.Library()
 
 class RenameBaseCommentNodeMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
     )
 
 

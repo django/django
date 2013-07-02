@@ -1,12 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+import unittest
 
 from django.core.paginator import (Paginator, EmptyPage, InvalidPage,
     PageNotAnInteger)
 from django.test import TestCase
 from django.utils import six
-from django.utils import unittest
 
 from .models import Article
 from .custom import ValidAdjacentNumsPaginator

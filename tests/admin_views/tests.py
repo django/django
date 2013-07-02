@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import datetime
+import unittest
 try:
     from urllib.parse import urljoin
 except ImportError:  # Python 2
@@ -15,6 +16,7 @@ from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -30,7 +32,8 @@ from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import patch_logger
-from django.utils import formats, translation, unittest
+from django.utils import formats
+from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
@@ -854,20 +857,20 @@ class AdminViewPermissionsTest(TestCase):
         # User who can add Articles
         add_user = User.objects.get(username='adduser')
         add_user.user_permissions.add(get_perm(Article,
-            opts.get_add_permission()))
+            get_permission_codename('add', opts)))
 
         # User who can change Articles
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Article,
-            opts.get_change_permission()))
+            get_permission_codename('change', opts)))
 
         # User who can delete Articles
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Article,
-            opts.get_delete_permission()))
+            get_permission_codename('delete', opts)))
 
         delete_user.user_permissions.add(get_perm(Section,
-            Section._meta.get_delete_permission()))
+            get_permission_codename('delete', Section._meta)))
 
         # login POST dicts
         self.super_login = {
@@ -1210,7 +1213,7 @@ class AdminViewPermissionsTest(TestCase):
         # Allow the add user to add sections too. Now they can see the "add
         # section" link.
         add_user = User.objects.get(username='adduser')
-        perm = get_perm(Section, Section._meta.get_add_permission())
+        perm = get_perm(Section, get_permission_codename('add', Section._meta))
         add_user.user_permissions.add(perm)
         response = self.client.get(url)
         self.assertContains(response, add_link_text)
@@ -1315,7 +1318,7 @@ class AdminViewsNoUrlTest(TestCase):
         # User who can change Reports
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Report,
-            opts.get_change_permission()))
+            get_permission_codename('change', opts)))
 
         # login POST dict
         self.changeuser_login = {
@@ -1372,7 +1375,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         self.client.logout()
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Plot,
-            Plot._meta.get_delete_permission()))
+            get_permission_codename('delete', Plot._meta)))
 
         self.assertTrue(self.client.login(username='deleteuser',
                                           password='secret'))

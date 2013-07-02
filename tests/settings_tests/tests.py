@@ -1,4 +1,5 @@
 import os
+import unittest
 import warnings
 
 from django.conf import settings, global_settings
@@ -6,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import SimpleTestCase, TransactionTestCase, TestCase, signals
 from django.test.utils import override_settings
-from django.utils import unittest, six
+from django.utils import six
 
 
 @override_settings(TEST='override', TEST_OUTER='outer')

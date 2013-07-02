@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
+from unittest import skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -22,7 +23,6 @@ from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller)
-from django.utils.unittest import skipIf
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)

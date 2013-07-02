@@ -352,7 +352,7 @@ class BaseForm(object):
                 if hasattr(field.widget, '_has_changed'):
                     warnings.warn("The _has_changed method on widgets is deprecated,"
                         " define it at field level instead.",
-                        PendingDeprecationWarning, stacklevel=2)
+                        DeprecationWarning, stacklevel=2)
                     if field.widget._has_changed(initial_value, data_value):
                         self._changed_data.append(name)
                 elif field._has_changed(initial_value, data_value):

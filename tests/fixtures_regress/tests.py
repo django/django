@@ -45,7 +45,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'sequence',
             verbosity=0,
-            commit=False
         )
 
         # Create a new animal. Without a sequence reset, this new object
@@ -84,7 +83,6 @@ class TestFixtures(TestCase):
             'sequence_extra',
             ignore=True,
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Animal.specimens.all()[0].name, 'Lion')
 
@@ -98,7 +96,6 @@ class TestFixtures(TestCase):
             'sequence_extra_xml',
             ignore=True,
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Animal.specimens.all()[0].name, 'Wolf')
 
@@ -113,7 +110,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'pretty.xml',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Stuff.objects.all()[0].name, None)
         self.assertEqual(Stuff.objects.all()[0].owner, None)
@@ -129,7 +125,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'pretty.xml',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Stuff.objects.all()[0].name, '')
         self.assertEqual(Stuff.objects.all()[0].owner, None)
@@ -152,7 +147,6 @@ class TestFixtures(TestCase):
             'loaddata',
             load_absolute_path,
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Absolute.load_count, 1)
 
@@ -168,7 +162,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'bad_fixture1.unkn',
                 verbosity=0,
-                commit=False,
             )
 
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
@@ -182,7 +175,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'bad_fixture1.unkn',
                 verbosity=0,
-                commit=False,
             )
 
     def test_invalid_data(self):
@@ -197,7 +189,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'bad_fixture2.xml',
                 verbosity=0,
-                commit=False,
             )
 
     def test_invalid_data_no_ext(self):
@@ -212,7 +203,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'bad_fixture2',
                 verbosity=0,
-                commit=False,
             )
 
     def test_empty(self):
@@ -226,7 +216,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'empty',
                 verbosity=0,
-                commit=False,
             )
 
     def test_error_message(self):
@@ -240,7 +229,6 @@ class TestFixtures(TestCase):
                 'bad_fixture2',
                 'animal',
                 verbosity=0,
-                commit=False,
             )
 
     def test_pg_sequence_resetting_checks(self):
@@ -253,7 +241,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'model-inheritance.json',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Parent.objects.all()[0].id, 1)
         self.assertEqual(Child.objects.all()[0].id, 1)
@@ -270,7 +257,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'big-fixture.json',
             verbosity=0,
-            commit=False
         )
         articles = Article.objects.exclude(id=9)
         self.assertEqual(
@@ -297,7 +283,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'animal.xml',
                 verbosity=0,
-                commit=False,
             )
             self.assertEqual(
                 self.pre_save_checks,
@@ -319,13 +304,11 @@ class TestFixtures(TestCase):
             'loaddata',
             'animal.xml',
             verbosity=0,
-            commit=False,
         )
         management.call_command(
             'loaddata',
             'sequence.json',
             verbosity=0,
-            commit=False,
         )
         animal = Animal(
             name='Platypus',
@@ -390,7 +373,6 @@ class TestFixtures(TestCase):
             'loaddata',
             'forward_ref.json',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Book.objects.all()[0].id, 1)
         self.assertEqual(Person.objects.all()[0].id, 4)
@@ -405,7 +387,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'forward_ref_bad_data.json',
                 verbosity=0,
-                commit=False,
             )
 
     _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
@@ -422,7 +403,6 @@ class TestFixtures(TestCase):
             'forward_ref_1.json',
             'forward_ref_2.json',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Book.objects.all()[0].id, 1)
         self.assertEqual(Person.objects.all()[0].id, 4)
@@ -437,7 +417,6 @@ class TestFixtures(TestCase):
             management.call_command(
                 'loaddata',
                 verbosity=0,
-                commit=False,
             )
 
     def test_loaddata_not_existant_fixture_file(self):
@@ -447,7 +426,6 @@ class TestFixtures(TestCase):
                 'loaddata',
                 'this_fixture_doesnt_exist',
                 verbosity=2,
-                commit=False,
                 stdout=stdout_output,
             )
         self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
@@ -465,13 +443,11 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'model-inheritance.json',
             verbosity=0,
-            commit=False
         )
         management.call_command(
             'loaddata',
             'nk-inheritance.json',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(
             NKChild.objects.get(pk=1).data,
@@ -492,19 +468,16 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'model-inheritance.json',
             verbosity=0,
-            commit=False
         )
         management.call_command(
             'loaddata',
             'nk-inheritance.json',
             verbosity=0,
-            commit=False
         )
         management.call_command(
             'loaddata',
             'nk-inheritance2.xml',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(
             NKChild.objects.get(pk=2).data,
@@ -524,7 +497,6 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'forward_ref_lookup.json',
             verbosity=0,
-            commit=False
             )
 
         stdout = StringIO()
@@ -662,19 +634,16 @@ class NaturalKeyFixtureTests(TestCase):
             'loaddata',
             'non_natural_1.json',
             verbosity=0,
-            commit=False
         )
         management.call_command(
             'loaddata',
             'forward_ref_lookup.json',
             verbosity=0,
-            commit=False
         )
         management.call_command(
             'loaddata',
             'non_natural_2.xml',
             verbosity=0,
-            commit=False
         )
         books = Book.objects.all()
         self.assertEqual(
@@ -696,7 +665,6 @@ class TestTicket11101(TransactionTestCase):
             'loaddata',
             'thingy.json',
             verbosity=0,
-            commit=False
         )
         self.assertEqual(Thingy.objects.count(), 1)
         transaction.rollback()

@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
+import unittest
+from unittest import skipUnless
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 
@@ -14,8 +16,6 @@ from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 from .. import HAS_GEOS
 

@@ -102,18 +102,6 @@ is compatible with the current version of Django.
 Upon finding things that are incompatible or require notifying the user, it
 issues a series of warnings.
 
-cleanup
--------
-
-.. django-admin:: cleanup
-
-Can be run as a cronjob or directly to clean out old data from the database
-(only expired sessions at the moment).
-
-.. versionchanged:: 1.5
-
-    :djadmin:`cleanup` is deprecated. Use :djadmin:`clearsessions` instead.
-
 compilemessages
 ---------------
 

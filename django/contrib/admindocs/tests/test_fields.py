@@ -1,9 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
+import unittest
+
 from django.contrib.admindocs import views
 from django.db import models
 from django.db.models import fields
-from django.utils import unittest
 from django.utils.translation import ugettext as _
 
 

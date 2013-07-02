@@ -89,7 +89,6 @@ def do_pending_lookups(sender, **kwargs):
 signals.class_prepared.connect(do_pending_lookups)
 
 
-#HACK
 class RelatedField(Field):
     def db_type(self, connection):
         '''By default related field will not have a column
@@ -142,8 +141,8 @@ class RelatedField(Field):
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
+        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
     )
 
 
@@ -1166,7 +1165,7 @@ class ForeignKey(ForeignObject):
         rel = self.rel
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
@@ -1367,9 +1366,7 @@ class ManyToManyField(RelatedField):
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            # Python 2.6 and earlier require dictionary keys to be of str type,
-            # not unicode and class names must be ASCII (in Python 2.x), so we
-            # forcibly coerce it here (breaks early if there's a problem).
+            # Class names must be ASCII in Python 2.x, so we forcibly coerce it here to break early if there's a problem.
             to = str(to)
 
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -1397,7 +1394,7 @@ class ManyToManyField(RelatedField):
             del kwargs['help_text']
         # Rel needs more work.
         rel = self.rel
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)

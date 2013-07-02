@@ -25,7 +25,7 @@ from django.utils.encoding import smart_text
 
 class RenameGenericForeignKeyMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
     )
 
 
@@ -434,8 +434,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 
-    You must provide ``ct_field`` and ``object_id`` if they different from the
-    defaults ``content_type`` and ``object_id`` respectively.
+    You must provide ``ct_field`` and ``fk_field`` if they are different from
+    the defaults ``content_type`` and ``object_id`` respectively.
     """
     opts = model._meta
     # if there is no field called `ct_field` let the exception propagate

@@ -109,7 +109,7 @@ def setup(verbosity, test_labels):
 
     # Load all the ALWAYS_INSTALLED_APPS.
     with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', PendingDeprecationWarning)
+        warnings.filterwarnings('ignore', 'django.contrib.comments is deprecated and will be removed before Django 1.8.', DeprecationWarning)
         get_apps()
 
     # Load all the test model apps.

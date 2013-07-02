@@ -2,13 +2,13 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import postgis
 from django.test import TestCase
 from django.utils._os import upath
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Union, Extent3D

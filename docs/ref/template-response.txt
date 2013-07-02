@@ -82,8 +82,7 @@ Methods
             deprecated), but since this is actually the value included in the HTTP
             ``Content-Type`` header, it can also include the character set
             encoding, which makes it more than just a MIME type specification. If
-            ``mimetype`` is specified (not ``None``), that value is used.
-            Otherwise, ``content_type`` is used. If neither is given,
+            ``content_type`` is specified, then its value is used. Otherwise,
             :setting:`DEFAULT_CONTENT_TYPE` is used.
 
 
@@ -175,8 +174,7 @@ Methods
         deprecated), but since this is actually the value included in the HTTP
         ``Content-Type`` header, it can also include the character set
         encoding, which makes it more than just a MIME type specification. If
-        ``mimetype`` is specified (not ``None``), that value is used.
-        Otherwise, ``content_type`` is used. If neither is given,
+        ``content_type`` is specified, then its value is used. Otherwise,
         :setting:`DEFAULT_CONTENT_TYPE` is used.
 
     ``current_app``

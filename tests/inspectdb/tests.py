@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 import re
+from unittest import expectedFailure
 
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.unittest import expectedFailure
 from django.utils.six import PY3, StringIO
 
 if connection.vendor == 'oracle':

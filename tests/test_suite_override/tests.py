@@ -1,6 +1,7 @@
+import unittest
+
 from django.db.models import get_app
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
-from django.utils import unittest
+from django.test.utils import IgnoreAllDeprecationWarningsMixin
 
 
 def suite():
@@ -9,7 +10,8 @@ def suite():
     return testSuite
 
 
-class SuiteOverrideTest(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+class SuiteOverrideTest(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
+
     def test_suite_override(self):
         """
         Validate that you can define a custom suite when running tests with

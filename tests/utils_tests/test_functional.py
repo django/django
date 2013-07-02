@@ -1,4 +1,5 @@
-from django.utils import unittest
+import unittest
+
 from django.utils.functional import lazy, lazy_property, cached_property
 
 

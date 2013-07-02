@@ -1,0 +1,47 @@
+============================================
+Django 1.7 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 1.7!
+
+These release notes cover the `new features`_, as well as some `backwards
+incompatible changes`_ you'll want to be aware of when upgrading from Django
+1.6 or older versions. We've also dropped some features, which are detailed in
+:doc:`our deprecation plan </internals/deprecation>`, and we've `begun the
+deprecation process for some features`_.
+
+.. _`new features`: `What's new in Django 1.7`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
+
+What's new in Django 1.7
+========================
+
+Backwards incompatible changes in 1.7
+=====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation plan </internals/deprecation>` for any features that
+    have been removed. If you haven't updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
+Features deprecated in 1.7
+==========================
+
+``django.utils.dictconfig``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.dictconfig`` was a copy of :mod:`logging.config` provided for
+Python versions prior to 2.7. It has been deprecated.
+
+``django.utils.unittest``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.unittest`` provided uniform access to the ``unittest2`` library
+on all Python versions. Since ``unittest2`` became the standard library's
+:mod:`unittest` module in Python 2.7, and Django 1.7 drops support for older
+Python versions, this module isn't useful anymore. It has been deprecated. Use
+:mod:`unittest` instead.

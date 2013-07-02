@@ -1,6 +1,7 @@
+import unittest
+from unittest import skipUnless
+
 from django.contrib.gis.gdal import HAS_GDAL
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException

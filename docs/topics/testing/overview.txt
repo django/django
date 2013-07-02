@@ -21,27 +21,15 @@ module defines tests using a class-based approach.
 
 .. admonition:: unittest2
 
+    .. deprecated:: 1.7
+
     Python 2.7 introduced some major changes to the ``unittest`` library,
-    adding some extremely useful features. To ensure that every Django
-    project can benefit from these new features, Django ships with a
-    copy of unittest2_, a copy of Python 2.7's ``unittest``, backported for
-    Python 2.6 compatibility.
+    adding some extremely useful features. To ensure that every Django project
+    could benefit from these new features, Django used to ship with a copy of
+    Python 2.7's ``unittest`` backported for Python 2.6 compatibility.
 
-    To access this library, Django provides the
-    ``django.utils.unittest`` module alias. If you are using Python
-    2.7, or you have installed ``unittest2`` locally, Django will map the alias
-    to it. Otherwise, Django will use its own bundled version of ``unittest2``.
-
-    To use this alias, simply use::
-
-        from django.utils import unittest
-
-    wherever you would have historically used::
-
-        import unittest
-
-    If you want to continue to use the legacy ``unittest`` library, you can --
-    you just won't get any of the nice new ``unittest2`` features.
+    Since Django no longer supports Python versions older than 2.7,
+    ``django.utils.unittest`` is deprecated. Simply use ``unittest``.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
 
@@ -812,7 +800,7 @@ Example
 
 The following is a simple unit test using the test client::
 
-    from django.utils import unittest
+    import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):
@@ -849,12 +837,9 @@ Normal Python unit test classes extend a base class of
 .. figure:: _images/django_unittest_classes_hierarchy.*
    :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
    :width: 508
-   :height: 391
+   :height: 328
 
    Hierarchy of Django unit testing classes
-
-Regardless of the version of Python you're using, if you've installed
-``unittest2``, ``django.utils.unittest`` will point to that library.
 
 SimpleTestCase
 ~~~~~~~~~~~~~~
@@ -905,7 +890,7 @@ features like:
 then you should use :class:`~django.test.TransactionTestCase` or
 :class:`~django.test.TestCase` instead.
 
-``SimpleTestCase`` inherits from ``django.utils.unittest.TestCase``.
+``SimpleTestCase`` inherits from ``unittest.TestCase``.
 
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
@@ -1158,7 +1143,7 @@ worry about state (such as cookies) carrying over from one test to another.
 
 This means, instead of instantiating a ``Client`` in each test::
 
-    from django.utils import unittest
+    import unittest
     from django.test.client import Client
 
     class SimpleTest(unittest.TestCase):

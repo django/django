@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+from unittest import TestCase
 
 from django import forms
 from django.conf import settings
@@ -16,7 +17,6 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils import translation
 from django.utils.html import conditional_escape
-from django.utils.unittest import TestCase
 
 from . import models
 from .widgetadmin import site as widget_admin_site

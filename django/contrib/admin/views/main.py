@@ -52,7 +52,7 @@ def _is_changelist_popup(request):
         warnings.warn(
         "The `%s` GET parameter has been renamed to `%s`." %
         (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
-        PendingDeprecationWarning, 2)
+        DeprecationWarning, 2)
         return True
 
     return False
@@ -60,7 +60,7 @@ def _is_changelist_popup(request):
 
 class RenameChangeListMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
     )
 
 
@@ -115,14 +115,14 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def root_query_set(self):
         warnings.warn("`ChangeList.root_query_set` is deprecated, "
                       "use `root_queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.root_queryset
 
     @property
     def query_set(self):
         warnings.warn("`ChangeList.query_set` is deprecated, "
                       "use `queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.queryset
 
     def get_filters_params(self, params=None):

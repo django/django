@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
 import re
+import unittest
+from unittest import skipUnless
 
 from django.db import connection
 from django.contrib.gis import gdal
@@ -9,8 +11,7 @@ from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
-from django.utils import six, unittest
-from django.utils.unittest import skipUnless
+from django.utils import six
 
 if HAS_GEOS:
     from django.contrib.gis.geos import (fromstr, GEOSGeometry,

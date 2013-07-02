@@ -1,7 +1,8 @@
+from unittest import skipUnless
+
 from django.core.management.color import no_style
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 from .models import Article
 

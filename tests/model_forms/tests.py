@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import os
 from decimal import Decimal
+from unittest import skipUnless
 import warnings
 
 from django import forms
@@ -13,7 +14,6 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils._os import upath
-from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
 
@@ -252,10 +252,12 @@ class StatusNoteCBM2mForm(forms.ModelForm):
         fields = '__all__'
         widgets = {'status': forms.CheckboxSelectMultiple}
 
+
 class CustomErrorMessageForm(forms.ModelForm):
     name1 = forms.CharField(error_messages={'invalid': 'Form custom error message.'})
 
     class Meta:
+        fields = '__all__'
         model = CustomErrorMessage
 
 
@@ -266,7 +268,7 @@ class ModelFormBaseTest(TestCase):
 
     def test_missing_fields_attribute(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
                 class Meta:
@@ -276,7 +278,7 @@ class ModelFormBaseTest(TestCase):
         # if a warning has been seen already, the catch_warnings won't
         # have recorded it. The following line therefore will not work reliably:
 
-        # self.assertEqual(w[0].category, PendingDeprecationWarning)
+        # self.assertEqual(w[0].category, DeprecationWarning)
 
         # Until end of the deprecation cycle, should still create the
         # form as before:

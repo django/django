@@ -1,5 +1,4 @@
 import copy
-import warnings
 from django.utils import six
 
 
@@ -216,31 +215,6 @@ class SortedDict(dict):
         if key not in self:
             self.keyOrder.append(key)
         return super(SortedDict, self).setdefault(key, default)
-
-    def value_for_index(self, index):
-        """Returns the value of the item at the given zero-based index."""
-        # This, and insert() are deprecated because they cannot be implemented
-        # using collections.OrderedDict (Python 2.7 and up), which we'll
-        # eventually switch to
-        warnings.warn(
-            "SortedDict.value_for_index is deprecated", DeprecationWarning,
-            stacklevel=2
-        )
-        return self[self.keyOrder[index]]
-
-    def insert(self, index, key, value):
-        """Inserts the key, value pair before the item with the given index."""
-        warnings.warn(
-            "SortedDict.insert is deprecated", DeprecationWarning,
-            stacklevel=2
-        )
-        if key in self.keyOrder:
-            n = self.keyOrder.index(key)
-            del self.keyOrder[n]
-            if n < index:
-                index -= 1
-        self.keyOrder.insert(index, key)
-        super(SortedDict, self).__setitem__(key, value)
 
     def copy(self):
         """Returns a copy of this object."""

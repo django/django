@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import copy
 import logging
 import sys
+from unittest import skipUnless
 import warnings
 
 from django.conf import LazySettings
@@ -13,7 +14,6 @@ from django.utils.encoding import force_text
 from django.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue)
 from django.utils.six import StringIO
-from django.utils.unittest import skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 

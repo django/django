@@ -4,6 +4,7 @@ import datetime
 from operator import attrgetter
 import pickle
 import sys
+import unittest
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -13,7 +14,6 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
-from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
 from .models import (

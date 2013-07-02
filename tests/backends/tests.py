@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 from decimal import Decimal
 import threading
+import unittest
 
 from django.conf import settings
 from django.core.management.color import no_style
@@ -21,7 +22,7 @@ from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings, str_prefix
-from django.utils import six, unittest
+from django.utils import six
 from django.utils.six.moves import xrange
 
 from . import models
@@ -163,6 +164,17 @@ class DateQuotingTest(TestCase):
 
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
+
+    def test_last_executed_query(self):
+        """
+        last_executed_query should not raise an exception even if no previous
+        query has been run.
+        """
+        cursor = connection.cursor()
+        try:
+            connection.ops.last_executed_query(cursor, '', ())
+        except Exception:
+            self.fail("'last_executed_query' should not raise an exception.")
 
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
@@ -458,7 +470,7 @@ class BackendTestCase(TestCase):
     def create_squares_with_executemany(self, args):
         self.create_squares(args, 'format', True)
 
-    def create_squares(self, args, paramstyle, multiple):    
+    def create_squares(self, args, paramstyle, multiple):
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
@@ -530,7 +542,7 @@ class BackendTestCase(TestCase):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 9)
-        
+
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects
         qn = connection.ops.quote_name
