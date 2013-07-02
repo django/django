@@ -1655,13 +1655,27 @@ class ManyToManyField(RelatedField):
                 obj=self)
 
     def check_relationship_model(self, from_model=None, **kwargs):
-        if (self.rel.through is not None and
+        if isinstance(self.rel.through, six.string_types):
+            # The relationship model is not installed.
+            yield checks.Error(
+                'No intermediary model %s.\n'
+                'The field specifies a many-to-many relation through model '
+                '%s, which has not been installed.'
+                % (self.rel.through, self.rel.through),
+                hint='Ensure that you did not misspell the model name and '
+                'the model is not abstract. Does your INSTALLED_APPS '
+                'setting contain the app where %s is defined?'
+                % self.rel.through,
+                obj=self)
+
+        elif (self.rel.through is not None and
             not isinstance(self.rel.through, six.string_types)):
             assert from_model is not None, \
                 "ManyToManyField with intermediate " \
                 "tables cannot be checked if you don't pass the model " \
                 "where the field is attached to."
 
+            # Set some useful local variables
             to_model = self.rel.to
             from_model_name = from_model._meta.object_name
             if isinstance(to_model, six.string_types):
@@ -1669,6 +1683,8 @@ class ManyToManyField(RelatedField):
             else:
                 to_model_name = to_model._meta.object_name
             relationship_model_name = self.rel.through._meta.object_name
+
+            # Count foreign keys in relationship model
             seen_from, seen_to, seen_self = 0, 0, 0
             for inter_field in self.rel.through._meta.fields:
                 rel_to = getattr(inter_field.rel, 'to', None)
@@ -1717,3 +1733,5 @@ class ManyToManyField(RelatedField):
                     'to %(from_model_name)s and %(to_model_name)s models '
                     'in %(relationship_model_name)s model.' % locals(),
                     obj=self)
+
+
