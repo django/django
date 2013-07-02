@@ -18,6 +18,18 @@ class Group(models.Model):
 class Person(models.Model):
     name = models.CharField(max_length=5)
 
+class ForeignKeyToMissingModel(models.Model):
+    field = models.ForeignKey('Rel1')
+
+class M2MToMissingModel(models.Model):
+    field = models.ManyToManyField("Rel2")
+
+class ForeignKeyToAbstractModel(models.Model):
+    field = models.ForeignKey('AbstractModel')
+
+class M2MToAbstractModel(models.Model):
+    field = models.ManyToManyField('AbstractModel')
+
 class RelationshipDoubleFK(models.Model):
     first = models.ForeignKey(Person, related_name="first_related_name")
     second = models.ForeignKey(Person, related_name="second_related_name")
