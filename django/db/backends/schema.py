@@ -84,7 +84,7 @@ class BaseDatabaseSchemaEditor(object):
         # Get the cursor
         cursor = self.connection.cursor()
         # Log the command we're running, then run it
-        logger.info("%s; (params %r)" % (sql, params))
+        logger.debug("%s; (params %r)" % (sql, params))
         cursor.execute(sql, params)
 
     def quote_name(self, name):
@@ -251,6 +251,40 @@ class BaseDatabaseSchemaEditor(object):
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_uniq"),
                 "columns": ", ".join(self.quote_name(column) for column in columns),
+            })
+
+    def alter_index_together(self, model, old_index_together, new_index_together):
+        """
+        Deals with a model changing its index_together.
+        Note: The input index_togethers must be doubly-nested, not the single-
+        nested ["foo", "bar"] format.
+        """
+        olds = set(frozenset(fields) for fields in old_index_together)
+        news = set(frozenset(fields) for fields in new_index_together)
+        # Deleted indexes
+        for fields in olds.difference(news):
+            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            constraint_names = self._constraint_names(model, list(columns), index=True)
+            if len(constraint_names) != 1:
+                raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
+                    len(constraint_names),
+                    model._meta.db_table,
+                    ", ".join(columns),
+                ))
+            self.execute(
+                self.sql_delete_index % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "name": constraint_names[0],
+                },
+            )
+        # Created indexes
+        for fields in news.difference(olds):
+            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            self.execute(self.sql_create_index % {
+                "table": self.quote_name(model._meta.db_table),
+                "name": self._create_index_name(model, columns, suffix="_idx"),
+                "columns": ", ".join(self.quote_name(column) for column in columns),
+                "extra": "",
             })
 
     def alter_db_table(self, model, old_db_table, new_db_table):

@@ -452,6 +452,57 @@ class SchemaTests(TransactionTestCase):
         self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         UniqueTest.objects.all().delete()
 
+    def test_index_together(self):
+        """
+        Tests removing and adding index_together constraints on a model.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        # Ensure there's no index on the year/slug columns first
+        self.assertEqual(
+            False,
+            any(
+                c["index"]
+                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                if c['columns'] == set(["slug", "title"])
+            ),
+        )
+        # Alter the model to add an index
+        with connection.schema_editor() as editor:
+            editor.alter_index_together(
+                Tag,
+                [],
+                [("slug", "title")],
+            )
+        # Ensure there is now an index
+        self.assertEqual(
+            True,
+            any(
+                c["index"]
+                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                if c['columns'] == set(["slug", "title"])
+            ),
+        )
+        # Alter it back
+        new_new_field = SlugField(unique=True)
+        new_new_field.set_attributes_from_name("slug")
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(
+                Tag,
+                [("slug", "title")],
+                [],
+            )
+        # Ensure there's no index
+        self.assertEqual(
+            False,
+            any(
+                c["index"]
+                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                if c['columns'] == set(["slug", "title"])
+            ),
+        )
+
     def test_db_table(self):
         """
         Tests renaming of the table
