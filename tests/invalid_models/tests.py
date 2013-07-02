@@ -317,14 +317,16 @@ class RelativeFieldsTests(TestCase):
                 obj=field),
         ])
 
-    def test_symetrical_self_referential_field(self):
+    def test_symmetrical_self_referential_field(self):
         from .invalid_models.models import PersonSelfRefM2M
         field = PersonSelfRefM2M.friends.field
-        self.assertEqual(list(field.check()), [
+        errors = list(field.check(from_model=PersonSelfRefM2M))
+        self.assertEqual(errors, [
             Error('Symmetrical m2m field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
-                hint='Set symmetrical=False on the field.'),
+                hint='Set symmetrical=False on the field.',
+                obj=field),
         ])
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
