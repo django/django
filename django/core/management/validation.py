@@ -179,7 +179,7 @@ def get_validation_errors(outfile, app=None):
                 from_model, to_model = cls, f.rel.to
                 if from_model == to_model and f.rel.symmetrical and not f.rel.through._meta.auto_created:
                     e.add(opts, "Many-to-many fields with intermediate tables cannot be symmetrical.")
-                seen_from, seen_to, seen_self = False, False, 0
+                seen_self = 0
                 for inter_field in f.rel.through._meta.fields:
                     rel_to = getattr(inter_field.rel, 'to', None)
                     if from_model == to_model:  # relation to self
@@ -193,29 +193,6 @@ def get_validation_errors(outfile, app=None):
                                     from_model._meta.object_name
                                 )
                             )
-                    else:
-                        if rel_to == from_model:
-                            if seen_from:
-                                e.add(opts, "Intermediary model %s has more "
-                                    "than one foreign key to %s, which is "
-                                    "ambiguous and is not permitted." % (
-                                        f.rel.through._meta.object_name,
-                                         from_model._meta.object_name
-                                     )
-                                 )
-                            else:
-                                seen_from = True
-                        elif rel_to == to_model:
-                            if seen_to:
-                                e.add(opts, "Intermediary model %s has more "
-                                    "than one foreign key to %s, which is "
-                                    "ambiguous and is not permitted." % (
-                                        f.rel.through._meta.object_name,
-                                        rel_to._meta.object_name
-                                    )
-                                )
-                            else:
-                                seen_to = True
                 if f.rel.through not in models.get_models(include_auto_created=True):
                     e.add(opts, "'%s' specifies an m2m relation through model "
                         "%s, which has not been installed." % (f.name, f.rel.through)

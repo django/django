@@ -688,7 +688,7 @@ class Field(object):
         errors = []
         for function_name in (i for i in dir(self) if i.startswith('check_')):
             function = getattr(self, function_name)
-            new_errors = list(function())
+            new_errors = list(function(**kwargs))
             for error in new_errors:
                 error.obj = self
             errors.extend(new_errors)

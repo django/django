@@ -35,6 +35,10 @@ class RelationshipDoubleFK(models.Model):
     second = models.ForeignKey(Person, related_name="second_related_name")
     date_added = models.DateTimeField()
 
+class ModelWithAmbiguousRelationship(models.Model):
+    field = models.ManyToManyField('Person',
+        through="RelationshipDoubleFK", related_name='tertiary')
+
 class Membership(models.Model):
     person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
