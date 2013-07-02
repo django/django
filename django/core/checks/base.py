@@ -11,6 +11,10 @@ class BaseError(object):
         return all(getattr(self, attr) == getattr(other, attr)
             for attr in ['msg', 'hint', 'obj'])
 
+    def __repr__(self):
+        return "<%s: msg=%r, hint=%s, obj=%s>" % \
+            (self.__class__.__name__, self.msg, self.hint, self.obj)
+
 
 class Error(BaseError):
     pass
