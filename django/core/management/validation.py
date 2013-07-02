@@ -163,8 +163,6 @@ def get_validation_errors(outfile, app=None):
 
             if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
                 from_model, to_model = cls, f.rel.to
-                if from_model == to_model and f.rel.symmetrical and not f.rel.through._meta.auto_created:
-                    e.add(opts, "Many-to-many fields with intermediate tables cannot be symmetrical.")
                 seen_self = 0
                 for inter_field in f.rel.through._meta.fields:
                     rel_to = getattr(inter_field.rel, 'to', None)

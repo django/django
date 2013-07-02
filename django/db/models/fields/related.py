@@ -1639,55 +1639,64 @@ class ManyToManyField(RelatedField):
             else:
                 to_model_name = to_model._meta.object_name
             relationship_model_name = self.rel.through._meta.object_name
+            self_referential = from_model == to_model
 
-            # Count foreign keys in relationship model
-            seen_from, seen_to, seen_self = 0, 0, 0
-            for inter_field in self.rel.through._meta.fields:
-                rel_to = getattr(inter_field.rel, 'to', None)
-                if from_model == to_model:  # relation to self
-                    pass
-                elif rel_to == from_model:
-                    seen_from += 1
-                elif rel_to == to_model:
-                    seen_to += 1
-
-            if seen_from > 1:
+            # Check symmetrical attribute.
+            if (self_referential and self.rel.symmetrical and
+                not self.rel.through._meta.auto_created):
                 yield checks.Error(
-                    'More than one foreign key to %(from_model_name)s '
-                    'in intermediary %(relationship_model_name)s model.\n'
-                    '%(relationship_model_name)s has more than one foreign '
-                    'key to %(from_model_name)s, which is ambiguous '
-                    'and is not permitted.' % locals(),
-                    hint='If you want to create a recursive relationship, use '
-                    'ForeignKey("self", symmetrical=False, '
-                    'through="%s").' % relationship_model_name,
+                    'Symmetrical m2m field with intermediate table.\n'
+                    'Many-to-many fields with intermediate tables cannot '
+                    'be symmetrical.',
+                    hint='Set symmetrical=False on the field.',
                     obj=self)
 
-            if seen_to > 1:
-                yield checks.Error(
-                    'More than one foreign key to %(to_model_name)s '
-                    'in intermediary %(relationship_model_name)s model.\n'
-                    '%(relationship_model_name)s has more than one foreign '
-                    'key to %(to_model_name)s, which is ambiguous '
-                    'and is not permitted.' % locals(),
-                    hint='If you want to create a recursive relationship, use '
-                    'ForeignKey("self", symmetrical=False, '
-                    'through="%s").' % relationship_model_name,
-                    obj=self)
+            if self_referential:
+                pass
 
-            if (not self.rel.through._meta.auto_created and
-                (seen_from == 0 or seen_to == 0)):
-                yield checks.Error(
-                    'No foreign key to %(from_model_name)s or '
-                    '%(to_model_name)s in intermediary '
-                    '%(relationship_model_name)s model.\n'
-                    'The field is a manually-defined many to many relation '
-                    'through model %(relationship_model_name)s, which '
-                    'does not have foreign keys to %(from_model_name)s or '
-                    '%(to_model_name)s.\n' % locals(),
-                    hint='Ensure that there are foreign keys '
-                    'to %(from_model_name)s and %(to_model_name)s models '
-                    'in %(relationship_model_name)s model.' % locals(),
-                    obj=self)
+            else:
+                # Count foreign keys in relationship model
+                seen_from = sum(from_model == getattr(field.rel, 'to', None)
+                    for field in self.rel.through._meta.fields)
+                seen_to = sum(to_model == getattr(field.rel, 'to', None)
+                    for field in self.rel.through._meta.fields)
 
+                if seen_from > 1:
+                    yield checks.Error(
+                        'More than one foreign key to %(from_model_name)s '
+                        'in intermediary %(relationship_model_name)s model.\n'
+                        '%(relationship_model_name)s has more than one '
+                        'foreign key to %(from_model_name)s, which is '
+                        'ambiguous and is not permitted.' % locals(),
+                        hint='If you want to create a recursive relationship, '
+                        'use ForeignKey("self", symmetrical=False, '
+                        'through="%s").' % relationship_model_name,
+                        obj=self)
 
+                if seen_to > 1:
+                    yield checks.Error(
+                        'More than one foreign key to %(to_model_name)s '
+                        'in intermediary %(relationship_model_name)s model.\n'
+                        '%(relationship_model_name)s has more than one '
+                        'foreign key to %(to_model_name)s, which is ambiguous '
+                        'and is not permitted.' % locals(),
+                        hint='If you want to create a recursive relationship, '
+                        'use ForeignKey("self", symmetrical=False, '
+                        'through="%s").' % relationship_model_name,
+                        obj=self)
+
+                if (not self.rel.through._meta.auto_created and
+                    (seen_from == 0 or seen_to == 0)):
+                    yield checks.Error(
+                        'No foreign key to %(from_model_name)s or '
+                        '%(to_model_name)s in intermediary '
+                        '%(relationship_model_name)s model.\n'
+                        'The field is a manually-defined many to many '
+                        'relation through model %(relationship_model_name)s, '
+                        'which does not have foreign keys to '
+                        '%(from_model_name)s or %(to_model_name)s.\n'
+                        % locals(),
+                        hint='Ensure that there are foreign keys '
+                        'to %(from_model_name)s and %(to_model_name)s models '
+                        'in %(relationship_model_name)s model.' % locals(),
+                        obj=self)
