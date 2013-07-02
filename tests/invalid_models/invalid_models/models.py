@@ -73,3 +73,6 @@ class AbstractModel(models.Model):
 class FKTarget(models.Model):
     bad = models.IntegerField()
     good = models.IntegerField(unique=True)
+
+class UniqueM2M(models.Model):
+    field = models.ManyToManyField('Person', unique=True)
