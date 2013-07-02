@@ -37,17 +37,24 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.utils import unittest
+    from django.contrib.auth.models import User
+    from django.test import TestCase
     from django.test.client import RequestFactory
 
-    class SimpleTest(unittest.TestCase):
+    class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
+            self.user = User.objects.create_user(
+                first_name='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
+
+            # Recall that middleware are not suported. You can simulate a
+            # logged-in user by setting request.user manually.
+            request.user = self.user
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
