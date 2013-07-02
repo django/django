@@ -332,13 +332,15 @@ class RelativeFieldsTests(TestCase):
     def test_too_many_foreign_keys_in_self_referential_model(self):
         from .invalid_models.models import PersonSelfRefM2M
         field = PersonSelfRefM2M.too_many_friends.field
-        self.assertEqual(list(field.check()), [
+        errors = list(field.check(from_model=PersonSelfRefM2M))
+        self.assertEqual(errors, [
             Error('More than two foreign keys to PersonSelfRefM2M '
                 'in intermediary model RelationshipTripleFK.\n'
                 'RelationshipTripleFK has more than two foreign keys to '
                 'PersonSelfRefM2M, which is ambiguous and is not permitted.',
                 hint='Remove excessive foreign keys to PersonSelfRefM2M '
-                'in RelationshipTripleFK.'),
+                'in RelationshipTripleFK.',
+                obj=field),
         ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):

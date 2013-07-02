@@ -67,7 +67,8 @@ class MembershipMissingFK(models.Model):
 
 class PersonSelfRefM2M(models.Model):
     friends = models.ManyToManyField('self', through="Relationship")
-    too_many_friends = models.ManyToManyField('self', through="RelationshipTripleFK")
+    too_many_friends = models.ManyToManyField('self',
+        through="RelationshipTripleFK", symmetrical=False)
 
 
 class Relationship(models.Model):
