@@ -49,9 +49,48 @@ The following is a simple unit test using the request factory::
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
-            # Test my_view() as if it were deployed at /customer/details
+            # Test my_view() as if it were deployed at /customer/details.
             response = my_view(request)
             self.assertEqual(response.status_code, 200)
+
+
+Example
+-------
+Suppose you have a logged in user and want to run a simple authentication unit
+test on the user. The following is a simple authentication unit test using the request factory::
+
+    import unittest
+    from django.test.client import RequestFactory, Client
+
+    class TestCaseWithUser(unittest.TestCase):
+        def setUp(self):
+            # Every test needs access to the request factory.
+            self.factory = RequestFactory()
+
+            # Create an instance of a dummy web browser using the test client.
+            self.client = Client()
+
+            # Create a new user account with login values.
+            self.sample_user = User.objects.create_user(first_name='jacob', email='jacob@…',password='top_secret')
+
+        def tearDown(self):
+            # Delete objects that are saved in setup.
+            self.sample_user.delete()
+
+        def test_request_user(self):
+            # Use the test client’s login() method to simulate the effect of a
+            # user logging into the site.
+            self.client.login(username='jacob', password='top_secret')
+
+            # Create an instance of a POST request.
+            request = self.factory.post('/my/url/', {'somedata': 'data'})
+
+            # Add logged-in user into the view.
+            request.user = self.sample_user
+
+            # Test if user is logged in.
+            self.assert_equal(request.user, self.sample_user)
+
 
 .. _topics-testing-advanced-multidb:
 
