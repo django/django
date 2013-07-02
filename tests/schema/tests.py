@@ -488,7 +488,7 @@ class SchemaTests(TransactionTestCase):
         new_new_field = SlugField(unique=True)
         new_new_field.set_attributes_from_name("slug")
         with connection.schema_editor() as editor:
-            editor.alter_unique_together(
+            editor.alter_index_together(
                 Tag,
                 [("slug", "title")],
                 [],
