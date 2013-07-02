@@ -367,11 +367,13 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_unique_m2m(self):
-        field = models.ManyToManyField('Person', unique=True)
+        from .invalid_models.models import UniqueM2M
+        field = UniqueM2M.field.field
         self.assertEqual(list(field.check()), [
             Error('Unique m2m field.\n'
                 'ManyToManyFields cannot be unique.',
-                hint='Remove the "unique" argument on the field.'),
+                hint='Remove the "unique" argument on the field.',
+                obj=field),
         ])
 
     def test_foreign_key_to_non_unique_field(self):

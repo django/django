@@ -1602,3 +1602,10 @@ class ManyToManyField(RelatedField):
         '%(rel)s, which has either not been installed '
         'or is abstract.'
     )
+
+    def check_unique(self, **kwargs):
+        if self.unique:
+            yield checks.Error('Unique m2m field.\n'
+                'ManyToManyFields cannot be unique.',
+                hint='Remove the "unique" argument on the field.',
+                obj=self)

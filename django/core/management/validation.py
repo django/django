@@ -161,10 +161,6 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, six.string_types):
                     continue
 
-            # Check that the field is not set to unique.  ManyToManyFields do not support unique.
-            if f.unique:
-                e.add(opts, "ManyToManyFields cannot be unique.  Remove the unique argument on '%s'." % f.name)
-
             if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
                 from_model, to_model = cls, f.rel.to
                 if from_model == to_model and f.rel.symmetrical and not f.rel.through._meta.auto_created:

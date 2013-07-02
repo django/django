@@ -199,11 +199,6 @@ class AbstractRelationModel(models.Model):
     fk2 = models.ManyToManyField('AbstractModel')
 
 
-class UniqueM2M(models.Model):
-    """ Model to test for unique ManyToManyFields, which are invalid. """
-    unique_people = models.ManyToManyField('Person', unique=True)
-
-
 class NonUniqueFKTarget1(models.Model):
     """ Model to test for non-unique FK target in yet-to-be-defined model: expect an error """
     tgt = models.ForeignKey('FKTarget', to_field='bad')
@@ -428,7 +423,6 @@ old_invalid_models.group: Intermediary model RelationshipDoubleFK has more than 
 old_invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 old_invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 old_invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
-old_invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 old_invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
@@ -534,7 +528,6 @@ x invalid_models.group: Intermediary model RelationshipDoubleFK has more than on
 x? invalid_models.personselfrefm2m: Many-to-many fields with intermediate tables cannot be symmetrical.
 x? invalid_models.personselfrefm2m: Intermediary model RelationshipTripleFK has more than two foreign keys to PersonSelfRefM2M, which is ambiguous and is not permitted.
 x? invalid_models.personselfrefm2mexplicit: Many-to-many fields with intermediate tables cannot be symmetrical.
-x invalid_models.uniquem2m: ManyToManyFields cannot be unique.  Remove the unique argument on 'unique_people'.
 x invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 x invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
