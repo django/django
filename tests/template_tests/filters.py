@@ -360,6 +360,13 @@ def get_filter_tests():
         # Ticket 19370: Make sure |date doesn't blow up on a midnight time object
         'date08': (r'{{ t|date:"H:i" }}', {'t': time(0, 1)}, '00:01'),
         'date09': (r'{{ t|date:"H:i" }}', {'t': time(0, 0)}, '00:00'),
+        # Ticket 20693: Add timezone support to built-in time template filter
+        'time01': (r'{{ dt|time:"e:O:T:Z" }}', {'dt': now_tz_i}, '+0315:+0315:+0315:11700'),
+        'time02': (r'{{ dt|time:"e:T" }}', {'dt': now}, ':' + now_tz.tzinfo.tzname(now_tz)),
+        'time03': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0, tzinfo=FixedOffset(30))}, '4 a.m.::::'),
+        'time04': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0)}, '4 a.m.::::'),
+        'time05': (r'{{ d|time:"P:e:O:T:Z" }}', {'d': today}, ''),
+        'time06': (r'{{ obj|time:"P:e:O:T:Z" }}', {'obj': 'non-datetime-value'}, ''),
 
          # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
