@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.db import connection, models, migrations
+from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.db.migrations.state import ProjectState
 
@@ -38,7 +39,7 @@ class OperationTests(TestCase):
             "Pony",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("pink", models.BooleanField(default=True)),
+                ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
         )
@@ -232,7 +233,8 @@ class OperationTests(TestCase):
             operation.database_forwards("test_alunto", editor, project_state, new_state)
         cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
         with self.assertRaises(IntegrityError):
-            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
+            with atomic():
+                cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
         cursor.execute("DELETE FROM test_alunto_pony")
         # And test reversal
         with connection.schema_editor() as editor:
