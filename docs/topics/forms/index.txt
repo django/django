@@ -321,7 +321,7 @@ attributes, which can be useful in your templates:
     .. versionchanged:: 1.6
 
         This includes the form's :attr:`~django.forms.Form.label_suffix`. For
-        example, the default ``label_suffix`` is a semicolon::
+        example, the default ``label_suffix`` is a colon::
 
             <label for="id_email">Email address:</label>
 
