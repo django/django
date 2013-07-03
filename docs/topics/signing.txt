@@ -127,14 +127,14 @@ created within a specified period of time::
 
 .. class:: TimestampSigner(key=None, sep=':', salt=None)
 
-.. function:: TimestampSigner.sign(value)
+.. method:: TimestampSigner.sign(value)
 
     Sign ``value`` and append current timestamp to it.
 
-.. function:: TimestampSigner.unsing(value, max_age=None)
+.. method:: TimestampSigner.unsign(value, max_age=None)
 
-    Checks if ``value`` was signed less than ``max_age`` seconds before, otherwise
-    raises ``SignatureExpired``
+    Checks if ``value`` wasn't signed more than ``max_age`` seconds ago,
+    otherwise raises ``SignatureExpired``.
 
 Protecting complex data structures
 ----------------------------------
@@ -159,5 +159,5 @@ to execute arbitrary commands by exploiting the pickle format.::
 
 .. function:: loads(string, key=None, salt='django.core.signing', max_age=None)
 
-    Reverse of ``dumps()``, raises ``BadSignature`` if signature fails. Optionaly
-    checks ``max_age`` (in seconds).
+    Reverse of ``dumps()``, raises ``BadSignature`` if signature fails. 
+    Checks ``max_age`` (in seconds) if given.
