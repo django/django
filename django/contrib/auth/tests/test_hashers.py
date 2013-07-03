@@ -187,6 +187,13 @@ class TestUtilsHashPass(unittest.TestCase):
         # This might fail one day due to a hash collision.
         self.assertNotEqual(encoded, make_password(None), "Random password collision?")
 
+    def test_unspecified_password(self):
+        """
+        Makes sure specifying no plain password with a valid encoded password
+        returns `False`.
+        """
+        self.assertFalse(check_password(None, make_password('lètmein')))
+
     def test_bad_algorithm(self):
         with self.assertRaises(ValueError):
             make_password('lètmein', hasher='lolcat')
