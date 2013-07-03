@@ -190,6 +190,21 @@ class OrderingTests(TestCase):
         )
         top_chapters = Chapter.objects.filter(topics__in=['css', 'javascript']).distinct('book_id').order_by('book_id', '-weight', 'id')
         chapters = Chapter.objects.filter(id__in=top_chapters).order_by('weight')
-        self.assertEqual(chapters.query.sql_with_params(), "(u'SELECT \"polls_chapter\".\"id\", \"polls_chapter\".\"book_id\", \"polls_chapter\".\"topics\", \"polls_chapter\".\"weight\" FROM \"polls_chapter\" WHERE \"polls_chapter\".\"id\" IN (SELECT DISTINCT ON (U0.\"book_id\") U0.\"id\" FROM \"polls_chapter\" U0 WHERE U0.\"topics\" IN (%s, %s) ORDER BY U0.\"book_id\") ORDER BY \"polls_chapter\".\"weight\" ASC', ('css', 'javascript'))")
 
-
+        sql_statement = """
+           (u'
+               SELECT "polls_chapter"."id", "polls_chapter"."book_id", "polls_chapter"."topics", "polls_chapter"."weight"
+               FROM "polls_chapter"
+               WHERE "polls_chapter"."id"
+               IN (
+                   SELECT DISTINCT ON (U0."book_id") U0."id"
+                   FROM "polls_chapter" U0
+                   WHERE U0."topics"
+                   IN (%s, %s)
+                   ORDER BY (U0."book_id")
+                   ORDER BY "polls_chapter"."weight" ASC', ('css', 'javascript')
+               )
+           )
+        """
+         
+        self.assertEqual(chapters.query.sql_with_params(), sql_statement)
