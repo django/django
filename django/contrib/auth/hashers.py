@@ -22,6 +22,7 @@ UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUS
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
 
+
 @receiver(setting_changed)
 def reset_hashers(**kwargs):
     if kwargs['setting'] == 'PASSWORD_HASHERS':
@@ -34,7 +35,7 @@ def is_password_usable(encoded):
     if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
         return False
     try:
-        hasher = identify_hasher(encoded)
+        identify_hasher(encoded)
     except ValueError:
         return False
     return True
@@ -48,7 +49,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     If setter is specified, it'll be called when you need to
     regenerate the password.
     """
-    if not is_password_usable(encoded):
+    if password is None or not is_password_usable(encoded):
         return False
 
     preferred = get_hasher(preferred)
