@@ -36,3 +36,8 @@ class ArticlePKOrdering(models.Model):
 
     def __str__(self):
         return self.headline
+
+class Chapter(models.Model):
+    book_id = models.IntegerField()
+    topics = models.CharField(max_length=200)
+    weight = models.IntegerField()
