@@ -114,6 +114,9 @@ def lang_stats(resources=None, languages=None):
             if p.returncode == 0:
                 # msgfmt output stats on stderr
                 print("%s: %s" % (lang, errors.strip()))
+            else:
+                print("Errors happened when checking %s translation for %s:\n%s" % (
+                    lang, name, errors))
 
 
 def fetch(resources=None, languages=None):
@@ -121,6 +124,7 @@ def fetch(resources=None, languages=None):
     Fetch translations from Transifex, wrap long lines, generate mo files.
     """
     locale_dirs = _get_locale_dirs()
+    errors = []
 
     for name, dir_ in locale_dirs:
         if resources and not name in resources:
@@ -140,8 +144,14 @@ def fetch(resources=None, languages=None):
             po_path = '%(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po' % {
                 'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''}
             call('msgcat -o %s %s' % (po_path, po_path), shell=True)
-            mo_path = '%s.mo' % po_path[:-3]
-            call('msgfmt -o %s %s' % (mo_path, po_path), shell=True)
+            res = call('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
+            if res != 0:
+                errors.append((name, lang))
+    if errors:
+        print("\nWARNING: Errors have occurred in following cases:")
+        for resource, lang in errors:
+            print("\tResource %s for language %s" % (resource, lang))
+        exit(1)
 
 
 if __name__ == "__main__":
