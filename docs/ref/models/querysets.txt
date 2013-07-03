@@ -1297,15 +1297,14 @@ get_or_create
 
 .. method:: get_or_create(**kwargs)
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+A convenience method for looking up an object with the given ``kwargs``,
+creating one if necessary.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
 
-This is meant as a shortcut to boilerplatish code and is mostly useful for
-data-import scripts. For example::
+This is meant as a shortcut to boilerplatish code. For example::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -1353,13 +1352,25 @@ when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. As mentioned
-earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
-data and create new records if existing ones aren't available. But if you need
-to use ``get_or_create()`` in a view, please make sure to use it only in
-``POST`` requests unless you have a good reason not to. ``GET`` requests
-shouldn't have any effect on data; use ``POST`` whenever a request to a page
-has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
+This method is atomic assuming correct usage, correct database configuration,
+and correct behavior of the underlying database. However, if uniqueness is not
+enforced at the database level for the ``kwargs`` used in a ``get_or_create``
+call (see :attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Options.unique_together`), this method is prone to a
+race-condition which can result in multiple rows with the same parameters being
+inserted simultaneously.
+
+If you are using MySQL, be sure to use the ``READ COMMITTED`` isolation level
+rather than ``REPEATABLE READ`` (the default), otherwise you may see cases
+where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
+object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
+call.
+
+Finally, a word on using ``get_or_create()`` in Django views: please make sure
+to use it only in ``POST`` requests unless you have a good reason not to
+``GET`` requests shouldn't have any effect on data; use ``POST`` whenever a
+request to a page as a side effect on your data. For more, see `Safe methods`_
+in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
