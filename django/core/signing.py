@@ -195,6 +195,10 @@ class TimestampSigner(Signer):
         return super(TimestampSigner, self).sign(value)
 
     def unsign(self, value, max_age=None):
+        """
+        Retrieve original value and check it wasn't signed more
+        than max_age seconds ago.
+        """
         result =  super(TimestampSigner, self).unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)

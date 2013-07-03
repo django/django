@@ -39,8 +39,6 @@ generate their own signed values.
 Using the low-level API
 =======================
 
-.. class:: Signer
-
 Django's signing methods live in the ``django.core.signing`` module.
 To sign a value, first instantiate a ``Signer`` instance::
 
@@ -76,6 +74,11 @@ generate signatures. You can use a different secret by passing it to the
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
+.. class:: Signer(key=None, sep=':', salt=None)
+
+    Returns a signer which uses ``key`` to generate signatures and ``sep``
+    to separate values.
+
 Using the salt argument
 -----------------------
 
@@ -107,8 +110,6 @@ secret.
 Verifying timestamped values
 ----------------------------
 
-.. class:: TimestampSigner
-
 ``TimestampSigner`` is a subclass of :class:`~Signer` that appends a signed
 timestamp to the value. This allows you to confirm that a signed value was
 created within a specified period of time::
@@ -125,6 +126,17 @@ created within a specified period of time::
     SignatureExpired: Signature age 15.5289158821 > 10 seconds
     >>> signer.unsign(value, max_age=20)
     u'hello'
+
+.. class:: TimestampSigner(key=None, sep=':', salt=None)
+
+    .. method:: sign(value)
+
+        Sign ``value`` and append current timestamp to it.
+
+    .. method:: unsign(value, max_age=None)
+
+        Checks if ``value`` was signed less than ``max_age`` seconds ago,
+        otherwise raises ``SignatureExpired``.
 
 Protecting complex data structures
 ----------------------------------
@@ -144,8 +156,10 @@ to execute arbitrary commands by exploiting the pickle format.::
 
 .. function:: dumps(obj, key=None, salt='django.core.signing', compress=False)
 
-    Returns URL-safe, sha1 signed base64 compressed JSON string.
+    Returns URL-safe, sha1 signed base64 compressed JSON string. Serialized
+    object is signed using :class:`~TimestampSigner`.
 
 .. function:: loads(string, key=None, salt='django.core.signing', max_age=None)
 
-    Reverse of dumps(), raises ``BadSignature`` if signature fails.
+    Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
+    Checks ``max_age`` (in seconds) if given.
