@@ -276,7 +276,7 @@ msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] "acum o secundă"
 msgstr[1] "acum %(count)s secunde"
-msgstr[2] ""
+msgstr[2] "acum %(count)s de secunde"
 
 #: templatetags/humanize.py:201
 #, python-format

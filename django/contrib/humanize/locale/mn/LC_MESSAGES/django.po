@@ -258,14 +258,14 @@ msgstr[1] "%(count)s секундын өмнө"
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "минутын өмнө"
-msgstr[1] "%s минутын өмнө"
+msgstr[1] "%(count)s минутын өмнө"
 
 #: templatetags/humanize.py:206
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "цагын өмнө"
-msgstr[1] "%s цагын өмнө"
+msgstr[1] "%(count)s цагын өмнө"
 
 #: templatetags/humanize.py:212
 #, python-format

@@ -257,14 +257,14 @@ msgstr[1] "hace %(count)s segundos"
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "Hace un minuto"
-msgstr[1] "Hace %s minutos"
+msgstr[1] "Hace %(count)s minutos"
 
 #: templatetags/humanize.py:206
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "Hace una hora"
-msgstr[1] "Hace %s horas"
+msgstr[1] "Hace %(count)s horas"
 
 #: templatetags/humanize.py:212
 #, python-format
