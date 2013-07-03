@@ -49,9 +49,26 @@ The following is a simple unit test using the request factory::
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
-            # Test my_view() as if it were deployed at /customer/details
+            # Test my_view() as if it were deployed at /customer/details.
             response = my_view(request)
             self.assertEqual(response.status_code, 200)
+
+
+Example
+-------
+Suppose you have a logged in user. The following shows how to use request.user::
+
+    # Every test needs access to the request factory.
+    request_factory = RequestFactory()
+
+    # Create a new user account with login values.
+    my_user = User.objects.create_user(first_name='jacob', email='jacob@…',password='top_secret')
+
+    # Create an instance of a GET request.
+    request = request_factory.get('/my/ur')
+
+    # User in request instance gets assigned to newly created sample user.
+    request.user = my_user
 
 .. _topics-testing-advanced-multidb:
 
