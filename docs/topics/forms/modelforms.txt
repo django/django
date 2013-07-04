@@ -162,6 +162,7 @@ Consider this set of models::
         title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
