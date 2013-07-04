@@ -589,8 +589,9 @@ The following methods are available on any subclass of
         been called for this user.
 
 You should also define a custom manager for your ``User`` model. If your
-``User`` model defines ``username`` and ``email`` fields the same as Django's
-default ``User``, you can just install Django's
+``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
+``is_superuser``, ``last_login``, and ``date_joined`` fields the same as
+Django's default ``User``, you can just install Django's
 :class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
 model defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
