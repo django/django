@@ -144,7 +144,7 @@ class RelatedField(Field):
         'has either not been installed or is abstract.'
     )
 
-    def check_relation_model_exists(self, **kwargs):
+    def _check_relation_model_exists(self, **kwargs):
         from django.db import models
         if self.rel.to not in models.get_models():
             if (not isinstance(self.rel.to, six.string_types) and
@@ -1192,7 +1192,7 @@ class ForeignObject(RelatedField):
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
-    def check_unique_target(self, **kwargs):
+    def _check_unique_target(self, **kwargs):
         if (self.requires_unique_target and
             not isinstance(self.rel.to, six.string_types)):
             if len(self.foreign_related_fields) > 1:
@@ -1222,7 +1222,7 @@ class ForeignObject(RelatedField):
                         obj=self)]
         return []
 
-    def check_on_delete_set_null(self, **kwargs):
+    def _check_on_delete_set_null(self, **kwargs):
         if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
             return [checks.Error(
                 'on_delete=SET_NULL but null forbidden.\n'
@@ -1231,7 +1231,7 @@ class ForeignObject(RelatedField):
                 obj=self)]
         return []
 
-    def check_on_delete_set_default(self, **kwargs):
+    def _check_on_delete_set_default(self, **kwargs):
         if (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
             not self.has_default()):
             return [checks.Error(
@@ -1698,7 +1698,7 @@ class ManyToManyField(RelatedField):
         'or is abstract.'
     )
 
-    def check_unique(self, **kwargs):
+    def _check_unique(self, **kwargs):
         if self.unique:
             return [checks.Error('Unique m2m field.\n'
                 'ManyToManyFields cannot be unique.',
@@ -1706,7 +1706,7 @@ class ManyToManyField(RelatedField):
                 obj=self)]
         return []
 
-    def check_relationship_model(self, from_model=None, **kwargs):
+    def _check_relationship_model(self, from_model=None, **kwargs):
         errors = []
         if isinstance(self.rel.through, six.string_types):
             # The relationship model is not installed.

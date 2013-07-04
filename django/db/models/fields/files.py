@@ -305,7 +305,7 @@ class FileField(Field):
         defaults.update(kwargs)
         return super(FileField, self).formfield(**defaults)
 
-    def check_upload_to(self, **kwargs):
+    def _check_upload_to(self, **kwargs):
         if not self.upload_to:
             yield checks.Error('No "upload_to" attribute.\n'
                 'FileFields require an "upload_to" attribute.',

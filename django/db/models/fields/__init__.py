@@ -686,7 +686,7 @@ class Field(object):
 
     def check(self, **kwargs):
         errors = []
-        for function_name in (i for i in dir(self) if i.startswith('check_')):
+        for function_name in (i for i in dir(self) if i.startswith('_check_')):
             function = getattr(self, function_name)
             new_errors = list(function(**kwargs))
             for error in new_errors:
@@ -694,7 +694,7 @@ class Field(object):
             errors.extend(new_errors)
         return errors
 
-    def check_chocies(self, **kwargs):
+    def _check_chocies(self, **kwargs):
         if self.choices:
             if (isinstance(self.choices, six.string_types) or
                 not is_iterable(self.choices)):
@@ -720,7 +720,7 @@ class Field(object):
                     obj=self)]
         return []
 
-    def check_db_index(self, **kwargs):
+    def _check_db_index(self, **kwargs):
         if self.db_index not in (None, True, False):
             return [checks.Error(
                 'Invalid "db_index" value (should be None, True or False).\n'
@@ -731,7 +731,7 @@ class Field(object):
                 obj=self)]
         return []
 
-    def check_null_allowed_for_primary_keys(self, **kwargs):
+    def _check_null_allowed_for_primary_keys(self, **kwargs):
         if (self.primary_key and self.null and
             not connection.features.interprets_empty_strings_as_nulls):
             # We cannot reliably check this for backends like Oracle which
@@ -877,7 +877,7 @@ class BooleanField(Field):
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
 
-    def check_null(self, **kwargs):
+    def _check_null(self, **kwargs):
         if getattr(self, 'null', False):
             return [checks.Error('null=True for BooleanField.\n'
                 'BooleanFields do not accept null values. Use '
@@ -914,7 +914,7 @@ class CharField(Field):
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
 
-    def check_max_length_attibute(self, **kwargs):
+    def _check_max_length_attibute(self, **kwargs):
         try:
             max_length = int(self.max_length)
             if max_length <= 0:
@@ -1239,9 +1239,9 @@ class DecimalField(Field):
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
 
-    def check_decimal_places_and_max_digits(self, **kwargs):
-        errors = self._check_decimal_places()
-        errors += self._check_max_digits()
+    def _check_decimal_places_and_max_digits(self, **kwargs):
+        errors = self.__check_decimal_places()
+        errors += self.__check_max_digits()
         if not errors and int(self.decimal_places) > int(self.max_digits):
             errors.append(checks.Error(
                 '"max_digits" smaller than "decimal_places".\n'
@@ -1256,7 +1256,7 @@ class DecimalField(Field):
                 obj=self))
         return errors
 
-    def _check_decimal_places(self):
+    def __check_decimal_places(self):
         try:
             decimal_places = int(self.decimal_places)
             if decimal_places < 0:
@@ -1282,7 +1282,7 @@ class DecimalField(Field):
         else:
             return []
 
-    def _check_max_digits(self):
+    def __check_max_digits(self):
         try:
             max_digits = int(self.max_digits)
             if max_digits <= 0:
@@ -1549,7 +1549,7 @@ class GenericIPAddressField(Field):
         defaults.update(kwargs)
         return super(GenericIPAddressField, self).formfield(**defaults)
 
-    def check_blank_and_null_values(self, **kwargs):
+    def _check_blank_and_null_values(self, **kwargs):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
             return [checks.Error(
                 'null=False and blank=True for GenericIPAddressField.\n'
