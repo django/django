@@ -291,6 +291,31 @@ class DummyBackendTest(unittest.TestCase):
             db.connections = old_db_connections
 
 
+class AliasedDefaultTestSetupTest(unittest.TestCase):
+    def test_setup_aliased_default_database(self):
+        """
+        Test that setup_datebases() doesn't fail when 'default' is aliased
+        """
+        runner_instance = runner.DiscoverRunner(verbosity=0)
+        old_db_connections = db.connections
+        try:
+            db.connections = db.ConnectionHandler({
+                'default': {
+                    'NAME': 'dummy'
+                },
+                'aliased': {
+                    'NAME': 'dummy'
+                }
+            })
+            old_config = runner_instance.setup_databases()
+            runner_instance.teardown_databases(old_config)
+        except Exception as e:
+            self.fail("setup_databases/teardown_databases unexpectedly raised "
+                      "an error: %s" % e)
+        finally:
+            db.connections = old_db_connections
+
+
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
