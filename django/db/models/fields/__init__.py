@@ -689,8 +689,6 @@ class Field(object):
         for function_name in (i for i in dir(self) if i.startswith('_check_')):
             function = getattr(self, function_name)
             new_errors = list(function(**kwargs))
-            for error in new_errors:
-                error.obj = self
             errors.extend(new_errors)
         return errors
 
@@ -924,14 +922,16 @@ class CharField(Field):
                 'No "max_length" argument.\n'
                 'CharFields require "max_length" argument that is '
                 'the maximum length (in characters) of the field.',
-                hint='Set "max_length" argument.')]
+                hint='Set "max_length" argument.',
+                obj=self)]
         except ValueError:
             return [checks.Error(
                 'Invalid "max_length" value.\n'
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.')]
+                hint='Change "max_length" value to a positive integer.',
+                obj=self)]
         else:
             return []
 

@@ -157,7 +157,8 @@ class RelatedField(Field):
                     hint='Ensure that you did not misspell the model name and '
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where %s is defined?'
-                    % (self.rel.to,))]
+                    % (self.rel.to,),
+                    obj=self)]
         return []
 
 
