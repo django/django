@@ -686,10 +686,9 @@ class Field(object):
 
     def check(self, **kwargs):
         errors = []
-        for function_name in (i for i in dir(self) if i.startswith('_check_')):
-            function = getattr(self, function_name)
-            new_errors = list(function(**kwargs))
-            errors.extend(new_errors)
+        errors.extend(self._check_chocies(**kwargs))
+        errors.extend(self._check_db_index(**kwargs))
+        errors.extend(self._check_null_allowed_for_primary_keys(**kwargs))
         return errors
 
     def _check_chocies(self, **kwargs):
@@ -875,6 +874,11 @@ class BooleanField(Field):
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
 
+    def check(self, **kwargs):
+        errors = super(BooleanField, self).check(**kwargs)
+        errors.extend(self._check_null(**kwargs))
+        return errors
+
     def _check_null(self, **kwargs):
         if getattr(self, 'null', False):
             return [checks.Error('null=True for BooleanField.\n'
@@ -911,6 +915,11 @@ class CharField(Field):
         defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(CharField, self).check(**kwargs)
+        errors.extend(self._check_max_length_attibute(**kwargs))
+        return errors
 
     def _check_max_length_attibute(self, **kwargs):
         try:
@@ -1239,6 +1248,11 @@ class DecimalField(Field):
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
 
+    def check(self, **kwargs):
+        errors = super(DecimalField, self).check(**kwargs)
+        errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
+        return errors
+
     def _check_decimal_places_and_max_digits(self, **kwargs):
         errors = self.__check_decimal_places()
         errors += self.__check_max_digits()
@@ -1546,6 +1560,11 @@ class GenericIPAddressField(Field):
         }
         defaults.update(kwargs)
         return super(GenericIPAddressField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(GenericIPAddressField, self).check(**kwargs)
+        errors.extend(self._check_blank_and_null_values(**kwargs))
+        return errors
 
     def _check_blank_and_null_values(self, **kwargs):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
