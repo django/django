@@ -419,20 +419,24 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_on_delete_set_null_on_non_nullable_field(self):
-        field = models.ForeignKey('Person', on_delete=models.SET_NULL)
+        from .invalid_models.models import InvalidSetNull
+        field = InvalidSetNull.field.field
         self.assertEqual(list(field.check()), [
             Error('on_delete=SET_NULL but null forbidden.\n'
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
-                hint='Set null=True argument on the field.'),
+                hint='Set null=True argument on the field.',
+                obj=field),
         ])
 
     def test_on_delete_set_default_without_default_value(self):
-        field = models.ForeignKey('Person', on_delete=models.SET_DEFAULT)
+        from .invalid_models.models import InvalidSetDefault
+        field = InvalidSetDefault.field.field
         self.assertEqual(list(field.check()), [
             Error('on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
                 'no default value.',
-                hint='Set "default" argument on the field.'),
+                hint='Set "default" argument on the field.',
+                obj=field),
         ])
 
     def test_nullable_primary_key(self):
