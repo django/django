@@ -180,10 +180,6 @@ class UnicodeForeignKeys(models.Model):
     #bad = models.ForeignKey('★')
 
 
-class PrimaryKeyNull(models.Model):
-    my_pk_field = models.IntegerField(primary_key=True, null=True)
-
-
 class OrderByPKModel(models.Model):
     """
     Model to test that ordering by pk passes validation.
@@ -357,10 +353,6 @@ old_invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the
 old_invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 old_invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
 """
-
-if not connection.features.interprets_empty_strings_as_nulls:
-    model_errors += """old_invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True."""
-
 
 """
 # Error messages predated by a character:

@@ -448,7 +448,8 @@ class RelativeFieldsTests(TestCase):
                 Error('null=True for primary_key.\n'
                     'Primary key fields cannot have null=True.',
                     hint='Set null=False on the field or '
-                    'remove primary_key=True argument.'),
+                    'remove primary_key=True argument.',
+                    obj=field),
             ])
 
 
