@@ -138,6 +138,11 @@ class RelatedField(Field):
         # "related_name" option.
         return self.rel.related_query_name or self.rel.related_name or self.opts.model_name
 
+    def check(self, **kwargs):
+        errors = super(RelatedField, self).check(**kwargs)
+        errors.extend(self._check_relation_model_exists(**kwargs))
+        return errors
+
     MISSING_MODEL_MESSAGE = (
         'No %(rel)s model or it is an abstract model.\n'
         'The field has a relation with model %(rel)s, which '
@@ -1193,6 +1198,13 @@ class ForeignObject(RelatedField):
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
+    def check(self, **kwargs):
+        errors = super(ForeignObject, self).check(**kwargs)
+        errors.extend(self._check_unique_target(**kwargs))
+        errors.extend(self._check_on_delete_set_null(**kwargs))
+        errors.extend(self._check_on_delete_set_default(**kwargs))
+        return errors
+
     def _check_unique_target(self, **kwargs):
         if (self.requires_unique_target and
             not isinstance(self.rel.to, six.string_types)):
@@ -1698,6 +1710,12 @@ class ManyToManyField(RelatedField):
         '%(rel)s, which has either not been installed '
         'or is abstract.'
     )
+
+    def check(self, **kwargs):
+        errors = super(ManyToManyField, self).check(**kwargs)
+        errors.extend(self._check_unique(**kwargs))
+        errors.extend(self._check_relationship_model(**kwargs))
+        return errors
 
     def _check_unique(self, **kwargs):
         if self.unique:
