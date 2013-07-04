@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 
-class BaseError(object):
+class BaseCheckError(object):
     def __init__(self, msg, hint, obj=None):
         self.msg = msg
         self.hint = hint
@@ -16,9 +16,9 @@ class BaseError(object):
             (self.__class__.__name__, self.msg, self.hint, self.obj)
 
 
-class Error(BaseError):
+class Error(BaseCheckError):
     pass
 
 
-class Warning(BaseError):
+class Warning(BaseCheckError):
     pass
