@@ -221,7 +221,7 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(list(field.check()), [])
 
 
-class RelativeFieldsTests(TestCase):
+class RelativeFieldTests(TestCase):
 
     def setUp(self):
         try:
