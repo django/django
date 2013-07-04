@@ -30,6 +30,13 @@ security support until the release of Django 1.8.
 What's new in Django 1.7
 ========================
 
+Calling custom ``QuerySet`` methods from the ``Manager``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
+class method has been added to :ref:`create Manager with QuerySet methods
+<create-manager-with-queryset-methods>`.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

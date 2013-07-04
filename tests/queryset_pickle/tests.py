@@ -90,3 +90,7 @@ class PickleabilityTestCase(TestCase):
         reloaded = pickle.loads(dumped)
         self.assertEqual(original, reloaded)
         self.assertIs(reloaded.__class__, dynclass)
+
+    def test_specialized_queryset(self):
+        self.assert_pickles(Happening.objects.values('name'))
+        self.assert_pickles(Happening.objects.values('name').dates('when', 'year'))

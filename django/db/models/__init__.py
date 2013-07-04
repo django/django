@@ -5,6 +5,7 @@ from django.db.models.loading import get_apps, get_app_path, get_app_paths, get_
 from django.db.models.query import Q
 from django.db.models.expressions import F
 from django.db.models.manager import Manager
+from django.db.models.query import QuerySet
 from django.db.models.base import Model
 from django.db.models.aggregates import *
 from django.db.models.fields import *

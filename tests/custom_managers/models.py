@@ -20,6 +20,49 @@ class PersonManager(models.Manager):
     def get_fun_people(self):
         return self.filter(fun=True)
 
+# An example of a custom manager that sets get_queryset().
+
+class PublishedBookManager(models.Manager):
+    def get_queryset(self):
+        return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
+
+# An example of a custom queryset that copies its methods onto the manager.
+
+class CustomQuerySet(models.QuerySet):
+    def filter(self, *args, **kwargs):
+        queryset = super(CustomQuerySet, self).filter(fun=True)
+        queryset._filter_CustomQuerySet = True
+        return queryset
+
+    def public_method(self, *args, **kwargs):
+        return self.all()
+
+    def _private_method(self, *args, **kwargs):
+        return self.all()
+
+    def optout_public_method(self, *args, **kwargs):
+        return self.all()
+    optout_public_method.queryset_only = True
+
+    def _optin_private_method(self, *args, **kwargs):
+        return self.all()
+    _optin_private_method.queryset_only = False
+
+class BaseCustomManager(models.Manager):
+    def __init__(self, arg):
+        super(BaseCustomManager, self).__init__()
+        self.init_arg = arg
+
+    def filter(self, *args, **kwargs):
+        queryset = super(BaseCustomManager, self).filter(fun=True)
+        queryset._filter_CustomManager = True
+        return queryset
+
+    def manager_only(self):
+        return self.all()
+
+CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
+
 @python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=30)
@@ -27,14 +70,11 @@ class Person(models.Model):
     fun = models.BooleanField()
     objects = PersonManager()
 
+    custom_queryset_default_manager = CustomQuerySet.as_manager()
+    custom_queryset_custom_manager = CustomManager('hello')
+
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
-
-# An example of a custom manager that sets get_queryset().
-
-class PublishedBookManager(models.Manager):
-    def get_queryset(self):
-        return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
 
 @python_2_unicode_compatible
 class Book(models.Model):
