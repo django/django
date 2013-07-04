@@ -698,7 +698,7 @@ class Field(object):
         if self.choices:
             if (isinstance(self.choices, six.string_types) or
                 not is_iterable(self.choices)):
-                yield checks.Error(
+                return [checks.Error(
                     '"choices" is not an iterable (e.g., a tuple or list).\n'
                     '"choices" should be an iterable of pairs. The first '
                     'element in each pair is the actual value to be stored, '
@@ -706,28 +706,30 @@ class Field(object):
                     'An example of a valid value is '
                     '[("1", "first choice"), ("2", "second choice")].',
                     hint='Convert "choices" into a list of pairs.',
-                    obj=self)
+                    obj=self)]
             elif any(isinstance(choice, six.string_types) or
                      not is_iterable(choice) or len(choice) != 2
                      for choice in self.choices):
-                yield checks.Error('Some items of "choices" are not pairs.\n'
+                return [checks.Error('Some items of "choices" are not pairs.\n'
                     '"choices" should be an iterable of pairs. The first '
                     'element in each pair is the actual value to be stored, '
                     'and the second element is the human-readable name. '
                     'An example of a valid value is '
                     '[("1", "first choice"), ("2", "second choice")].',
                     hint='Convert "choices" into a list of pairs.',
-                    obj=self)
+                    obj=self)]
+        return []
 
     def check_db_index(self, **kwargs):
         if self.db_index not in (None, True, False):
-            yield checks.Error(
+            return [checks.Error(
                 'Invalid "db_index" value (should be None, True or False).\n'
                 'If set to True, a database index will be created for this '
                 'field. ',
                 hint='Set "db_index" to False or True '
                 'or remove this argument.',
-                obj=self)
+                obj=self)]
+        return []
 
     def check_null_allowed_for_primary_keys(self, **kwargs):
         if (self.primary_key and self.null and
@@ -735,11 +737,12 @@ class Field(object):
             # We cannot reliably check this for backends like Oracle which
             # consider NULL and '' to be equal (and thus set up
             # character-based fields a little differently).
-            yield checks.Error('null=True for primary_key.\n'
+            return [checks.Error('null=True for primary_key.\n'
                 'Primary key fields cannot have null=True.',
                 hint='Set null=False on the field or '
                 'remove primary_key=True argument.',
-                obj=self)
+                obj=self)]
+        return []
 
     def __repr__(self):
         """
@@ -876,11 +879,12 @@ class BooleanField(Field):
 
     def check_null(self, **kwargs):
         if getattr(self, 'null', False):
-            yield checks.Error('null=True for BooleanField.\n'
+            return [checks.Error('null=True for BooleanField.\n'
                 'BooleanFields do not accept null values. Use '
                 'a NullBooleanField instead.',
                 hint='Replace BooleanField with NullBooleanField.',
-                obj=self)
+                obj=self)]
+        return []
 
 
 class CharField(Field):
@@ -916,18 +920,20 @@ class CharField(Field):
             if max_length <= 0:
                 raise ValueError()
         except TypeError:
-            yield checks.Error(
+            return [checks.Error(
                 'No "max_length" argument.\n'
                 'CharFields require "max_length" argument that is '
                 'the maximum length (in characters) of the field.',
-                hint='Set "max_length" argument.')
+                hint='Set "max_length" argument.')]
         except ValueError:
-            yield checks.Error(
+            return [checks.Error(
                 'Invalid "max_length" value.\n'
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.')
+                hint='Change "max_length" value to a positive integer.')]
+        else:
+            return []
 
 
 # TODO: Maybe move this into contrib, because it's specialized.
@@ -1234,8 +1240,8 @@ class DecimalField(Field):
         return super(DecimalField, self).formfield(**defaults)
 
     def check_decimal_places_and_max_digits(self, **kwargs):
-        errors = list(self._check_decimal_places())
-        errors += list(self._check_max_digits())
+        errors = self._check_decimal_places()
+        errors += self._check_max_digits()
         if not errors and int(self.decimal_places) > int(self.max_digits):
             errors.append(checks.Error(
                 '"max_digits" smaller than "decimal_places".\n'
@@ -1256,23 +1262,25 @@ class DecimalField(Field):
             if decimal_places < 0:
                 raise ValueError()
         except TypeError:
-            yield checks.Error('No "decimal_places" attribute.\n'
+            return [checks.Error('No "decimal_places" attribute.\n'
                 'DecimalFields require a "decimal_places" attribute that is '
                 'the number of decimal places to store with the number and is '
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
                 hint='Set "decimal_places" argument.',
-                obj=self)
+                obj=self)]
         except ValueError:
-            yield checks.Error('Invalid "decimal_places" value.\n'
+            return [checks.Error('Invalid "decimal_places" value.\n'
                 'DecimalFields require a "decimal_places" attribute that is '
                 'the number of decimal places to store with the number and is '
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
                 hint='Change "decimal_places" argument.',
-                obj=self)
+                obj=self)]
+        else:
+            return []
 
     def _check_max_digits(self):
         try:
@@ -1280,7 +1288,7 @@ class DecimalField(Field):
             if max_digits <= 0:
                 raise ValueError()
         except TypeError:
-            yield checks.Error('No "max_digits" attribute.\n'
+            return [checks.Error('No "max_digits" attribute.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -1288,9 +1296,9 @@ class DecimalField(Field):
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
                 hint='Set "max_length" argument.',
-                obj=self)
+                obj=self)]
         except ValueError:
-            yield checks.Error('Invalid "max_digits" value.\n'
+            return [checks.Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
                 'is a positive integer greater or equal to "decimal_places". '
@@ -1298,7 +1306,9 @@ class DecimalField(Field):
                 'and "decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
                 hint='Change "max_length" argument.',
-                obj=self)
+                obj=self)]
+        else:
+            return []
 
 
 class EmailField(CharField):
@@ -1541,14 +1551,15 @@ class GenericIPAddressField(Field):
 
     def check_blank_and_null_values(self, **kwargs):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
-            yield checks.Error(
+            return [checks.Error(
                 'null=False and blank=True for GenericIPAddressField.\n'
                 'GenericIPAddressField cannot accept blank values '
                 'if null values are not allowed, as blank values are stored '
                 'as null.',
                 hint='Allow to store null values (null=True) or '
                 'forbid blank values (blank=False).',
-                obj=self)
+                obj=self)]
+        return []
 
 
 class NullBooleanField(Field):
