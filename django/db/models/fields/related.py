@@ -152,13 +152,14 @@ class RelatedField(Field):
                 self.rel.to._meta.swapped):
                 pass
             else:
-                yield checks.Error(
+                return [checks.Error(
                     self.MISSING_MODEL_MESSAGE
                     % {'rel': self.rel.to},
                     hint='Ensure that you did not misspell the model name and '
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where %s is defined?'
-                    % (self.rel.to,))
+                    % (self.rel.to,))]
+        return []
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
@@ -1154,42 +1155,45 @@ class ForeignObject(RelatedField):
                     field_combination = ','.join(rel_field.name
                         for rel_field in self.foreign_related_fields)
                     model_name = self.rel.to.__name__
-                    yield checks.Error('No unique=True constraint '
+                    return [checks.Error('No unique=True constraint '
                         'on field combination "%s" under model %s.'
                         % (field_combination, model_name),
                         hint='Set unique=True argument on any of the fields '
                         '"%s" under model %s.'
                         % (field_combination, model_name),
-                        obj=self)
+                        obj=self)]
             else:
                 if not self.foreign_related_fields[0].unique:
                     field_name = self.foreign_related_fields[0].name
                     model_name = self.rel.to.__name__
-                    yield checks.Error('No unique=True constraint on field '
+                    return [checks.Error('No unique=True constraint on field '
                         '"%(field_name)s" under model %(model_name)s.\n'
                         'The field "%(field_name)s" has to be unique because '
                         'a foreign key references to it.' % locals(),
                         hint='Set unique=True argument on the field '
                         '"%s" under model %s.' % (field_name, model_name),
-                        obj=self)
+                        obj=self)]
+        return []
 
     def check_on_delete_set_null(self, **kwargs):
         if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
-            yield checks.Error(
+            return [checks.Error(
                 'on_delete=SET_NULL but null forbidden.\n'
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field.',
-                obj=self)
+                obj=self)]
+        return []
 
     def check_on_delete_set_default(self, **kwargs):
         if (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
             not self.has_default()):
-            yield checks.Error(
+            return [checks.Error(
                 'on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
                 'no default value.',
                 hint='Set "default" argument on the field.',
-                obj=self)
+                obj=self)]
+        return []
 
 
 class ForeignKey(ForeignObject):
@@ -1652,15 +1656,17 @@ class ManyToManyField(RelatedField):
 
     def check_unique(self, **kwargs):
         if self.unique:
-            yield checks.Error('Unique m2m field.\n'
+            return [checks.Error('Unique m2m field.\n'
                 'ManyToManyFields cannot be unique.',
                 hint='Remove the "unique" argument on the field.',
-                obj=self)
+                obj=self)]
+        return []
 
     def check_relationship_model(self, from_model=None, **kwargs):
+        errors = []
         if isinstance(self.rel.through, six.string_types):
             # The relationship model is not installed.
-            yield checks.Error(
+            errors.append(checks.Error(
                 'No intermediary model %s.\n'
                 'The field specifies a many-to-many relation through model '
                 '%s, which has not been installed.'
@@ -1669,10 +1675,11 @@ class ManyToManyField(RelatedField):
                 'the model is not abstract. Does your INSTALLED_APPS '
                 'setting contain the app where %s is defined?'
                 % self.rel.through,
-                obj=self)
+                obj=self))
 
         elif (self.rel.through is not None and
             not isinstance(self.rel.through, six.string_types)):
+
             assert from_model is not None, \
                 "ManyToManyField with intermediate " \
                 "tables cannot be checked if you don't pass the model " \
@@ -1691,12 +1698,12 @@ class ManyToManyField(RelatedField):
             # Check symmetrical attribute.
             if (self_referential and self.rel.symmetrical and
                 not self.rel.through._meta.auto_created):
-                yield checks.Error(
+                errors.append(checks.Error(
                     'Symmetrical m2m field with intermediate table.\n'
                     'Many-to-many fields with intermediate tables cannot '
                     'be symmetrical.',
                     hint='Set symmetrical=False on the field.',
-                    obj=self)
+                    obj=self))
 
             # Count foreign keys in intermediate model
             if self_referential:
@@ -1704,7 +1711,7 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_self > 2:
-                    yield checks.Error(
+                    errors.append(checks.Error(
                         'More than two foreign keys to %(from_model_name)s '
                         'in intermediary model %(relationship_model_name)s.\n'
                         '%(relationship_model_name)s has more than two '
@@ -1713,7 +1720,7 @@ class ManyToManyField(RelatedField):
                         hint='Remove excessive foreign keys to '
                         '%(from_model_name)s in %(relationship_model_name)s.'
                         % locals(),
-                        obj=self)
+                        obj=self))
 
             else:
                 # Count foreign keys in relationship model
@@ -1723,7 +1730,7 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_from > 1:
-                    yield checks.Error(
+                    errors.append(checks.Error(
                         'More than one foreign key to %(from_model_name)s '
                         'in intermediary %(relationship_model_name)s model.\n'
                         '%(relationship_model_name)s has more than one '
@@ -1732,10 +1739,10 @@ class ManyToManyField(RelatedField):
                         hint='If you want to create a recursive relationship, '
                         'use ForeignKey("self", symmetrical=False, '
                         'through="%s").' % relationship_model_name,
-                        obj=self)
+                        obj=self))
 
                 if seen_to > 1:
-                    yield checks.Error(
+                    errors.append(checks.Error(
                         'More than one foreign key to %(to_model_name)s '
                         'in intermediary %(relationship_model_name)s model.\n'
                         '%(relationship_model_name)s has more than one '
@@ -1744,11 +1751,11 @@ class ManyToManyField(RelatedField):
                         hint='If you want to create a recursive relationship, '
                         'use ForeignKey("self", symmetrical=False, '
                         'through="%s").' % relationship_model_name,
-                        obj=self)
+                        obj=self))
 
                 if (not self.rel.through._meta.auto_created and
                     (seen_from == 0 or seen_to == 0)):
-                    yield checks.Error(
+                    errors.append(checks.Error(
                         'No foreign key to %(from_model_name)s or '
                         '%(to_model_name)s in intermediary '
                         '%(relationship_model_name)s model.\n'
@@ -1760,4 +1767,5 @@ class ManyToManyField(RelatedField):
                         hint='Ensure that there are foreign keys '
                         'to %(from_model_name)s and %(to_model_name)s models '
                         'in %(relationship_model_name)s model.' % locals(),
-                        obj=self)
+                        obj=self))
+        return errors
