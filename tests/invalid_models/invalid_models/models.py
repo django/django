@@ -66,9 +66,14 @@ class MembershipMissingFK(models.Model):
 
 
 class PersonSelfRefM2M(models.Model):
+    # Implicit symmetrical=False.
     friends = models.ManyToManyField('self', through="Relationship")
     too_many_friends = models.ManyToManyField('self',
         through="RelationshipTripleFK", symmetrical=False)
+
+
+class NonUniqueFKTarget(models.Model):
+    field = models.ForeignKey('FKTarget', to_field='bad')
 
 
 class Relationship(models.Model):
