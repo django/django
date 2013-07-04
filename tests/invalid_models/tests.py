@@ -393,14 +393,16 @@ class RelativeFieldsTests(TestCase):
         ])
 
     def test_foreign_key_to_non_unique_field(self):
-        field = models.ForeignKey('FKTarget', to_field='bad')
+        from .invalid_models.models import NonUniqueFKTarget
+        field = NonUniqueFKTarget.field.field
         self.assertEqual(list(field.check()), [
             Error('No unique=True constraint on field "bad" under model '
                 'FKTarget.\n'
                 'The field "bad" has to be unique because a foreign key '
                 'references to it.',
                 hint='Set unique=True argument on the field "bad" '
-                'under model FKTarget.'),
+                'under model FKTarget.',
+                obj=field),
         ])
 
     def test_foreign_key_to_non_unique_field_under_explicit_model(self):
@@ -412,7 +414,8 @@ class RelativeFieldsTests(TestCase):
                 'The field "bad" has to be unique because a foreign key '
                 'references to it.',
                 hint='Set unique=True argument on the field "bad" '
-                'under model FKTarget.'),
+                'under model FKTarget.',
+                obj=field),
         ])
 
     def test_on_delete_set_null_on_non_nullable_field(self):

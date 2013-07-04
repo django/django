@@ -1191,6 +1191,35 @@ class ForeignObject(RelatedField):
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
+    def check_unique_target(self, **kwargs):
+        if (self.requires_unique_target and
+            not isinstance(self.rel.to, six.string_types)):
+            if len(self.foreign_related_fields) > 1:
+                has_unique_field = any(rel_field.unique
+                    for rel_field in self.foreign_related_fields)
+                if not has_unique_field:
+                    field_combination = ','.join(rel_field.name
+                        for rel_field in self.foreign_related_fields)
+                    model_name = self.rel.to.__name__
+                    yield checks.Error('No unique=True constraint '
+                        'on field combination "%s" under model %s.'
+                        % (field_combination, model_name),
+                        hint='Set unique=True argument on any of the fields '
+                        '"%s" under model %s.'
+                        % (field_combination, model_name),
+                        obj=self)
+            else:
+                if not self.foreign_related_fields[0].unique:
+                    field_name = self.foreign_related_fields[0].name
+                    model_name = self.rel.to.__name__
+                    yield checks.Error('No unique=True constraint on field '
+                        '"%(field_name)s" under model %(model_name)s.\n'
+                        'The field "%(field_name)s" has to be unique because '
+                        'a foreign key references to it.' % locals(),
+                        hint='Set unique=True argument on the field '
+                        '"%s" under model %s.' % (field_name, model_name),
+                        obj=self)
+
 
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False

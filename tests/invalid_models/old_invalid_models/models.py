@@ -150,24 +150,13 @@ class AbstractRelationModel(models.Model):
     fk2 = models.ManyToManyField('AbstractModel')
 
 
-class NonUniqueFKTarget1(models.Model):
-    """ Model to test for non-unique FK target in yet-to-be-defined model: expect an error """
-    tgt = models.ForeignKey('FKTarget', to_field='bad')
-
-
 class UniqueFKTarget1(models.Model):
     """ Model to test for unique FK target in yet-to-be-defined model: expect no error """
     tgt = models.ForeignKey('FKTarget', to_field='good')
 
 
 class FKTarget(models.Model):
-    bad = models.IntegerField()
     good = models.IntegerField(unique=True)
-
-
-class NonUniqueFKTarget2(models.Model):
-    """ Model to test for non-unique FK target in previously seen model: expect an error """
-    tgt = models.ForeignKey(FKTarget, to_field='bad')
 
 
 class UniqueFKTarget2(models.Model):
@@ -367,8 +356,6 @@ old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with rel
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-old_invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
-old_invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 old_invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 old_invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
@@ -469,8 +456,6 @@ m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with relat
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-x invalid_models.nonuniquefktarget1: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
-x invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have a unique=True constraint.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 x invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 x invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
