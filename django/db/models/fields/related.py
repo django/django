@@ -4,11 +4,11 @@ from django.core import checks
 from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import signals
+from django.db.models.deletion import SET_NULL, SET_DEFAULT, CASCADE
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
-from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-from django.db.models.deletion import CASCADE
+from django.db.models.related import RelatedObject, PathInfo
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
@@ -1219,6 +1219,24 @@ class ForeignObject(RelatedField):
                         hint='Set unique=True argument on the field '
                         '"%s" under model %s.' % (field_name, model_name),
                         obj=self)
+
+    def check_on_delete_set_null(self, **kwargs):
+        if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
+            yield checks.Error(
+                'on_delete=SET_NULL but null forbidden.\n'
+                'The field specifies on_delete=SET_NULL, but cannot be null.',
+                hint='Set null=True argument on the field.',
+                obj=self)
+
+    def check_on_delete_set_default(self, **kwargs):
+        if (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
+            not self.has_default()):
+            yield checks.Error(
+                'on_delete=SET_DEFAULT but no default value.\n'
+                'The field specifies on_delete=SET_DEFAULT, but has '
+                'no default value.',
+                hint='Set "default" argument on the field.',
+                obj=self)
 
 
 class ForeignKey(ForeignObject):

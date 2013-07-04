@@ -100,13 +100,6 @@ def get_validation_errors(outfile, app=None):
             # Perform any backend-specific field validation.
             connection.validation.validate_field(e, opts, f)
 
-            # Check if the on_delete behavior is sane
-            if f.rel and hasattr(f.rel, 'on_delete'):
-                if f.rel.on_delete == SET_NULL and not f.null:
-                    e.add(opts, "'%s' specifies on_delete=SET_NULL, but cannot be null." % f.name)
-                elif f.rel.on_delete == SET_DEFAULT and not f.has_default():
-                    e.add(opts, "'%s' specifies on_delete=SET_DEFAULT, but has no default value." % f.name)
-
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:

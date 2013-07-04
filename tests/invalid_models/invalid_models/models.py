@@ -76,6 +76,14 @@ class NonUniqueFKTarget(models.Model):
     field = models.ForeignKey('FKTarget', to_field='bad')
 
 
+class InvalidSetNull(models.Model):
+    field = models.ForeignKey('Person', on_delete=models.SET_NULL)
+
+
+class InvalidSetDefault(models.Model):
+    field = models.ForeignKey('Person', on_delete=models.SET_DEFAULT)
+
+
 class Relationship(models.Model):
     first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set")
     second = models.ForeignKey(PersonSelfRefM2M, related_name="rel_to_set")

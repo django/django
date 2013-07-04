@@ -169,14 +169,6 @@ class NonExistingOrderingWithSingleUnderscore(models.Model):
         ordering = ("does_not_exist",)
 
 
-class InvalidSetNull(models.Model):
-    fk = models.ForeignKey('self', on_delete=models.SET_NULL)
-
-
-class InvalidSetDefault(models.Model):
-    fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
-
-
 class UnicodeForeignKeys(models.Model):
     """Foreign keys which can translate to ascii should be OK, but fail if
     they're not."""
@@ -357,8 +349,6 @@ old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashe
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
-old_invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
-old_invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
 old_invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 old_invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 old_invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
@@ -457,8 +447,6 @@ m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes 
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
-x invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
-x invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
 m? invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 m? invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 m? invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
