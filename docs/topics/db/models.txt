@@ -416,6 +416,7 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -423,6 +424,7 @@ something like this::
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -709,7 +711,10 @@ of :ref:`methods automatically given to each model <model-instance-methods>`.
 You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
-:meth:`~Model.__unicode__`
+:meth:`~Model.__str__` (Python 3)
+    Python 3 equivalent of ``__unicode__()``.
+
+:meth:`~Model.__unicode__` (Python 2)
     A Python "magic method" that returns a unicode "representation" of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most

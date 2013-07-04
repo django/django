@@ -270,6 +270,7 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = generic.GenericForeignKey('content_type', 'object_id')
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.tag
 
