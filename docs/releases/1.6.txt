@@ -762,7 +762,7 @@ Miscellaneous
   ``{{ obj.view_href }}`` will cause template rendering to fail if
   ``view_href()`` raises ``NoReverseMatch``. There is no change to the
   ``{% url %}`` tag, it causes template rendering to fail like always when
-  ``NoReverseMatch`` is risen.
+  ``NoReverseMatch`` is raised.
 
 * :meth:`django.test.client.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the
