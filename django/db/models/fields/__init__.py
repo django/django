@@ -729,6 +729,18 @@ class Field(object):
                 'or remove this argument.',
                 obj=self)
 
+    def check_null_allowed_for_primary_keys(self, **kwargs):
+        if (self.primary_key and self.null and
+            not connection.features.interprets_empty_strings_as_nulls):
+            # We cannot reliably check this for backends like Oracle which
+            # consider NULL and '' to be equal (and thus set up
+            # character-based fields a little differently).
+            yield checks.Error('null=True for primary_key.\n'
+                'Primary key fields cannot have null=True.',
+                hint='Set null=False on the field or '
+                'remove primary_key=True argument.',
+                obj=self)
+
     def __repr__(self):
         """
         Displays the module, class and name of the field.

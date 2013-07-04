@@ -180,10 +180,6 @@ class UnicodeForeignKeys(models.Model):
     #bad = models.ForeignKey('★')
 
 
-class PrimaryKeyNull(models.Model):
-    my_pk_field = models.IntegerField(primary_key=True, null=True)
-
-
 class OrderByPKModel(models.Model):
     """
     Model to test that ordering by pk passes validation.
@@ -361,10 +357,6 @@ old_invalid_models.duplicatecolumnnamemodel2: Field 'bar' has column name 'bar' 
 old_invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' that is already used.
 
 """
-
-if not connection.features.interprets_empty_strings_as_nulls:
-    model_errors += """old_invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True."""
-
 
 """
 # Error messages predated by a character:
