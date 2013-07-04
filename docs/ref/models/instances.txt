@@ -430,6 +430,12 @@ Other model instance methods
 
 A few object methods have special purposes.
 
+.. note::
+    On Python 3, as all strings are natively considered Unicode, only use the
+    ``__str__()`` method (the ``__unicode__()`` method is obsolete).
+    If you'd like compatibility with Python 2, you can decorate your model class
+    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
+
 ``__unicode__``
 ---------------
 
