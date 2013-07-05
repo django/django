@@ -1,6 +1,6 @@
 import copy
 import sys
-import unittest
+from types import MethodType
 
 from django.core.checks import Error
 from django.core.management.validation import get_validation_errors
@@ -629,3 +629,20 @@ class OtherFieldTests(TestCase):
                 hint='Set allow_files or allow_folders to True.',
                 obj=field)
         ])
+
+    def test_backend_specific_checks(self):
+        error = Error('an error', hint=None)
+        mock = lambda self, field, **kwargs: [error]
+
+        # Mock connection.validation.check_field method.
+        v = connection.validation
+        old_check_field = v.check_field
+        v.check_field = MethodType(mock, v)
+
+        try:
+            field = models.IntegerField()
+            errors = field.check()
+            self.assertEqual(errors, [error])
+        finally:
+            # Unmock connection.validation.check_field method.
+            v.check_field = old_check_field
