@@ -74,8 +74,6 @@ def get_validation_errors(outfile, app=None):
                     from django.utils.image import Image
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
-            if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
-                e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
 
             # Perform any backend-specific field validation.
             connection.validation.validate_field(e, opts, f)

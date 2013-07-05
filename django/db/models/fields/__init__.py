@@ -1393,6 +1393,21 @@ class FilePathField(Field):
     def get_internal_type(self):
         return "FilePathField"
 
+    def check(self, **kwargs):
+        errors = super(FilePathField, self).check(**kwargs)
+        errors.extend(self._check_allowing_files_or_folders(**kwargs))
+        return errors
+
+    def _check_allowing_files_or_folders(self, **kwargs):
+        if not self.allow_files and not self.allow_folders:
+            return [checks.Error('allow_files=False and allow_folders=False '
+                'on FilePathField.\n'
+                'FilePathFields must have either allow_files or allow_folders '
+                'set to True.',
+                hint='Set allow_files or allow_folders to True.',
+                obj=self)]
+        return []
+
 
 class FloatField(Field):
     empty_strings_allowed = False
