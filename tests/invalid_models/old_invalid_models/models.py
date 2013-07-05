@@ -191,23 +191,8 @@ class OrderByPKModel(models.Model):
         ordering = ('pk',)
 
 
-class SwappableModel(models.Model):
-    """A model that can be, but isn't swapped out.
-
-    References to this model *shoudln't* raise any validation error.
-    """
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        swappable = 'TEST_SWAPPABLE_MODEL'
-
-
 class SwappedModel(models.Model):
     """A model that is swapped out.
-
-    References to this model *should* raise a validation error.
-    Requires TEST_SWAPPED_MODEL to be defined in the test environment;
-    this is guaranteed by the test runner using @override_settings.
 
     The foreign keys and m2m relations on this model *shouldn't*
     install related accessors, so there shouldn't be clashes with
@@ -230,6 +215,15 @@ class ReplacementModel(models.Model):
     m2m = models.ManyToManyField(Target, related_name='swappable_m2m_set')
 
 
+class SwappingModel(models.Model):
+    """ Uses SwappedModel. """
+
+    foreign_key = models.ForeignKey(settings.TEST_SWAPPED_MODEL,
+        related_name='swapping_foreign_key')
+    m2m = models.ManyToManyField(settings.TEST_SWAPPED_MODEL,
+        related_name='swapping_m2m')
+
+
 class BadSwappableValue(models.Model):
     """A model that can be swapped out; during testing, the swappable
     value is not of the format app.model
@@ -248,17 +242,6 @@ class BadSwappableModel(models.Model):
 
     class Meta:
         swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
-
-
-class HardReferenceModel(models.Model):
-    fk_1 = models.ForeignKey(SwappableModel, related_name='fk_hardref1')
-    fk_2 = models.ForeignKey('old_invalid_models.SwappableModel', related_name='fk_hardref2')
-    fk_3 = models.ForeignKey(SwappedModel, related_name='fk_hardref3')
-    fk_4 = models.ForeignKey('old_invalid_models.SwappedModel', related_name='fk_hardref4')
-    m2m_1 = models.ManyToManyField(SwappableModel, related_name='m2m_hardref1')
-    m2m_2 = models.ManyToManyField('old_invalid_models.SwappableModel', related_name='m2m_hardref2')
-    m2m_3 = models.ManyToManyField(SwappedModel, related_name='m2m_hardref3')
-    m2m_4 = models.ManyToManyField('old_invalid_models.SwappedModel', related_name='m2m_hardref4')
 
 
 class BadIndexTogether1(models.Model):
@@ -345,10 +328,6 @@ old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashe
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
-old_invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-old_invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-old_invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-old_invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'old_invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 old_invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 old_invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 old_invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
@@ -439,10 +418,6 @@ m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes 
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
-m? invalid_models.hardreferencemodel: 'fk_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-m? invalid_models.hardreferencemodel: 'fk_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-m? invalid_models.hardreferencemodel: 'm2m_3' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
-m? invalid_models.hardreferencemodel: 'm2m_4' defines a relation with the model 'invalid_models.SwappedModel', which has been swapped out. Update the relation to point at settings.TEST_SWAPPED_MODEL.
 m invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 m invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 m invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.

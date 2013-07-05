@@ -581,6 +581,75 @@ class RelativeFieldTests(TestCase):
                     obj=field),
             ])
 
+    def test_not_swapped_model(self):
+        class SwappableModel(models.Model):
+            # A model that can be, but isn't swapped out. References to this
+            # model *shoudln't* raise any validation error.
+            class Meta:
+                swappable = 'TEST_SWAPPABLE_MODEL'
+
+        class Model(models.Model):
+            explicit_fk = models.ForeignKey(SwappableModel,
+                related_name='explicit_fk')
+            implicit_fk = models.ForeignKey('invalid_models.SwappableModel',
+                related_name='implicit_fk')
+            explicit_m2m = models.ManyToManyField(SwappableModel,
+                related_name='explicit_m2m')
+            implicit_m2m = models.ManyToManyField(
+                'invalid_models.SwappableModel',
+                related_name='implicit_m2m')
+
+        explicit_fk = Model.explicit_fk.field
+        self.assertEqual(explicit_fk.check(), [])
+
+        implicit_fk = Model.implicit_fk.field
+        self.assertEqual(implicit_fk.check(), [])
+
+        explicit_m2m = Model.explicit_m2m.field
+        self.assertEqual(explicit_m2m.check(from_model=Model), [])
+
+        implicit_m2m = Model.implicit_m2m.field
+        self.assertEqual(implicit_m2m.check(from_model=Model), [])
+
+    @override_settings(TEST_SWAPPED_MODEL='invalid_models.Replacement')
+    def test_referencing_to_swapped_model(self):
+        class Replacement(models.Model):
+            pass
+
+        class SwappedModel(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPED_MODEL'
+
+        class Model(models.Model):
+            explicit_fk = models.ForeignKey(SwappedModel,
+                related_name='explicit_fk')
+            implicit_fk = models.ForeignKey('invalid_models.SwappedModel',
+                related_name='implicit_fk')
+            explicit_m2m = models.ManyToManyField(SwappedModel,
+                related_name='explicit_m2m')
+            implicit_m2m = models.ManyToManyField(
+                'invalid_models.SwappedModel',
+                related_name='implicit_m2m')
+
+        fields = [
+            Model.explicit_fk.field,
+            Model.implicit_fk.field,
+            Model.explicit_m2m.field,
+            Model.implicit_m2m.field,
+        ]
+
+        expected_error = Error(
+            'A relation with a swapped model.\n'
+            'The field defines a relation with the model '
+            'invalid_models.SwappedModel, which has been swapped out.',
+            hint='Update the relation to point at '
+            'settings.TEST_SWAPPED_MODEL')
+
+        for field in fields:
+            expected_error.obj = field
+            errors = field.check(from_model=Model)
+            self.assertEqual(errors, [expected_error])
+
 
 class OtherFieldTests(TestCase):
 

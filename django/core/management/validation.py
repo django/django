@@ -92,12 +92,6 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
-                if f.rel.to not in models.get_models():
-                    # If the related model is swapped, provide a hint;
-                    # otherwise, the model just hasn't been installed.
-                    if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
-                        e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
-
                 # it is a string and we could not find the model it refers to
                 # so skip the next section
                 if isinstance(f.rel.to, six.string_types):
@@ -146,16 +140,12 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related
             # objects
-            if f.rel.to not in models.get_models():
-                # If the related model is swapped, provide a hint;
-                # otherwise, the model just hasn't been installed.
-                if not isinstance(f.rel.to, six.string_types) and f.rel.to._meta.swapped:
-                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
 
-                # it is a string and we could not find the model it refers to
-                # so skip the next section
-                if isinstance(f.rel.to, six.string_types):
-                    continue
+            # it is a string and we could not find the model it refers to
+            # so skip the next section
+            if (f.rel.to not in models.get_models() and
+                isinstance(f.rel.to, six.string_types)):
+                continue
 
             if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
                 from_model, to_model = cls, f.rel.to
