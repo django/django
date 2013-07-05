@@ -438,7 +438,8 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__unicode__()`` representation of each object.
+    column that displays the ``__unicode__()`` (``__str__()`` on Python 3)
+    representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -488,7 +489,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` of the related object.
+      ``__unicode__()`` (``__str__()`` on Python 3) of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
