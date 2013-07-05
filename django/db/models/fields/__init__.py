@@ -689,6 +689,7 @@ class Field(object):
         errors.extend(self._check_chocies(**kwargs))
         errors.extend(self._check_db_index(**kwargs))
         errors.extend(self._check_null_allowed_for_primary_keys(**kwargs))
+        errors.extend(self._check_backend_specific_checks(**kwargs))
         return errors
 
     def _check_chocies(self, **kwargs):
@@ -740,6 +741,10 @@ class Field(object):
                 'remove primary_key=True argument.',
                 obj=self)]
         return []
+
+    def _check_backend_specific_checks(self, **kwargs):
+        return connection.validation.check_field(self, **kwargs)
+
 
     def __repr__(self):
         """

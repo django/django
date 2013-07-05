@@ -89,9 +89,6 @@ def get_validation_errors(outfile, app=None):
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
 
-            # Perform any backend-specific field validation.
-            connection.validation.validate_field(e, opts, f)
-
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:

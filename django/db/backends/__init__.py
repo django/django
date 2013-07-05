@@ -1404,6 +1404,6 @@ class BaseDatabaseValidation(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def validate_field(self, errors, opts, f):
-        "By default, there is no backend-specific validation"
-        pass
+    def check_field(self, field, **kwargs):
+        "By default, there is no backend-specific validation."
+        return []
