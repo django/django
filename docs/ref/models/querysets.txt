@@ -379,15 +379,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-You can pass positional arguments (``*fields``) in order to specify the names
-of fields to which the ``DISTINCT`` should apply. This translates to a
-``SELECT DISTINCT ON`` SQL query. Here's the difference. For a normal
-``distinct()`` call, the database compares *each* field in each row when
+On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
+specify the names of fields to which the ``DISTINCT`` should apply. This
+translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a
+normal ``distinct()`` call, the database compares *each* field in each row when
 determining which rows are distinct. For a ``distinct()`` call with specified
 field names, the database will only compare the specified field names.
-
-.. note::
-    This ability to specify field names is only available in PostgreSQL.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
@@ -398,7 +395,7 @@ field names, the database will only compare the specified field names.
     value in column ``a``. If you don't specify an order, you'll get some
     arbitrary row.
 
-Examples::
+Examples (those after the first will only work on PostgreSQL)::
 
     >>> Author.objects.distinct()
     [...]
