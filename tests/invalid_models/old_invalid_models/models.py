@@ -1,13 +1,8 @@
-#encoding=utf-8
-"""
-26. Invalid models
-
-This example exists purely to point out errors in models.
-"""
-
+# -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import connection, models
+from django.conf import settings
+from django.db import models
 
 
 class FieldErrors(models.Model):
@@ -113,11 +108,6 @@ class Model(models.Model):
     name = models.CharField(max_length=10)  # DB 4 GT
 
 
-class Car(models.Model):
-    colour = models.CharField(max_length=5)
-    model = models.ForeignKey(Model)
-
-
 class Person(models.Model):
     name = models.CharField(max_length=5)
 
@@ -132,22 +122,6 @@ class Membership(models.Model):
     person = models.ForeignKey(Person)
     group = models.ForeignKey(Group)
     not_default_or_null = models.CharField(max_length=5)
-
-
-class MembershipMissingFK(models.Model):
-    person = models.ForeignKey(Person)
-
-
-class AbstractModel(models.Model):
-    name = models.CharField(max_length=10)
-
-    class Meta:
-        abstract = True
-
-
-class AbstractRelationModel(models.Model):
-    fk1 = models.ForeignKey('AbstractModel')
-    fk2 = models.ManyToManyField('AbstractModel')
 
 
 class UniqueFKTarget1(models.Model):
