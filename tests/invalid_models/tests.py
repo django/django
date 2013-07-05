@@ -617,3 +617,15 @@ class OtherFieldTests(TestCase):
                 'forbid blank values (blank=False).',
                 obj=field),
         ])
+
+    def test_FilePathField(self):
+        field = models.FilePathField(allow_files=False, allow_folders=False)
+        errors = field.check()
+        self.assertEqual(errors, [
+            Error('allow_files=False and allow_folders=False '
+                'on FilePathField.\n'
+                'FilePathFields must have either allow_files or allow_folders '
+                'set to True.',
+                hint='Set allow_files or allow_folders to True.',
+                obj=field)
+        ])
