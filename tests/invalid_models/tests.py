@@ -233,7 +233,7 @@ class DecimalFieldTests(TestCase):
 
 class RelativeFieldTests(TestCase):
 
-    def setUp(self):
+    def tearDown(self):
         # If you create a model in a test, the model is accessible in other
         # tests. To avoid this, we need to clear list of all models created in
         # `invalid_models` module.
