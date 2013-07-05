@@ -1,0 +1,53 @@
+==================
+Checking framework
+==================
+
+1. What is checking framework?
+
+   - Set of static checks.
+
+   - Launched explicitly with `validate` command.
+
+   - Launched implicitly when running server `runserver` or `syncdb`.
+
+2. What can be checked.
+
+   - Four kinds of objects: apps, models, fields and managers.
+
+3. General contract.
+
+   - A callable piece of code `check`.
+
+   - The piece of code returns list of errors and warnings. If no error,
+     returns empty list.
+
+   - The callable piece of code may be a method (in case of fields and
+     managers), a classmethod (in case of models) and a function (in case of
+     an app).
+
+Errors and warnings
+===================
+
+`django.core.checks` defines two classes: `Error` and `Warning`. Both have the
+same interface, they differ only in their meaning.
+
+- There is `django.core.checks` module. There are `Error` and `Warning` classes.
+
+- Both classes are the same. The difference is in the meaning.
+
+- How to create an error/warning?
+
+- Errors are comparable, so you can easily write tests.
+
+Field checking
+==============
+
+If you created your own field, you may want to add some validation. In that
+case, you need to override `check` method, like this::
+
+  == A piece of code. ==
+
+It's recommended to split checking into smaller parts, call it `_check_*`
+methods and run them explicitly from `check` method.
+
+- Backend specific validation.
