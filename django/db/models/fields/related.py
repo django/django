@@ -142,6 +142,7 @@ class RelatedField(Field):
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
         errors.extend(self._check_relation_model_exists(**kwargs))
+        errors.extend(self._check_referencing_to_swapped_model(**kwargs))
         return errors
 
     MISSING_MODEL_MESSAGE = (
@@ -166,6 +167,24 @@ class RelatedField(Field):
                     % (self.rel.to,),
                     obj=self)]
         return []
+
+    def _check_referencing_to_swapped_model(self, **kwargs):
+        from django.db import models
+        if (self.rel.to not in models.get_models() and
+            not isinstance(self.rel.to, six.string_types) and
+            self.rel.to._meta.swapped):
+            model = "%s.%s" % (
+                self.rel.to._meta.app_label,
+                self.rel.to._meta.object_name)
+            return [checks.Error(
+                'A relation with a swapped model.\n'
+                'The field defines a relation with the model '
+                '%s, which has been swapped out.' % model,
+                hint='Update the relation to point at '
+                'settings.%s' % self.rel.to._meta.swappable,
+                obj=self)]
+        return []
+
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
