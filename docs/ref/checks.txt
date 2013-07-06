@@ -2,52 +2,83 @@
 Checking framework
 ==================
 
-1. What is checking framework?
+Checking framework is a set of static checks validating mainly apps and
+models. It detects common problems and report them providing hints.
 
-   - Set of static checks.
+Checking can be triggered explicitly via ``python manage.py check`` command.
+It's also triggered implicitly before running server (command ``runserver``)
+or syncing database  (``syncdb``). For performance issues, the checks are not
+performed if ``DEBUG`` is set to False.
 
-   - Launched explicitly with `validate` command.
-
-   - Launched implicitly when running server `runserver` or `syncdb`.
-
-2. What can be checked.
-
-   - Four kinds of objects: apps, models, fields and managers.
-
-3. General contract.
-
-   - A callable piece of code `check`.
-
-   - The piece of code returns list of errors and warnings. If no error,
-     returns empty list.
-
-   - The callable piece of code may be a method (in case of fields and
-     managers), a classmethod (in case of models) and a function (in case of
-     an app).
+Four kinds of object can be checked: apps, models, fields and managers. All of
+them share the same interface. Each of these objects have a callable piece of
+code named ``check``. The callable piece of code is a method (in case of
+fields and managers), a classmethod (in case of models) or a function (in
+case of an app). It should receive ``**kwargs`` and return list of errors and
+warnings.
 
 Errors and warnings
 ===================
 
-`django.core.checks` defines two classes: `Error` and `Warning`. Both have the
-same interface, they differ only in their meaning.
+``django.core.checks`` defines two classes: ``Error`` and ``Warning``. Both
+have the same interface, they differ only in their meaning. When an Error
+occures, Django stops everything and doesn't allow to i. e. run a server.
+Warnings are reported along with Errors, but you can run server or syncdb even
+though there are Warnings.
 
-- There is `django.core.checks` module. There are `Error` and `Warning` classes.
+An Error and Warning have fields: ``msg``, ``hint`` and ``obj``. The first one
+is a required string. It can be multiline. In that case, the first line should
+be a short description and the rest is treated as a long description. ``hint``
+is second and last required argument. It's a string or ``None`` if you cannot
+provide any hint. ``obj`` is optional. It points to the invalid object. If not
+provided, the default value is ``None``.
 
-- Both classes are the same. The difference is in the meaning.
+Errors and Warnings are comparable. That allows you to easily write tests::
 
-- How to create an error/warning?
-
-- Errors are comparable, so you can easily write tests.
+    from django.core.checks import Error
+    errors = checked_object.check()
+    expected_errors = [Error('an error', hint=None, obj=checked_object)]
+    self.assertEqual(errors, expected_errors)
 
 Field checking
 ==============
 
-If you created your own field, you may want to add some validation. In that
-case, you need to override `check` method, like this::
+If you created your own field, you may want to add some checking. In that
+case, you need to override `check` method: it should super to the superclass,
+perform its own checks (which may end in some new errors or warnings) and
+eventually return list of all errors and warnings. It's recommended to
+delegate checks to separated methods whose names start with ``_check_``, i. e.
+``_check_min_max_values``.
 
-  == A piece of code. ==
+Consider an example where you are implementing ``RangedIntegerField``. It adds
+``min`` and ``max`` arguments to the constructor. You want to check if min
+value is smaller or equal to max value. Here is a snippet of code showing how
+can you implement this check::
 
-It's recommended to split checking into smaller parts, call it `_check_*`
-methods and run them explicitly from `check` method.
+    from django.core import checks
+    from django.db import models
 
-- Backend specific validation.
+    class RangedIntegerField(models.IntegerField):
+        def __init__(self, min=None, max=None, **kwargs)
+            super(RangedIntegerField, self).__init__(**kwargs)
+            self.min = min
+            self.max = max
+
+        def check(self, **kwargs):
+            errors = super(MyField, self).check(**kwargs)
+            # Do some custom checking and add errors and warning to `errors`:
+            errors.extend(self._check_min_max_values(**kwargs))
+            return errors
+
+        def _check_min_max_values(**kwargs):
+            if (self.min is not None and
+                self.max is not None and
+                self.min > self.max):
+                return [checks.Error(
+                    'min greated than max.',
+                    hint='Lower min or upper max.'
+                    obj=self)]
+            return [] # When no error, return an empty list
+
+Database backend specific checks are performed in
+``DatabaseValidation.check_field`` method.
