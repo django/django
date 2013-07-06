@@ -76,7 +76,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 
 class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
     renamed_methods = (
-        ('queryset', 'get_queryset', PendingDeprecationWarning),
+        ('queryset', 'get_queryset', DeprecationWarning),
     )
 
 

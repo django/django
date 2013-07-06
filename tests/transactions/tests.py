@@ -1,13 +1,12 @@
 from __future__ import absolute_import
 
 import sys
-import warnings
+from unittest import skipIf, skipUnless
 
-from django.db import connection, transaction, IntegrityError
+from django.db import connection, transaction, DatabaseError, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
-from django.utils.unittest import skipIf, skipUnless
 
 from .models import Reporter
 
@@ -188,6 +187,29 @@ class AtomicTests(TransactionTestCase):
                 raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
+    def test_force_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            # atomic block shouldn't rollback, but force it.
+            self.assertFalse(transaction.get_rollback())
+            transaction.set_rollback(True)
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_prevent_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            sid = transaction.savepoint()
+            # trigger a database error inside an inner atomic without savepoint
+            with self.assertRaises(DatabaseError):
+                with transaction.atomic(savepoint=False):
+                    connection.cursor().execute(
+                            "SELECT no_such_col FROM transactions_reporter")
+            transaction.savepoint_rollback(sid)
+            # atomic block should rollback, but prevent it, as we just did it.
+            self.assertTrue(transaction.get_rollback())
+            transaction.set_rollback(False)
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
 
 class AtomicInsideTransactionTests(AtomicTests):
     """All basic tests for atomic should also pass within an existing transaction."""
@@ -328,7 +350,7 @@ class AtomicMiscTests(TransactionTestCase):
         transaction.atomic(Callable())
 
 
-class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 
@@ -486,7 +508,7 @@ class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCas
         )
 
 
-class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionRollbackTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 
@@ -506,7 +528,7 @@ class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, Transactio
         self.assertRaises(IntegrityError, execute_bad_sql)
         transaction.rollback()
 
-class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
 
     available_apps = ['transactions']
 

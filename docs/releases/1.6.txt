@@ -41,9 +41,9 @@ Simplified default project and app templates
 The default templates used by :djadmin:`startproject` and :djadmin:`startapp`
 have been simplified and modernized. The :doc:`admin
 </ref/contrib/admin/index>` is now enabled by default in new projects; the
-:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`Language
-detection <how-django-discovers-language-preference>` and :ref:`clickjacking
-prevention <clickjacking-prevention>` are turned on.
+:doc:`sites </ref/contrib/sites>` framework no longer is. :ref:`clickjacking
+prevention <clickjacking-prevention>` is now on and the database defaults to
+SQLite.
 
 If the default templates don't suit your tastes, you can use :ref:`custom
 project and app templates <custom-app-and-project-templates>`.
@@ -337,6 +337,12 @@ Minor features
   default) to allow customizing the :attr:`~django.forms.Form.prefix` of the
   form.
 
+* Raw queries (``Manager.raw()`` or ``cursor.execute()``) can now use the
+  "pyformat" parameter style, where placeholders in the query are given as
+  ``'%(name)s'`` and the parameters are passed as a dictionary rather than
+  a list (except on SQLite). This has long been possible (but not officially
+  supported) on MySQL and PostgreSQL, and is now also available on Oracle.
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -628,10 +634,10 @@ If you manually render ``label_tag`` in your templates:
 
     {{ form.my_field.label_tag }}: {{ form.my_field }}
 
-you'll want to remove the semicolon (or whatever other separator you may be
+you'll want to remove the colon (or whatever other separator you may be
 using) to avoid duplicating it when upgrading to Django 1.6. The following
 template in Django 1.6 will render identically to the above template in Django
-1.5, except that the semicolon will appear inside the ``<label>`` element.
+1.5, except that the colon will appear inside the ``<label>`` element.
 
 .. code-block:: html+django
 
@@ -655,6 +661,59 @@ account for that change if you have custom admin templates or if your tests
 rely on the previous URLs. If you want to revert to the original behavior you
 can set the
 :attr:`~django.contrib.admin.ModelAdmin.preserve_filters` attribute to ``False``.
+
+``django.contrib.auth`` password reset uses base 64 encoding of ``User`` PK
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Past versions of Django used base 36 encoding of the ``User`` primary key in
+the password reset views and URLs
+(:func:`django.contrib.auth.views.password_reset_confirm`). Base 36 encoding is
+sufficient if the user primary key is an integer, however, with the
+introduction of custom user models in Django 1.5, that assumption may no longer
+be true.
+
+:func:`django.contrib.auth.views.password_reset_confirm` has been modified to
+take a ``uidb64`` parameter instead of ``uidb36``. If you are reversing this
+view, for example in a custom ``password_reset_email.html`` template, be sure
+to update your code.
+
+A temporary shim for :func:`django.contrib.auth.views.password_reset_confirm`
+that will allow password reset links generated prior to Django 1.6 to continue
+to work has been added to provide backwards compatibility; this will be removed
+in Django 1.7. Thus, as long as your site has been running Django 1.6 for more
+than :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect.
+If not (for example, if you upgrade directly from Django 1.5 to Django 1.7),
+then any password reset links generated before you upgrade to Django 1.7 or
+later won't work after the upgrade.
+
+In addition, if you have any custom password reset URLs, you will need to
+update them by replacing ``uidb36`` with ``uidb64`` and the dash that follows
+that pattern with a slash. Also add ``_\-`` to the list of characters that may
+match the ``uidb64`` pattern.
+
+For example::
+
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        name='password_reset_confirm'),
+
+becomes::
+
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        name='password_reset_confirm'),
+
+You may also want to add the shim to support the old style reset links. Using
+the example above, you would modify the existing url by replacing
+``django.contrib.auth.views.password_reset_confirm`` with
+``django.contrib.auth.views.password_reset_confirm_uidb36`` and also remove
+the ``name`` argument so it doesn't conflict with the new url::
+
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm_uidb36'),
+
+You can remove this url pattern after your app has been deployed with Django
+1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -703,7 +762,7 @@ Miscellaneous
   ``{{ obj.view_href }}`` will cause template rendering to fail if
   ``view_href()`` raises ``NoReverseMatch``. There is no change to the
   ``{% url %}`` tag, it causes template rendering to fail like always when
-  ``NoReverseMatch`` is risen.
+  ``NoReverseMatch`` is raised.
 
 * :meth:`django.test.client.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the

@@ -10,7 +10,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
-from django.utils.unittest import expectedFailure
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
         ItemTag, WithManualPK)

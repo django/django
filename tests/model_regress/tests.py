@@ -3,12 +3,12 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 from operator import attrgetter
 import sys
+import unittest
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils import tzinfo
-from django.utils import unittest
 from django.db import connection, router
 from django.db.models.sql import InsertQuery
 

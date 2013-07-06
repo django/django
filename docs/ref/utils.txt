@@ -107,20 +107,6 @@ to distinguish caches by the ``Accept-language`` header.
 
     The :class:`django.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
-    ``SortedDict`` adds two additional methods to the standard Python ``dict``
-    class:
-
-    .. method:: insert(index, key, value)
-
-        .. deprecated:: 1.5
-
-        Inserts the key, value pair before the item with the given index.
-
-    .. method:: value_for_index(index)
-
-        .. deprecated:: 1.5
-
-        Returns the value of the item at the given zero-based index.
 
 Creating a new SortedDict
 -------------------------
@@ -202,18 +188,7 @@ The functions defined in this module share the following properties:
 =========================
 
 .. module:: django.utils.encoding
-   :synopsis: A series of helper classes and function to manage character encoding.
-
-.. class:: StrAndUnicode
-
-    A class that derives ``__str__`` from ``__unicode__``.
-
-    On Python 2, ``__str__`` returns the output of ``__unicode__`` encoded as
-    a UTF-8 bytestring. On Python 3, ``__str__`` returns the output of
-    ``__unicode__``.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define ``__unicode__``.
+   :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
 
@@ -471,12 +446,14 @@ Atom1Feed
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
+        # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
     The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
     a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode`` here
-    and ensure that your function returns only Unicode strings.
+    original function can return. Usually, it's enough to include ``unicode``
+    (or ``str`` on Python 3) here and ensure that your function returns only
+    Unicode strings.
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at the
@@ -648,6 +625,20 @@ escaping HTML.
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than :data:`sys.maxint`.
+
+.. function:: urlsafe_base64_encode(s)
+
+    .. versionadded:: 1.6
+
+    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    equal signs.
+
+.. function::  urlsafe_base64_decode(s)
+
+    .. versionadded:: 1.6
+
+    Decodes a base64 encoded string, adding back any trailing equal signs that
+    might have been stripped.
 
 ``django.utils.module_loading``
 ===============================

@@ -1,8 +1,8 @@
 import re
+from unittest import TestCase
 
 from django import get_version
 from django.utils import six
-from django.utils.unittest import TestCase
 
 class VersionTests(TestCase):
 

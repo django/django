@@ -67,7 +67,7 @@ After the previous tutorials, our project should look like this::
             admin.py
             models.py
             static/
-                polls
+                polls/
                     images/
                         background.gif
                     style.css

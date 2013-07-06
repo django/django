@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
 import warnings
+from unittest import expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
-from django.utils.unittest import expectedFailure
 from django.test.client import RequestFactory
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin, CreateView
@@ -146,7 +146,7 @@ class CreateViewTests(TestCase):
     def test_create_view_all_fields(self):
 
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MyCreateView(CreateView):
                 model = Author
@@ -160,7 +160,7 @@ class CreateViewTests(TestCase):
     def test_create_view_without_explicit_fields(self):
 
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MyCreateView(CreateView):
                 model = Author
@@ -171,7 +171,7 @@ class CreateViewTests(TestCase):
                              ['name', 'slug'])
 
         # but with a warning:
-        self.assertEqual(w[0].category, PendingDeprecationWarning)
+        self.assertEqual(w[0].category, DeprecationWarning)
 
 
 class UpdateViewTests(TestCase):

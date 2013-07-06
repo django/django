@@ -1,7 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-import warnings
-
 from django.test import TestCase
 
 from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
@@ -55,9 +53,7 @@ class SelectRelatedTests(TestCase):
         extra queries
         """
         with self.assertNumQueries(1):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", DeprecationWarning)
-                person = Species.objects.select_related(depth=10).get(name="sapiens")
+            person = Species.objects.select_related('genus__family__order__klass__phylum__kingdom__domain').get(name="sapiens")
             domain = person.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
 
@@ -91,53 +87,27 @@ class SelectRelatedTests(TestCase):
                 'Hominidae',
             ])
 
-    def test_depth(self, depth=1, expected=7):
-        """
-        The "depth" argument to select_related() will stop the descent at a
-        particular level.
-        """
-        # Notice: one fewer queries than above because of depth=1
-        with self.assertNumQueries(expected):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", DeprecationWarning)
-                pea = Species.objects.select_related(depth=depth).get(name="sativum")
-            self.assertEqual(
-                pea.genus.family.order.klass.phylum.kingdom.domain.name,
-                'Eukaryota'
-            )
-
-    def test_larger_depth(self):
-        """
-        The "depth" argument to select_related() will stop the descent at a
-        particular level.  This tests a larger depth value.
-        """
-        self.test_depth(depth=5, expected=3)
-
     def test_list_with_depth(self):
         """
-        The "depth" argument to select_related() will stop the descent at a
-        particular level. This can be used on lists as well.
+        Passing a relationship field lookup specifier to select_related() will
+        stop the descent at a particular level. This can be used on lists as
+        well.
         """
         with self.assertNumQueries(5):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", DeprecationWarning)
-                world = Species.objects.all().select_related(depth=2)
-                orders = [o.genus.family.order.name for o in world]
+            world = Species.objects.all().select_related('genus__family')
+            orders = [o.genus.family.order.name for o in world]
             self.assertEqual(sorted(orders),
                 ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            s = Species.objects.all().select_related(depth=1)\
-                .extra(select={'a': 'select_related_species.id + 10'})[0]
+        s = Species.objects.all().select_related()\
+            .extra(select={'a': 'select_related_species.id + 10'})[0]
         self.assertEqual(s.id + 10, s.a)
 
     def test_certain_fields(self):
         """
         The optional fields passed to select_related() control which related
-        models we pull in. This allows for smaller queries and can act as an
-        alternative (or, in addition to) the depth parameter.
+        models we pull in. This allows for smaller queries.
 
         In this case, we explicitly say to select the 'genus' and
         'genus.family' models, leading to the same number of queries as before.
@@ -166,12 +136,10 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.assertRaises(TypeError,
-                Species.objects.select_related,
-                'genus__family__order', depth=4
-            )
+        self.assertRaises(TypeError,
+            Species.objects.select_related,
+            'genus__family__order', depth=4
+        )
 
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)

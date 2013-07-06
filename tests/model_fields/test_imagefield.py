@@ -2,13 +2,13 @@ from __future__ import absolute_import
 
 import os
 import shutil
+from unittest import skipIf
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.utils._os import upath
-from django.utils.unittest import skipIf
 
 try:
     from .models import Image

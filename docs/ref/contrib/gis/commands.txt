@@ -65,8 +65,8 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --name-field <name_field>
 
-   Generates a ``__unicode__`` routine on the model that will return the
-   the given field name.
+   Generates a ``__unicode__`` routine (``__str__`` on Python 3) on the model
+   that will return the the given field name.
 
 .. django-admin-option:: --no-imports
 

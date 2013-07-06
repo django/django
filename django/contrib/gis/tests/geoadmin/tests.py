@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
+from unittest import skipUnless
+
 from django.test import TestCase
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS and HAS_SPATIAL_DB:
     from django.contrib.gis import admin

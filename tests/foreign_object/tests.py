@@ -1,9 +1,10 @@
 import datetime
 from operator import attrgetter
 
-from .models import Country, Person, Group, Membership, Friendship, Article, ArticleTranslation
+from .models import Country, Person, Group, Membership, Friendship, Article, ArticleTranslation, ArticleTag, ArticleIdea
 from django.test import TestCase
 from django.utils.translation import activate
+from django.core.exceptions import FieldError
 from django import forms
 
 class MultiColumnFKTests(TestCase):
@@ -320,6 +321,24 @@ class MultiColumnFKTests(TestCase):
         referrer = ArticleTranslation()
         with self.assertRaisesMessage(Article.DoesNotExist, 'ArticleTranslation has no article'):
             referrer.article
+
+    def test_foreign_key_related_query_name(self):
+        a1 = Article.objects.create(pub_date=datetime.date.today())
+        ArticleTag.objects.create(article=a1, name="foo")
+        self.assertEqual(Article.objects.filter(tag__name="foo").count(), 1)
+        self.assertEqual(Article.objects.filter(tag__name="bar").count(), 0)
+        with self.assertRaises(FieldError):
+            Article.objects.filter(tags__name="foo")
+
+    def test_many_to_many_related_query_name(self):
+        a1 = Article.objects.create(pub_date=datetime.date.today())
+        i1 = ArticleIdea.objects.create(name="idea1")
+        a1.ideas.add(i1)
+        self.assertEqual(Article.objects.filter(idea_things__name="idea1").count(), 1)
+        self.assertEqual(Article.objects.filter(idea_things__name="idea2").count(), 0)
+        with self.assertRaises(FieldError):
+            Article.objects.filter(ideas__name="idea1")
+
 
 class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs

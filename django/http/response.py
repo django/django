@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import time
-import warnings
 from email.header import Header
 try:
     from urllib.parse import urlparse
@@ -98,7 +97,7 @@ class HttpResponseBase(six.Iterator):
     status_code = 200
     reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, reason=None, mimetype=None):
+    def __init__(self, content_type=None, status=None, reason=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
@@ -108,11 +107,6 @@ class HttpResponseBase(six.Iterator):
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
         self._handler_class = None
-        if mimetype:
-            warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead",
-                          DeprecationWarning, stacklevel=2)
-            content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
@@ -337,53 +331,27 @@ class HttpResponse(HttpResponseBase):
     else:
         __str__ = serialize
 
-    def _consume_content(self):
-        # If the response was instantiated with an iterator, when its content
-        # is accessed, the iterator is going be exhausted and the content
-        # loaded in memory. At this point, it's better to abandon the original
-        # iterator and save the content for later reuse. This is a temporary
-        # solution. See the comment in __iter__ below for the long term plan.
-        if self._base_content_is_iter:
-            self.content = b''.join(self.make_bytes(e) for e in self._container)
-
     @property
     def content(self):
-        self._consume_content()
         return b''.join(self.make_bytes(e) for e in self._container)
 
     @content.setter
     def content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
-            self._container = value
-            self._base_content_is_iter = True
             if hasattr(value, 'close'):
                 self._closable_objects.append(value)
-        else:
-            self._container = [value]
-            self._base_content_is_iter = False
+            value = b''.join(self.make_bytes(e) for e in value)
+        self._container = [value]
 
     def __iter__(self):
-        # Raise a deprecation warning only if the content wasn't consumed yet,
-        # because the response may be intended to be streamed.
-        # Once the deprecation completes, iterators should be consumed upon
-        # assignment rather than upon access. The _consume_content method
-        # should be removed. See #6527.
-        if self._base_content_is_iter:
-            warnings.warn(
-                'Creating streaming responses with `HttpResponse` is '
-                'deprecated. Use `StreamingHttpResponse` instead '
-                'if you need the streaming behavior.',
-                DeprecationWarning, stacklevel=2)
         if not hasattr(self, '_iterator'):
             self._iterator = iter(self._container)
         return self
 
     def write(self, content):
-        self._consume_content()
         self._container.append(content)
 
     def tell(self):
-        self._consume_content()
         return len(self.content)
 
 
@@ -421,35 +389,6 @@ class StreamingHttpResponse(HttpResponseBase):
             self._closable_objects.append(value)
 
 
-class CompatibleStreamingHttpResponse(StreamingHttpResponse):
-    """
-    This class maintains compatibility with middleware that doesn't know how
-    to handle the content of a streaming response by exposing a `content`
-    attribute that will consume and cache the content iterator when accessed.
-
-    These responses will stream only if no middleware attempts to access the
-    `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a `DeprecationWarning`.
-    """
-    @property
-    def content(self):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            DeprecationWarning, stacklevel=2)
-        content = b''.join(self)
-        self.streaming_content = [content]
-        return content
-
-    @content.setter
-    def content(self, content):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            DeprecationWarning, stacklevel=2)
-        self.streaming_content = [content]
-
-
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
@@ -483,7 +422,6 @@ class HttpResponseNotModified(HttpResponse):
         if value:
             raise AttributeError("You cannot set content to a 304 (Not Modified) response")
         self._container = []
-        self._base_content_is_iter = False
 
 
 class HttpResponseBadRequest(HttpResponse):

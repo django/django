@@ -568,7 +568,7 @@ def cycle(parser, token, escape=False):
             "'The `cycle` template tag is changing to escape its arguments; "
             "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -712,7 +712,7 @@ def firstof(parser, token, escape=False):
             "'The `firstof` template tag is changing to escape its arguments; "
             "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     bits = token.split_contents()[1:]
     if len(bits) < 1:

@@ -16,6 +16,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
     class Publication(models.Model):
         title = models.CharField(max_length=30)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.title
 
@@ -26,6 +27,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
         headline = models.CharField(max_length=100)
         publications = models.ManyToManyField(Publication)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.headline
 

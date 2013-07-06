@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
@@ -9,7 +10,6 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.db.models import Count, Min
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS:
     from .models import City, PennsylvaniaCity, State, Truth

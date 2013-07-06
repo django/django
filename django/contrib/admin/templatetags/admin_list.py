@@ -11,7 +11,7 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import formats
-from django.utils.html import format_html
+from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -226,12 +226,12 @@ def items_for_result(cl, result, form):
             else:
                 attr = pk
             value = result.serializable_value(attr)
-            result_id = repr(force_text(value))[1:]
+            result_id = escapejs(value)
             yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
                               table_tag,
                               row_class,
                               url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, {0}); return false;"', result_id)
+                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
                                 if cl.is_popup else '',
                               result_repr,
                               table_tag)

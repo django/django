@@ -3,8 +3,9 @@ import datetime
 import os
 import pickle
 import time
+import unittest
+
 from django.utils.tzinfo import FixedOffset, LocalTimezone
-from django.utils import unittest
 
 class TzinfoTests(unittest.TestCase):
 

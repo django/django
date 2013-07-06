@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
-from django.core.serializers.xml_serializer import DTDForbidden
+from unittest import expectedFailure, skipUnless
 
 try:
     import yaml
@@ -20,13 +20,13 @@ except ImportError:
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import DeserializationError
+from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import curry
-from django.utils.unittest import expectedFailure, skipUnless
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,

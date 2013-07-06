@@ -85,12 +85,7 @@ class DatabaseErrorWrapper(object):
             ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
-                # Under Python 2.6, exc_value can still be a string.
-                try:
-                    args = tuple(exc_value.args)
-                except AttributeError:
-                    args = (exc_value,)
-                dj_exc_value = dj_exc_type(*args)
+                dj_exc_value = dj_exc_type(*exc_value.args)
                 dj_exc_value.__cause__ = exc_value
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
@@ -174,7 +169,7 @@ class ConnectionHandler(object):
         if settings.TRANSACTIONS_MANAGED:
             warnings.warn(
                 "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
             conn.setdefault('AUTOCOMMIT', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')

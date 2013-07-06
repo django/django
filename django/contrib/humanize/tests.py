@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
+from unittest import skipIf
 
 try:
     import pytz
@@ -17,7 +18,6 @@ from django.utils.timezone import utc
 from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils import tzinfo
-from django.utils.unittest import skipIf
 
 from i18n import TransRealMixin
 

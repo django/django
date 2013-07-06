@@ -218,20 +218,6 @@ Methods
         Sends an email to the user. If ``from_email`` is ``None``, Django uses
         the :setting:`DEFAULT_FROM_EMAIL`.
 
-    .. method:: get_profile()
-
-        .. deprecated:: 1.5
-            With the introduction of :ref:`custom User models <auth-custom-user>`,
-            the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-            model is no longer supported. See the
-            :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-        Returns a site-specific profile for this user. Raises
-        ``django.contrib.auth.models.SiteProfileNotAvailable`` if the
-        current site doesn't allow profiles, or
-        :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
-        have a profile.
-
 Manager methods
 ---------------
 

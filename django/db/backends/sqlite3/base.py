@@ -19,6 +19,7 @@ from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.models import fields
 from django.db.models.sql import aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
 from django.utils import six
@@ -77,14 +78,8 @@ Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-if Database.version_info >= (2, 4, 1):
-    # Starting in 2.4.1, the str type is not accepted anymore, therefore,
-    # we convert all str objects to Unicode
-    # As registering a adapter for a primitive type causes a small
-    # slow-down, this adapter is only registered for sqlite3 versions
-    # needing it (Python 2.6 and up).
-    Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
+Database.register_adapter(str, lambda s: s.decode('utf-8'))
+Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
@@ -100,6 +95,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
     autocommits_when_autocommit_is_off = True
+    supports_paramstyle_pyformat = False
 
     @cached_property
     def uses_savepoints(self):
@@ -522,4 +518,4 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     return str(dt)
 
 def _sqlite_regexp(re_pattern, re_string):
-    return bool(re.search(re_pattern, re_string))
+    return bool(re.search(re_pattern, force_text(re_string))) if re_string is not None else False

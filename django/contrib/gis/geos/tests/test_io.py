@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 import binascii
 import unittest
+from unittest import skipUnless
 
 from django.contrib.gis import memoryview
-from django.utils.unittest import skipUnless
 
 from ..import HAS_GEOS
 

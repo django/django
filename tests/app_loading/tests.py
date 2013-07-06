@@ -4,11 +4,12 @@ import copy
 import os
 import sys
 import time
+from unittest import TestCase
 
 from django.conf import Settings
 from django.db.models.loading import cache, load_app, get_model, get_models
 from django.utils._os import upath
-from django.utils.unittest import TestCase
+
 
 class EggLoadingTest(TestCase):
 

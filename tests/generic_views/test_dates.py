@@ -2,12 +2,12 @@ from __future__ import absolute_import
 
 import time
 import datetime
+from unittest import skipUnless
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
-from django.utils.unittest import skipUnless
 
 from .models import Book, BookSigning
 

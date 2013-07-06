@@ -2,13 +2,13 @@ from __future__ import absolute_import
 
 import sys
 import time
+import unittest
 
 from django.conf import settings
 from django.db import transaction, connection
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.utils import unittest
 
 from .models import Person
 

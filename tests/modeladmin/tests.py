@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import date
+import unittest
 
 from django import forms
 from django.conf import settings
@@ -15,7 +16,7 @@ from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 from django.test.utils import str_prefix
-from django.utils import unittest, six
+from django.utils import six
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 

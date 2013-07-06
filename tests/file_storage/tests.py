@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
 try:
     from urllib.request import urlopen
 except ImportError:     # Python 2
@@ -28,7 +29,6 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.utils import six
-from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
 
@@ -363,6 +363,14 @@ class FileStorageTests(unittest.TestCase):
         f1.chunks = failing_chunks
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
+
+    def test_delete_no_name(self):
+        """
+        Calling delete with an empty name should not try to remove the base
+        storage directory, but fail loudly (#20660).
+        """
+        with self.assertRaises(AssertionError):
+            self.storage.delete('')
 
 
 class CustomStorage(FileSystemStorage):

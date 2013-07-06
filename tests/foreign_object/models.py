@@ -150,3 +150,11 @@ class ArticleTranslation(models.Model):
     class Meta:
         unique_together = ('article', 'lang')
         ordering = ('active_translation__title',)
+
+class ArticleTag(models.Model):
+    article = models.ForeignKey(Article, related_name="tags", related_query_name="tag")
+    name = models.CharField(max_length=255)
+
+class ArticleIdea(models.Model):
+    articles = models.ManyToManyField(Article, related_name="ideas", related_query_name="idea_things")
+    name = models.CharField(max_length=255)

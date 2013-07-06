@@ -1,45 +1,9 @@
-import warnings
-
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import (Group, User, SiteProfileNotAvailable,
-    UserManager)
+from django.contrib.auth.models import Group, User, UserManager
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.db.models.signals import post_save
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils import six
-
-
-@skipIfCustomUser
-@override_settings(USE_TZ=False, AUTH_PROFILE_MODULE='')
-class ProfileTestCase(TestCase):
-
-    def test_site_profile_not_available(self):
-        user = User.objects.create(username='testclient')
-
-        # calling get_profile without AUTH_PROFILE_MODULE set
-        del settings.AUTH_PROFILE_MODULE
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            with six.assertRaisesRegex(self, SiteProfileNotAvailable,
-                    "You need to set AUTH_PROFILE_MODULE in your project"):
-                user.get_profile()
-
-        # Bad syntax in AUTH_PROFILE_MODULE:
-        settings.AUTH_PROFILE_MODULE = 'foobar'
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            with six.assertRaisesRegex(self, SiteProfileNotAvailable,
-                    "app_label and model_name should be separated by a dot"):
-                user.get_profile()
-
-        # module that doesn't exist
-        settings.AUTH_PROFILE_MODULE = 'foo.bar'
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            with six.assertRaisesRegex(self, SiteProfileNotAvailable,
-                    "Unable to load the profile model"):
-                user.get_profile()
 
 
 @skipIfCustomUser
@@ -140,3 +104,27 @@ class IsActiveTestCase(TestCase):
         user_fetched = UserModel._default_manager.get(pk=user.pk)
         # the attribute is always true for newly retrieved instance
         self.assertEqual(user_fetched.is_active, True)
+
+
+@skipIfCustomUser
+class TestCreateSuperUserSignals(TestCase):
+    """
+    Simple test case for ticket #20541
+    """
+    def post_save_listener(self, *args, **kwargs):
+        self.signals_count += 1
+
+    def setUp(self):
+        self.signals_count = 0
+        post_save.connect(self.post_save_listener, sender=User)
+
+    def tearDown(self):
+        post_save.disconnect(self.post_save_listener, sender=User)
+
+    def test_create_user(self):
+        User.objects.create_user("JohnDoe")
+        self.assertEqual(self.signals_count, 1)
+
+    def test_create_superuser(self):
+        User.objects.create_superuser("JohnDoe", "mail@example.com", "1")
+        self.assertEqual(self.signals_count, 1)

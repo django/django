@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from django.utils import unittest
+import unittest
 
 from .models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
 

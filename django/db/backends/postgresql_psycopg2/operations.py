@@ -69,7 +69,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         # Cast text lookups to text to allow things like filter(x__contains=4)
         if lookup_type in ('iexact', 'contains', 'icontains', 'startswith',
-                           'istartswith', 'endswith', 'iendswith'):
+                           'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
             lookup = "%s::text"
 
         # Use UPPER(x) for case-insensitive lookups; it's faster.

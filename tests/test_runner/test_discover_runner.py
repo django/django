@@ -1,15 +1,10 @@
 from contextlib import contextmanager
 import os
 import sys
+from unittest import expectedFailure
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-from django.utils.unittest import expectedFailure
-
-try:
-    import unittest2
-except ImportError:
-    unittest2 = None
 
 
 def expectedFailureIf(condition):
@@ -26,7 +21,7 @@ class DiscoverRunnerTest(TestCase):
             ["test_discovery_sample.tests_sample"],
         ).countTestCases()
 
-        self.assertEqual(count, 3)
+        self.assertEqual(count, 2)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = DiscoverRunner().build_suite(
@@ -35,33 +30,9 @@ class DiscoverRunnerTest(TestCase):
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_class_unittest2(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestUnittest2"],
-        ).countTestCases()
-
-        self.assertEqual(count, 1)
-
     def test_dotted_test_class_django_testcase(self):
         count = DiscoverRunner().build_suite(
             ["test_discovery_sample.tests_sample.TestDjangoTestCase"],
-        ).countTestCases()
-
-        self.assertEqual(count, 1)
-
-    # this test fails if unittest2 is installed from PyPI on Python 2.6
-    # refs https://code.djangoproject.com/ticket/20437
-    @expectedFailureIf(sys.version_info < (2, 7) and unittest2)
-    def test_dotted_test_method_vanilla_unittest(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestVanillaUnittest.test_sample"],
-        ).countTestCases()
-
-        self.assertEqual(count, 1)
-
-    def test_dotted_test_method_unittest2(self):
-        count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestUnittest2.test_sample"],
         ).countTestCases()
 
         self.assertEqual(count, 1)
@@ -96,4 +67,4 @@ class DiscoverRunnerTest(TestCase):
                 ["test_discovery_sample/"],
             ).countTestCases()
 
-        self.assertEqual(count, 4)
+        self.assertEqual(count, 3)

@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 from decimal import Decimal
 import threading
+import unittest
 
 from django.conf import settings
 from django.core.management.color import no_style
@@ -21,7 +22,7 @@ from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings, str_prefix
-from django.utils import six, unittest
+from django.utils import six
 from django.utils.six.moves import xrange
 
 from . import models
@@ -163,6 +164,17 @@ class DateQuotingTest(TestCase):
 
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
+
+    def test_last_executed_query(self):
+        """
+        last_executed_query should not raise an exception even if no previous
+        query has been run.
+        """
+        cursor = connection.cursor()
+        try:
+            connection.ops.last_executed_query(cursor, '', ())
+        except Exception:
+            self.fail("'last_executed_query' should not raise an exception.")
 
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
@@ -456,13 +468,24 @@ class SqliteChecks(TestCase):
 class BackendTestCase(TestCase):
 
     def create_squares_with_executemany(self, args):
+        self.create_squares(args, 'format', True)
+
+    def create_squares(self, args, paramstyle, multiple):
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
-        query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
-        cursor.executemany(query, args)
+        if paramstyle=='format':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+        elif paramstyle=='pyformat':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+        else:
+            raise ValueError("unsupported paramstyle in test")
+        if multiple:
+            cursor.executemany(query, args)
+        else:
+            cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
@@ -489,6 +512,35 @@ class BackendTestCase(TestCase):
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
+        self.assertEqual(models.Square.objects.count(), 9)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_execute_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = {'root': 3, 'square': 9}
+        self.create_squares(args, 'pyformat', multiple=False)
+        self.assertEqual(models.Square.objects.count(), 1)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = [{'root': i, 'square': i**2} for i in range(-5, 6)]
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 11)
+        for i in range(-5, 6):
+            square = models.Square.objects.get(root=i)
+            self.assertEqual(square.square, i**2)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat_iterator(self):
+        args = iter({'root': i, 'square': i**2} for i in range(-3, 2))
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 5)
+
+        args = iter({'root': i, 'square': i**2} for i in range(3, 7))
+        with override_settings(DEBUG=True):
+            # same test for DebugCursorWrapper
+            self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 9)
 
     def test_unicode_fetches(self):

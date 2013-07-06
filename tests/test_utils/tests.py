@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-import warnings
+
+import unittest
+from unittest import skip
 
 from django.db import connection
 from django.forms import EmailField, IntegerField
@@ -8,10 +10,8 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, IgnorePendingDeprecationWarningsMixin
+from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
-from django.utils import unittest
-from django.utils.unittest import skip
 
 from .models import Person
 
@@ -268,37 +268,6 @@ class AssertTemplateUsedContextManagerTests(TestCase):
         with self.assertRaises(AssertionError):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
-
-
-class SaveRestoreWarningState(TestCase):
-    def test_save_restore_warnings_state(self):
-        """
-        Ensure save_warnings_state/restore_warnings_state work correctly.
-        """
-        # In reality this test could be satisfied by many broken implementations
-        # of save_warnings_state/restore_warnings_state (e.g. just
-        # warnings.resetwarnings()) , but it is difficult to test more.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-
-            self.save_warnings_state()
-
-            class MyWarning(Warning):
-                pass
-
-            # Add a filter that causes an exception to be thrown, so we can catch it
-            warnings.simplefilter("error", MyWarning)
-            self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
-
-            # Now restore.
-            self.restore_warnings_state()
-            # After restoring, we shouldn't get an exception. But we don't want a
-            # warning printed either, so we have to silence the warning.
-            warnings.simplefilter("ignore", MyWarning)
-            warnings.warn("warn", MyWarning)
-
-            # Remove the filter we just added.
-            self.restore_warnings_state()
 
 
 class HTMLEqualTests(TestCase):
@@ -623,7 +592,7 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
 
     def test_normalizer(self):
         from django.test.simple import make_doctest

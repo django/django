@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import datetime
+import unittest
 try:
     from urllib.parse import urljoin
 except ImportError:  # Python 2
@@ -15,6 +16,7 @@ from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -30,7 +32,8 @@ from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import patch_logger
-from django.utils import formats, translation, unittest
+from django.utils import formats
+from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
@@ -57,7 +60,7 @@ for a staff account. Note that both fields may be case-sensitive."
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class AdminViewBasicTest(TestCase):
+class AdminViewBasicTestCase(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
 
@@ -92,6 +95,7 @@ class AdminViewBasicTest(TestCase):
             failing_msg
         )
 
+class AdminViewBasicTest(AdminViewBasicTestCase):
     def testTrailingSlashRequired(self):
         """
         If you leave off the trailing slash, app should redirect and add it.
@@ -583,6 +587,14 @@ class AdminViewBasicTest(TestCase):
         response = self.client.get("/test_admin/admin/admin_views/inquisition/?leader__name=Palin&leader__age=27")
         self.assertEqual(response.status_code, 200)
 
+    def test_popup_dismiss_related(self):
+        """
+        Regression test for ticket 20664 - ensure the pk is properly quoted.
+        """
+        actor = Actor.objects.create(name="Palin", age=27)
+        response = self.client.get("/test_admin/admin/admin_views/actor/?%s" % IS_POPUP_VAR)
+        self.assertContains(response, "opener.dismissRelatedLookupPopup(window, &#39;%s&#39;)" % actor.pk)
+
     def test_hide_change_password(self):
         """
         Tests if the "change password" link in the admin is hidden if the User
@@ -753,7 +765,7 @@ class SaveAsTests(TestCase):
         self.assertEqual(response.context['form_url'], '/test_admin/admin/admin_views/person/add/')
 
 
-class CustomModelAdminTest(AdminViewBasicTest):
+class CustomModelAdminTest(AdminViewBasicTestCase):
     urls = "admin_views.urls"
     urlbit = "admin2"
 
@@ -845,20 +857,20 @@ class AdminViewPermissionsTest(TestCase):
         # User who can add Articles
         add_user = User.objects.get(username='adduser')
         add_user.user_permissions.add(get_perm(Article,
-            opts.get_add_permission()))
+            get_permission_codename('add', opts)))
 
         # User who can change Articles
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Article,
-            opts.get_change_permission()))
+            get_permission_codename('change', opts)))
 
         # User who can delete Articles
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Article,
-            opts.get_delete_permission()))
+            get_permission_codename('delete', opts)))
 
         delete_user.user_permissions.add(get_perm(Section,
-            Section._meta.get_delete_permission()))
+            get_permission_codename('delete', Section._meta)))
 
         # login POST dicts
         self.super_login = {
@@ -1201,7 +1213,7 @@ class AdminViewPermissionsTest(TestCase):
         # Allow the add user to add sections too. Now they can see the "add
         # section" link.
         add_user = User.objects.get(username='adduser')
-        perm = get_perm(Section, Section._meta.get_add_permission())
+        perm = get_perm(Section, get_permission_codename('add', Section._meta))
         add_user.user_permissions.add(perm)
         response = self.client.get(url)
         self.assertContains(response, add_link_text)
@@ -1306,7 +1318,7 @@ class AdminViewsNoUrlTest(TestCase):
         # User who can change Reports
         change_user = User.objects.get(username='changeuser')
         change_user.user_permissions.add(get_perm(Report,
-            opts.get_change_permission()))
+            get_permission_codename('change', opts)))
 
         # login POST dict
         self.changeuser_login = {
@@ -1363,7 +1375,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         self.client.logout()
         delete_user = User.objects.get(username='deleteuser')
         delete_user.user_permissions.add(get_perm(Plot,
-            Plot._meta.get_delete_permission()))
+            get_permission_codename('delete', Plot._meta)))
 
         self.assertTrue(self.client.login(username='deleteuser',
                                           password='secret'))

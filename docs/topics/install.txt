@@ -7,10 +7,8 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python.
-
-It works with any Python version from 2.6.5 to 2.7. It also features
-experimental support for versions from 3.2.3 to 3.3.
+Being a Python Web framework, Django requires Python. It works with Python 2.7,
+3.2 or 3.3.
 
 Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
 probably already have it installed.
