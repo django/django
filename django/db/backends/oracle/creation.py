@@ -168,9 +168,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                IDENTIFIED BY %(password)s
                DEFAULT TABLESPACE %(tblspace)s
                TEMPORARY TABLESPACE %(tblspace_temp)s
+               QUOTA UNLIMITED ON %(tblspace)s
             """,
             """GRANT CONNECT, RESOURCE TO %(user)s""",
-            """ALTER USER %(user)s QUOTA UNLIMITED ON %(tblspace)s""",
         ]
         self._execute_statements(cursor, statements, parameters, verbosity)
 
