@@ -314,6 +314,13 @@ descriptive text in a ``description`` class attribute of your custom field. In
 the above example, the description displayed by the ``admindocs``
 application for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
+In the :mod:`django.contrib.admindocs` display, the field description is
+interpolated with ``field.__dict__`` which allows the description to
+incorporate arguments of the field. For example, the description for
+:class:`~django.db.models.CharField` is::
+
+    description = _("String (up to %(max_length)s)")
+
 Useful methods
 --------------
 
