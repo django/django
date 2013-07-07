@@ -110,14 +110,14 @@ def get_validation_errors(outfile, app=None):
             if not f.rel:
                 continue
 
+            # It is a string and we could not find the model it refers to so
+            # skip the next section
+            if isinstance(f.rel.to, six.string_types):
+                continue
+
             if f in opts.local_fields:
                 # Check to see if the related field will clash with any existing
                 # fields, m2m fields, m2m related objects or related objects
-
-                # it is a string and we could not find the model it refers to
-                # so skip the next section
-                if isinstance(f.rel.to, six.string_types):
-                    continue
 
                 rel_opts = f.rel.to._meta
                 rel_name = f.related.get_accessor_name()
