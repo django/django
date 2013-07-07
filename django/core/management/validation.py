@@ -105,6 +105,11 @@ def get_validation_errors(outfile, app=None):
                     seen_intermediary_signatures.append(signature)
 
         for f in opts.local_fields + opts.local_many_to_many:
+            # Skip all non-relative fields, because opts.local_fields may
+            # contain them.
+            if not f.rel:
+                continue
+
             if f in opts.local_fields:
                 # Check to see if the related field will clash with any existing
                 # fields, m2m fields, m2m related objects or related objects
