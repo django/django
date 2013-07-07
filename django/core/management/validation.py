@@ -149,11 +149,9 @@ def get_validation_errors(outfile, app=None):
                 else: # if m2m
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
 
-                if not m2m:
-                    if r in rel_opts.get_all_related_objects() and r.field is f:
-                        continue
-                else: # if m2m
-                    if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
+                if r.field is f:
+                    if (not m2m and r in rel_opts.get_all_related_objects() or
+                        m2m and r in rel_opts.get_all_related_many_to_many_objects()):
                         continue
 
                 if r.get_accessor_name() == rel_name:
