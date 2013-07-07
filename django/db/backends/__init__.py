@@ -70,7 +70,9 @@ class BaseDatabaseWrapper(object):
         self._thread_ident = thread.get_ident()
 
     def __eq__(self, other):
-        return self.alias == other.alias
+        if isinstance(other, BaseDatabaseWrapper):
+            return self.alias == other.alias
+        return NotImplemented
 
     def __ne__(self, other):
         return not self == other
