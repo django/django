@@ -153,6 +153,11 @@ def get_validation_errors(outfile, app=None):
                 else:
                     seen_intermediary_signatures.append(signature)
 
+        for f in opts.local_many_to_many:
+            if (f.rel.to not in models.get_models() and
+                isinstance(f.rel.to, six.string_types)):
+                continue
+
             rel_opts = f.rel.to._meta
             rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
