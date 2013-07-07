@@ -16,7 +16,8 @@ def timesince(d, now=None, reversed=False):
     displayed.  For example, "2 weeks, 3 days" and "1 year, 3 months" are
     possible outputs, but "2 weeks, 3 hours" and "1 year, 5 days" are not.
 
-    Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
+    Adapted from
+    http://web.archive.org/web/20060617175230/http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
       (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
