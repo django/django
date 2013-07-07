@@ -189,8 +189,6 @@ def get_javascript_catalog(locale, domain, packages):
     packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
     t = {}
     paths = []
-    en_selected = locale.startswith('en')
-    en_catalog_missing = True
     # paths of requested packages
     for package in packages:
         p = importlib.import_module(package)
@@ -198,46 +196,15 @@ def get_javascript_catalog(locale, domain, packages):
         paths.append(path)
     # add the filesystem paths listed in the LOCALE_PATHS setting
     paths.extend(list(reversed(settings.LOCALE_PATHS)))
-    # first load all english languages files for defaults
+    # Load the currently selected language.
     for path in paths:
         try:
-            catalog = gettext_module.translation(domain, path, ['en'])
-            t.update(catalog._catalog)
+            catalog = gettext_module.translation(domain, path, [locale])
         except IOError:
-            pass
-        else:
-            # 'en' is the selected language and at least one of the packages
-            # listed in `packages` has an 'en' catalog
-            if en_selected:
-                en_catalog_missing = False
-    # next load the settings.LANGUAGE_CODE translations if it isn't english
-    if default_locale != 'en':
-        for path in paths:
-            try:
-                catalog = gettext_module.translation(domain, path, [default_locale])
-            except IOError:
-                catalog = None
-            if catalog is not None:
-                t.update(catalog._catalog)
-    # last load the currently selected language, if it isn't identical to the default.
-    if locale != default_locale:
-        # If the currently selected language is English but it doesn't have a
-        # translation catalog (presumably due to being the language translated
-        # from) then a wrong language catalog might have been loaded in the
-        # previous step. It needs to be discarded.
-        if en_selected and en_catalog_missing:
-            t = {}
-        else:
-            locale_t = {}
-            for path in paths:
-                try:
-                    catalog = gettext_module.translation(domain, path, [locale])
-                except IOError:
-                    catalog = None
-                if catalog is not None:
-                    locale_t.update(catalog._catalog)
-            if locale_t:
-                t = locale_t
+            catalog = None
+        if catalog is not None:
+            t.update(catalog._catalog)
+
     plural = None
     if '' in t:
         for l in t[''].split('\n'):

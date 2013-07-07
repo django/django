@@ -89,14 +89,21 @@ class JsI18NTests(TestCase):
             response = self.client.get('/views/jsi18n/')
             self.assertNotContains(response, 'esto tiene que ser traducido')
 
-    def test_jsi18n_fallback_language(self):
+    def test_jsi18n_not_loading_english_unless_requested(self):
         """
-        Let's make sure that the fallback language is still working properly
-        in cases where the selected language cannot be found.
+        Regression test for #16284.
+
+        Ensure that if we translate from language other than English,
+        javascript_catalog doesn’t load English translation files unless it is
+        explicitly requested.
         """
-        with self.settings(LANGUAGE_CODE='fr'), override('fi'):
-            response = self.client.get('/views/jsi18n/')
-            self.assertContains(response, 'il faut le traduire')
+        # Actually there’s no way to determine what language we’re translating from.
+        # For the purpose of this test, we assume it to be Polish.
+        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests.app0']
+        with self.settings(LANGUAGE_CODE='pl', INSTALLED_APPS=extended_apps), \
+             override('pl'):
+            response = self.client.get('/views/jsi18n_english_translation/')
+            self.assertNotContains(response, javascript_quote('this app0 string is to be translated'))
 
     def testI18NLanguageNonEnglishDefault(self):
         """
