@@ -146,6 +146,29 @@ def get_validation_errors(outfile, app=None):
             if rel_name is None:
                 continue
 
+            # Consider the following (invalid) models:
+            #
+            #     class Target(models.Model):
+            #         model = models.IntegerField()
+            #         model_set = models.IntegerField()
+            #
+            #     class Model(models.Model):
+            #         foreign = ForeignKey(Target)
+            #         m2m = ManyToManyField(Target)
+            #
+            # In that case, when the checked field is `foreign`, local
+            # variables values are:
+            #
+            #     field = cls.foreign.field
+            #     field_name = "field 'foreign'"
+            #     is_field_m2m = False
+            #     opts.local_field = [cls.id.field, cls.foreign.field]
+            #     opts.local_many_to_many = [cls.m2m.field]
+            #     rel_name = "model_set"
+            #     rel_query_name = "model"
+            #     rel_opts.fields = [Target.id.field, Target.model.field, Target.model_set.field]
+            #     rel_opts.local_many_to_many = []
+
             for r in rel_opts.fields + rel_opts.local_many_to_many:
                 m2m_part = "m2m " if r in rel_opts.many_to_many else ""
                 if r.name == rel_name:
