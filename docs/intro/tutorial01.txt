@@ -98,7 +98,7 @@ Let's look at what :djadmin:`startproject` created::
 
 These files are:
 
-* The outer :file:`mysite/` directory is just a container for your
+* The outer :file:`mysite/` root directory is just a container for your
   project. Its name doesn't matter to Django; you can rename it to anything
   you like.
 
@@ -108,7 +108,7 @@ These files are:
 
 * The inner :file:`mysite/` directory is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
-  anything inside it (e.g. ``import mysite.settings``).
+  anything inside it (e.g. ``mysite.urls``).
 
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
   directory should be considered a Python package. (Read `more about
