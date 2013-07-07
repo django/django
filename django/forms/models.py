@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.forms.fields import Field, ChoiceField
 from django.forms.forms import BaseForm, get_declared_fields
 from django.forms.formsets import BaseFormSet, formset_factory
-from django.forms.util import ErrorList
+from django.forms.util import ErrorList, WarningList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text
@@ -292,8 +292,8 @@ class ModelFormMetaclass(type):
 
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False, instance=None):
+                 initial=None, error_class=ErrorList, warning_class=WarningList,
+                 label_suffix=':', empty_permitted=False, instance=None):
         opts = self._meta
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
@@ -312,7 +312,8 @@ class BaseModelForm(BaseForm):
         # super will stop validate_unique from being called.
         self._validate_unique = False
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
+                                            error_class, warning_class, label_suffix,
+                                            empty_permitted)
 
     def _update_errors(self, errors):
         for field, messages in errors.error_dict.items():
