@@ -157,7 +157,7 @@ def get_validation_errors(outfile, app=None):
                         "Add a related_name argument to the definition for '%s'."
                         % (m2m_part2, f.name, m2m_part, rel_opts.object_name, r.name, f.name))
 
-            if f in opts.local_fields:
+            if not m2m:
                 for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
                     if r in rel_opts.get_all_related_objects() and r.field is f:
@@ -171,7 +171,7 @@ def get_validation_errors(outfile, app=None):
                             "Add a related_name argument to the definition for '%s'."
                             % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
 
-            else: # f in opts.local_many_to_many
+            else: # if m2m
                 for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
                     if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
