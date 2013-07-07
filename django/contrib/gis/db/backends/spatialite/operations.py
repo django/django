@@ -56,7 +56,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = dict([(k, None) for k in ('Extent', 'Union')])
+    valid_aggregates = {'Extent', 'Union'}
 
     Adapter = SpatiaLiteAdapter
     Adaptor = Adapter # Backwards-compatibility alias.
