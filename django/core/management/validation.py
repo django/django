@@ -146,11 +146,13 @@ def get_validation_errors(outfile, app=None):
             for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
                 if not m2m:
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
-                    if r in rel_opts.get_all_related_objects() and r.field is f:
-                        continue
-
                 else: # if m2m
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
+
+                if not m2m:
+                    if r in rel_opts.get_all_related_objects() and r.field is f:
+                        continue
+                else: # if m2m
                     if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
                         continue
 
