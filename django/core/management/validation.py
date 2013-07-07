@@ -77,6 +77,7 @@ def get_validation_errors(outfile, app=None):
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
 
+        for f in opts.local_fields:
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
             if f.rel:
@@ -126,7 +127,7 @@ def get_validation_errors(outfile, app=None):
                                 % (f.name, m2m, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         seen_intermediary_signatures = []
-        for i, f in enumerate(opts.local_many_to_many):
+        for f in opts.local_many_to_many:
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related
             # objects
