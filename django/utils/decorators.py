@@ -43,17 +43,6 @@ def method_decorator(decorator):
     _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
     return _dec
 
-def method_decorator_with_args(decorator_factory):
-    """
-    Converts a function decorator factory (e.g. `permission_required`) into a
-    method decorator factory.
-    """
-    def _method_dec_factory(*args, **kwargs):
-        return method_decorator(decorator_factory(*args, **kwargs))
-    update_wrapper(_method_dec_factory, decorator_factory)
-    # Change the name to aid debugging.
-    _method_dec_factory.__name__ = 'method_decorator_with_args(%s)' % decorator_factory.__name__
-    return _method_dec_factory
 
 def decorator_from_middleware_with_args(middleware_class):
     """
