@@ -129,13 +129,14 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f.rel.to, six.string_types):
                 continue
 
+            rel_opts = f.rel.to._meta
+            rel_name = f.related.get_accessor_name()
+            rel_query_name = f.related_query_name()
+
             if f in opts.local_fields:
                 # Check to see if the related field will clash with any existing
                 # fields, m2m fields, m2m related objects or related objects
 
-                rel_opts = f.rel.to._meta
-                rel_name = f.related.get_accessor_name()
-                rel_query_name = f.related_query_name()
                 if not f.rel.is_hidden():
                     for r in rel_opts.fields + rel_opts.local_many_to_many:
                         m2m = "m2m " if r in rel_opts.many_to_many else ""
