@@ -117,7 +117,7 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f.rel.to, six.string_types):
                 continue
 
-            if not m2m and f.rel.is_hidden():
+            if f.rel.is_hidden():
                 continue
 
             rel_opts = f.rel.to._meta
@@ -129,7 +129,7 @@ def get_validation_errors(outfile, app=None):
             # occurs for symmetrical m2m relations to self). If this is the
             # case, there are no clashes to check for this field, as there are
             # no reverse descriptors for this field.
-            if m2m and rel_name is None:
+            if rel_name is None:
                 continue
 
             for r in rel_opts.fields + rel_opts.local_many_to_many:
