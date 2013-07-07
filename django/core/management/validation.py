@@ -167,24 +167,16 @@ def get_validation_errors(outfile, app=None):
             # case, there are no clashes to check for this field, as there are
             # no reverse descriptors for this field.
             if rel_name is not None:
-                for r in rel_opts.fields:
+                for r in rel_opts.fields + rel_opts.local_many_to_many:
+                    m2m = "m2m " if r in rel_opts.many_to_many else ""
                     if r.name == rel_name:
-                        e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. "
+                        e.add(opts, "Accessor for m2m field '%s' clashes with %sfield '%s.%s'. "
                             "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.name, f.name))
+                            % (f.name, m2m, rel_opts.object_name, r.name, f.name))
                     if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for m2m field '%s' clashes with field '%s.%s'. "
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with %sfield '%s.%s'. "
                             "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.local_many_to_many:
-                    if r.name == rel_name:
-                        e.add(opts, "Accessor for m2m field '%s' clashes with m2m field '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.name, f.name))
-                    if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for m2m field '%s' clashes with m2m field '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.name, f.name))
+                            % (f.name, m2m, rel_opts.object_name, r.name, f.name))
                 for r in rel_opts.get_all_related_many_to_many_objects():
                     if r.field is not f:
                         if r.get_accessor_name() == rel_name:
