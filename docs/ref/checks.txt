@@ -6,16 +6,15 @@ Checking framework is a set of static checks validating mainly apps and
 models. It detects common problems and report them providing hints.
 
 Checking can be triggered explicitly via ``python manage.py check`` command.
-It's also triggered implicitly before running server (command ``runserver``)
-or syncing database  (``syncdb``). For performance issues, the checks are not
-performed if ``DEBUG`` is set to False.
+It's also triggered implicitly before most command, including ``runserver``
+and ``syncdb``. For performance issues, the checks are not performed if
+``DEBUG`` is set to False.
 
 Four kinds of object can be checked: apps, models, fields and managers. All of
-them share the same interface. Each of these objects have a callable piece of
-code named ``check``. The callable piece of code is a method (in case of
-fields and managers), a classmethod (in case of models) or a function (in
-case of an app). It should receive ``**kwargs`` and return list of errors and
-warnings.
+them share the same interface. Each of these objects has a callable piece of
+code named ``check``. It is a method (in case of fields and managers), a
+classmethod (in case of models) or a function (in case of an app). It receives
+``**kwargs`` and returns list of errors and warnings.
 
 Errors and warnings
 ===================
@@ -23,15 +22,25 @@ Errors and warnings
 ``django.core.checks`` defines two classes: ``Error`` and ``Warning``. Both
 have the same interface, they differ only in their meaning. When an Error
 occures, Django stops everything and doesn't allow to i. e. run a server.
-Warnings are reported along with Errors, but you can run server or syncdb even
-though there are Warnings.
+Warnings are reported along with Errors, but you can run server even though
+there are Warnings.
 
-An Error and Warning have fields: ``msg``, ``hint`` and ``obj``. The first one
-is a required string. It can be multiline. In that case, the first line should
-be a short description and the rest is treated as a long description. ``hint``
-is second and last required argument. It's a string or ``None`` if you cannot
-provide any hint. ``obj`` is optional. It points to the invalid object. If not
-provided, the default value is ``None``.
+Constructor arguments are:
+
+``msg``
+    A required string. It can consists of one or more lines. In the latter
+    case, the first line is a short description and the rest is a long
+    description.
+
+``hint``
+    A single-line string or ``None`` if you cannot provide any hint. Note that
+    this argument is required even if you pass ``None``::
+
+        Error('error message') # bad
+        Error('error message', hint=None) # good
+
+``obj``
+    Optional. Point to the invalid object.
 
 Errors and Warnings are comparable. That allows you to easily write tests::
 
@@ -44,39 +53,38 @@ Field checking
 ==============
 
 If you created your own field, you may want to add some checking. In that
-case, you need to override `check` method: it should super to the superclass,
-perform its own checks (which may end in some new errors or warnings) and
-eventually return list of all errors and warnings. It's recommended to
+case, you need to override `check` method: it should call the superclass (1),
+perform its own checks which may end in new errors or warnings (2) and
+eventually return list of all errors and warnings (3). It's recommended to
 delegate checks to separated methods whose names start with ``_check_``, i. e.
 ``_check_min_max_values``.
 
 Consider an example where you are implementing ``RangedIntegerField``. It adds
 ``min`` and ``max`` arguments to the constructor. You want to check if min
 value is smaller or equal to max value. Here is a snippet of code showing how
-can you implement this check::
+you can implement this check::
 
     from django.core import checks
     from django.db import models
 
     class RangedIntegerField(models.IntegerField):
-        def __init__(self, min=None, max=None, **kwargs)
+        def __init__(self, min=None, max=None, **kwargs):
             super(RangedIntegerField, self).__init__(**kwargs)
             self.min = min
             self.max = max
 
         def check(self, **kwargs):
-            errors = super(MyField, self).check(**kwargs)
-            # Do some custom checking and add errors and warning to `errors`:
+            errors = super(MyField, self).check(**kwargs) # (1) call the superclass
+            # (2) Do some custom checking and add errors and warning to `errors`:
             errors.extend(self._check_min_max_values(**kwargs))
-            return errors
+            return errors # (3) return all errors and warnings
 
-        def _check_min_max_values(**kwargs):
+        def _check_min_max_values(self, **kwargs):
             if (self.min is not None and
                 self.max is not None and
                 self.min > self.max):
-                return [checks.Error(
-                    'min greated than max.',
-                    hint='Lower min or upper max.'
+                return [checks.Error('min greated than max.',
+                    hint='Lower min or upper max.',
                     obj=self)]
             return [] # When no error, return an empty list
 
