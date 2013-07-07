@@ -91,6 +91,33 @@ def get_validation_errors(outfile, app=None):
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
 
+        seen_intermediary_signatures = []
+        for f in opts.local_many_to_many:
+            # Check to see if the related m2m field will clash with any
+            # existing fields, m2m fields, m2m related objects or related
+            # objects
+
+            # it is a string and we could not find the model it refers to
+            # so skip the next section
+            if (f.rel.to not in models.get_models() and
+                isinstance(f.rel.to, six.string_types)):
+                continue
+
+            if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
+                from_model, to_model = cls, f.rel.to
+                signature = (f.rel.to, cls, f.rel.through)
+                if signature in seen_intermediary_signatures:
+                    e.add(opts, "The model %s has two manually-defined m2m "
+                        "relations through the model %s, which is not "
+                        "permitted. Please consider using an extra field on "
+                        "your intermediary model instead." % (
+                            cls._meta.object_name,
+                            f.rel.through._meta.object_name
+                        )
+                    )
+                else:
+                    seen_intermediary_signatures.append(signature)
+
         for f in opts.local_fields:
             # Check to see if the related field will clash with any existing
             # fields, m2m fields, m2m related objects or related objects
@@ -139,33 +166,6 @@ def get_validation_errors(outfile, app=None):
                             e.add(opts, "Reverse query name for field '%s' clashes with related %sfield '%s.%s'. "
                                 "Add a related_name argument to the definition for '%s'."
                                 % (f.name, m2m, rel_opts.object_name, r.get_accessor_name(), f.name))
-
-        seen_intermediary_signatures = []
-        for f in opts.local_many_to_many:
-            # Check to see if the related m2m field will clash with any
-            # existing fields, m2m fields, m2m related objects or related
-            # objects
-
-            # it is a string and we could not find the model it refers to
-            # so skip the next section
-            if (f.rel.to not in models.get_models() and
-                isinstance(f.rel.to, six.string_types)):
-                continue
-
-            if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
-                from_model, to_model = cls, f.rel.to
-                signature = (f.rel.to, cls, f.rel.through)
-                if signature in seen_intermediary_signatures:
-                    e.add(opts, "The model %s has two manually-defined m2m "
-                        "relations through the model %s, which is not "
-                        "permitted. Please consider using an extra field on "
-                        "your intermediary model instead." % (
-                            cls._meta.object_name,
-                            f.rel.through._meta.object_name
-                        )
-                    )
-                else:
-                    seen_intermediary_signatures.append(signature)
 
         for f in opts.local_many_to_many:
             if (f.rel.to not in models.get_models() and
