@@ -185,25 +185,19 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, "Reverse query name for m2m field '%s' clashes with %sfield '%s.%s'. "
                             "Add a related_name argument to the definition for '%s'."
                             % (f.name, m2m, rel_opts.object_name, r.name, f.name))
-                for r in rel_opts.get_all_related_many_to_many_objects():
-                    if r.field is not f:
-                        if r.get_accessor_name() == rel_name:
-                            e.add(opts, "Accessor for m2m field '%s' clashes with related m2m field '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-                        if r.get_accessor_name() == rel_query_name:
-                            e.add(opts, "Reverse query name for m2m field '%s' clashes with related m2m field '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-                for r in rel_opts.get_all_related_objects():
+
+                for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
+                    m2m = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
+                    if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
+                        continue
                     if r.get_accessor_name() == rel_name:
-                        e.add(opts, "Accessor for m2m field '%s' clashes with related field '%s.%s'. "
+                        e.add(opts, "Accessor for m2m field '%s' clashes with related %sfield '%s.%s'. "
                             "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                            % (f.name, m2m, rel_opts.object_name, r.get_accessor_name(), f.name))
                     if r.get_accessor_name() == rel_query_name:
-                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. "
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related %sfield '%s.%s'. "
                             "Add a related_name argument to the definition for '%s'."
-                            % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                            % (f.name, m2m, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         # Check ordering attribute.
         if opts.ordering:
