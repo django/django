@@ -137,6 +137,7 @@ def get_validation_errors(outfile, app=None):
             rel_opts = f.rel.to._meta
             rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
+            m2m_part2 = "m2m " if m2m else ""
 
             # If rel_name is None, there is no reverse accessor (this only
             # occurs for symmetrical m2m relations to self). If this is the
@@ -145,21 +146,18 @@ def get_validation_errors(outfile, app=None):
             if m2m and rel_name is None:
                 continue
 
+            for r in rel_opts.fields + rel_opts.local_many_to_many:
+                m2m_part = "m2m " if r in rel_opts.many_to_many else ""
+                if r.name == rel_name:
+                    e.add(opts, "Accessor for %sfield '%s' clashes with %sfield '%s.%s'. "
+                        "Add a related_name argument to the definition for '%s'."
+                        % (m2m_part2, f.name, m2m_part, rel_opts.object_name, r.name, f.name))
+                if r.name == rel_query_name:
+                    e.add(opts, "Reverse query name for %sfield '%s' clashes with %sfield '%s.%s'. "
+                        "Add a related_name argument to the definition for '%s'."
+                        % (m2m_part2, f.name, m2m_part, rel_opts.object_name, r.name, f.name))
+
             if f in opts.local_fields:
-                # Check to see if the related field will clash with any existing
-                # fields, m2m fields, m2m related objects or related objects
-
-                for r in rel_opts.fields + rel_opts.local_many_to_many:
-                    m2m_part = "m2m " if r in rel_opts.many_to_many else ""
-                    if r.name == rel_name:
-                        e.add(opts, "Accessor for field '%s' clashes with %sfield '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-                    if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for field '%s' clashes with %sfield '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-
                 for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
                     if r in rel_opts.get_all_related_objects() and r.field is f:
@@ -174,18 +172,6 @@ def get_validation_errors(outfile, app=None):
                             % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
 
             else: # f in opts.local_many_to_many
-
-                for r in rel_opts.fields + rel_opts.local_many_to_many:
-                    m2m_part = "m2m " if r in rel_opts.many_to_many else ""
-                    if r.name == rel_name:
-                        e.add(opts, "Accessor for m2m field '%s' clashes with %sfield '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-                    if r.name == rel_query_name:
-                        e.add(opts, "Reverse query name for m2m field '%s' clashes with %sfield '%s.%s'. "
-                            "Add a related_name argument to the definition for '%s'."
-                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-
                 for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
                     m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
                     if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
