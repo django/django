@@ -138,6 +138,13 @@ def get_validation_errors(outfile, app=None):
             rel_name = f.related.get_accessor_name()
             rel_query_name = f.related_query_name()
 
+            # If rel_name is None, there is no reverse accessor (this only
+            # occurs for symmetrical m2m relations to self). If this is the
+            # case, there are no clashes to check for this field, as there are
+            # no reverse descriptors for this field.
+            if m2m and rel_name is None:
+                continue
+
             if f in opts.local_fields:
                 # Check to see if the related field will clash with any existing
                 # fields, m2m fields, m2m related objects or related objects
@@ -167,54 +174,30 @@ def get_validation_errors(outfile, app=None):
                             % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
 
             else: # f in opts.local_many_to_many
-                if (f.rel.to not in models.get_models() and
-                    isinstance(f.rel.to, six.string_types)):
-                    continue
 
-                # Make sure the related field specified by a ForeignKey is unique
-                if f.requires_unique_target:
-                    if len(f.foreign_related_fields) > 1:
-                        has_unique_field = False
-                        for rel_field in f.foreign_related_fields:
-                            has_unique_field = has_unique_field or rel_field.unique
-                        if not has_unique_field:
-                            e.add(opts, "Field combination '%s' under model '%s' must have a unique=True constraint" % (','.join(rel_field.name for rel_field in f.foreign_related_fields), f.rel.to.__name__))
-                    else:
-                        if not f.foreign_related_fields[0].unique:
-                            e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.foreign_related_fields[0].name, f.rel.to.__name__))
+                for r in rel_opts.fields + rel_opts.local_many_to_many:
+                    m2m_part = "m2m " if r in rel_opts.many_to_many else ""
+                    if r.name == rel_name:
+                        e.add(opts, "Accessor for m2m field '%s' clashes with %sfield '%s.%s'. "
+                            "Add a related_name argument to the definition for '%s'."
+                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
+                    if r.name == rel_query_name:
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with %sfield '%s.%s'. "
+                            "Add a related_name argument to the definition for '%s'."
+                            % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
 
-                rel_opts = f.rel.to._meta
-                rel_name = f.related.get_accessor_name()
-                rel_query_name = f.related_query_name()
-
-                # If rel_name is none, there is no reverse accessor (this only
-                # occurs for symmetrical m2m relations to self). If this is the
-                # case, there are no clashes to check for this field, as there are
-                # no reverse descriptors for this field.
-                if rel_name is not None:
-                    for r in rel_opts.fields + rel_opts.local_many_to_many:
-                        m2m_part = "m2m " if r in rel_opts.many_to_many else ""
-                        if r.name == rel_name:
-                            e.add(opts, "Accessor for m2m field '%s' clashes with %sfield '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-                        if r.name == rel_query_name:
-                            e.add(opts, "Reverse query name for m2m field '%s' clashes with %sfield '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, m2m_part, rel_opts.object_name, r.name, f.name))
-
-                    for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
-                        m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
-                        if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
-                            continue
-                        if r.get_accessor_name() == rel_name:
-                            e.add(opts, "Accessor for m2m field '%s' clashes with related %sfield '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
-                        if r.get_accessor_name() == rel_query_name:
-                            e.add(opts, "Reverse query name for m2m field '%s' clashes with related %sfield '%s.%s'. "
-                                "Add a related_name argument to the definition for '%s'."
-                                % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
+                for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
+                    m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
+                    if r in rel_opts.get_all_related_many_to_many_objects() and r.field is f:
+                        continue
+                    if r.get_accessor_name() == rel_name:
+                        e.add(opts, "Accessor for m2m field '%s' clashes with related %sfield '%s.%s'. "
+                            "Add a related_name argument to the definition for '%s'."
+                            % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    if r.get_accessor_name() == rel_query_name:
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related %sfield '%s.%s'. "
+                            "Add a related_name argument to the definition for '%s'."
+                            % (f.name, m2m_part, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         # Check ordering attribute.
         if opts.ordering:
