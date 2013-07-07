@@ -36,6 +36,9 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
+        errors = cls.check()
+        assert not errors, errors
+
         # Check swappable attribute.
         if opts.swapped:
             try:
@@ -67,9 +70,6 @@ def get_validation_errors(outfile, app=None):
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
-            errors = f.check()
-            assert not errors, errors
-
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if f.name.endswith('_'):
@@ -139,8 +139,6 @@ def get_validation_errors(outfile, app=None):
 
         seen_intermediary_signatures = []
         for i, f in enumerate(opts.local_many_to_many):
-            errors = f.check(from_model=cls)
-            assert not errors, errors
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related
             # objects
