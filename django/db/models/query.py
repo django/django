@@ -638,7 +638,7 @@ class QuerySet(object):
         obj.query.select_for_update_nowait = nowait
         return obj
 
-    def select_related(self, *fields, **kwargs):
+    def select_related(self, *fields):
         """
         Returns a new QuerySet instance that will select related objects.
 
@@ -647,9 +647,6 @@ class QuerySet(object):
 
         If select_related(None) is called, the list is cleared.
         """
-        if kwargs:
-            raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (list(kwargs),))
         obj = self._clone()
         if fields == (None,):
             obj.query.select_related = False
