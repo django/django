@@ -72,9 +72,9 @@ class Command(BaseCommand):
 
         self.serialization_formats = serializers.get_public_serializer_formats()
         self.compression_formats = {
-            None:   open,
-            'gz':   gzip.GzipFile,
-            'zip':  SingleZipReader
+            None: open,
+            'gz': gzip.GzipFile,
+            'zip': SingleZipReader
         }
         if has_bz2:
             self.compression_formats['bz2'] = bz2.BZ2File
@@ -139,12 +139,14 @@ class Command(BaseCommand):
                         try:
                             obj.save(using=self.using)
                         except (DatabaseError, IntegrityError) as e:
-                            e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
+                            e.args = (
+                                "Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                     'app_label': obj.object._meta.app_label,
                                     'object_name': obj.object._meta.object_name,
                                     'pk': obj.object.pk,
-                                    'error_msg': force_text(e)
-                                },)
+                                    'error_msg': force_text(e),
+                                },
+                            )
                             raise
 
                 self.loaded_object_count += loaded_objects_in_fixture

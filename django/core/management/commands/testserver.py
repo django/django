@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 
 from optparse import make_option
 
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
@@ -34,12 +35,12 @@ class Command(BaseCommand):
         # Run the development server. Turn off auto-reloading because it causes
         # a strange error -- it causes this handle() method to be called
         # multiple times.
-        shutdown_message = '\nServer stopped.\nNote that the test database, %r, has not been deleted. You can explore it on your own.' % db_name
+        shutdown_message = '\nServer stopped.\nNote that the test database, %r, ' % db_name + \
+                           'has not been deleted. You can explore it on your own.'
         use_threading = connection.features.test_db_allows_multiple_connections
         call_command('runserver',
             addrport=addrport,
             shutdown_message=shutdown_message,
             use_reloader=False,
             use_ipv6=options['use_ipv6'],
-            use_threading=use_threading
-        )
+            use_threading=use_threading)

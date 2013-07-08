@@ -5,17 +5,21 @@ Module for abstract serializer/unserializer base classes.
 from django.db import models
 from django.utils import six
 
+
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
     pass
+
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
     pass
 
+
 class DeserializationError(Exception):
     """Something bad happened during deserialization."""
     pass
+
 
 class Serializer(object):
     """
@@ -111,6 +115,7 @@ class Serializer(object):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
+
 class Deserializer(six.Iterator):
     """
     Abstract base deserializer class.
@@ -136,6 +141,7 @@ class Deserializer(six.Iterator):
     def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError
+
 
 class DeserializedObject(object):
     """

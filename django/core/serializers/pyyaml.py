@@ -26,8 +26,8 @@ except ImportError:
 class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
         return self.represent_scalar('tag:yaml.org,2002:str', str(data))
-
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
+
 
 class Serializer(PythonSerializer):
     """
@@ -54,6 +54,7 @@ class Serializer(PythonSerializer):
     def getvalue(self):
         # Grand-parent super
         return super(PythonSerializer, self).getvalue()
+
 
 def Deserializer(stream_or_string, **options):
     """

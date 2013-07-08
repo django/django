@@ -30,7 +30,6 @@ class BaseHandler(object):
     def __init__(self):
         self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
-
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
@@ -190,7 +189,7 @@ class BaseHandler(object):
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except: # Handle everything else.
+        except:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -200,7 +199,7 @@ class BaseHandler(object):
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
-        except: # Any exception should be gathered and handled
+        except:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 

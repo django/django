@@ -23,9 +23,9 @@ from django.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
-    "xml"    : "django.core.serializers.xml_serializer",
-    "python" : "django.core.serializers.python",
-    "json"   : "django.core.serializers.json",
+    "xml": "django.core.serializers.xml_serializer",
+    "python": "django.core.serializers.python",
+    "json": "django.core.serializers.json",
 }
 
 # Check for PyYaml and register the serializer if it's available.
@@ -36,6 +36,7 @@ except ImportError:
     pass
 
 _serializers = {}
+
 
 def register_serializer(format, serializer_module, serializers=None):
     """Register a new serializer.
@@ -58,6 +59,7 @@ def register_serializer(format, serializer_module, serializers=None):
     else:
         serializers[format] = module
 
+
 def unregister_serializer(format):
     "Unregister a given serializer. This is not a thread-safe operation."
     if not _serializers:
@@ -66,6 +68,7 @@ def unregister_serializer(format):
         raise SerializerDoesNotExist(format)
     del _serializers[format]
 
+
 def get_serializer(format):
     if not _serializers:
         _load_serializers()
@@ -73,15 +76,18 @@ def get_serializer(format):
         raise SerializerDoesNotExist(format)
     return _serializers[format].Serializer
 
+
 def get_serializer_formats():
     if not _serializers:
         _load_serializers()
     return list(_serializers)
 
+
 def get_public_serializer_formats():
     if not _serializers:
         _load_serializers()
     return [k for k, v in six.iteritems(_serializers) if not v.Serializer.internal_use_only]
+
 
 def get_deserializer(format):
     if not _serializers:
@@ -89,6 +95,7 @@ def get_deserializer(format):
     if format not in _serializers:
         raise SerializerDoesNotExist(format)
     return _serializers[format].Deserializer
+
 
 def serialize(format, queryset, **options):
     """
@@ -99,6 +106,7 @@ def serialize(format, queryset, **options):
     s.serialize(queryset, **options)
     return s.getvalue()
 
+
 def deserialize(format, stream_or_string, **options):
     """
     Deserialize a stream or a string. Returns an iterator that yields ``(obj,
@@ -108,6 +116,7 @@ def deserialize(format, stream_or_string, **options):
     """
     d = get_deserializer(format)
     return d(stream_or_string, **options)
+
 
 def _load_serializers():
     """

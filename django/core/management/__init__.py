@@ -17,6 +17,7 @@ from django import get_version
 # doesn't have to reload every time it's called.
 _commands = None
 
+
 def find_commands(management_dir):
     """
     Given a path to a management directory, returns a list of all the command
@@ -30,6 +31,7 @@ def find_commands(management_dir):
                 if not f.startswith('_') and f.endswith('.py')]
     except OSError:
         return []
+
 
 def find_management_module(app_name):
     """
@@ -66,6 +68,7 @@ def find_management_module(app_name):
             f.close()
     return path
 
+
 def load_command_class(app_name, name):
     """
     Given a command name and an application name, returns the Command
@@ -74,6 +77,7 @@ def load_command_class(app_name, name):
     """
     module = import_module('%s.management.commands.%s' % (app_name, name))
     return module.Command()
+
 
 def get_commands():
     """
@@ -117,9 +121,10 @@ def get_commands():
                 _commands.update(dict([(name, app_name)
                                        for name in find_commands(path)]))
             except ImportError:
-                pass # No management module - ignore this app
+                pass  # No management module - ignore this app
 
     return _commands
+
 
 def call_command(name, *args, **options):
     """
@@ -157,6 +162,7 @@ def call_command(name, *args, **options):
     defaults.update(options)
 
     return klass.execute(*args, **defaults)
+
 
 class LaxOptionParser(OptionParser):
     """
@@ -212,6 +218,7 @@ class LaxOptionParser(OptionParser):
             except:
                 largs.append(arg)
 
+
 class ManagementUtility(object):
     """
     Encapsulates the logic of the django-admin.py and manage.py utilities.
@@ -260,8 +267,8 @@ class ManagementUtility(object):
         try:
             app_name = get_commands()[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
-                (subcommand, self.prog_name))
+            errmsg = "Unknown command: %r\nType '%s help' for usage.\n"
+            sys.stderr.write(errmsg % (subcommand, self.prog_name))
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -299,7 +306,7 @@ class ManagementUtility(object):
         cword = int(os.environ['COMP_CWORD'])
 
         try:
-            curr = cwords[cword-1]
+            curr = cwords[cword - 1]
         except IndexError:
             curr = ''
 
@@ -332,7 +339,7 @@ class ManagementUtility(object):
             options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
                         subcommand_cls.option_list]
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword-1]]
+            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input
@@ -361,12 +368,12 @@ class ManagementUtility(object):
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
         except:
-            pass # Ignore any option errors at this point.
+            pass  # Ignore any option errors at this point.
 
         try:
             subcommand = self.argv[1]
         except IndexError:
-            subcommand = 'help' # Display help if no arguments were given.
+            subcommand = 'help'  # Display help if no arguments were given.
 
         if subcommand == 'help':
             if len(args) <= 2:
@@ -388,6 +395,7 @@ class ManagementUtility(object):
             sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
+
 
 def execute_from_command_line(argv=None):
     """
