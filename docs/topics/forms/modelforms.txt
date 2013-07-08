@@ -857,14 +857,16 @@ than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
 
-Overiding ``clean()`` on a ``model_formset``
+.. _model-formsets-overriding-clean:
+
+Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
 Just like with ``ModelForms``, by default the ``clean()`` method of a
-``model_formset`` will validate that none of the items in the formset violate
+``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to override the ``clean()`` method
-on a ``model_formset`` and maintain this validation, you must call the parent
+on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
     from django.forms.models import BaseModelFormSet
@@ -969,6 +971,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 Inline formsets
 ===============
 
+.. class:: models.BaseInlineFormSet
+
 Inline formsets is a small abstraction layer on top of model formsets. These
 simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
@@ -999,6 +1003,13 @@ a particular author, you could do this::
 .. seealso::
 
     :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
+
+Overriding ``clean()`` on an ``InlineFormSet``
+----------------------------------------------
+
+See :ref:`model-formsets-overriding-clean`, but subclass
+:class:`~models.BaseInlineFormSet` rather than
+:class:`~models.BaseModelFormSet`.
 
 More than one foreign key to the same model
 -------------------------------------------
