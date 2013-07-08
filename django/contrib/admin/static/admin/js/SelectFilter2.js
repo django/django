@@ -13,6 +13,7 @@ function findForm(node) {
 }
 
 window.SelectFilter = {
+    typingTimers: new Object(),
     init: function(field_id, field_name, is_stacked, admin_static_prefix) {
         if (field_id.match(/__prefix__/)){
             // Don't intialize on empty forms.
@@ -58,15 +59,15 @@ window.SelectFilter = {
         filter_input.id = field_id + '_input';
 
         selector_available.appendChild(from_box);
-        var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'title', interpolate(gettext('Click to choose all %s at once.'), [field_name]), 'href', 'javascript: (function(){ SelectBox.move_all("' + field_id + '_from", "' + field_id + '_to"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_all_link');
+        var choose_all = quickElement('a', selector_available, gettext('Choose all'), 'title', interpolate(gettext('Click to choose all %s at once.'), [field_name]), 'href', 'javascript: (function(){ SelectBox.move_all("' + field_id + '"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_all_link', 'tabindex', '-1');
         choose_all.className = 'selector-chooseall';
 
         // <ul class="selector-chooser">
         var selector_chooser = quickElement('ul', selector_div, '');
         selector_chooser.className = 'selector-chooser';
-        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_link');
+        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_link', 'tabindex', '-1');
         add_link.className = 'selector-add';
-        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_link');
+        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '", true); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_link', 'tabindex', '-1');
         remove_link.className = 'selector-remove';
 
         // <div class="selector-chosen">
@@ -77,23 +78,23 @@ window.SelectFilter = {
 
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
-        var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_all_link');
+        var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '", true); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_all_link', 'tabindex', '-1');
         clear_all.className = 'selector-clearall';
 
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
         // Set up the JavaScript event handlers for the select box filter interface
-        addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
         addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
+        addEvent(from_box, 'keydown', function(e) { SelectFilter.box_key_down(e, field_id); });
+        addEvent(to_box, 'keydown', function(e) { SelectFilter.box_key_down(e, field_id); });
+        addEvent(from_box, 'focus', function(e) { SelectFilter.box_focus(e, field_id); });
+        addEvent(to_box, 'focus', function(e) { SelectFilter.box_focus(e, field_id); });
         addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
         addEvent(to_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
-        addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
-        addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
+        addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id); SelectFilter.refresh_icons(field_id); });
+        addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id, true); SelectFilter.refresh_icons(field_id); });
         addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
-        SelectBox.init(field_id + '_from');
-        SelectBox.init(field_id + '_to');
-        // Move selected from_box options to to_box
-        SelectBox.move(field_id + '_from', field_id + '_to');
+        SelectBox.init(field_id);
 
         if (!is_stacked) {
             // In horizontal mode, give the same height to the two boxes.
@@ -112,49 +113,71 @@ window.SelectFilter = {
         SelectFilter.refresh_icons(field_id);
     },
     refresh_icons: function(field_id) {
-        var from = $('#' + field_id + '_from');
-        var to = $('#' + field_id + '_to');
-        var is_from_selected = from.find('option:selected').length > 0;
-        var is_to_selected = to.find('option:selected').length > 0;
+        var from = document.getElementById(field_id + '_from');
+            to = document.getElementById(field_id + '_to'),
+            is_from_selected = from.selectedIndex > -1,
+            is_to_selected = to.selectedIndex > -1;
         // Active if at least one item is selected
         $('#' + field_id + '_add_link').toggleClass('active', is_from_selected);
         $('#' + field_id + '_remove_link').toggleClass('active', is_to_selected);
         // Active if the corresponding box isn't empty
-        $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
-        $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
+        $('#' + field_id + '_add_all_link').toggleClass('active', from.options.length > 0);
+        $('#' + field_id + '_remove_all_link').toggleClass('active', to.options.length > 0);
     },
-    filter_key_up: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
-        // don't submit form if user pressed Enter
-        if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)) {
-            from.selectedIndex = 0;
-            SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = 0;
-            return false;
+    box_focus: function(event, field_id) {
+        var target = event.target || event.srcElement;
+        if (target.selectedIndex < 0) {
+            target.selectedIndex = 0;
         }
-        var temp = from.selectedIndex;
-        SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
-        from.selectedIndex = temp;
-        return true;
+    },
+    box_key_down: function(event, field_id) {
+        var key = event.keyCode || event.which,
+            box = event.target || event.srcElement,
+            reverse = /_to$/.test(box.id);
+
+        if (event.shiftKey) {
+            return true; // Prevent Opera's spatial navigation thing from moving options
+        }
+
+        if (key == 32 || (!reverse && key == 39) || (reverse && key == 37)) { // Enter, space, or left/right arrow - move across
+            var old_index = box.selectedIndex;
+            SelectBox.move(field_id, reverse);
+            // Firefox mostly has this feature by default except it's buggy at the top
+            if (!$.browser.mozilla) {
+                box.selectedIndex = (old_index == box.length) ? box.length - 1 : old_index;
+            } else if (old_index == 0) {
+                box.selectedIndex = -1;
+            }
+        } else {
+            return true;
+        }
+
+        event.preventDefault ? event.preventDefault() : event.returnValue = false; // With <= IE8 fix
     },
     filter_key_down: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
-        // right arrow -- move across
-        if ((event.which && event.which == 39) || (event.keyCode && event.keyCode == 39)) {
-            var old_index = from.selectedIndex;
-            SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = (old_index == from.length) ? from.length - 1 : old_index;
-            return false;
+        clearTimeout(SelectFilter.typingTimers[field_id]);
+
+        var from = document.getElementById(field_id + '_from'),
+            key = event.keyCode || event.which,
+            delay = 250,
+            num_options = SelectBox.options[field_id].length;
+
+        if (key != 8 && key != 13 && key < 46) { // Don't do anything if just passing through
+            return true;
         }
-        // down arrow -- wrap around
-        if ((event.which && event.which == 40) || (event.keyCode && event.keyCode == 40)) {
-            from.selectedIndex = (from.length == from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
+
+        if (key == 13) { // Hitting Enter is instant search
+            delay = 0;
+            event.preventDefault ? event.preventDefault() : event.returnValue = false; // With <= IE8 fix
+        } else if (num_options > 1000) { // Large boxes have added delay for safety
+            delay = 1000;
         }
-        // up arrow -- wrap around
-        if ((event.which && event.which == 38) || (event.keyCode && event.keyCode == 38)) {
-            from.selectedIndex = (from.selectedIndex == 0) ? from.length - 1 : from.selectedIndex - 1;
-        }
-        return true;
+
+        SelectFilter.typingTimers[field_id] = setTimeout(function() {
+            SelectBox.filter(field_id, document.getElementById(field_id + '_input').value);
+        }, delay);
+
+        return false;
     }
 }
 
