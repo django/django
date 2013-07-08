@@ -39,7 +39,14 @@ class DefaultConnectionProxy(object):
     def __delattr__(self, name):
         return delattr(connections[DEFAULT_DB_ALIAS], name)
 
+    def __eq__(self, other):
+        return connections[DEFAULT_DB_ALIAS] == other
+
+    def __ne__(self, other):
+        return connections[DEFAULT_DB_ALIAS] != other
+
 connection = DefaultConnectionProxy()
+
 
 class DefaultBackendProxy(object):
     """
