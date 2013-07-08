@@ -15,8 +15,10 @@ import os
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+
 class UnavailableApp(Exception):
     pass
+
 
 class AppCache(object):
     """

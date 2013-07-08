@@ -1167,6 +1167,7 @@ FieldInfo = namedtuple('FieldInfo',
     'name type_code display_size internal_size precision scale null_ok'
 )
 
+
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities

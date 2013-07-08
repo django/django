@@ -226,9 +226,9 @@ class ModelBase(type):
             # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '\
-                                     'with field of similar name from '\
-                                     'abstract base class %r' % \
+                    raise FieldError('Local field %r in class %r clashes '
+                                     'with field of similar name from '
+                                     'abstract base class %r' %
                                         (field.name, name, base.__name__))
                 new_class.add_to_class(field.name, copy.deepcopy(field))
 
@@ -1008,14 +1008,13 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 # MISC #
 ########
 
-class Empty(object):
-    pass
 
 def simple_class_factory(model, attrs):
     """
     Needed for dynamic classes.
     """
     return model
+
 
 def model_unpickle(model_id, attrs, factory):
     """

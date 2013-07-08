@@ -615,7 +615,6 @@ class Query(object):
             for model, values in six.iteritems(seen):
                 callback(target, model, values)
 
-
     def deferred_to_columns_cb(self, target, model, fields):
         """
         Callback used by deferred_to_columns(). The "target" parameter should
@@ -626,7 +625,6 @@ class Query(object):
             target[table] = set()
         for field in fields:
             target[table].add(field.column)
-
 
     def table_alias(self, table_name, create=False):
         """
@@ -954,7 +952,6 @@ class Query(object):
             if key:
                 self.unref_alias(alias)
         self.included_inherited_models = {}
-
 
     def add_aggregate(self, aggregate, model, alias, is_summary):
         """
@@ -1780,7 +1777,7 @@ class Query(object):
             return self._aggregate_select_cache
         elif self.aggregate_select_mask is not None:
             self._aggregate_select_cache = SortedDict([
-                (k,v) for k,v in self.aggregates.items()
+                (k, v) for k, v in self.aggregates.items()
                 if k in self.aggregate_select_mask
             ])
             return self._aggregate_select_cache
@@ -1793,7 +1790,7 @@ class Query(object):
             return self._extra_select_cache
         elif self.extra_select_mask is not None:
             self._extra_select_cache = SortedDict([
-                (k,v) for k,v in self.extra.items()
+                (k, v) for k, v in self.extra.items()
                 if k in self.extra_select_mask
             ])
             return self._extra_select_cache
@@ -1876,6 +1873,7 @@ class Query(object):
         else:
             return field.null
 
+
 def get_order_dir(field, default='ASC'):
     """
     Returns the field name and direction for an order specification. For
@@ -1900,12 +1898,14 @@ def add_to_dict(data, key, value):
     else:
         data[key] = set([value])
 
+
 def is_reverse_o2o(field):
     """
     A little helper to check if the given field is reverse-o2o. The field is
     expected to be some sort of relation field or related object.
     """
     return not hasattr(field, 'rel') and field.field.unique
+
 
 def alias_diff(refcounts_before, refcounts_after):
     """

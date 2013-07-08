@@ -688,7 +688,7 @@ class SQLCompiler(object):
                 # the relation, which is always nullable.
                 new_nullable = True
                 table = model._meta.db_table
-                self.fill_related_selections(model._meta, table, cur_depth+1,
+                self.fill_related_selections(model._meta, table, cur_depth + 1,
                     next, restricted, new_nullable)
 
     def deferred_to_columns(self):
@@ -915,6 +915,7 @@ class SQLDeleteCompiler(SQLCompiler):
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
 
+
 class SQLUpdateCompiler(SQLCompiler):
     def as_sql(self):
         """
@@ -1029,6 +1030,7 @@ class SQLUpdateCompiler(SQLCompiler):
         for alias in self.query.tables[1:]:
             self.query.alias_refcount[alias] = 0
 
+
 class SQLAggregateCompiler(SQLCompiler):
     def as_sql(self, qn=None):
         """
@@ -1049,6 +1051,7 @@ class SQLAggregateCompiler(SQLCompiler):
         sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
         params = params + self.query.sub_params
         return sql, params
+
 
 class SQLDateCompiler(SQLCompiler):
     def results_iter(self):
@@ -1074,6 +1077,7 @@ class SQLDateCompiler(SQLCompiler):
                 if isinstance(date, datetime.datetime):
                     date = date.date()
                 yield date
+
 
 class SQLDateTimeCompiler(SQLCompiler):
     def results_iter(self):
@@ -1106,6 +1110,7 @@ class SQLDateTimeCompiler(SQLCompiler):
                     datetime = datetime.replace(tzinfo=None)
                     datetime = timezone.make_aware(datetime, self.query.tzinfo)
                 yield datetime
+
 
 def order_modified_iter(cursor, trim, sentinel):
     """

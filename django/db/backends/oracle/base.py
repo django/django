@@ -7,11 +7,12 @@ from __future__ import unicode_literals
 
 import decimal
 import re
+import platform
 import sys
 import warnings
 
+
 def _setup_environment(environ):
-    import platform
     # Cygwin requires some special voodoo to set the environment variables
     # properly so that Oracle will see them.
     if platform.system().upper().startswith('CYGWIN'):
@@ -89,6 +90,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -308,7 +310,7 @@ WHEN (new.%(col_name)s IS NULL)
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
-        name = name.replace('%','%%')
+        name = name.replace('%', '%%')
         return name.upper()
 
     def random_function_sql(self):
@@ -758,7 +760,7 @@ class FormatStylePlaceholderCursor(object):
 
     def _format_params(self, params):
         try:
-            return dict((k,OracleParam(v, self, True)) for k,v in params.items())
+            return dict((k, OracleParam(v, self, True)) for k, v in params.items())
         except AttributeError:
             return tuple([OracleParam(p, self, True) for p in params])
 
@@ -778,12 +780,12 @@ class FormatStylePlaceholderCursor(object):
                 for i, value in enumerate(params):
                     if value.input_size:
                         sizes[i] = value.input_size
-            self.setinputsizes(*sizes)        
+            self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
         if hasattr(params, 'items'):
-            return dict((k, v.force_bytes) for k,v in params.items())
+            return dict((k, v.force_bytes) for k, v in params.items())
         else:
             return [p.force_bytes for p in params]
 
@@ -799,14 +801,14 @@ class FormatStylePlaceholderCursor(object):
             query = convert_unicode(query, self.charset)
         elif hasattr(params, 'keys'):
             # Handle params as dict
-            args = dict((k, ":%s"%k) for k in params.keys())
+            args = dict((k, ":%s" % k) for k in params.keys())
             query = convert_unicode(query % args, self.charset)
         else:
             # Handle params as sequence
             args = [(':arg%d' % i) for i in range(len(params))]
             query = convert_unicode(query % tuple(args), self.charset)
         return query, self._format_params(params)
-        
+
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params)
         self._guess_input_sizes([params])
@@ -825,9 +827,9 @@ class FormatStylePlaceholderCursor(object):
         # uniform treatment for sequences and iterables
         params_iter = iter(params)
         query, firstparams = self._fix_for_params(query, next(params_iter))
-        # we build a list of formatted params; as we're going to traverse it 
+        # we build a list of formatted params; as we're going to traverse it
         # more than once, we can't make it lazy by using a generator
-        formatted = [firstparams]+[self._format_params(p) for p in params_iter]
+        formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         try:
             return self.cursor.executemany(query,

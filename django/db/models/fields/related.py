@@ -213,7 +213,7 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
 
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
-        if value is None and self.related.field.null == False:
+        if value is None and self.related.field.null is False:
             raise ValueError('Cannot assign None: "%s.%s" does not allow null values.' %
                                 (instance._meta.object_name, self.related.get_accessor_name()))
         elif value is not None and not isinstance(value, self.related.model):
@@ -312,7 +312,7 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
     def __set__(self, instance, value):
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
-        if value is None and self.field.null == False:
+        if value is None and self.field.null is False:
             raise ValueError('Cannot assign None: "%s.%s" does not allow null values.' %
                                 (instance._meta.object_name, self.field.name))
         elif value is not None and not isinstance(value, self.field.rel.to):
@@ -397,7 +397,7 @@ class ForeignRelatedObjectsDescriptor(object):
             def __init__(self, instance):
                 super(RelatedManager, self).__init__()
                 self.instance = instance
-                self.core_filters= {'%s__exact' % rel_field.name: instance}
+                self.core_filters = {'%s__exact' % rel_field.name: instance}
                 self.model = rel_model
 
             def get_queryset(self):
@@ -511,7 +511,6 @@ def create_many_related_manager(superclass, rel):
                 raise ValueError("%r instance needs to have a primary key value before "
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
-
 
         def _get_fk_val(self, obj, field_name):
             """
@@ -823,6 +822,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         manager.clear()
         manager.add(*value)
 
+
 class ForeignObjectRel(object):
     def __init__(self, field, to, related_name=None, limit_choices_to=None,
                  parent_link=False, on_delete=None, related_query_name=None):
@@ -859,6 +859,7 @@ class ForeignObjectRel(object):
         # By default foreign object doesn't relate to any remote field (for
         # example custom multicolumn joins currently have no remote field).
         self.field_name = None
+
 
 class ManyToOneRel(ForeignObjectRel):
     def __init__(self, field, to, field_name, related_name=None, limit_choices_to=None,
@@ -1125,7 +1126,7 @@ class ForeignKey(ForeignObject):
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
                  db_constraint=True, **kwargs):
         try:
-            to_name = to._meta.object_name.lower()
+            to._meta.object_name.lower()
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
@@ -1162,7 +1163,6 @@ class ForeignKey(ForeignObject):
         if self.rel.on_delete is not CASCADE:
             kwargs['on_delete'] = self.rel.on_delete
         # Rel needs more work.
-        rel = self.rel
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
         if isinstance(self.rel.to, six.string_types):
@@ -1193,8 +1193,8 @@ class ForeignKey(ForeignObject):
 
         using = router.db_for_read(model_instance.__class__, instance=model_instance)
         qs = self.rel.to._default_manager.using(using).filter(
-                **{self.rel.field_name: value}
-             )
+          **{self.rel.field_name: value}
+         )
         qs = qs.complex_filter(self.rel.limit_choices_to)
         if not qs.exists():
             raise exceptions.ValidationError(
@@ -1222,7 +1222,7 @@ class ForeignKey(ForeignObject):
         return field_default
 
     def get_db_prep_save(self, value, connection):
-        if value == '' or value == None:
+        if value == '' or value is None:
             return None
         else:
             return self.related_field.get_db_prep_save(value,
@@ -1389,7 +1389,6 @@ class ManyToManyField(RelatedField):
         if "help_text" in kwargs:
             del kwargs['help_text']
         # Rel needs more work.
-        rel = self.rel
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
         else:
