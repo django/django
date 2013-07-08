@@ -399,7 +399,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sq',
         'name': 'Albanian',
-        'name_local': 'Albanian',
+        'name_local': 'shqip',
     },
     'sr': {
         'bidi': False,
