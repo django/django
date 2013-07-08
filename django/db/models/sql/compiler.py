@@ -750,6 +750,16 @@ class SQLCompiler(object):
 
                 yield row
 
+    def has_results(self):
+        """
+        Backends (e.g. NoSQL) can override this in order to use optimized
+        versions of "query has any results."
+        """
+        # This is always executed on a query clone, so we can modify self.query
+        self.query.add_extra({'a': 1}, None, None, None, None, None)
+        self.query.set_extra_mask(['a'])
+        return bool(self.execute_sql(SINGLE))
+
     def execute_sql(self, result_type=MULTI):
         """
         Run the query against the database and returns the result(s). The
