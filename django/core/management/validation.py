@@ -104,35 +104,35 @@ def get_validation_errors(outfile, app=None):
                 else:
                     seen_intermediary_signatures.append(signature)
 
-        for field in opts.local_fields + opts.local_many_to_many:
+        fields = opts.local_fields + opts.local_many_to_many
+
+        # Skip all non-relative fields, because opts.local_fields may
+        # contain them.
+        fields = (f for f in fields if f.rel)
+
+        # If `f.rel.to` is a string, it wasn't resolved into a model; that means
+        # that we couldn't find the model and we skip in that case.
+        fields = (f for f in fields
+            if not isinstance(f.rel.to, six.string_types))
+
+        # If the field doesn't install backward relation on the target model (so
+        # `is_hidden` returns True), then there are no clashes to check and we
+        # can skip.
+        fields = (f for f in fields if not f.rel.is_hidden())
+
+        # Skip all fields without reverse accessors (this only occurs for
+        # symmetrical m2m relations to self). If this is the case, there are no
+        # clashes to check for this field, as there are no reverse descriptors
+        # for this field.
+        fields = (f for f in fields if f.related.get_accessor_name())
+
+        for field in fields:
             is_field_m2m = field in opts.local_many_to_many
-
-            # Skip all non-relative fields, because opts.local_fields may
-            # contain them.
-            if not field.rel:
-                continue
-
-            # It is a string and we could not find the model it refers to so
-            # skip the next section
-            if isinstance(field.rel.to, six.string_types):
-                continue
-
-            # If the field doesn't install backward relation on the target
-            # model, then there are no clashes to check and we can skip.
-            if field.rel.is_hidden():
-                continue
 
             rel_opts = field.rel.to._meta
             rel_name = field.related.get_accessor_name()
             rel_query_name = field.related_query_name()
             field_name = ("m2m " if is_field_m2m else "") + ("field '%s'" % field.name)
-
-            # If rel_name is None, there is no reverse accessor (this only
-            # occurs for symmetrical m2m relations to self). If this is the
-            # case, there are no clashes to check for this field, as there are
-            # no reverse descriptors for this field.
-            if rel_name is None:
-                continue
 
             # Consider the following (invalid) models:
             #
@@ -204,29 +204,6 @@ def get_validation_errors(outfile, app=None):
                         is_field_m2m and r in rel_opts.get_all_related_many_to_many_objects()):
                         continue
                 check()
-
-            # First loop
-            # field, r, r.name, errors
-            #
-            # <django.db.models.fields.related.ForeignKey: foreign>, <django.db.models.fields.AutoField: id>, u'id',
-            #     []
-            # <django.db.models.fields.related.ForeignKey: foreign>, <django.db.models.fields.CharField: model>, 'model',
-            #     ["Reverse query name for field 'foreign' clashes with field 'Target.model'. Add a related_name argument to the definition for 'foreign'."]
-            # <django.db.models.fields.related.ForeignKey: foreign>, <django.db.models.fields.CharField: model_set>, 'model_set',
-            #     ["Accessor for field 'foreign' clashes with field 'Target.model_set'. Add a related_name argument to the definition for 'foreign'."]
-            #
-            # Second loop
-            # field, r.field, r.get_accessor_name(), errors
-            #
-            # <django.db.models.fields.related.ForeignKey: foreign>, <django.db.models.fields.related.ManyToManyField: m2m>, 'model_set',
-            #     ["Accessor for field 'foreign' clashes with related m2m field 'Target.model_set'. Add a related_name argument to the definition for 'foreign'."]
-            # <django.db.models.fields.related.ForeignKey: foreign>, <django.db.models.fields.related.ForeignKey: foreign>, 'model_set',
-            #     r.field is field
-
-
-
-
-
 
         # Check ordering attribute.
         if opts.ordering:
