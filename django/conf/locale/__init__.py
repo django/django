@@ -279,7 +279,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'lt',
         'name': 'Lithuanian',
-        'name_local': 'Lithuanian',
+        'name_local': 'Lietuviškai',
     },
     'lv': {
         'bidi': False,
@@ -441,7 +441,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'th',
         'name': 'Thai',
-        'name_local': 'Thai',
+        'name_local': 'ภาษาไทย',
     },
     'tr': {
         'bidi': False,
@@ -477,7 +477,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'vi',
         'name': 'Vietnamese',
-        'name_local': 'Vietnamese',
+        'name_local': 'Tiếng Việt',
     },
     'zh-cn': {
         'bidi': False,
