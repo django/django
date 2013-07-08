@@ -7,6 +7,7 @@ from django.utils.six.moves import zip
 
 import django.db.models.manager  # Imported to register signal handler.
 from django.conf import settings
+from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -1015,6 +1016,7 @@ class Model(six.with_metaclass(ModelBase)):
     def check(cls, **kwargs):
         errors = []
         errors.extend(cls._check_fields(**kwargs))
+        errors.extend(cls._check_relative_fields(**kwargs))
         return errors
 
     @classmethod
@@ -1026,6 +1028,157 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(field.check(from_model=cls, **kwargs))
         return errors
 
+    @classmethod
+    def _check_relative_fields(cls, **kwargs):
+        errors = []
+        opts = cls._meta
+
+        fields = opts.local_fields + opts.local_many_to_many
+
+        # Skip all non-relative fields, because opts.local_fields may
+        # contain them.
+        fields = (f for f in fields if f.rel)
+
+        # If `f.rel.to` is a string, it wasn't resolved into a model; that means
+        # that we couldn't find the model and we skip in that case.
+        fields = (f for f in fields
+            if not isinstance(f.rel.to, six.string_types))
+
+        # If the field doesn't install backward relation on the target model (so
+        # `is_hidden` returns True), then there are no clashes to check and we
+        # can skip.
+        fields = (f for f in fields if not f.rel.is_hidden())
+
+        # Skip all fields without reverse accessors (this only occurs for
+        # symmetrical m2m relations to self). If this is the case, there are no
+        # clashes to check for this field, as there are no reverse descriptors
+        # for this field.
+        fields = (f for f in fields if f.related.get_accessor_name())
+
+        for field in fields:
+            is_field_m2m = field in opts.local_many_to_many
+            rel_opts = field.rel.to._meta
+            rel_name = field.related.get_accessor_name()
+            rel_query_name = field.related_query_name()
+            # field_name is e.g. "m2m field Model.field"
+            field_name = ("m2m " if is_field_m2m else "") \
+                + ("field %s.%s" % (opts.object_name, field.name))
+
+            # Consider the following (invalid) models:
+            #
+            #     class Target(models.Model):
+            #         model = models.IntegerField()
+            #         model_set = models.IntegerField()
+            #
+            #     class Model(models.Model):
+            #         foreign = ForeignKey(Target)
+            #         m2m = ManyToManyField(Target)
+            #
+            # In that case, when the checked field is `Model.foreign`, local
+            # variable values are:
+            #
+            #     field = cls.foreign.field
+            #     field_name = "field Model.foreign"
+            #     is_field_m2m = False
+            #     opts.local_field = [cls.id.field, cls.foreign.field]
+            #     opts.local_many_to_many = [cls.m2m.field]
+            #     rel_name = "model_set"
+            #     rel_query_name = "model"
+            #     rel_opts.fields = [
+            #         Target.id.field,
+            #         Target.model.field,
+            #         Target.model_set.field
+            #     ]
+            #     rel_opts.local_many_to_many = []
+            #     rel_opts.get_all_related_objects() = [
+            #         <RelatedObject: invalid_models:model related to foreign>
+            #     ]
+            #     rel_opts.get_all_related_many_to_many_objects() = [
+            #         <RelatedObject: invalid_models:model related to m2m>
+            #     ]
+            #     rel_opts.object_name = "Target"
+            #
+            # When we check clash between field `Target.model` and reverse
+            # query name for field `Model.foreign` which is `Target.model`
+            # too, we are in the first loop and local variables values are:
+            #
+            #     r = Target.model.field
+            #     r.name = "model"
+            #
+            # When we check clash between related m2m field `Target.model_set`
+            # and accessor for `Model.foreign` field which is
+            # `Target.model_set` too, we are in the second loop and local
+            # variables values are:
+            #
+            #     r.field = Model.m2m.field
+            #     r.get_accessor_name() = "model_set"
+
+            # The first loop.
+            for r in rel_opts.fields + rel_opts.local_many_to_many:
+                r_name = ("m2m " if r in rel_opts.many_to_many else "") \
+                    + "field %s.%s" % (rel_opts.object_name, r.name)
+                compare_to = r.name
+
+                if compare_to == rel_name:
+                    errors.append(checks.Error(
+                        'Clash between accessor for %s and %s.'
+                        % (field_name, r_name),
+                        hint='Rename %s or add a related_name argument '
+                        'to the definition for %s.' % (r_name, field_name),
+                        obj=field))
+
+                if compare_to == rel_query_name:
+                    errors.append(checks.Error(
+                        'Clash between reverse query name for %s and %s.'
+                        % (field_name, r_name),
+                        hint='Rename %s or add a related_name argument '
+                        'to the definition for %s.' % (r_name, field_name),
+                        obj=field))
+
+            # The second loop.
+            for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
+                m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
+                r_name = "related " + m2m_part + "field %s.%s" % (rel_opts.object_name, r.get_accessor_name())
+                compare_to = r.get_accessor_name()
+                if r.field is field:
+                    if (not is_field_m2m and r in rel_opts.get_all_related_objects() or
+                        is_field_m2m and r in rel_opts.get_all_related_many_to_many_objects()):
+                        continue
+
+                if compare_to == rel_name:
+                    # import ipdb; ipdb.set_trace()
+                    r_name2 = "%s.%s" % (r.model._meta.object_name, r.field.name)
+                    field_name2 = "%s.%s" % (opts.object_name, field.name)
+                    errors.append(checks.Error(
+                        'Clash between accessor for %s and %s.'
+                        % (field_name, r_name),
+                        hint='Add or change a related_name argument '
+                        'to the definition of %s or %s.' % (field_name2, r_name2),
+                        obj=field))
+                #    errors.append(checks.Error(
+                #        'Clash between accessor for %s and %s.'
+                #        % (field_name, r_name),
+                #        hint='Rename %s or add a related_name argument '
+                #        'to the definition for %s.' % (r_name, field_name),
+                #        obj=field))
+
+                """
+                'Clash between accessor for field Model.foreign '
+                'and related m2m field Target.model_set.',
+                hint='Add or change a related_name argument to the definition '
+                'of Model.foreign or Model.m2m.',
+                obj=Model.foreign.field),
+                """
+
+                if compare_to == rel_query_name:
+                    errors.append(checks.Error(
+                        'Clash between reverse query name for %s and %s.'
+                        % (field_name, r_name),
+                        hint='Rename %s or add a related_name argument '
+                        'to the definition for %s.' % (r_name, field_name),
+                        obj=field))
+
+        return errors
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
