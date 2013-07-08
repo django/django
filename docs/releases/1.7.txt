@@ -17,6 +17,14 @@ deprecation process for some features`_.
 What's new in Django 1.7
 ========================
 
+Minor features
+~~~~~~~~~~~~~~
+
+* The :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
 Backwards incompatible changes in 1.7
 =====================================
 

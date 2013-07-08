@@ -180,7 +180,11 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
-    content_type = mimetypes.guess_type(file.name)[0]
+    if hasattr(file, 'content_type'):
+        content_type = file.content_type
+    else:
+        content_type = mimetypes.guess_type(file.name)[0]
+
     if content_type is None:
         content_type = 'application/octet-stream'
     return [

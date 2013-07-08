@@ -240,6 +240,13 @@ In addition to those inherited from :class:`~django.core.files.File`, all
     need to validate that the file contains the content that the content-type
     header claims -- "trust but verify."
 
+.. attribute:: UploadedFile.content_type_extra
+
+    .. versionadded:: 1.7
+
+    A dictionary containing extra parameters passed to the ``content-type``
+    header.
+
 .. attribute:: UploadedFile.charset
 
     For :mimetype:`text/*` content-types, the character set (i.e. ``utf8``)
@@ -404,7 +411,7 @@ attributes:
 
     The default is 64*2\ :sup:`10` bytes, or 64 KB.
 
-``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
+``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset, content_type_extra)``
     Callback signaling that a new file upload is starting. This is called
     before any data has been fed to any upload handlers.
 
@@ -421,8 +428,16 @@ attributes:
     ``charset`` is the character set (i.e. ``utf8``) given by the browser.
     Like ``content_length``, this sometimes won't be provided.
 
+    ``content_type_extra`` is extra information about the file. Rarely will
+    browsers provide extra headers, but some services such as Google App Engine
+    will do so.
+
     This method may raise a ``StopFutureHandlers`` exception to prevent
     future handlers from handling this file.
+
+    .. versionadded:: 1.7
+
+        The ``content_type_extra`` parameter was added.
 
 ``FileUploadHandler.upload_complete(self)``
     Callback signaling that the entire upload (all files) has completed.

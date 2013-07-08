@@ -7,7 +7,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import six
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, smart_str
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
@@ -136,3 +136,12 @@ def file_upload_filename_case_view(request):
     obj = FileModel()
     obj.testfile.save(file.name, file)
     return HttpResponse('%d' % obj.pk)
+
+def file_upload_content_type_extra(request):
+    """
+    Simple view to echo back extra content-type parameters.
+    """
+    r = dict([(k, dict(
+        [(k1, smart_str(v)) for k1, v in f.content_type_extra.items()]
+    )) for k, f in request.FILES.items()])
+    return HttpResponse(json.dumps(r))

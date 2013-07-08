@@ -64,6 +64,7 @@ class FileUploadHandler(object):
         self.content_type = None
         self.content_length = None
         self.charset = None
+        self.content_type_extra = None
         self.request = request
 
     def handle_raw_input(self, input_data, META, content_length, boundary, encoding=None):
@@ -84,7 +85,7 @@ class FileUploadHandler(object):
         """
         pass
 
-    def new_file(self, field_name, file_name, content_type, content_length, charset=None):
+    def new_file(self, field_name, file_name, content_type, content_length, charset=None, content_type_extra=None):
         """
         Signal that a new file has been started.
 
@@ -96,6 +97,7 @@ class FileUploadHandler(object):
         self.content_type = content_type
         self.content_length = content_length
         self.charset = charset
+        self.content_type_extra = content_type_extra
 
     def receive_data_chunk(self, raw_data, start):
         """
@@ -132,7 +134,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         Create the file object to append to as data is coming in.
         """
         super(TemporaryFileUploadHandler, self).new_file(file_name, *args, **kwargs)
-        self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset)
+        self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset, self.content_type_extra)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
@@ -187,7 +189,8 @@ class MemoryFileUploadHandler(FileUploadHandler):
             name = self.file_name,
             content_type = self.content_type,
             size = file_size,
-            charset = self.charset
+            charset = self.charset,
+            content_type_extra = self.content_type_extra
         )
 
 

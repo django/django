@@ -50,7 +50,7 @@ class MultiPartParser(object):
             The raw post data, as a file-like object.
         :upload_handlers:
             A list of UploadHandler instances that perform operations on the uploaded
-            data. 
+            data.
         :encoding:
             The encoding with which to treat the incoming data.
         """
@@ -177,11 +177,9 @@ class MultiPartParser(object):
                     file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
-                    content_type = meta_data.get('content-type', ('',))[0].strip()
-                    try:
-                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
-                    except:
-                        charset = None
+                    content_type, content_type_extra = meta_data.get('content-type', ('', {}))
+                    content_type = content_type.strip()
+                    charset = content_type_extra.get('charset')
 
                     try:
                         content_length = int(meta_data.get('content-length')[0])
@@ -194,7 +192,7 @@ class MultiPartParser(object):
                             try:
                                 handler.new_file(field_name, file_name,
                                                  content_type, content_length,
-                                                 charset)
+                                                 charset, content_type_extra)
                             except StopFutureHandlers:
                                 break
 
