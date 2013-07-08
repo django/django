@@ -36,9 +36,9 @@ except ImportError:
     pytz = None
 
 from django.conf import settings
-from django.db import (utils, BaseDatabaseFeatures, BaseDatabaseOperations,
-    BaseDatabaseWrapper)
-from django.db.backends import util
+from django.db import utils
+from django.db.backends import (util, BaseDatabaseFeatures,
+    BaseDatabaseOperations, BaseDatabaseWrapper)
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
