@@ -155,6 +155,28 @@ class ModelTest(TestCase):
             pub_date__month=7,
         )
 
+    def test_multiple_objects_max_num_fetched(self):
+        """
+        #6785 - get() should fetch a limited number of results.
+        """
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(20)
+        )
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned 20!",
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area 20', pub_date=datetime(2005, 7, 28))
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned more than 20!",
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+
     def test_object_creation(self):
         # Create an Article.
         a = Article(
