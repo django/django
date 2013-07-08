@@ -142,11 +142,11 @@ def get_validation_errors(outfile, app=None):
 
         for field in fields:
             is_field_m2m = field in opts.local_many_to_many
-
             rel_opts = field.rel.to._meta
             rel_name = field.related.get_accessor_name()
             rel_query_name = field.related_query_name()
-            field_name = ("m2m " if is_field_m2m else "") + ("field '%s'" % field.name)
+            field_name = ("m2m " if is_field_m2m else "") \
+                + ("field '%s'" % field.name) # e.g. "m2m field 'mym2m'"
 
             # Consider the following (invalid) models:
             #
