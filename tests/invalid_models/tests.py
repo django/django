@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import sys
 from types import MethodType
@@ -59,6 +61,18 @@ class InvalidModelTestCase(TestCase):
         missing = [err for err in expected if err not in actual]
         self.assertFalse(unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
         self.assertFalse(missing, "Missing Errors: " + '\n'.join(missing))
+
+
+class IsolatedModelsTestCase(TestCase):
+
+    def setUp(self):
+        # If you create a model in a test, the model is accessible in other
+        # tests. To avoid this, we need to clear list of all models created in
+        # `invalid_models` module.
+        cache.app_models['invalid_models'] = {}
+        cache._get_models_cache = {}
+
+    tearDown = setUp
 
 
 class CharFieldTests(TestCase):
@@ -231,14 +245,7 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(field.check(), [])
 
 
-class RelativeFieldTests(TestCase):
-
-    def tearDown(self):
-        # If you create a model in a test, the model is accessible in other
-        # tests. To avoid this, we need to clear list of all models created in
-        # `invalid_models` module.
-        cache.app_models['invalid_models'] = {}
-        cache._get_models_cache = {}
+class RelativeFieldTests(IsolatedModelsTestCase):
 
     def test_foreign_key_to_missing_model(self):
         # Model names are resolved when a model is being created, so we cannot
@@ -715,3 +722,76 @@ class OtherFieldTests(TestCase):
         finally:
             # Unmock connection.validation.check_field method.
             v.check_field = old_check_field
+
+
+class InvalidModelsTests(IsolatedModelsTestCase):
+
+    def test_basic_foreign_key_clash(self):
+        class Target(models.Model):
+            model = models.CharField(max_length=10)
+            model_set = models.CharField(max_length=10)
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between reverse query name for field Model.foreign '
+                'and field Target.model.',
+                hint='Rename field Target.model or add '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+            Error('Clash between accessor for field Model.foreign '
+                'and field Target.model_set.',
+                hint='Rename field Target.model_set or add '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+        ])
+
+    def test_basic_m2m_clash(self):
+        class Target(models.Model):
+            model = models.CharField(max_length=10)
+            model_set = models.CharField(max_length=10)
+
+        class Model(models.Model):
+            m2m = models.ManyToManyField(Target)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between reverse query name for m2m field Model.m2m '
+                'and field Target.model.',
+                hint='Rename field Target.model or add '
+                'a related_name argument to the definition '
+                'for m2m field Model.m2m.',
+                obj=Model.m2m.field),
+            Error('Clash between accessor for m2m field Model.m2m '
+                'and field Target.model_set.',
+                hint='Rename field Target.model_set or add '
+                'a related_name argument to the definition '
+                'for m2m field Model.m2m.',
+                obj=Model.m2m.field),
+        ])
+
+    def test_clash_between_accessors(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target)
+            m2m = models.ManyToManyField(Target)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between accessor for field Model.foreign '
+                'and related m2m field Target.model_set.',
+                hint='Add or change a related_name argument to the definition '
+                'of Model.foreign or Model.m2m.',
+                obj=Model.foreign.field),
+            Error('Clash between accessor for m2m field Model.m2m '
+                'and related field Target.model_set.',
+                hint='Add or change a related_name argument to the definition '
+                'of Model.m2m or Model.foreign.',
+                obj=Model.m2m.field),
+        ])
