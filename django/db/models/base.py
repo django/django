@@ -1153,22 +1153,8 @@ class Model(six.with_metaclass(ModelBase)):
                         'Clash between accessor for %s and %s.'
                         % (field_name, r_name),
                         hint='Add or change a related_name argument '
-                        'to the definition of %s or %s.' % (field_name2, r_name2),
+                        'to the definition for %s or %s.' % (field_name2, r_name2),
                         obj=field))
-                #    errors.append(checks.Error(
-                #        'Clash between accessor for %s and %s.'
-                #        % (field_name, r_name),
-                #        hint='Rename %s or add a related_name argument '
-                #        'to the definition for %s.' % (r_name, field_name),
-                #        obj=field))
-
-                """
-                'Clash between accessor for field Model.foreign '
-                'and related m2m field Target.model_set.',
-                hint='Add or change a related_name argument to the definition '
-                'of Model.foreign or Model.m2m.',
-                obj=Model.foreign.field),
-                """
 
                 if compare_to == rel_query_name:
                     errors.append(checks.Error(
