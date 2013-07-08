@@ -787,11 +787,138 @@ class InvalidModelsTests(IsolatedModelsTestCase):
             Error('Clash between accessor for field Model.foreign '
                 'and related m2m field Target.model_set.',
                 hint='Add or change a related_name argument to the definition '
-                'of Model.foreign or Model.m2m.',
+                'for Model.foreign or Model.m2m.',
                 obj=Model.foreign.field),
             Error('Clash between accessor for m2m field Model.m2m '
                 'and related field Target.model_set.',
                 hint='Add or change a related_name argument to the definition '
-                'of Model.m2m or Model.foreign.',
+                'for Model.m2m or Model.foreign.',
                 obj=Model.m2m.field),
         ])
+
+    def test_complex_clash(self):
+        class Target(models.Model):
+            tgt_safe = models.CharField(max_length=10)
+            clash1 = models.CharField(max_length=10)
+            model = models.CharField(max_length=10)
+
+            clash1_set = models.CharField(max_length=10)
+
+        class Model(models.Model):
+            src_safe = models.CharField(max_length=10)
+
+            foreign_1 = models.ForeignKey(Target, related_name='id')
+            foreign_2 = models.ForeignKey(Target, related_name='src_safe')
+
+            m2m_1 = models.ManyToManyField(Target, related_name='id')
+            m2m_2 = models.ManyToManyField(Target, related_name='src_safe')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between accessor for field Model.foreign_1 '
+                'and field Target.id.',
+                hint='Rename field Target.id or add a related_name argument '
+                'to the definition for field Model.foreign_1.',
+                obj=Model.foreign_1.field),
+            Error('Clash between reverse query name for field Model.foreign_1 '
+                'and field Target.id.',
+                hint='Rename field Target.id or add a related_name argument '
+                'to the definition for field Model.foreign_1.',
+                obj=Model.foreign_1.field),
+            Error('Clash between accessor for field Model.foreign_1 and '
+                'related m2m field Target.id.',
+                hint='Add or change a related_name argument to '
+                'the definition for Model.foreign_1 or Model.m2m_1.',
+                obj=Model.foreign_1.field),
+            Error('Clash between reverse query name for field Model.foreign_1 '
+                'and related m2m field Target.id.',
+                hint='Rename related m2m field Target.id or add '
+                'a related_name argument to the definition '
+                'for field Model.foreign_1.',
+                obj=Model.foreign_1.field),
+
+            Error('Clash between accessor for field Model.foreign_2 and '
+                'related m2m field Target.src_safe.',
+                hint='Add or change a related_name argument '
+                'to the definition for Model.foreign_2 or Model.m2m_2.',
+                obj=Model.foreign_2.field),
+            Error('Clash between reverse query name for field Model.foreign_2 '
+                'and related m2m field Target.src_safe.',
+                hint='Rename related m2m field Target.src_safe or add '
+                'a related_name argument to the definition '
+                'for field Model.foreign_2.',
+                obj=Model.foreign_2.field),
+
+            Error('Clash between accessor for m2m field Model.m2m_1 '
+                'and field Target.id.',
+                hint='Rename field Target.id or add a related_name argument '
+                'to the definition for m2m field Model.m2m_1.',
+                obj=Model.m2m_1.field),
+            Error('Clash between reverse query name for '
+                'm2m field Model.m2m_1 and field Target.id.',
+                hint='Rename field Target.id or add a related_name argument '
+                'to the definition for m2m field Model.m2m_1.',
+                obj=Model.m2m_1.field),
+            Error('Clash between accessor for m2m field Model.m2m_1 '
+                'and related field Target.id.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.m2m_1 or Model.foreign_1.',
+                obj=Model.m2m_1.field),
+            Error('Clash between reverse query name for '
+                'm2m field Model.m2m_1 and related field Target.id.',
+                hint='Rename related field Target.id or add a related_name '
+                'argument to the definition for m2m field Model.m2m_1.',
+                obj=Model.m2m_1.field),
+
+            Error('Clash between accessor for m2m field Model.m2m_2 '
+                'and related field Target.src_safe.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.m2m_2 or Model.foreign_2.',
+                obj=Model.m2m_2.field),
+            Error('Clash between reverse query name for m2m field Model.m2m_2 '
+                'and related field Target.src_safe.',
+                hint='Rename related field Target.src_safe or add '
+                'a related_name argument to the definition '
+                'for m2m field Model.m2m_2.',
+                obj=Model.m2m_2.field),
+        ])
+
+        """
+        Original error messages were:
+
+        Accessor for field 'foreign_1' clashes with field 'Target.id'.
+            Add a related_name argument to the definition for 'foreign_1'.
+
+        Accessor for field 'foreign_1' clashes with related m2m field 'Target.id'.
+            Add a related_name argument to the definition for 'foreign_1'.
+
+        Reverse query name for field 'foreign_1' clashes with field 'Target.id'.
+            Add a related_name argument to the definition for 'foreign_1'.
+
+        Reverse query name for field 'foreign_1' clashes with related m2m field 'Target.id'.
+            Add a related_name argument to the definition for 'foreign_1'.
+
+        Accessor for field 'foreign_2' clashes with related m2m field 'Target.src_safe'.
+            Add a related_name argument to the definition for 'foreign_2'.
+
+        Reverse query name for field 'foreign_2' clashes with related m2m field 'Target.src_safe'.
+            Add a related_name argument to the definition for 'foreign_2'.
+
+        Accessor for m2m field 'm2m_1' clashes with field 'Target.id'.
+            Add a related_name argument to the definition for 'm2m_1'.
+
+        Accessor for m2m field 'm2m_1' clashes with related field 'Target.id'.
+            Add a related_name argument to the definition for 'm2m_1'.
+
+        Reverse query name for m2m field 'm2m_1' clashes with field 'Target.id'.
+            Add a related_name argument to the definition for 'm2m_1'.
+
+        Reverse query name for m2m field 'm2m_1' clashes with related field 'Target.id'.
+            Add a related_name argument to the definition for 'm2m_1'.
+
+        Accessor for m2m field 'm2m_2' clashes with related field 'Target.src_safe'.
+            Add a related_name argument to the definition for 'm2m_2'.
+
+        Reverse query name for m2m field 'm2m_2' clashes with related field 'Target.src_safe'.
+            Add a related_name argument to the definition for 'm2m_2'.
+        """
