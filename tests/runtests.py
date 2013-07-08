@@ -174,7 +174,12 @@ def teardown(state):
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
-    state = setup(verbosity, test_labels)
+    try:
+        state = setup(verbosity, test_labels)
+    except ImportError, e:
+        raise Exception("Check for empty directories in test suite, "
+                         "possibly remaining from previous changes. "
+                         "%s" % repr(e))
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
