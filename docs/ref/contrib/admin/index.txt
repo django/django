@@ -1585,9 +1585,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.formset
 
-    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-    many possibilities of customization. Inlines are built around
-    :ref:`model formsets <model-formsets>`.
+    This defaults to :class:`~django.forms.models.BaseInlineFormSet`. Using
+    your own formset can give you many possibilities of customization. Inlines
+    are built around :ref:`model formsets <model-formsets>`.
 
 .. attribute:: InlineModelAdmin.form
 
@@ -1653,8 +1653,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
 
-    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
-    See the example for :class:`ModelAdmin.get_formsets`.
+    Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
+    admin add/change views. See the example for
+    :class:`ModelAdmin.get_formsets`.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------

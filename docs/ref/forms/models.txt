@@ -42,8 +42,8 @@ Model Form Functions
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
-    defaults of ``formset=BaseInlineFormSet``, ``can_delete=True``, and
-    ``extra=3``.
+    defaults of ``formset=``:class:`~django.forms.models.BaseInlineFormSet`,
+    ``can_delete=True``, and ``extra=3``.
 
     If your model has more than one :class:`~django.db.models.ForeignKey` to
     the ``parent_model``, you must specify a ``fk_name``.
