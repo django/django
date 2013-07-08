@@ -7,4 +7,3 @@ docs/_build/
 docs/locale/
 tests/coverage_html/
 tests/.coverage
-.DS_Store
