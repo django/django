@@ -323,7 +323,7 @@ happen when the user changes these values::
 
 Default: ``False``
 
-Lets you create a formset with the ability to delete::
+Lets you create a formset with the ability to select forms for deletion::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
@@ -368,6 +368,13 @@ delete fields you can access them with ``deleted_forms``::
     ... ])
     >>> [form.cleaned_data for form in formset.deleted_forms]
     [{'DELETE': True, 'pub_date': datetime.date(2008, 5, 10), 'title': u'Article #1'}]
+
+If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
+model instances for deleted forms will be deleted when you call
+``formset.save()``. On the other hand, if you are using a plain ``FormSet``,
+it's up to you to handle ``formset.deleted_forms``, perhaps in your formset's
+``save()`` method, as there's no general notion of what it means to delete a
+form.
 
 Adding additional fields to a formset
 -------------------------------------
@@ -460,8 +467,8 @@ If you manually render fields in the template, you can render
     </form>
 
 
-Similarly, if the formset has the ability to order (``can_order=True``), it is possible to render it
-with ``{{ form.ORDER }}``.
+Similarly, if the formset has the ability to order (``can_order=True``), it is
+possible to render it with ``{{ form.ORDER }}``.
 
 Using more than one formset in a view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
