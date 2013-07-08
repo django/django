@@ -81,7 +81,8 @@ def forbid_multi_line_headers(name, val, encoding):
     encoding = encoding or settings.DEFAULT_CHARSET
     val = force_text(val)
     if '\n' in val or '\r' in val:
-        raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
+        errmsg = "Header values can't contain newlines (got %r for header %r)" % (val, name)
+        raise BadHeaderError(errmsg)
     try:
         val.encode('ascii')
     except UnicodeEncodeError:
@@ -138,7 +139,7 @@ class SafeMIMEText(MIMEText):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_ = False)
+        g = Generator(fp, mangle_from_=False)
         if sys.version_info < (2, 6, 6) and isinstance(self._payload, six.text_type):
             # Workaround for http://bugs.python.org/issue1368247
             self._payload = self._payload.encode(self._charset.output_charset)
@@ -165,7 +166,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_ = False)
+        g = Generator(fp, mangle_from_=False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 
@@ -263,7 +264,7 @@ class EmailMessage(object):
         into the resulting message attachments.
         """
         if isinstance(filename, MIMEBase):
-            assert content == mimetype == None
+            assert content is mimetype is None
             self.attachments.append(filename)
         else:
             assert content is not None

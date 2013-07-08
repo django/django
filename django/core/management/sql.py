@@ -12,7 +12,7 @@ from django.utils._os import upath
 
 
 def sql_create(app, style, connection):
-    "Returns a list of the CREATE TABLE SQL statements for the given app."
+    """Returns a list of the CREATE TABLE SQL statements for the given app."""
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
@@ -28,7 +28,9 @@ def sql_create(app, style, connection):
     app_models = models.get_models(app, include_auto_created=True)
     final_output = []
     tables = connection.introspection.table_names()
-    known_models = set([model for model in connection.introspection.installed_models(tables) if model not in app_models])
+    known_models = set([model for model
+                        in connection.introspection.installed_models(tables)
+                        if model not in app_models])
     pending_references = {}
 
     for model in app_models:
@@ -58,7 +60,7 @@ def sql_create(app, style, connection):
 
 
 def sql_delete(app, style, connection):
-    "Returns a list of the DROP TABLE SQL statements for the given app."
+    """Returns a list of the DROP TABLE SQL statements for the given app."""
 
     # This should work even if a connection isn't available
     try:
@@ -119,7 +121,7 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
 
 
 def sql_custom(app, style, connection):
-    "Returns a list of the custom table modifying SQL statements for the given app."
+    """Returns a list of the custom table modifying SQL statements for the given app."""
     output = []
 
     app_models = get_models(app)
@@ -131,7 +133,7 @@ def sql_custom(app, style, connection):
 
 
 def sql_indexes(app, style, connection):
-    "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
+    """Returns a list of the CREATE INDEX SQL statements for all models in the given app."""
     output = []
     for model in models.get_models(app, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
@@ -139,7 +141,7 @@ def sql_indexes(app, style, connection):
 
 
 def sql_destroy_indexes(app, style, connection):
-    "Returns a list of the DROP INDEX SQL statements for all models in the given app."
+    """Returns a list of the DROP INDEX SQL statements for all models in the given app."""
     output = []
     for model in models.get_models(app, include_auto_created=True):
         output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
@@ -147,7 +149,8 @@ def sql_destroy_indexes(app, style, connection):
 
 
 def sql_all(app, style, connection):
-    "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
+    """Returns a list of CREATE TABLE SQL, initial-data inserts, and
+    CREATE INDEX SQL for the given module."""
     return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
 
 

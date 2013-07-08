@@ -142,6 +142,7 @@ class TranslatableFile(object):
         if is_templatized:
             os.unlink(work_file)
 
+
 def write_pot_file(potfile, msgs):
     """
     Write the :param potfile: POT file with the :param msgs: contents,
@@ -166,12 +167,14 @@ class Command(NoArgsCommand):
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.'),
         make_option('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: "html,txt", or "js" if the domain is "djangojs"). Separate multiple extensions with commas, or use -e multiple times.',
-            action='append'),
+            help='The file extension(s) to examine (default: "html,txt", or "js" if the domain is "djangojs"). ' +
+            'Separate multiple extensions with commas, or use -e multiple times.', action='append'),
         make_option('--symlinks', '-s', action='store_true', dest='symlinks',
-            default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
+            default=False, help='Follows symlinks to directories when examining source code ' +
+            'and templates for translation strings.'),
         make_option('--ignore', '-i', action='append', dest='ignore_patterns',
-            default=[], metavar='PATTERN', help='Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.'),
+            default=[], metavar='PATTERN', help='Ignore files or directories matching this ' +
+            'glob-style pattern. Use multiple times to ignore more.'),
         make_option('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
             default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'."),
         make_option('--no-wrap', action='store_true', dest='no_wrap',
@@ -230,7 +233,7 @@ class Command(NoArgsCommand):
         if settings.configured:
             settings.USE_I18N = True
         else:
-            settings.configure(USE_I18N = True)
+            settings.configure(USE_I18N=True)
 
         self.invoked_for_django = False
         if os.path.isdir(os.path.join('conf', 'locale')):

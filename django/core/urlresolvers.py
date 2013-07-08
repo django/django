@@ -24,9 +24,9 @@ from django.utils import six
 from django.utils.translation import get_language
 
 
-_resolver_cache = {} # Maps URLconf modules to RegexURLResolver instances.
-_ns_resolver_cache = {} # Maps namespaces to RegexURLResolver instances.
-_callable_cache = {} # Maps view and url pattern names to their view functions.
+_resolver_cache = {}  # Maps URLconf modules to RegexURLResolver instances.
+_ns_resolver_cache = {}  # Maps namespaces to RegexURLResolver instances.
+_callable_cache = {}  # Maps view and url pattern names to their view functions.
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -62,7 +62,7 @@ class ResolverMatch(object):
 
     @property
     def view_name(self):
-        return ':'.join([ x for x in [ self.namespace, self.url_name ]  if x ])
+        return ':'.join([x for x in [self.namespace, self.url_name] if x])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
@@ -71,11 +71,14 @@ class ResolverMatch(object):
         return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name='%s', app_name='%s', namespace='%s')" % (
             self.func, self.args, self.kwargs, self.url_name, self.app_name, self.namespace)
 
+
 class Resolver404(Http404):
     pass
 
+
 class NoReverseMatch(Exception):
     pass
+
 
 def get_callable(lookup_view, can_fail=False):
     """
@@ -118,12 +121,14 @@ def get_callable(lookup_view, can_fail=False):
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache, 1)
 
+
 def get_resolver(urlconf):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return RegexURLResolver(r'^/', urlconf)
 get_resolver = memoize(get_resolver, _resolver_cache, 1)
+
 
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent urlconf pattern.
@@ -134,6 +139,7 @@ def get_ns_resolver(ns_pattern, resolver):
     return RegexURLResolver(r'^/', [ns_resolver])
 get_ns_resolver = memoize(get_ns_resolver, _ns_resolver_cache, 2)
 
+
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
     # ['django.views.news.stories', 'story_detail']
@@ -141,7 +147,8 @@ def get_mod_func(callback):
         dot = callback.rindex('.')
     except ValueError:
         return callback, ''
-    return callback[:dot], callback[dot+1:]
+    return callback[:dot], callback[dot + 1:]
+
 
 class LocaleRegexProvider(object):
     """
@@ -155,7 +162,6 @@ class LocaleRegexProvider(object):
         # expression.
         self._regex = regex
         self._regex_dict = {}
-
 
     @property
     def regex(self):
@@ -228,6 +234,7 @@ class RegexURLPattern(LocaleRegexProvider):
 
         self._callback = get_callable(self._callback_str)
         return self._callback
+
 
 class RegexURLResolver(LocaleRegexProvider):
     def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
@@ -328,10 +335,13 @@ class RegexURLResolver(LocaleRegexProvider):
                     if sub_match:
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
-                        return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
+                        return ResolverMatch(sub_match.func, sub_match.args,
+                                sub_match_dict, sub_match.url_name,
+                                self.app_name or sub_match.app_name,
+                                [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
-        raise Resolver404({'path' : path})
+        raise Resolver404({'path': path})
 
     @property
     def urlconf_module(self):
@@ -428,6 +438,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 "arguments '%s' not found. %d pattern(s) tried: %s" %
                              (lookup_view_s, args, kwargs, len(patterns), patterns))
 
+
 class LocaleRegexURLResolver(RegexURLResolver):
     """
     A URL resolver that always matches the active language code as URL prefix.
@@ -447,10 +458,12 @@ class LocaleRegexURLResolver(RegexURLResolver):
             self._regex_dict[language_code] = regex_compiled
         return self._regex_dict[language_code]
 
+
 def resolve(path, urlconf=None):
     if urlconf is None:
         urlconf = get_urlconf()
     return get_resolver(urlconf).resolve(path)
+
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
     if urlconf is None:
@@ -510,6 +523,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
 
 reverse_lazy = lazy(reverse, str)
 
+
 def clear_url_caches():
     global _resolver_cache
     global _ns_resolver_cache
@@ -517,6 +531,7 @@ def clear_url_caches():
     _resolver_cache.clear()
     _ns_resolver_cache.clear()
     _callable_cache.clear()
+
 
 def set_script_prefix(prefix):
     """
@@ -526,6 +541,7 @@ def set_script_prefix(prefix):
         prefix += '/'
     _prefixes.value = prefix
 
+
 def get_script_prefix():
     """
     Returns the currently active script prefix. Useful for client code that
@@ -533,6 +549,7 @@ def get_script_prefix():
     instance is normally going to be a lot cleaner).
     """
     return getattr(_prefixes, "value", '/')
+
 
 def clear_script_prefix():
     """
@@ -542,6 +559,7 @@ def clear_script_prefix():
         del _prefixes.value
     except AttributeError:
         pass
+
 
 def set_urlconf(urlconf_name):
     """
@@ -554,12 +572,14 @@ def set_urlconf(urlconf_name):
         if hasattr(_urlconfs, "value"):
             del _urlconfs.value
 
+
 def get_urlconf(default=None):
     """
     Returns the root URLconf to use for the current thread if it has been
     changed from the default one.
     """
     return getattr(_urlconfs, "value", default)
+
 
 def is_valid_path(path, urlconf=None):
     """

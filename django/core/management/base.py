@@ -166,7 +166,8 @@ class BaseCommand(object):
             type='choice', choices=['0', '1', '2', '3'],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'),
         make_option('--settings',
-            help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
+            help='The Python path to a settings module, e.g. "myproject.settings.main". ' +
+                 'If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
         make_option('--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',

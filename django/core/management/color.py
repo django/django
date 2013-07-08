@@ -7,6 +7,7 @@ import sys
 
 from django.utils import termcolors
 
+
 def supports_color():
     """
     Returns True if the running system's terminal supports color, and False
@@ -19,6 +20,7 @@ def supports_color():
         return False
     return True
 
+
 def color_style():
     """Returns a Style object with the Django color scheme."""
     if not supports_color():
@@ -27,13 +29,14 @@ def color_style():
         DJANGO_COLORS = os.environ.get('DJANGO_COLORS', '')
         color_settings = termcolors.parse_color_setting(DJANGO_COLORS)
         if color_settings:
-            class dummy: pass
+            class dummy:
+                pass
             style = dummy()
             # The nocolor palette has all available roles.
             # Use that pallete as the basis for populating
             # the palette as defined in the environment.
             for role in termcolors.PALETTES[termcolors.NOCOLOR_PALETTE]:
-                format = color_settings.get(role,{})
+                format = color_settings.get(role, {})
                 setattr(style, role, termcolors.make_style(**format))
             # For backwards compatibility,
             # set style for ERROR_OUTPUT == ERROR
@@ -41,6 +44,7 @@ def color_style():
         else:
             style = no_style()
     return style
+
 
 def no_style():
     """Returns a Style object that has no colors."""

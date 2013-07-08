@@ -141,6 +141,7 @@ def Deserializer(object_list, **options):
 
         yield base.DeserializedObject(Model(**data), m2m_data)
 
+
 def _get_model(model_identifier):
     """
     Helper to look up a model from an "app_label.model_name" string.

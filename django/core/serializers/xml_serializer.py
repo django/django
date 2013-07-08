@@ -13,6 +13,7 @@ from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
+
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to XML.
@@ -28,7 +29,7 @@ class Serializer(base.Serializer):
         """
         self.xml = SimplerXMLGenerator(self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET))
         self.xml.startDocument()
-        self.xml.startElement("django-objects", {"version" : "1.0"})
+        self.xml.startElement("django-objects", {"version": "1.0"})
 
     def end_serialization(self):
         """
@@ -48,7 +49,7 @@ class Serializer(base.Serializer):
         self.indent(1)
         obj_pk = obj._get_pk_val()
         if obj_pk is None:
-            attrs = {"model": smart_text(obj._meta),}
+            attrs = {"model": smart_text(obj._meta)}
         else:
             attrs = {
                 "pk": smart_text(obj._get_pk_val()),
@@ -71,8 +72,8 @@ class Serializer(base.Serializer):
         """
         self.indent(2)
         self.xml.startElement("field", {
-            "name" : field.name,
-            "type" : field.get_internal_type()
+            "name": field.name,
+            "type": field.get_internal_type()
         })
 
         # Get a "string version" of the object's data.
@@ -128,7 +129,7 @@ class Serializer(base.Serializer):
             else:
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={
-                        'pk' : smart_text(value._get_pk_val())
+                        'pk': smart_text(value._get_pk_val())
                     })
             for relobj in getattr(obj, field.name).iterator():
                 handle_m2m(relobj)
@@ -141,10 +142,11 @@ class Serializer(base.Serializer):
         """
         self.indent(2)
         self.xml.startElement("field", {
-            "name" : field.name,
-            "rel"  : field.rel.__class__.__name__,
-            "to"   : smart_text(field.rel.to._meta),
+            "name": field.name,
+            "rel": field.rel.__class__.__name__,
+            "to": smart_text(field.rel.to._meta),
         })
+
 
 class Deserializer(base.Deserializer):
     """
@@ -183,7 +185,7 @@ class Deserializer(base.Deserializer):
         else:
             pk = None
 
-        data = {Model._meta.pk.attname : Model._meta.pk.to_python(pk)}
+        data = {Model._meta.pk.attname: Model._meta.pk.to_python(pk)}
 
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
@@ -275,16 +277,14 @@ class Deserializer(base.Deserializer):
         model_identifier = node.getAttribute(attr)
         if not model_identifier:
             raise base.DeserializationError(
-                "<%s> node is missing the required '%s' attribute" \
-                    % (node.nodeName, attr))
+                "<%s> node is missing the required '%s' attribute" % (node.nodeName, attr))
         try:
             Model = models.get_model(*model_identifier.split("."))
         except TypeError:
             Model = None
         if Model is None:
-            raise base.DeserializationError(
-                "<%s> node has invalid model identifier: '%s'" % \
-                    (node.nodeName, model_identifier))
+            raise base.DeserializationError("<%s> node has invalid model identifier: '%s'" %
+                                            (node.nodeName, model_identifier))
         return Model
 
 
@@ -300,7 +300,7 @@ def getInnerText(node):
         elif child.nodeType == child.ELEMENT_NODE:
             inner_text.extend(getInnerText(child))
         else:
-           pass
+            pass
     return "".join(inner_text)
 
 

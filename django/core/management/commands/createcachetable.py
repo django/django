@@ -45,13 +45,13 @@ class Command(LabelCommand):
                 field_output.append("UNIQUE")
             if f.db_index:
                 unique = "UNIQUE " if f.unique else ""
-                index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
+                index_output.append("CREATE %sINDEX %s ON %s (%s);" %
                     (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
                     qn(f.name)))
             table_output.append(" ".join(field_output))
         full_statement = ["CREATE TABLE %s (" % qn(tablename)]
         for i, line in enumerate(table_output):
-            full_statement.append('    %s%s' % (line, ',' if i < len(table_output)-1 else ''))
+            full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(');')
         with transaction.commit_on_success_unless_managed():
             curs = connection.cursor()

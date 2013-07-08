@@ -130,8 +130,8 @@ class Command(NoArgsCommand):
                                 for sql in custom_sql:
                                     cursor.execute(sql)
                         except Exception as e:
-                            self.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
-                                                (app_name, model._meta.object_name, e))
+                            self.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" %
+                                              (app_name, model._meta.object_name, e))
                             if show_traceback:
                                 traceback.print_exc()
                     else:
@@ -153,8 +153,8 @@ class Command(NoArgsCommand):
                                 for sql in index_sql:
                                     cursor.execute(sql)
                         except Exception as e:
-                            self.stderr.write("Failed to install index for %s.%s model: %s\n" % \
-                                                (app_name, model._meta.object_name, e))
+                            self.stderr.write("Failed to install index for %s.%s model: %s\n" %
+                                              (app_name, model._meta.object_name, e))
 
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
