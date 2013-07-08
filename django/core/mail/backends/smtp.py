@@ -15,6 +15,7 @@ class EmailBackend(BaseEmailBackend):
     A wrapper that manages the SMTP network connection.
     """
     def __init__(self, host=None, port=None, username=None, password=None,
+                 use_ssl=None, keyfile=None, certfile=None,
                  use_tls=None, fail_silently=False, **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
@@ -31,6 +32,18 @@ class EmailBackend(BaseEmailBackend):
             self.use_tls = settings.EMAIL_USE_TLS
         else:
             self.use_tls = use_tls
+        if use_ssl is None:
+            self.use_ssl = settings.EMAIL_USE_SSL
+        else:
+            self.use_ssl = use_ssl
+        if keyfile is None:
+            self.keyfile = settings.EMAIL_SSL_KEYFILE
+        else:
+            self.keyfile = keyfile
+        if certfile is None:
+            self.certfile = settings.EMAIL_SSL_CERTFILE
+        else:
+            self.certfile = certfile
         self.connection = None
         self._lock = threading.RLock()
 
@@ -45,8 +58,13 @@ class EmailBackend(BaseEmailBackend):
         try:
             # If local_hostname is not specified, socket.getfqdn() gets used.
             # For performance, we use the cached FQDN for local_hostname.
-            self.connection = smtplib.SMTP(self.host, self.port,
-                                           local_hostname=DNS_NAME.get_fqdn())
+            if self.use_ssl:
+                self.connection = smtplib.SMTP_SSL(self.host, self.port,
+                        keyfile=self.keyfile, certfile=self.certfile,
+                        local_hostname=DNS_NAME.get_fqdn())
+            else:
+                self.connection = smtplib.SMTP(self.host, self.port,
+                        local_hostname=DNS_NAME.get_fqdn())
             if self.use_tls:
                 self.connection.ehlo()
                 self.connection.starttls()

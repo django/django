@@ -1056,6 +1056,49 @@ Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
 
+.. setting:: EMAIL_USE_SSL 
+
+EMAIL_USE_SSL
+-------------
+ 
+.. versionadded:: 1.5
+
+Default: ``False`` 
+ 
+Whether to use a SSL (secure) connection when talking to the SMTP server.  
+ 
+.. warning:: 
+ 
+        Requirements: Python 2.6 or higher 
+
+EMAIL_SSL_CERTFILE
+------------------
+ 
+.. versionadded:: 1.5
+
+Default: ``None`` 
+ 
+If :setting:`EMAIL_USE_SSL` is ``True``, optionally specify the path to a
+PEM-formatted certificate chain file to use for the SSL connection.
+ 
+.. warning:: 
+ 
+        Requirements: Python 2.6 or higher 
+
+EMAIL_SSL_KEYFILE
+-----------------
+ 
+.. versionadded:: 1.5
+
+Default: ``None`` 
+ 
+If :setting:`EMAIL_USE_SSL` is ``True``, optionally specify the path to a
+PEM-formatted private key file to use for the SSL connection.
+ 
+.. warning:: 
+ 
+        Requirements: Python 2.6 or higher 
+
 .. setting:: FILE_CHARSET
 
 FILE_CHARSET
