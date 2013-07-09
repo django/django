@@ -1019,6 +1019,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors.extend(cls._check_field_names(**kwargs))
         errors.extend(cls._check_relative_fields(**kwargs))
         errors.extend(cls._check_id_field(**kwargs))
+        errors.extend(cls._check_index_together(**kwargs))
         return errors
 
     @classmethod
@@ -1196,6 +1197,68 @@ class Model(six.with_metaclass(ModelBase)):
                 'to a field.',
                 obj=cls)]
         return []
+
+    @classmethod
+    def _check_index_together(cls, **kwargs):
+        from django.db import models
+
+        if not isinstance(cls._meta.index_together, (tuple, list)):
+            return [checks.Error(
+                'Non-iterable "index_together".\n'
+                '"index_together" is a list of field names that, taken '
+                'together, are indexed, so "index_together" must be '
+                'an iterable (e.g. a list). ',
+                hint='Convert "index_together" to a list.',
+                obj=cls)]
+
+        if any(not isinstance(fields, (tuple, list))
+            for fields in cls._meta.index_together):
+            return [checks.Error(
+                'Some items of "index_together" are not iterable '
+                '(e.g. a list).\n'
+                '"index_together" is a list of field names '
+                '(which are nested lists) that, taken together, are '
+                'indexed, so "index_together" must be an iterable '
+                'of iterables (i. e. a list of lists), i. e. '
+                '[["first_field", "second_field"]].\n',
+                hint='Convert "index_together" to a list of lists.',
+                obj=cls)]
+
+        errors = []
+        for fields in cls._meta.index_together:
+            for field_name in fields:
+                try:
+                    field = cls._meta.get_field(field_name,
+                        many_to_many=True)
+                except models.FieldDoesNotExist:
+                    errors.append(checks.Error(
+                        '"index_together" pointing to a missing "%s" '
+                        'field.\n'
+                        '%s.index_together points to a field '
+                        '"%s" which does not exist.'
+                        % (field_name, cls._meta.object_name, field_name),
+                        hint='Ensure that you did not misspell '
+                        'the field name.',
+                        obj=cls))
+                else:
+                    if isinstance(field.rel, models.ManyToManyRel):
+                        errors.append(checks.Error(
+                            '"index_together" referring to a m2m "%s" '
+                            'field.\n'
+                            'ManyToManyFields are not supported in '
+                            '"index_together".' % field_name,
+                            hint='Remove the m2m field '
+                            'from "index_together".',
+                            obj=cls))
+                    if field not in cls._meta.local_fields:
+                        errors.append(checks.Error(
+                            '"index_together" pointing to '
+                            'a non-local field.\n'
+                            '?',
+                            hint='?',
+                            obj=cls))
+        return errors
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #

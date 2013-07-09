@@ -197,13 +197,6 @@ class BadSwappableModel(models.Model):
         swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
 
 
-class BadIndexTogether1(models.Model):
-    class Meta:
-        index_together = [
-            ["field_that_does_not_exist"],
-        ]
-
-
 model_errors = """
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
@@ -268,7 +261,6 @@ old_invalid_models.badindextogether1: "index_together" refers to field_that_does
 old_invalid_models.duplicatecolumnnamemodel1: Field 'bar' has column name 'foo' that is already used.
 old_invalid_models.duplicatecolumnnamemodel2: Field 'bar' has column name 'bar' that is already used.
 old_invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' that is already used.
-
 """
 
 """
