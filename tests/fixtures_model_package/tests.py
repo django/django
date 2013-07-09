@@ -30,8 +30,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
     available_apps = ['fixtures_model_package']
 
     def test_syncdb(self):
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             Book.objects.all().delete()
 
             management.call_command(
@@ -40,9 +39,6 @@ class TestNoInitialDataLoading(TransactionTestCase):
                 load_initial_data=False
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
-            transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
 
 
     def test_flush(self):
@@ -54,8 +50,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
             lambda a: a.name
         )
 
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             management.call_command(
                 'flush',
                 verbosity=0,
@@ -63,9 +58,6 @@ class TestNoInitialDataLoading(TransactionTestCase):
                 load_initial_data=False
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
-            transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
 
 
 class FixtureTestCase(TestCase):
