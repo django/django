@@ -41,14 +41,6 @@ def get_validation_errors(outfile, app=None):
 
         # Check swappable attribute.
         if opts.swapped:
-            try:
-                app_label, model_name = opts.swapped.split('.')
-            except ValueError:
-                e.add(opts, "%s is not of the form 'app_label.app_name'." % opts.swappable)
-                continue
-            if not models.get_model(app_label, model_name):
-                e.add(opts, "Model has been swapped out for '%s' which has not been installed or is abstract." % opts.swapped)
-            # No need to perform any other validation checks on a swapped model.
             continue
 
         # If this is the current User model, check known validation problems with User models

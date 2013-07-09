@@ -1056,3 +1056,36 @@ class InvalidModelTests(IsolatedModelsTestCase):
                 hint='Ensure that you did not misspell the field name.',
                 obj=Model)
         ])
+
+    @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
+    def test_swappable_missing_app_name(self):
+        class Model(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPED_MODEL_BAD_VALUE'
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"TEST_SWAPPED_MODEL_BAD_VALUE" is not of the form '
+                '"app_label.app_name".',
+                hint='Add app label to '
+                '"TEST_SWAPPED_MODEL_BAD_VALUE" setting.',
+                obj=Model)
+        ])
+
+    @override_settings(TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target')
+    def test_swappable_missing_app(self):
+        class Model(models.Model):
+            class Meta:
+                swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('not_an_app.Target not installed or abstract.\n'
+                'The model has been swapped out for not_an_app.Target which '
+                'has not been installed or is abstract.',
+                hint='Ensure that you did not misspell the model name and '
+                'the app name as well as the model is not abstract. Does your '
+                'INSTALLED_APPS setting contain the "not_an_app" app?',
+                obj=Model)
+        ])
+
