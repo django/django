@@ -1017,6 +1017,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         errors.extend(cls._check_swappable(**kwargs))
         if not cls._meta.swapped:
+            errors.extend(cls._check_user_model(**kwargs))
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_field_names(**kwargs))
             errors.extend(cls._check_relative_fields(**kwargs))
@@ -1051,6 +1052,45 @@ class Model(six.with_metaclass(ModelBase)):
                         'contain the "%(app_label)s" app?' % locals(),
                         obj=cls)]
         return []
+
+    @classmethod
+    def _check_user_model(cls, **kwargs):
+        errors = []
+        # If this is the current User model, check known validation problems
+        # with User models
+        model_name = '%s.%s' % (cls._meta.app_label, cls._meta.object_name)
+        if settings.AUTH_USER_MODEL == model_name:
+            # Check that REQUIRED_FIELDS is a list
+            if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                errors.append(checks.Error(
+                    'Non-iterable %s.REQUIRED_FIELDS.\n'
+                    'The REQUIRED_FIELDS must be an iterable (i. e. a list '
+                    'or tuple).' % cls._meta.object_name,
+                    hint='Convert the REQUIRED_FIELDS to a list.',
+                    obj=cls))
+
+            # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
+            if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
+                errors.append(checks.Error(
+                    '%s.USERNAME_FIELD included in REQUIRED_FIELDS.\n'
+                    'The field named as the USERNAME_FIELD should not be '
+                    'included in REQUIRED_FIELDS.' % cls._meta.object_name,
+                    hint='Exclude "%s" from REQUIRED_FIELDS.'
+                    % cls.USERNAME_FIELD,
+                    obj=cls))
+
+            # Check that the username field is unique
+            if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
+                errors.append(checks.Error(
+                    'Non unique %s.USERNAME_FIELD.\n'
+                    'The %s.%s field must be unique because it is pointed by '
+                    'USERNAME_FIELD.' % (cls._meta.object_name,
+                    cls._meta.object_name, cls.USERNAME_FIELD),
+                    hint='Add unique=True to field %s.%s.'
+                    % (cls._meta.object_name, cls.USERNAME_FIELD),
+                    obj=cls))
+
+        return errors
 
     @classmethod
     def _check_fields(cls, **kwargs):
