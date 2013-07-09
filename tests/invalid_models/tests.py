@@ -724,7 +724,7 @@ class OtherFieldTests(TestCase):
             v.check_field = old_check_field
 
 
-class InvalidModelsTests(IsolatedModelsTestCase):
+class ClashesTests(IsolatedModelsTestCase):
 
     def test_basic_foreign_key_clash(self):
         class Target(models.Model):
@@ -922,3 +922,20 @@ class InvalidModelsTests(IsolatedModelsTestCase):
         Reverse query name for m2m field 'm2m_2' clashes with related field 'Target.src_safe'.
             Add a related_name argument to the definition for 'm2m_2'.
         """
+
+class InvalidModelTests(IsolatedModelsTestCase):
+
+    def test_unique_primary_key(self):
+        class Model(models.Model):
+            id = models.IntegerField(primary_key=False)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"id" field is not a primary key.\n'
+                'You cannot use "id" as a field name, '
+                'because each model automatically gets an "id" field '
+                'if none of the fields have primary_key=True.',
+                hint='Remove or rename "id" field or '
+                'add primary_key=True to a field.',
+                obj=Model)
+        ])

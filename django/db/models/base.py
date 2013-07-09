@@ -1017,6 +1017,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         errors.extend(cls._check_fields(**kwargs))
         errors.extend(cls._check_relative_fields(**kwargs))
+        errors.extend(cls._check_id_field(**kwargs))
         return errors
 
     @classmethod
@@ -1165,6 +1166,22 @@ class Model(six.with_metaclass(ModelBase)):
                         obj=field))
 
         return errors
+
+    @classmethod
+    def _check_id_field(cls, **kwargs):
+        fields = list(f for f in cls._meta.local_fields
+            if f.name == 'id' and f != cls._meta.pk)
+        # fields is empty or consists of the invalid "id" field
+        if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
+            return [checks.Error(
+                '"id" field is not a primary key.\n'
+                'You cannot use "id" as a field name, because each model '
+                'automatically gets an "id" field if none of the fields '
+                'have primary_key=True.',
+                hint='Remove or rename "id" field or add primary_key=True '
+                'to a field.',
+                obj=cls)]
+        return []
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #

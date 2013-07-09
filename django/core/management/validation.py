@@ -70,8 +70,6 @@ def get_validation_errors(outfile, app=None):
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
-            if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
-                e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if f.name.endswith('_'):
                 e.add(opts, '"%s": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.' % f.name)
 
