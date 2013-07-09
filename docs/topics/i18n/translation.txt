@@ -1238,7 +1238,7 @@ German.
 
 The script should be run from one of two places:
 
-* The root directory of your Django project (the one that contains``manage.py``).
+* The root directory of your Django project (the one that contains ``manage.py``).
 * The root directory of one of your Django apps.
 
 The script runs over your project source tree or your application source tree

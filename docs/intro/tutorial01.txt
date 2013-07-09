@@ -105,12 +105,11 @@ These files are:
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
-  :file:`manage.py` in :doc:`/ref/django-admin`. In general, most command lines
-  will be run in the directory containing manage.py.
+  :file:`manage.py` in :doc:`/ref/django-admin`.
 
-* The inner :file:`mysite/` directory, also known as the project module, is the
-  actual Python package for your project. Its name is the Python package name
-  you'll need to use to import anything inside it (e.g. ``mysite.urls``).
+* The inner :file:`mysite/` directory is the actual Python package for your
+  project. Its name is the Python package name you'll need to use to import
+  anything inside it (e.g. ``mysite.urls``).
 
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
   directory should be considered a Python package. (Read `more about
