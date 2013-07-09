@@ -190,10 +190,9 @@ class TestTransactionClosing(IgnorePendingDeprecationWarningsMixin, TransactionT
         """
         self.test_failing_query_transaction_closed()
 
-@skipIf(connection.vendor == 'sqlite' and
-        (connection.settings_dict['NAME'] == ':memory:' or
-         not connection.settings_dict['NAME']),
-        'Test uses multiple connections, but in-memory sqlite does not support this')
+@skipIf(connection.vendor == 'sqlite'
+        and connection.settings_dict['TEST_NAME'] in (None, '', ':memory:'),
+        "Cannot establish two connections to an in-memory SQLite database.")
 class TestNewConnection(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
     """
     Check that new connections don't have special behaviour.
