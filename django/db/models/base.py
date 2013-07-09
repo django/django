@@ -1015,13 +1015,42 @@ class Model(six.with_metaclass(ModelBase)):
     @classmethod
     def check(cls, **kwargs):
         errors = []
-        errors.extend(cls._check_fields(**kwargs))
-        errors.extend(cls._check_field_names(**kwargs))
-        errors.extend(cls._check_relative_fields(**kwargs))
-        errors.extend(cls._check_id_field(**kwargs))
-        errors.extend(cls._check_index_together(**kwargs))
-        errors.extend(cls._check_ordering(**kwargs))
+        errors.extend(cls._check_swappable(**kwargs))
+        if not cls._meta.swapped:
+            errors.extend(cls._check_fields(**kwargs))
+            errors.extend(cls._check_field_names(**kwargs))
+            errors.extend(cls._check_relative_fields(**kwargs))
+            errors.extend(cls._check_id_field(**kwargs))
+            errors.extend(cls._check_index_together(**kwargs))
+            errors.extend(cls._check_ordering(**kwargs))
         return errors
+
+    @classmethod
+    def _check_swappable(cls, **kwargs):
+        from django.db import models
+        if cls._meta.swapped:
+            try:
+                app_label, model_name = cls._meta.swapped.split('.')
+            except ValueError:
+                return [checks.Error(
+                    '"%s" is not of the form "app_label.app_name".'
+                    % cls._meta.swappable,
+                    hint='Add app label to "%s" setting.' % cls._meta.swappable,
+                    obj=cls)]
+            else:
+                if not models.get_model(app_label, model_name):
+                    return [checks.Error(
+                        '%(app_label)s.%(model_name)s not installed '
+                        'or abstract.\n'
+                        'The model has been swapped out for '
+                        '%(app_label)s.%(model_name)s which has not been '
+                        'installed or is abstract.' % locals(),
+                        hint='Ensure that you did not misspell the model '
+                        'name and the app name as well as the model '
+                        'is not abstract. Does your INSTALLED_APPS setting '
+                        'contain the "%(app_label)s" app?' % locals(),
+                        obj=cls)]
+        return []
 
     @classmethod
     def _check_fields(cls, **kwargs):
@@ -1307,7 +1336,6 @@ class Model(six.with_metaclass(ModelBase)):
                     hint='Ensure that you did not misspell the field name.',
                     obj=cls))
         return errors
-
 
 
 ############################################

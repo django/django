@@ -172,26 +172,6 @@ class SwappingModel(models.Model):
         related_name='swapping_m2m')
 
 
-class BadSwappableValue(models.Model):
-    """A model that can be swapped out; during testing, the swappable
-    value is not of the format app.model
-    """
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        swappable = 'TEST_SWAPPED_MODEL_BAD_VALUE'
-
-
-class BadSwappableModel(models.Model):
-    """A model that can be swapped out; during testing, the swappable
-    value references an unknown model.
-    """
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
-
-
 model_errors = """
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
@@ -249,8 +229,6 @@ old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with rel
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-old_invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
-old_invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 """
 
 """
@@ -314,6 +292,4 @@ m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with relat
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-m invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
-m invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 """
