@@ -12,13 +12,11 @@ from django.utils._os import upath
 from django.utils import six
 
 CONTRIB_MODULE_PATH = 'django.contrib'
-CONTRIB_GIS_TESTS_PATH = 'django.contrib.gis.tests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
-CONTRIB_GIS_TESTS_DIR = os.path.join(CONTRIB_DIR, 'gis', 'tests')
 
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
@@ -52,11 +50,18 @@ ALWAYS_INSTALLED_APPS = [
 
 
 def get_test_modules():
+    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
-    for modpath, dirpath in (
+    discovery_paths = [
         (None, RUNTESTS_DIR),
-        (CONTRIB_MODULE_PATH, CONTRIB_DIR),
-        (CONTRIB_GIS_TESTS_PATH, CONTRIB_GIS_TESTS_DIR)):
+        (CONTRIB_MODULE_PATH, CONTRIB_DIR)
+    ]
+    if HAS_SPATIAL_DB:
+        discovery_paths.append(
+            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
+        )
+
+    for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
                 # Python 3 byte code dirs (PEP 3147)
