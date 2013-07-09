@@ -433,6 +433,13 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
                 self.assertEqual(c.mpoly.union(geom), c.union)
 
+    @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
+    def test_envelope(self):
+        "Testing the `envelope` GeoQuerySet method."
+        countries = Country.objects.all().envelope()
+        for country in countries:
+            self.assertIsInstance(country.envelope, Polygon)
+
     @no_mysql
     @no_spatialite # SpatiaLite does not have an Extent function
     def test_extent(self):
