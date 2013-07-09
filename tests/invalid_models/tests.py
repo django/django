@@ -958,3 +958,74 @@ class InvalidModelTests(IsolatedModelsTestCase):
                 hint='Rename the field.',
                 obj=Model._meta.get_field('m2m_')),
         ])
+
+    def test_index_together_not_iterable(self):
+        class Model(models.Model):
+            class Meta:
+                index_together = 10
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Non-iterable "index_together".\n'
+                '"index_together" is a list of field names that, taken '
+                'together, are indexed, so "index_together" must be '
+                'an iterable (e.g. a list). ',
+                hint='Convert "index_together" to a list.',
+                obj=Model),
+        ])
+
+    def test_index_together_containing_non_iterable(self):
+        class Model(models.Model):
+            class Meta:
+                index_together = [
+                    'non-iterable',
+                    'second-non-iterable',
+                ]
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Some items of "index_together" are not iterable '
+                '(e.g. a list).\n'
+                '"index_together" is a list of field names '
+                '(which are nested lists) that, taken together, are '
+                'indexed, so "index_together" must be an iterable '
+                'of iterables (i. e. a list of lists), i. e. '
+                '[["first_field", "second_field"]].\n',
+                hint='Convert "index_together" to a list of lists.',
+                obj=Model),
+        ])
+
+    def test_index_together_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                index_together = [
+                    ["missing_field"],
+                ]
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"index_together" pointing to a missing "missing_field" '
+                'field.\n'
+                'Model.index_together points to a field "missing_field" '
+                'which does not exist.',
+                hint='Ensure that you did not misspell the field name.',
+                obj=Model),
+        ])
+
+    def test_index_together_pointing_to_m2m(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                index_together = [
+                    ["m2m"],
+                ]
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"index_together" referring to a m2m "m2m" field.\n'
+                'ManyToManyFields are not supported in '
+                '"index_together".',
+                hint='Remove the m2m field from "index_together".',
+                obj=Model)
+        ])

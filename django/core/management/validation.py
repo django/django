@@ -226,11 +226,6 @@ def get_validation_errors(outfile, app=None):
         # Check unique_together.
         for ut in opts.unique_together:
             validate_local_fields(e, opts, "unique_together", ut)
-        if not isinstance(opts.index_together, collections.Sequence):
-            e.add(opts, '"index_together" must a sequence')
-        else:
-            for it in opts.index_together:
-                validate_local_fields(e, opts, "index_together", it)
 
     return len(e.errors)
 

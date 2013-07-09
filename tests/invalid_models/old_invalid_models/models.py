@@ -197,13 +197,6 @@ class BadSwappableModel(models.Model):
         swappable = 'TEST_SWAPPED_MODEL_BAD_MODEL'
 
 
-class BadIndexTogether1(models.Model):
-    class Meta:
-        index_together = [
-            ["field_that_does_not_exist"],
-        ]
-
-
 model_errors = """
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
@@ -264,7 +257,6 @@ old_invalid_models.group: The model Group has two manually-defined m2m relations
 old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 old_invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 old_invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
-old_invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
 """
 
 """
@@ -331,5 +323,4 @@ m invalid_models.group: The model Group has two manually-defined m2m relations t
 m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 m invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 m invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
-m invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
 """
