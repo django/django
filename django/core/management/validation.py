@@ -67,8 +67,6 @@ def get_validation_errors(outfile, app=None):
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
-            if f.name.endswith('_'):
-                e.add(opts, '"%s": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.' % f.name)
             if isinstance(f, models.ImageField):
                 try:
                     from django.utils.image import Image

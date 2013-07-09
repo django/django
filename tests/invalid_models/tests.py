@@ -939,3 +939,22 @@ class InvalidModelTests(IsolatedModelsTestCase):
                 'add primary_key=True to a field.',
                 obj=Model)
         ])
+
+    def test_field_names_ending_with_underscore(self):
+        class Model(models.Model):
+            field_ = models.CharField(max_length=10)
+            m2m_ = models.ManyToManyField('self')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Field name ending with an underscore.\n'
+                'Field names cannot end with underscores, because this '
+                'would lead to ambiguous queryset filters.',
+                hint='Rename the field.',
+                obj=Model._meta.get_field('field_')),
+            Error('Field name ending with an underscore.\n'
+                'Field names cannot end with underscores, because this '
+                'would lead to ambiguous queryset filters.',
+                hint='Rename the field.',
+                obj=Model._meta.get_field('m2m_')),
+        ])
