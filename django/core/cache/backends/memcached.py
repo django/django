@@ -75,7 +75,7 @@ class BaseMemcachedCache(BaseCache):
         self._cache.delete(key)
 
     def get_many(self, keys, version=None):
-        new_keys = map(lambda x: self.make_key(x, version=version), keys)
+        new_keys = [self.make_key(x, version=version) for x in keys]
         ret = self._cache.get_multi(new_keys)
         if ret:
             _ = {}
