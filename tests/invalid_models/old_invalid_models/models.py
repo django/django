@@ -5,10 +5,6 @@ from django.conf import settings
 from django.db import models
 
 
-class FieldErrors(models.Model):
-    field_ = models.CharField(max_length=10)
-
-
 class Target(models.Model):
     tgt_safe = models.CharField(max_length=10)
     clash1 = models.CharField(max_length=10)
@@ -209,7 +205,6 @@ class BadIndexTogether1(models.Model):
 
 
 model_errors = """
-old_invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 old_invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 old_invalid_models.clash3: Reverse query name for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
@@ -281,7 +276,6 @@ old_invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' 
 # - 'x' -- the test was rewritten
 # - 'm' -- the test is actually a model test, not a field test; not rewritten
 
-m invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 m invalid_models.clash3: Accessor for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 m invalid_models.clash3: Accessor for field 'foreign_1' clashes with related m2m field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.
 m invalid_models.clash3: Reverse query name for field 'foreign_1' clashes with field 'Target2.foreign_tgt'. Add a related_name argument to the definition for 'foreign_1'.

@@ -1016,6 +1016,7 @@ class Model(six.with_metaclass(ModelBase)):
     def check(cls, **kwargs):
         errors = []
         errors.extend(cls._check_fields(**kwargs))
+        errors.extend(cls._check_field_names(**kwargs))
         errors.extend(cls._check_relative_fields(**kwargs))
         errors.extend(cls._check_id_field(**kwargs))
         return errors
@@ -1027,6 +1028,19 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(field.check(**kwargs))
         for field in cls._meta.local_many_to_many:
             errors.extend(field.check(from_model=cls, **kwargs))
+        return errors
+
+    @classmethod
+    def _check_field_names(cls, **kwargs):
+        errors = []
+        for field in cls._meta.local_fields + cls._meta.local_many_to_many:
+            if field.name.endswith('_'):
+                errors.append(checks.Error(
+                    'Field name ending with an underscore.\n'
+                    'Field names cannot end with underscores, because this '
+                    'would lead to ambiguous queryset filters.',
+                    hint='Rename the field.',
+                    obj=field))
         return errors
 
     @classmethod

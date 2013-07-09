@@ -70,9 +70,6 @@ def get_validation_errors(outfile, app=None):
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
-            if f.name.endswith('_'):
-                e.add(opts, '"%s": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.' % f.name)
-
             # Column name validation.
             # Determine which column name this field wants to use.
             _, column_name = f.get_attname_column()
