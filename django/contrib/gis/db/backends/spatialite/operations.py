@@ -169,6 +169,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         Checks if the given aggregate name is supported (that is, if it's
         in `self.valid_aggregates`).
         """
+        super(SpatiaLiteOperations, self).check_aggregate_support(aggregate)
         agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
 
