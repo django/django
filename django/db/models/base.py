@@ -1020,6 +1020,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors.extend(cls._check_relative_fields(**kwargs))
         errors.extend(cls._check_id_field(**kwargs))
         errors.extend(cls._check_index_together(**kwargs))
+        errors.extend(cls._check_ordering(**kwargs))
         return errors
 
     @classmethod
@@ -1258,6 +1259,55 @@ class Model(six.with_metaclass(ModelBase)):
                             hint='?',
                             obj=cls))
         return errors
+
+    @classmethod
+    def _check_ordering(cls, **kwargs):
+        from django.db import models
+
+        if not cls._meta.ordering:
+            return []
+
+        if not isinstance(cls._meta.ordering, (list, tuple)):
+            return [checks.Error(
+                'Non iterable "ordering".\n'
+                '"ordering" must be a tuple or list of field names, i. e. '
+                '["pub_date", "author"]. If you want to order by only one '
+                'field, you still need to use a list, i. e. ["pub_date"].',
+                hint='Convert "ordering" to a list.',
+                obj=cls)]
+
+        errors = []
+
+        fields = cls._meta.ordering
+
+        # Skip '?' fields.
+        fields = (f for f in fields if f != '?')
+
+        # Convert "-field" to "field".
+        fields = ((f[1:] if f.startswith('-') else f) for f in fields)
+
+        fields = (f for f in fields if
+            f != '_order' or not cls._meta.order_with_respect_to)
+
+        # Skip ordering in the format field1__field2 (FIXME: checking
+        # this format would be nice, but it's a little fiddly).
+        fields = (f for f in fields if '__' not in f)
+
+        # Skip ordering on pk. This is always a valid order_by field
+        # but is an alias and therefore won't be found by opts.get_field.
+        fields = (f for f in fields if f != 'pk')
+
+        for field_name in fields:
+            try:
+                cls._meta.get_field(field_name, many_to_many=False)
+            except models.FieldDoesNotExist:
+                errors.append(checks.Error(
+                    '"ordering" pointing to a missing "%s" field.'
+                    % field_name,
+                    hint='Ensure that you did not misspell the field name.',
+                    obj=cls))
+        return errors
+
 
 
 ############################################

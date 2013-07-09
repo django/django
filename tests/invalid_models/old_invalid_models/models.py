@@ -117,11 +117,6 @@ class UniqueFKTarget2(models.Model):
     tgt = models.ForeignKey(FKTarget, to_field='good')
 
 
-class NonExistingOrderingWithSingleUnderscore(models.Model):
-    class Meta:
-        ordering = ("does_not_exist",)
-
-
 class UnicodeForeignKeys(models.Model):
     """Foreign keys which can translate to ascii should be OK, but fail if
     they're not."""
@@ -254,7 +249,6 @@ old_invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with rel
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 old_invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-old_invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 old_invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 old_invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 old_invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.
@@ -324,7 +318,6 @@ m invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with relat
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 m invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 m invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-m invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 m invalid_models.badswappablevalue: TEST_SWAPPED_MODEL_BAD_VALUE is not of the form 'app_label.app_name'.
 m invalid_models.badswappablemodel: Model has been swapped out for 'not_an_app.Target' which has not been installed or is abstract.
 m invalid_models.badindextogether1: "index_together" refers to field_that_does_not_exist, a field that doesn't exist.

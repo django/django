@@ -214,28 +214,6 @@ def get_validation_errors(outfile, app=None):
                         continue
                 check()
 
-        # Check ordering attribute.
-        if opts.ordering:
-            for field_name in opts.ordering:
-                if field_name == '?':
-                    continue
-                if field_name.startswith('-'):
-                    field_name = field_name[1:]
-                if opts.order_with_respect_to and field_name == '_order':
-                    continue
-                # Skip ordering in the format field1__field2 (FIXME: checking
-                # this format would be nice, but it's a little fiddly).
-                if '__' in field_name:
-                    continue
-                # Skip ordering on pk. This is always a valid order_by field
-                # but is an alias and therefore won't be found by opts.get_field.
-                if field_name == 'pk':
-                    continue
-                try:
-                    opts.get_field(field_name, many_to_many=False)
-                except models.FieldDoesNotExist:
-                    e.add(opts, '"ordering" refers to "%s", a field that doesn\'t exist.' % field_name)
-
         # Check unique_together.
         for ut in opts.unique_together:
             validate_local_fields(e, opts, "unique_together", ut)

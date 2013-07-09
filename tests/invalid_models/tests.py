@@ -1029,3 +1029,30 @@ class InvalidModelTests(IsolatedModelsTestCase):
                 hint='Remove the m2m field from "index_together".',
                 obj=Model)
         ])
+
+    def test_ordering_non_iterable(self):
+        class Model(models.Model):
+            class Meta:
+                ordering = "missing_field"
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Non iterable "ordering".\n'
+                '"ordering" must be a tuple or list of field names, i. e. '
+                '["pub_date", "author"]. If you want to order by only one '
+                'field, you still need to use a list, i. e. ["pub_date"].',
+                hint='Convert "ordering" to a list.',
+                obj=Model)
+        ])
+
+    def test_ordering_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                ordering = ("missing_field",)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"ordering" pointing to a missing "missing_field" field.',
+                hint='Ensure that you did not misspell the field name.',
+                obj=Model)
+        ])
