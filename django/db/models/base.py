@@ -1147,8 +1147,7 @@ class Model(six.with_metaclass(ModelBase)):
             rel_name = field.related.get_accessor_name()
             rel_query_name = field.related_query_name()
             # field_name is e.g. "m2m field Model.field"
-            field_name = ("m2m " if is_field_m2m else "") \
-                + ("field %s.%s" % (opts.object_name, field.name))
+            field_name = "field %s.%s" % (opts.object_name, field.name)
 
             # Consider the following (invalid) models:
             #
@@ -1201,8 +1200,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             # The first loop.
             for r in rel_opts.fields + rel_opts.local_many_to_many:
-                r_name = ("m2m " if r in rel_opts.many_to_many else "") \
-                    + "field %s.%s" % (rel_opts.object_name, r.name)
+                r_name = "field %s.%s" % (rel_opts.object_name, r.name)
                 compare_to = r.name
 
                 if compare_to == rel_name:
@@ -1223,8 +1221,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             # The second loop.
             for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
-                m2m_part = "m2m " if r in rel_opts.get_all_related_many_to_many_objects() else ""
-                r_name = "related " + m2m_part + "field %s.%s" % (rel_opts.object_name, r.get_accessor_name())
+                r_name = "related field %s.%s" % (rel_opts.object_name, r.get_accessor_name())
                 compare_to = r.get_accessor_name()
                 if r.field is field:
                     if (not is_field_m2m and r in rel_opts.get_all_related_objects() or

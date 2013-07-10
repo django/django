@@ -396,7 +396,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Person.friends.field
         errors = field.check(from_model=Person)
         self.assertEqual(errors, [
-            Error('Symmetrical m2m field with intermediate table.\n'
+            Error('Symmetrical field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
                 hint='Set symmetrical=False on the field.',
@@ -438,7 +438,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Person.friends.field
         errors = field.check(from_model=Person)
         self.assertEqual(errors, [
-            Error('Symmetrical m2m field with intermediate table.\n'
+            Error('Symmetrical field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
                 hint='Set symmetrical=False on the field.',
@@ -496,7 +496,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.members.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('Unique m2m field.\n'
+            Error('Unique many-to-many field.\n'
                 'ManyToManyFields cannot be unique.',
                 hint='Remove the "unique" argument on the field.',
                 obj=field),
@@ -752,11 +752,11 @@ class ClashesTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Reverse query name for m2m field Model.m2m clashes '
+            Error('Reverse query name for field Model.m2m clashes '
                 'with field Target.model.',
                 hint='Rename field Target.model or add/change '
                 'a related_name argument to the definition '
-                'for m2m field Model.m2m.',
+                'for field Model.m2m.',
                 obj=Model.m2m.field),
         ])
 
@@ -786,11 +786,11 @@ class ClashesTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Accessor for m2m field Model.m2m clashes with '
+            Error('Accessor for field Model.m2m clashes with '
                 'field Target.model_set.',
                 hint='Rename field Target.model_set or add/change '
                 'a related_name argument to the definition '
-                'for m2m field Model.m2m.',
+                'for field Model.m2m.',
                 obj=Model.m2m.field),
         ])
 
@@ -876,14 +876,14 @@ class ClashesTests(IsolatedModelsTestCase):
         errors = Model.check()
         self.assertEqual(errors, [
             Error('Accessor for field Model.foreign clashes with '
-                'm2m field Target.clash.',
-                hint='Rename m2m field Target.clash or add/change '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
                 'a related_name argument to the definition '
                 'for field Model.foreign.',
                 obj=Model.foreign.field),
             Error('Reverse query name for field Model.foreign clashes with '
-                'm2m field Target.clash.',
-                hint='Rename m2m field Target.clash or add/change '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
                 'a related_name argument to the definition '
                 'for field Model.foreign.',
                 obj=Model.foreign.field),
@@ -940,15 +940,15 @@ class ClashesTests(IsolatedModelsTestCase):
                 'the definition for Model.foreign_2 or Model.m2m_2.',
                 obj=Model.foreign_2.field),
 
-            Error('Accessor for m2m field Model.m2m_1 clashes with '
+            Error('Accessor for field Model.m2m_1 clashes with '
                 'field Target.id.',
                 hint='Rename field Target.id or add/change a related_name '
-                'argument to the definition for m2m field Model.m2m_1.',
+                'argument to the definition for field Model.m2m_1.',
                 obj=Model.m2m_1.field),
-            Error('Reverse query name for m2m field Model.m2m_1 clashes with '
+            Error('Reverse query name for field Model.m2m_1 clashes with '
                 'field Target.id.',
                 hint='Rename field Target.id or add/change a related_name '
-                'argument to the definition for m2m field Model.m2m_1.',
+                'argument to the definition for field Model.m2m_1.',
                 obj=Model.m2m_1.field),
             Error('Clash between accessors for Model.m2m_1 '
                 'and Model.foreign_1.',

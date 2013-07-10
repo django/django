@@ -1692,7 +1692,7 @@ class ManyToManyField(RelatedField):
 
     def _check_unique(self, **kwargs):
         if self.unique:
-            return [checks.Error('Unique m2m field.\n'
+            return [checks.Error('Unique many-to-many field.\n'
                 'ManyToManyFields cannot be unique.',
                 hint='Remove the "unique" argument on the field.',
                 obj=self)]
@@ -1735,7 +1735,7 @@ class ManyToManyField(RelatedField):
             if (self_referential and self.rel.symmetrical and
                 not self.rel.through._meta.auto_created):
                 errors.append(checks.Error(
-                    'Symmetrical m2m field with intermediate table.\n'
+                    'Symmetrical field with intermediate table.\n'
                     'Many-to-many fields with intermediate tables cannot '
                     'be symmetrical.',
                     hint='Set symmetrical=False on the field.',
