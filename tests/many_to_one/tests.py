@@ -4,6 +4,7 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.db import models
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -441,3 +442,41 @@ class ManyToOneTests(TestCase):
                                  expected_message % ', '.join(['EXTRA',] + Article._meta.get_all_field_names()),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')
+
+
+class FieldCloningTests(TestCase):
+    def test_basic_cloning(self):
+        original_field = models.CharField(max_length=47)
+        clone_result = original_field.clone_for_foreignkey(
+            'test_name',
+            False,
+            original_field.creation_counter,
+            original_field.creation_counter + 1,
+            'dummy_column',
+            fk_field='dummy value',
+        )
+        self.assertEqual(len(clone_result), 1)
+        new_name, new_field = clone_result[0]
+        self.assertEqual(new_name, 'test_name')
+        self.assertIsNot(original_field, new_field)
+        self.assertLess(original_field.creation_counter,
+                        new_field.creation_counter)
+        self.assertLess(new_field.creation_counter,
+                        original_field.creation_counter + 1)
+        self.assertEqual(original_field.max_length,
+                         new_field.max_length)
+        self.assertEqual(new_field.db_column, 'dummy_column')
+
+    def test_autofield_cloning(self):
+        original_field = models.AutoField(primary_key=True)
+        clone_result = original_field.clone_for_foreignkey(
+            'test_name',
+            False,
+            original_field.creation_counter,
+            original_field.creation_counter + 1,
+            'dummy_column',
+        )
+        self.assertEqual(len(clone_result), 1)
+        new_name, new_field = clone_result[0]
+        self.assertIsInstance(new_field, models.IntegerField)
+        self.assertFalse(new_field.primary_key)

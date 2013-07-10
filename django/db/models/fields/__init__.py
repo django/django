@@ -6,6 +6,7 @@ import decimal
 import math
 import warnings
 from base64 import b64decode, b64encode
+from fractions import Fraction
 from itertools import tee
 
 from django.db import connection
@@ -227,6 +228,38 @@ class Field(object):
             [],
             keywords,
         )
+
+    def clone_for_foreignkey(self, name, null, counter_low,
+                             counter_high, db_column, klass=None,
+                             args=None, kwargs=None, fk_field=None):
+        """
+        Returns a list of fields to be added to another model in order to
+        create an auxiliary field for a ForeignKey. For each field,
+        returns a pair (name, instance) where name is the new name of the
+        field in the target model.
+        """
+        if args is None or kwargs is None:
+            name_, path_, args_, kwargs_ = self.deconstruct()
+            args = args_ if args is None else args
+            kwargs = kwargs_ if kwargs is None else kwargs
+        klass = klass or self.__class__
+        # Certain field arguments are not supposed to be set on the
+        # auxiliary field, instead, the owning ForeignKey takes care of
+        # them.
+        for arg_name in ['primary_key', 'choices', 'default', 'unique',
+                         'db_index']:
+            if arg_name in kwargs:
+                del kwargs[arg_name]
+        kwargs['serialize'] = False
+        kwargs['null'] = null
+        kwargs['editable'] = False
+        kwargs['db_column'] = db_column
+        instance = klass(*args, **kwargs)
+        # We need to set this manually in order to make the field appear
+        # just after the ForeignKey to preserve the order of columns.
+        instance.creation_counter = (Fraction(counter_low) +
+                                     Fraction(counter_high)) / 2
+        return [(name, instance)]
 
     def __eq__(self, other):
         # Needed for @total_ordering
@@ -674,6 +707,10 @@ class AutoField(Field):
         del kwargs['blank']
         kwargs['primary_key'] = True
         return name, path, args, kwargs
+
+    def clone_for_foreignkey(self, *args, **kwargs):
+        kwargs['klass'] = IntegerField
+        return super(AutoField, self).clone_for_foreignkey(*args, **kwargs)
 
     def get_internal_type(self):
         return "AutoField"
