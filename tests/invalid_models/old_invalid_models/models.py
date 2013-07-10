@@ -22,14 +22,6 @@ class Target2(models.Model):
     clashm2m_set = models.ManyToManyField(Target)
 
 
-class ClashForeign(models.Model):
-    foreign = models.ForeignKey(Target2)
-
-
-class ClashM2M(models.Model):
-    m2m = models.ManyToManyField(Target2)
-
-
 class SelfClashForeign(models.Model):
     src_safe = models.CharField(max_length=10)
     selfclashforeign = models.CharField(max_length=10)
@@ -163,8 +155,6 @@ class SwappingModel(models.Model):
 
 
 model_errors = """
-old_invalid_models.clashforeign: Accessor for field 'foreign' clashes with field 'Target2.clashforeign_set'. Add a related_name argument to the definition for 'foreign'.
-old_invalid_models.clashm2m: Accessor for m2m field 'm2m' clashes with m2m field 'Target2.clashm2m_set'. Add a related_name argument to the definition for 'm2m'.
 old_invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
 old_invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
 old_invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
@@ -213,8 +203,6 @@ old_invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' 
 # - 'x' -- the test was rewritten
 # - 'm' -- the test is actually a model test, not a field test; not rewritten
 
-m invalid_models.clashforeign: Accessor for field 'foreign' clashes with field 'Target2.clashforeign_set'. Add a related_name argument to the definition for 'foreign'.
-m invalid_models.clashm2m: Accessor for m2m field 'm2m' clashes with m2m field 'Target2.clashm2m_set'. Add a related_name argument to the definition for 'm2m'.
 m invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
 m invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related m2m field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
 m invalid_models.target2: Accessor for field 'foreign_tgt' clashes with related field 'Target.target2_set'. Add a related_name argument to the definition for 'foreign_tgt'.
