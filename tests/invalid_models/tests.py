@@ -726,50 +726,69 @@ class OtherFieldTests(TestCase):
 
 class ClashesTests(IsolatedModelsTestCase):
 
-    def test_reverse_query_name_foreign_key_clash(self):
-        self._test_reverse_query_name_clash(models.ForeignKey('Target'))
+    def targets(self):
+        # The list cannot be a class attribute because we need a fresh field
+        # instances each time the method is called.
+        return [
+            models.IntegerField(),
+            models.ForeignKey('Another'),
+            models.ManyToManyField('Another')
+        ]
 
-    def test_reverse_query_name_m2m_clash(self):
-        self._test_reverse_query_name_clash(models.ManyToManyField('Target'))
+    def relatives(self):
+        return [
+            models.ForeignKey('Target'),
+            models.ManyToManyField('Target')
+        ]
 
-    def _test_reverse_query_name_clash(self, relative_field):
+    def test_reverse_query_name_clash(self):
+        for target in self.targets():
+            for relative in self.relatives():
+                self._test_reverse_query_name_clash(target, relative)
+
+    def _test_reverse_query_name_clash(self, target, relative):
+        class Another(models.Model):
+            pass
+
         class Target(models.Model):
-            model = models.IntegerField()
+            model = target
 
         class Model(models.Model):
-            relative = relative_field
+            rel = relative
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Reverse query name for field Model.relative clashes '
+            Error('Reverse query name for field Model.rel clashes '
                 'with field Target.model.',
                 hint='Rename field Target.model or add/change '
                 'a related_name argument to the definition '
-                'for field Model.relative.',
-                obj=Model.relative.field),
+                'for field Model.rel.',
+                obj=Model.rel.field),
         ])
 
-    def test_accessor_foreign_key_clash(self):
-        self._test_accessor_clash(models.ForeignKey('Target'))
+    def test_accessor_clash(self):
+        for target in self.targets():
+            for relative in self.relatives():
+                self._test_accessor_clash(target, relative)
 
-    def test_accessor_m2m_clash(self):
-        self._test_accessor_clash(models.ManyToManyField('Target'))
+    def _test_accessor_clash(self, target, relative):
+        class Another(models.Model):
+            pass
 
-    def _test_accessor_clash(self, relative_field):
         class Target(models.Model):
-            model_set = models.IntegerField()
+            model_set = target
 
         class Model(models.Model):
-            relative = relative_field
+            rel = relative
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Accessor for field Model.relative clashes with '
+            Error('Accessor for field Model.rel clashes with '
                 'field Target.model_set.',
                 hint='Rename field Target.model_set or add/change '
                 'a related_name argument to the definition '
-                'for field Model.relative.',
-                obj=Model.relative.field),
+                'for field Model.rel.',
+                obj=Model.rel.field),
         ])
 
     def test_clash_between_accessors(self):
