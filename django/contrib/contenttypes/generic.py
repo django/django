@@ -9,7 +9,6 @@ from functools import partial
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, DEFAULT_DB_ALIAS
-from django.db.models import signals
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.where import Constraint
@@ -46,23 +45,6 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
     def contribute_to_class(self, cls, name):
         super(GenericForeignKey, self).contribute_to_class(cls, name)
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_field(self)
-
-        # For some reason I don't totally understand, using weakrefs here doesn't work.
-        signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
-
-        # Connect myself as the descriptor for this field
-        setattr(cls, name, self)
-
-    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
-        """
-        Handles initializing an object with the generic FK instead of
-        content-type/object-id fields.
-        """
-        if self.name in kwargs:
-            value = kwargs.pop(self.name)
-            kwargs[self.ct_field] = self.get_content_type(obj=value)
-            kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:

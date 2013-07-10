@@ -411,7 +411,16 @@ class Model(six.with_metaclass(ModelBase)):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
                         setattr(self, prop, kwargs.pop(prop))
+                        continue
                 except AttributeError:
+                    pass
+
+                # We also have to try to look the name up again in case it
+                # was a virtual field.
+                try:
+                    self._meta.get_field_by_name(prop)
+                    setattr(self, prop, kwargs.pop(prop))
+                except FieldDoesNotExist:
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
