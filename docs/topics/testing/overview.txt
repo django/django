@@ -1403,6 +1403,19 @@ The decorator can also be applied to test case classes::
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
 
+.. warning::
+
+    The settings file also contains some settings that are only consulted
+    during initialization. If you change them with ``override_settings``, the
+    setting is changed if you access it via the ``django.conf.settings`` module
+    however, Django's internals access it differently. Effectively, using
+    ``override_settings`` with these specific settings is probably not going to
+    do what you expect them to do.
+
+    Pay special attention to the following settings: :setting:`DATABASES` and
+    :setting:`CACHES`.
+
+
 You can also simulate the absence of a setting by deleting it after settings
 have been overriden, like this::
 

@@ -228,7 +228,7 @@ class override_settings(object):
         settings._wrapped = override
         for key, new_value in self.options.items():
             setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value)
+                                 setting=key, value=new_value, enter=True)
 
     def disable(self):
         settings._wrapped = self.wrapped
@@ -236,7 +236,7 @@ class override_settings(object):
         for key in self.options:
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
-                                 setting=key, value=new_value)
+                                 setting=key, value=new_value, enter=False)
 
 
 def compare_xml(want, got):
