@@ -139,6 +139,7 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  PIL_
+*  py-bcrypt_
 *  PyYAML_
 *  Markdown_
 *  Textile_
@@ -168,6 +169,7 @@ Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
 .. _PIL: https://pypi.python.org/pypi/PIL
+.. _py-bcrypt: https://pypi.python.org/pypi/py-bcrypt/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _Markdown: http://pypi.python.org/pypi/Markdown/1.7
 .. _Textile: http://pypi.python.org/pypi/textile
