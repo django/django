@@ -136,6 +136,8 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
+*  bcrypt_
+*  docutils_
 *  Pillow_
 *  PyYAML_
 *  pytz_
@@ -162,6 +164,8 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
+.. _bcrypt: https://pypi.python.org/pypi/bcrypt
+.. _docutils: https://pypi.python.org/pypi/docutils
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
