@@ -741,33 +741,6 @@ class ClashesTests(IsolatedModelsTestCase):
             models.ManyToManyField('Target', **kwargs),
         ]
 
-    def test_reverse_query_name_clash(self):
-        for target in self.targets():
-            for relative in self.relatives():
-                self.setUp()
-                self._test_reverse_query_name_clash(target, relative)
-                self.tearDown()
-
-    def _test_reverse_query_name_clash(self, target, relative):
-        class Another(models.Model):
-            pass
-
-        class Target(models.Model):
-            model = target
-
-        class Model(models.Model):
-            rel = relative
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Reverse query name for field Model.rel clashes '
-                'with field Target.model.',
-                hint='Rename field Target.model or add/change '
-                'a related_name argument to the definition '
-                'for field Model.rel.',
-                obj=Model.rel.field),
-        ])
-
     def test_accessor_clash(self):
         for target in self.targets():
             for relative in self.relatives():
@@ -790,6 +763,33 @@ class ClashesTests(IsolatedModelsTestCase):
             Error('Accessor for field Model.rel clashes with '
                 'field Target.model_set.',
                 hint='Rename field Target.model_set or add/change '
+                'a related_name argument to the definition '
+                'for field Model.rel.',
+                obj=Model.rel.field),
+        ])
+
+    def test_reverse_query_name_clash(self):
+        for target in self.targets():
+            for relative in self.relatives():
+                self.setUp()
+                self._test_reverse_query_name_clash(target, relative)
+                self.tearDown()
+
+    def _test_reverse_query_name_clash(self, target, relative):
+        class Another(models.Model):
+            pass
+
+        class Target(models.Model):
+            model = target
+
+        class Model(models.Model):
+            rel = relative
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Reverse query name for field Model.rel clashes '
+                'with field Target.model.',
+                hint='Rename field Target.model or add/change '
                 'a related_name argument to the definition '
                 'for field Model.rel.',
                 obj=Model.rel.field),
@@ -846,6 +846,55 @@ class ClashesTests(IsolatedModelsTestCase):
                 hint='Add or change a related_name argument to the definition '
                 'for Model.m2m or Model.foreign.',
                 obj=Model.m2m.field),
+        ])
+
+    def test_self_clash_accessor(self):
+        class Model(models.Model):
+            model_set = models.ForeignKey("Model")
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.model_set clashes with '
+                'field Model.model_set.',
+                hint='Rename field Model.model_set or add/change '
+                'a related_name argument to the definition '
+                'for field Model.model_set.',
+                obj=Model._meta.get_field('model_set')),
+        ])
+
+    def test_self_clash_reverse_query_name(self):
+        class Model(models.Model):
+            model = models.ForeignKey("Model")
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Reverse query name for field Model.model clashes with '
+                'field Model.model.',
+                hint='Rename field Model.model or add/change '
+                'a related_name argument to the definition '
+                'for field Model.model.',
+                obj=Model._meta.get_field('model')),
+        ])
+
+    def test_self_clash_explicit_related_name(self):
+        class Model(models.Model):
+            clash = models.CharField(max_length=10)
+            foreign = models.ForeignKey("Model", related_name='clash')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.foreign clashes with '
+                'field Model.clash.',
+                hint='Rename field Model.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+            Error('Reverse query name for field Model.foreign clashes with '
+                'field Model.clash.',
+                hint='Rename field Model.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
         ])
 
     def test_complex_clash(self):
