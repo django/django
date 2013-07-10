@@ -1207,17 +1207,17 @@ class Model(six.with_metaclass(ModelBase)):
 
                 if compare_to == rel_name:
                     errors.append(checks.Error(
-                        'Clash between accessor for %s and %s.'
+                        'Accessor for %s clashes with %s.'
                         % (field_name, r_name),
-                        hint='Rename %s or add a related_name argument '
+                        hint='Rename %s or add/change a related_name argument '
                         'to the definition for %s.' % (r_name, field_name),
                         obj=field))
 
                 if compare_to == rel_query_name:
                     errors.append(checks.Error(
-                        'Clash between reverse query name for %s and %s.'
+                        'Reverse query name for %s clashes with %s.'
                         % (field_name, r_name),
-                        hint='Rename %s or add a related_name argument '
+                        hint='Rename %s or add/change a related_name argument '
                         'to the definition for %s.' % (r_name, field_name),
                         obj=field))
 
@@ -1236,18 +1236,20 @@ class Model(six.with_metaclass(ModelBase)):
                     r_name2 = "%s.%s" % (r.model._meta.object_name, r.field.name)
                     field_name2 = "%s.%s" % (opts.object_name, field.name)
                     errors.append(checks.Error(
-                        'Clash between accessor for %s and %s.'
-                        % (field_name, r_name),
+                        'Clash between accessors for %s and %s.'
+                        % (field_name2, r_name2),
                         hint='Add or change a related_name argument '
-                        'to the definition for %s or %s.' % (field_name2, r_name2),
+                        'to the definition for %s or %s.'
+                        % (field_name2, r_name2),
                         obj=field))
 
                 if compare_to == rel_query_name:
                     errors.append(checks.Error(
-                        'Clash between reverse query name for %s and %s.'
-                        % (field_name, r_name),
-                        hint='Rename %s or add a related_name argument '
-                        'to the definition for %s.' % (r_name, field_name),
+                        'Clash between reverse query names for %s and %s.'
+                        % (field_name2, r_name2),
+                        hint='Add or change a related_name argument '
+                        'to the definition for %s or %s.'
+                        % (field_name2, r_name2),
                         obj=field))
 
         return errors
