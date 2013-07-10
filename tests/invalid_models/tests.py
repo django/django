@@ -814,6 +814,81 @@ class ClashesTests(IsolatedModelsTestCase):
                 obj=Model.m2m.field),
         ])
 
+    def test_clash_explicit_related_name(self):
+        class Target(models.Model):
+            clash = models.IntegerField()
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target, related_name='clash')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.foreign clashes with '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+            Error('Reverse query name for field Model.foreign clashes with '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+        ])
+
+    def test_clash_fk_explicit_related_name(self):
+        class Another(models.Model):
+            pass
+
+        class Target(models.Model):
+            clash = models.ForeignKey(Another)
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target, related_name='clash')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.foreign clashes with '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+            Error('Reverse query name for field Model.foreign clashes with '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+        ])
+
+    def test_clash_m2m_explicit_related_name(self):
+        class Another(models.Model):
+            pass
+
+        class Target(models.Model):
+            clash = models.ManyToManyField(Another)
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target, related_name='clash')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.foreign clashes with '
+                'm2m field Target.clash.',
+                hint='Rename m2m field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+            Error('Reverse query name for field Model.foreign clashes with '
+                'm2m field Target.clash.',
+                hint='Rename m2m field Target.clash or add/change '
+                'a related_name argument to the definition '
+                'for field Model.foreign.',
+                obj=Model.foreign.field),
+        ])
+
     def test_complex_clash(self):
         class Target(models.Model):
             tgt_safe = models.CharField(max_length=10)
