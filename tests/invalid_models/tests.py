@@ -746,6 +746,7 @@ class ClashesTests(IsolatedModelsTestCase):
             for relative in self.relatives():
                 self._test_reverse_query_name_clash(target, relative)
 
+
     def _test_reverse_query_name_clash(self, target, relative):
         class Another(models.Model):
             pass
@@ -791,26 +792,6 @@ class ClashesTests(IsolatedModelsTestCase):
                 obj=Model.rel.field),
         ])
 
-    def test_clash_between_accessors(self):
-        class Target(models.Model):
-            pass
-
-        class Model(models.Model):
-            foreign = models.ForeignKey(Target)
-            m2m = models.ManyToManyField(Target)
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Clash between accessors for Model.foreign and Model.m2m.',
-                hint='Add or change a related_name argument to the definition '
-                'for Model.foreign or Model.m2m.',
-                obj=Model.foreign.field),
-            Error('Clash between accessors for Model.m2m and Model.foreign.',
-                hint='Add or change a related_name argument to the definition '
-                'for Model.m2m or Model.foreign.',
-                obj=Model.m2m.field),
-        ])
-
     def test_clash_explicit_related_name(self):
         for target in self.targets():
             for relative in self.relatives(related_name='clash'):
@@ -840,6 +821,26 @@ class ClashesTests(IsolatedModelsTestCase):
                 'a related_name argument to the definition '
                 'for field Model.rel.',
                 obj=Model.rel.field),
+        ])
+
+    def test_clash_between_accessors(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target)
+            m2m = models.ManyToManyField(Target)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between accessors for Model.foreign and Model.m2m.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.foreign or Model.m2m.',
+                obj=Model.foreign.field),
+            Error('Clash between accessors for Model.m2m and Model.foreign.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.m2m or Model.foreign.',
+                obj=Model.m2m.field),
         ])
 
     def test_complex_clash(self):
