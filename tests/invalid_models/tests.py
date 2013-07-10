@@ -744,8 +744,9 @@ class ClashesTests(IsolatedModelsTestCase):
     def test_reverse_query_name_clash(self):
         for target in self.targets():
             for relative in self.relatives():
+                self.setUp()
                 self._test_reverse_query_name_clash(target, relative)
-
+                self.tearDown()
 
     def _test_reverse_query_name_clash(self, target, relative):
         class Another(models.Model):
@@ -770,7 +771,9 @@ class ClashesTests(IsolatedModelsTestCase):
     def test_accessor_clash(self):
         for target in self.targets():
             for relative in self.relatives():
+                self.setUp()
                 self._test_accessor_clash(target, relative)
+                self.tearDown()
 
     def _test_accessor_clash(self, target, relative):
         class Another(models.Model):
@@ -795,7 +798,9 @@ class ClashesTests(IsolatedModelsTestCase):
     def test_clash_explicit_related_name(self):
         for target in self.targets():
             for relative in self.relatives(related_name='clash'):
+                self.setUp()
                 self._test_clash_explicit_related_name(target, relative)
+                self.tearDown()
 
     def _test_clash_explicit_related_name(self, target, relative):
         class Another(models.Model):
