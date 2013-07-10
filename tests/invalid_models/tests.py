@@ -793,60 +793,21 @@ class ClashesTests(IsolatedModelsTestCase):
         ])
 
     def test_clash_explicit_related_name(self):
-        class Target(models.Model):
-            clash = models.IntegerField()
-
-        class Model(models.Model):
-            foreign = models.ForeignKey(Target, related_name='clash')
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Accessor for field Model.foreign clashes with '
-                'field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                'a related_name argument to the definition '
-                'for field Model.foreign.',
-                obj=Model.foreign.field),
-            Error('Reverse query name for field Model.foreign clashes with '
-                'field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                'a related_name argument to the definition '
-                'for field Model.foreign.',
-                obj=Model.foreign.field),
-        ])
+        self._test_clash_explicit_related_name(models.IntegerField())
 
     def test_clash_fk_explicit_related_name(self):
-        class Another(models.Model):
-            pass
-
-        class Target(models.Model):
-            clash = models.ForeignKey(Another)
-
-        class Model(models.Model):
-            foreign = models.ForeignKey(Target, related_name='clash')
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Accessor for field Model.foreign clashes with '
-                'field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                'a related_name argument to the definition '
-                'for field Model.foreign.',
-                obj=Model.foreign.field),
-            Error('Reverse query name for field Model.foreign clashes with '
-                'field Target.clash.',
-                hint='Rename field Target.clash or add/change '
-                'a related_name argument to the definition '
-                'for field Model.foreign.',
-                obj=Model.foreign.field),
-        ])
+        self._test_clash_explicit_related_name(models.ForeignKey('Another'))
 
     def test_clash_m2m_explicit_related_name(self):
+        self._test_clash_explicit_related_name(
+            models.ManyToManyField('Another'))
+
+    def _test_clash_explicit_related_name(self, target_field):
         class Another(models.Model):
             pass
 
         class Target(models.Model):
-            clash = models.ManyToManyField(Another)
+            clash = target_field
 
         class Model(models.Model):
             foreign = models.ForeignKey(Target, related_name='clash')
