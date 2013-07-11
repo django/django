@@ -311,7 +311,7 @@ class BaseCommand(object):
         """
         from django.core.management.validation import get_validation_errors
         s = StringIO()
-        num_errors = get_validation_errors(s, app)
+        num_errors = len(get_validation_errors(s, app))
         if num_errors:
             s.seek(0)
             error_text = s.read()

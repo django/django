@@ -29,6 +29,7 @@ def get_validation_errors(outfile, app=None):
     from django.db.models.loading import get_app_errors
 
     e = ModelErrorCollection(outfile)
+    all_errors = []
 
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
@@ -36,8 +37,14 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
+        # Trigger checking framework
         errors = cls.check()
-        assert not errors
+        for error in errors:
+            msg = error.msg
+            if error.hint:
+                msg += '\n%s' % error.hint
+            e.add(msg)
+        all_errors.extend(errors)
 
         # Check swappable attribute.
         if opts.swapped:
@@ -96,7 +103,7 @@ def get_validation_errors(outfile, app=None):
         for ut in opts.unique_together:
             validate_local_fields(e, opts, "unique_together", ut)
 
-    return e.errors
+    return all_errors
 
 
 def validate_local_fields(e, opts, field_name, fields):
