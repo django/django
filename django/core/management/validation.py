@@ -10,13 +10,13 @@ from django.utils import six
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
-        self.errors = []
+        self.errors = 0
         self.outfile = outfile
         self.style = color_style()
 
-    def add(self, context, error):
-        self.errors.append((context, error))
-        self.outfile.write(self.style.ERROR(force_str("%s: %s\n" % (context, error))))
+    def add(self, msg):
+        self.errors += 1
+        self.outfile.write(self.style.ERROR(force_str(msg)))
 
 
 def get_validation_errors(outfile, app=None):
@@ -37,7 +37,7 @@ def get_validation_errors(outfile, app=None):
         opts = cls._meta
 
         errors = cls.check()
-        #assert not errors, errors
+        assert not errors
 
         # Check swappable attribute.
         if opts.swapped:
@@ -49,7 +49,7 @@ def get_validation_errors(outfile, app=None):
                 try:
                     from django.utils.image import Image
                 except ImportError:
-                    e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
+                    e.add('%s: "%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % (opts, f.name))
 
         seen_intermediary_signatures = []
         for f in opts.local_many_to_many:
@@ -67,10 +67,11 @@ def get_validation_errors(outfile, app=None):
                 from_model, to_model = cls, f.rel.to
                 signature = (f.rel.to, cls, f.rel.through)
                 if signature in seen_intermediary_signatures:
-                    e.add(opts, "The model %s has two manually-defined m2m "
+                    e.add("%s: The model %s has two manually-defined m2m "
                         "relations through the model %s, which is not "
                         "permitted. Please consider using an extra field on "
                         "your intermediary model instead." % (
+                            opts,
                             cls._meta.object_name,
                             f.rel.through._meta.object_name
                         )
@@ -82,22 +83,22 @@ def get_validation_errors(outfile, app=None):
         for ut in opts.unique_together:
             validate_local_fields(e, opts, "unique_together", ut)
 
-    return len(e.errors)
+    return e.errors
 
 
 def validate_local_fields(e, opts, field_name, fields):
     from django.db import models
 
     if not isinstance(fields, collections.Sequence):
-        e.add(opts, 'all %s elements must be sequences' % field_name)
+        e.add('%s: all %s elements must be sequences' % (opts, field_name))
     else:
         for field in fields:
             try:
                 f = opts.get_field(field, many_to_many=True)
             except models.FieldDoesNotExist:
-                e.add(opts, '"%s" refers to %s, a field that doesn\'t exist.' % (field_name, field))
+                e.add('%s: "%s" refers to %s, a field that doesn\'t exist.' % (opts, field_name, field))
             else:
                 if isinstance(f.rel, models.ManyToManyRel):
-                    e.add(opts, '"%s" refers to %s. ManyToManyFields are not supported in %s.' % (field_name, f.name, field_name))
+                    e.add('%s: "%s" refers to %s. ManyToManyFields are not supported in %s.' % (opts, field_name, f.name, field_name))
                 if f not in opts.local_fields:
-                    e.add(opts, '"%s" refers to %s. This is not in the same model as the %s statement.' % (field_name, f.name, field_name))
+                    e.add('%s: "%s" refers to %s. This is not in the same model as the %s statement.' % (opts, field_name, f.name, field_name))

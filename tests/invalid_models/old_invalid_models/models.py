@@ -120,9 +120,7 @@ class SwappingModel(models.Model):
         related_name='swapping_m2m')
 
 
-model_errors = """
-old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead.
-"""
+model_errors = """old_invalid_models.group: The model Group has two manually-defined m2m relations through the model Membership, which is not permitted. Please consider using an extra field on your intermediary model instead."""
 
 """
 # Error messages predated by a character:
