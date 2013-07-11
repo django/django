@@ -4,6 +4,7 @@ import os
 from django import forms
 from django.db.models.fields import Field
 from django.core import checks
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -433,3 +434,22 @@ class ImageField(FileField):
         defaults = {'form_class': forms.ImageField}
         defaults.update(kwargs)
         return super(ImageField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(ImageField, self).check(**kwargs)
+        errors.extend(self._check_image_library_installed())
+        return errors
+
+    def _check_image_library_installed(self):
+        try:
+            from django.utils.image import Image
+        except ImproperlyConfigured:
+            return [checks.Error(
+                'Pillow not installed.\n'
+                'To use ImageFields, you need to install Pillow.'
+                'Get it at https://pypi.python.org/pypi/Pillow or run '
+                'command "pip install pillow".',
+                obj=self)]
+        else:
+            return []
+

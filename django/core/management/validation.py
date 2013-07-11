@@ -2,6 +2,7 @@ import collections
 import sys
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
@@ -51,13 +52,6 @@ def get_validation_errors(outfile, app=None):
             continue
 
         # Model isn't swapped; do field-specific validation.
-        for f in opts.local_fields:
-            if isinstance(f, models.ImageField):
-                try:
-                    from django.utils.image import Image
-                except ImportError:
-                    e.add('%s: "%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % (opts, f.name))
-
         seen_intermediary_signatures = []
         for f in opts.local_many_to_many:
             # Check to see if the related m2m field will clash with any
