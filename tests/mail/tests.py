@@ -9,6 +9,8 @@ import smtpd
 import sys
 import tempfile
 import threading
+from smtplib import SMTPException
+from ssl import SSLError
 
 from django.core import mail
 from django.core.mail import (EmailMessage, mail_admins, mail_managers,
@@ -621,11 +623,23 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
 
 
+class FakeSMTPChannel(smtpd.SMTPChannel):
+
+    def collect_incoming_data(self, data):
+        try:
+            super(FakeSMTPChannel, self).collect_incoming_data(data)
+        except UnicodeDecodeError:
+            # ignore decode error in SSL/TLS connection tests as we only care
+            # whether the connection attempt was made
+            pass
+
+
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
     """
     Asyncore SMTP server wrapped into a thread. Based on DummyFTPServer from:
     http://svn.python.org/view/python/branches/py3k/Lib/test/test_ftplib.py?revision=86061&view=markup
     """
+    channel_class = FakeSMTPChannel
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
@@ -738,3 +752,44 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
             backend.close()
         except Exception as e:
             self.fail("close() unexpectedly raised an exception: %s" % e)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_tls)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_override_settings(self):
+        backend = smtp.EmailBackend(use_tls=False)
+        self.assertFalse(backend.use_tls)
+
+    def test_email_tls_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertFalse(backend.use_tls)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_ssl)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_override_settings(self):
+        backend = smtp.EmailBackend(use_ssl=False)
+        self.assertFalse(backend.use_ssl)
+
+    def test_email_ssl_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertFalse(backend.use_ssl)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_attempts_starttls(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_tls)
+        self.assertRaisesMessage(SMTPException,
+            'STARTTLS extension not supported by server.', backend.open)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_attempts_ssl_connection(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_ssl)
+        self.assertRaises(SSLError, backend.open)
