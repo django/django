@@ -466,6 +466,7 @@ class FieldCloningTests(TestCase):
         self.assertEqual(original_field.max_length,
                          new_field.max_length)
         self.assertEqual(new_field.db_column, 'dummy_column')
+        self.assertEqual(new_field.auxiliary_to, 'dummy value')
 
     def test_autofield_cloning(self):
         original_field = models.AutoField(primary_key=True)

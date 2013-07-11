@@ -206,6 +206,9 @@ class ModelBase(type):
                 else:
                     field = None
                 new_class._meta.parents[base] = field
+                # We need to clear any existing field caches to ensure
+                # superclass fields are propagated properly.
+                new_class._meta.clear_all_caches()
             else:
                 # .. and abstract ones.
                 for field in parent_fields:
@@ -262,6 +265,8 @@ class ModelBase(type):
     def add_to_class(cls, name, value):
         if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
+            if getattr(value, 'prepare_after_contribute_to_class', False):
+                value.prepare()
         else:
             setattr(cls, name, value)
 

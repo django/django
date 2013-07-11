@@ -12,6 +12,7 @@ from itertools import tee
 from django.db import connection
 from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
+from django.db.models import signals
 from django.conf import settings
 from django import forms
 from django.core import exceptions, validators
@@ -77,6 +78,11 @@ class Field(object):
     # relies on this).
     clone_in_subclasses = False
 
+    # Whether ModelBase.add_to_class should prepare the field after its
+    # contribute_to_class finishes. Subclasses that set this to False have
+    # to call the "prepare" method on their own.
+    prepare_after_contribute_to_class = True
+
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
     # creates, creation_counter is used for all user-specified fields.
@@ -104,7 +110,7 @@ class Field(object):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+            error_messages=None, auxiliary_to=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -145,6 +151,9 @@ class Field(object):
         messages.update(error_messages or {})
         self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
+        self.auxiliary_to = auxiliary_to
+
+        self.prepared = False
 
     def deconstruct(self):
         """
@@ -250,6 +259,7 @@ class Field(object):
                          'db_index']:
             if arg_name in kwargs:
                 del kwargs[arg_name]
+        kwargs['auxiliary_to'] = fk_field
         kwargs['serialize'] = False
         kwargs['null'] = null
         kwargs['editable'] = False
@@ -260,6 +270,9 @@ class Field(object):
         instance.creation_counter = (Fraction(counter_low) +
                                      Fraction(counter_high)) / 2
         return [(name, instance)]
+
+    def resolve_basic_fields(self):
+        return [self]
 
     def __eq__(self, other):
         # Needed for @total_ordering
@@ -427,6 +440,10 @@ class Field(object):
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
+
+    def prepare(self):
+        self.prepared = True
+        signals.field_prepared.send(sender=self)
 
     def get_attname(self):
         return self.name

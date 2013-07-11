@@ -1122,6 +1122,7 @@ class ForeignKey(ForeignObject):
         'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
+    prepare_after_contribute_to_class = False
 
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
                  db_constraint=True, **kwargs):
@@ -1172,9 +1173,17 @@ class ForeignKey(ForeignObject):
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
         return name, path, args, kwargs
 
-    @property
+    def clone_for_foreignkey(self, *args, **kwargs):
+        # We only need to clone our auxiliary field and not the ForeignKey
+        # itself.
+        return self.auxiliary_field.clone_for_foreignkey(*args, **kwargs)
+
+    def resolve_basic_fields(self):
+        return self.model._meta.get_field(self.attname).resolve_basic_fields()
+
+    @cached_property
     def related_field(self):
-        return self.foreign_related_fields[0]
+        return self.rel.get_related_field()
 
     def get_reverse_path_info(self):
         """
@@ -1208,7 +1217,7 @@ class ForeignKey(ForeignObject):
         return '%s_id' % self.name
 
     def get_column(self):
-        return self.db_column or self.attname
+        return None
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.related_field.name)
@@ -1244,6 +1253,48 @@ class ForeignKey(ForeignObject):
         if self.rel.field_name is None:
             self.rel.field_name = cls._meta.pk.name
 
+    def do_related_class(self, other, cls):
+        super(ForeignKey, self).do_related_class(other, cls)
+        if self.model._meta.abstract:
+            # We don't add auxiliary fields to abstract models, that would
+            # result in them being added twice. They are only added to
+            # concrete subclasses.
+            self.prepare()
+        else:
+            # contribute_to_related_class is called from
+            # RelatedField.do_related_class, which means self.rel.field_name
+            # contains a valid string by now. However, we can't just use
+            # self.related_field as that eventually calls the other
+            # model's get_field_by_name and it might be too early for that
+            # to succeed.
+            rel_field = other._meta.get_field(self.rel.field_name)
+            self.create_aux_field(rel_field, self.attname)
+
+    def create_aux_field(self, field, name):
+        if not field.prepared:
+            def delayed_aux_field_creation(sender, **kwargs):
+                self.create_aux_field(field, name)
+            signals.field_prepared.connect(delayed_aux_field_creation,
+                                           sender=field,
+                                           weak=False)
+        to_add = field.clone_for_foreignkey(
+            name, self.null,
+            self.creation_counter, self.creation_counter + 1,
+            self.db_column or self.attname,
+            fk_field=self
+        )
+        for new_name, new_field in to_add:
+            self.model.add_to_class(new_name, new_field)
+        aux_field = self.model._meta.get_field(self.attname)
+        # It is safe to assume here that all auxiliary fields are prepared
+        # by now -- they are supposed to be only basic concrete fields or
+        # a CompositeField which is added only after all its constituents.
+        self.from_fields = [f.name for f in aux_field.resolve_basic_fields()]
+        self.to_fields = [f.name for f in field.resolve_basic_fields()]
+        # Cache the aux field for later use.
+        self.auxiliary_field = aux_field
+        self.prepare()
+
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)
         if isinstance(self.rel.to, six.string_types):
@@ -1259,19 +1310,7 @@ class ForeignKey(ForeignObject):
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
-        # The database column type of a ForeignKey is the column type
-        # of the field to which it points. An exception is if the ForeignKey
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        # If the database needs similar types for key fields however, the only
-        # thing we can do is making AutoField an IntegerField.
-        rel_field = self.related_field
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+        return None
 
 
 class OneToOneField(ForeignKey):

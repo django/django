@@ -1535,7 +1535,8 @@ class Query(object):
 
                 self.promote_joins(joins[1:])
                 for target in targets:
-                    self.select.append(SelectInfo((final_alias, target.column), target))
+                    for f in target.resolve_basic_fields():
+                        self.select.append(SelectInfo((final_alias, f.column), f))
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:

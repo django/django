@@ -168,8 +168,7 @@ class Options(object):
         # self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
-            if hasattr(self, '_m2m_cache'):
-                del self._m2m_cache
+            self.clear_m2m_caches()
         else:
             if field.clone_in_subclasses:
                 target = self.local_private_fields
@@ -177,33 +176,52 @@ class Options(object):
                 target = self.local_fields
             target.insert(bisect(target, field), field)
             self.setup_pk(field)
-            if hasattr(self, '_field_cache'):
-                del self._field_cache
-                del self._field_name_cache
-                # The fields, concrete_fields and local_concrete_fields are
-                # implemented as cached properties for performance reasons.
-                # The attrs will not exists if the cached property isn't
-                # accessed yet, hence the try-excepts.
-                try:
-                    del self.fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.concrete_fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.local_concrete_fields
-                except AttributeError:
-                    pass
-
-        if hasattr(self, '_name_map'):
-            del self._name_map
+            self.clear_field_caches()
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
             self.pk = field
             field.serialize = False
+
+    def clear_all_caches(self):
+        """
+        The Options class holds all kinds of field caches for various
+        purposes. These have to be cleared each time a new field is added
+        to the model or a new base class is processed.
+        """
+        self.clear_field_caches()
+        self.clear_m2m_caches()
+
+    def clear_field_caches(self):
+        if hasattr(self, '_field_cache'):
+            del self._field_cache
+            del self._field_name_cache
+            # The fields, concrete_fields and local_concrete_fields are
+            # implemented as cached properties for performance reasons.
+            # The attrs will not exists if the cached property isn't
+            # accessed yet, hence the try-excepts.
+            try:
+                del self.fields
+            except AttributeError:
+                pass
+            try:
+                del self.concrete_fields
+            except AttributeError:
+                pass
+            try:
+                del self.local_concrete_fields
+            except AttributeError:
+                pass
+        self.clear_global_field_caches()
+
+    def clear_m2m_caches(self):
+        if hasattr(self, '_m2m_cache'):
+            del self._m2m_cache
+        self.clear_global_field_caches()
+
+    def clear_global_field_caches(self):
+        if hasattr(self, '_name_map'):
+            del self._name_map
 
     def pk_index(self):
         """

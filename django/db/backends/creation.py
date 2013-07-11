@@ -49,7 +49,7 @@ class BaseDatabaseCreation(object):
         table_output = []
         pending_references = {}
         qn = self.connection.ops.quote_name
-        for f in opts.local_fields:
+        for f in opts.local_concrete_fields:
             col_type = f.db_type(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
@@ -78,20 +78,26 @@ class BaseDatabaseCreation(object):
                     tablespace, inline=True)
                 if tablespace_sql:
                     field_output.append(tablespace_sql)
-            if f.rel and f.db_constraint:
+            if f.auxiliary_to and f.auxiliary_to.db_constraint:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(
-                    model, f, known_models, style)
+                    model, f.auxiliary_to, known_models, style)
                 if pending:
-                    pending_references.setdefault(f.rel.to, []).append(
+                    pending_references.setdefault(f.auxiliary_to.rel.to, []).append(
                         (model, f))
                 else:
                     field_output.extend(ref_output)
             table_output.append(' '.join(field_output))
+        unique_togethers = []
         for field_constraints in opts.unique_together:
+            unique_togethers.append([opts.get_field(f) for f in field_constraints])
+        unique_togethers.extend([f] for f in opts.local_fields
+                                if f.column is None and f.unique)
+        for field_list in unique_togethers:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' %
-                ", ".join(
-                    [style.SQL_FIELD(qn(opts.get_field(f).column))
-                     for f in field_constraints]))
+                ", ".join(style.SQL_FIELD(qn(basic.column))
+                          for f in field_list
+                          for basic in f.resolve_basic_fields())
+            )
 
         full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' +
                           style.SQL_TABLE(qn(opts.db_table)) + ' (']
@@ -125,11 +131,12 @@ class BaseDatabaseCreation(object):
         """
         qn = self.connection.ops.quote_name
         rel_to = field.rel.to
+        target_field = rel_to._meta.get_field(field.rel.field_name)
+        target_columns = [f.column for f in target_field.resolve_basic_fields()]
         if rel_to in known_models or rel_to == model:
             output = [style.SQL_KEYWORD('REFERENCES') + ' ' +
                 style.SQL_TABLE(qn(rel_to._meta.db_table)) + ' (' +
-                style.SQL_FIELD(qn(rel_to._meta.get_field(
-                    field.rel.field_name).column)) + ')' +
+                ', '.join(style.SQL_FIELD(qn(col)) for col in target_columns) + ')' +
                 self.connection.ops.deferrable_sql()
             ]
             pending = False
@@ -206,7 +213,8 @@ class BaseDatabaseCreation(object):
         field_names = []
         qn = self.connection.ops.quote_name
         for f in fields:
-            field_names.append(style.SQL_FIELD(qn(f.column)))
+            for basic in f.resolve_basic_fields():
+                field_names.append(style.SQL_FIELD(qn(basic.column)))
 
         index_name = "%s_%s" % (model._meta.db_table, self._digest([f.name for f in fields]))
 
