@@ -1025,6 +1025,7 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(cls._check_id_field(**kwargs))
             errors.extend(cls._check_column_name_clashes(**kwargs))
             errors.extend(cls._check_index_together(**kwargs))
+            errors.extend(cls._check_unique_together(**kwargs))
             errors.extend(cls._check_ordering(**kwargs))
         return errors
 
@@ -1325,8 +1326,6 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_index_together(cls, **kwargs):
-        from django.db import models
-
         if not isinstance(cls._meta.index_together, (tuple, list)):
             return [checks.Error(
                 'Non-iterable "index_together".\n'
@@ -1345,44 +1344,82 @@ class Model(six.with_metaclass(ModelBase)):
                 '(which are nested lists) that, taken together, are '
                 'indexed, so "index_together" must be an iterable '
                 'of iterables (i. e. a list of lists), i. e. '
-                '[["first_field", "second_field"]].\n',
+                '[["first_field", "second_field"]].',
                 hint='Convert "index_together" to a list of lists.',
                 obj=cls)]
 
         errors = []
         for fields in cls._meta.index_together:
-            for field_name in fields:
-                try:
-                    field = cls._meta.get_field(field_name,
-                        many_to_many=True)
-                except models.FieldDoesNotExist:
-                    errors.append(checks.Error(
-                        '"index_together" pointing to a missing "%s" '
-                        'field.\n'
-                        '%s.index_together points to a field '
-                        '"%s" which does not exist.'
-                        % (field_name, cls._meta.object_name, field_name),
-                        hint='Ensure that you did not misspell '
-                        'the field name.',
-                        obj=cls))
-                else:
-                    if isinstance(field.rel, models.ManyToManyRel):
-                        errors.append(checks.Error(
-                            '"index_together" referring to a m2m "%s" '
-                            'field.\n'
-                            'ManyToManyFields are not supported in '
-                            '"index_together".' % field_name,
-                            hint='Remove the m2m field '
-                            'from "index_together".',
-                            obj=cls))
-                    if field not in cls._meta.local_fields:
-                        errors.append(checks.Error(
-                            '"index_together" pointing to '
-                            'a non-local field.\n'
-                            '?',
-                            hint='?',
-                            obj=cls))
+            errors.extend(cls._check_local_fields(fields, "index_together"))
         return errors
+
+    @classmethod
+    def _check_unique_together(cls, **kwargs):
+        if not isinstance(cls._meta.unique_together, (tuple, list)):
+            return [checks.Error(
+                'Non-iterable "unique_together".\n'
+                '"unique_together" is a list of field names that, taken '
+                'together, are indexed, so "unique_together" must be '
+                'an iterable (e.g. a list).',
+                hint='Convert "unique_together" to a list.',
+                obj=cls)]
+
+        if any(not isinstance(fields, (tuple, list))
+            for fields in cls._meta.unique_together):
+            return [checks.Error(
+                'Some items of "unique_together" are not iterable '
+                '(e.g. a list).\n'
+                '"unique_together" is a list of field names '
+                '(which are nested lists) that, taken together, are '
+                'indexed, so "unique_together" must be an iterable '
+                'of iterables (i. e. a list of tuples), i. e. '
+                '[("first_field", "second_field")]. When dealing with '
+                'a single set of fields, a single tuple can be used: '
+                '("first_field", "second_field").',
+                hint='Convert "unique_together" to a list of lists.',
+                obj=cls)]
+
+        errors = []
+        for fields in cls._meta.unique_together:
+            errors.extend(cls._check_local_fields(fields, "unique_together"))
+        return errors
+
+    @classmethod
+    def _check_local_fields(cls, fields, option):
+        from django.db import models
+
+        for field_name in fields:
+            try:
+                field = cls._meta.get_field(field_name,
+                    many_to_many=True)
+            except models.FieldDoesNotExist:
+                return [checks.Error(
+                    '"%s" pointing to a missing "%s" field.\n'
+                    '%s.%s points to a field "%s" which does not exist.'
+                    % (option, field_name, cls._meta.object_name,
+                        option, field_name),
+                    hint='Ensure that you did not misspell '
+                    'the field name.',
+                    obj=cls)]
+            else:
+                if isinstance(field.rel, models.ManyToManyRel):
+                    return [checks.Error(
+                        '"%s" referring to a m2m "%s" field.\n'
+                        'ManyToManyFields are not supported in '
+                        '"%s".' % (option, field_name, option),
+                        hint='Remove the m2m field '
+                        'from "%s".' % option,
+                        obj=cls)]
+                if field not in cls._meta.local_fields:
+                    return [checks.Error(
+                        '"%s" pointing to field defined '
+                        'in parent model.\n',
+                        'You cannot refer to fields defined in parent '
+                        'model.' % option,
+                        hint='Remove "%s" from "%s".'
+                        % (field_name, option),
+                        obj=cls)]
+        return []
 
     @classmethod
     def _check_ordering(cls, **kwargs):

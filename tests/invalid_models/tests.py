@@ -1004,46 +1004,12 @@ class ClashTests(IsolatedModelsTestCase):
         ])
 
 
-class OtherModelTests(IsolatedModelsTestCase):
-
-    def test_unique_primary_key(self):
-        class Model(models.Model):
-            id = models.IntegerField(primary_key=False)
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('"id" field is not a primary key.\n'
-                'You cannot use "id" as a field name, '
-                'because each model automatically gets an "id" field '
-                'if none of the fields have primary_key=True.',
-                hint='Remove or rename "id" field or '
-                'add primary_key=True to a field.',
-                obj=Model)
-        ])
-
-    def test_field_names_ending_with_underscore(self):
-        class Model(models.Model):
-            field_ = models.CharField(max_length=10)
-            m2m_ = models.ManyToManyField('self')
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Field name ending with an underscore.\n'
-                'Field names cannot end with underscores, because this '
-                'would lead to ambiguous queryset filters.',
-                hint='Rename the field.',
-                obj=Model._meta.get_field('field_')),
-            Error('Field name ending with an underscore.\n'
-                'Field names cannot end with underscores, because this '
-                'would lead to ambiguous queryset filters.',
-                hint='Rename the field.',
-                obj=Model._meta.get_field('m2m_')),
-        ])
+class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
 
     def test_index_together_not_iterable(self):
         class Model(models.Model):
             class Meta:
-                index_together = 10
+                index_together = 'not-a-list'
 
         errors = Model.check()
         self.assertEqual(errors, [
@@ -1071,7 +1037,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                 '(which are nested lists) that, taken together, are '
                 'indexed, so "index_together" must be an iterable '
                 'of iterables (i. e. a list of lists), i. e. '
-                '[["first_field", "second_field"]].\n',
+                '[["first_field", "second_field"]].',
                 hint='Convert "index_together" to a list of lists.',
                 obj=Model),
         ])
@@ -1109,6 +1075,128 @@ class OtherModelTests(IsolatedModelsTestCase):
                 '"index_together".',
                 hint='Remove the m2m field from "index_together".',
                 obj=Model)
+        ])
+
+    def test_unique_together_not_iterable(self):
+        class Model(models.Model):
+            class Meta:
+                unique_together = 'not-a-list'
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Non-iterable "unique_together".\n'
+                '"unique_together" is a list of field names that, taken '
+                'together, are indexed, so "unique_together" must be '
+                'an iterable (e.g. a list).',
+                hint='Convert "unique_together" to a list.',
+                obj=Model),
+        ])
+
+    def test_unique_together_containing_non_iterable(self):
+        class Model(models.Model):
+            one = models.IntegerField()
+            two = models.IntegerField()
+
+            class Meta:
+                unique_together = [('a', 'b'), 'not-a-list']
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Some items of "unique_together" are not iterable '
+                '(e.g. a list).\n'
+                '"unique_together" is a list of field names '
+                '(which are nested lists) that, taken together, are '
+                'indexed, so "unique_together" must be an iterable '
+                'of iterables (i. e. a list of tuples), i. e. '
+                '[("first_field", "second_field")]. When dealing with '
+                'a single set of fields, a single tuple can be used: '
+                '("first_field", "second_field").',
+                hint='Convert "unique_together" to a list of lists.',
+                obj=Model),
+        ])
+
+    def test_valid_unique_together(self):
+        class Model(models.Model):
+            one = models.IntegerField()
+            two = models.IntegerField()
+
+            class Meta:
+                # unique_together can be a simple tuple
+                unique_together = ('one', 'two')
+
+        errors = Model.check()
+        self.assertEqual(errors, [])
+
+    def test_unique_together_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                unique_together = [
+                    ["missing_field"],
+                ]
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"unique_together" pointing to a missing "missing_field" '
+                'field.\n'
+                'Model.unique_together points to a field "missing_field" '
+                'which does not exist.',
+                hint='Ensure that you did not misspell the field name.',
+                obj=Model),
+        ])
+
+    def test_unique_together_pointing_to_m2m(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                unique_together = [
+                    ["m2m"],
+                ]
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"unique_together" referring to a m2m "m2m" field.\n'
+                'ManyToManyFields are not supported in '
+                '"unique_together".',
+                hint='Remove the m2m field from "unique_together".',
+                obj=Model)
+        ])
+
+
+class OtherModelTests(IsolatedModelsTestCase):
+
+    def test_unique_primary_key(self):
+        class Model(models.Model):
+            id = models.IntegerField(primary_key=False)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('"id" field is not a primary key.\n'
+                'You cannot use "id" as a field name, '
+                'because each model automatically gets an "id" field '
+                'if none of the fields have primary_key=True.',
+                hint='Remove or rename "id" field or '
+                'add primary_key=True to a field.',
+                obj=Model)
+        ])
+
+    def test_field_names_ending_with_underscore(self):
+        class Model(models.Model):
+            field_ = models.CharField(max_length=10)
+            m2m_ = models.ManyToManyField('self')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Field name ending with an underscore.\n'
+                'Field names cannot end with underscores, because this '
+                'would lead to ambiguous queryset filters.',
+                hint='Rename the field.',
+                obj=Model._meta.get_field('field_')),
+            Error('Field name ending with an underscore.\n'
+                'Field names cannot end with underscores, because this '
+                'would lead to ambiguous queryset filters.',
+                hint='Rename the field.',
+                obj=Model._meta.get_field('m2m_')),
         ])
 
     def test_ordering_non_iterable(self):

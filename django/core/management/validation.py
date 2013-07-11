@@ -1,12 +1,7 @@
-import collections
 import sys
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.utils.encoding import force_str
-from django.utils.itercompat import is_iterable
-from django.utils import six
 
 
 class ModelErrorCollection:
@@ -22,9 +17,9 @@ class ModelErrorCollection:
 
 def get_validation_errors(outfile, app=None):
     """
-    Validates all models that are part of the specified app. If no app name is provided,
-    validates all models of all installed apps. Writes errors, if any, to outfile.
-    Returns number of errors.
+    Validates all models that are part of the specified app. If no app name is
+    provided, validates all models of all installed apps. Writes errors, if any,
+    to outfile. Returns number of errors.
     """
     from django.db import models
     from django.db.models.loading import get_app_errors
@@ -35,10 +30,8 @@ def get_validation_errors(outfile, app=None):
     for (app_name, error) in get_app_errors().items():
         e.add(app_name, error)
 
+    # Trigger checking framework for each model
     for cls in models.get_models(app, include_swapped=True):
-        opts = cls._meta
-
-        # Trigger checking framework
         errors = cls.check()
         for error in errors:
             msg = error.msg
@@ -47,30 +40,4 @@ def get_validation_errors(outfile, app=None):
             e.add(msg)
         all_errors.extend(errors)
 
-        # Check swappable attribute.
-        if opts.swapped:
-            continue
-
-        # Check unique_together.
-        for ut in opts.unique_together:
-            validate_local_fields(e, opts, "unique_together", ut)
-
     return all_errors
-
-
-def validate_local_fields(e, opts, field_name, fields):
-    from django.db import models
-
-    if not isinstance(fields, collections.Sequence):
-        e.add('%s: all %s elements must be sequences' % (opts, field_name))
-    else:
-        for field in fields:
-            try:
-                f = opts.get_field(field, many_to_many=True)
-            except models.FieldDoesNotExist:
-                e.add('%s: "%s" refers to %s, a field that doesn\'t exist.' % (opts, field_name, field))
-            else:
-                if isinstance(f.rel, models.ManyToManyRel):
-                    e.add('%s: "%s" refers to %s. ManyToManyFields are not supported in %s.' % (opts, field_name, f.name, field_name))
-                if f not in opts.local_fields:
-                    e.add('%s: "%s" refers to %s. This is not in the same model as the %s statement.' % (opts, field_name, f.name, field_name))
