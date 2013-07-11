@@ -1020,6 +1020,7 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(cls._check_user_model(**kwargs))
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_field_names(**kwargs))
+            errors.extend(cls._check_m2m_through_same_relationship(**kwargs))
             errors.extend(cls._check_relative_fields(**kwargs))
             errors.extend(cls._check_id_field(**kwargs))
             errors.extend(cls._check_index_together(**kwargs))
@@ -1112,6 +1113,36 @@ class Model(six.with_metaclass(ModelBase)):
                     'would lead to ambiguous queryset filters.',
                     hint='Rename the field.',
                     obj=field))
+        return errors
+
+    @classmethod
+    def _check_m2m_through_same_relationship(cls, **kwargs):
+        from django.db import models
+        errors = []
+        seen_intermediary_signatures = []
+
+        fields = cls._meta.local_many_to_many
+
+        # Skip when the target model wasn't found.
+        fields = (f for f in fields if f.rel.to in models.get_models() or
+            not isinstance(f.rel.to, six.string_types))
+
+        # Skip when the relationship model wasn't found.
+        fields = (f for f in fields if f.rel.through is not None and
+            not isinstance(f.rel.through, six.string_types))
+
+        for f in fields:
+            signature = (f.rel.to, cls, f.rel.through)
+            if signature in seen_intermediary_signatures:
+                errors.append(checks.Error(
+                    'Two m2m relations through the same model.\n'
+                    'The model has two many-to-many relations through '
+                    'the intermediary %s model, which is not permitted.'
+                    % f.rel.through._meta.object_name,
+                    hint=None,
+                    obj=cls))
+            else:
+                seen_intermediary_signatures.append(signature)
         return errors
 
     @classmethod

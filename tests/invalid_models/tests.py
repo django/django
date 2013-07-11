@@ -1,66 +1,12 @@
 from __future__ import unicode_literals
 
-import copy
-import sys
 from types import MethodType
 
 from django.core.checks import Error
-from django.core.management.validation import get_validation_errors
 from django.db import connection, models
-from django.db.models.loading import cache, load_app
+from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.six import StringIO
-
-
-class InvalidModelTestCase(TestCase):
-    """Import an appliation with invalid models and test the exceptions."""
-
-    def setUp(self):
-        # Make sure sys.stdout is not a tty so that we get errors without
-        # coloring attached (makes matching the results easier). We restore
-        # sys.stderr afterwards.
-        self.old_stdout = sys.stdout
-        self.stdout = StringIO()
-        sys.stdout = self.stdout
-
-        # This test adds dummy applications to the app cache. These
-        # need to be removed in order to prevent bad interactions
-        # with the flush operation in other tests.
-        self.old_app_models = copy.deepcopy(cache.app_models)
-        self.old_app_store = copy.deepcopy(cache.app_store)
-
-    def tearDown(self):
-        cache.app_models = self.old_app_models
-        cache.app_store = self.old_app_store
-        cache._get_models_cache = {}
-        sys.stdout = self.old_stdout
-
-    # Technically, this isn't an override -- TEST_SWAPPED_MODEL must be
-    # set to *something* in order for the test to work. However, it's
-    # easier to set this up as an override than to require every developer
-    # to specify a value in their test settings.
-    @override_settings(
-        TEST_SWAPPED_MODEL='old_invalid_models.ReplacementModel',
-        TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model',
-        TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target',
-    )
-    def test_invalid_models(self):
-        try:
-            module = load_app("invalid_models.old_invalid_models")
-        except Exception:
-            self.fail('Unable to load old_invalid_models module')
-
-        get_validation_errors(self.stdout, module)
-        self.stdout.seek(0)
-        error_log = self.stdout.read()
-        actual = error_log.split('\n')
-        expected = module.model_errors.split('\n')
-
-        unexpected = [err for err in actual if err not in expected]
-        missing = [err for err in expected if err not in actual]
-        self.assertFalse(unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
-        self.assertFalse(missing, "Missing Errors: " + '\n'.join(missing))
 
 
 class IsolatedModelsTestCase(TestCase):
@@ -504,7 +450,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
     def test_foreign_key_to_non_unique_field(self):
         class Target(models.Model):
-            bad = models.IntegerField() # No unique=True
+            bad = models.IntegerField()  # No unique=True
 
         class Model(models.Model):
             foreign_key = models.ForeignKey('Target', to_field='bad')
@@ -724,7 +670,7 @@ class OtherFieldTests(TestCase):
             v.check_field = old_check_field
 
 
-class ClashesTests(IsolatedModelsTestCase):
+class ClashTests(IsolatedModelsTestCase):
 
     def targets(self):
         # The list cannot be a class attribute because we need a fresh field
@@ -1058,7 +1004,7 @@ class ClashesTests(IsolatedModelsTestCase):
         ])
 
 
-class InvalidModelTests(IsolatedModelsTestCase):
+class OtherModelTests(IsolatedModelsTestCase):
 
     def test_unique_primary_key(self):
         class Model(models.Model):
@@ -1222,4 +1168,27 @@ class InvalidModelTests(IsolatedModelsTestCase):
                 'the app name as well as the model is not abstract. Does your '
                 'INSTALLED_APPS setting contain the "not_an_app" app?',
                 obj=Model)
+        ])
+
+    def test_two_m2m_through_same_relationship(self):
+        class Person(models.Model):
+            pass
+
+        class Group(models.Model):
+            primary = models.ManyToManyField(Person,
+                through="Membership", related_name="primary")
+            secondary = models.ManyToManyField(Person, through="Membership",
+                related_name="secondary")
+
+        class Membership(models.Model):
+            person = models.ForeignKey(Person)
+            group = models.ForeignKey(Group)
+
+        errors = Group.check()
+        self.assertEqual(errors, [
+            Error('Two m2m relations through the same model.\n'
+                'The model has two many-to-many relations through '
+                'the intermediary Membership model, which is not permitted.',
+                hint=None,
+                obj=Group)
         ])
