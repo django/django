@@ -89,4 +89,5 @@ you can implement this check::
             return [] # When no error, return an empty list
 
 Database backend specific checks are performed in
-``DatabaseValidation.check_field`` method.
+``DatabaseValidation.check_field`` method. The API of ``DatabaseValidation``
+is not formally stable and may change in future.
