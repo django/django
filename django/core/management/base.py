@@ -11,8 +11,8 @@ from optparse import make_option, OptionParser
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
+from django.core.management.validation import get_validation_errors
 from django.utils.encoding import force_str
-from django.utils.six import StringIO
 
 
 class CommandError(Exception):
@@ -309,15 +309,16 @@ class BaseCommand(object):
         If app is None, then this will validate all installed apps.
 
         """
-        from django.core.management.validation import get_validation_errors
-        s = StringIO()
-        num_errors = len(get_validation_errors(s, app))
-        if num_errors:
-            s.seek(0)
-            error_text = s.read()
-            raise CommandError("One or more models did not validate:\n%s" % error_text)
+
+        errors = get_validation_errors(app)
+        if errors:
+            msg = "\n\n".join(sorted(force_str(error) for error in errors))
+            msg = color_style().ERROR(msg)
+            msg = "One or more models did not validate:\n%s" % msg
+            raise CommandError(msg)
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
+            self.stdout.write("%s error%s found"
+                % (len(errors), '' if len(errors) == 1 else 's'))
 
     def handle(self, *args, **options):
         """

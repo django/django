@@ -180,8 +180,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "REQUIRED_FIELDS should be a list."
 
         from .test_custom_user import CustomUserNonListRequiredFields
-        new_io = StringIO()
-        errors = get_validation_errors(new_io, get_app('auth'))
+        errors = get_validation_errors(get_app('auth'))
         self.assertEqual(errors, [
             checks.Error('Non-iterable '
                 'CustomUserNonListRequiredFields.REQUIRED_FIELDS.\n'
@@ -196,8 +195,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
 
         from .test_custom_user import CustomUserBadRequiredFields
-        new_io = StringIO()
-        errors = get_validation_errors(new_io, get_app('auth'))
+        errors = get_validation_errors(get_app('auth'))
         self.assertEqual(errors, [
             checks.Error(
                 'CustomUserBadRequiredFields.USERNAME_FIELD included in '
@@ -213,8 +211,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "A non-unique USERNAME_FIELD should raise a model validation error."
 
         from .test_custom_user import CustomUserNonUniqueUsername
-        new_io = StringIO()
-        errors = get_validation_errors(new_io, get_app('auth'))
+        errors = get_validation_errors(get_app('auth'))
         self.assertEqual(errors, [
             checks.Error(
                 'Non unique CustomUserNonUniqueUsername.USERNAME_FIELD.\n'
