@@ -897,6 +897,82 @@ class ClashesTests(IsolatedModelsTestCase):
                 obj=Model.foreign.field),
         ])
 
+    def test_self_m2m_clash(self):
+        class Model(models.Model):
+            first_m2m = models.ManyToManyField('self', symmetrical=False)
+            second_m2m = models.ManyToManyField('self', symmetrical=False)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between accessors for Model.first_m2m '
+                'and Model.second_m2m.',
+                hint=u'Add or change a related_name argument '
+                'to the definition for Model.first_m2m or Model.second_m2m.',
+                obj=Model.first_m2m.field),
+            Error('Clash between accessors for Model.second_m2m '
+                'and Model.first_m2m.',
+                hint=u'Add or change a related_name argument '
+                'to the definition for Model.second_m2m or Model.first_m2m.',
+                obj=Model.second_m2m.field),
+        ])
+
+    def test_self_m2m_accessor_clash(self):
+        class Model(models.Model):
+            model_set = models.ManyToManyField("self", symmetrical=False)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.model_set clashes with '
+                'field Model.model_set.',
+                hint='Rename field Model.model_set or add/change '
+                'a related_name argument to the definition '
+                'for field Model.model_set.',
+                obj=Model._meta.get_field('model_set'))
+        ])
+
+    def test_self_m2m_reverse_query_name_clash(self):
+        class Model(models.Model):
+            model = models.ManyToManyField("self", symmetrical=False)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Reverse query name for field Model.model clashes with '
+                'field Model.model.',
+                hint='Rename field Model.model or add/change a related_name '
+                'argument to the definition for field Model.model.',
+                obj=Model._meta.get_field('model'))
+        ])
+
+    def test_self_m2m_clash_explicit_related_name(self):
+        class Model(models.Model):
+            clash = models.IntegerField()
+            m2m = models.ManyToManyField("self",
+                symmetrical=False, related_name='clash')
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Accessor for field Model.m2m clashes with '
+                'field Model.clash.',
+                hint='Rename field Model.clash or add/change a related_name '
+                'argument to the definition for field Model.m2m.',
+                obj=Model.m2m.field),
+            Error('Reverse query name for field Model.m2m clashes with '
+                'field Model.clash.',
+                hint='Rename field Model.clash or add/change a related_name '
+                'argument to the definition for field Model.m2m.',
+                obj=Model.m2m.field),
+        ])
+
+    def test_valid_self_m2m(self):
+        class Model(models.Model):
+            first = models.ManyToManyField("self",
+                symmetrical=False, related_name='first_accessor')
+            second = models.ManyToManyField("self",
+                symmetrical=False, related_name='second_accessor')
+
+        errors = Model.check()
+        self.assertEqual(errors, [])
+
     def test_complex_clash(self):
         class Target(models.Model):
             tgt_safe = models.CharField(max_length=10)
