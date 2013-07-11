@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
+from django.core import checks
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
@@ -177,23 +178,52 @@ class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
+
+        from .test_custom_user import CustomUserNonListRequiredFields
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
+        errors = get_validation_errors(new_io, get_app('auth'))
+        self.assertEqual(errors, [
+            checks.Error('Non-iterable '
+                'CustomUserNonListRequiredFields.REQUIRED_FIELDS.\n'
+                'The REQUIRED_FIELDS must be an iterable (i. e. a list '
+                'or tuple).',
+                hint='Convert the REQUIRED_FIELDS to a list.',
+                obj=CustomUserNonListRequiredFields),
+        ])
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
+
+        from .test_custom_user import CustomUserBadRequiredFields
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
+        errors = get_validation_errors(new_io, get_app('auth'))
+        self.assertEqual(errors, [
+            checks.Error(
+                'CustomUserBadRequiredFields.USERNAME_FIELD included in '
+                'REQUIRED_FIELDS.\n'
+                'The field named as the USERNAME_FIELD should not be '
+                'included in REQUIRED_FIELDS.',
+                hint='Exclude "username" from REQUIRED_FIELDS.',
+                obj=CustomUserBadRequiredFields),
+        ])
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
+
+        from .test_custom_user import CustomUserNonUniqueUsername
         new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
+        errors = get_validation_errors(new_io, get_app('auth'))
+        self.assertEqual(errors, [
+            checks.Error(
+                'Non unique CustomUserNonUniqueUsername.USERNAME_FIELD.\n'
+                'The CustomUserNonUniqueUsername.username field must be '
+                'unique because it is pointed by USERNAME_FIELD.',
+                hint='Add unique=True to field '
+                'CustomUserNonUniqueUsername.username.',
+                obj=CustomUserNonUniqueUsername),
+        ])
 
 
 class PermissionTestCase(TestCase):
