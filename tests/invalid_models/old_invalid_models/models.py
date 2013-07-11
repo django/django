@@ -127,6 +127,8 @@ old_invalid_models.duplicatecolumnnamemodel2: Field 'bar' has column name 'bar' 
 old_invalid_models.duplicatecolumnnamemodel4: Field 'bar' has column name 'baz' that is already used.
 """
 
+# Space
+
 """
 # Error messages predated by a character:
 # - 'x' -- the test was rewritten
