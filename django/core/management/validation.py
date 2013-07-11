@@ -51,49 +51,6 @@ def get_validation_errors(outfile, app=None):
         if opts.swapped:
             continue
 
-        # Store a list of column names which have already been used by other fields.
-        used_column_names = []
-
-        # Model isn't swapped; do field-specific validation.
-        for f in opts.local_fields:
-            # Column name validation.
-            # Determine which column name this field wants to use.
-            _, column_name = f.get_attname_column()
-
-            # Ensure the column name is not already in use.
-            if column_name and column_name in used_column_names:
-                e.add(opts, "Field '%s' has column name '%s' that is already used." % (f.name, column_name))
-            else:
-                used_column_names.append(column_name)
-
-        seen_intermediary_signatures = []
-        for f in opts.local_many_to_many:
-            # Check to see if the related m2m field will clash with any
-            # existing fields, m2m fields, m2m related objects or related
-            # objects
-
-            # it is a string and we could not find the model it refers to
-            # so skip the next section
-            if (f.rel.to not in models.get_models() and
-                isinstance(f.rel.to, six.string_types)):
-                continue
-
-            if f.rel.through is not None and not isinstance(f.rel.through, six.string_types):
-                from_model, to_model = cls, f.rel.to
-                signature = (f.rel.to, cls, f.rel.through)
-                if signature in seen_intermediary_signatures:
-                    e.add("%s: The model %s has two manually-defined m2m "
-                        "relations through the model %s, which is not "
-                        "permitted. Please consider using an extra field on "
-                        "your intermediary model instead." % (
-                            opts,
-                            cls._meta.object_name,
-                            f.rel.through._meta.object_name
-                        )
-                    )
-                else:
-                    seen_intermediary_signatures.append(signature)
-
         # Check unique_together.
         for ut in opts.unique_together:
             validate_local_fields(e, opts, "unique_together", ut)
