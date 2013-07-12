@@ -1117,10 +1117,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. class:: ManyToManyField(othermodel, [**options])
 
-A many-to-many relationship. Requires a positional argument: the class to which
-the model is related. This works exactly the same as it does for
-:class:`ForeignKey`, including all the options regarding :ref:`recursive
-<recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
+A many-to-many relationship. Requires a positional argument: the class to
+which the model is related, which works exactly the same as it does for
+:class:`ForeignKey`, including :ref:`recursive <recursive-relationships>` and
+:ref:`lazy <lazy-relationships>` relationships.
 
 Related objects can be added, removed, or created with the field's
 :class:`~django.db.models.fields.related.RelatedManager`.
