@@ -44,6 +44,14 @@ Related objects reference
             >>> e = Entry.objects.get(id=234)
             >>> b.entry_set.add(e) # Associates Entry e with Blog b.
 
+        In the example above, ``e.save()`` is called to perform the update.
+        Using ``add()`` with a many-to-many relationship, however, will not
+        call any ``save()`` methods, but rather create the relationships
+        using :meth:`QuerySet.bulk_create()
+        <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
+        some custom logic when a relationship is created, listen to the
+        :data:`~django.db.models.signals.m2m_changed` signal.
+
     .. method:: create(**kwargs)
 
         Creates a new object, saves it and puts it in the related object set.
@@ -81,6 +89,14 @@ Related objects reference
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry.objects.get(id=234)
             >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
+
+        Similar to :meth:`add()`, ``e.save()`` is called in the example above
+        to perform the update. Using ``remove()`` with a many-to-many
+        relationship, however, will delete the relationships using
+        :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which
+        means no model ``save()`` methods are called; listen to the
+        :data:`~django.db.models.signals.m2m_changed` signal if you wish to
+        execute custom code when a relationship is deleted.
 
         For :class:`~django.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
