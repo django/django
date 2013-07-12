@@ -1158,14 +1158,13 @@ class Model(six.with_metaclass(ModelBase)):
         # contain them.
         fields = (f for f in fields if f.rel)
 
-        # If `f.rel.to` is a string, it wasn't resolved into a model; that means
-        # that we couldn't find the model and we skip in that case.
-        fields = (f for f in fields
-            if not isinstance(f.rel.to, six.string_types))
+        # `f.rel.to` may be a string instead of a model. Skip all not resolved
+        # model names.
+        fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
 
         # If the field doesn't install backward relation on the target model (so
         # `is_hidden` returns True), then there are no clashes to check and we
-        # can skip.
+        # can skip these fields.
         fields = (f for f in fields if not f.rel.is_hidden())
 
         # Skip all fields without reverse accessors (this only occurs for
@@ -1175,111 +1174,75 @@ class Model(six.with_metaclass(ModelBase)):
         fields = (f for f in fields if f.related.get_accessor_name())
 
         for field in fields:
-            is_field_m2m = field in opts.local_many_to_many
-            rel_opts = field.rel.to._meta
-            rel_name = field.related.get_accessor_name()
-            rel_query_name = field.related_query_name()
-            # field_name is e.g. "m2m field Model.field"
-            field_name = "field %s.%s" % (opts.object_name, field.name)
-
-            # Consider the following (invalid) models:
+            # Consider that we are checking field `Model.foreign` and the models
+            # are:
             #
             #     class Target(models.Model):
             #         model = models.IntegerField()
             #         model_set = models.IntegerField()
             #
             #     class Model(models.Model):
-            #         foreign = ForeignKey(Target)
-            #         m2m = ManyToManyField(Target)
-            #
-            # In that case, when the checked field is `Model.foreign`, local
-            # variable values are:
-            #
-            #     field = cls.foreign.field
-            #     field_name = "field Model.foreign"
-            #     is_field_m2m = False
-            #     opts.local_field = [cls.id.field, cls.foreign.field]
-            #     opts.local_many_to_many = [cls.m2m.field]
-            #     rel_name = "model_set"
-            #     rel_query_name = "model"
-            #     rel_opts.fields = [
-            #         Target.id.field,
-            #         Target.model.field,
-            #         Target.model_set.field
-            #     ]
-            #     rel_opts.local_many_to_many = []
-            #     rel_opts.get_all_related_objects() = [
-            #         <RelatedObject: invalid_models:model related to foreign>
-            #     ]
-            #     rel_opts.get_all_related_many_to_many_objects() = [
-            #         <RelatedObject: invalid_models:model related to m2m>
-            #     ]
-            #     rel_opts.object_name = "Target"
-            #
-            # When we check clash between field `Target.model` and reverse
-            # query name for field `Model.foreign` which is `Target.model`
-            # too, we are in the first loop and local variables values are:
-            #
-            #     r = Target.model.field
-            #     r.name = "model"
-            #
-            # When we check clash between related m2m field `Target.model_set`
-            # and accessor for `Model.foreign` field which is
-            # `Target.model_set` too, we are in the second loop and local
-            # variables values are:
-            #
-            #     r.field = Model.m2m.field
-            #     r.get_accessor_name() = "model_set"
+            #         foreign = models.ForeignKey(Target)
+            #         m2m = models.ManyToManyField(Target)
 
-            # The first loop.
-            for r in rel_opts.fields + rel_opts.local_many_to_many:
-                r_name = "field %s.%s" % (rel_opts.object_name, r.name)
-                compare_to = r.name
+            rel_opts = field.rel.to._meta
+            # rel_opts.object_name == "Target"
+            rel_name = field.related.get_accessor_name()  # i. e. "model_set"
+            rel_query_name = field.related_query_name()  # i. e. "model"
+            field_name = "%s.%s" % (opts.object_name,
+                field.name)  # i. e. "Model.field"
 
-                if compare_to == rel_name:
+            # Check clashes between accessor or reverse query name of `field`
+            # and any other field name -- i. e. accessor for Model.foreign is
+            # model_set and it clashes with Target.model_set.
+            potential_clashes = rel_opts.fields + rel_opts.local_many_to_many
+            for clash_field in potential_clashes:
+                clash_name = "%s.%s" % (rel_opts.object_name,
+                    clash_field.name)  # i. e. "Target.model_set"
+                if clash_field.name == rel_name:
                     errors.append(checks.Error(
-                        'Accessor for %s clashes with %s.'
-                        % (field_name, r_name),
-                        hint='Rename %s or add/change a related_name argument '
-                        'to the definition for %s.' % (r_name, field_name),
+                        'Accessor for field %s clashes with field %s.'
+                        % (field_name, clash_name),
+                        hint='Rename field %s or add/change a related_name '
+                        'argument to the definition for field %s.'
+                        % (clash_name, field_name),
                         obj=field))
 
-                if compare_to == rel_query_name:
+                if clash_field.name == rel_query_name:
                     errors.append(checks.Error(
-                        'Reverse query name for %s clashes with %s.'
-                        % (field_name, r_name),
-                        hint='Rename %s or add/change a related_name argument '
-                        'to the definition for %s.' % (r_name, field_name),
+                        'Reverse query name for field %s clashes with field %s.'
+                        % (field_name, clash_name),
+                        hint='Rename field %s or add/change a related_name '
+                        'argument to the definition for field %s.'
+                        % (clash_name, field_name),
                         obj=field))
 
-            # The second loop.
-            for r in rel_opts.get_all_related_many_to_many_objects() + rel_opts.get_all_related_objects():
-                r_name = "related field %s.%s" % (rel_opts.object_name, r.get_accessor_name())
-                compare_to = r.get_accessor_name()
-                if r.field is field:
-                    if (not is_field_m2m and r in rel_opts.get_all_related_objects() or
-                        is_field_m2m and r in rel_opts.get_all_related_many_to_many_objects()):
-                        continue
-
-                if compare_to == rel_name:
-                    # import ipdb; ipdb.set_trace()
-                    r_name2 = "%s.%s" % (r.model._meta.object_name, r.field.name)
-                    field_name2 = "%s.%s" % (opts.object_name, field.name)
+            # Check clashes between accessors/reverse query names of `field` and
+            # any other field -- i. e. Model.foreign accessor clashes with
+            # Model.m2m accessor.
+            potential_clashes = rel_opts.get_all_related_many_to_many_objects()
+            potential_clashes += rel_opts.get_all_related_objects()
+            potential_clashes = (r for r in potential_clashes
+                if r.field is not field)
+            for clash_field in potential_clashes:
+                clash_name = "%s.%s" % (clash_field.model._meta.object_name,
+                    clash_field.field.name)  # i. e. "Model.m2m"
+                if clash_field.get_accessor_name() == rel_name:
                     errors.append(checks.Error(
                         'Clash between accessors for %s and %s.'
-                        % (field_name2, r_name2),
+                        % (field_name, clash_name),
                         hint='Add or change a related_name argument '
                         'to the definition for %s or %s.'
-                        % (field_name2, r_name2),
+                        % (field_name, clash_name),
                         obj=field))
 
-                if compare_to == rel_query_name:
+                if clash_field.get_accessor_name() == rel_query_name:
                     errors.append(checks.Error(
                         'Clash between reverse query names for %s and %s.'
-                        % (field_name2, r_name2),
+                        % (field_name, clash_name),
                         hint='Add or change a related_name argument '
                         'to the definition for %s or %s.'
-                        % (field_name2, r_name2),
+                        % (field_name, clash_name),
                         obj=field))
 
         return errors
