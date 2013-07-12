@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 To provide a shim layer over Pillow/PIL situation until the PIL support is
-removed.
+removed. See #19934.
 
 
 Combinations To Account For
@@ -132,6 +132,8 @@ def _detect_image_library():
     try:
         from PIL import ImageFile as PILImageFile
     except ImportError:
+        # This import cannot fail unless Pillow/PIL install is completely
+        # broken (e.g. missing Python modules).
         import ImageFile as PILImageFile
 
     # Finally, warn about deprecation...
