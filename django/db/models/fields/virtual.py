@@ -9,6 +9,7 @@ class VirtualField(Field):
     """
     def __init__(self, **kwargs):
         kwargs.setdefault('serialize', False)
+        kwargs.setdefault('editable', False)
         super(VirtualField, self).__init__(**kwargs)
 
     def db_type(self, connection):
