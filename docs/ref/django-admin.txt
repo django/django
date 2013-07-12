@@ -89,10 +89,10 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
-checksetup
-----------
+check
+-----
 
-.. django-admin:: checksetup
+.. django-admin:: check
 
 .. versionadded:: 1.6
 
