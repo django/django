@@ -641,8 +641,7 @@ class FkConstraintsTests(TransactionTestCase):
         """
         When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
         """
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -654,17 +653,13 @@ class FkConstraintsTests(TransactionTestCase):
                 connection.enable_constraint_checking()
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            transaction.set_rollback(True)
 
     def test_disable_constraint_checks_context_manager(self):
         """
         When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
         """
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -675,31 +670,23 @@ class FkConstraintsTests(TransactionTestCase):
                     a.save()
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            transaction.set_rollback(True)
 
     def test_check_constraints(self):
         """
         Constraint checks should raise an IntegrityError when bad data is in the DB.
         """
-        try:
-            transaction.set_autocommit(False)
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
-            try:
-                with connection.constraint_checks_disabled():
-                    a.save()
-                    with self.assertRaises(IntegrityError):
-                        connection.check_constraints()
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            with connection.constraint_checks_disabled():
+                a.save()
+                with self.assertRaises(IntegrityError):
+                    connection.check_constraints()
+            transaction.set_rollback(True)
 
 
 class ThreadTests(TestCase):

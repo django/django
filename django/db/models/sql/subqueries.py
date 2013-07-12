@@ -7,7 +7,7 @@ from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
-from django.db.models.sql.constants import *
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
@@ -19,6 +19,7 @@ from django.utils import timezone
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
         'DateTimeQuery', 'AggregateQuery']
+
 
 class DeleteQuery(Query):
     """
@@ -77,7 +78,9 @@ class DeleteQuery(Query):
                 return
             else:
                 innerq.clear_select_clause()
-                innerq.select = [SelectInfo((self.get_initial_alias(), pk.column), None)]
+                innerq.select = [
+                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                ]
                 values = innerq
             where = self.where_class()
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
@@ -178,6 +181,7 @@ class UpdateQuery(Query):
             result.append(query)
         return result
 
+
 class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
@@ -214,6 +218,7 @@ class InsertQuery(Query):
                     setattr(obj, field.attname, force_text(value))
         self.objs = objs
         self.raw = raw
+
 
 class DateQuery(Query):
     """
@@ -260,6 +265,7 @@ class DateQuery(Query):
     def _get_select(self, col, lookup_type):
         return Date(col, lookup_type)
 
+
 class DateTimeQuery(DateQuery):
     """
     A DateTimeQuery is like a DateQuery but for a datetime field. If time zone
@@ -279,6 +285,7 @@ class DateTimeQuery(DateQuery):
         else:
             tzname = timezone._get_timezone_name(self.tzinfo)
         return DateTime(col, lookup_type, tzname)
+
 
 class AggregateQuery(Query):
     """

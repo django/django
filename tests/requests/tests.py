@@ -679,7 +679,7 @@ class RequestsTests(SimpleTestCase):
 
 
 @skipIf(connection.vendor == 'sqlite'
-        and connection.settings_dict['NAME'] in ('', ':memory:'),
+        and connection.settings_dict['TEST_NAME'] in (None, '', ':memory:'),
         "Cannot establish two connections to an in-memory SQLite database.")
 class DatabaseConnectionHandlingTests(TransactionTestCase):
 

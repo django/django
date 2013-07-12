@@ -1,19 +1,24 @@
 import warnings
 
 from django.core import signals
-from django.db.utils import (DEFAULT_DB_ALIAS,
-    DataError, OperationalError, IntegrityError, InternalError,
-    ProgrammingError, NotSupportedError, DatabaseError,
-    InterfaceError, Error,
-    load_backend, ConnectionHandler, ConnectionRouter)
+from django.db.utils import (DEFAULT_DB_ALIAS, DataError, OperationalError,
+    IntegrityError, InternalError, ProgrammingError, NotSupportedError,
+    DatabaseError, InterfaceError, Error, load_backend,
+    ConnectionHandler, ConnectionRouter)
 from django.utils.functional import cached_property
 
-__all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
-    'IntegrityError', 'DEFAULT_DB_ALIAS')
+
+__all__ = [
+    'backend', 'connection', 'connections', 'router', 'DatabaseError',
+    'IntegrityError', 'InternalError', 'ProgrammingError', 'DataError',
+    'NotSupportedError', 'Error', 'InterfaceError', 'OperationalError',
+    'DEFAULT_DB_ALIAS'
+]
 
 connections = ConnectionHandler()
 
 router = ConnectionRouter()
+
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
@@ -39,7 +44,14 @@ class DefaultConnectionProxy(object):
     def __delattr__(self, name):
         return delattr(connections[DEFAULT_DB_ALIAS], name)
 
+    def __eq__(self, other):
+        return connections[DEFAULT_DB_ALIAS] == other
+
+    def __ne__(self, other):
+        return connections[DEFAULT_DB_ALIAS] != other
+
 connection = DefaultConnectionProxy()
+
 
 class DefaultBackendProxy(object):
     """
@@ -63,6 +75,7 @@ class DefaultBackendProxy(object):
 
 backend = DefaultBackendProxy()
 
+
 def close_connection(**kwargs):
     warnings.warn(
         "close_connection is superseded by close_old_connections.",
@@ -76,11 +89,13 @@ def close_connection(**kwargs):
         transaction.abort(conn)
         connections[conn].close()
 
+
 # Register an event to reset saved queries when a Django request is started.
 def reset_queries(**kwargs):
     for conn in connections.all():
         conn.queries = []
 signals.request_started.connect(reset_queries)
+
 
 # Register an event to reset transaction state and close connections past
 # their lifetime. NB: abort() doesn't do anything outside of a transaction.

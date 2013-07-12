@@ -22,6 +22,8 @@ TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
+    'data',
+    'requirements',
     'templates',
     'test_discovery_sample',
     'test_discovery_sample2',
@@ -49,10 +51,18 @@ ALWAYS_INSTALLED_APPS = [
 
 
 def get_test_modules():
+    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
-    for modpath, dirpath in (
+    discovery_paths = [
         (None, RUNTESTS_DIR),
-        (CONTRIB_MODULE_PATH, CONTRIB_DIR)):
+        (CONTRIB_MODULE_PATH, CONTRIB_DIR)
+    ]
+    if HAS_SPATIAL_DB:
+        discovery_paths.append(
+            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
+        )
+
+    for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
             if ('.' in f or
                 # Python 3 byte code dirs (PEP 3147)
@@ -63,6 +73,7 @@ def get_test_modules():
                 continue
             modules.append((modpath, f))
     return modules
+
 
 def get_installed():
     from django.db.models.loading import get_apps
@@ -124,14 +135,6 @@ def setup(verbosity, test_labels):
         else:
             bits = bits[:1]
         test_labels_set.add('.'.join(bits))
-
-    # If GeoDjango, then we'll want to add in the test applications
-    # that are a part of its test suite.
-    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-    if HAS_SPATIAL_DB:
-        from django.contrib.gis.tests import geo_apps
-        test_modules.extend(geo_apps())
-        settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for modpath, module_name in test_modules:
         if modpath:

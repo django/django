@@ -89,3 +89,11 @@ Deployment
 When you are sufficiently confident your app works with the new version of
 Django, you're ready to go ahead and :doc:`deploy </howto/deployment/index>`
 your upgraded Django project.
+
+If you are using caching provided by Django, you should consider clearing your
+cache after upgrading. Otherwise you may run into problems, for example, if you
+are caching pickled objects as these objects are not guaranteed to be
+pickle-compatible across Django versions. A past instance of incompatibility
+was caching pickled :class:`~django.http.HttpResponse` objects, either
+directly or indirectly via the :func:`~django.views.decorators.cache.cache_page`
+decorator.

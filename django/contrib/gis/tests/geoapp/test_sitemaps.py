@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from io import BytesIO
 from unittest import skipUnless
 from xml.dom import minidom
+import os
 import zipfile
 
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
 from django.test import TestCase
+from django.utils._os import upath
 
 if HAS_GEOS:
     from .models import City, Country
@@ -37,7 +39,11 @@ class GeoSitemapTest(TestCase):
     def test_geositemap_index(self):
         "Tests geographic sitemap index."
         # Getting the geo index.
-        doc = minidom.parseString(self.client.get('/sitemap.xml').content)
+        from django.contrib import sitemaps
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(upath(sitemaps.__file__)), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            doc = minidom.parseString(self.client.get('/sitemap.xml').content)
         index = doc.firstChild
         self.assertEqual(index.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
         self.assertEqual(3, len(index.getElementsByTagName('sitemap')))

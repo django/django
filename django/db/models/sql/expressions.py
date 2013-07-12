@@ -1,7 +1,9 @@
+import copy
+
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import FieldDoesNotExist
-import copy
+
 
 class SQLEvaluator(object):
     def __init__(self, expression, query, allow_joins=True, reuse=None):

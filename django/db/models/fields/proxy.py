@@ -5,6 +5,7 @@ have the same attributes as fields sometimes (avoids a lot of special casing).
 
 from django.db.models import fields
 
+
 class OrderWrt(fields.IntegerField):
     """
     A proxy for the _order database field that is used when

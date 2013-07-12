@@ -42,7 +42,7 @@ The library deals with these concepts:
         A collection of fields that knows how to validate itself and
         display itself as HTML.
 
-    Form Media
+    Form Assets (the ``Media`` class)
         The CSS and JavaScript resources that are required to render a form.
 
 The library is decoupled from the other Django components, such as the database

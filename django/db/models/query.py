@@ -19,6 +19,10 @@ from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
 
+# The maximum number (one less than the max to be precise) of results to fetch
+# in a get() query
+MAX_GET_RESULTS = 20
+
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -297,6 +301,7 @@ class QuerySet(object):
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter():
             clone = clone.order_by()
+        clone = clone[:MAX_GET_RESULTS + 1]
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -305,8 +310,11 @@ class QuerySet(object):
                 "%s matching query does not exist." %
                 self.model._meta.object_name)
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num))
+            "get() returned more than one %s -- it returned %s!" % (
+                self.model._meta.object_name,
+                num if num <= MAX_GET_RESULTS else 'more than %s' % MAX_GET_RESULTS
+            )
+        )
 
     def create(self, **kwargs):
         """
@@ -351,7 +359,7 @@ class QuerySet(object):
                 if objs_with_pk:
                     self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
-                    fields= [f for f in fields if not isinstance(f, AutoField)]
+                    fields = [f for f in fields if not isinstance(f, AutoField)]
                     self._batched_insert(objs_without_pk, fields, batch_size)
 
         return objs
@@ -638,7 +646,7 @@ class QuerySet(object):
         obj.query.select_for_update_nowait = nowait
         return obj
 
-    def select_related(self, *fields, **kwargs):
+    def select_related(self, *fields):
         """
         Returns a new QuerySet instance that will select related objects.
 
@@ -647,9 +655,6 @@ class QuerySet(object):
 
         If select_related(None) is called, the list is cleared.
         """
-        if kwargs:
-            raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (list(kwargs),))
         obj = self._clone()
         if fields == (None,):
             obj.query.select_related = False
@@ -821,7 +826,7 @@ class QuerySet(object):
             return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
-        for batch in [objs[i:i+batch_size]
+        for batch in [objs[i:i + batch_size]
                       for i in range(0, len(objs), batch_size)]:
             self.model._base_manager._insert(batch, fields=fields,
                                              using=self.db)
@@ -902,9 +907,11 @@ class QuerySet(object):
     # empty" result.
     value_annotation = True
 
+
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
         return instance.query.is_empty()
+
 
 class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
     """
@@ -914,6 +921,7 @@ class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
 
     def __init__(self, *args, **kwargs):
         raise TypeError("EmptyQuerySet can't be instantiated")
+
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -1243,7 +1251,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
                 parent = klass if issubclass(o.model, klass) else None
-                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
+                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth + 1,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:
@@ -1254,7 +1262,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
 
-def get_cached_row(row, index_start, using,  klass_info, offset=0,
+def get_cached_row(row, index_start, using, klass_info, offset=0,
                    parent_data=()):
     """
     Helper function that recursively returns an object with the specified
@@ -1279,11 +1287,10 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0,
         return None
     klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx = klass_info
 
-
-    fields = row[index_start : index_start + field_count]
+    fields = row[index_start:index_start + field_count]
     # If the pk column is None (or the Oracle equivalent ''), then the related
     # object must be non-existent - set the relation to None.
-    if fields[pk_idx] == None or fields[pk_idx] == '':
+    if fields[pk_idx] is None or fields[pk_idx] == '':
         obj = None
     elif field_names:
         fields = list(fields)
@@ -1513,8 +1520,6 @@ def prefetch_related_objects(result_cache, related_lookups):
     if len(result_cache) == 0:
         return # nothing to do
 
-    model = result_cache[0].__class__
-
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
@@ -1541,7 +1546,7 @@ def prefetch_related_objects(result_cache, related_lookups):
             if len(obj_list) == 0:
                 break
 
-            current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
+            current_lookup = LOOKUP_SEP.join(attrs[:level + 1])
             if current_lookup in done_queries:
                 # Skip any prefetching, and any object preparation
                 obj_list = done_queries[current_lookup]

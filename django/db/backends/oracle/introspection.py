@@ -1,9 +1,12 @@
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
-from django.utils.encoding import force_text
-import cx_Oracle
 import re
 
+import cx_Oracle
+
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
+
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
+
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type objects to Django Field types.
@@ -95,11 +98,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT ccol.column_name, rcol.table_name AS referenced_table, rcol.column_name AS referenced_column
             FROM user_constraints c
             JOIN user_cons_columns ccol
-              ON ccol.constraint_name = c.constraint_name 
+              ON ccol.constraint_name = c.constraint_name
             JOIN user_cons_columns rcol
-              ON rcol.constraint_name = c.r_constraint_name 
-            WHERE c.table_name = %s AND c.constraint_type = 'R'""" , [table_name.upper()])
-        return [tuple(cell.lower() for cell in row) 
+              ON rcol.constraint_name = c.r_constraint_name
+            WHERE c.table_name = %s AND c.constraint_type = 'R'""", [table_name.upper()])
+        return [tuple(cell.lower() for cell in row)
                 for row in cursor.fetchall()]
 
     def get_indexes(self, cursor, table_name):

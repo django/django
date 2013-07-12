@@ -56,6 +56,7 @@ class PostGISSphereDistance(PostGISDistance):
 class PostGISRelate(PostGISFunctionParam):
     "For PostGIS Relate(<geom>, <pattern>) calls."
     pattern_regex = re.compile(r'^[012TF\*]{9}$')
+
     def __init__(self, prefix, pattern):
         if not self.pattern_regex.match(pattern):
             raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
@@ -68,8 +69,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
     postgis = True
     geom_func_prefix = 'ST_'
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = dict([(k, None) for k in
-                             ('Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union')])
+    valid_aggregates = {'Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union'}
 
     Adapter = PostGISAdapter
     Adaptor = Adapter # Backwards-compatibility alias.

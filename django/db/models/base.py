@@ -1022,14 +1022,13 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 # MISC #
 ########
 
-class Empty(object):
-    pass
 
 def simple_class_factory(model, attrs):
     """
     Needed for dynamic classes.
     """
     return model
+
 
 def model_unpickle(model_id, attrs, factory):
     """

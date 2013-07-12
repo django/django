@@ -8,29 +8,29 @@ class DatabaseCreation(BaseDatabaseCreation):
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
-        'AutoField':         'serial',
-        'BinaryField':       'bytea',
-        'BooleanField':      'boolean',
-        'CharField':         'varchar(%(max_length)s)',
+        'AutoField': 'serial',
+        'BinaryField': 'bytea',
+        'BooleanField': 'boolean',
+        'CharField': 'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField':         'date',
-        'DateTimeField':     'timestamp with time zone',
-        'DecimalField':      'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField':         'varchar(%(max_length)s)',
-        'FilePathField':     'varchar(%(max_length)s)',
-        'FloatField':        'double precision',
-        'IntegerField':      'integer',
-        'BigIntegerField':   'bigint',
-        'IPAddressField':    'inet',
+        'DateField': 'date',
+        'DateTimeField': 'timestamp with time zone',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'inet',
         'GenericIPAddressField': 'inet',
-        'NullBooleanField':  'boolean',
-        'OneToOneField':     'integer',
+        'NullBooleanField': 'boolean',
+        'OneToOneField': 'integer',
         'PositiveIntegerField': 'integer CHECK ("%(column)s" >= 0)',
         'PositiveSmallIntegerField': 'smallint CHECK ("%(column)s" >= 0)',
-        'SlugField':         'varchar(%(max_length)s)',
+        'SlugField': 'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
-        'TextField':         'text',
-        'TimeField':         'time',
+        'TextField': 'text',
+        'TimeField': 'time',
     }
 
     def sql_table_creation_suffix(self):
@@ -54,7 +54,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
             def get_index_sql(index_name, opclass=''):
                 return (style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                        style.SQL_TABLE(qn(truncate_name(index_name,self.connection.ops.max_name_length()))) + ' ' +
+                        style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + ' ' +
                         style.SQL_KEYWORD('ON') + ' ' +
                         style.SQL_TABLE(qn(db_table)) + ' ' +
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +

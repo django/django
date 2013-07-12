@@ -3,8 +3,10 @@ Useful auxilliary data structures for query construction. Not useful outside
 the SQL domain.
 """
 
+
 class EmptyResultSet(Exception):
     pass
+
 
 class MultiJoin(Exception):
     """
@@ -17,12 +19,10 @@ class MultiJoin(Exception):
         # The path travelled, this includes the path to the multijoin.
         self.names_with_path = path_with_names
 
+
 class Empty(object):
     pass
 
-class RawValue(object):
-    def __init__(self, value):
-        self.value = value
 
 class Date(object):
     """
@@ -41,6 +41,7 @@ class Date(object):
         else:
             col = self.col
         return connection.ops.date_trunc_sql(self.lookup_type, col), []
+
 
 class DateTime(object):
     """
