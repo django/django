@@ -91,3 +91,17 @@ you can implement this check::
 Database backend specific checks are performed in
 ``DatabaseValidation.check_field`` method. The API of ``DatabaseValidation``
 is not formally stable and may change in future.
+
+Model checking
+==============
+
+It's possible to check Model classes. Note that the framework verifies the
+class, not it's instances. It works exactly the same as field checking except
+you need to use classmethods::
+
+    class MyModel(models.Model):
+        @classmethod
+        def check(cls, **kwargs):
+            errors = super(MyModel, cls).check(**kwargs)
+            # ... your own checking stuff ...
+            return errors
