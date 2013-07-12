@@ -1119,19 +1119,16 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_m2m_through_same_relationship(cls, **kwargs):
-        from django.db import models
         errors = []
         seen_intermediary_signatures = []
 
         fields = cls._meta.local_many_to_many
 
         # Skip when the target model wasn't found.
-        fields = (f for f in fields if f.rel.to in models.get_models() or
-            not isinstance(f.rel.to, six.string_types))
+        fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
 
         # Skip when the relationship model wasn't found.
-        fields = (f for f in fields if f.rel.through is not None and
-            not isinstance(f.rel.through, six.string_types))
+        fields = (f for f in fields if isinstance(f.rel.through, ModelBase))
 
         for f in fields:
             signature = (f.rel.to, cls, f.rel.through)
