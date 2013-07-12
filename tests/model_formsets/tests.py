@@ -32,6 +32,9 @@ class DeletionTests(TestCase):
             'form-0-DELETE': 'on',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
+        formset.save(commit=False)
+        self.assertEqual(Poet.objects.count(), 1)
+
         formset.save()
         self.assertTrue(formset.is_valid())
         self.assertEqual(Poet.objects.count(), 0)
