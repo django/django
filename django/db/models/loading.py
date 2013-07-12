@@ -47,9 +47,6 @@ def _initialize():
         # May contain apps that are not installed.
         app_models=ModelDict(),
 
-        # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors = {},
-
         # Pending lookups for lazy relations
         pending_lookups = {},
 
@@ -233,11 +230,6 @@ class BaseAppCache(object):
         finally:
             imp.release_lock()
 
-    def get_app_errors(self):
-        "Returns the map of known problems with the INSTALLED_APPS."
-        self._populate()
-        return self.app_errors
-
     def get_models(self, app_mod=None,
                    include_auto_created=False, include_deferred=False,
                    only_installed=True, include_swapped=False):
@@ -383,7 +375,6 @@ get_apps = cache.get_apps
 get_app_path = cache.get_app_path
 get_app_paths = cache.get_app_paths
 get_app = cache.get_app
-get_app_errors = cache.get_app_errors
 get_models = cache.get_models
 get_model = cache.get_model
 register_models = cache.register_models
