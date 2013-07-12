@@ -774,6 +774,32 @@ class ClashTests(IsolatedModelsTestCase):
                 obj=Model.rel.field),
         ])
 
+    def test_clash_explicit_related_query_name(self):
+        for target in self.targets():
+            for relative in self.relatives(related_query_name='clash'):
+                self.setUp()
+                self._test_clash_explicit_related_query_name(target, relative)
+                self.tearDown()
+
+    def _test_clash_explicit_related_query_name(self, target, relative):
+        class Another(models.Model):
+            pass
+
+        class Target(models.Model):
+            clash = target
+
+        class Model(models.Model):
+            rel = relative
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Reverse query name for field Model.rel clashes with '
+                'field Target.clash.',
+                hint='Rename field Target.clash or add/change a related_name '
+                'argument to the definition for field Model.rel.',
+                obj=Model.rel.field)
+        ])
+
     def test_clash_between_accessors(self):
         class Target(models.Model):
             pass
