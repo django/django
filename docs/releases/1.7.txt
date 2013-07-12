@@ -94,6 +94,11 @@ Miscellaneous
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
 
+* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`'s no longer
+  delete instances when ``save(commit=False)`` is called. See
+  :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
+  to manually delete objects from deleted forms.
+
 Features deprecated in 1.7
 ==========================
 
