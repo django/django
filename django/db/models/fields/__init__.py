@@ -1334,7 +1334,10 @@ class GenericIPAddressField(Field):
         return value
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.GenericIPAddressField}
+        defaults = {
+            'protocol': self.protocol,
+            'form_class': forms.GenericIPAddressField,
+        }
         defaults.update(kwargs)
         return super(GenericIPAddressField, self).formfield(**defaults)
 
