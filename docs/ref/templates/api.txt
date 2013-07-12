@@ -228,6 +228,15 @@ straight lookups. Here are some things to keep in mind:
   if your variable is not callable (allowing you to access attributes of
   the callable, for example).
 
+Getting the rendering generator
+-------------------------------
+
+As an alternative to rendering a context all-at-once, you can get the string
+generator that renders the context progressively by calling the ``Template``
+object's ``stream()`` method, passing the context as its argument. You can
+then pass the generator to :class:`~django.http.HttpResponse` to get a
+"streaming" effect on your view.
+
 .. _invalid-template-variables:
 
 How invalid variables are handled
@@ -766,6 +775,14 @@ context_instance
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
 suitable for returning directly from a view.
+
+The ``stream()`` shortcut
+=========================
+
+This shortcut is like :func:`render_to_string` but instead of returning
+the whole rendered text of the template, this shortcut returns a generator
+that successively renders parts of the template. See
+:func:`~django.shortcuts.stream_to_response()` for an example of its usage.
 
 Configuring the template system in standalone mode
 ==================================================

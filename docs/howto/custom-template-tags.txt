@@ -1225,3 +1225,25 @@ For more examples of complex rendering, see the source code for
 :ttag:`{% if %}<if>`, :ttag:`{% for %}<for>`, :ttag:`{% ifequal %}<ifequal>`
 or :ttag:`{% ifchanged %}<ifchanged>`. They live in
 ``django/template/defaulttags.py``.
+
+
+Streaming support
+~~~~~~~~~~~~~~~~~
+
+Simple tags do not need to worry about streaming support. But if your custom
+tag is a more complex one with a "begin" and "end" tag, you want the tag to 
+be able to progressively render its contents. You can define your own 
+``stream()`` method for a custom tag. The ``stream()`` method takes the same
+arguments as ``render()`` but instead of returning string, it needs to return
+a string generator.
+
+As an example, the ``stream()`` method for the ``{% upper %}`` tag above will
+look like this::
+
+    def stream(self, context):
+        for chunk in self.nodelist.stream(context):
+            yield chunk.upper()
+
+If you define ``stream()`` in your custom template tag, you can define its
+``render()`` method as ``''.join(self.stream(context))`` to avoid duplicate
+code.

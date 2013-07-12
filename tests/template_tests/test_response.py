@@ -9,6 +9,7 @@ from django.test import RequestFactory, TestCase
 from django.conf import settings
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
+                                      StreamingTemplateResponse, SimpleStreamingTemplateResponse,
                                       ContentNotRenderedError)
 from django.test.utils import override_settings
 from django.utils._os import upath
@@ -295,6 +296,53 @@ class TemplateResponseTest(TestCase):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
         repickled_response = pickle.dumps(unpickled_response)
+
+
+@override_settings(
+    TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(upath(__file__)), 'templates')),
+)
+class StreamingTemplateResponseTest(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _response(self, template='foo', *args, **kwargs):
+        return StreamingTemplateResponse(self.factory.get('/'), Template(template),
+                                *args, **kwargs)
+
+    def test_stream(self):
+        response = self._response('{{ foo }}{{ processors }}')
+        self.assertEqual(''.join(response.streaming_content), b'yes')
+
+    def test_stream_with_requestcontext(self):
+        response = self._response('{{ foo }}{{ processors }}',
+                                  {'foo': 'bar'})
+        self.assertEqual(''.join(response.streaming_content), b'baryes')
+
+    def test_stream_with_context(self):
+        response = self._response('{{ foo }}{{ processors }}',
+                                  Context({'foo': 'bar'}))
+        self.assertEqual(''.join(response.streaming_content), b'bar')
+
+    def test_kwargs(self):
+        response = self._response(content_type='application/json',
+                                  status=504)
+        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.status_code, 504)
+
+    def test_args(self):
+        response = StreamingTemplateResponse(self.factory.get('/'), '', {},
+                                    'application/json', 504)
+        self.assertEqual(response['content-type'], 'application/json')
+        self.assertEqual(response.status_code, 504)
+
+    def test_custom_app(self):
+        response = self._response('{{ foo }}', current_app="foobar")
+
+        rc = response.resolve_context(response.context_data)
+
+        self.assertEqual(rc.current_app, 'foobar')
 
 
 class CustomURLConfTest(TestCase):

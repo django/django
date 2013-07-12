@@ -554,6 +554,9 @@ class TemplateTests(TransRealMixin, TestCase):
                         continue
                     if output != result:
                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, output))
+                    streamed_output = self.stream_to_string(test_template, vals)
+                    if streamed_output != result:
+                        failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Streamed output expected %r, got %r" % (is_cached, invalid_str, template_debug, name, result, streamed_output))
                 cache_loader.reset()
 
             if 'LANGUAGE_CODE' in vals[1]:
@@ -576,6 +579,17 @@ class TemplateTests(TransRealMixin, TestCase):
         context = template.Context(vals[1])
         before_stack_size = len(context.dicts)
         output = test_template.render(context)
+        if len(context.dicts) != before_stack_size:
+            raise ContextStackException
+        return output
+
+    def stream_to_string(self, test_template, vals):
+        context = template.Context(vals[1])
+        before_stack_size = len(context.dicts)
+        stream = test_template.stream(context)
+        if len(context.dicts) != before_stack_size:
+            raise ContextStackException
+        output = ''.join(stream)
         if len(context.dicts) != before_stack_size:
             raise ContextStackException
         return output

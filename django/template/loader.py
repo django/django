@@ -30,6 +30,7 @@ from django.template.base import Origin, Template, Context, TemplateDoesNotExist
 from django.conf import settings
 from django.utils.module_loading import import_by_path
 from django.utils import six
+from copy import copy
 
 template_source_loaders = None
 
@@ -155,18 +156,28 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
     get_template, or it may be a tuple to use select_template to find one of
     the templates in the list. Returns a string.
     """
+    return ''.join(stream(template_name, dictionary, context_instance))
+
+
+def stream(template_name, dictionary=None, context_instance=None):
+    """
+    Loads the given template_name and streams it with the given dictionary as
+    context. The template_name may be a string to load a single template using
+    get_template, or it may be a tuple to use select_template to find one of
+    the templates in the list. Returns a string generator.
+    """
     dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
         t = select_template(template_name)
     else:
         t = get_template(template_name)
     if not context_instance:
-        return t.render(Context(dictionary))
+        return t.stream(Context(dictionary))
     # Add the dictionary to the context stack, ensuring it gets removed again
     # to keep the context_instance in the same state it started in.
     context_instance.update(dictionary)
     try:
-        return t.render(context_instance)
+        return t.stream(copy(context_instance))
     finally:
         context_instance.pop()
 

@@ -87,6 +87,13 @@ This example is equivalent to::
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
 
+``stream``
+==========
+
+.. function:: stream(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app])
+
+   This function is the same as :func:`render()`, but uses a generator in the 
+   :class:`~django.http.HttpResponse` object to progressively render text.
 
 ``render_to_response``
 ======================
@@ -158,6 +165,30 @@ This example is equivalent to::
         c = Context({'foo': 'bar'})
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
+
+``stream_to_response``
+======================
+
+.. function:: stream_to_response(template[, dictionary][, context_instance][, mimetype])
+
+   The ``stream_to_response`` shortcut is the same as
+   :func:`render_to_response`, except that ``stream_to_response`` returns an
+   :class:`~django.http.HttpResponse` object that gradually renders the
+   template, while ``render_to_response`` waits for the whole template to be
+   rendered before putting it into the response.
+
+   This is useful if something inside the template takes a long time to
+   render. For example, if the template contains the following code::
+
+    {% for item in warehouse %}
+        Current value: {{ item.calculate_depreciation }}
+    {% endfor %}
+
+   If there are 100 items in warehouse and ``calculate_depreciation()`` takes
+   0.5 seconds to complete, ``render_to_response`` will need 50 seconds to
+   render all items before returning a response, while ``stream_to_response``
+   will immediately return a response that renders one item every half
+   second.
 
 ``redirect``
 ============

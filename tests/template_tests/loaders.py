@@ -119,6 +119,7 @@ class CachedLoader(unittest.TestCase):
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
+        self.assertNotEqual(''.join(t1.stream(Context({}))), ''.join(t2.stream(Context({}))))
 
 class RenderToStringTest(unittest.TestCase):
 
@@ -138,6 +139,13 @@ class RenderToStringTest(unittest.TestCase):
         self.assertEqual(loader.render_to_string('test_context.html',
                                                  {'obj': 'test'}), 'obj:test')
 
+    def test_basic_stream(self):
+        self.assertEqual(list(loader.stream('test_context.html')), ['obj:', ''])
+
+    def test_basic_context_stream(self):
+        self.assertEqual(list(loader.stream('test_context.html',
+                                                 {'obj': 'test'})), ['obj:', 'test'])
+
     def test_existing_context_kept_clean(self):
         context = Context({'obj': 'before'})
         output = loader.render_to_string('test_context.html', {'obj': 'after'},
@@ -150,6 +158,17 @@ class RenderToStringTest(unittest.TestCase):
                                 'No template names provided$',
                                 loader.render_to_string, [])
 
+    def test_existing_context_kept_clean_stream(self):
+        context = Context({'obj': 'before'})
+        output = loader.stream('test_context.html', {'obj': 'after'},
+                                         context_instance=context)
+        self.assertEqual(list(output), ['obj:', 'after'])
+        self.assertEqual(context['obj'], 'before')
+
+    def test_empty_list_stream(self):
+        six.assertRaisesRegex(self, TemplateDoesNotExist,
+                                'No template names provided$',
+                                loader.stream, [])
 
     def test_select_templates_from_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
