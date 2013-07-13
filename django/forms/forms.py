@@ -77,7 +77,7 @@ class BaseForm(object):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
+                 initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
@@ -86,7 +86,8 @@ class BaseForm(object):
         self.prefix = prefix
         self.initial = initial or {}
         self.error_class = error_class
-        self.label_suffix = label_suffix
+        # Translators: This is the default suffix added to form field labels
+        self.label_suffix = label_suffix if label_suffix is not None else _(':')
         self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
         self._changed_data = None
@@ -518,7 +519,9 @@ class BoundField(object):
         """
         contents = contents or self.label
         # Only add the suffix if the label does not end in punctuation.
-        if self.form.label_suffix and contents and contents[-1] not in ':?.!':
+        # Translators: If found as last label character, these punctuation
+        # characters will prevent the default label_suffix to be appended to the label
+        if self.form.label_suffix and contents and contents[-1] not in _(':?.!'):
             contents = format_html('{0}{1}', contents, self.form.label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
