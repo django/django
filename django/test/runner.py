@@ -272,15 +272,16 @@ def setup_databases(verbosity, interactive, **kwargs):
         test_databases.items(), dependencies):
         test_db_name = None
         # Actually create the database for the first connection
-
         for alias in aliases:
             connection = connections[alias]
-            old_names.append((connection, db_name, True))
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
                         verbosity, autoclobber=not interactive)
+                destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name
+                destroy = False
+            old_names.append((connection, db_name, destroy))
 
     for alias, mirror_alias in mirrored_aliases.items():
         mirrors.append((alias, connections[alias].settings_dict['NAME']))
