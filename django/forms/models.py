@@ -292,7 +292,7 @@ class ModelFormMetaclass(type):
 
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
+                 initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, instance=None):
         opts = self._meta
         if opts.model is None:
