@@ -5,7 +5,6 @@ these implementations if necessary.
 """
 
 import collections
-import sys
 
 
 def is_iterable(x):
@@ -18,12 +17,5 @@ def is_iterable(x):
         return True
 
 def is_iterator(x):
-    """An implementation independent way of checking for iterators
-
-    Python 2.6 has a different implementation of collections.Iterator which
-    accepts anything with a `next` method. 2.7+ requires and `__iter__` method
-    as well.
-    """
-    if sys.version_info >= (2, 7):
-        return isinstance(x, collections.Iterator)
+    "An implementation independent way of checking for iterators"
     return isinstance(x, collections.Iterator) and hasattr(x, '__iter__')
