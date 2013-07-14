@@ -318,7 +318,7 @@ If you have an authenticated user you want to attach to the current session
     which authentication backend successfully authenticated that user (see the
     :ref:`backends documentation <authentication-backends>` for details), and
     this information is needed later during the login process. An error will be
-    raise if you try to login a user object retrieved from the database
+    raised if you try to login a user object retrieved from the database
     directly.
 
 How to log a user out
