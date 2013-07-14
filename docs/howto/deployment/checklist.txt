@@ -217,9 +217,9 @@ This setting is required if you're using the :ttag:`ssi` template tag.
 Python Options
 ==============
 
-If you're using Python 2.6.8+, it's strongly recommended that you invoke the
-Python process running your Django application using the `-R`_ option or with
-the :envvar:`PYTHONHASHSEED` environment variable set to ``random``.
+It's strongly recommended that you invoke the Python process running your
+Django application using the `-R`_ option or with the
+:envvar:`PYTHONHASHSEED` environment variable set to ``random``.
 
 These options help protect your site from denial-of-service (DoS)
 attacks triggered by carefully crafted inputs. Such an attack can

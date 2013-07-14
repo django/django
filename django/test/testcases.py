@@ -8,7 +8,6 @@ import json
 import os
 import re
 import sys
-import select
 import socket
 import threading
 import unittest
@@ -924,104 +923,6 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-if sys.version_info >= (3, 3, 0):
-    _ImprovedEvent = threading.Event
-elif sys.version_info >= (2, 7, 0):
-    _ImprovedEvent = threading._Event
-else:
-    class _ImprovedEvent(threading._Event):
-        """
-        Does the same as `threading.Event` except it overrides the wait() method
-        with some code borrowed from Python 2.7 to return the set state of the
-        event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
-        to know whether the wait() method exited normally or because of the
-        timeout. This class can be removed when Django supports only Python >= 2.7.
-        """
-
-        def wait(self, timeout=None):
-            self._Event__cond.acquire()
-            try:
-                if not self._Event__flag:
-                    self._Event__cond.wait(timeout)
-                return self._Event__flag
-            finally:
-                self._Event__cond.release()
-
-
-class StoppableWSGIServer(WSGIServer):
-    """
-    The code in this class is borrowed from the `SocketServer.BaseServer` class
-    in Python 2.6. The important functionality here is that the server is non-
-    blocking and that it can be shut down at any moment. This is made possible
-    by the server regularly polling the socket and checking if it has been
-    asked to stop.
-    Note for the future: Once Django stops supporting Python 2.6, this class
-    can be removed as `WSGIServer` will have this ability to shutdown on
-    demand and will not require the use of the _ImprovedEvent class whose code
-    is borrowed from Python 2.7.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(StoppableWSGIServer, self).__init__(*args, **kwargs)
-        self.__is_shut_down = _ImprovedEvent()
-        self.__serving = False
-
-    def serve_forever(self, poll_interval=0.5):
-        """
-        Handle one request at a time until shutdown.
-
-        Polls for shutdown every poll_interval seconds.
-        """
-        self.__serving = True
-        self.__is_shut_down.clear()
-        while self.__serving:
-            r, w, e = select.select([self], [], [], poll_interval)
-            if r:
-                self._handle_request_noblock()
-        self.__is_shut_down.set()
-
-    def shutdown(self):
-        """
-        Stops the serve_forever loop.
-
-        Blocks until the loop has finished. This must be called while
-        serve_forever() is running in another thread, or it will
-        deadlock.
-        """
-        self.__serving = False
-        if not self.__is_shut_down.wait(2):
-            raise RuntimeError(
-                "Failed to shutdown the live test server in 2 seconds. The "
-                "server might be stuck or generating a slow response.")
-
-    def handle_request(self):
-        """Handle one request, possibly blocking.
-        """
-        fd_sets = select.select([self], [], [], None)
-        if not fd_sets[0]:
-            return
-        self._handle_request_noblock()
-
-    def _handle_request_noblock(self):
-        """
-        Handle one request, without blocking.
-
-        I assume that select.select has returned that the socket is
-        readable before this function was called, so there should be
-        no risk of blocking in get_request().
-        """
-        try:
-            request, client_address = self.get_request()
-        except socket.error:
-            return
-        if self.verify_request(request, client_address):
-            try:
-                self.process_request(request, client_address)
-            except Exception:
-                self.handle_error(request, client_address)
-                self.close_request(request)
-
-
 class _MediaFilesHandler(StaticFilesHandler):
     """
     Handler for serving the media files. This is a private class that is
@@ -1071,7 +972,7 @@ class LiveServerThread(threading.Thread):
             # one that is free to use for the WSGI server.
             for index, port in enumerate(self.possible_ports):
                 try:
-                    self.httpd = StoppableWSGIServer(
+                    self.httpd = WSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
                 except WSGIServerException as e:
                     if (index + 1 < len(self.possible_ports) and
