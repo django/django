@@ -19,6 +19,9 @@ classmethod (in case of models) or a function (in case of an app). It receives
 Errors and warnings
 ===================
 
+.. class:: Error(msg, hint, obj=None)
+.. class:: Warning(msg, hint, obj=None)
+
 ``django.core.checks`` defines two classes: ``Error`` and ``Warning``. Both
 have the same interface, they differ only in their meaning. When an Error
 occures, Django stops everything and doesn't allow to i. e. run a server.
@@ -48,6 +51,8 @@ Errors and Warnings are comparable. That allows you to easily write tests::
     errors = checked_object.check()
     expected_errors = [Error('an error', hint=None, obj=checked_object)]
     self.assertEqual(errors, expected_errors)
+
+.. _field-checking:
 
 Field checking
 ==============
@@ -91,6 +96,13 @@ you can implement this check::
 Database backend specific checks are performed in
 ``DatabaseValidation.check_field`` method. The API of ``DatabaseValidation``
 is not formally stable and may change in future.
+
+Manager checking
+================
+
+Manager checking is very similar to :ref:`field checking <field-checking>`.
+The only difference is that your class needs to inherit from
+``models.Manager``.
 
 Model checking
 ==============

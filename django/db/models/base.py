@@ -1016,6 +1016,7 @@ class Model(six.with_metaclass(ModelBase)):
     def check(cls, **kwargs):
         errors = []
         errors.extend(cls._check_swappable(**kwargs))
+        errors.extend(cls._check_managers(**kwargs))
         if not cls._meta.swapped:
             errors.extend(cls._check_user_model(**kwargs))
             errors.extend(cls._check_fields(**kwargs))
@@ -1054,6 +1055,15 @@ class Model(six.with_metaclass(ModelBase)):
                         'contain the "%(app_label)s" app?' % locals(),
                         obj=cls)]
         return []
+
+    @classmethod
+    def _check_managers(cls, **kwargs):
+        #import ipdb; ipdb.set_trace()
+        errors = []
+        managers = cls._meta.concrete_managers + cls._meta.abstract_managers
+        for (_, _, manager) in managers:
+            errors.extend(manager.check(**kwargs))
+        return errors
 
     @classmethod
     def _check_user_model(cls, **kwargs):

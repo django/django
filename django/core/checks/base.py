@@ -32,6 +32,15 @@ class BaseCheckError(object):
             model = self.obj
             app = model._meta.app_label
             result += '%s.%s: ' % (app, model._meta.object_name)
+        elif isinstance(self.obj, models.Manager):
+            model = self.obj.model
+            model_name = model._meta.object_name
+            opts = model._meta
+            app = model._meta.app_label
+            manager_name = next(name for (_, name, manager)
+                in opts.concrete_managers + opts.abstract_managers
+                if manager == self.obj)
+            result += '%s.%s.%s: ' % (app, model_name, manager_name)
         else:
             result += '?: '
         result += self.msg

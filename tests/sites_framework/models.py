@@ -27,12 +27,3 @@ class CustomArticle(AbstractArticle):
 
     objects = models.Manager()
     on_site = CurrentSiteManager("places_this_article_should_appear")
-
-class InvalidArticle(AbstractArticle):
-    site = models.ForeignKey(Site)
-
-    objects = models.Manager()
-    on_site = CurrentSiteManager("places_this_article_should_appear")
-
-class ConfusedArticle(AbstractArticle):
-    site = models.IntegerField()

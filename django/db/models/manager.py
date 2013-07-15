@@ -171,6 +171,9 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
 
 Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
 
+    def check(self, **kwargs):
+        return []
+
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
