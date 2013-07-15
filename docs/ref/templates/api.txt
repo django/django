@@ -2,6 +2,9 @@
 The Django template language: For Python programmers
 ====================================================
 
+.. module:: django.template
+    :synopsis: Django's template system
+
 This document explains the Django template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
 reference on the language syntax, see :doc:`/topics/templates`.
@@ -52,7 +55,7 @@ from the context and executing all block tags.
 Using the template system
 =========================
 
-.. class:: django.template.Template
+.. class:: Template
 
 Using the template system in Python is a two-step process:
 
@@ -279,7 +282,7 @@ these variables resolve to the corresponding Python objects.
 Playing with Context objects
 ----------------------------
 
-.. class:: django.template.Context
+.. class:: Context
 
 Most of the time, you'll instantiate ``Context`` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
@@ -296,9 +299,9 @@ dictionary syntax::
     >>> c['newvariable']
     'hello'
 
-.. method:: pop()
-.. method:: push()
-.. exception:: django.template.ContextPopException
+.. method:: Context.pop()
+.. method:: Context.push()
+.. exception:: ContextPopException
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
@@ -347,7 +350,7 @@ you'll see below.
 Subclassing Context: RequestContext
 -----------------------------------
 
-.. class:: django.template.RequestContext
+.. class:: RequestContext
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently than the
@@ -443,6 +446,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   ``django.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
+.. currentmodule:: django.core.context_processors
+
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -479,7 +484,7 @@ value of the :setting:`MEDIA_URL` setting.
 django.core.context_processors.static
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: django.core.context_processors.static
+.. function:: static
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``STATIC_URL``, providing the
