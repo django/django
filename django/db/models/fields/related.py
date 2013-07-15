@@ -1039,7 +1039,8 @@ class ForeignObject(RelatedField):
         """
         opts = self.model._meta
         from_opts = self.rel.to._meta
-        pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
+        fields = opts.pk.resolve_basic_fields()
+        pathinfos = [PathInfo(from_opts, opts, fields, self.rel, not self.unique, False)]
         return pathinfos
 
     def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
@@ -1191,7 +1192,8 @@ class ForeignKey(ForeignObject):
         """
         opts = self.model._meta
         from_opts = self.rel.to._meta
-        pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
+        fields = opts.pk.resolve_basic_fields()
+        pathinfos = [PathInfo(from_opts, opts, fields, self.rel, not self.unique, False)]
         return pathinfos
 
     def validate(self, value, model_instance):
