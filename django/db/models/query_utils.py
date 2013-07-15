@@ -169,7 +169,10 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
     if not restricted and field.null:
         return False
     if load_fields:
-        if field.name not in load_fields:
+        # TODO: This check will need to be fixed to check for all basic
+        # fields instead of an attname once multi-column fields are
+        # implemented.
+        if field.attname not in load_fields:
             if restricted and field.name in requested:
                 raise InvalidQuery("Field %s.%s cannot be both deferred"
                                    " and traversed using select_related"
