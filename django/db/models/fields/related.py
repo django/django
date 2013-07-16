@@ -1279,6 +1279,7 @@ class ForeignKey(ForeignObject):
             signals.field_prepared.connect(delayed_aux_field_creation,
                                            sender=field,
                                            weak=False)
+            return
         to_add = field.clone_for_foreignkey(
             name, self.null,
             self.creation_counter, self.creation_counter + 1,

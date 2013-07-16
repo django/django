@@ -188,6 +188,8 @@ class Options(object):
         The Options class holds all kinds of field caches for various
         purposes. These have to be cleared each time a new field is added
         to the model or a new base class is processed.
+
+        Caches have to be cleared recursively in all subclasses as well.
         """
         self.clear_field_caches()
         self.clear_m2m_caches()
@@ -212,16 +214,23 @@ class Options(object):
                 del self.local_concrete_fields
             except AttributeError:
                 pass
-        self.clear_global_field_caches()
+        self.clear_global_field_caches(recurse_subclasses=False)
+        for submodel in self.model.__subclasses__():
+            submodel._meta.clear_field_caches()
 
     def clear_m2m_caches(self):
         if hasattr(self, '_m2m_cache'):
             del self._m2m_cache
-        self.clear_global_field_caches()
+        self.clear_global_field_caches(recurse_subclasses=False)
+        for submodel in self.model.__subclasses__():
+            submodel._meta.clear_m2m_caches()
 
-    def clear_global_field_caches(self):
+    def clear_global_field_caches(self, recurse_subclasses=False):
         if hasattr(self, '_name_map'):
             del self._name_map
+        if recurse_subclasses:
+            for submodel in self.model.__subclasses__():
+                submodel._meta.clear_global_field_caches()
 
     def pk_indexes(self):
         """

@@ -363,7 +363,6 @@ class Model(six.with_metaclass(ModelBase)):
         # keywords, or default.
 
         for field in fields_iter:
-            is_related_object = False
             # This slightly odd construct is so that we can access any
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
@@ -383,7 +382,7 @@ class Model(six.with_metaclass(ModelBase)):
                             # Object instance wasn't passed in -- must be an ID.
                             val = kwargs.pop(field.attname)
                         except KeyError:
-                            val = field.get_default()
+                            val = field.auxiliary_to.get_default()
                 else:
                     try:
                         val = kwargs.pop(field.attname)
