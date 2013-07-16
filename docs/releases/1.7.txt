@@ -116,3 +116,12 @@ on all Python versions. Since ``unittest2`` became the standard library's
 :mod:`unittest` module in Python 2.7, and Django 1.7 drops support for older
 Python versions, this module isn't useful anymore. It has been deprecated. Use
 :mod:`unittest` instead.
+
+Custom SQL location for models package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if models were organized in a package (``myapp/models/``) rather
+than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
+<initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
+will search ``myapp/sql/`` as documented. The old location will continue to
+work until Django 1.9.
