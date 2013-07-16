@@ -14,6 +14,19 @@ deprecation process for some features`_.
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
 
+Python compatibility
+====================
+
+Django 1.7 requires Python 2.7 or above, though we **highly recommend**
+the latest minor release. Support for Python 2.6 has been dropped.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.7 or newer as their default
+version. If you're still using Python 2.6, however, you'll need to stick to
+Django 1.6 until you can upgrade your Python version. Per :doc:`our support
+policy </internals/release-process>`, Django 1.6 will continue to receive
+security support until the release of Django 1.8.
+
 What's new in Django 1.7
 ========================
 

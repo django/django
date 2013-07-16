@@ -2148,13 +2148,6 @@ class ConditionalTests(BaseQuerysetTest):
         t4 = Tag.objects.create(name='t4', parent=t3)
         t5 = Tag.objects.create(name='t5', parent=t3)
 
-
-    # In Python 2.6 beta releases, exceptions raised in __len__ are swallowed
-    # (Python issue 1242657), so these cases return an empty list, rather than
-    # raising an exception. Not a lot we can do about that, unfortunately, due to
-    # the way Python handles list() calls internally. Thus, we skip the tests for
-    # Python 2.6.
-    @unittest.skipIf(sys.version_info[:2] == (2, 6), "Python version is 2.6")
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
         # default ordering on foreign keys in a cycle. We detect that.
