@@ -60,6 +60,13 @@ Minor features
 * :attr:`~django.db.models.Options.app_label` is no longer required for models
   that are defined in a ``models`` package within an app.
 
+* The :meth:`Context.push() <django.template.Context.push>` method now returns
+  a context manager which automatically calls :meth:`pop()
+  <django.template.Context.pop>` upon exiting the ``with`` statement.
+  Additionally, :meth:`push() <django.template.Context.push>` now accepts
+  parameters that are passed to the ``dict`` constructor used to build the new
+  context level.
+
 Backwards incompatible changes in 1.7
 =====================================
 
