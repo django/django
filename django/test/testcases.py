@@ -924,7 +924,7 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _MediaFilesHandler(StaticFilesHandler):
+class _MediaFilesHandler(FSFilesHandler):
     """
     Handler for serving the media files. This is a private class that is
     meant to be used solely as a convenience by LiveServerThread.
@@ -953,22 +953,7 @@ class _StaticFilesHandler(FSFilesHandler):
         return settings.STATIC_ROOT
 
     def get_base_url(self):
-        self.check_settings()
         return settings.STATIC_URL
-
-    def check_settings(self):
-        base_url = settings.STATIC_URL
-        if not base_url:
-            raise ImproperlyConfigured(
-                "You're using the staticfiles app "
-                "without having set the required STATIC_URL setting.")
-        if settings.MEDIA_URL == base_url:
-            raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
-                                    "settings must have different values")
-        if (settings.MEDIA_ROOT and settings.STATIC_ROOT and
-                settings.MEDIA_ROOT == settings.STATIC_ROOT):
-            raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
-                                    "settings must have different values")
 
     def serve(self, request):
         path = self.file_path(request.path)

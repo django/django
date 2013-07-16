@@ -82,13 +82,6 @@ class LiveServerAddress(LiveServerBase):
         cls.raises_exception('localhost:8081-blah', ImproperlyConfigured)
         cls.raises_exception('localhost:8081-8082-8083', ImproperlyConfigured)
 
-        # If contrib.staticfiles isn't configured properly, the exception
-        # should bubble up to the main thread.
-        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
-        TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception('localhost:8081', ImproperlyConfigured)
-        TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
         # Restore original environment variable
         if address_predefined:
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
