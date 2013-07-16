@@ -1700,13 +1700,24 @@ class Query(object):
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
-                cur_model = opts.get_field_by_name(name)[0].rel.to
+                field = opts.get_field_by_name(name)[0]
+                try:
+                    cur_model = field.rel.to
+                except AttributeError:
+                    # We're crossing a reverse relation, therefore field
+                    # is a RelatedObject which does not have a `rel`
+                    # attribute.
+                    cur_model = field.parent_model
                 opts = cur_model._meta
             field, model, _, _ = opts.get_field_by_name(parts[-1])
             prefix = LOOKUP_SEP.join(parts[:-1])
             if prefix:
                 prefix = prefix + LOOKUP_SEP
-            resolved.update(prefix + f.name for f in field.resolve_basic_fields())
+            try:
+                resolved.update(prefix + f.name for f in field.resolve_basic_fields())
+            except AttributeError:
+                # In case of a reverse relation, leave it as it is.
+                resolved.add(field_name)
         return resolved
 
     def add_deferred_loading(self, field_names):
