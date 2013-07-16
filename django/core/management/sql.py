@@ -168,7 +168,14 @@ def _split_statements(content):
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(models.get_app(model._meta.app_label).__file__)), 'sql'))
+    app = models.get_app(model._meta.app_label)
+    if hasattr(app, '__path__'):
+        # models may be a module
+        app_dir = app.__path__[0]
+    else:
+        app_dir = app.__file__
+
+    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(app_dir)), 'sql'))
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.

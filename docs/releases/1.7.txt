@@ -86,6 +86,12 @@ Miscellaneous
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
 
+* Previously, if models were organized in a directory (``myapp/models/``)
+  rather than simply ``myapp/models.py``, Django would look for
+  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. This bug has
+  been fixed so that Django will search ``myapp/sql/`` as documented. You'll
+  want to move your ``sql`` directory if you've been working around this bug.
+
 Features deprecated in 1.7
 ==========================
 
