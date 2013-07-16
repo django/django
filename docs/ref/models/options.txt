@@ -24,11 +24,16 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of the standard :file:`models.py` (for instance,
-    if the app's models are in submodules of ``myapp.models``), the model must
-    define which app it is part of::
+    If a model exists outside of the standard locations (:file:`models.py` or
+    a ``models`` package in an app), the model must define which app it is part
+    of::
 
         app_label = 'myapp'
+
+    .. versionadded:: 1.7
+
+        ``app_label`` is no longer required for models that are defined
+        in a ``models`` package within an app.
 
 ``db_table``
 ------------

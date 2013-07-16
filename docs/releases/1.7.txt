@@ -57,6 +57,9 @@ Minor features
 * The :meth:`QuerySet.update_or_create()
   <django.db.models.query.QuerySet.update_or_create>` method was added.
 
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
+
 Backwards incompatible changes in 1.7
 =====================================
 
