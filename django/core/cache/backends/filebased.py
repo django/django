@@ -1,8 +1,8 @@
 "File-based cache backend"
-
 import hashlib
 import os
 import shutil
+import tempfile
 import time
 try:
     from django.utils.six.moves import cPickle as pickle
@@ -14,6 +14,8 @@ from django.utils.encoding import force_bytes
 
 
 class FileBasedCache(BaseCache):
+    _tmp_suffix = '.__djcache'
+
     def __init__(self, dir, params):
         BaseCache.__init__(self, params)
         self._dir = dir
@@ -55,15 +57,31 @@ class FileBasedCache(BaseCache):
             timeout = self.default_timeout
 
         self._cull()
-
         try:
             if not os.path.exists(dirname):
-                os.makedirs(dirname)
+                try:
+                    os.makedirs(dirname)
+                except OSError:
+                    # This can happen when two cache keys that point to the
+                    # same directory are added at the same time.
+                    pass
 
-            with open(fname, 'wb') as f:
+            fd, tmp_fname = tempfile.mkstemp(suffix=self._tmp_suffix,
+                                             dir=dirname)
+            renamed = False
+            try:
                 expiry = None if timeout is None else time.time() + timeout
-                pickle.dump(expiry, f, pickle.HIGHEST_PROTOCOL)
-                pickle.dump(value, f, pickle.HIGHEST_PROTOCOL)
+                os.write(fd, pickle.dumps(expiry, pickle.HIGHEST_PROTOCOL))
+                os.write(fd, pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+                # This will atomically rename the file (os.rename) if the OS
+                # supports it. Otherwise this will result in a shutil.copy2
+                # and os.unlink (for example on Windows).
+                shutil.move(tmp_fname, fname)
+                renamed = True
+            finally:
+                os.close(fd)
+                if not renamed:
+                    os.unlink(tmp_fname)
         except (IOError, OSError):
             pass
 
