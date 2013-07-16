@@ -223,11 +223,13 @@ class Options(object):
         if hasattr(self, '_name_map'):
             del self._name_map
 
-    def pk_index(self):
+    def pk_indexes(self):
         """
-        Returns the index of the primary key field in the self.fields list.
+        Returns the indexes of the basic fields backing the primary key in
+        the self.concrete_fields list.
         """
-        return self.fields.index(self.pk)
+        return [self.concrete_fields.index(basic)
+                for basic in self.pk.resolve_basic_fields()]
 
     def setup_proxy(self, target):
         """
