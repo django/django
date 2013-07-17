@@ -93,6 +93,6 @@ Example ini configuration file usage::
     uwsgi --ini uwsgi.ini
 
 See the uWSGI docs on `managing the uWSGI process`_ for information on
-starting, stoping and reloading the uWSGI workers.
+starting, stopping and reloading the uWSGI workers.
 
 .. _managing the uWSGI process: http://projects.unbit.it/uwsgi/wiki/Management
