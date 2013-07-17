@@ -1,5 +1,6 @@
 import datetime
 import time
+from types import MethodType
 
 from django.db.utils import DatabaseError, ProgrammingError
 
@@ -12,6 +13,7 @@ from contextlib import contextmanager
 from importlib import import_module
 
 from django.conf import settings
+from django.core import checks
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.db.backends import utils
@@ -1404,6 +1406,19 @@ class BaseDatabaseValidation(object):
     def __init__(self, connection):
         self.connection = connection
 
+    def validate_field(self, errors, opts, f):
+        """ By default, there is no backend-specific validation. This method
+        is deprecated. Use `check_field` instead."""
+        pass
+
     def check_field(self, field, **kwargs):
-        "By default, there is no backend-specific validation."
-        return []
+        class ErrorList(list):
+            def add(self, opts, error_message):
+                self.append(checks.Error(error_message, hint=None, obj=field))
+
+        errors = ErrorList()
+        # Some tests create fields in isolation -- the fields are not attached
+        # to any model, so they have no `model` attribute.
+        opts = field.model._meta if hasattr(field, 'model') else None
+        self.validate_field(errors, field, opts)
+        return list(errors)

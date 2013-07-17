@@ -9,6 +9,8 @@ class DatabaseValidation(BaseDatabaseValidation):
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
         """
+        errors = super(DatabaseValidation, self).check_field(field, **kwargs)
+
         from django.db import models
         varchar_fields = (
             models.CharField,
@@ -17,12 +19,12 @@ class DatabaseValidation(BaseDatabaseValidation):
         )
         if (isinstance(field, varchar_fields) and field.unique
             and (field.max_length is None or int(field.max_length) > 255)):
-            return [checks.Error(
+            errors.append(checks.Error(
                 '"max_length" greated than 255 when using "unique=True" '
                 'under MySQL.\n'
                 'The field cannot have a "max_length" greated than 255 '
                 'when it is unique.',
                 hint='Set unique=False or set max_length to 255 or less.',
                 obj=field,
-            )]
-        return []
+            ))
+        return errors
