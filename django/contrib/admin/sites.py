@@ -49,7 +49,7 @@ class AdminSite(object):
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
 
-    def register(self, model_or_iterable, admin_class=None, **options):
+    def register(self, model_or_iterable, admin_class=None, order_sequence=None, **options):
         """
         Registers the given model(s) with the given admin class.
 
@@ -62,6 +62,9 @@ class AdminSite(object):
         If a model is already registered, this will raise AlreadyRegistered.
 
         If a model is abstract, this will raise ImproperlyConfigured.
+
+        If all models in one app has been specified the order_sequence, e.g., 1, 2...
+        then the admin/app index page will display the models with the order_sequence
         """
         if not admin_class:
             admin_class = ModelAdmin
@@ -90,6 +93,11 @@ class AdminSite(object):
 
                 if admin_class is not ModelAdmin and settings.DEBUG:
                     admin_class.validate(model)
+
+                # Set the `order_sequence` property to it's model
+                if not isinstance(order_sequence, int):
+                    order_sequence = None
+                setattr(model, 'order_sequence', order_sequence)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
@@ -329,6 +337,24 @@ class AdminSite(object):
         }
         return login(request, **defaults)
 
+
+    def _sort_app_models(self, app_models):
+        """
+        If all this app's models have a valid `order_sequence`, (Int)
+        Then sort app_models by `order_sequence`, else by `name`
+        """
+        order_by_custom_sequence = True
+        for m in app_models:
+            if 'order_sequence' not in m or m['order_sequence'] is None:
+                order_by_custom_sequence = False
+                break
+
+        if order_by_custom_sequence:
+            app_models.sort(key=lambda x: x['order_sequence'])
+        else:
+            app_models.sort(key=lambda x: x['name'])
+
+
     @never_cache
     def index(self, request, extra_context=None):
         """
@@ -351,6 +377,7 @@ class AdminSite(object):
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
                         'object_name': model._meta.object_name,
+                        'order_sequence': getattr(model, 'order_sequence', None),
                         'perms': perms,
                     }
                     if perms.get('change', False):
@@ -378,9 +405,9 @@ class AdminSite(object):
         app_list = list(six.itervalues(app_dict))
         app_list.sort(key=lambda x: x['name'])
 
-        # Sort the models alphabetically within each app.
+        # Sort the models within each app.
         for app in app_list:
-            app['models'].sort(key=lambda x: x['name'])
+            self._sort_app_models(app['models'])
 
         context = {
             'title': _('Site administration'),
@@ -407,6 +434,7 @@ class AdminSite(object):
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
                             'object_name': model._meta.object_name,
+                            'order_sequence': getattr(model, 'order_sequence', None),
                             'perms': perms,
                         }
                         if perms.get('change', False):
@@ -434,8 +462,8 @@ class AdminSite(object):
                             }
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
-        # Sort the models alphabetically within each app.
-        app_dict['models'].sort(key=lambda x: x['name'])
+        # Sort the models within each app.
+        self._sort_app_models(app_dict['models'])
         context = {
             'title': _('%s administration') % capfirst(app_label),
             'app_list': [app_dict],

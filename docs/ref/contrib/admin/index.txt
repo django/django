@@ -101,6 +101,34 @@ Other topics
 
             admin.site.register(Author)
 
+
+    .. note::
+
+        Default If you registered some Models, this Models in Admin/App index
+        page are sorted by ``verbose_name_plural``::
+
+            class AuthorAdmin(admin.ModelAdmin):
+                class Meta:
+                    verbose_name_plural = 'Author'
+
+            class BookAdmin(admin.ModelAdmin):
+                class Meta:
+                    verbose_name_plural = 'Book'
+
+            admin.site.register(Author, AuthorAdmin)
+            admin.site.register(Book, BookAdmin)
+
+        In the admin page, Author will displayed above the Book.
+        If you wanna change the orders, you need to pass an additional argument
+        to register::
+
+         
+            admin.site.register(Author, AuthorAdmin, order_sequence=2)
+            admin.site.register(Book, BookAdmin, order_sequence=1)
+                
+        This time, Book will displayed about the Author.
+
+
 ``ModelAdmin`` options
 ----------------------
 
