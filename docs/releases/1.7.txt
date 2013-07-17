@@ -96,3 +96,12 @@ on all Python versions. Since ``unittest2`` became the standard library's
 :mod:`unittest` module in Python 2.7, and Django 1.7 drops support for older
 Python versions, this module isn't useful anymore. It has been deprecated. Use
 :mod:`unittest` instead.
+
+``shell`` management command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The only benefit of the "shell" management command is that it saves you from
+having to set the :envvar:`DJANGO_SETTINGS_MODULE` environment variable. This
+is a pretty minor benefit as it's not difficult to use your favorite technique
+such as a shell alias to reduce the number of characters you need to type to
+run ``DJANGO_SETTINGS_MODULE=someproj.settings python``.

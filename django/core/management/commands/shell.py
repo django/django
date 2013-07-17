@@ -52,6 +52,10 @@ class Command(NoArgsCommand):
         raise ImportError
 
     def handle_noargs(self, **options):
+        warnings.warn(
+            "The `shell` command has been deprecated.",
+            PendingDeprecationWarning)
+
         # XXX: (Temporary) workaround for ticket #1796: force early loading of all
         # models from installed apps.
         from django.db.models.loading import get_models

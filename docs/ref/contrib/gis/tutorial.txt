@@ -331,11 +331,12 @@ Earlier, you used ``ogrinfo`` to examine the contents of the world borders
 shapefile.  GeoDjango also includes a Pythonic interface to GDAL's powerful OGR
 library that can work with all the vector data sources that OGR supports.
 
-First, invoke the Django shell:
+First, invoke the Python interpreter (from the directory that contains
+``manage.py``):
 
 .. code-block:: bash
 
-    $ python manage.py shell
+    $ DJANGO_SETTINGS_MODULE=mysite.settings python
 
 If you downloaded the :ref:`worldborders` data earlier in the
 tutorial, then you can determine its path using Python's built-in
@@ -495,11 +496,12 @@ A few notes about what's going on:
   values in the shapefile. This ensures that string values are read and saved
   correctly from their original encoding system.
 
-Afterwards, invoke the Django shell from the ``geodjango`` project directory:
+Afterwards, invoke the python interpreter from the ``geodjango`` project
+directory:
 
 .. code-block:: bash
 
-   $ python manage.py shell
+   $ DJANGO_SETTINGS_MODULE=mysite.settings python
 
 Next, import the ``load`` module, call the ``run`` routine, and watch
 ``LayerMapping`` do the work::
@@ -590,11 +592,12 @@ Spatial Lookups
 ---------------
 GeoDjango adds spatial lookups to the Django ORM.  For example, you
 can find the country in the ``WorldBorder`` table that contains
-a particular point.  First, fire up the management shell:
+a particular point.  First, fire up the Python interpreter (from the directory
+that contains ``manage.py``):
 
 .. code-block:: bash
 
-    $ python manage.py shell
+    $ DJANGO_SETTINGS_MODULE=mysite.settings python
 
 Now, define a point of interest [#]_::
 
