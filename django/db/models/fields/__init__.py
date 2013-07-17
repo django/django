@@ -686,13 +686,13 @@ class Field(object):
 
     def check(self, **kwargs):
         errors = []
-        errors.extend(self._check_chocies(**kwargs))
+        errors.extend(self._check_choices(**kwargs))
         errors.extend(self._check_db_index(**kwargs))
         errors.extend(self._check_null_allowed_for_primary_keys(**kwargs))
         errors.extend(self._check_backend_specific_checks(**kwargs))
         return errors
 
-    def _check_chocies(self, **kwargs):
+    def _check_choices(self, **kwargs):
         if self.choices:
             if (isinstance(self.choices, six.string_types) or
                 not is_iterable(self.choices)):
