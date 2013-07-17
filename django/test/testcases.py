@@ -957,12 +957,8 @@ class _StaticFilesHandler(FSFilesHandler):
 
     def serve(self, request):
         path = self.file_path(request.path)
-        normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
-        absolute_path = finders.find(normalized_path)
-        if not absolute_path:
-            raise Http404("'%s' could not be found" % path)
-        document_root, path = os.path.split(absolute_path)
-        return serve(request, path, document_root=document_root)
+        path2 = posixpath.normpath(unquote(path)).lstrip('/')
+        return serve(request, path2, document_root=settings.STATIC_ROOT)
 
 
 class LiveServerThread(threading.Thread):
