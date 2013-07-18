@@ -217,6 +217,8 @@ class GenericRelation(ForeignObject):
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
         field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        # Resolve the auxiliary field holding the actual value.
+        field = field.auxiliary_field
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         cond.add((Constraint(remote_alias, field.column, field), 'exact', contenttype_pk), 'AND')
