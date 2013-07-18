@@ -577,6 +577,9 @@ runfcgi [options]
 
 .. django-admin:: runfcgi
 
+.. deprecated:: 1.7
+    FastCGI support is deprecated and will be removed in Django 1.9.
+
 Starts a set of FastCGI processes suitable for use with any Web server that
 supports the FastCGI protocol. See the :doc:`FastCGI deployment documentation
 </howto/deployment/fastcgi>` for details. Requires the Python FastCGI module from

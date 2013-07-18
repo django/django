@@ -414,6 +414,9 @@ these changes.
 
 * ``django.utils.unittest`` will be removed.
 
+* FastCGI support, including the ``runfcgi`` management command, will be
+  removed. Please deploy your project using WSGI.
+
 2.0
 ---
 
