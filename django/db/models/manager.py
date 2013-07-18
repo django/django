@@ -169,10 +169,11 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         # understanding of how this comes into play.
         return self.get_queryset()
 
-Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
-
     def check(self, **kwargs):
         return []
+
+
+Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
 
 
 class ManagerDescriptor(object):
