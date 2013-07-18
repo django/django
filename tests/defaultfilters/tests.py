@@ -184,6 +184,9 @@ class DefaultFiltersTests(TestCase):
             '<p>one <a href="#">two - three <br>four</a> five</p>')
         self.assertEqual(truncatewords_html(
             '\xc5ngstr\xf6m was here', 1), '\xc5ngstr\xf6m ...')
+        self.assertEqual(truncatewords_html('<i>Buenos d&iacute;as! '
+            '&#x00bf;C&oacute;mo est&aacute;?</i>', 3),
+            '<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo ...</i>')
 
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')

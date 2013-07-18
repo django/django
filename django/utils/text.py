@@ -22,7 +22,7 @@ capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
 capfirst = allow_lazy(capfirst, six.text_type)
 
 # Set up regular expressions
-re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U|re.S)
+re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U|re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 
 
