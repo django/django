@@ -418,6 +418,9 @@ these changes.
   :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
   custom SQL files to ``myapp/sql/``.
 
+* FastCGI support via the ``runfcgi`` management command will be
+  removed. Please deploy your project using WSGI.
+
 2.0
 ---
 
