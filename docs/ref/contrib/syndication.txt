@@ -815,6 +815,24 @@ This example illustrates all possible attributes and methods for a
 
         item_pubdate = datetime.datetime(2005, 5, 3) # Hard-coded pubdate.
 
+        # ITEM UPDATED -- It's optional to use one of these three. This is a
+        # hook that specifies how to get the updateddate for a given item.
+        # In each case, the method/attribute should return a Python
+        # datetime.datetime object.
+
+        def item_updateddate(self, item):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            updateddate.
+            """
+
+        def item_updateddate(self):
+            """
+            Returns the updateddated for every item in the feed.
+            """
+
+        item_updateddate = datetime.datetime(2005, 5, 3) # Hard-coded updateddate.
+
         # ITEM CATEGORIES -- It's optional to use one of these three. This is
         # a hook that specifies how to get the list of categories for a given
         # item. In each case, the method/attribute should return an iterable
@@ -928,15 +946,21 @@ They share this interface:
     * ``categories``
     * ``item_copyright``
     * ``ttl``
+    * ``updateddate``
 
     Extra keyword arguments will be stored for `custom feed generators`_.
 
     All parameters, if given, should be Unicode objects, except:
 
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
+    * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosure`` should be an instance of
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
+
+    .. versionadded:: 1.7
+
+        The optional ``updateddate`` argument was added.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

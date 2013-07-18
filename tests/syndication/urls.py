@@ -16,6 +16,7 @@ urlpatterns = patterns(
     (r'^syndication/rss091/$', feeds.TestRss091Feed()),
     (r'^syndication/no_pubdate/$', feeds.TestNoPubdateFeed()),
     (r'^syndication/atom/$', feeds.TestAtomFeed()),
+    (r'^syndication/latest/$', feeds.TestLatestFeed()),
     (r'^syndication/custom/$', feeds.TestCustomFeed()),
     (r'^syndication/naive-dates/$', feeds.NaiveDatesFeed()),
     (r'^syndication/aware-dates/$', feeds.TZAwareDatesFeed()),
