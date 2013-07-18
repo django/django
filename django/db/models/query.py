@@ -364,37 +364,84 @@ class QuerySet(object):
 
         return objs
 
-    def get_or_create(self, **kwargs):
+    def get_or_create(self, defaults=None, **kwargs):
         """
         Looks up an object with the given kwargs, creating one if necessary.
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        defaults = kwargs.pop('defaults', {})
-        lookup = kwargs.copy()
-        for f in self.model._meta.fields:
-            if f.attname in lookup:
-                lookup[f.name] = lookup.pop(f.attname)
+        lookup, params, _ = self._extract_model_params(defaults, **kwargs)
         try:
             self._for_write = True
             return self.get(**lookup), False
         except self.model.DoesNotExist:
+            return self._create_object_from_params(lookup, params)
+
+    def update_or_create(self, defaults=None, **kwargs):
+        """
+        Looks up an object with the given kwargs, updating one with defaults
+        if it exists, otherwise creates a new one.
+        Returns a tuple (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        lookup, params, filtered_defaults = self._extract_model_params(defaults, **kwargs)
+        try:
+            self._for_write = True
+            obj = self.get(**lookup)
+        except self.model.DoesNotExist:
+            obj, created = self._create_object_from_params(lookup, params)
+            if created:
+                return obj, created
+        for k, v in six.iteritems(filtered_defaults):
+            setattr(obj, k, v)
+        try:
+            sid = transaction.savepoint(using=self.db)
+            obj.save(update_fields=filtered_defaults.keys(), using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, False
+        except DatabaseError:
+            transaction.savepoint_rollback(sid, using=self.db)
+            six.reraise(sys.exc_info())
+
+    def _create_object_from_params(self, lookup, params):
+        """
+        Tries to create an object using passed params.
+        Used by get_or_create and update_or_create
+        """
+        try:
+            obj = self.model(**params)
+            sid = transaction.savepoint(using=self.db)
+            obj.save(force_insert=True, using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, True
+        except DatabaseError:
+            transaction.savepoint_rollback(sid, using=self.db)
+            exc_info = sys.exc_info()
             try:
-                params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
-                params.update(defaults)
-                obj = self.model(**params)
-                sid = transaction.savepoint(using=self.db)
-                obj.save(force_insert=True, using=self.db)
-                transaction.savepoint_commit(sid, using=self.db)
-                return obj, True
-            except DatabaseError:
-                transaction.savepoint_rollback(sid, using=self.db)
-                exc_info = sys.exc_info()
-                try:
-                    return self.get(**lookup), False
-                except self.model.DoesNotExist:
-                    # Re-raise the DatabaseError with its original traceback.
-                    six.reraise(*exc_info)
+                return self.get(**lookup), False
+            except self.model.DoesNotExist:
+                # Re-raise the DatabaseError with its original traceback.
+                six.reraise(*exc_info)
+
+    def _extract_model_params(self, defaults, **kwargs):
+        """
+        Prepares `lookup` (kwargs that are valid model attributes), `params`
+        (for creating a model instance) and `filtered_defaults` (defaults
+        that are valid model attributes) based on given kwargs; for use by
+        get_or_create and update_or_create.
+        """
+        defaults = defaults or {}
+        filtered_defaults = {}
+        lookup = kwargs.copy()
+        for f in self.model._meta.fields:
+            # Filter out fields that don't belongs to the model.
+            if f.attname in lookup:
+                lookup[f.name] = lookup.pop(f.attname)
+            if f.attname in defaults:
+                filtered_defaults[f.name] = defaults.pop(f.attname)
+        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params.update(filtered_defaults)
+        return lookup, params, filtered_defaults
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
         """

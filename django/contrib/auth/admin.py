@@ -70,10 +70,7 @@ class UserAdmin(admin.ModelAdmin):
         """
         defaults = {}
         if obj is None:
-            defaults.update({
-                'form': self.add_form,
-                'fields': admin.util.flatten_fieldsets(self.add_fieldsets),
-            })
+            defaults['form'] = self.add_form
         defaults.update(kwargs)
         return super(UserAdmin, self).get_form(request, obj, **defaults)
 

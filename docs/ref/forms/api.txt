@@ -500,9 +500,15 @@ By default, ``auto_id`` is set to the string ``'id_%s'``.
 
 .. attribute:: Form.label_suffix
 
-Normally, a colon (``:``) will be appended after any label name when a form is
-rendered. It's possible to change the colon to another character, or omit it
-entirely, using the ``label_suffix`` parameter::
+A translatable string (defaults to a colon (``:``) in English) that will be
+appended after any label name when a form is rendered.
+
+.. versionchanged:: 1.6
+
+    The default ``label_suffix`` is translatable.
+
+It's possible to customize that character, or omit it entirely, using the
+ ``label_suffix`` parameter::
 
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
     >>> print(f.as_ul())
@@ -518,7 +524,8 @@ entirely, using the ``label_suffix`` parameter::
     <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
 
 Note that the label suffix is added only if the last character of the
-label isn't a punctuation character (``.``, ``!``, ``?`` or ``:``)
+label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
+or ``:``).
 
 Notes on field ordering
 ~~~~~~~~~~~~~~~~~~~~~~~
