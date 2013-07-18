@@ -948,8 +948,9 @@ class ForeignObject(RelatedField):
 
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
-            raise ValueError('Foreign Object from and to fields must be the same non-zero length')
-        related_fields = []
+            raise ValueError('Foreign Object from and to fields must be '
+                             'the same non-zero length.')
+        basic_from_fields, basic_to_fields = [], []
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
             to_field_name = self.to_fields[index]
@@ -957,8 +958,15 @@ class ForeignObject(RelatedField):
                           else self.opts.get_field_by_name(from_field_name)[0])
             to_field = (self.rel.to._meta.pk if to_field_name is None
                         else self.rel.to._meta.get_field_by_name(to_field_name)[0])
-            related_fields.append((from_field, to_field))
-        return related_fields
+            basic_from = from_field.resolve_basic_fields()
+            basic_to = to_field.resolve_basic_fields()
+            if len(basic_from) != len(basic_to):
+                raise ValueError('Related from field %s and to field %s '
+                                 'resolve to different numbers of basic '
+                                 'fields.' % (from_field.name, to_field.name))
+            basic_from_fields.extend(basic_from)
+            basic_to_fields.extend(basic_to)
+        return list(zip(basic_from_fields, basic_to_fields))
 
     @property
     def related_fields(self):
