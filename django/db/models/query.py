@@ -1404,7 +1404,7 @@ class RawQuerySet(object):
 
         # Find out which model's fields are not present in the query.
         skip = set()
-        for field in self.model._meta.fields:
+        for field in self.model._meta.concrete_fields:
             if field.attname not in model_init_field_names:
                 skip.add(field.attname)
         if skip:
@@ -1417,7 +1417,7 @@ class RawQuerySet(object):
             # to use *args based model instantation. For each field of the model,
             # record the query column position matching that field.
             model_init_field_pos = []
-            for field in self.model._meta.fields:
+            for field in self.model._meta.concrete_fields:
                 model_init_field_pos.append(model_init_field_names[field.attname])
         if need_resolv_columns:
             fields = [self.model_fields.get(c, None) for c in self.columns]
@@ -1494,7 +1494,7 @@ class RawQuerySet(object):
         if not hasattr(self, '_model_fields'):
             converter = connections[self.db].introspection.table_name_converter
             self._model_fields = {}
-            for field in self.model._meta.fields:
+            for field in self.model._meta.concrete_fields:
                 column = field.column
                 self._model_fields[converter(column)] = field
         return self._model_fields
