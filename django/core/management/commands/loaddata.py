@@ -233,7 +233,7 @@ class Command(BaseCommand):
         """
         dirs = []
         for path in get_app_paths():
-            d = os.path.join(os.path.dirname(path), 'fixtures')
+            d = os.path.join(path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))
