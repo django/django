@@ -25,7 +25,6 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
@@ -51,6 +50,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, Choice, ShortMessage, Telegram)
+from .admin import site, site2
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -4184,6 +4184,7 @@ class AdminUserMessageTest(TestCase):
 class AdminKeepChangeListFiltersTests(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
+    admin_site = site
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -4207,13 +4208,15 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
     def get_changelist_url(self):
         return '%s?%s' % (
-            reverse('admin:auth_user_changelist'),
+            reverse('admin:auth_user_changelist',
+                    current_app=self.admin_site.name),
             self.get_changelist_filters_querystring(),
         )
 
     def get_add_url(self):
         return '%s?%s' % (
-            reverse('admin:auth_user_add'),
+            reverse('admin:auth_user_add',
+                    current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
         )
 
@@ -4221,7 +4224,8 @@ class AdminKeepChangeListFiltersTests(TestCase):
         if user_id is None:
             user_id = self.get_sample_user_id()
         return "%s?%s" % (
-            reverse('admin:auth_user_change', args=(user_id,)),
+            reverse('admin:auth_user_change', args=(user_id,),
+                    current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
         )
 
@@ -4229,7 +4233,8 @@ class AdminKeepChangeListFiltersTests(TestCase):
         if user_id is None:
             user_id = self.get_sample_user_id()
         return "%s?%s" % (
-            reverse('admin:auth_user_history', args=(user_id,)),
+            reverse('admin:auth_user_history', args=(user_id,),
+                    current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
         )
 
@@ -4237,7 +4242,8 @@ class AdminKeepChangeListFiltersTests(TestCase):
         if user_id is None:
             user_id = self.get_sample_user_id()
         return "%s?%s" % (
-            reverse('admin:auth_user_delete', args=(user_id,)),
+            reverse('admin:auth_user_delete', args=(user_id,),
+                    current_app=self.admin_site.name),
             self.get_preserved_filters_querystring(),
         )
 
@@ -4331,3 +4337,6 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test redirect on "Delete".
         response = self.client.post(self.get_delete_url(), {'post': 'yes'})
         self.assertRedirects(response, self.get_changelist_url())
+
+class NamespacedAdminKeepChangeListFiltersTests(AdminKeepChangeListFiltersTests):
+    admin_site = site2
