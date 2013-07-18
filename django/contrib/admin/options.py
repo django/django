@@ -771,12 +771,10 @@ class ModelAdmin(BaseModelAdmin):
         Returns the preserved filters querystring.
         """
 
-        # FIXME: We can remove that getattr as soon as #20619 is fixed.
-        match = getattr(request, 'resolver_match', None)
-
+        match = request.resolver_match
         if self.preserve_filters and match:
             opts = self.model._meta
-            current_url = '%s:%s' % (match.namespace, match.url_name)
+            current_url = '%s:%s' % (match.app_name, match.url_name)
             changelist_url = 'admin:%s_%s_changelist' % (opts.app_label, opts.model_name)
             if current_url == changelist_url:
                 preserved_filters = request.GET.urlencode()
