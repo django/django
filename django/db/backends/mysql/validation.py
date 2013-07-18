@@ -9,15 +9,18 @@ class DatabaseValidation(BaseDatabaseValidation):
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
         """
-        errors = super(DatabaseValidation, self).check_field(field, **kwargs)
+        from django.db import connection
 
-        from django.db import models
-        varchar_fields = (
-            models.CharField,
-            models.CommaSeparatedIntegerField,
-            models.SlugField
-        )
-        if (isinstance(field, varchar_fields) and field.unique
+        errors = super(DatabaseValidation, self).check_field(field, **kwargs)
+        try:
+            field_type = field.db_type(connection) or ''
+        except AttributeError:
+            # If the field is a relative field and the target model is
+            # missing, then field.rel.to is not a model and doesn't have
+            # `_meta` attribute.
+            field_type = ''
+
+        if (field_type.startswith('varchar') and field.unique
             and (field.max_length is None or int(field.max_length) > 255)):
             errors.append(checks.Error(
                 '"max_length" greated than 255 when using "unique=True" '
