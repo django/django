@@ -17,7 +17,7 @@ you want to generate feeds outside of a Web context, or in some other
 lower-level way.
 
 .. _RSS: http://www.whatisrss.com/
-.. _Atom: http://www.atomenabled.org/
+.. _Atom: http://tools.ietf.org/html/rfc4287
 
 The high-level framework
 ========================

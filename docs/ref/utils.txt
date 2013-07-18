@@ -376,7 +376,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://www.atomenabled.org/developers/syndication/atom-format-spec.php
+    Spec: http://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================
