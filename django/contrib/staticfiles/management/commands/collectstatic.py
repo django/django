@@ -149,7 +149,8 @@ class Command(NoArgsCommand):
         if self.clear:
             clear_display = 'This will DELETE EXISTING FILES!'
         else:
-            clear_display = 'This will overwrite existing files!'
+            clear_display = """This will overwrite any default static files
+you have modified!"""
 
         if self.interactive:
             confirm = input("""
