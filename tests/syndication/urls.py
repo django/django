@@ -5,7 +5,8 @@ from django.conf.urls import patterns
 from . import feeds
 
 
-urlpatterns = patterns('django.contrib.syndication.views',
+urlpatterns = patterns(
+    'django.contrib.syndication.views',
     (r'^syndication/complex/(?P<foo>.*)/$', feeds.ComplexFeed()),
     (r'^syndication/rss2/$', feeds.TestRss2Feed()),
     (r'^syndication/rss2/guid_ispermalink_true/$',
@@ -15,6 +16,7 @@ urlpatterns = patterns('django.contrib.syndication.views',
     (r'^syndication/rss091/$', feeds.TestRss091Feed()),
     (r'^syndication/no_pubdate/$', feeds.TestNoPubdateFeed()),
     (r'^syndication/atom/$', feeds.TestAtomFeed()),
+    (r'^syndication/latest/$', feeds.TestLatestFeed()),
     (r'^syndication/custom/$', feeds.TestCustomFeed()),
     (r'^syndication/naive-dates/$', feeds.NaiveDatesFeed()),
     (r'^syndication/aware-dates/$', feeds.TZAwareDatesFeed()),

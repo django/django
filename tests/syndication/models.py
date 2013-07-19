@@ -5,10 +5,11 @@ from django.utils.encoding import python_2_unicode_compatible
 @python_2_unicode_compatible
 class Entry(models.Model):
     title = models.CharField(max_length=200)
-    date = models.DateTimeField()
+    updated = models.DateTimeField()
+    published = models.DateTimeField()
 
     class Meta:
-        ordering = ('date',)
+        ordering = ('updated',)
 
     def __str__(self):
         return self.title
@@ -24,4 +25,3 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-

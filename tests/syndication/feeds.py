@@ -33,7 +33,10 @@ class TestRss2Feed(views.Feed):
         return "Overridden description: %s" % item
 
     def item_pubdate(self, item):
-        return item.date
+        return item.published
+
+    def item_updateddate(self, item):
+        return item.updated
 
     item_author_name = 'Sally Smith'
     item_author_email = 'test@example.com'
@@ -70,6 +73,17 @@ class TestNoPubdateFeed(views.Feed):
 class TestAtomFeed(TestRss2Feed):
     feed_type = feedgenerator.Atom1Feed
     subtitle = TestRss2Feed.description
+
+
+class TestLatestFeed(TestRss2Feed):
+    """
+    A feed where the latest entry date is an `updated` element.
+    """
+    feed_type = feedgenerator.Atom1Feed
+    subtitle = TestRss2Feed.description
+
+    def items(self):
+        return Entry.objects.exclude(pk=5)
 
 
 class ArticlesFeed(TestRss2Feed):
@@ -115,7 +129,7 @@ class NaiveDatesFeed(TestAtomFeed):
     A feed with naive (non-timezone-aware) dates.
     """
     def item_pubdate(self, item):
-        return item.date
+        return item.published
 
 
 class TZAwareDatesFeed(TestAtomFeed):
@@ -126,7 +140,7 @@ class TZAwareDatesFeed(TestAtomFeed):
         # Provide a weird offset so that the test can know it's getting this
         # specific offset and not accidentally getting on from
         # settings.TIME_ZONE.
-        return item.date.replace(tzinfo=tzinfo.FixedOffset(42))
+        return item.published.replace(tzinfo=tzinfo.FixedOffset(42))
 
 
 class TestFeedUrlFeed(TestAtomFeed):
