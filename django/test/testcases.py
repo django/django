@@ -879,10 +879,19 @@ class TestCase(TransactionTestCase):
             self.atomics[db_name].__exit__(None, None, None)
 
 
+class CheckCondition(object):
+    """Descriptor class for deferred condition checking"""
+    def __init__(self, cond_func):
+        self.cond_func = cond_func
+
+    def __get__(self, obj, objtype):
+        return self.cond_func()
+
+
 def _deferredSkip(condition, reason):
     def decorator(test_func):
         if not (isinstance(test_func, type) and
-                issubclass(test_func, TestCase)):
+                issubclass(test_func, unittest.TestCase)):
             @wraps(test_func)
             def skip_wrapper(*args, **kwargs):
                 if condition():
@@ -890,7 +899,9 @@ def _deferredSkip(condition, reason):
                 return test_func(*args, **kwargs)
             test_item = skip_wrapper
         else:
+            # Assume a class is decorated
             test_item = test_func
+            test_item.__unittest_skip__ = CheckCondition(condition)
         test_item.__unittest_skip_why__ = reason
         return test_item
     return decorator
