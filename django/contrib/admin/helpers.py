@@ -266,10 +266,12 @@ class InlineAdminForm(AdminForm):
             yield InlineFieldset(self.formset, self.form, name,
                 self.readonly_fields, model_admin=self.model_admin, **options)
 
-    def has_auto_field(self):
-        if self.form._meta.model._meta.has_auto_field:
+    def needs_explicit_pk_field(self):
+        # Auto fields are editable (oddly), so need to check for auto or non-editable pk
+        if self.form._meta.model._meta.has_auto_field or not self.form._meta.model._meta.pk.editable:
             return True
-        # Also search any parents for an auto field.
+        # Also search any parents for an auto field. (The pk info is propagated to child
+        # models so that does not need to be checked in parents.)
         for parent in self.form._meta.model._meta.get_parent_list():
             if parent._meta.has_auto_field:
                 return True
