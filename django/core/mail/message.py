@@ -20,7 +20,8 @@ from django.utils import six
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
-Charset.add_charset('utf-8', Charset.SHORTEST, None, 'utf-8')
+utf8_charset = Charset.Charset('utf-8')
+utf8_charset.body_encoding = None  # Python defaults to BASE64
 
 # Default MIME type to use on attachments (if it is not explicitly given
 # and cannot be guessed).
@@ -122,7 +123,14 @@ class SafeMIMEText(MIMEText):
 
     def __init__(self, text, subtype, charset):
         self.encoding = charset
-        MIMEText.__init__(self, text, subtype, charset)
+        MIMEText.__init__(self, text, subtype, None)
+        # Unfortunately, Python doesn't support setting a Charset instance as
+        # MIMEText init parameter (http://bugs.python.org/issue16324)
+        if charset == 'utf-8':
+            self.set_charset(utf8_charset)
+        else:
+            self.set_charset(charset)
+        self.replace_header('Content-Type', 'text/%s; charset="%s"' % (subtype, charset))
 
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)

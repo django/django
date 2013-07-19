@@ -92,17 +92,8 @@ class MailTests(TestCase):
         """
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
+        self.assertEqual(email.message().as_string(), 'MIME-Version: 1.0\nContent-Type: text/plain; charset="utf-8"\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
 
-        self.assertEqual(sorted(email.message().items()), [
-            ('Content-Transfer-Encoding', '7bit'),
-            ('Content-Type', 'text/plain; charset="utf-8"'),
-            ('From', 'from@example.com'),
-            ('MIME-Version', '1.0'),
-            ('Message-ID', 'foo'),
-            ('Subject', 'subject'),
-            ('To', 'to@example.com'),
-            ('date', 'Fri, 09 Nov 2001 01:08:47 -0000'),
-        ])
 
     def test_from_header(self):
         """
@@ -184,7 +175,7 @@ class MailTests(TestCase):
         email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])
         email.encoding = 'iso-8859-1'
         message = email.message()
-        self.assertTrue(message.as_string().startswith('Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com'))
+        self.assertTrue(message.as_string().startswith('MIME-Version: 1.0\nContent-Type: text/plain; charset="iso-8859-1"\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com'))
         self.assertEqual(message.get_payload(), 'Firstname S=FCrname is a great guy.')
 
         # Make sure MIME attachments also works correctly with other encodings than utf-8
@@ -193,8 +184,8 @@ class MailTests(TestCase):
         msg = EmailMultiAlternatives('Subject', text_content, 'from@example.com', ['to@example.com'])
         msg.encoding = 'iso-8859-1'
         msg.attach_alternative(html_content, "text/html")
-        self.assertEqual(msg.message().get_payload(0).as_string(), 'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.')
-        self.assertEqual(msg.message().get_payload(1).as_string(), 'Content-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
+        self.assertEqual(msg.message().get_payload(0).as_string(), 'MIME-Version: 1.0\nContent-Type: text/plain; charset="iso-8859-1"\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.')
+        self.assertEqual(msg.message().get_payload(1).as_string(), 'MIME-Version: 1.0\nContent-Type: text/html; charset="iso-8859-1"\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
 
     def test_attachments(self):
         """Regression test for #9367"""
@@ -462,7 +453,7 @@ class BaseEmailBackendTests(object):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         mail.get_connection().send_messages([email])
         message = self.get_the_message()
-        self.assertStartsWith(message.as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
+        self.assertStartsWith(message.as_string(), 'MIME-Version: 1.0\nContent-Type: text/plain; charset="utf-8"\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
 
     def test_idn_send(self):
         """
@@ -620,7 +611,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
+        self.assertTrue(s.getvalue().startswith('MIME-Version: 1.0\nContent-Type: text/plain; charset="utf-8"\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
