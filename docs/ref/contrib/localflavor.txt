@@ -90,7 +90,7 @@ The following countries have django-localflavor- packages.
 * Chile: https://github.com/django/django-localflavor-cl
 * China: https://github.com/django/django-localflavor-cn
 * Colombia: https://github.com/django/django-localflavor-co
-* Croatia: https://github.com/django/django-localflavor-cr
+* Croatia: https://github.com/django/django-localflavor-hr
 * Czech Republic: https://github.com/django/django-localflavor-cz
 * Ecuador: https://github.com/django/django-localflavor-ec
 * Finland: https://github.com/django/django-localflavor-fi
