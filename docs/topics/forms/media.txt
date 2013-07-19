@@ -255,7 +255,7 @@ to filter out a medium of interest. For example::
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
 
-    >>> print(w.media)['css']
+    >>> print(w.media['css'])
     <link href="http://static.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
 
 When you use the subscript operator, the value that is returned is a new
