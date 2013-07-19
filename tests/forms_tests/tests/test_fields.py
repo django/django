@@ -374,6 +374,17 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
 
+    def test_decimalfield_widget_attrs(self):
+        f = DecimalField(max_digits=6, decimal_places=2)
+        self.assertEqual(f.widget_attrs(Widget()), {})
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '0.01'})
+        f = DecimalField(max_digits=10, decimal_places=0)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1'})
+        f = DecimalField(max_digits=19, decimal_places=19)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
+        f = DecimalField(max_digits=20)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+
     def test_decimalfield_localized(self):
         """
         Make sure localized DecimalField's widget renders to a text input with
