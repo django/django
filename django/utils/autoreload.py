@@ -130,14 +130,28 @@ def reloader_thread():
             sys.exit(3) # force reload
         time.sleep(1)
 
+child_pid = None
+
+def signal_exit(sig, frame):
+    if child_pid:
+        os.kill(child_pid, signal.SIGINT)
+    os._exit(1)
+
 def restart_with_reloader():
+    global child_pid
+
+    signal.signal(signal.SIGINT, signal_exit)
+    signal.signal(signal.SIGTERM, signal_exit)
+
     while True:
         args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
         if sys.platform == "win32":
             args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
         new_environ["RUN_MAIN"] = 'true'
-        exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
+        child_pid = os.spawnve(os.P_NOWAIT, sys.executable, args, new_environ)
+        (_, exit_code) = os.waitpid(child_pid, 0)
+        child_pid = None
         if exit_code != 3:
             return exit_code
 
