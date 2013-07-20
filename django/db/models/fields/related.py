@@ -1065,6 +1065,8 @@ class ForeignObject(RelatedField):
                 for source in sources:
                     # Account for one-to-one relations when sent a different model
                     while not isinstance(value, source.model):
+                        if source.auxiliary_to is not None:
+                            source = source.auxiliary_to
                         source = source.rel.to._meta.get_field(source.rel.field_name)
                     value_list.append(getattr(value, source.attname))
                 return tuple(value_list)
