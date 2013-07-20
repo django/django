@@ -11,7 +11,7 @@ import warnings
 from django.core.exceptions import ValidationError
 from django.forms.fields import Field, FileField
 from django.forms.utils import flatatt, ErrorDict, ErrorList
-from django.forms.widgets import Media, media_property, TextInput, Textarea
+from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
 from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
@@ -29,6 +29,7 @@ def pretty_name(name):
         return ''
     return name.replace('_', ' ').capitalize()
 
+
 def get_declared_fields(bases, attrs, with_base_fields=True):
     """
     Create a list of form field instances from the passed in 'attrs', plus any
@@ -40,6 +41,13 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     used. The distinction is useful in ModelForm subclassing.
     Also integrates any additional media definitions.
     """
+
+    warnings.warn(
+        "get_declared_fields is deprecated and will be removed in Django 1.9.",
+        PendingDeprecationWarning,
+        stacklevel=2,
+    )
+
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)]
     fields.sort(key=lambda x: x[1].creation_counter)
 
@@ -57,18 +65,36 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
 
     return OrderedDict(fields)
 
-class DeclarativeFieldsMetaclass(type):
+
+class DeclarativeFieldsMetaclass(MediaDefiningClass):
     """
-    Metaclass that converts Field attributes to a dictionary called
-    'base_fields', taking into account parent class 'base_fields' as well.
+    Metaclass that collects Fields declared on the base classes.
     """
-    def __new__(cls, name, bases, attrs):
-        attrs['base_fields'] = get_declared_fields(bases, attrs)
-        new_class = super(DeclarativeFieldsMetaclass,
-                     cls).__new__(cls, name, bases, attrs)
-        if 'media' not in attrs:
-            new_class.media = media_property(new_class)
+    def __new__(mcs, name, bases, attrs):
+        # Collect fields from current class.
+        current_fields = []
+        for key, value in list(attrs.items()):
+            if isinstance(value, Field):
+                current_fields.append((key, value))
+                attrs.pop(key)
+        current_fields.sort(key=lambda x: x[1].creation_counter)
+        attrs['declared_fields'] = OrderedDict(current_fields)
+
+        new_class = (super(DeclarativeFieldsMetaclass, mcs)
+            .__new__(mcs, name, bases, attrs))
+
+        # Walk through the MRO.
+        declared_fields = OrderedDict()
+        for base in reversed(new_class.__mro__):
+            # Collect fields from base class.
+            if hasattr(base, 'declared_fields'):
+                declared_fields.update(base.declared_fields)
+
+        new_class.base_fields = declared_fields
+        new_class.declared_fields = declared_fields
+
         return new_class
+
 
 @python_2_unicode_compatible
 class BaseForm(object):
@@ -398,6 +424,7 @@ class BaseForm(object):
         """
         return [field for field in self if not field.is_hidden]
 
+
 class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
@@ -405,6 +432,7 @@ class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
     # fancy metaclass stuff purely for the semantic sugar -- it allows one
     # to define a form using declarative syntax.
     # BaseForm itself has no way of designating self.fields.
+
 
 @python_2_unicode_compatible
 class BoundField(object):

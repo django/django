@@ -10,11 +10,11 @@ import warnings
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.forms.fields import Field, ChoiceField
-from django.forms.forms import BaseForm, get_declared_fields
+from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
-    MultipleHiddenInput, media_property, CheckboxSelectMultiple)
+    MultipleHiddenInput, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
@@ -60,6 +60,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
         f.save_form_data(instance, cleaned_data[f.name])
 
     return instance
+
 
 def save_instance(form, instance, fields=None, fail_message='saved',
                   commit=True, exclude=None, construct=True):
@@ -138,6 +139,7 @@ def model_to_dict(instance, fields=None, exclude=None):
             data[f.name] = f.value_from_object(instance)
     return data
 
+
 def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      formfield_callback=None, localized_fields=None,
                      labels=None, help_texts=None, error_messages=None):
@@ -207,6 +209,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
         )
     return field_dict
 
+
 class ModelFormOptions(object):
     def __init__(self, options=None):
         self.model = getattr(options, 'model', None)
@@ -219,22 +222,16 @@ class ModelFormOptions(object):
         self.error_messages = getattr(options, 'error_messages', None)
 
 
-class ModelFormMetaclass(type):
-    def __new__(cls, name, bases, attrs):
+class ModelFormMetaclass(DeclarativeFieldsMetaclass):
+    def __new__(mcs, name, bases, attrs):
         formfield_callback = attrs.pop('formfield_callback', None)
-        try:
-            parents = [b for b in bases if issubclass(b, ModelForm)]
-        except NameError:
-            # We are defining ModelForm itself.
-            parents = None
-        declared_fields = get_declared_fields(bases, attrs, False)
-        new_class = super(ModelFormMetaclass, cls).__new__(cls, name, bases,
-                attrs)
-        if not parents:
+
+        new_class = (super(ModelFormMetaclass, mcs)
+                        .__new__(mcs, name, bases, attrs))
+
+        if bases == (BaseModelForm,):
             return new_class
 
-        if 'media' not in attrs:
-            new_class.media = media_property(new_class)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
 
         # We check if a string was passed to `fields` or `exclude`,
@@ -253,7 +250,6 @@ class ModelFormMetaclass(type):
 
         if opts.model:
             # If a model is defined, extract form fields from it.
-
             if opts.fields is None and opts.exclude is None:
                 # This should be some kind of assertion error once deprecation
                 # cycle is complete.
@@ -263,7 +259,7 @@ class ModelFormMetaclass(type):
                               DeprecationWarning, stacklevel=2)
 
             if opts.fields == ALL_FIELDS:
-                # sentinel for fields_for_model to indicate "get the list of
+                # Sentinel for fields_for_model to indicate "get the list of
                 # fields from the model"
                 opts.fields = None
 
@@ -274,8 +270,8 @@ class ModelFormMetaclass(type):
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in six.iteritems(fields) if not v]
-            missing_fields = set(none_model_fields) - \
-                             set(declared_fields.keys())
+            missing_fields = (set(none_model_fields) -
+                              set(new_class.declared_fields.keys()))
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -283,12 +279,14 @@ class ModelFormMetaclass(type):
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
-            fields.update(declared_fields)
+            fields.update(new_class.declared_fields)
         else:
-            fields = declared_fields
-        new_class.declared_fields = declared_fields
+            fields = new_class.declared_fields
+
         new_class.base_fields = fields
+
         return new_class
+
 
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -438,8 +436,10 @@ class BaseModelForm(BaseForm):
 
     save.alters_data = True
 
+
 class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
     pass
+
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       formfield_callback=None, widgets=None, localized_fields=None,
@@ -780,6 +780,7 @@ class BaseModelFormSet(BaseFormSet):
             form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=widget)
         super(BaseModelFormSet, self).add_fields(form, index)
 
+
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
                          can_order=False, max_num=None, fields=None, exclude=None,
@@ -1021,6 +1022,7 @@ class InlineForeignKeyField(Field):
     def _has_changed(self, initial, data):
         return False
 
+
 class ModelChoiceIterator(object):
     def __init__(self, field):
         self.field = field
@@ -1046,6 +1048,7 @@ class ModelChoiceIterator(object):
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
+
 
 class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
@@ -1140,6 +1143,7 @@ class ModelChoiceField(ChoiceField):
         initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return force_text(self.prepare_value(initial_value)) != force_text(data_value)
+
 
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""

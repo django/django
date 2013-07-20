@@ -1802,3 +1802,16 @@ class M2mHelpTextTest(TestCase):
         html = form.as_p()
         self.assertInHTML('<ul id="id_status">', html)
         self.assertInHTML(dreaded_help_text, html, count=0)
+
+
+class ModelFormInheritanceTests(TestCase):
+    def test_form_subclass_inheritance(self):
+        class Form(forms.Form):
+            age = forms.IntegerField()
+
+        class ModelForm(forms.ModelForm, Form):
+            class Meta:
+                model = Writer
+                fields = '__all__'
+
+        self.assertEqual(list(ModelForm().fields.keys()), ['name', 'age'])
