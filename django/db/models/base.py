@@ -404,6 +404,8 @@ class Model(six.with_metaclass(ModelBase)):
                         # get_default() to be evaluated, and then not used.
                         # Refs #12057.
                         val = field.get_default()
+            elif field.auxiliary_to is not None:
+                val = field.auxiliary_to.get_default()
             else:
                 val = field.get_default()
 
