@@ -331,6 +331,10 @@ class ValidationTest(test.TestCase):
         f = models.CharField(choices=[('a', 'A'), ('b', 'B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
+    def test_charfield_get_choices_with_blank_defined(self):
+        f = models.CharField(choices=[('', '<><>'), ('a', 'A')])
+        self.assertEqual(f.get_choices(True), [('', '<><>'), ('a', 'A')])
+
     def test_choices_validation_supports_named_groups(self):
         f = models.IntegerField(
             choices=(('group', ((10, 'A'), (20, 'B'))), (30, 'C')))

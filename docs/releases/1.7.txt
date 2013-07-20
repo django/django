@@ -105,6 +105,11 @@ Minor features
   <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
   to more easily customize the login policy.
 
+* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
+  customize the "empty choice" label by including a tuple with an empty string
+  or ``None`` for the key and the custom label as the value. The default blank
+  option ``"----------"`` will be omitted in this case.
+
 Backwards incompatible changes in 1.7
 =====================================
 

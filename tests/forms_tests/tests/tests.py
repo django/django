@@ -10,8 +10,8 @@ from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
 from django.utils import six
 
-from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
-    BoundaryModel, Defaults, OptionalMultiChoiceModel)
+from ..models import (ChoiceModel, ChoiceOptionModel, ChoiceFieldModel,
+    FileModel, Group, BoundaryModel, Defaults, OptionalMultiChoiceModel)
 
 
 class ChoiceFieldForm(ModelForm):
@@ -32,6 +32,24 @@ class ChoiceFieldExclusionForm(ModelForm):
     class Meta:
         exclude = ['multi_choice']
         model = ChoiceFieldModel
+
+
+class EmptyCharLabelChoiceForm(ModelForm):
+    class Meta:
+        model = ChoiceModel
+        fields = ['name', 'choice']
+
+
+class EmptyIntegerLabelChoiceForm(ModelForm):
+    class Meta:
+        model = ChoiceModel
+        fields = ['name', 'choice_integer']
+
+
+class EmptyCharLabelNoneChoiceForm(ModelForm):
+    class Meta:
+        model = ChoiceModel
+        fields = ['name', 'choice_string_w_none']
 
 
 class FileForm(Form):
@@ -259,3 +277,78 @@ class ManyToManyExclusionTestCase(TestCase):
         self.assertEqual(form.instance.choice_int.pk, data['choice_int'])
         self.assertEqual(list(form.instance.multi_choice.all()), [opt2, opt3])
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
+
+
+class EmptyLabelTestCase(TestCase):
+    def test_empty_field_char(self):
+        f = EmptyCharLabelChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
+<p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
+<option value="" selected="selected">No Preference</option>
+<option value="f">Foo</option>
+<option value="b">Bar</option>
+</select></p>""")
+
+    def test_empty_field_char_none(self):
+        f = EmptyCharLabelNoneChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
+<p><label for="id_choice_string_w_none">Choice string w none:</label> <select id="id_choice_string_w_none" name="choice_string_w_none">
+<option value="" selected="selected">No Preference</option>
+<option value="f">Foo</option>
+<option value="b">Bar</option>
+</select></p>""")
+
+    def test_save_empty_label_forms(self):
+        # Test that saving a form with a blank choice results in the expected
+        # value being stored in the database.
+        tests = [
+            (EmptyCharLabelNoneChoiceForm, 'choice_string_w_none', None),
+            (EmptyIntegerLabelChoiceForm, 'choice_integer', None),
+            (EmptyCharLabelChoiceForm, 'choice', ''),
+        ]
+
+        for form, key, expected in tests:
+            f = form({'name': 'some-key', key: ''})
+            self.assertTrue(f.is_valid())
+            m = f.save()
+            self.assertEqual(expected, getattr(m, key))
+            self.assertEqual('No Preference',
+                             getattr(m, 'get_{0}_display'.format(key))())
+
+    def test_empty_field_integer(self):
+        f = EmptyIntegerLabelChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
+<p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
+<option value="" selected="selected">No Preference</option>
+<option value="1">Foo</option>
+<option value="2">Bar</option>
+</select></p>""")
+
+    def test_get_display_value_on_none(self):
+        m = ChoiceModel.objects.create(name='test', choice='', choice_integer=None)
+        self.assertEqual(None, m.choice_integer)
+        self.assertEqual('No Preference', m.get_choice_integer_display())
+
+    def test_html_rendering_of_prepopulated_models(self):
+        none_model = ChoiceModel(name='none-test', choice_integer=None)
+        f = EmptyIntegerLabelChoiceForm(instance=none_model)
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" value="none-test"/></p>
+<p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
+<option value="" selected="selected">No Preference</option>
+<option value="1">Foo</option>
+<option value="2">Bar</option>
+</select></p>""")
+
+        foo_model = ChoiceModel(name='foo-test', choice_integer=1)
+        f = EmptyIntegerLabelChoiceForm(instance=foo_model)
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" value="foo-test"/></p>
+<p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
+<option value="">No Preference</option>
+<option value="1" selected="selected">Foo</option>
+<option value="2">Bar</option>
+</select></p>""")

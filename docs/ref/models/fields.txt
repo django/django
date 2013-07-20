@@ -152,11 +152,20 @@ method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
 documentation.
 
-Finally, note that choices can be any iterable object -- not necessarily a list
-or tuple. This lets you construct choices dynamically. But if you find yourself
-hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
-proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
-meant for static data that doesn't change much, if ever.
+Note that choices can be any iterable object -- not necessarily a list or tuple.
+This lets you construct choices dynamically. But if you find yourself hacking
+:attr:`~Field.choices` to be dynamic, you're probably better off using a proper
+database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
+static data that doesn't change much, if ever.
+
+.. versionadded:: 1.7
+
+Unless :attr:`blank=False<Field.blank>` is set on the field along with a
+:attr:`~Field.default` then a label containing ``"---------"`` will be rendered
+with the select box. To override this behavior, add a tuple to ``choices``
+containing ``None``; e.g. ``(None, 'Your String For Display')``.
+Alternatively, you can use an empty string instead of ``None`` where this makes
+sense - such as on a :class:`~django.db.models.CharField`.
 
 ``db_column``
 -------------

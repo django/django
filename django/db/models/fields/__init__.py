@@ -544,7 +544,14 @@ class Field(object):
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
-        first_choice = blank_choice if include_blank else []
+        blank_defined = False
+        for choice, _ in self.choices:
+            if choice in ('', None):
+                blank_defined = True
+                break
+
+        first_choice = (blank_choice if include_blank and
+                        not blank_defined else [])
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
