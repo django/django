@@ -91,12 +91,19 @@ class BaseDatabaseCreation(object):
         for field_constraints in opts.unique_together:
             unique_togethers.append([opts.get_field(f) for f in field_constraints])
         unique_togethers.extend([f] for f in opts.local_fields
-                                if f.column is None and f.unique)
+                                if f.column is None and f.unique and
+                                not f.primary_key)
         for field_list in unique_togethers:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' %
                 ", ".join(style.SQL_FIELD(qn(basic.column))
                           for f in field_list
                           for basic in f.resolve_basic_fields())
+            )
+
+        if opts.pk.column is None:
+            table_output.append(style.SQL_KEYWORD('PRIMARY KEY') + ' (%s)' %
+                ", ".join(style.SQL_FIELD(qn(f.column))
+                          for f in opts.pk.resolve_basic_fields())
             )
 
         full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' +
