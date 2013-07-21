@@ -46,6 +46,7 @@ TEST_DATA = (
     (validate_email, 'example@-invalid.com', ValidationError),
     (validate_email, 'example@inv-.alid-.com', ValidationError),
     (validate_email, 'example@inv-.-alid.com', ValidationError),
+    (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
     # Quoted-string format (CR not allowed)
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),

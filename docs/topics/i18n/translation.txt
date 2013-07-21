@@ -29,9 +29,7 @@ use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
 You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and
-``'django.middleware.locale.LocaleMiddleware'`` from your
-:setting:`MIDDLEWARE_CLASSES` setting.
+from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. note::
 
@@ -1563,15 +1561,9 @@ If you want to let each individual user specify which language he or she
 prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
 selection based on data from the request. It customizes content for each user.
 
-``LocaleMiddleware`` is enabled in the default settings file: the
-:setting:`MIDDLEWARE_CLASSES` setting contains
-``'django.middleware.locale.LocaleMiddleware'``.
-
-.. versionchanged:: 1.6
-
-    In previous versions, ``LocaleMiddleware``  wasn't enabled by default.
-
-Because middleware order matters, you should follow these guidelines:
+To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
+to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
+matters, you should follow these guidelines:
 
 * Make sure it's one of the first middlewares installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``

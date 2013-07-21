@@ -777,3 +777,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
+
+# Used to test URL namespaces
+site2 = admin.AdminSite(name="namespaced_admin")
+site2.register(User, UserAdmin)
+site2.register(Group, GroupAdmin)
