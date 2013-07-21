@@ -118,7 +118,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     from django.db.models.fields.related import ManyToManyField
     opts = instance._meta
     data = {}
-    for f in opts.concrete_fields + opts.many_to_many:
+    for f in opts.fields + opts.many_to_many:
         if not f.editable:
             continue
         if fields and not f.name in fields:
