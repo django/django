@@ -3824,6 +3824,59 @@ class CSSTest(TestCase):
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
+    def testAppModelInFormBodyClass(self):
+        """
+        Ensure app and model tag are correcly read by change_form template
+        """
+        response = self.client.get('/test_admin/admin/admin_views/section/add/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+            '<body class="app-admin_views model-section ')
+
+    def testAppModelInListBodyClass(self):
+        """
+        Ensure app and model tag are correcly read by change_list template
+        """
+        response = self.client.get('/test_admin/admin/admin_views/section/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+            '<body class="app-admin_views model-section ')
+
+    def testAppModelInDeleteConfirmationBodyClass(self):
+        """
+        Ensure app and model tag are correcly read by delete_confirmation
+        template
+        """
+        response = self.client.get(
+            '/test_admin/admin/admin_views/section/1/delete/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+            '<body class="app-admin_views model-section ')
+
+    def testAppModelInAppIndexBodyClass(self):
+        """
+        Ensure app and model tag are correcly read by app_index template
+        """
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<body class="app-admin_views ')
+
+    def testAppModelInDeleteSelectedConfirmationBodyClass(self):
+        """
+        Ensure app and model tag are correcly read by
+        delete_selected_confirmation template
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [1],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post('/test_admin/admin/admin_views/section/',
+            action_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+            '<body class="app-admin_views model-section ')
+
 try:
     import docutils
 except ImportError:
