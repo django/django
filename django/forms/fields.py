@@ -1025,7 +1025,7 @@ class MultiValueField(Field):
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(initial, data):
+            if field._has_changed(field.to_python(initial), data):
                 return True
         return False
 
