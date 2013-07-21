@@ -943,6 +943,7 @@ class ForeignObject(RelatedField):
                 on_delete=kwargs.pop('on_delete', CASCADE),
             )
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
+        kwargs.setdefault('editable', False)
 
         super(ForeignObject, self).__init__(**kwargs)
 
@@ -1162,6 +1163,7 @@ class ForeignKey(ForeignObject):
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
+        kwargs.setdefault('editable', True)
         super(ForeignKey, self).__init__(to, ['self'], [to_field], **kwargs)
 
     def deconstruct(self):
