@@ -475,12 +475,12 @@ class Model(six.with_metaclass(ModelBase)):
         data = self.__dict__
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
-            return model_unpickle, (class_id, [], simple_class_factory), data
-        defers = []
-        for field in self._meta.fields:
+            return model_unpickle, (class_id, set(), simple_class_factory), data
+        defers = set()
+        for field in self._meta.concrete_fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
                           DeferredAttribute):
-                defers.append(field.attname)
+                defers.add(field.attname)
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
         return (model_unpickle, (class_id, defers, deferred_class_factory), data)
