@@ -8,7 +8,7 @@ import sys
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, DatabaseError
+from django.db import connections, router, transaction, DatabaseError, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -397,34 +397,35 @@ class QuerySet(object):
                 return obj, created
         for k, v in six.iteritems(filtered_defaults):
             setattr(obj, k, v)
+
+        sid = transaction.savepoint(using=self.db)
         try:
-            sid = transaction.savepoint(using=self.db)
             obj.save(update_fields=filtered_defaults.keys(), using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, False
         except DatabaseError:
             transaction.savepoint_rollback(sid, using=self.db)
-            six.reraise(sys.exc_info())
+            six.reraise(*sys.exc_info())
 
     def _create_object_from_params(self, lookup, params):
         """
         Tries to create an object using passed params.
         Used by get_or_create and update_or_create
         """
+        obj = self.model(**params)
+        sid = transaction.savepoint(using=self.db)
         try:
-            obj = self.model(**params)
-            sid = transaction.savepoint(using=self.db)
             obj.save(force_insert=True, using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, True
-        except DatabaseError:
+        except DatabaseError as e:
             transaction.savepoint_rollback(sid, using=self.db)
-            exc_info = sys.exc_info()
-            try:
-                return self.get(**lookup), False
-            except self.model.DoesNotExist:
-                # Re-raise the DatabaseError with its original traceback.
-                six.reraise(*exc_info)
+            if isinstance(e, IntegrityError):
+                try:
+                    return self.get(**lookup), False
+                except self.model.DoesNotExist:
+                    pass
+            six.reraise(*sys.exc_info())
 
     def _extract_model_params(self, defaults, **kwargs):
         """
