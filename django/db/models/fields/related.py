@@ -1568,10 +1568,6 @@ class ManyToManyField(RelatedField):
         if not self.rel.is_hidden() and not related.model._meta.swapped:
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
 
-        # Set up the accessors for the column names on the m2m table
-        self.m2m_column_name = curry(self._get_m2m_attr, related, 'column')
-        self.m2m_reverse_name = curry(self._get_m2m_reverse_attr, related, 'column')
-
         self.m2m_field_name = curry(self._get_m2m_attr, related, 'name')
         self.m2m_reverse_field_name = curry(self._get_m2m_reverse_attr, related, 'name')
 

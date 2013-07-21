@@ -43,23 +43,17 @@ class ModelPackageTests(TestCase):
         # class that are specified as dotted strings don't retain any path
         # component for the field or column name
         article_field = Article.publications.through._meta.fields[1]
-        publication_field = Article.publications.through._meta.fields[2]
+        basic_article_field = Article.publications.through._meta.fields[2]
+        publication_field = Article.publications.through._meta.fields[3]
+        basic_publication_field = Article.publications.through._meta.fields[4]
         self.assertEqual(article_field.name, 'article')
         self.assertEqual(article_field.attname, 'article_id')
-        self.assertEqual(article_field.column, 'article_id')
+        self.assertEqual(basic_article_field.column, 'article_id')
         self.assertEqual(publication_field.name, 'publication')
         self.assertEqual(publication_field.attname, 'publication_id')
-        self.assertEqual(publication_field.column, 'publication_id')
+        self.assertEqual(basic_publication_field.column, 'publication_id')
 
         # The oracle backend truncates the name to 'model_package_article_publ233f'.
         self.assertTrue(
             Article._meta.get_field('publications').m2m_db_table() in ('model_package_article_publications', 'model_package_article_publ233f')
-        )
-
-        self.assertEqual(
-            Article._meta.get_field('publications').m2m_column_name(), 'article_id'
-        )
-        self.assertEqual(
-            Article._meta.get_field('publications').m2m_reverse_name(),
-            'publication_id'
         )
