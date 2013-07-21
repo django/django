@@ -134,6 +134,14 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+        deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
+
+            'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
+            'SESSION_COOKIE_DOMAIN', 'SESSION_COOKIE_SECURE', 'SESSION_COOKIE_PATH',
+            'SESSION_COOKIE_HTTPONLY',
+
+            'CSRF_COOKIE_NAME', 'CSRF_COOKIE_DOMAIN', 'CSRF_COOKIE_SECURE',
+            'CSRF_COOKIE_PATH', 'CSRF_COOKIE_HTTPONLY')
 
         for setting in dir(mod):
             if setting == setting.upper():
@@ -143,6 +151,12 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
+
+                if setting in deprecated_cookie_settings:
+                    prefix, _ = setting.split('_', 1)
+                    new = '%s_COOKIE' % prefix
+                    warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead." % {'old': setting, 'new': new},
+                                  PendingDeprecationWarning, stacklevel=2)
 
                 setattr(self, setting, setting_value)
 
