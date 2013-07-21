@@ -535,6 +535,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             update_fields = frozenset(update_fields)
             field_names = set()
+            basic_update_fields = set()
 
             for field in self._meta.fields:
                 if not field.primary_key:
@@ -543,6 +544,10 @@ class Model(six.with_metaclass(ModelBase)):
                     if field.name != field.attname:
                         field_names.add(field.attname)
 
+                    if (field.name in update_fields
+                            or field.attname in update_fields):
+                        basic_update_fields.update(field.resolve_basic_fields())
+
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -550,12 +555,24 @@ class Model(six.with_metaclass(ModelBase)):
                                  "model or are m2m fields: %s"
                                  % ', '.join(non_model_fields))
 
+            update_fields = frozenset(f.name for f in basic_update_fields)
+
         # If saving to the same database, and this model is deferred, then
         # automatically do a "update_fields" save on the loaded fields.
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set()
+
+            # We need to determine the set of fields which are the primary
+            # keys for either the local model or any of its parents so
+            # that we don't update those as well. They might be virtual
+            # fields, which means we need to resolve them into basic
+            # concrete fields first.
+            pk_field_names = set(f.name for f in self._meta.pk.resolve_basic_fields())
+            for parent in self._meta.parents:
+                pk_field_names.update(f.name for f in parent._meta.pk.resolve_basic_fields())
+
             for field in self._meta.concrete_fields:
-                if not field.primary_key and not hasattr(field, 'through'):
+                if not field.name in pk_field_names and not hasattr(field, 'through'):
                     field_names.add(field.attname)
             deferred_fields = [
                 f.attname for f in self._meta.fields
@@ -640,7 +657,8 @@ class Model(six.with_metaclass(ModelBase)):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+        pk_names = set(f.name for f in meta.pk.resolve_basic_fields())
+        non_pks = [f for f in meta.local_concrete_fields if not f.name in pk_names]
 
         if update_fields:
             non_pks = [f for f in non_pks
