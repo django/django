@@ -42,6 +42,10 @@ class DatabaseCreation(BaseDatabaseCreation):
     def sql_indexes_for_field(self, model, f, style):
         output = []
         if f.db_index or f.unique:
+            basic_fields = f.resolve_basic_fields()
+            if len(basic_fields) != 1:
+                return self.sql_indexes_for_fields(model, basic_fields, style)
+            f = basic_fields[0]
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace

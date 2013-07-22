@@ -83,7 +83,7 @@ class BaseDatabaseCreation(object):
                     model, f.auxiliary_to, known_models, style)
                 if pending:
                     pending_references.setdefault(f.auxiliary_to.rel.to, []).append(
-                        (model, f))
+                        (model, f.auxiliary_to))
                 else:
                     field_output.extend(ref_output)
             table_output.append(' '.join(field_output))
@@ -93,6 +93,7 @@ class BaseDatabaseCreation(object):
         unique_togethers.extend([f] for f in opts.local_fields
                                 if f.column is None and f.unique and
                                 not f.primary_key)
+        # FIXME: this will probably need some tablespace SQL as well
         for field_list in unique_togethers:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' %
                 ", ".join(style.SQL_FIELD(qn(basic.column))
@@ -100,6 +101,7 @@ class BaseDatabaseCreation(object):
                           for basic in f.resolve_basic_fields())
             )
 
+        # FIXME: this will probably need some tablespace SQL as well
         if opts.pk.column is None:
             table_output.append(style.SQL_KEYWORD('PRIMARY KEY') + ' (%s)' %
                 ", ".join(style.SQL_FIELD(qn(f.column))
@@ -168,18 +170,21 @@ class BaseDatabaseCreation(object):
             for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
                 r_table = rel_opts.db_table
-                r_col = f.column
+                r_cols = [basic.column for basic in f.resolve_basic_fields()]
                 table = opts.db_table
-                col = opts.get_field(f.rel.field_name).column
+                cols = [basic.column for basic in
+                        opts.get_field(f.rel.field_name).resolve_basic_fields()]
                 # For MySQL, r_name must be unique in the first 64 characters.
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%s' % (
-                    r_col, col, self._digest(r_table, table))
+                    '_'.join(r_cols), '_'.join(cols), self._digest(r_table, table))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') +
                     ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' %
                     (qn(r_table), qn(truncate_name(
                         r_name, self.connection.ops.max_name_length())),
-                    qn(r_col), qn(table), qn(col),
+                    ', '.join(qn(col) for col in r_cols),
+                    qn(table),
+                    ', '.join(qn(col) for col in cols),
                     self.connection.ops.deferrable_sql()))
             del pending_references[model]
         return final_output
