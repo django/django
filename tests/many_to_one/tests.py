@@ -450,6 +450,7 @@ class FieldCloningTests(TestCase):
         clone_result = original_field.clone_for_foreignkey(
             'test_name',
             False,
+            'test_tablespace',
             original_field.creation_counter,
             original_field.creation_counter + 1,
             'dummy_column',
@@ -467,12 +468,14 @@ class FieldCloningTests(TestCase):
                          new_field.max_length)
         self.assertEqual(new_field.db_column, 'dummy_column')
         self.assertEqual(new_field.auxiliary_to, 'dummy value')
+        self.assertEqual(new_field.db_tablespace, 'test_tablespace')
 
     def test_autofield_cloning(self):
         original_field = models.AutoField(primary_key=True)
         clone_result = original_field.clone_for_foreignkey(
             'test_name',
             False,
+            'test_tablespace',
             original_field.creation_counter,
             original_field.creation_counter + 1,
             'dummy_column',

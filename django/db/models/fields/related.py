@@ -1293,7 +1293,7 @@ class ForeignKey(ForeignObject):
                                            weak=False)
             return
         to_add = field.clone_for_foreignkey(
-            name, self.null,
+            name, self.null, self.db_tablespace,
             self.creation_counter, self.creation_counter + 1,
             self.db_column or self.attname,
             fk_field=self

@@ -244,7 +244,7 @@ class Field(object):
             keywords,
         )
 
-    def clone_for_foreignkey(self, name, null, counter_low,
+    def clone_for_foreignkey(self, name, null, db_tablespace, counter_low,
                              counter_high, db_column, klass=None,
                              args=None, kwargs=None, fk_field=None):
         """
@@ -270,6 +270,7 @@ class Field(object):
         kwargs['null'] = null
         kwargs['editable'] = False
         kwargs['db_column'] = db_column
+        kwargs['db_tablespace'] = db_tablespace
         instance = klass(*args, **kwargs)
         # We need to set this manually in order to make the field appear
         # just after the ForeignKey to preserve the order of columns.
