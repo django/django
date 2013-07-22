@@ -113,12 +113,12 @@ Add Google projection to ``spatial_ref_sys`` table
 In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
 an entry must be added to your spatial database's ``spatial_ref_sys`` table.
-Invoke the Django shell from your project and execute the
+Invoke the Python interpreter from your project and execute the
 ``add_srs_entry`` function:
 
 .. code-block:: pycon
 
-    $ python manage.py shell
+    $ DJANGO_SETTINGS_MODULE=mysite.settings python
     >>> from django.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(900913)
 

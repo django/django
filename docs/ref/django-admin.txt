@@ -823,6 +823,15 @@ shell
 
 Starts the Python interactive interpreter.
 
+.. deprecated:: 1.7
+
+The only benefit of the "shell" management command is that it saves you
+from having to set the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable. This is a pretty minor benefit as it's not difficult to use your
+favorite technique such as a shell alias to reduce the number of characters
+you need to type to run ``DJANGO_SETTINGS_MODULE=someproj.settings python``.
+It will be removed in Django 1.9.
+
 Django will use IPython_ or bpython_ if either is installed. If you have a
 rich shell installed but want to force use of the "plain" Python interpreter,
 use the ``--plain`` option, like so::

@@ -515,25 +515,19 @@ Playing with the API
 ====================
 
 Now, let's hop into the interactive Python shell and play around with the free
-API Django gives you. To invoke the Python shell, use this command:
+API Django gives you. To invoke the Python shell, use this command from the
+directory that contains :file:`manage.py` (or ensure that directory is on the
+Python path, so that ``import mysite`` works):
 
 .. code-block:: bash
 
-    python manage.py shell
+    DJANGO_SETTINGS_MODULE=mysite.settings python
 
-We're using this instead of simply typing "python", because :file:`manage.py`
-sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
-the Python import path to your :file:`mysite/settings.py` file.
-
-.. admonition:: Bypassing manage.py
-
-    If you'd rather not use :file:`manage.py`, no problem. Just set the
-    ``DJANGO_SETTINGS_MODULE`` environment variable to ``mysite.settings`` and
-    run ``python`` from the same directory :file:`manage.py` is in (or ensure
-    that directory is on the Python path, so that ``import mysite`` works).
-
-    For more information on all of this, see the :doc:`django-admin.py
-    documentation </ref/django-admin>`.
+The :envvar:`DJANGO_SETTINGS_MODULE` environment variable gives Django the
+Python import path to your :file:`mysite/settings.py` file. You'll probably
+want to set it using something like a shell alias to avoid having to type it
+every time. For more information on all of this, see the :doc:`django-admin.py
+documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
@@ -641,7 +635,7 @@ you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
 Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again::
+``DJANGO_SETTINGS_MODULE=mysite.settings python`` again::
 
     >>> from polls.models import Poll, Choice
 

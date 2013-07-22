@@ -277,7 +277,6 @@ GDAL data files before invoking Python  (typically ``/usr/local/share``; use
 ``gdal-config --datadir`` to find out). For example::
 
     $ export GDAL_DATA=`gdal-config --datadir`
-    $ python manage.py shell
 
 If using Apache, you may need to add this environment variable to your configuration
 file:
@@ -297,4 +296,3 @@ file:
 .. [#] Specifically, GeoDjango provides support for the `OGR
        <http://gdal.org/ogr>`_ library, a component of GDAL.
 .. [#] See `GDAL ticket #2382 <http://trac.osgeo.org/gdal/ticket/2382>`_.
-

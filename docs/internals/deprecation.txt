@@ -414,6 +414,12 @@ these changes.
 
 * ``django.utils.unittest`` will be removed.
 
+* The ``shell`` management command will be removed. Its only benefit is that it
+  saves you from having to set the :envvar:`DJANGO_SETTINGS_MODULE` environment
+  variable. This is a pretty minor benefit as it's not difficult to use your
+  favorite technique such as a shell alias to reduce the number of characters
+  you need to type to run ``DJANGO_SETTINGS_MODULE=someproj.settings python``.
+
 2.0
 ---
 
