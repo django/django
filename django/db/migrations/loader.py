@@ -79,6 +79,23 @@ class MigrationLoader(object):
                     raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_label))
                 self.disk_migrations[app_label, migration_name] = migration_module.Migration(migration_name, app_label)
 
+    def get_migration_by_prefix(self, app_label, name_prefix):
+        "Returns the migration(s) which match the given app label and name _prefix_"
+        # Make sure we have the disk data
+        if self.disk_migrations is None:
+            self.load_disk()
+        # Do the search
+        results = []
+        for l, n in self.disk_migrations:
+            if l == app_label and n.startswith(name_prefix):
+                results.append((l, n))
+        if len(results) > 1:
+            raise AmbiguityError("There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix))
+        elif len(results) == 0:
+            raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
+        else:
+            return self.disk_migrations[results[0]]
+
     @cached_property
     def graph(self):
         """
@@ -139,5 +156,12 @@ class MigrationLoader(object):
 class BadMigrationError(Exception):
     """
     Raised when there's a bad migration (unreadable/bad format/etc.)
+    """
+    pass
+
+
+class AmbiguityError(Exception):
+    """
+    Raised when more than one migration matches a name prefix
     """
     pass

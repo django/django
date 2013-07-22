@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection
-from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
 
 
@@ -64,3 +64,16 @@ class LoaderTests(TestCase):
             [x for x, y in book_state.fields],
             ["id", "author"]
         )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_name_match(self):
+        "Tests prefix name matching"
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.get_migration_by_prefix("migrations", "0001").name,
+            "0001_initial",
+        )
+        with self.assertRaises(AmbiguityError):
+            migration_loader.get_migration_by_prefix("migrations", "0")
+        with self.assertRaises(KeyError):
+            migration_loader.get_migration_by_prefix("migrations", "blarg")

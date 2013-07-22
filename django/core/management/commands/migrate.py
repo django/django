@@ -4,17 +4,18 @@ import traceback
 
 from django.conf import settings
 from django.core.management import call_command
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import color_style, no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
+from django.db.migrations.loader import AmbiguityError
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 
 
-class Command(NoArgsCommand):
-    option_list = NoArgsCommand.option_list + (
+class Command(BaseCommand):
+    option_list = BaseCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
         make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
@@ -26,7 +27,7 @@ class Command(NoArgsCommand):
 
     help = "Updates database schema. Manages both apps with migrations and those without."
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
 
         self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
@@ -60,24 +61,57 @@ class Command(NoArgsCommand):
         connection = connections[db]
 
         # Work out which apps have migrations and which do not
-        if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_HEADING("Calculating migration plan:"))
         executor = MigrationExecutor(connection, self.migration_progress_callback)
-        if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_LABEL("  Apps without migrations: ") + (", ".join(executor.loader.unmigrated_apps) or "(none)"))
 
-        # Work out what targets they want, and then make a migration plan
-        # TODO: Let users select targets
-        targets = executor.loader.graph.leaf_nodes()
+        # If they supplied command line arguments, work out what they mean.
+        run_syncdb = False
+        target_app_labels_only = True
+        if len(args) > 2:
+            raise CommandError("Too many command-line arguments (expecting 'appname' or 'appname migrationname')")
+        elif len(args) == 2:
+            app_label, migration_name = args
+            if app_label not in executor.loader.migrated_apps:
+                raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
+            if migration_name == "zero":
+                migration_name = None
+            else:
+                try:
+                    migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
+                except AmbiguityError:
+                    raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+                except KeyError:
+                    raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
+            targets = [(app_label, migration.name)]
+            target_app_labels_only = False
+        elif len(args) == 1:
+            app_label = args[0]
+            if app_label not in executor.loader.migrated_apps:
+                raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
+            targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
+        else:
+            targets = executor.loader.graph.leaf_nodes()
+            run_syncdb = True
+
         plan = executor.migration_plan(targets)
 
+        # Print some useful info
         if self.verbosity >= 1:
-            self.stdout.write(self.style.MIGRATE_LABEL("  Apps with migrations:    ") + (", ".join(executor.loader.migrated_apps) or "(none)"))
+            self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
+            if run_syncdb:
+                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps) or "(none)"))
+            if target_app_labels_only:
+                self.stdout.write(self.style.MIGRATE_LABEL("  Apply all migrations: ") + (", ".join(set(a for a, n in targets)) or "(none)"))
+            else:
+                if targets[0][1] is None:
+                    self.stdout.write(self.style.MIGRATE_LABEL("  Unapply all migrations: ") + "%s" % (targets[0][0], ))
+                else:
+                    self.stdout.write(self.style.MIGRATE_LABEL("  Target specific migration: ") + "%s, from %s" % (targets[0][1], targets[0][0]))
 
         # Run the syncdb phase.
         # If you ever manage to get rid of this, I owe you many, many drinks.
-        self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-        self.sync_apps(connection, executor.loader.unmigrated_apps)
+        if run_syncdb:
+            self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
+            self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:

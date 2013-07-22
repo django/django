@@ -22,9 +22,17 @@ class MigrationExecutor(object):
         plan = []
         applied = self.recorder.applied_migrations()
         for target in targets:
+            # If the target is (appname, None), that means unmigrate everything
+            if target[1] is None:
+                for root in self.loader.graph.root_nodes():
+                    if root[0] == target[0]:
+                        for migration in self.loader.graph.backwards_plan(root):
+                            if migration in applied:
+                                plan.append((self.loader.graph.nodes[migration], True))
+                                applied.remove(migration)
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
-            if target in applied:
+            elif target in applied:
                 for migration in self.loader.graph.backwards_plan(target)[:-1]:
                     if migration in applied:
                         plan.append((self.loader.graph.nodes[migration], True))
