@@ -697,6 +697,12 @@ Tests
 Validators
 ^^^^^^^^^^
 
+* :class:`~django.core.validators.RegexValidator` now accepts an optional
+  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` argument
+  which determines if the :exc:`~django.core.exceptions.ValidationError` should
+  be raised when the regular expression pattern matches (``True``) or does not
+  match (``False``, by default) the provided ``value``.
+
 * :class:`~django.core.validators.URLValidator` now accepts an optional
   ``schemes`` argument which allows customization of the accepted URI schemes
   (instead of the defaults ``http(s)`` and ``ftp(s)``).
