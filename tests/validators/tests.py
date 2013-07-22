@@ -170,6 +170,10 @@ TEST_DATA = (
 
     (RegexValidator('x'), 'y', ValidationError),
     (RegexValidator(re.compile('x')), 'y', ValidationError),
+    (RegexValidator('x', reverse=True), 'y', None),
+    (RegexValidator(re.compile('x'), reverse=True), 'y', None),
+    (RegexValidator('x', reverse=True), 'x', ValidationError),
+    (RegexValidator(re.compile('x'), reverse=True), 'x', ValidationError),
 )
 
 def create_simple_test_method(validator, expected, value, num):
