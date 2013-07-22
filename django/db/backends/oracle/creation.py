@@ -5,8 +5,10 @@ from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 from django.utils.six.moves import input
 
+
 TEST_DATABASE_PREFIX = 'test_'
 PASSWORD = 'Im_a_lumberjack'
+
 
 class DatabaseCreation(BaseDatabaseCreation):
     # This dictionary maps Field objects to their associated Oracle column
@@ -18,30 +20,30 @@ class DatabaseCreation(BaseDatabaseCreation):
     # output (the "qn_" prefix is stripped before the lookup is performed.
 
     data_types = {
-        'AutoField':                    'NUMBER(11)',
-        'BinaryField':                  'BLOB',
-        'BooleanField':                 'NUMBER(1)',
-        'CharField':                    'NVARCHAR2(%(max_length)s)',
-        'CommaSeparatedIntegerField':   'VARCHAR2(%(max_length)s)',
-        'DateField':                    'DATE',
-        'DateTimeField':                'TIMESTAMP',
-        'DecimalField':                 'NUMBER(%(max_digits)s, %(decimal_places)s)',
-        'FileField':                    'NVARCHAR2(%(max_length)s)',
-        'FilePathField':                'NVARCHAR2(%(max_length)s)',
-        'FloatField':                   'DOUBLE PRECISION',
-        'IntegerField':                 'NUMBER(11)',
-        'BigIntegerField':              'NUMBER(19)',
-        'IPAddressField':               'VARCHAR2(15)',
-        'GenericIPAddressField':        'VARCHAR2(39)',
-        'NullBooleanField':             'NUMBER(1)',
-        'OneToOneField':                'NUMBER(11)',
-        'PositiveIntegerField':         'NUMBER(11)',
-        'PositiveSmallIntegerField':    'NUMBER(11)',
-        'SlugField':                    'NVARCHAR2(%(max_length)s)',
-        'SmallIntegerField':            'NUMBER(11)',
-        'TextField':                    'NCLOB',
-        'TimeField':                    'TIMESTAMP',
-        'URLField':                     'VARCHAR2(%(max_length)s)',
+        'AutoField': 'NUMBER(11)',
+        'BinaryField': 'BLOB',
+        'BooleanField': 'NUMBER(1)',
+        'CharField': 'NVARCHAR2(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
+        'DateField': 'DATE',
+        'DateTimeField': 'TIMESTAMP',
+        'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'NVARCHAR2(%(max_length)s)',
+        'FilePathField': 'NVARCHAR2(%(max_length)s)',
+        'FloatField': 'DOUBLE PRECISION',
+        'IntegerField': 'NUMBER(11)',
+        'BigIntegerField': 'NUMBER(19)',
+        'IPAddressField': 'VARCHAR2(15)',
+        'GenericIPAddressField': 'VARCHAR2(39)',
+        'NullBooleanField': 'NUMBER(1)',
+        'OneToOneField': 'NUMBER(11)',
+        'PositiveIntegerField': 'NUMBER(11)',
+        'PositiveSmallIntegerField': 'NUMBER(11)',
+        'SlugField': 'NVARCHAR2(%(max_length)s)',
+        'SmallIntegerField': 'NUMBER(11)',
+        'TextField': 'NCLOB',
+        'TimeField': 'TIMESTAMP',
+        'URLField': 'VARCHAR2(%(max_length)s)',
     }
 
     data_type_check_constraints = {
@@ -190,7 +192,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         statements = [
             'DROP TABLESPACE %(tblspace)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
             'DROP TABLESPACE %(tblspace_temp)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
-            ]
+        ]
         self._execute_statements(cursor, statements, parameters, verbosity)
 
     def _destroy_test_user(self, cursor, parameters, verbosity):

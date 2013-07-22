@@ -1403,6 +1403,23 @@ The decorator can also be applied to test case classes::
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
 
+.. warning::
+
+    The settings file contains some settings that are only consulted during
+    initialization of Django internals. If you change them with
+    ``override_settings``, the setting is changed if you access it via the
+    ``django.conf.settings`` module, however, Django's internals access it
+    differently. Effectively, using ``override_settings`` with these settings
+    is probably not going to do what you expect it to do.
+
+    We do not recommend using ``override_settings`` with :setting:`DATABASES`.
+    Using ``override_settings`` with :setting:`CACHES` is possible, but a bit
+    tricky if you are using internals that make using of caching, like
+    :mod:`django.contrib.sessions`. For example, you will have to reinitialize
+    the session backend in a test that uses cached sessions and overrides
+    :setting:`CACHES`.
+
+
 You can also simulate the absence of a setting by deleting it after settings
 have been overriden, like this::
 
@@ -1787,7 +1804,8 @@ for skipping tests.
 
 .. function:: skipIfDBFeature(feature_name_string)
 
-Skip the decorated test if the named database feature is supported.
+Skip the decorated test or ``TestCase`` if the named database feature is
+supported.
 
 For example, the following test will not be executed if the database
 supports transactions (e.g., it would *not* run under PostgreSQL, but
@@ -1798,9 +1816,13 @@ it would under MySQL with MyISAM tables)::
         def test_transaction_behavior(self):
             # ... conditional test code
 
+.. versionchanged:: 1.7
+
+    ``skipIfDBFeature`` can now be used to decorate a ``TestCase`` class.
+
 .. function:: skipUnlessDBFeature(feature_name_string)
 
-Skip the decorated test if the named database feature is *not*
+Skip the decorated test or ``TestCase`` if the named database feature is *not*
 supported.
 
 For example, the following test will only be executed if the database
@@ -1811,3 +1833,7 @@ under MySQL with MyISAM tables)::
         @skipUnlessDBFeature('supports_transactions')
         def test_transaction_behavior(self):
             # ... conditional test code
+
+.. versionchanged:: 1.7
+
+    ``skipUnlessDBFeature`` can now be used to decorate a ``TestCase`` class.

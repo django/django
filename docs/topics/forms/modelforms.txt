@@ -162,6 +162,7 @@ Consider this set of models::
         title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -196,29 +197,89 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
-.. _modelform-is-valid-and-errors:
+.. _validation-on-modelform:
 
-The ``is_valid()`` method and ``errors``
-----------------------------------------
+Validation on a ``ModelForm``
+-----------------------------
 
-The first time you call ``is_valid()`` or access the ``errors`` attribute of a
-``ModelForm`` triggers :ref:`form validation <form-and-field-validation>` as
-well as :ref:`model validation <validating-objects>`. This has the side-effect
-of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
-calling ``is_valid()`` on your form will convert any date fields on your model
-to actual date objects. If form validation fails, only some of the updates
-may be applied. For this reason, you'll probably want to avoid reusing the
-model instance passed to the form, especially if validation fails.
+There are two main steps involved in validating a ``ModelForm``:
 
+1. :ref:`Validating the form <form-and-field-validation>`
+2. :ref:`Validating the model instance <validating-objects>`
+
+Just like normal form validation, model form validation is triggered implicitly
+when calling :meth:`~django.forms.Form.is_valid()` or accessing the
+:attr:`~django.forms.Form.errors` attribute and explicitly when calling
+``full_clean()``, although you will typically not use the latter method in
+practice.
+
+``Model`` validation (:meth:`Model.full_clean()
+<django.db.models.Model.full_clean()>`) is triggered from within the form
+validation step, right after the form's ``clean()`` method is called.
+
+.. warning::
+
+    The cleaning process modifies the model instance passed to the
+    ``ModelForm`` constructor in various ways. For instance, any date fields on
+    the model are converted into actual date objects. Failed validation may
+    leave the underlying model instance in an inconsistent state and therefore
+    it's not recommended to reuse it.
+
+.. _overriding-modelform-clean-method:
+
+Overriding the clean() method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can override the ``clean()`` method on a model form to provide additional
+validation in the same way you can on a normal form.
+
+A model form instance bound to a model object will contain an ``instance``
+attribute that gives its methods access to that specific model instance.
+
+.. warning::
+
+    The ``ModelForm.clean()`` method sets a flag that makes the :ref:`model
+    validation <validating-objects>` step validate the uniqueness of model
+    fields that are marked as ``unique``, ``unique_together`` or
+    ``unique_for_date|month|year``.
+
+    If you would like to override the ``clean()`` method and maintain this
+    validation, you must call the parent class's ``clean()`` method.
+
+Interaction with model validation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As part of the validation process, ``ModelForm`` will call the ``clean()``
+method of each field on your model that has a corresponding field on your form.
+If you have excluded any model fields, validation will not be run on those
+fields. See the :doc:`form validation </ref/forms/validation>` documentation
+for more on how field cleaning and validation work.
+
+The model's ``clean()`` method will be called before any uniqueness checks are
+made. See :ref:`Validating objects <validating-objects>` for more information
+on the model's ``clean()`` hook.
+
+Considerations regarding fields' ``error_messages``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error messages defined at the
+:attr:`form field <django.forms.Field.error_messages>` level or at the
+:ref:`form Meta <modelforms-overriding-default-fields>` level always take
+precedence over the error messages defined at the
+:attr:`model field <django.db.models.Field.error_messages>` level.
+Error messages  defined on :attr:`model fields
+<django.db.models.Field.error_messages>` are only used when the
+``ValidationError`` is raised during the :ref:`model validation
+<validating-objects>` step and no corresponding error messages are defined at
+the form level.
 
 The ``save()`` method
 ---------------------
 
-Every form produced by ``ModelForm`` also has a ``save()``
-method. This method creates and saves a database object from the data
-bound to the form. A subclass of ``ModelForm`` can accept an existing
-model instance as the keyword argument ``instance``; if this is
-supplied, ``save()`` will update that instance. If it's not supplied,
+Every ``ModelForm`` also has a ``save()`` method. This method creates and saves
+a database object from the data bound to the form. A subclass of ``ModelForm``
+can accept an existing model instance as the keyword argument ``instance``; if
+this is supplied, ``save()`` will update that instance. If it's not supplied,
 ``save()`` will create a new instance of the specified model:
 
 .. code-block:: python
@@ -239,7 +300,7 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     >>> f.save()
 
 Note that if the form :ref:`hasn't been validated
-<modelform-is-valid-and-errors>`, calling ``save()`` will do so by checking
+<validation-on-modelform>`, calling ``save()`` will do so by checking
 ``form.errors``. A ``ValueError`` will be raised if the data in the form
 doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
@@ -262,7 +323,9 @@ exists in the database.
 To work around this problem, every time you save a form using ``commit=False``,
 Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data. For example::
+``save_m2m()`` to save the many-to-many form data. For example:
+
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
@@ -282,7 +345,9 @@ you've manually saved the instance produced by the form, you can invoke
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a simple ``save()`` on a form, all data -- including
 many-to-many data -- is saved without the need for any additional method calls.
-For example::
+For example:
+
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> a = Author()
@@ -536,27 +601,6 @@ attribute on the ``Meta`` class.
 If ``localized_fields`` is set to the special value ``'__all__'``, all fields
 will be localized.
 
-.. _overriding-modelform-clean-method:
-
-Overriding the clean() method
------------------------------
-
-You can override the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form.
-
-In this regard, model forms have two specific characteristics when compared to
-forms:
-
-By default the ``clean()`` method validates the uniqueness of fields that are
-marked as ``unique``, ``unique_together`` or ``unique_for_date|month|year`` on
-the model.  Therefore, if you would like to override the ``clean()`` method and
-maintain the default validation, you must call the parent class's ``clean()``
-method.
-
-Also, a model form instance bound to a model object will contain a
-``self.instance`` attribute that gives model form methods access to that
-specific model instance.
-
 Form inheritance
 ----------------
 
@@ -594,18 +638,6 @@ There are a couple of things to note, however.
 
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.
-
-Interaction with model validation
----------------------------------
-
-As part of its validation process, ``ModelForm`` will call the ``clean()``
-method of each field on your model that has a corresponding field on your form.
-If you have excluded any model fields, validation will not be run on those
-fields. See the :doc:`form validation </ref/forms/validation>` documentation
-for more on how field cleaning and validation work. Also, your model's
-``clean()`` method will be called before any uniqueness checks are made. See
-:ref:`Validating objects <validating-objects>` for more information on the
-model's ``clean()`` hook.
 
 .. _modelforms-factory:
 
@@ -856,14 +888,16 @@ than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
 
-Overiding ``clean()`` on a ``model_formset``
+.. _model-formsets-overriding-clean:
+
+Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
 Just like with ``ModelForms``, by default the ``clean()`` method of a
-``model_formset`` will validate that none of the items in the formset violate
+``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to override the ``clean()`` method
-on a ``model_formset`` and maintain this validation, you must call the parent
+on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 
     from django.forms.models import BaseModelFormSet
@@ -968,6 +1002,8 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 Inline formsets
 ===============
 
+.. class:: models.BaseInlineFormSet
+
 Inline formsets is a small abstraction layer on top of model formsets. These
 simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
@@ -998,6 +1034,13 @@ a particular author, you could do this::
 .. seealso::
 
     :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
+
+Overriding ``clean()`` on an ``InlineFormSet``
+----------------------------------------------
+
+See :ref:`model-formsets-overriding-clean`, but subclass
+:class:`~models.BaseInlineFormSet` rather than
+:class:`~models.BaseModelFormSet`.
 
 More than one foreign key to the same model
 -------------------------------------------

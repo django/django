@@ -15,8 +15,12 @@ import os
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+MODELS_MODULE_NAME = 'models'
+
+
 class UnavailableApp(Exception):
     pass
+
 
 def _initialize():
     """
@@ -118,12 +122,12 @@ class BaseAppCache(object):
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
-            models = import_module('.models', app_name)
+            models = import_module('.' + MODELS_MODULE_NAME, app_name)
         except ImportError:
             self.nesting_level -= 1
             # If the app doesn't have a models module, we can just ignore the
             # ImportError and return no models for it.
-            if not module_has_submodule(app_module, 'models'):
+            if not module_has_submodule(app_module, MODELS_MODULE_NAME):
                 return None
             # But if the app does have a models module, we need to figure out
             # whether to suppress or propagate the error. If can_postpone is

@@ -14,9 +14,6 @@ class Advertisment(models.Model):
         "model_package.Publication", null=True, blank=True
     )
 
-    class Meta:
-        app_label = 'model_package'
-
 
 class ModelPackageTests(TestCase):
     def test_model_packages(self):

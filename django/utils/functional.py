@@ -403,9 +403,8 @@ def partition(predicate, values):
 if sys.version_info >= (2, 7, 2):
     from functools import total_ordering
 else:
-    # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
-    # total_ordering in 2.7 versions prior to 2.7.2 is buggy. See
-    # http://bugs.python.org/issue10042 for details. For these versions use
+    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
+    # See http://bugs.python.org/issue10042 for details. For these versions use
     # code borrowed from Python 2.7.3.
     def total_ordering(cls):
         """Class decorator that fills in missing ordering methods"""

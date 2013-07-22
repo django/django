@@ -89,10 +89,10 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
-checksetup
-----------
+check
+-----
 
-.. django-admin:: checksetup
+.. django-admin:: check
 
 .. versionadded:: 1.6
 
@@ -311,7 +311,7 @@ you need to perform on the resulting ``models.py`` file is to change the
 Python declaration of each one of these models to specify it is a
 :attr:`managed <django.db.models.Options.managed>` one.
 
-This servers as an explicit opt-in to give your nascent Django project write
+This serves as an explicit opt-in to give your nascent Django project write
 access to your precious data on a model by model basis.
 
 The :djadminopt:`--database` option may be used to specify the

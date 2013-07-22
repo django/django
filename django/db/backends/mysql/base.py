@@ -37,7 +37,8 @@ except ImportError:
 
 from django.conf import settings
 from django.db import utils
-from django.db.backends import *
+from django.db.backends import (util, BaseDatabaseFeatures,
+    BaseDatabaseOperations, BaseDatabaseWrapper)
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
@@ -60,12 +61,14 @@ IntegrityError = Database.IntegrityError
 # It's impossible to import datetime_or_None directly from MySQLdb.times
 parse_datetime = conversions[FIELD_TYPE.DATETIME]
 
+
 def parse_datetime_with_timezone_support(value):
     dt = parse_datetime(value)
     # Confirm that dt is naive before overwriting its tzinfo.
     if dt is not None and settings.USE_TZ and timezone.is_naive(dt):
         dt = dt.replace(tzinfo=timezone.utc)
     return dt
+
 
 def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
@@ -100,6 +103,7 @@ django_conversions.update({
 # at http://dev.mysql.com/doc/refman/4.1/en/news.html and
 # http://dev.mysql.com/doc/refman/5.0/en/news.html .
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
+
 
 # MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
 # MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
@@ -150,6 +154,7 @@ class CursorWrapper(object):
 
     def __iter__(self):
         return iter(self.cursor)
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -207,6 +212,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         cursor = self.connection.cursor()
         cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
         return cursor.fetchone() is not None
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
@@ -323,7 +329,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Truncate already resets the AUTO_INCREMENT field from
         # MySQL version 5.0.13 onwards. Refs #16961.
         if self.connection.mysql_version < (5, 0, 13):
-            return ["%s %s %s %s %s;" % \
+            return ["%s %s %s %s %s;" %
                     (style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('TABLE'),
                     style.SQL_TABLE(self.quote_name(sequence['table'])),
@@ -376,6 +382,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'

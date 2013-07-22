@@ -19,7 +19,8 @@ def _parse_version(text):
     try:
         return int(major) * 10000 + int(major2) * 100 + int(minor)
     except (ValueError, TypeError):
-        return int(major) * 10000 +  int(major2) * 100
+        return int(major) * 10000 + int(major2) * 100
+
 
 def get_version(connection):
     """

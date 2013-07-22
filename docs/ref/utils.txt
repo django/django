@@ -342,11 +342,15 @@ SyndicationFeed
         All parameters should be Unicode objects, except ``categories``, which
         should be a sequence of Unicode objects.
 
-    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
+    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs])
 
         Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate``, which is a ``datetime.datetime`` object, and
-        ``enclosure``, which is an instance of the ``Enclosure`` class.
+        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
+
+        .. versionadded:: 1.7
+
+            The optional ``updateddate`` argument was added.
 
     .. method:: num_items()
 
@@ -380,8 +384,9 @@ SyndicationFeed
 
     .. method:: latest_post_date()
 
-        Returns the latest item's ``pubdate``. If none of them have a
-        ``pubdate``, this returns the current date/time.
+        Returns the latest ``pubdate`` or ``updateddate`` for all items in the
+        feed. If no items have either of these attributes this returns the
+        current date/time.
 
 Enclosure
 ---------
@@ -414,7 +419,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://www.atomenabled.org/developers/syndication/atom-format-spec.php
+    Spec: http://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================
@@ -446,12 +451,14 @@ Atom1Feed
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
+        # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
     The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
     a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode`` here
-    and ensure that your function returns only Unicode strings.
+    original function can return. Usually, it's enough to include ``unicode``
+    (or ``str`` on Python 3) here and ensure that your function returns only
+    Unicode strings.
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at the

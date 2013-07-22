@@ -6,7 +6,7 @@ import threading
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import Field, FieldDoesNotExist
-from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
+from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -153,6 +153,28 @@ class ModelTest(TestCase):
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=7,
+        )
+
+    def test_multiple_objects_max_num_fetched(self):
+        """
+        #6785 - get() should fetch a limited number of results.
+        """
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(MAX_GET_RESULTS)
+        )
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area %s' % MAX_GET_RESULTS, pub_date=datetime(2005, 7, 28))
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned more than %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
         )
 
     def test_object_creation(self):

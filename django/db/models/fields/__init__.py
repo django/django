@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 import copy
 import datetime
 import decimal
@@ -17,7 +18,6 @@ from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import curry, total_ordering
-from django.utils.itercompat import is_iterator
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -25,8 +25,10 @@ from django.utils.encoding import smart_text, force_text, force_bytes
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 
+
 class Empty(object):
     pass
+
 
 class NOT_PROVIDED:
     pass
@@ -35,11 +37,14 @@ class NOT_PROVIDED:
 # of most "choices" lists.
 BLANK_CHOICE_DASH = [("", "---------")]
 
+
 def _load_field(app_label, model_name, field_name):
     return get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
 
+
 class FieldDoesNotExist(Exception):
     pass
+
 
 # A guide to Field parameters:
 #
@@ -60,6 +65,7 @@ def _empty(of_cls):
     new = Empty()
     new.__class__ = of_cls
     return new
+
 
 @total_ordering
 class Field(object):
@@ -464,12 +470,12 @@ class Field(object):
         if hasattr(value, '_prepare'):
             return value._prepare()
 
-        if lookup_type in (
-                'iexact', 'contains', 'icontains',
-                'startswith', 'istartswith', 'endswith', 'iendswith',
-                'month', 'day', 'week_day', 'hour', 'minute', 'second',
-                'isnull', 'search', 'regex', 'iregex',
-            ):
+        if lookup_type in {
+            'iexact', 'contains', 'icontains',
+            'startswith', 'istartswith', 'endswith', 'iendswith',
+            'month', 'day', 'week_day', 'hour', 'minute', 'second',
+            'isnull', 'search', 'regex', 'iregex',
+        }:
             return value
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte'):
             return self.get_prep_value(value)
@@ -599,7 +605,7 @@ class Field(object):
         return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
-        if is_iterator(self._choices):
+        if isinstance(self._choices, collections.Iterator):
             choices, self._choices = tee(self._choices)
             return choices
         else:
@@ -613,7 +619,7 @@ class Field(object):
             if isinstance(value, (list, tuple)):
                 flat.extend(value)
             else:
-                flat.append((choice,value))
+                flat.append((choice, value))
         return flat
     flatchoices = property(_get_flatchoices)
 
@@ -732,6 +738,7 @@ class AutoField(Field):
     def formfield(self, **kwargs):
         return None
 
+
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
@@ -786,12 +793,12 @@ class BooleanField(Field):
         if self.choices:
             include_blank = (self.null or
                              not (self.has_default() or 'initial' in kwargs))
-            defaults = {'choices': self.get_choices(
-                                       include_blank=include_blank)}
+            defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
             defaults = {'form_class': forms.BooleanField}
         defaults.update(kwargs)
         return super(BooleanField, self).formfield(**defaults)
+
 
 class CharField(Field):
     description = _("String (up to %(max_length)s)")
@@ -819,6 +826,7 @@ class CharField(Field):
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
 
+
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
@@ -832,6 +840,7 @@ class CommaSeparatedIntegerField(CharField):
         }
         defaults.update(kwargs)
         return super(CommaSeparatedIntegerField, self).formfield(**defaults)
+
 
 class DateField(Field):
     empty_strings_allowed = False
@@ -905,7 +914,7 @@ class DateField(Field):
             return super(DateField, self).pre_save(model_instance, add)
 
     def contribute_to_class(self, cls, name):
-        super(DateField,self).contribute_to_class(cls, name)
+        super(DateField, self).contribute_to_class(cls, name)
         if not self.null:
             setattr(cls, 'get_next_by_%s' % self.name,
                 curry(cls._get_next_or_previous_by_FIELD, field=self,
@@ -938,6 +947,7 @@ class DateField(Field):
         defaults = {'form_class': forms.DateField}
         defaults.update(kwargs)
         return super(DateField, self).formfield(**defaults)
+
 
 class DateTimeField(DateField):
     empty_strings_allowed = False
@@ -1045,6 +1055,7 @@ class DateTimeField(DateField):
         defaults.update(kwargs)
         return super(DateTimeField, self).formfield(**defaults)
 
+
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
@@ -1116,6 +1127,7 @@ class DecimalField(Field):
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
 
+
 class EmailField(CharField):
     default_validators = [validators.validate_email]
     description = _("Email address")
@@ -1142,13 +1154,14 @@ class EmailField(CharField):
         defaults.update(kwargs)
         return super(EmailField, self).formfield(**defaults)
 
+
 class FilePathField(Field):
     description = _("File path")
 
     def __init__(self, verbose_name=None, name=None, path='', match=None,
                  recursive=False, allow_files=True, allow_folders=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
-        self.allow_files, self.allow_folders =  allow_files, allow_folders
+        self.allow_files, self.allow_folders = allow_files, allow_folders
         kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
@@ -1183,6 +1196,7 @@ class FilePathField(Field):
     def get_internal_type(self):
         return "FilePathField"
 
+
 class FloatField(Field):
     empty_strings_allowed = False
     default_error_messages = {
@@ -1214,6 +1228,7 @@ class FloatField(Field):
         defaults = {'form_class': forms.FloatField}
         defaults.update(kwargs)
         return super(FloatField, self).formfield(**defaults)
+
 
 class IntegerField(Field):
     empty_strings_allowed = False
@@ -1253,6 +1268,7 @@ class IntegerField(Field):
         defaults.update(kwargs)
         return super(IntegerField, self).formfield(**defaults)
 
+
 class BigIntegerField(IntegerField):
     empty_strings_allowed = False
     description = _("Big (8 byte) integer")
@@ -1266,6 +1282,7 @@ class BigIntegerField(IntegerField):
                     'max_value': BigIntegerField.MAX_BIGINT}
         defaults.update(kwargs)
         return super(BigIntegerField, self).formfield(**defaults)
+
 
 class IPAddressField(Field):
     empty_strings_allowed = False
@@ -1287,6 +1304,7 @@ class IPAddressField(Field):
         defaults = {'form_class': forms.IPAddressField}
         defaults.update(kwargs)
         return super(IPAddressField, self).formfield(**defaults)
+
 
 class GenericIPAddressField(Field):
     empty_strings_allowed = True
@@ -1336,7 +1354,10 @@ class GenericIPAddressField(Field):
         return value
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.GenericIPAddressField}
+        defaults = {
+            'protocol': self.protocol,
+            'form_class': forms.GenericIPAddressField,
+        }
         defaults.update(kwargs)
         return super(GenericIPAddressField, self).formfield(**defaults)
 
@@ -1403,6 +1424,7 @@ class NullBooleanField(Field):
         defaults.update(kwargs)
         return super(NullBooleanField, self).formfield(**defaults)
 
+
 class PositiveIntegerField(IntegerField):
     description = _("Positive integer")
 
@@ -1414,6 +1436,7 @@ class PositiveIntegerField(IntegerField):
         defaults.update(kwargs)
         return super(PositiveIntegerField, self).formfield(**defaults)
 
+
 class PositiveSmallIntegerField(IntegerField):
     description = _("Positive small integer")
 
@@ -1424,6 +1447,7 @@ class PositiveSmallIntegerField(IntegerField):
         defaults = {'min_value': 0}
         defaults.update(kwargs)
         return super(PositiveSmallIntegerField, self).formfield(**defaults)
+
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
@@ -1454,11 +1478,13 @@ class SlugField(CharField):
         defaults.update(kwargs)
         return super(SlugField, self).formfield(**defaults)
 
+
 class SmallIntegerField(IntegerField):
     description = _("Small integer")
 
     def get_internal_type(self):
         return "SmallIntegerField"
+
 
 class TextField(Field):
     description = _("Text")
@@ -1475,6 +1501,7 @@ class TextField(Field):
         defaults = {'widget': forms.Textarea}
         defaults.update(kwargs)
         return super(TextField, self).formfield(**defaults)
+
 
 class TimeField(Field):
     empty_strings_allowed = False
@@ -1559,6 +1586,7 @@ class TimeField(Field):
         defaults.update(kwargs)
         return super(TimeField, self).formfield(**defaults)
 
+
 class URLField(CharField):
     default_validators = [validators.URLValidator()]
     description = _("URL")
@@ -1581,6 +1609,7 @@ class URLField(CharField):
         }
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
+
 
 class BinaryField(Field):
     description = _("Raw binary data")

@@ -438,7 +438,8 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__unicode__()`` representation of each object.
+    column that displays the ``__unicode__()`` (``__str__()`` on Python 3)
+    representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -488,7 +489,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` of the related object.
+      ``__unicode__()`` (``__str__()`` on Python 3) of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -1553,13 +1554,13 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
 
-.. _modeladmin-media-definitions:
+.. _modeladmin-asset-definitions:
 
-``ModelAdmin`` media definitions
+``ModelAdmin`` asset definitions
 --------------------------------
 
 There are times where you would like add a bit of CSS and/or JavaScript to
-the add/change views. This can be accomplished by using a Media inner class
+the add/change views. This can be accomplished by using a ``Media`` inner class
 on your ``ModelAdmin``::
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -1571,8 +1572,8 @@ on your ``ModelAdmin``::
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
-``None``) to any media paths. The same rules apply as :ref:`regular media
-definitions on forms <form-media-paths>`.
+``None``) to any asset paths. The same rules apply as :ref:`regular asset
+definitions on forms <form-asset-paths>`.
 
 jQuery
 ~~~~~~
@@ -1712,9 +1713,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.formset
 
-    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-    many possibilities of customization. Inlines are built around
-    :ref:`model formsets <model-formsets>`.
+    This defaults to :class:`~django.forms.models.BaseInlineFormSet`. Using
+    your own formset can give you many possibilities of customization. Inlines
+    are built around :ref:`model formsets <model-formsets>`.
 
 .. attribute:: InlineModelAdmin.form
 
@@ -1790,8 +1791,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
 
-    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
-    See the example for :class:`ModelAdmin.get_formsets`.
+    Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
+    admin add/change views. See the example for
+    :class:`ModelAdmin.get_formsets`.
 
 .. method:: InlineModelAdmin.get_extra(self, request, obj=None, **kwargs)
 

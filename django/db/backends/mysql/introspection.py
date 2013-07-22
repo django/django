@@ -7,6 +7,7 @@ from django.utils.encoding import force_text
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
+
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = {
         FIELD_TYPE.BLOB: 'TextField',

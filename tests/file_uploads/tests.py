@@ -187,6 +187,27 @@ class FileUploadTests(TestCase):
         got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
 
+    def test_content_type_extra(self):
+        """Uploaded files may have content type parameters available."""
+        tdir = tempfile.gettempdir()
+
+        no_content_type = tempfile.NamedTemporaryFile(suffix=".ctype_extra", dir=tdir)
+        no_content_type.write(b'something')
+        no_content_type.seek(0)
+
+        simple_file = tempfile.NamedTemporaryFile(suffix=".ctype_extra", dir=tdir)
+        simple_file.write(b'something')
+        simple_file.seek(0)
+        simple_file.content_type = 'text/plain; test-key=test_value'
+
+        response = self.client.post('/file_uploads/echo_content_type_extra/', {
+            'no_content_type': no_content_type,
+            'simple_file': simple_file,
+        })
+        received = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(received['no_content_type'], {})
+        self.assertEqual(received['simple_file'], {'test-key': 'test_value'})
+
     def test_truncated_multipart_handled_gracefully(self):
         """
         If passed an incomplete multipart message, MultiPartParser does not

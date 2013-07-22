@@ -14,8 +14,63 @@ deprecation process for some features`_.
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
 
+Python compatibility
+====================
+
+Django 1.7 requires Python 2.7 or above, though we **highly recommend**
+the latest minor release. Support for Python 2.6 has been dropped.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.7 or newer as their default
+version. If you're still using Python 2.6, however, you'll need to stick to
+Django 1.6 until you can upgrade your Python version. Per :doc:`our support
+policy </internals/release-process>`, Django 1.6 will continue to receive
+security support until the release of Django 1.8.
+
 What's new in Django 1.7
 ========================
+
+Admin shortcuts support time zones
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "today" and "now" shortcuts next to date and time input widgets in the
+admin are now operating in the :ref:`current time zone
+<default-current-time-zone>`. Previously, they used the browser time zone,
+which could result in saving the wrong value when it didn't match the current
+time zone on the server.
+
+In addition, the widgets now display a help message when the browser and
+server time zone are different, to clarify how the value inserted in the field
+will be interpreted.
+
+Minor features
+~~~~~~~~~~~~~~
+
+* The new :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
+* The ``enter`` argument was added to the
+  :data:`~django.test.signals.setting_changed` signal.
+
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
+
+* The :meth:`Context.push() <django.template.Context.push>` method now returns
+  a context manager which automatically calls :meth:`pop()
+  <django.template.Context.pop>` upon exiting the ``with`` statement.
+  Additionally, :meth:`push() <django.template.Context.push>` now accepts
+  parameters that are passed to the ``dict`` constructor used to build the new
+  context level.
+
+* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
+  ``updated`` element now utilizes `updateddate` instead of ``pubdate``,
+  allowing the ``published`` element to be included in the feed (which
+  relies on ``pubdate``).
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -27,6 +82,14 @@ Backwards incompatible changes in 1.7
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file()`
+  method is now passed an additional ``content_type_extra`` parameter. If you
+  have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
+  that implements ``new_file()``, be sure it accepts this new parameter.
 
 Features deprecated in 1.7
 ==========================

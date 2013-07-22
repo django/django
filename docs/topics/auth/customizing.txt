@@ -589,8 +589,9 @@ The following methods are available on any subclass of
         been called for this user.
 
 You should also define a custom manager for your ``User`` model. If your
-``User`` model defines ``username`` and ``email`` fields the same as Django's
-default ``User``, you can just install Django's
+``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
+``is_superuser``, ``last_login``, and ``date_joined`` fields the same as
+Django's default ``User``, you can just install Django's
 :class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
 model defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
@@ -967,6 +968,7 @@ authentication app::
             # The user is identified by their email address
             return self.email
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.email
 
@@ -1058,6 +1060,8 @@ code would be required in the app's ``admin.py`` file::
             ('Personal info', {'fields': ('date_of_birth',)}),
             ('Permissions', {'fields': ('is_admin',)}),
         )
+        # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
+        # overrides get_fieldsets to use this attribute when creating a user.
         add_fieldsets = (
             (None, {
                 'classes': ('wide',),

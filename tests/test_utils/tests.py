@@ -2,13 +2,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import unittest
-from unittest import skip
 
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
@@ -25,6 +24,29 @@ class SkippingTestCase(TestCase):
             raise ValueError
 
         self.assertRaises(ValueError, test_func)
+
+
+class SkippingClassTestCase(TestCase):
+    def test_skip_class_unless_db_feature(self):
+        @skipUnlessDBFeature("__class__")
+        class NotSkippedTests(unittest.TestCase):
+            def test_dummy(self):
+                return
+
+        @skipIfDBFeature("__class__")
+        class SkippedTests(unittest.TestCase):
+            def test_will_be_skipped(self):
+                self.fail("We should never arrive here.")
+
+        test_suite = unittest.TestSuite()
+        test_suite.addTest(NotSkippedTests('test_dummy'))
+        try:
+            test_suite.addTest(SkippedTests('test_will_be_skipped'))
+        except unittest.SkipTest:
+            self.fail("SkipTest should not be raised at this stage")
+        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
+        self.assertEqual(result.testsRun, 2)
+        self.assertEqual(len(result.skipped), 1)
 
 
 class AssertNumQueriesTests(TestCase):
@@ -561,7 +583,7 @@ class SkippingExtraTests(TestCase):
         with self.assertNumQueries(0):
             super(SkippingExtraTests, self).__call__(result)
 
-    @skip("Fixture loading should not be performed for skipped tests.")
+    @unittest.skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
         pass
 

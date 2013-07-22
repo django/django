@@ -12,6 +12,21 @@ class ContextPopException(Exception):
     "pop() has been called more times than push()"
     pass
 
+
+class ContextDict(dict):
+    def __init__(self, context, *args, **kwargs):
+        super(ContextDict, self).__init__(*args, **kwargs)
+
+        context.dicts.append(self)
+        self.context = context
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.context.pop()
+
+
 class BaseContext(object):
     def __init__(self, dict_=None):
         self._reset_dicts(dict_)
@@ -34,10 +49,8 @@ class BaseContext(object):
         for d in reversed(self.dicts):
             yield d
 
-    def push(self):
-        d = {}
-        self.dicts.append(d)
-        return d
+    def push(self, *args, **kwargs):
+        return ContextDict(self, *args, **kwargs)
 
     def pop(self):
         if len(self.dicts) == 1:
@@ -83,6 +96,7 @@ class BaseContext(object):
         new_context._reset_dicts(values)
         return new_context
 
+
 class Context(BaseContext):
     "A stack container for variable context"
     def __init__(self, dict_=None, autoescape=True, current_app=None,
@@ -105,6 +119,7 @@ class Context(BaseContext):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         self.dicts.append(other_dict)
         return other_dict
+
 
 class RenderContext(BaseContext):
     """

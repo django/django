@@ -291,6 +291,65 @@ class DummyBackendTest(unittest.TestCase):
             db.connections = old_db_connections
 
 
+class AliasedDefaultTestSetupTest(unittest.TestCase):
+    def test_setup_aliased_default_database(self):
+        """
+        Test that setup_datebases() doesn't fail when 'default' is aliased
+        """
+        runner_instance = runner.DiscoverRunner(verbosity=0)
+        old_db_connections = db.connections
+        try:
+            db.connections = db.ConnectionHandler({
+                'default': {
+                    'NAME': 'dummy'
+                },
+                'aliased': {
+                    'NAME': 'dummy'
+                }
+            })
+            old_config = runner_instance.setup_databases()
+            runner_instance.teardown_databases(old_config)
+        except Exception as e:
+            self.fail("setup_databases/teardown_databases unexpectedly raised "
+                      "an error: %s" % e)
+        finally:
+            db.connections = old_db_connections
+
+
+class AliasedDatabaseTeardownTest(unittest.TestCase):
+    def test_setup_aliased_databases(self):
+        from django.db.backends.dummy.base import DatabaseCreation
+
+        runner_instance = runner.DiscoverRunner(verbosity=0)
+        old_db_connections = db.connections
+        old_destroy_test_db = DatabaseCreation.destroy_test_db
+        old_create_test_db = DatabaseCreation.create_test_db
+        try:
+            destroyed_names = []
+            DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1: destroyed_names.append(old_database_name)
+            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False: self._get_test_db_name()
+
+            db.connections = db.ConnectionHandler({
+                'default': {
+                    'ENGINE': 'django.db.backends.dummy',
+                    'NAME': 'dbname',
+                },
+                'other': {
+                    'ENGINE': 'django.db.backends.dummy',
+                    'NAME': 'dbname',
+                }
+            })
+
+            old_config = runner_instance.setup_databases()
+            runner_instance.teardown_databases(old_config)
+
+            self.assertEqual(destroyed_names.count('dbname'), 1)
+        finally:
+            DatabaseCreation.create_test_db = old_create_test_db
+            DatabaseCreation.destroy_test_db = old_destroy_test_db
+            db.connections = old_db_connections
+
+
 class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
@@ -308,8 +367,6 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         self.assertIn("DeprecationWarning: warning from test", err)
         self.assertIn("DeprecationWarning: module-level warning from deprecation_app", err)
 
-    @unittest.skipIf(sys.version_info[:2] == (2, 6),
-        "On Python 2.6, DeprecationWarnings are visible anyway")
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=settings', '--verbosity=0']
         out, err = self.run_django_admin(args)

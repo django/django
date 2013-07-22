@@ -114,11 +114,11 @@ class SyndicationFeed(object):
     def add_item(self, title, link, description, author_email=None,
         author_name=None, author_link=None, pubdate=None, comments=None,
         unique_id=None, unique_id_is_permalink=None, enclosure=None,
-        categories=(), item_copyright=None, ttl=None, **kwargs):
+        categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
-        objects except pubdate, which is a datetime.datetime object, and
-        enclosure, which is an instance of the Enclosure class.
+        objects except pubdate and updateddate, which are datetime.datetime
+        objects, and enclosure, which is an instance of the Enclosure class.
         """
         to_unicode = lambda s: force_text(s, strings_only=True)
         if categories:
@@ -134,6 +134,7 @@ class SyndicationFeed(object):
             'author_name': to_unicode(author_name),
             'author_link': iri_to_uri(author_link),
             'pubdate': pubdate,
+            'updateddate': updateddate,
             'comments': to_unicode(comments),
             'unique_id': to_unicode(unique_id),
             'unique_id_is_permalink': unique_id_is_permalink,
@@ -191,15 +192,20 @@ class SyndicationFeed(object):
 
     def latest_post_date(self):
         """
-        Returns the latest item's pubdate. If none of them have a pubdate,
-        this returns the current date/time.
+        Returns the latest item's pubdate or updateddate. If no items
+        have either of these attributes this returns the current date/time.
         """
-        updates = [i['pubdate'] for i in self.items if i['pubdate'] is not None]
-        if len(updates) > 0:
-            updates.sort()
-            return updates[-1]
-        else:
-            return datetime.datetime.now()
+        latest_date = None
+        date_keys = ('updateddate', 'pubdate')
+
+        for item in self.items:
+            for date_key in date_keys:
+                item_date = item.get(date_key)
+                if item_date:
+                    if latest_date is None or item_date > latest_date:
+                        latest_date = item_date
+
+        return latest_date or datetime.datetime.now()
 
 class Enclosure(object):
     "Represents an RSS enclosure"
@@ -349,8 +355,12 @@ class Atom1Feed(SyndicationFeed):
     def add_item_elements(self, handler, item):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
+
         if item['pubdate'] is not None:
-            handler.addQuickElement("updated", rfc3339_date(item['pubdate']))
+            handler.addQuickElement('published', rfc3339_date(item['pubdate']))
+
+        if item['updateddate'] is not None:
+            handler.addQuickElement('updated', rfc3339_date(item['updateddate']))
 
         # Author information.
         if item['author_name'] is not None:

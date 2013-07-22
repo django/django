@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-25 14:27+0200\n"
+"POT-Creation-Date: 2013-06-11 18:44+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -699,9 +699,20 @@ msgstr ""
 msgid "Enter a list of values."
 msgstr ""
 
-#: forms/forms.py:158
+#. Translators: This is the default suffix added to form field labels
+#: forms/forms.py:90
+msgid ":"
+msgstr ""
+
+#: forms/forms.py:159
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the label
+#: forms/forms.py:525
+msgid ":?.!"
 msgstr ""
 
 #: forms/formsets.py:310

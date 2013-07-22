@@ -4,6 +4,7 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 
 from __future__ import absolute_import
 
+import collections
 import datetime
 from itertools import repeat
 
@@ -11,14 +12,15 @@ from django.conf import settings
 from django.db.models.fields import DateTimeField, Field
 from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.db.models.sql.aggregates import Aggregate
-from django.utils.itercompat import is_iterator
 from django.utils.six.moves import xrange
 from django.utils import timezone
 from django.utils import tree
 
+
 # Connection types
 AND = 'AND'
 OR = 'OR'
+
 
 class EmptyShortCircuit(Exception):
     """
@@ -26,6 +28,7 @@ class EmptyShortCircuit(Exception):
     added to the where-clause.
     """
     pass
+
 
 class WhereNode(tree.Node):
     """
@@ -58,7 +61,7 @@ class WhereNode(tree.Node):
         if not isinstance(data, (list, tuple)):
             return data
         obj, lookup_type, value = data
-        if is_iterator(value):
+        if isinstance(value, collections.Iterator):
             # Consume any generators immediately, so that we can determine
             # emptiness and transform any non-empty values correctly.
             value = list(value)
@@ -175,7 +178,7 @@ class WhereNode(tree.Node):
         """
         lvalue, lookup_type, value_annotation, params_or_value = child
         field_internal_type = lvalue.field.get_internal_type() if lvalue.field else None
-        
+
         if isinstance(lvalue, Constraint):
             try:
                 lvalue, params = lvalue.process(lookup_type, params_or_value, connection)
@@ -304,13 +307,14 @@ class WhereNode(tree.Node):
                 clone.children.append(child)
         return clone
 
-class EmptyWhere(WhereNode):
 
+class EmptyWhere(WhereNode):
     def add(self, data, connector):
         return
 
     def as_sql(self, qn=None, connection=None):
         raise EmptyResultSet
+
 
 class EverythingNode(object):
     """
@@ -384,6 +388,7 @@ class Constraint(object):
             new.__class__ = self.__class__
             new.alias, new.col, new.field = change_map[self.alias], self.col, self.field
             return new
+
 
 class SubqueryConstraint(object):
     def __init__(self, alias, columns, targets, query_object):

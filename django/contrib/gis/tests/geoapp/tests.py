@@ -8,7 +8,7 @@ from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import (
-    no_mysql, no_oracle, no_spatialite,
+    HAS_SPATIAL_DB, no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
 from django.utils import six
@@ -28,7 +28,7 @@ def postgis_bug_version():
     return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
 
 
-@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoModelTest(TestCase):
 
     def test_fixtures(self):
@@ -203,7 +203,7 @@ class GeoModelTest(TestCase):
         self.assertTrue(isinstance(cities2[0].point, Point))
 
 
-@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoLookupTest(TestCase):
 
     @no_mysql
@@ -389,7 +389,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
-@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoQuerySetTest(TestCase):
     # Please keep the tests in GeoQuerySet method's alphabetic order
 
@@ -432,6 +432,13 @@ class GeoQuerySetTest(TestCase):
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
                 self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
                 self.assertEqual(c.mpoly.union(geom), c.union)
+
+    @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
+    def test_envelope(self):
+        "Testing the `envelope` GeoQuerySet method."
+        countries = Country.objects.all().envelope()
+        for country in countries:
+            self.assertIsInstance(country.envelope, Polygon)
 
     @no_mysql
     @no_spatialite # SpatiaLite does not have an Extent function

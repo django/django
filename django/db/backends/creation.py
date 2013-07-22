@@ -253,12 +253,13 @@ class BaseDatabaseCreation(object):
             r_col = model._meta.get_field(f.rel.field_name).column
             r_name = '%s_refs_%s_%s' % (
                 col, r_col, self._digest(table, r_table))
-            output.append('%s %s %s %s;' % \
-                (style.SQL_KEYWORD('ALTER TABLE'),
+            output.append('%s %s %s %s;' % (
+                style.SQL_KEYWORD('ALTER TABLE'),
                 style.SQL_TABLE(qn(table)),
                 style.SQL_KEYWORD(self.connection.ops.drop_foreignkey_sql()),
                 style.SQL_FIELD(qn(truncate_name(
-                    r_name, self.connection.ops.max_name_length())))))
+                    r_name, self.connection.ops.max_name_length())))
+            ))
         del references_to_delete[model]
         return output
 

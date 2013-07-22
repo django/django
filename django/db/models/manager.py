@@ -6,6 +6,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 
+
 def ensure_default_manager(sender, **kwargs):
     """
     Ensures that a Model subclass contains a default manager  and sets the
@@ -153,6 +154,9 @@ class Manager(six.with_metaclass(RenameManagerMethods)):
     def get_or_create(self, **kwargs):
         return self.get_queryset().get_or_create(**kwargs)
 
+    def update_or_create(self, **kwargs):
+        return self.get_queryset().update_or_create(**kwargs)
+
     def create(self, **kwargs):
         return self.get_queryset().create(**kwargs)
 
@@ -245,7 +249,7 @@ class ManagerDescriptor(object):
         self.manager = manager
 
     def __get__(self, instance, type=None):
-        if instance != None:
+        if instance is not None:
             raise AttributeError("Manager isn't accessible via %s instances" % type.__name__)
         return self.manager
 

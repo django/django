@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 
 class ModelBackend(object):
     """
-    Authenticates against django.contrib.auth.models.User.
+    Authenticates against settings.AUTH_USER_MODEL.
     """
 
     def authenticate(self, username=None, password=None, **kwargs):

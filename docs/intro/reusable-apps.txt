@@ -255,9 +255,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    installs have a lot of advantages over installing the package system-wide,
    such as being usable on systems where you don't have administrator access
    as well as preventing the package from affecting system services and other
-   users of the machine. Python 2.6 added support for user libraries, so if
-   you are using an older version this won't work, but Django 1.5 requires
-   Python 2.6 or newer anyway.
+   users of the machine.
 
    Note that per-user installations can still affect the behavior of system
    tools that run as that user, so ``virtualenv`` is a more robust solution

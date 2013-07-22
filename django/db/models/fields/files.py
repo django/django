@@ -11,6 +11,7 @@ from django.utils.encoding import force_str, force_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
+
 class FieldFile(File):
     def __init__(self, instance, field, name):
         super(FieldFile, self).__init__(None, name)
@@ -135,6 +136,7 @@ class FieldFile(File):
         # be restored later, by FileDescriptor below.
         return {'name': self.name, 'closed': False, '_committed': True, '_file': None}
 
+
 class FileDescriptor(object):
     """
     The descriptor for the file attribute on the model instance. Returns a
@@ -204,6 +206,7 @@ class FileDescriptor(object):
 
     def __set__(self, instance, value):
         instance.__dict__[self.field.name] = value
+
 
 class FileField(Field):
 
@@ -300,6 +303,7 @@ class FileField(Field):
         defaults.update(kwargs)
         return super(FileField, self).formfield(**defaults)
 
+
 class ImageFileDescriptor(FileDescriptor):
     """
     Just like the FileDescriptor, but for ImageFields. The only difference is
@@ -321,13 +325,14 @@ class ImageFileDescriptor(FileDescriptor):
         if previous_file is not None:
             self.field.update_dimension_fields(instance, force=True)
 
-class ImageFieldFile(ImageFile, FieldFile):
 
+class ImageFieldFile(ImageFile, FieldFile):
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, '_dimensions_cache'):
             del self._dimensions_cache
         super(ImageFieldFile, self).delete(save)
+
 
 class ImageField(FileField):
     attr_class = ImageFieldFile

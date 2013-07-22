@@ -1055,6 +1055,26 @@ EMAIL_USE_TLS
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL_USE_SSL`.
+
+.. setting:: EMAIL_USE_SSL
+
+EMAIL_USE_SSL
+-------------
+
+.. versionadded:: 1.7
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
+
+Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
+exclusive, so only set one of those settings to ``True``.
 
 .. setting:: FILE_CHARSET
 
@@ -2475,7 +2495,7 @@ URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
-:ref:`media definitions<form-media-paths>` and the
+:ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.

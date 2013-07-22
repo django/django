@@ -234,10 +234,11 @@ a model's ``Meta`` class, you can also create permissions directly. For
 example, you can create the ``can_publish`` permission for a ``BlogPost`` model
 in ``myapp``::
 
+    from myapp.models import BlogPost
     from django.contrib.auth.models import Group, Permission
     from django.contrib.contenttypes.models import ContentType
 
-    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    content_type = ContentType.objects.get_for_model(BlogPost)
     permission = Permission.objects.create(codename='can_publish',
                                            name='Can Publish Posts',
                                            content_type=content_type)
@@ -317,7 +318,7 @@ If you have an authenticated user you want to attach to the current session
     which authentication backend successfully authenticated that user (see the
     :ref:`backends documentation <authentication-backends>` for details), and
     this information is needed later during the login process. An error will be
-    raise if you try to login a user object retrieved from the database
+    raised if you try to login a user object retrieved from the database
     directly.
 
 How to log a user out

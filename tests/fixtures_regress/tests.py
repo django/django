@@ -660,22 +660,15 @@ class TestTicket11101(TransactionTestCase):
         'django.contrib.contenttypes',
     ]
 
-    def ticket_11101(self):
-        management.call_command(
-            'loaddata',
-            'thingy.json',
-            verbosity=0,
-        )
-        self.assertEqual(Thingy.objects.count(), 1)
-        transaction.rollback()
-        self.assertEqual(Thingy.objects.count(), 0)
-        transaction.commit()
-
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):
         """Test that fixtures can be rolled back (ticket #11101)."""
-        transaction.set_autocommit(False)
-        try:
-            self.ticket_11101()
-        finally:
-            transaction.set_autocommit(True)
+        with transaction.atomic():
+            management.call_command(
+                'loaddata',
+                'thingy.json',
+                verbosity=0,
+            )
+            self.assertEqual(Thingy.objects.count(), 1)
+            transaction.set_rollback(True)
+        self.assertEqual(Thingy.objects.count(), 0)

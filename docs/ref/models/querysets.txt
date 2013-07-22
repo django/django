@@ -379,15 +379,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-You can pass positional arguments (``*fields``) in order to specify the names
-of fields to which the ``DISTINCT`` should apply. This translates to a
-``SELECT DISTINCT ON`` SQL query. Here's the difference. For a normal
-``distinct()`` call, the database compares *each* field in each row when
+On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
+specify the names of fields to which the ``DISTINCT`` should apply. This
+translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a
+normal ``distinct()`` call, the database compares *each* field in each row when
 determining which rows are distinct. For a ``distinct()`` call with specified
 field names, the database will only compare the specified field names.
-
-.. note::
-    This ability to specify field names is only available in PostgreSQL.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
@@ -398,7 +395,7 @@ field names, the database will only compare the specified field names.
     value in column ``a``. If you don't specify an order, you'll get some
     arbitrary row.
 
-Examples::
+Examples (those after the first will only work on PostgreSQL)::
 
     >>> Author.objects.distinct()
     [...]
@@ -817,6 +814,7 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s (%s)" % (self.name, u", ".join([topping.name
                                                         for topping in self.toppings.all()]))
@@ -1332,9 +1330,9 @@ prepared to handle the exception if you are using manual primary keys.
 get_or_create
 ~~~~~~~~~~~~~
 
-.. method:: get_or_create(**kwargs)
+.. method:: get_or_create(defaults=None, **kwargs)
 
-A convenience method for looking up an object with the given kwargs (may be
+A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
 
 .. versionchanged:: 1.6
@@ -1345,8 +1343,7 @@ Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
 
-This is meant as a shortcut to boilerplatish code and is mostly useful for
-data-import scripts. For example::
+This is meant as a shortcut to boilerplatish code. For example::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -1369,7 +1366,6 @@ found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
-    defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
     params.update(defaults)
     obj = self.model(**params)
@@ -1394,13 +1390,25 @@ when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. As mentioned
-earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
-data and create new records if existing ones aren't available. But if you need
-to use ``get_or_create()`` in a view, please make sure to use it only in
-``POST`` requests unless you have a good reason not to. ``GET`` requests
-shouldn't have any effect on data; use ``POST`` whenever a request to a page
-has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
+This method is atomic assuming correct usage, correct database configuration,
+and correct behavior of the underlying database. However, if uniqueness is not
+enforced at the database level for the ``kwargs`` used in a ``get_or_create``
+call (see :attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Options.unique_together`), this method is prone to a
+race-condition which can result in multiple rows with the same parameters being
+inserted simultaneously.
+
+If you are using MySQL, be sure to use the ``READ COMMITTED`` isolation level
+rather than ``REPEATABLE READ`` (the default), otherwise you may see cases
+where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
+object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
+call.
+
+Finally, a word on using ``get_or_create()`` in Django views: please make sure
+to use it only in ``POST`` requests unless you have a good reason not to
+``GET`` requests shouldn't have any effect on data; use ``POST`` whenever a
+request to a page as a side effect on your data. For more, see `Safe methods`_
+in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
@@ -1438,6 +1446,49 @@ has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+update_or_create
+~~~~~~~~~~~~~~~~
+
+.. method:: update_or_create(defaults=None, **kwargs)
+
+.. versionadded:: 1.7
+
+A convenience method for updating an object with the given ``kwargs``, creating
+a new one if necessary. The ``defaults`` is a dictionary of (field, value)
+pairs used to update the object.
+
+Returns a tuple of ``(object, created)``, where ``object`` is the created or
+updated object and ``created`` is a boolean specifying whether a new object was
+created.
+
+The ``update_or_create`` method tries to fetch an object from database based on
+the given ``kwargs``. If a match is found, it updates the fields passed in the
+``defaults`` dictionary.
+
+This is meant as a shortcut to boilerplatish code. For example::
+
+    try:
+        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        for key, value in updated_values.iteritems():
+            setattr(obj, key, value)
+        obj.save()
+    except Person.DoesNotExist:
+        updated_values.update({'first_name': 'John', 'last_name': 'Lennon'})
+        obj = Person(**updated_values)
+        obj.save()
+
+This pattern gets quite unwieldy as the number of fields in a model goes up.
+The above example can be rewritten using ``update_or_create()`` like so::
+
+    obj, created = Person.objects.update_or_create(
+        first_name='John', last_name='Lennon', defaults=updated_values)
+
+For detailed description how names passed in ``kwargs`` are resolved see
+:meth:`get_or_create`.
+
+As described above in :meth:`get_or_create`, this method is prone to a
+race-condition which can result in multiple rows being inserted simultaneously
+if uniqueness is not enforced at the database level.
 
 bulk_create
 ~~~~~~~~~~~
