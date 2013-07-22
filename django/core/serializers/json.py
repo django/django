@@ -99,7 +99,7 @@ class DjangoJSONEncoder(json.JSONEncoder):
                 r = r[:12]
             return r
         elif isinstance(o, decimal.Decimal):
-            return str(o)
+            return float(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)
 
