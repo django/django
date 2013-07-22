@@ -39,10 +39,7 @@ class RegexValidator(object):
         Validates that the input matches the regular expression
         if reverse is False, otherwise raises ValidationError.
         """
-        if not self.reverse:
-            if not self.regex.search(force_text(value)):
-                raise ValidationError(self.message, code=self.code)
-        elif self.regex.search(force_text(value)):
+        if not (self.reverse is not bool(self.regex.search(force_text(value)))):
             raise ValidationError(self.message, code=self.code)
 
 
