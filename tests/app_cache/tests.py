@@ -1,16 +1,11 @@
 from __future__ import absolute_import
-import datetime
-from django.test import TransactionTestCase
-from django.utils.unittest import skipUnless
-from django.db import connection, DatabaseError, IntegrityError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField
-from django.db.models.fields.related import ManyToManyField, ForeignKey
+from django.test import TestCase
 from django.db.models.loading import cache, BaseAppCache
 from django.db import models
 from .models import TotallyNormal, SoAlternative, new_app_cache
 
 
-class AppCacheTests(TransactionTestCase):
+class AppCacheTests(TestCase):
     """
     Tests the AppCache borg and non-borg versions
     """
@@ -19,7 +14,6 @@ class AppCacheTests(TransactionTestCase):
         """
         Tests that the models in the models.py file were loaded correctly.
         """
-
         self.assertEqual(cache.get_model("app_cache", "TotallyNormal"), TotallyNormal)
         self.assertEqual(cache.get_model("app_cache", "SoAlternative"), None)
 
