@@ -95,6 +95,12 @@ Minor features
 * The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
   disable the colorization of management command output.
 
+* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
+  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
+  header in the response. This makes it possible for the
+  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
+  conditional ``GET`` requests for sitemaps which set ``lastmod``.
+
 Backwards incompatible changes in 1.7
 =====================================
 
