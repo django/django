@@ -17,7 +17,9 @@ class ModelBackend(object):
             if user.check_password(password):
                 return user
         except UserModel.DoesNotExist:
-            return None
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a non-existing user (#20760).
+            UserModel().set_password(password)
 
     def get_group_permissions(self, user_obj, obj=None):
         """
