@@ -420,12 +420,13 @@ class QuerySet(object):
             return obj, True
         except DatabaseError as e:
             transaction.savepoint_rollback(sid, using=self.db)
+            exc_info = sys.exc_info()
             if isinstance(e, IntegrityError):
                 try:
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
                     pass
-            six.reraise(*sys.exc_info())
+            six.reraise(*exc_info)
 
     def _extract_model_params(self, defaults, **kwargs):
         """
