@@ -11,8 +11,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.core.management.validation import get_validation_errors
-from django.db.models.loading import get_app
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
@@ -180,7 +178,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "REQUIRED_FIELDS should be a list."
 
         from .test_custom_user import CustomUserNonListRequiredFields
-        errors = get_validation_errors(get_app('auth'))
+        errors = checks.run_checks()
         self.assertEqual(errors, [
             checks.Error('Non-iterable '
                 'CustomUserNonListRequiredFields.REQUIRED_FIELDS.\n'
@@ -195,7 +193,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
 
         from .test_custom_user import CustomUserBadRequiredFields
-        errors = get_validation_errors(get_app('auth'))
+        errors = checks.run_checks()
         self.assertEqual(errors, [
             checks.Error(
                 'CustomUserBadRequiredFields.USERNAME_FIELD included in '
@@ -211,7 +209,7 @@ class CustomUserModelValidationTestCase(TestCase):
         "A non-unique USERNAME_FIELD should raise a model validation error."
 
         from .test_custom_user import CustomUserNonUniqueUsername
-        errors = get_validation_errors(get_app('auth'))
+        errors = checks.run_checks()
         self.assertEqual(errors, [
             checks.Error(
                 'Non unique CustomUserNonUniqueUsername.USERNAME_FIELD.\n'
