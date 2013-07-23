@@ -152,11 +152,17 @@ class Settings(BaseSettings):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
 
+                # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
                 if setting in deprecated_cookie_settings:
-                    prefix, _ = setting.split('_', 1)
+                    prefix, _, attrib = setting.split('_', 2)
                     new = '%s_COOKIE' % prefix
-                    warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead." % {'old': setting, 'new': new},
-                                  PendingDeprecationWarning, stacklevel=2)
+                    warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead."
+                                  % {'old': setting, 'new': new},
+                        PendingDeprecationWarning, stacklevel=2)
+                    temp = getattr(self, new)
+                    temp[attrib] = setting_value
+                    setattr(self, new, temp)
+                    continue
 
                 setattr(self, setting, setting_value)
 

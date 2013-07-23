@@ -140,6 +140,7 @@ LOCALE_PATHS = ()
 LANGUAGE_COOKIE = {
     'NAME': 'django_language',
 }
+LANGUAGE_COOKIE_NAME = LANGUAGE_COOKIE['NAME'] # Deprecated
 
 # If you set this to True, Django will format dates, numbers and calendars
 # according to user current locale.
@@ -467,12 +468,6 @@ MIDDLEWARE_CLASSES = (
 ############
 
 SESSION_CACHE_ALIAS = 'default'                         # Cache to store session data if using the cache session backend.
-SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
-SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.
-SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
-SESSION_COOKIE_PATH = '/'                               # The path of the session cookie.
-SESSION_COOKIE_HTTPONLY = True                          # Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
 SESSION_COOKIE = {
     'NAME': 'sessionid',                                # Cookie name. This can be whatever you want.
     'AGE': 60 * 60 * 24 * 7 * 2,                        # Age of cookie, in seconds (default: 2 weeks).
@@ -481,6 +476,12 @@ SESSION_COOKIE = {
     'PATH': '/',                                        # The path of the session cookie.
     'HTTPONLY': True,                                   # Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
 }
+SESSION_COOKIE_NAME = SESSION_COOKIE['NAME']            # Deprecated
+SESSION_COOKIE_AGE = SESSION_COOKIE['AGE']              # Deprecated
+SESSION_COOKIE_DOMAIN = SESSION_COOKIE['DOMAIN']        # Deprecated
+SESSION_COOKIE_SECURE = SESSION_COOKIE['SECURE']        # Deprecated
+SESSION_COOKIE_PATH = SESSION_COOKIE['PATH']            # Deprecated
+SESSION_COOKIE_HTTPONLY = SESSION_COOKIE['HTTPONLY']    # Deprecated
 SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
@@ -558,11 +559,6 @@ SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Settings for CSRF cookie.
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_COOKIE_DOMAIN = None
-CSRF_COOKIE_PATH = '/'
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE = {
     'NAME': 'csrftoken',
     'DOMAIN': None,
@@ -570,6 +566,11 @@ CSRF_COOKIE = {
     'SECURE': False,
     'HTTPONLY': False,
 }
+CSRF_COOKIE_NAME = CSRF_COOKIE['NAME']          # Deprecated
+CSRF_COOKIE_DOMAIN = CSRF_COOKIE['DOMAIN']      # Deprecated
+CSRF_COOKIE_PATH = CSRF_COOKIE['PATH']          # Deprecated
+CSRF_COOKIE_SECURE = CSRF_COOKIE['SECURE']      # Deprecated
+CSRF_COOKIE_HTTPONLY = CSRF_COOKIE['HTTPONLY']  # Deprecated
 
 ############
 # MESSAGES #
