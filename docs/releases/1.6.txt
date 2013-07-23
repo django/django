@@ -797,6 +797,9 @@ Miscellaneous
   of the admin views. You should update your custom templates if they use the
   previous parameter name.
 
+* :meth:`~django.core.validators.validate_email` now accepts email addresses
+  with ``localhost`` as the domain.
+
 Features deprecated in 1.6
 ==========================
 
