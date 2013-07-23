@@ -86,13 +86,17 @@ class Sitemap(object):
         domain = site.domain
 
         urls = []
+        self.latest_lastmod = None
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
             priority = self.__get('priority', item, None)
+            lastmod = self.__get('lastmod', item, None)
+            if lastmod is not None and (self.latest_lastmod is None or lastmod > self.latest_lastmod):
+                self.latest_lastmod = lastmod
             url_info = {
                 'item':       item,
                 'location':   loc,
-                'lastmod':    self.__get('lastmod', item, None),
+                'lastmod':    lastmod,
                 'changefreq': self.__get('changefreq', item, None),
                 'priority':   str(priority if priority is not None else ''),
             }
