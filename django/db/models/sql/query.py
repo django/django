@@ -1753,6 +1753,10 @@ class Query(object):
             self.aggregate_select_mask = set(names)
         self._aggregate_select_cache = None
 
+    def append_aggregate_mask(self, names):
+        if self.aggregate_select_mask is not None:
+            self.set_aggregate_mask(set(names).union(self.aggregate_select_mask))
+
     def set_extra_mask(self, names):
         """
         Set the mask of extra select items that will be returned by SELECT,

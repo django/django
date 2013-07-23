@@ -274,9 +274,12 @@ class QuerySet(object):
 
         query = self.query.clone()
 
+        aggregate_names = []
         for (alias, aggregate_expr) in kwargs.items():
             query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=True)
+                                is_summary=True)
+            aggregate_names.append(alias)
+        query.append_aggregate_mask(aggregate_names)
 
         return query.get_aggregation(using=self.db)
 
