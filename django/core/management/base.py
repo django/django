@@ -9,9 +9,9 @@ import sys
 from optparse import make_option, OptionParser
 
 import django
+from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
-from django.core.management.validation import get_validation_errors
 from django.utils.encoding import force_str
 
 
@@ -304,21 +304,44 @@ class BaseCommand(object):
 
     def validate(self, app=None, display_num_errors=False):
         """
-        Validates the given app, raising CommandError for any errors.
+        Validates all apps, raising CommandError for any errors. If there are
+        only warnings, they are printed to stdout and no exception is raised.
 
-        If app is None, then this will validate all installed apps.
+        The `app` argument is ignored.
 
         """
 
-        errors = get_validation_errors(app)
+        errors = checks.run_checks()
+
         if errors:
-            msg = "\n\n".join(sorted(force_str(error) for error in errors))
-            msg = color_style().ERROR(msg)
-            msg = "One or more models did not validate:\n%s" % msg
-            raise CommandError(msg)
+            formatted_errors = (
+                color_style().ERROR(force_str(e))
+                if isinstance(e, checks.Error)
+                else color_style().WARNING(force_str(e))
+                for e in errors)
+            msg = "\n\n".join(sorted(formatted_errors))
+            msg = "There are some errors or warnings:\n%s" % msg
+            if any(isinstance(e, checks.Error) for e in errors):
+                raise CommandError(msg)
+            else:
+                self.stdout.write(msg)
+
         if display_num_errors:
-            self.stdout.write("%s error%s found"
-                % (len(errors), '' if len(errors) == 1 else 's'))
+            errors_no = sum(isinstance(e, checks.Error) for e in errors)
+            warnings_no = sum(isinstance(e, checks.Warning) for e in errors)
+            error_part = (
+                "" if errors_no == 0 else
+                "1 error" if errors_no == 1 else
+                "%s errors" % errors_no)
+            warning_part = (
+                "" if warnings_no == 0 else
+                "1 warning" if warnings_no == 1 else
+                "%s warnings" % warnings_no)
+            and_part = " and " if error_part and warning_part else ""
+            msg = ("%s%s%s found" % (error_part, and_part, warning_part)
+                if error_part or warning_part
+                else "No errors/warnings found")
+            self.stdout.write(msg)
 
     def handle(self, *args, **options):
         """

@@ -1080,7 +1080,7 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, '0 errors found')
+        self.assertOutput(out, 'No errors/warnings found')
 
     def test_app_with_import(self):
         "manage.py validate does not raise errors when an app imports a base class that itself has an abstract base"
@@ -1093,7 +1093,7 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, '0 errors found')
+        self.assertOutput(out, 'No errors/warnings found')
 
 
 class CustomTestRunner(DiscoverRunner):
