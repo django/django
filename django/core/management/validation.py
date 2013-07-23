@@ -123,9 +123,13 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.choices, six.string_types) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
-                    for c in f.choices:
+                    for c in f.flatchoices:
                         if isinstance(c, six.string_types) or not is_iterable(c) or len(c) != 2:
                             e.add(opts, '"%s": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).' % f.name)
+                        elif isinstance(f, models.CharField) and c[0] and not isinstance(c[0], six.string_types):
+                            e.add(opts, '"%s": "choices" should have a string as first item for CharField.' % f.name)
+                        elif isinstance(f, models.IntegerField) and c[0] and not isinstance(c[0], six.integer_types):
+                            e.add(opts, '"%s": "choices" should have an integer as first item for IntegerField.' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 

@@ -417,13 +417,13 @@ class ModelAdminTests(TestCase):
 
         self.assertEqual(type(cmafa.base_fields['day'].widget), Select)
         self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
-            [('', '---------'), (1, 'Fri'), (2, 'Sat')])
+            [('', '---------'), ('1', 'Fri'), ('2', 'Sat')])
 
         self.assertEqual(type(cmafa.base_fields['transport'].widget),
             Select)
         self.assertEqual(
             list(cmafa.base_fields['transport'].widget.choices),
-            [('', '---------'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
+            [('', '---------'), ('1', 'Plane'), ('2', 'Train'), ('3', 'Bus')])
 
     def test_foreign_key_as_radio_field(self):
         # Now specify all the fields as radio_fields.  Widgets should now be
@@ -463,14 +463,14 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['day'].widget.attrs,
             {'class': 'radiolist'})
         self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
-            [(1, 'Fri'), (2, 'Sat')])
+            [('1', 'Fri'), ('2', 'Sat')])
 
         self.assertEqual(type(cmafa.base_fields['transport'].widget),
             AdminRadioSelect)
         self.assertEqual(cmafa.base_fields['transport'].widget.attrs,
             {'class': 'radiolist inline'})
         self.assertEqual(list(cmafa.base_fields['transport'].widget.choices),
-            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
+            [('', 'None'), ('1', 'Plane'), ('2', 'Train'), ('3', 'Bus')])
 
         class AdminConcertForm(forms.ModelForm):
             class Meta:
