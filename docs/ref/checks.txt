@@ -10,11 +10,14 @@ It's also triggered implicitly before most command, including ``runserver``
 and ``syncdb``. For performance issues, the checks are not performed if
 ``DEBUG`` is set to False.
 
-Four kinds of object can be checked: apps, models, fields and managers. All of
-them share the same interface. Each of these objects has a callable piece of
-code named ``check``. It is a method (in case of fields and managers), a
-classmethod (in case of models) or a function (in case of an app). It receives
-``**kwargs`` and returns list of errors and warnings.
+Checking framework is really flexible and allow you to write functions (or
+other callable objects like methods) performing any kind of checks. The
+function has to receive ``**kwargs`` and return list of errors and warnings.
+If there are no errors, you still have to return an empty list. In case of
+fields and managers, you can just override ``check`` method. There is relevant
+classmethod for models. In other cases, you need to `register the function`_.
+
+.. _`register the function`: `registering-checks`_
 
 Errors and warnings
 ===================
@@ -117,3 +120,23 @@ you need to use classmethods::
             errors = super(MyModel, cls).check(**kwargs)
             # ... your own checking stuff ...
             return errors
+
+.. _`registering-checks`:
+
+Registering checks
+==================
+
+You may be interested in app-specific checks or other kinds of checks which
+are connected with neither fields, managers nor models. In that case, you need
+to write a function (or other kind of callable object) performing the checks
+and register it.
+
+.. method:: register(callable)
+
+The callable has to follow the contract defined at the beginning of this doc
+-- it receives ``**kwargs`` and returns list of errors and warnings.
+
+Note that checks are performed just after loading apps and you need to
+register them earlier. It's recommended to call the ``register`` function at
+the module level so the checks will be registered at the the time of importing
+the module.
