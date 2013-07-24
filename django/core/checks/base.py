@@ -6,7 +6,7 @@ from django.utils.itercompat import is_iterable
 
 
 @python_2_unicode_compatible
-class BaseCheckError(object):
+class BaseCheckMessage(object):
     def __init__(self, msg, hint, obj=None):
         self.msg = msg
         self.hint = hint
@@ -54,11 +54,11 @@ class BaseCheckError(object):
             (self.__class__.__name__, self.msg, self.hint, self.obj)
 
 
-class Error(BaseCheckError):
+class Error(BaseCheckMessage):
     pass
 
 
-class Warning(BaseCheckError):
+class Warning(BaseCheckMessage):
     pass
 
 
