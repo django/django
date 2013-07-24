@@ -1407,8 +1407,14 @@ class BaseDatabaseValidation(object):
         self.connection = connection
 
     def validate_field(self, errors, opts, f):
-        """ By default, there is no backend-specific validation. This method
-        is deprecated. Use `check_field` instead."""
+        """
+        By default, there is no backend-specific validation.
+
+        This method has been deprecated by the new checks framework. New
+        backends should implement check_field instead.
+
+        """
+
         pass
 
     def check_field(self, field, **kwargs):
