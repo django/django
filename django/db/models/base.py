@@ -1032,7 +1032,6 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_swappable(cls, **kwargs):
-        from django.db import models
         if cls._meta.swapped:
             try:
                 app_label, model_name = cls._meta.swapped.split('.')
@@ -1042,7 +1041,7 @@ class Model(six.with_metaclass(ModelBase)):
                     % cls._meta.swappable,
                     hint=None, obj=cls)]
             else:
-                if not models.get_model(app_label, model_name):
+                if not get_model(app_label, model_name):
                     return [checks.Error(
                         '%(app_label)s.%(model_name)s not installed '
                         'or abstract.\n'
@@ -1058,7 +1057,6 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_managers(cls, **kwargs):
-        #import ipdb; ipdb.set_trace()
         errors = []
         managers = cls._meta.concrete_managers + cls._meta.abstract_managers
         for (_, _, manager) in managers:
