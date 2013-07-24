@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import collections
@@ -21,7 +22,8 @@ from django.utils.functional import curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_text, force_text, force_bytes
+from django.utils.encoding import (smart_text, force_text, force_bytes,
+    python_2_unicode_compatible)
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils import six
 from django.utils.itercompat import is_iterable
@@ -69,6 +71,7 @@ def _empty(of_cls):
 
 
 @total_ordering
+@python_2_unicode_compatible
 class Field(object):
     """Base class for all field types"""
 
@@ -743,6 +746,11 @@ class Field(object):
     def _check_backend_specific_checks(self, **kwargs):
         return connection.validation.check_field(self, **kwargs)
 
+    def __str__(self):
+        """ Return "app_label.model_label.field_name". """
+        model = self.model
+        app = model._meta.app_label
+        return '%s.%s.%s: ' % (app, model._meta.object_name, self.name)
 
     def __repr__(self):
         """
