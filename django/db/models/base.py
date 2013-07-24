@@ -1041,16 +1041,17 @@ class Model(six.with_metaclass(ModelBase)):
                     hint=None, obj=cls)]
             else:
                 if not get_model(app_label, model_name):
+                    d = {'app_label': app_label, 'model_name': model_name}
                     return [checks.Error(
                         '%(app_label)s.%(model_name)s not installed '
                         'or abstract.\n'
                         'The model has been swapped out for '
                         '%(app_label)s.%(model_name)s which has not been '
-                        'installed or is abstract.' % locals(),
+                        'installed or is abstract.' % d,
                         hint='Ensure that you did not misspell the model '
                         'name and the app name as well as the model '
                         'is not abstract. Does your INSTALLED_APPS setting '
-                        'contain the "%(app_label)s" app?' % locals(),
+                        'contain the "%(app_label)s" app?' % d,
                         obj=cls)]
         return []
 
