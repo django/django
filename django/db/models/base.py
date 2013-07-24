@@ -1039,8 +1039,7 @@ class Model(six.with_metaclass(ModelBase)):
                 return [checks.Error(
                     '"%s" is not of the form "app_label.app_name".'
                     % cls._meta.swappable,
-                    hint='Add app label to "%s" setting.' % cls._meta.swappable,
-                    obj=cls)]
+                    hint=None, obj=cls)]
             else:
                 if not models.get_model(app_label, model_name):
                     return [checks.Error(
@@ -1117,8 +1116,7 @@ class Model(six.with_metaclass(ModelBase)):
                     'Field name ending with an underscore.\n'
                     'Field names cannot end with underscores, because this '
                     'would lead to ambiguous queryset filters.',
-                    hint='Rename the field.',
-                    obj=field))
+                    hint=None, obj=field))
         return errors
 
     @classmethod
@@ -1272,8 +1270,7 @@ class Model(six.with_metaclass(ModelBase)):
                 '"index_together" is a list of field names that, taken '
                 'together, are indexed, so "index_together" must be '
                 'an iterable (e.g. a list). ',
-                hint='Convert "index_together" to a list.',
-                obj=cls)]
+                hint=None, obj=cls)]
 
         if any(not isinstance(fields, (tuple, list))
             for fields in cls._meta.index_together):
@@ -1285,8 +1282,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'indexed, so "index_together" must be an iterable '
                 'of iterables (i. e. a list of lists), i. e. '
                 '[["first_field", "second_field"]].',
-                hint='Convert "index_together" to a list of lists.',
-                obj=cls)]
+                hint=None, obj=cls)]
 
         errors = []
         for fields in cls._meta.index_together:
@@ -1301,8 +1297,7 @@ class Model(six.with_metaclass(ModelBase)):
                 '"unique_together" is a list of field names that, taken '
                 'together, are indexed, so "unique_together" must be '
                 'an iterable (e.g. a list).',
-                hint='Convert "unique_together" to a list.',
-                obj=cls)]
+                hint=None, obj=cls)]
 
         if any(not isinstance(fields, (tuple, list))
             for fields in cls._meta.unique_together):
@@ -1316,8 +1311,7 @@ class Model(six.with_metaclass(ModelBase)):
                 '[("first_field", "second_field")]. When dealing with '
                 'a single set of fields, a single tuple can be used: '
                 '("first_field", "second_field").',
-                hint='Convert "unique_together" to a list of lists.',
-                obj=cls)]
+                hint=None, obj=cls)]
 
         errors = []
         for fields in cls._meta.unique_together:
@@ -1345,20 +1339,15 @@ class Model(six.with_metaclass(ModelBase)):
                 if isinstance(field.rel, models.ManyToManyRel):
                     return [checks.Error(
                         '"%s" referring to a m2m "%s" field.\n'
-                        'ManyToManyFields are not supported in '
-                        '"%s".' % (option, field_name, option),
-                        hint='Remove the m2m field '
-                        'from "%s".' % option,
-                        obj=cls)]
+                        'ManyToManyFields are not supported in "%s".'
+                        % (option, field_name, option),
+                        hint=None, obj=cls)]
                 if field not in cls._meta.local_fields:
                     return [checks.Error(
-                        '"%s" pointing to field defined '
-                        'in parent model.\n',
-                        'You cannot refer to fields defined in parent '
-                        'model.' % option,
-                        hint='Remove "%s" from "%s".'
-                        % (field_name, option),
-                        obj=cls)]
+                        '"%s" pointing to field defined in parent model.\n',
+                        'You cannot refer to fields defined in parent model.'
+                        % option,
+                        hint=None, obj=cls)]
         return []
 
     @classmethod
@@ -1374,8 +1363,7 @@ class Model(six.with_metaclass(ModelBase)):
                 '"ordering" must be a tuple or list of field names, i. e. '
                 '["pub_date", "author"]. If you want to order by only one '
                 'field, you still need to use a list, i. e. ["pub_date"].',
-                hint='Convert "ordering" to a list.',
-                obj=cls)]
+                hint=None, obj=cls)]
 
         errors = []
 

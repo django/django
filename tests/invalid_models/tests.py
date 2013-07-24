@@ -30,8 +30,7 @@ class CharFieldTests(TestCase):
             Error('No "max_length" argument.\n'
                 'CharFields require "max_length" argument that is '
                 'the maximum length (in characters) of the field.',
-                hint='Set "max_length" argument.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_negative_max_length(self):
@@ -42,8 +41,7 @@ class CharFieldTests(TestCase):
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_bad_value_of_max_length(self):
@@ -54,8 +52,7 @@ class CharFieldTests(TestCase):
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_non_iterable_choices(self):
@@ -68,8 +65,7 @@ class CharFieldTests(TestCase):
                 'the second element is the human-readable name. '
                 'An example of a valid value is '
                 '[("1", "first choice"), ("2", "second choice")].',
-                hint='Convert "choices" into a list of pairs.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_choices_containing_non_pairs(self):
@@ -82,8 +78,7 @@ class CharFieldTests(TestCase):
                 'the second element is the human-readable name. '
                 'An example of a valid value is '
                 '[("1", "first choice"), ("2", "second choice")].',
-                hint='Convert "choices" into a list of pairs.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_bad_value_of_db_index(self):
@@ -93,8 +88,8 @@ class CharFieldTests(TestCase):
             Error('Invalid "db_index" value (should be None, True or False).\n'
                 'If set to True, a database index will be created for this '
                 'field. ',
-                hint='Set "db_index" to False or True '
-                'or remove this argument.',
+                hint='Set "db_index" to False or True or '
+                'remove this optional argument.',
                 obj=field),
         ])
 
@@ -111,8 +106,7 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Set "decimal_places" argument.',
-                obj=field),
+                hint=None, obj=field),
             Error('No "max_digits" attribute.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -120,8 +114,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 and '
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Set "max_length" argument.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_negative_max_digits_and_decimal_places(self):
@@ -134,8 +127,7 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Change "decimal_places" argument.',
-                obj=field),
+                hint=None, obj=field),
             Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -143,8 +135,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 '
                 'and "decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Change "max_length" argument.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
@@ -157,8 +148,7 @@ class DecimalFieldTests(TestCase):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Change "decimal_places" argument.',
-                obj=field),
+                hint=None, obj=field),
             Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
                 'the maximum number of digits allowed in the number and '
@@ -166,8 +156,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "max_digits" to 5 and '
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Change "max_length" argument.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_decimal_places_greater_than_max_digits(self):
@@ -181,9 +170,7 @@ class DecimalFieldTests(TestCase):
                 'For example, if you set "decimal_places" to 2 and you '
                 'want to store numbers up to 999.99 then you should set '
                 '"max_digits" to 5.',
-                hint='Increase "max_digits" value to at least '
-                '"decimal_places" value.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_valid_field(self):
@@ -280,9 +267,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'The field is a manually-defined many to many relation '
                 'through model InvalidRelationship, which does not have '
                 'foreign keys to Group or Person.\n',
-                hint='Ensure that there are foreign keys to Group '
-                'and Person models in InvalidRelationship model.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_relationship_model_missing_foreign_key(self):
@@ -305,9 +290,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'The field is a manually-defined many to many relation '
                 'through model InvalidRelationship, which does not have '
                 'foreign keys to Group or Person.\n',
-                hint='Ensure that there are foreign keys to Group '
-                'and Person models in InvalidRelationship model.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_missing_relationship_model(self):
@@ -345,8 +328,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             Error('Symmetrical field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
-                hint='Set symmetrical=False on the field.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
@@ -366,9 +348,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'in intermediary model InvalidRelationship.\n'
                 'InvalidRelationship has more than two foreign keys to '
                 'Person, which is ambiguous and is not permitted.',
-                hint='Remove excessive foreign keys to Person '
-                'in InvalidRelationship.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):
@@ -387,8 +367,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             Error('Symmetrical field with intermediate table.\n'
                 'Many-to-many fields with intermediate tables cannot '
                 'be symmetrical.',
-                hint='Set symmetrical=False on the field.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_foreign_key_to_abstract_model(self):
@@ -444,8 +423,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, [
             Error('Unique many-to-many field.\n'
                 'ManyToManyFields cannot be unique.',
-                hint='Remove the "unique" argument on the field.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_foreign_key_to_non_unique_field(self):
@@ -462,9 +440,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Target.\n'
                 'The field "bad" has to be unique because a foreign key '
                 'references to it.',
-                hint='Set unique=True argument on the field "bad" '
-                'under model Target.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_foreign_key_to_non_unique_field_under_explicit_model(self):
@@ -480,9 +456,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Target.\n'
                 'The field "bad" has to be unique because a foreign key '
                 'references to it.',
-                hint='Set unique=True argument on the field "bad" '
-                'under model Target.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_on_delete_set_null_on_non_nullable_field(self):
@@ -516,7 +490,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             Error('on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
                 'no default value.',
-                hint='Set "default" argument on the field.',
+                hint=None,
                 obj=field),
         ])
 
@@ -612,8 +586,7 @@ class OtherFieldTests(TestCase):
         self.assertEqual(errors, [
             Error('No "upload_to" attribute.\n'
                 'FileFields require an "upload_to" attribute.',
-                hint='Set "upload_to" attribute.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_nullable_boolean_field(self):
@@ -623,8 +596,7 @@ class OtherFieldTests(TestCase):
             Error('null=True for BooleanField.\n'
                 'BooleanFields do not accept null values. Use '
                 'a NullBooleanField instead.',
-                hint='Replace BooleanField with NullBooleanField.',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_non_nullable_blank_GenericIPAddressField(self):
@@ -635,9 +607,7 @@ class OtherFieldTests(TestCase):
                 'GenericIPAddressField cannot accept blank values '
                 'if null values are not allowed, as blank values are stored '
                 'as null.',
-                hint='Allow to store null values (null=True) or '
-                'forbid blank values (blank=False).',
-                obj=field),
+                hint=None, obj=field),
         ])
 
     def test_FilePathField(self):
@@ -648,8 +618,7 @@ class OtherFieldTests(TestCase):
                 'on FilePathField.\n'
                 'FilePathFields must have either allow_files or allow_folders '
                 'set to True.',
-                hint='Set allow_files or allow_folders to True.',
-                obj=field)
+                hint=None, obj=field)
         ])
 
     def test_backend_specific_checks(self):
@@ -1141,8 +1110,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 '"index_together" is a list of field names that, taken '
                 'together, are indexed, so "index_together" must be '
                 'an iterable (e.g. a list). ',
-                hint='Convert "index_together" to a list.',
-                obj=Model),
+                hint=None, obj=Model),
         ])
 
     def test_index_together_containing_non_iterable(self):
@@ -1162,8 +1130,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 'indexed, so "index_together" must be an iterable '
                 'of iterables (i. e. a list of lists), i. e. '
                 '[["first_field", "second_field"]].',
-                hint='Convert "index_together" to a list of lists.',
-                obj=Model),
+                hint=None, obj=Model),
         ])
 
     def test_index_together_pointing_to_missing_field(self):
@@ -1197,8 +1164,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
             Error('"index_together" referring to a m2m "m2m" field.\n'
                 'ManyToManyFields are not supported in '
                 '"index_together".',
-                hint='Remove the m2m field from "index_together".',
-                obj=Model)
+                hint=None, obj=Model)
         ])
 
     def test_unique_together_not_iterable(self):
@@ -1212,8 +1178,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 '"unique_together" is a list of field names that, taken '
                 'together, are indexed, so "unique_together" must be '
                 'an iterable (e.g. a list).',
-                hint='Convert "unique_together" to a list.',
-                obj=Model),
+                hint=None, obj=Model),
         ])
 
     def test_unique_together_containing_non_iterable(self):
@@ -1235,8 +1200,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 '[("first_field", "second_field")]. When dealing with '
                 'a single set of fields, a single tuple can be used: '
                 '("first_field", "second_field").',
-                hint='Convert "unique_together" to a list of lists.',
-                obj=Model),
+                hint=None, obj=Model),
         ])
 
     def test_valid_unique_together(self):
@@ -1282,8 +1246,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
             Error('"unique_together" referring to a m2m "m2m" field.\n'
                 'ManyToManyFields are not supported in '
                 '"unique_together".',
-                hint='Remove the m2m field from "unique_together".',
-                obj=Model)
+                hint=None, obj=Model)
         ])
 
 
@@ -1314,13 +1277,11 @@ class OtherModelTests(IsolatedModelsTestCase):
             Error('Field name ending with an underscore.\n'
                 'Field names cannot end with underscores, because this '
                 'would lead to ambiguous queryset filters.',
-                hint='Rename the field.',
-                obj=Model._meta.get_field('field_')),
+                hint=None, obj=Model._meta.get_field('field_')),
             Error('Field name ending with an underscore.\n'
                 'Field names cannot end with underscores, because this '
                 'would lead to ambiguous queryset filters.',
-                hint='Rename the field.',
-                obj=Model._meta.get_field('m2m_')),
+                hint=None, obj=Model._meta.get_field('m2m_')),
         ])
 
     def test_ordering_non_iterable(self):
@@ -1334,8 +1295,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                 '"ordering" must be a tuple or list of field names, i. e. '
                 '["pub_date", "author"]. If you want to order by only one '
                 'field, you still need to use a list, i. e. ["pub_date"].',
-                hint='Convert "ordering" to a list.',
-                obj=Model)
+                hint=None, obj=Model)
         ])
 
     def test_ordering_pointing_to_missing_field(self):
@@ -1360,9 +1320,7 @@ class OtherModelTests(IsolatedModelsTestCase):
         self.assertEqual(errors, [
             Error('"TEST_SWAPPED_MODEL_BAD_VALUE" is not of the form '
                 '"app_label.app_name".',
-                hint='Add app label to '
-                '"TEST_SWAPPED_MODEL_BAD_VALUE" setting.',
-                obj=Model)
+                hint=None, obj=Model)
         ])
 
     @override_settings(TEST_SWAPPED_MODEL_BAD_MODEL='not_an_app.Target')

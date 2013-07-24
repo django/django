@@ -703,8 +703,7 @@ class Field(object):
                     'and the second element is the human-readable name. '
                     'An example of a valid value is '
                     '[("1", "first choice"), ("2", "second choice")].',
-                    hint='Convert "choices" into a list of pairs.',
-                    obj=self)]
+                    hint=None, obj=self)]
             elif any(isinstance(choice, six.string_types) or
                      not is_iterable(choice) or len(choice) != 2
                      for choice in self.choices):
@@ -714,8 +713,7 @@ class Field(object):
                     'and the second element is the human-readable name. '
                     'An example of a valid value is '
                     '[("1", "first choice"), ("2", "second choice")].',
-                    hint='Convert "choices" into a list of pairs.',
-                    obj=self)]
+                    hint=None, obj=self)]
         return []
 
     def _check_db_index(self, **kwargs):
@@ -725,7 +723,7 @@ class Field(object):
                 'If set to True, a database index will be created for this '
                 'field. ',
                 hint='Set "db_index" to False or True '
-                'or remove this argument.',
+                'or remove this optional argument.',
                 obj=self)]
         return []
 
@@ -889,8 +887,7 @@ class BooleanField(Field):
             return [checks.Error('null=True for BooleanField.\n'
                 'BooleanFields do not accept null values. Use '
                 'a NullBooleanField instead.',
-                hint='Replace BooleanField with NullBooleanField.',
-                obj=self)]
+                hint=None, obj=self)]
         return []
 
 
@@ -936,16 +933,14 @@ class CharField(Field):
                 'No "max_length" argument.\n'
                 'CharFields require "max_length" argument that is '
                 'the maximum length (in characters) of the field.',
-                hint='Set "max_length" argument.',
-                obj=self)]
+                hint=None, obj=self)]
         except ValueError:
             return [checks.Error(
                 'Invalid "max_length" value.\n'
                 'CharFields require a "max_length" attribute that is '
                 'the maximum length (in characters) of the field '
                 'and is a positive integer.',
-                hint='Change "max_length" value to a positive integer.',
-                obj=self)]
+                hint=None, obj=self)]
         else:
             return []
 
@@ -1270,9 +1265,7 @@ class DecimalField(Field):
                 'For example, if you set "decimal_places" to 2 and you '
                 'want to store numbers up to 999.99 then you should set '
                 '"max_digits" to 5.',
-                hint='Increase "max_digits" value to at least '
-                '"decimal_places" value.',
-                obj=self))
+                hint=None, obj=self))
         return errors
 
     def __check_decimal_places(self):
@@ -1287,8 +1280,7 @@ class DecimalField(Field):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Set "decimal_places" argument.',
-                obj=self)]
+                hint=None, obj=self)]
         except ValueError:
             return [checks.Error('Invalid "decimal_places" value.\n'
                 'DecimalFields require a "decimal_places" attribute that is '
@@ -1296,8 +1288,7 @@ class DecimalField(Field):
                 'a non-negative integer smaller or equal to "max_digits". '
                 'For example, if you set "decimal_places" to 2 then 1.23456 '
                 'will be saved as 1.23.',
-                hint='Change "decimal_places" argument.',
-                obj=self)]
+                hint=None, obj=self)]
         else:
             return []
 
@@ -1314,8 +1305,7 @@ class DecimalField(Field):
                 'For example, if you set "max_digits" to 5 and '
                 '"decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Set "max_length" argument.',
-                obj=self)]
+                hint=None, obj=self)]
         except ValueError:
             return [checks.Error('Invalid "max_digits" value.\n'
                 'DecimalFields require a "max_digits" attribute that is '
@@ -1324,8 +1314,7 @@ class DecimalField(Field):
                 'For example, if you set "max_digits" to 5 '
                 'and "decimal_places" to 2 then 999.99 is the greatest number '
                 'that you can save.',
-                hint='Change "max_length" argument.',
-                obj=self)]
+                hint=None, obj=self)]
         else:
             return []
 
@@ -1409,8 +1398,7 @@ class FilePathField(Field):
                 'on FilePathField.\n'
                 'FilePathFields must have either allow_files or allow_folders '
                 'set to True.',
-                hint='Set allow_files or allow_folders to True.',
-                obj=self)]
+                hint=None, obj=self)]
         return []
 
 
@@ -1593,9 +1581,7 @@ class GenericIPAddressField(Field):
                 'GenericIPAddressField cannot accept blank values '
                 'if null values are not allowed, as blank values are stored '
                 'as null.',
-                hint='Allow to store null values (null=True) or '
-                'forbid blank values (blank=False).',
-                obj=self)]
+                hint=None, obj=self)]
         return []
 
 
