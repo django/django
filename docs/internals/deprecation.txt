@@ -414,6 +414,10 @@ these changes.
 
 * ``django.utils.unittest`` will be removed.
 
+* If models are organized in a package, Django will no longer look for
+  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
+  custom SQL files to ``myapp/sql/``.
+
 2.0
 ---
 
