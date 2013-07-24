@@ -184,7 +184,7 @@ class CustomUserModelValidationTestCase(TestCase):
                 'CustomUserNonListRequiredFields.REQUIRED_FIELDS.\n'
                 'The REQUIRED_FIELDS must be an iterable (i. e. a list '
                 'or tuple).',
-                hint='Convert the REQUIRED_FIELDS to a list.',
+                hint=None,
                 obj=CustomUserNonListRequiredFields),
         ])
 
@@ -200,7 +200,7 @@ class CustomUserModelValidationTestCase(TestCase):
                 'REQUIRED_FIELDS.\n'
                 'The field named as the USERNAME_FIELD should not be '
                 'included in REQUIRED_FIELDS.',
-                hint='Exclude "username" from REQUIRED_FIELDS.',
+                hint=None,
                 obj=CustomUserBadRequiredFields),
         ])
 
@@ -215,8 +215,7 @@ class CustomUserModelValidationTestCase(TestCase):
                 'Non unique CustomUserNonUniqueUsername.USERNAME_FIELD.\n'
                 'The CustomUserNonUniqueUsername.username field must be '
                 'unique because it is pointed by USERNAME_FIELD.',
-                hint='Add unique=True to field '
-                'CustomUserNonUniqueUsername.username.',
+                hint=None,
                 obj=CustomUserNonUniqueUsername),
         ])
 
