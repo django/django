@@ -1804,7 +1804,8 @@ for skipping tests.
 
 .. function:: skipIfDBFeature(feature_name_string)
 
-Skip the decorated test if the named database feature is supported.
+Skip the decorated test or ``TestCase`` if the named database feature is
+supported.
 
 For example, the following test will not be executed if the database
 supports transactions (e.g., it would *not* run under PostgreSQL, but
@@ -1815,9 +1816,13 @@ it would under MySQL with MyISAM tables)::
         def test_transaction_behavior(self):
             # ... conditional test code
 
+.. versionchanged:: 1.7
+
+    ``skipIfDBFeature`` can now be used to decorate a ``TestCase`` class.
+
 .. function:: skipUnlessDBFeature(feature_name_string)
 
-Skip the decorated test if the named database feature is *not*
+Skip the decorated test or ``TestCase`` if the named database feature is *not*
 supported.
 
 For example, the following test will only be executed if the database
@@ -1828,3 +1833,7 @@ under MySQL with MyISAM tables)::
         @skipUnlessDBFeature('supports_transactions')
         def test_transaction_behavior(self):
             # ... conditional test code
+
+.. versionchanged:: 1.7
+
+    ``skipUnlessDBFeature`` can now be used to decorate a ``TestCase`` class.

@@ -47,22 +47,21 @@ class BlockNode(Node):
 
     def render(self, context):
         block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
-        context.push()
-        if block_context is None:
-            context['block'] = self
-            result = self.nodelist.render(context)
-        else:
-            push = block = block_context.pop(self.name)
-            if block is None:
-                block = self
-            # Create new block so we can store context without thread-safety issues.
-            block = BlockNode(block.name, block.nodelist)
-            block.context = context
-            context['block'] = block
-            result = block.nodelist.render(context)
-            if push is not None:
-                block_context.push(self.name, push)
-        context.pop()
+        with context.push():
+            if block_context is None:
+                context['block'] = self
+                result = self.nodelist.render(context)
+            else:
+                push = block = block_context.pop(self.name)
+                if block is None:
+                    block = self
+                # Create new block so we can store context without thread-safety issues.
+                block = BlockNode(block.name, block.nodelist)
+                block.context = context
+                context['block'] = block
+                result = block.nodelist.render(context)
+                if push is not None:
+                    block_context.push(self.name, push)
         return result
 
     def super(self):
@@ -133,10 +132,9 @@ class BaseIncludeNode(Node):
                        in six.iteritems(self.extra_context)])
         if self.isolated_context:
             return template.render(context.new(values))
-        context.update(values)
-        output = template.render(context)
-        context.pop()
-        return output
+        with context.push(**values):
+            return template.render(context)
+
 
 class ConstantIncludeNode(BaseIncludeNode):
     def __init__(self, template_path, *args, **kwargs):

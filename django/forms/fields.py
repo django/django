@@ -370,8 +370,14 @@ class DecimalField(IntegerField):
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)
-        if isinstance(widget, NumberInput) and self.decimal_places:
-            attrs['step'] = '0.%s1' % ('0' * (self.decimal_places - 1))
+        if isinstance(widget, NumberInput):
+            if self.decimal_places is not None:
+                # Use exponential notation for small values since they might
+                # be parsed as 0 otherwise. ref #20765
+                step = str(Decimal('1') / 10 ** self.decimal_places).lower()
+            else:
+                step = 'any'
+            attrs.setdefault('step', step)
         return attrs
 
 
@@ -1019,7 +1025,7 @@ class MultiValueField(Field):
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(initial, data):
+            if field._has_changed(field.to_python(initial), data):
                 return True
         return False
 

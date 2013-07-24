@@ -58,7 +58,7 @@ class SyndicationFeedTest(FeedTestCase):
         chan = chan_elem[0]
 
         # Find the last build date
-        d = Entry.objects.latest('date').date
+        d = Entry.objects.latest('published').published
         ltz = tzinfo.LocalTimezone(d)
         last_build_date = rfc2822_date(d.replace(tzinfo=ltz))
 
@@ -88,7 +88,7 @@ class SyndicationFeedTest(FeedTestCase):
         )
 
         # Find the pubdate of the first feed item
-        d = Entry.objects.get(pk=1).date
+        d = Entry.objects.get(pk=1).published
         ltz = tzinfo.LocalTimezone(d)
         pub_date = rfc2822_date(d.replace(tzinfo=ltz))
 
@@ -203,9 +203,60 @@ class SyndicationFeedTest(FeedTestCase):
         entries = feed.getElementsByTagName('entry')
         self.assertEqual(len(entries), Entry.objects.count())
         for entry in entries:
-            self.assertChildNodes(entry, ['title', 'link', 'id', 'summary', 'category', 'updated', 'rights', 'author'])
+            self.assertChildNodes(entry, [
+                'title',
+                'link',
+                'id',
+                'summary',
+                'category',
+                'updated',
+                'published',
+                'rights',
+                'author',
+            ])
             summary = entry.getElementsByTagName('summary')[0]
             self.assertEqual(summary.getAttribute('type'), 'html')
+
+    def test_atom_feed_published_and_updated_elements(self):
+        """
+        Test that the published and updated elements are not
+        the same and now adhere to RFC 4287.
+        """
+        response = self.client.get('/syndication/atom/')
+        feed = minidom.parseString(response.content).firstChild
+        entries = feed.getElementsByTagName('entry')
+
+        published = entries[0].getElementsByTagName('published')[0].firstChild.wholeText
+        updated = entries[0].getElementsByTagName('updated')[0].firstChild.wholeText
+
+        self.assertNotEqual(published, updated)
+
+    def test_latest_post_date(self):
+        """
+        Test that both the published and updated dates are
+        considered when determining the latest post date.
+        """
+        # this feed has a `published` element with the latest date
+        response = self.client.get('/syndication/atom/')
+        feed = minidom.parseString(response.content).firstChild
+        updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
+
+        d = Entry.objects.latest('published').published
+        ltz = tzinfo.LocalTimezone(d)
+        latest_published = rfc3339_date(d.replace(tzinfo=ltz))
+
+        self.assertEqual(updated, latest_published)
+
+        # this feed has an `updated` element with the latest date
+        response = self.client.get('/syndication/latest/')
+        feed = minidom.parseString(response.content).firstChild
+        updated = feed.getElementsByTagName('updated')[0].firstChild.wholeText
+
+        d = Entry.objects.exclude(pk=5).latest('updated').updated
+        ltz = tzinfo.LocalTimezone(d)
+        latest_updated = rfc3339_date(d.replace(tzinfo=ltz))
+
+        self.assertEqual(updated, latest_updated)
 
     def test_custom_feed_generator(self):
         response = self.client.get('/syndication/custom/')
@@ -219,7 +270,18 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertEqual(len(entries), Entry.objects.count())
         for entry in entries:
             self.assertEqual(entry.getAttribute('bacon'), 'yum')
-            self.assertChildNodes(entry, ['title', 'link', 'id', 'summary', 'ministry', 'rights', 'author', 'updated', 'category'])
+            self.assertChildNodes(entry, [
+                'title',
+                'link',
+                'id',
+                'summary',
+                'ministry',
+                'rights',
+                'author',
+                'updated',
+                'published',
+                'category',
+            ])
             summary = entry.getElementsByTagName('summary')[0]
             self.assertEqual(summary.getAttribute('type'), 'html')
 
@@ -245,7 +307,7 @@ class SyndicationFeedTest(FeedTestCase):
         doc = minidom.parseString(response.content)
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
 
-        d = Entry.objects.latest('date').date
+        d = Entry.objects.latest('published').published
         ltz = tzinfo.LocalTimezone(d)
         latest = rfc3339_date(d.replace(tzinfo=ltz))
 
@@ -257,12 +319,12 @@ class SyndicationFeedTest(FeedTestCase):
         """
         response = self.client.get('/syndication/aware-dates/')
         doc = minidom.parseString(response.content)
-        updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
-        self.assertEqual(updated[-6:], '+00:42')
+        published = doc.getElementsByTagName('published')[0].firstChild.wholeText
+        self.assertEqual(published[-6:], '+00:42')
 
     def test_feed_last_modified_time(self):
         response = self.client.get('/syndication/naive-dates/')
-        self.assertEqual(response['Last-Modified'], 'Thu, 03 Jan 2008 19:30:00 GMT')
+        self.assertEqual(response['Last-Modified'], 'Tue, 26 Mar 2013 01:00:00 GMT')
 
         # No last-modified when feed has no item_pubdate
         response = self.client.get('/syndication/no_pubdate/')

@@ -2910,7 +2910,7 @@ class DoubleInSubqueryTests(TestCase):
         self.assertQuerysetEqual(
             qs, [lfb1], lambda x: x)
 
-class Ticket18785Tests(unittest.TestCase):
+class Ticket18785Tests(TestCase):
     def test_ticket_18785(self):
         # Test join trimming from ticket18785
         qs = Item.objects.exclude(
@@ -2920,3 +2920,22 @@ class Ticket18785Tests(unittest.TestCase):
         ).order_by()
         self.assertEqual(1, str(qs.query).count('INNER JOIN'))
         self.assertEqual(0, str(qs.query).count('OUTER JOIN'))
+
+
+class Ticket20788Tests(TestCase):
+    def test_ticket_20788(self):
+        Paragraph.objects.create()
+        paragraph = Paragraph.objects.create()
+        page = paragraph.page.create()
+        chapter = Chapter.objects.create(paragraph=paragraph)
+        Book.objects.create(chapter=chapter)
+
+        paragraph2 = Paragraph.objects.create()
+        Page.objects.create()
+        chapter2 = Chapter.objects.create(paragraph=paragraph2)
+        book2 = Book.objects.create(chapter=chapter2)
+
+        sentences_not_in_pub = Book.objects.exclude(
+            chapter__paragraph__page=page)
+        self.assertQuerysetEqual(
+            sentences_not_in_pub, [book2], lambda x: x)

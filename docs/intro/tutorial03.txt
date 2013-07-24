@@ -182,7 +182,7 @@ slightly different, because they take an argument::
     def vote(request, poll_id):
         return HttpResponse("You're voting on poll %s." % poll_id)
 
-Wire these news views into the ``polls.urls`` module by adding the following
+Wire these new views into the ``polls.urls`` module by adding the following
 :func:`~django.conf.urls.url` calls::
 
     from django.conf.urls import patterns, url
