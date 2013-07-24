@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.encoding import python_2_unicode_compatible
 
 
 def ensure_default_manager(sender, **kwargs):
@@ -58,6 +59,7 @@ class RenameManagerMethods(RenameMethodsBase):
     )
 
 
+@python_2_unicode_compatible
 class BaseManager(six.with_metaclass(RenameManagerMethods)):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
@@ -155,6 +157,23 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
     def db(self):
         return self._db or router.db_for_read(self.model, **self._hints)
 
+    def check(self, **kwargs):
+        return []
+
+    def __str__(self):
+        """ Return "app_label.model_label.manager_name". """
+        model = self.model
+        opts = model._meta
+        app = model._meta.app_label
+        manager_name = next(name for (_, name, manager)
+            in opts.concrete_managers + opts.abstract_managers
+            if manager == self)
+        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+
+    #######################
+    # PROXIES TO QUERYSET #
+    #######################
+
     def get_queryset(self):
         """
         Returns a new QuerySet object.  Subclasses can override this method to
@@ -170,9 +189,6 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
-
-    def check(self, **kwargs):
-        return []
 
 
 Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
