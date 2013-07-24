@@ -53,8 +53,6 @@ class CurrentSiteManager(models.Manager):
                 'CurrentSiteManager uses a non-relative field.\n'
                 '%s.%s should be a ForeignKey or ManyToManyField.'
                 % (self.model._meta.object_name, field_name),
-                hint='Convert the field to a relative field or create a new '
-                'relative field that will be used by CurrentSiteManager.',
-                obj=self)]
+                hint=None, obj=self)]
 
         return []

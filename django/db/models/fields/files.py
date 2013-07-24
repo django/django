@@ -313,10 +313,10 @@ class FileField(Field):
 
     def _check_upload_to(self, **kwargs):
         if not self.upload_to:
-            yield checks.Error('No "upload_to" attribute.\n'
+            return [checks.Error('No "upload_to" attribute.\n'
                 'FileFields require an "upload_to" attribute.',
-                hint='Set "upload_to" attribute.',
-                obj=self)
+                hint=None, obj=self)]
+        return []
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -451,7 +451,7 @@ class ImageField(FileField):
                 'To use ImageFields, you need to install Pillow.'
                 'Get it at https://pypi.python.org/pypi/Pillow or run '
                 'command "pip install pillow".',
-                obj=self)]
+                hint=None, obj=self)]
         else:
             return []
 

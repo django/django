@@ -202,8 +202,7 @@ class RelatedField(Field):
                 'on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
                 'no default value.',
-                hint='Set "default" argument on the field.',
-                obj=self)]
+                hint=None, obj=self)]
         return []
 
 
@@ -1268,9 +1267,7 @@ class ForeignObject(RelatedField):
                         '"%(field_name)s" under model %(model_name)s.\n'
                         'The field "%(field_name)s" has to be unique because '
                         'a foreign key references to it.' % locals(),
-                        hint='Set unique=True argument on the field '
-                        '"%s" under model %s.' % (field_name, model_name),
-                        obj=self)]
+                        hint=None, obj=self)]
         return []
 
 class ForeignKey(ForeignObject):
@@ -1738,8 +1735,7 @@ class ManyToManyField(RelatedField):
         if self.unique:
             return [checks.Error('Unique many-to-many field.\n'
                 'ManyToManyFields cannot be unique.',
-                hint='Remove the "unique" argument on the field.',
-                obj=self)]
+                hint=None, obj=self)]
         return []
 
     def _check_relationship_model(self, from_model=None, **kwargs):
@@ -1782,8 +1778,7 @@ class ManyToManyField(RelatedField):
                     'Symmetrical field with intermediate table.\n'
                     'Many-to-many fields with intermediate tables cannot '
                     'be symmetrical.',
-                    hint='Set symmetrical=False on the field.',
-                    obj=self))
+                    hint=None, obj=self))
 
             # Count foreign keys in intermediate model
             if self_referential:
@@ -1797,10 +1792,7 @@ class ManyToManyField(RelatedField):
                         '%(relationship_model_name)s has more than two '
                         'foreign keys to %(from_model_name)s, which is '
                         'ambiguous and is not permitted.' % locals(),
-                        hint='Remove excessive foreign keys to '
-                        '%(from_model_name)s in %(relationship_model_name)s.'
-                        % locals(),
-                        obj=self))
+                        hint=None, obj=self))
 
             else:
                 # Count foreign keys in relationship model
@@ -1844,8 +1836,5 @@ class ManyToManyField(RelatedField):
                         'which does not have foreign keys to '
                         '%(from_model_name)s or %(to_model_name)s.\n'
                         % locals(),
-                        hint='Ensure that there are foreign keys '
-                        'to %(from_model_name)s and %(to_model_name)s models '
-                        'in %(relationship_model_name)s model.' % locals(),
-                        obj=self))
+                        hint=None, obj=self))
         return errors

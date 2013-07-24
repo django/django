@@ -73,6 +73,4 @@ class SitesFrameworkTestCase(TestCase):
         self.assertEqual(errors, [checks.Error(
             'CurrentSiteManager uses a non-relative field.\n'
             'ConfusedArticle.site should be a ForeignKey or ManyToManyField.',
-            hint='Convert the field to a relative field or create a new '
-            'relative field that will be used by CurrentSiteManager.',
-            obj=ConfusedArticle.on_site)])
+            hint=None, obj=ConfusedArticle.on_site)])
