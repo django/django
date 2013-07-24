@@ -245,7 +245,7 @@ All attributes can be set in your derived class and can be used in
   Make sure you know what you are doing if you decide to change the value of
   this option in your custom command if it creates database content that
   is locale-sensitive and such content shouldn't contain any translations (like
-  it happens e.g. with django.contrim.auth permissions) as making the locale
+  it happens e.g. with django.contrib.auth permissions) as making the locale
   differ from the de facto default 'en-us' might cause unintended effects. See
   the `Management commands and locales`_ section above for further details.
 
