@@ -1078,8 +1078,7 @@ class Model(six.with_metaclass(ModelBase)):
                     'Non-iterable %s.REQUIRED_FIELDS.\n'
                     'The REQUIRED_FIELDS must be an iterable (i. e. a list '
                     'or tuple).' % cls._meta.object_name,
-                    hint='Convert the REQUIRED_FIELDS to a list.',
-                    obj=cls))
+                    hint=None, obj=cls))
 
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
@@ -1087,9 +1086,7 @@ class Model(six.with_metaclass(ModelBase)):
                     '%s.USERNAME_FIELD included in REQUIRED_FIELDS.\n'
                     'The field named as the USERNAME_FIELD should not be '
                     'included in REQUIRED_FIELDS.' % cls._meta.object_name,
-                    hint='Exclude "%s" from REQUIRED_FIELDS.'
-                    % cls.USERNAME_FIELD,
-                    obj=cls))
+                    hint=None, obj=cls))
 
             # Check that the username field is unique
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
@@ -1098,9 +1095,7 @@ class Model(six.with_metaclass(ModelBase)):
                     'The %s.%s field must be unique because it is pointed by '
                     'USERNAME_FIELD.' % (cls._meta.object_name,
                     cls._meta.object_name, cls.USERNAME_FIELD),
-                    hint='Add unique=True to field %s.%s.'
-                    % (cls._meta.object_name, cls.USERNAME_FIELD),
-                    obj=cls))
+                    hint=None, obj=cls))
 
         return errors
 
