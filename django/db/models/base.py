@@ -1031,6 +1031,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_swappable(cls, **kwargs):
+        """ Check if the swapped model exists. """
+
         if cls._meta.swapped:
             try:
                 app_label, model_name = cls._meta.swapped.split('.')
@@ -1057,6 +1059,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_managers(cls, **kwargs):
+        """ Perform all manager checks. """
+
         errors = []
         managers = cls._meta.concrete_managers + cls._meta.abstract_managers
         for (_, _, manager) in managers:
@@ -1099,6 +1103,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_fields(cls, **kwargs):
+        """ Perform all field checks. """
+
         errors = []
         for field in cls._meta.local_fields:
             errors.extend(field.check(**kwargs))
@@ -1108,6 +1114,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_field_names(cls, **kwargs):
+        """ Check if field names are valid (i. e. not ending with an
+        underscore). """
         errors = []
         for field in cls._meta.local_fields + cls._meta.local_many_to_many:
             if field.name.endswith('_'):
@@ -1120,6 +1128,9 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_m2m_through_same_relationship(cls, **kwargs):
+        """ Check if no relationship model is used by more than one m2m field.
+        """
+
         errors = []
         seen_intermediary_signatures = []
 
@@ -1147,6 +1158,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_relative_fields(cls, **kwargs):
+        """ Check accessor and reverse query name clashes. """
+
         errors = []
         opts = cls._meta
 
@@ -1247,6 +1260,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_id_field(cls, **kwargs):
+        """ Check if `id` field is a primary key. """
+
         fields = list(f for f in cls._meta.local_fields
             if f.name == 'id' and f != cls._meta.pk)
         # fields is empty or consists of the invalid "id" field
@@ -1263,6 +1278,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_index_together(cls, **kwargs):
+        """ Check the value of "index_together" option. """
+
         if not isinstance(cls._meta.index_together, (tuple, list)):
             return [checks.Error(
                 'Non-iterable "index_together".\n'
@@ -1290,6 +1307,8 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_unique_together(cls, **kwargs):
+        """ Check the value of "unique_together" option. """
+
         if not isinstance(cls._meta.unique_together, (tuple, list)):
             return [checks.Error(
                 'Non-iterable "unique_together".\n'
@@ -1351,6 +1370,9 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_ordering(cls, **kwargs):
+        """ Check "ordering" option -- is it a list of lists and do all fields
+        exist? """
+
         from django.db import models
 
         if not cls._meta.ordering:
