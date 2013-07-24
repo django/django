@@ -10,9 +10,6 @@ class ThingItem(object):
     def __iter__(self):
         return (x for x in [self.value, self.display])
 
-    def __getitem__(self, key):
-        return [self.value, self.display][key]
-
     def __len__(self):
         return 2
 
@@ -20,7 +17,7 @@ class ThingItem(object):
 class Things(object):
 
     def __iter__(self):
-        return (x for x in [ThingItem('1', 'One'), ThingItem('2', 'Two')])
+        return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
 
 
 class ThingWithIterableChoices(models.Model):
