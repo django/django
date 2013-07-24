@@ -1263,10 +1263,11 @@ class ForeignObject(RelatedField):
                 if not self.foreign_related_fields[0].unique:
                     field_name = self.foreign_related_fields[0].name
                     model_name = self.rel.to.__name__
+                    d = {'field_name': field_name, 'model_name': model_name}
                     return [checks.Error('No unique=True constraint on field '
                         '"%(field_name)s" under model %(model_name)s.\n'
                         'The field "%(field_name)s" has to be unique because '
-                        'a foreign key references to it.' % locals(),
+                        'a foreign key references to it.' % d,
                         hint=None, obj=self)]
         return []
 
@@ -1786,12 +1787,14 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_self > 2:
+                    d = {'from_model_name': from_model_name,
+                        'relationship_model_name': relationship_model_name}
                     errors.append(checks.Error(
                         'More than two foreign keys to %(from_model_name)s '
                         'in intermediary model %(relationship_model_name)s.\n'
                         '%(relationship_model_name)s has more than two '
                         'foreign keys to %(from_model_name)s, which is '
-                        'ambiguous and is not permitted.' % locals(),
+                        'ambiguous and is not permitted.' % d,
                         hint=None, obj=self))
 
             else:
@@ -1802,24 +1805,28 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_from > 1:
+                    d = {'from_model_name': from_model_name,
+                        'relationship_model_name': relationship_model_name}
                     errors.append(checks.Error(
                         'More than one foreign key to %(from_model_name)s '
                         'in intermediary %(relationship_model_name)s model.\n'
                         '%(relationship_model_name)s has more than one '
                         'foreign key to %(from_model_name)s, which is '
-                        'ambiguous and is not permitted.' % locals(),
+                        'ambiguous and is not permitted.' % d,
                         hint='If you want to create a recursive relationship, '
                         'use ForeignKey("self", symmetrical=False, '
                         'through="%s").' % relationship_model_name,
                         obj=self))
 
                 if seen_to > 1:
+                    d = {'to_model_name': to_model_name,
+                        'relationship_model_name': relationship_model_name}
                     errors.append(checks.Error(
                         'More than one foreign key to %(to_model_name)s '
                         'in intermediary %(relationship_model_name)s model.\n'
                         '%(relationship_model_name)s has more than one '
                         'foreign key to %(to_model_name)s, which is ambiguous '
-                        'and is not permitted.' % locals(),
+                        'and is not permitted.' % d,
                         hint='If you want to create a recursive relationship, '
                         'use ForeignKey("self", symmetrical=False, '
                         'through="%s").' % relationship_model_name,
@@ -1827,6 +1834,9 @@ class ManyToManyField(RelatedField):
 
                 if (not self.rel.through._meta.auto_created and
                     (seen_from == 0 or seen_to == 0)):
+                    d = {'from_model_name': from_model_name,
+                        'to_model_name': to_model_name,
+                        'relationship_model_name': relationship_model_name}
                     errors.append(checks.Error(
                         'No foreign key to %(from_model_name)s or '
                         '%(to_model_name)s in intermediary '
@@ -1834,7 +1844,6 @@ class ManyToManyField(RelatedField):
                         'The field is a manually-defined many to many '
                         'relation through model %(relationship_model_name)s, '
                         'which does not have foreign keys to '
-                        '%(from_model_name)s or %(to_model_name)s.\n'
-                        % locals(),
+                        '%(from_model_name)s or %(to_model_name)s.\n' % d,
                         hint=None, obj=self))
         return errors
