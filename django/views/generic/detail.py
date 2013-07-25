@@ -57,19 +57,22 @@ class SingleObjectMixin(ContextMixin):
 
     def get_queryset(self):
         """
-        Get the queryset to look an object up against. May not be called if
-        `get_object` is overridden.
+        Get the queryset to look an object up against.
+
+        Note that it may not be called if `get_object` is overridden.
         """
         if self.queryset is None:
-            if self.model:
-                return self.model._default_manager.all()
+            if self.model is None:
+                raise ImproperlyConfigured(
+                    "%(cls)s is missing a QuerySet. Define "
+                    "%(cls)s.model, %(cls)s.queryset, or override "
+                    "%(cls)s.get_queryset()." % {
+                        'cls': self.__class__.__name__
+                    }
+                )
             else:
-                raise ImproperlyConfigured("%(cls)s is missing a queryset. Define "
-                                           "%(cls)s.model, %(cls)s.queryset, or override "
-                                           "%(cls)s.get_queryset()." % {
-                                                'cls': self.__class__.__name__
-                                        })
-        return self.queryset._clone()
+                return self.model._default_manager.all()
+        return self.queryset.all()
 
     def get_slug_field(self):
         """
