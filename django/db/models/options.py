@@ -204,9 +204,10 @@ class Options(object):
 
     def pk_index(self):
         """
-        Returns the index of the primary key field in the self.fields list.
+        Returns the index of the primary key field in the self.concrete_fields
+        list.
         """
-        return self.fields.index(self.pk)
+        return self.concrete_fields.index(self.pk)
 
     def setup_proxy(self, target):
         """
