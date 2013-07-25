@@ -12,6 +12,7 @@ Introductions to all the key parts of Django you'll need to know:
    forms/index
    templates
    class-based-views/index
+   migrations
    files
    testing/index
    auth/index
