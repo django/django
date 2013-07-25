@@ -122,14 +122,12 @@ database bindings are installed.
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
 
-If you plan to use Django's ``manage.py syncdb`` command to automatically
+If you plan to use Django's ``manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create
 the tables, you can simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and
-``DELETE`` permissions. On some databases, Django will need ``ALTER TABLE``
-privileges during ``syncdb`` but won't issue ``ALTER TABLE`` statements on a
-table once ``syncdb`` has created it. After creating a database user with these
+``DELETE`` permissions. After creating a database user with these
 permissions, you'll specify the details in your project's settings file,
 see :setting:`DATABASES` for details.
 

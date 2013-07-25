@@ -278,7 +278,7 @@ testing behavior. This behavior involves:
 
 #. Creating the test databases.
 
-#. Running ``syncdb`` to install models and initial data into the test
+#. Running ``migrate`` to install models and initial data into the test
    databases.
 
 #. Running the tests that were found.
@@ -469,7 +469,7 @@ can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 
-    Creates a new test database and runs ``syncdb`` against it.
+    Creates a new test database and runs ``migrate`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 

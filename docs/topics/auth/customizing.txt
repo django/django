@@ -275,7 +275,7 @@ can or cannot do with Task instances, specific to your application::
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
+:djadmin:`manage.py migrate <migrate>`. Your code is in charge of checking the
 value of these permissions when an user is trying to access the functionality
 provided by the application (viewing tasks, changing the status of tasks,
 closing tasks.) Continuing the above example, the following checks if a user may
@@ -380,14 +380,12 @@ use as your User model.
    Changing :setting:`AUTH_USER_MODEL` has a big effect on your database
    structure. It changes the tables that are available, and it will affect the
    construction of foreign keys and many-to-many relationships. If you intend
-   to set :setting:`AUTH_USER_MODEL`, you should set it before running
-   ``manage.py syncdb`` for the first time.
+   to set :setting:`AUTH_USER_MODEL`, you should set it before creating
+   any migrations or running ``manage.py migrate`` for the first time.
 
-   If you have an existing project and you want to migrate to using a custom
-   User model, you may need to look into using a migration tool like South_
-   to ease the transition.
-
-.. _South: http://south.aeracode.org
+   Changing this setting after you have tables created is not supported
+   by :djadmin:`makemigrations` and will result in you having to manually
+   write a set of migrations to fix your schema.
 
 Referencing the User model
 --------------------------

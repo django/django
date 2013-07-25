@@ -242,10 +242,8 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after :djadmin:`syncdb`
-was executed. This means that all data will be removed from the database, any
-post-synchronization handlers will be re-executed, and the ``initial_data``
-fixture will be re-installed.
+Removes all data from the database, re-executes any post-synchronization
+handlers, and reinstalls any initial data fixtures.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
@@ -1293,7 +1291,7 @@ This command is only available if Django's :doc:`authentication system
 
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account but did not
-do so during ``syncdb``, or if you need to programmatically generate
+do so during the first ``migrate``, or if you need to programmatically generate
 superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
@@ -1379,7 +1377,7 @@ allows for the following options:
 
 Example usage::
 
-    django-admin.py syncdb --pythonpath='/home/djangoprojects/myproject'
+    django-admin.py migrate --pythonpath='/home/djangoprojects/myproject'
 
 Adds the given filesystem path to the Python `import search path`_. If this
 isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
@@ -1394,7 +1392,7 @@ setting the Python path for you.
 
 Example usage::
 
-    django-admin.py syncdb --settings=mysite.settings
+    django-admin.py migrate --settings=mysite.settings
 
 Explicitly specifies the settings module to use. The settings module should be
 in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
@@ -1408,7 +1406,7 @@ Note that this option is unnecessary in ``manage.py``, because it uses
 
 Example usage::
 
-    django-admin.py syncdb --traceback
+    django-admin.py migrate --traceback
 
 By default, ``django-admin.py`` will show a simple error message whenever an
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
@@ -1424,7 +1422,7 @@ will also output a full stack trace when a ``CommandError`` is raised.
 
 Example usage::
 
-    django-admin.py syncdb --verbosity 2
+    django-admin.py migrate --verbosity 2
 
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.

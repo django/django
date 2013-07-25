@@ -31,7 +31,7 @@ and Django's handling of database schema:
 
 * :djadmin:`migrate`, which is responsible for applying migrations, as well as
   unapplying and listing their status.
-  
+
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
 
@@ -111,3 +111,113 @@ production environment unless you are very aware of the risks and
 its limitations; the support Django ships with is designed to allow
 developers to use SQLite on their local machines to develop less complex
 Django projects without the need for a full database.
+
+Workflow
+--------
+
+Working with migrations is simple. Make changes to your models - say, add
+a field and remove a model - and then run :djadmin:`makemigrations`::
+
+    $ python manage.py makemigrations
+    Migrations for 'books':
+      0003_auto.py:
+        - Alter field author on book
+
+Your models will be scanned and compared to the versions currently
+contained in your migration files, and then a new set of migrations
+will be written out. Make sure to read the output to see what
+``makemigrations`` thinks you have changed - it's not perfect, and for
+complex changes it might not be detecting what you expect.
+
+Once you have your new migration files, you should apply them to your
+database to make sure they work as expected::
+
+    $ python manage.py migrate
+    Operations to perform:
+      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
+      Apply all migrations: books
+    Synchronizing apps without migrations:
+      Creating tables...
+      Installing custom SQL...
+      Installing indexes...
+    Installed 0 object(s) from 0 fixture(s)
+    Running migrations:
+      Applying books.0003_auto... OK
+
+The command runs in two stages; first, it synchronizes unmigrated apps
+(performing the same functionality that ``syncdb`` used to provide), and
+then it runs any migrations that have not yet been applied.
+
+Once the migration is applied, commit the migration and the models change
+to your version control system as a single commit - that way, when other
+developers (or your production servers) check out the code, they'll
+get both the changes to your models and the accompanying migration at the
+same time.
+
+Dependencies
+------------
+
+While migrations are per-app, the tables and relationships implied by
+your models are too complex to be created for just one app at a time. When
+you make a migration that requires something else to run - for example,
+you add a ForeignKey in your ``books`` app to your ``authors`` app - the
+resulting migration will contain a dependency on a migration in ``authors``.
+
+This means that when you run the migrations, the ``authors`` migration runs
+first and creates the table the ForeignKey references, and then the migration
+that makes the ForeignKey column runs afterwards and creates the constraint.
+If this didn't happen, the migration would try to create the ForeignKey column
+without the table it's referencing existing and your database would
+throw an error.
+
+This dependency behaviour affects most migration operations where you
+restrict to a single app. Restricting to a single app (either in
+``makemigrations`` or ``migrate``) is a best-efforts promise, and not
+a guarantee; any other apps that need to be used to get dependencies correct
+will be.
+
+Migration files
+---------------
+
+Migrations are stored as an on-disk format, referred to here as
+"migration files". These files are actually just normal Python files with
+an agreed-upon object layout, written in a declarative style.
+
+A basic migration file looks like this::
+
+    from django.db import migrations, models
+
+    class Migration(migrations.Migration):
+
+        dependencies = [("migrations", "0001_initial")]
+
+        operations = [
+            migrations.DeleteModel("Tribble"),
+            migrations.AddField("Author", "rating", models.IntegerField(default=0)),
+        ]
+
+What Django looks for when it loads a migration file (as a Python module) is
+a subclass of ``django.db.migrations.Migration`` called ``Migration``. It then
+inspects this object for four attributes, only two of which are used
+most of the time:
+
+* ``dependencies``, a list of migrations this one depends on.
+* ``operations``, a list of Operation classes that define what this migration
+  does.
+
+The operations are the key; they are a set of declarative instructions which
+tell Django what schema changes need to be made. Django scans them and
+builds an in-memory representation of all of the schema changes to all apps,
+and uses this to generate the SQL which makes the schema changes.
+
+That in-memory structure is also used to work out what the differences are
+between your models and the current state of your migrations; Django runs
+through all the changes, in order, on an in-memory set of models to come
+up with the state of your models last time you ran ``makemigrations``. It
+then uses these models to compare against the ones in your ``models.py`` files
+to work out what you have changed.
+
+You should rarely, if ever, need to edit migration files by hand, but
+it's entirely possible to write them manually if you need to. Some of the
+more complex operations are not autodetectable and are only available via
+a hand-written migration, so don't be scared about editing them if you have to.

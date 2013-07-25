@@ -106,9 +106,9 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.managed
 
     Defaults to ``True``, meaning Django will create the appropriate database
-    tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`flush`
-    management command. That is, Django *manages* the database tables'
-    lifecycles.
+    tables in :djadmin:`migrate` or as part of migrations and remove them as
+    part of a :djadmin:`flush` management command. That is, Django
+    *manages* the database tables' lifecycles.
 
     If ``False``, no database table creation or deletion operations will be
     performed for this model. This is useful if the model represents an existing
@@ -192,9 +192,9 @@ Django quotes column and table names behind the scenes.
 .. admonition:: Changing order_with_respect_to
 
         ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to handle that as you would any other
-        change to your models if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`syncdb`.
+        named ``_order``, so be sure to make and apply the appropriate 
+        migrations if you add or change ``order_with_respect_to``
+        after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------

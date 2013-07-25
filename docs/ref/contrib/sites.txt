@@ -264,7 +264,7 @@ To enable the sites framework, follow these steps:
 
     SITE_ID = 1
 
-3. Run :djadmin:`syncdb`.
+3. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_syncdb` signal handler which creates a

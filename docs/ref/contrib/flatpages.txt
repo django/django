@@ -55,14 +55,14 @@ or:
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
    to your :setting:`MIDDLEWARE_CLASSES` setting.
 
-4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+4. Run the command :djadmin:`manage.py migrate <migrate>`.
 
 .. currentmodule:: django.contrib.flatpages.middleware
 
 How it works
 ============
 
-``manage.py syncdb`` creates two tables in your database: ``django_flatpage``
+``manage.py migrate`` creates two tables in your database: ``django_flatpage``
 and ``django_flatpage_sites``. ``django_flatpage`` is a simple lookup table
 that simply maps a URL to a title and bunch of text content.
 ``django_flatpage_sites`` associates a flatpage with a site.

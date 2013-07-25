@@ -81,10 +81,10 @@ access to your precious data on a model by model basis.
 Install the core Django tables
 ==============================
 
-Next, run the :djadmin:`syncdb` command to install any extra needed database
+Next, run the :djadmin:`migrate` command to install any extra needed database
 records such as admin permissions and content types::
 
-    python manage.py syncdb
+    python manage.py migrate
 
 Test and tweak
 ==============
