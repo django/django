@@ -73,7 +73,7 @@ class Command(BaseCommand):
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
             if migration_name == "zero":
-                migration_name = None
+                targets = [(app_label, None)]
             else:
                 try:
                     migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                     raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
                 except KeyError:
                     raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
-            targets = [(app_label, migration.name)]
+                targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif len(args) == 1:
             app_label = args[0]
@@ -110,7 +110,8 @@ class Command(BaseCommand):
         # Run the syncdb phase.
         # If you ever manage to get rid of this, I owe you many, many drinks.
         if run_syncdb:
-            self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
+            if self.verbosity >= 1:
+                self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!

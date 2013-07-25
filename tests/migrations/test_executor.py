@@ -20,6 +20,7 @@ class ExecutorTests(TransactionTestCase):
         Tests running a simple set of migrations.
         """
         executor = MigrationExecutor(connection)
+        executor.recorder.flush()
         # Let's look at the plan first and make sure it's up to scratch
         plan = executor.migration_plan([("migrations", "0002_second")])
         self.assertEqual(
