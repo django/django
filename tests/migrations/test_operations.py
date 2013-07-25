@@ -12,24 +12,28 @@ class OperationTests(MigrationTestBase):
     both forwards and backwards.
     """
 
-    def set_up_test_model(self, app_label):
+    def set_up_test_model(self, app_label, second_model=False):
         """
         Creates a test model state and database table.
         """
         # Make the "current" state
-        creation = migrations.CreateModel(
+        operations = [migrations.CreateModel(
             "Pony",
             [
                 ("id", models.AutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
-        )
+        )]
+        if second_model:
+            operations.append(migrations.CreateModel("Stable", [("id", models.AutoField(primary_key=True))]))
         project_state = ProjectState()
-        creation.state_forwards(app_label, project_state)
+        for operation in operations:
+            operation.state_forwards(app_label, project_state)
         # Set up the database
         with connection.schema_editor() as editor:
-            creation.database_forwards(app_label, editor, ProjectState(), project_state)
+            for operation in operations:
+                operation.database_forwards(app_label, editor, ProjectState(), project_state)
         return project_state
 
     def test_create_model(self):
@@ -48,7 +52,7 @@ class OperationTests(MigrationTestBase):
         project_state = ProjectState()
         new_state = project_state.clone()
         operation.state_forwards("test_crmo", new_state)
-        self.assertEqual(new_state.models["test_crmo", "pony"].name, "pony")
+        self.assertEqual(new_state.models["test_crmo", "pony"].name, "Pony")
         self.assertEqual(len(new_state.models["test_crmo", "pony"].fields), 2)
         # Test the database alteration
         self.assertTableNotExists("test_crmo_pony")
@@ -105,6 +109,27 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+
+    def test_add_field_m2m(self):
+        """
+        Tests the AddField operation with a ManyToManyField.
+        """
+        project_state = self.set_up_test_model("test_adflmm", second_model=True)
+        # Test the state alteration
+        operation = migrations.AddField("Pony", "stables", models.ManyToManyField("Stable"))
+        new_state = project_state.clone()
+        operation.state_forwards("test_adflmm", new_state)
+        self.assertEqual(len(new_state.models["test_adflmm", "pony"].fields), 4)
+        # Test the database alteration
+        self.assertTableNotExists("test_adflmm_pony_stables")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adflmm", editor, project_state, new_state)
+        self.assertTableExists("test_adflmm_pony_stables")
+        self.assertColumnNotExists("test_adflmm_pony", "stables")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_adflmm", editor, new_state, project_state)
+        self.assertTableNotExists("test_adflmm_pony_stables")
 
     def test_remove_field(self):
         """

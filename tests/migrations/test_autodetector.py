@@ -85,7 +85,7 @@ class AutodetectorTests(TestCase):
         # Right action?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "author")
+        self.assertEqual(action.name, "Author")
 
     def test_old_model(self):
         "Tests deletion of old models"
@@ -102,7 +102,7 @@ class AutodetectorTests(TestCase):
         # Right action?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "DeleteModel")
-        self.assertEqual(action.name, "author")
+        self.assertEqual(action.name, "Author")
 
     def test_add_field(self):
         "Tests autodetection of new fields"

@@ -9,7 +9,7 @@ class CreateModel(Operation):
     """
 
     def __init__(self, name, fields, options=None, bases=None):
-        self.name = name.lower()
+        self.name = name
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
@@ -35,7 +35,7 @@ class DeleteModel(Operation):
     """
 
     def __init__(self, name):
-        self.name = name.lower()
+        self.name = name
 
     def state_forwards(self, app_label, state):
         del state.models[app_label, self.name.lower()]
@@ -58,7 +58,7 @@ class AlterModelTable(Operation):
     """
 
     def __init__(self, name, table):
-        self.name = name.lower()
+        self.name = name
         self.table = table
 
     def state_forwards(self, app_label, state):
@@ -87,7 +87,7 @@ class AlterUniqueTogether(Operation):
     """
 
     def __init__(self, name, unique_together):
-        self.name = name.lower()
+        self.name = name
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):
@@ -117,7 +117,7 @@ class AlterIndexTogether(Operation):
     """
 
     def __init__(self, name, index_together):
-        self.name = name.lower()
+        self.name = name
         self.index_together = set(tuple(cons) for cons in index_together)
 
     def state_forwards(self, app_label, state):
