@@ -15,8 +15,16 @@ class SimpleSitemap(Sitemap):
     def items(self):
         return [object()]
 
+
+class FixedLastmodSitemap(SimpleSitemap):
+    lastmod = datetime(2013, 03, 13, 10, 0, 0)
+
 simple_sitemaps = {
     'simple': SimpleSitemap,
+}
+
+fixed_lastmod_sitemaps = {
+    'fixed-lastmod': FixedLastmodSitemap,
 }
 
 generic_sitemaps = {
@@ -36,6 +44,7 @@ urlpatterns = patterns('django.contrib.sitemaps.views',
     (r'^simple/sitemap\.xml$', 'sitemap', {'sitemaps': simple_sitemaps}),
     (r'^simple/custom-sitemap\.xml$', 'sitemap',
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap.xml'}),
+    (r'^lastmod/sitemap\.xml$', 'sitemap', {'sitemaps': fixed_lastmod_sitemaps}),
     (r'^generic/sitemap\.xml$', 'sitemap', {'sitemaps': generic_sitemaps}),
     (r'^flatpages/sitemap\.xml$', 'sitemap', {'sitemaps': flatpage_sitemaps}),
     url(r'^cached/index\.xml$', cache_page(1)(views.index),

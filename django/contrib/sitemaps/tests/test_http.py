@@ -77,6 +77,15 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
+    def test_sitemap_last_modified(self):
+        "Tests that Last-Modified header is set correctly"
+        response = self.client.get('/lastmod/sitemap.xml')
+        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+
+        # No last-modified when sitemap has no lastmod
+        response = self.client.get('/generic/sitemap.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
     def test_localized_priority(self):
