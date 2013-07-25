@@ -492,6 +492,26 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.lists()
         [(u'a', [u'1', u'2', u'3'])]
 
+.. method:: QueryDict.pop(key)
+
+    Returns a list of values for the given key and removes them from the
+    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.pop('a')
+        [u'1', u'2', u'3']
+
+.. method:: QueryDict.popitem()
+
+    Removes an arbitrary member of the dictionary (since there's no concept
+    of ordering), and returns a two value tuple containing the key and a list
+    of all values for the key. Raises ``KeyError`` when called on an empty
+    dictionary. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.popitem()
+        (u'a', [u'1', u'2', u'3'])
+
 .. method:: QueryDict.dict()
 
     .. versionadded:: 1.4
