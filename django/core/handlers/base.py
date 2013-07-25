@@ -149,6 +149,7 @@ class BaseHandler(object):
             else:
                 try:
                     callback, param_dict = resolver.resolve404()
+                    param_dict.update({'exception_404': e})
                     response = callback(request, **param_dict)
                 except:
                     signals.got_request_exception.send(sender=self.__class__, request=request)
