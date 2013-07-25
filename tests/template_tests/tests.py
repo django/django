@@ -8,8 +8,7 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import date, datetime, timedelta
-import time
+from datetime import date, datetime
 import os
 import sys
 import traceback
@@ -31,20 +30,11 @@ from django.test.utils import (setup_test_template_loader,
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
-from django.utils.translation import activate, deactivate, ugettext as _
+from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.tzinfo import LocalTimezone
 
 from i18n import TransRealMixin
-
-try:
-    from .loaders import RenderToStringTest, EggLoaderTest
-except ImportError as e:
-    if "pkg_resources" in e.args[0]:
-        pass # If setuptools isn't installed, that's fine. Just move on.
-    else:
-        raise
 
 # NumPy installed?
 try:
