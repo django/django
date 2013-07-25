@@ -32,6 +32,16 @@ deprecation process for some features`_.
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.6`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.6`_
 
+Python compatibility
+====================
+
+Django 1.6, like Django 1.5, requires Python 2.6.5 or above. Python 3 is also
+officially supported. We **highly recommend** the latest minor release for each
+supported Python series (2.6.X, 2.7.X, 3.2.X, and 3.3.X).
+
+Django 1.6 will be the final release series to support Python 2.6; beginning
+with Django 1.7, the minimum supported Python version will be 2.7.
+
 What's new in Django 1.6
 ========================
 
