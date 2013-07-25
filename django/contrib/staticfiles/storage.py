@@ -202,7 +202,7 @@ class CachedFilesMixin(object):
 
     def post_process(self, paths, dry_run=False, **options):
         """
-        Post process the given list of files (called from collectstatic).
+        Post process the given SortedDict of files (called from collectstatic).
 
         Processing is actually two separate operations:
 
