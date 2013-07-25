@@ -37,7 +37,7 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 Adds a few conveniences for perfectionists:
 
 * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
-  setting, which should be a list of strings.
+  setting, which should be a list of compiled regular expression objects.
 
 * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
   :setting:`PREPEND_WWW` settings.
