@@ -1,3 +1,5 @@
+.. module:: django.core.checks
+
 ======================
 System check framework
 ======================
@@ -19,39 +21,61 @@ models. In other cases, you need to `register the function`_.
 
 .. _`register the function`: `registering-checks`_
 
-Errors and warnings
-===================
+CheckMessage
+============
 
-.. class:: Error(msg, hint, obj=None)
-.. class:: Warning(msg, hint, obj=None)
+.. class:: django.core.checks.CheckMessage(level, msg, hint, obj=None)
 
-``django.core.checks`` defines two classes: ``Error`` and ``Warning``. Both
-have the same interface, they differ only in their meaning. When an Error
-occures, Django stops everything and doesn't allow to i. e. run a server.
-Warnings are reported along with Errors, but you can run server even though
-there are Warnings.
+:class:`~django.core.checks.CheckMessage` is the key concept of
+:mod:`django.core.checks` module and represents a single message,
+i. e. a warning or an error. The concept is very similar to messages from
+`message framework` or `logging framework`_. Messages are tagged with ``level``
+indicating how serious the message is.
+
+.. _`logging framework`: http://docs.python.org/2/library/logging.html
 
 Constructor arguments are:
 
+``level``
+    A positive integer. Determines how serious the message is. Use one of the
+    predefined values: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``,
+    ``CRITICAL``. If the level is greater or equal to ``ERROR``, then Django
+    stops everything and doesn't allow to i. e. run a server. Messages with
+    level lower than ``ERROR`` (i. e. warnings) are still reported, but Django
+    allows you to run server.
+
 ``msg``
-    A required one-line string.
+    A required single-line string.
 
 ``hint``
     A single-line string or ``None`` if you cannot provide any hint. Note that
     this argument is required even if you pass ``None``::
 
         Error('error message') # bad
-        Error('error message', hint=None) # good
+        Error('error message', None) # good
+        Error('error message', hint=None) # good (preferable)
 
 ``obj``
-    Optional. Point to the invalid object.
+    Optional. Point to the invalid object. The object should be a model, field
+    or manager or any other object that defines ``__repr__`` method. The method
+    is used while reporting all messages and its result precedes the message, i.
+    e. model errors are printed using ``applabel.modellabel: message`` pattern.
 
-Errors and Warnings are comparable. That allows you to easily write tests::
+Messages are comparable. That allows you to easily write tests::
 
     from django.core.checks import Error
     errors = checked_object.check()
     expected_errors = [Error('an error', hint=None, obj=checked_object)]
     self.assertEqual(errors, expected_errors)
+
+There are shortcuts to make creating messages with common levels easier. You can
+omit ``level`` argument because the level is indicated by the class name.
+
+.. class:: django.core.checks.Debug(msg, hint, obj=None)
+.. class:: django.core.checks.Info(msg, hint, obj=None)
+.. class:: django.core.checks.Warning(msg, hint, obj=None)
+.. class:: django.core.checks.Error(msg, hint, obj=None)
+.. class:: django.core.checks.Critical(msg, hint, obj=None)
 
 .. _field-checking:
 
