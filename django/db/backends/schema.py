@@ -1,11 +1,12 @@
-import sys
 import hashlib
 import operator
+import sys
+
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
-from django.utils.log import getLogger
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
+from django.utils.log import getLogger
 from django.utils.six.moves import reduce
 
 logger = getLogger('django.db.backends.schema')
