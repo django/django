@@ -22,17 +22,18 @@ class BaseCheckMessage(object):
     def __str__(self):
         from django.db import models
 
-        result = ""
-        if isinstance(self.obj, models.base.ModelBase):
+        if self.obj is None:
+            obj = "?"
+        elif isinstance(self.obj, models.base.ModelBase):
+            # We need to hardcode ModelBase case because its __repr__ method
+            # doesn't return "applabel.modellabel" and cannot be changed.
             model = self.obj
             app = model._meta.app_label
-            result += '%s.%s: ' % (app, model._meta.object_name)
+            obj = '%s.%s' % (app, model._meta.object_name)
         else:
-            result += force_str(self.obj) + ": "
-        result += self.msg
-        if self.hint:
-            result += "\nHINT: %s" % self.hint
-        return result
+            obj = force_str(self.obj)
+        hint = " HINT: %s" % self.hint if self.hint else ''
+        return "%s: %s%s" % (obj, self.msg, hint)
 
     def __repr__(self):
         return "<%s: msg=%r, hint=%r, obj=%r>" % \
