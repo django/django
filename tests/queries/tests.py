@@ -2927,3 +2927,19 @@ class Ticket18785Tests(unittest.TestCase):
         ).order_by()
         self.assertEqual(1, str(qs.query).count('INNER JOIN'))
         self.assertEqual(0, str(qs.query).count('OUTER JOIN'))
+
+class RelatedLookupTypeTests(TestCase):
+    def test_wrong_type_lookup(self):
+        oa = ObjectA.objects.create(name="oa")
+        wrong_type = Order.objects.create(id=oa.pk)
+        ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
+        # Currently Django doesn't care if the object is of correct
+        # type, it will just use the objecta's related fields attribute
+        # (id) for model lookup. Making things more restrictive could
+        # be a good idea...
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta=wrong_type),
+            [ob], lambda x: x)
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta__in=[wrong_type]),
+            [ob], lambda x: x)
