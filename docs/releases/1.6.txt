@@ -664,7 +664,9 @@ will render something like:
     <label for="id_my_field">My Field:</label> <input id="id_my_field" type="text" name="my_field" />
 
 If you want to keep the current behavior of rendering ``label_tag`` without
-the ``label_suffix``, instantiate the form ``label_suffix=''``.
+the ``label_suffix``, instantiate the form ``label_suffix=''``. You can also
+customize the ``label_suffix`` on a per-field basis using the new
+``label_suffix`` parameter on :meth:`~django.forms.BoundField.label_tag`.
 
 Admin views ``_changelist_filters`` GET parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

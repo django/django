@@ -527,6 +527,11 @@ Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
 or ``:``).
 
+.. versionadded:: 1.6
+
+You can also customize the ``label_suffix`` on a per-field basis using the
+``label_suffix`` parameter to :meth:`~django.forms.BoundField.label_tag`.
+
 Notes on field ordering
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -653,7 +658,7 @@ when printed::
     >>> str(f['subject'].errors)
     ''
 
-.. method:: BoundField.label_tag(contents=None, attrs=None)
+.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
 
 To separately render the label tag of a form field, you can call its
 ``label_tag`` method::
@@ -670,6 +675,14 @@ additional attributes for the ``<label>`` tag.
 
     The label now includes the form's :attr:`~django.forms.Form.label_suffix`
     (a colon, by default).
+
+.. versionadded:: 1.6
+
+    The optional ``label_suffix`` parameter allows you to override the form's
+    :attr:`~django.forms.Form.label_suffix`. For example, you can use an empty
+    string to hide the label on selected fields. If you need to do this in a
+    template, you could write a custom filter to allow passing parameters to
+    ``label_tag``.
 
 .. method:: BoundField.css_classes()
 
