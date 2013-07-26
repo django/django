@@ -1698,6 +1698,14 @@ class ManyToManyField(RelatedField):
 
     def _check_relationship_model(self, from_model=None, **kwargs):
         errors = []
+
+        # Skip automatically created relationship models.
+        try:
+            if self.rel.through._meta.auto_created:
+                return []
+        except AttributeError:
+            pass
+
         if self.rel.through not in get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(checks.Error(
@@ -1711,8 +1719,7 @@ class ManyToManyField(RelatedField):
                 % self.rel.through,
                 obj=self))
 
-        elif (self.rel.through is not None and
-            not isinstance(self.rel.through, six.string_types)):
+        elif not isinstance(self.rel.through, six.string_types):
 
             assert from_model is not None, \
                 "ManyToManyField with intermediate " \
