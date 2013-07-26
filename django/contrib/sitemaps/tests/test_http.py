@@ -82,8 +82,14 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
-        # No last-modified when sitemap has no lastmod
+    def test_sitemap_last_modified_missing(self):
+        "Tests that Last-Modified header is missing when sitemap has no lastmod"
         response = self.client.get('/generic/sitemap.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemap_last_modified_mixed(self):
+        "Tests that Last-Modified header is omitted when lastmod not on all items"
+        response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")

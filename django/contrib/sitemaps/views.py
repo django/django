@@ -68,7 +68,7 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("No page '%s'" % page)
     response = TemplateResponse(request, template_name, {'urlset': urls},
                                 content_type=content_type)
-    if site.latest_lastmod:
+    if hasattr(site, 'latest_lastmod'):
         # if latest_lastmod is defined for site, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
         response['Last-Modified'] = http_date(
