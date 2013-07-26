@@ -147,7 +147,7 @@ class RelatedField(Field):
         errors.extend(self._check_on_delete_set_default(**kwargs))
         return errors
 
-    MISSING_MODEL_MESSAGE = (
+    _MISSING_MODEL_MESSAGE = (
         'No %(rel)s model or it is an abstract model.\n'
         'The field has a relation with model %(rel)s, which '
         'has either not been installed or is abstract.'
@@ -161,7 +161,7 @@ class RelatedField(Field):
                 pass
             else:
                 return [checks.Error(
-                    self.MISSING_MODEL_MESSAGE
+                    self._MISSING_MODEL_MESSAGE
                     % {'rel': self.rel.to},
                     hint='Ensure that you did not misspell the model name and '
                     'the model is not abstract. Does your INSTALLED_APPS '
@@ -1720,7 +1720,7 @@ class ManyToManyField(RelatedField):
     def db_parameters(self, connection):
         return {"type": None, "check": None}
 
-    MISSING_MODEL_MESSAGE = (
+    _MISSING_MODEL_MESSAGE = (
         'No %(rel)s model or it is an abstract model.\n'
         'The field has a many to many relation with model '
         '%(rel)s, which has either not been installed '
