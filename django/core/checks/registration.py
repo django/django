@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.utils.itercompat import is_iterable
 
 
-class CheckingFramework(object):
+class CheckFramework(object):
 
     def __init__(self):
         self.registered_checks = []
@@ -30,6 +30,6 @@ class CheckingFramework(object):
         return errors
 
 
-framework = CheckingFramework()
+framework = CheckFramework()
 register = framework.register
 run_checks = framework.run_checks

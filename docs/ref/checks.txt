@@ -1,21 +1,21 @@
-==================
-Checking framework
-==================
+======================
+System check framework
+======================
 
-Checking framework is a set of static checks validating mainly apps and
+System check framework is a set of static checks validating mainly apps and
 models. It detects common problems and report them providing hints.
 
-Checking can be triggered explicitly via ``python manage.py check`` command.
+Checks can be triggered explicitly via ``python manage.py check`` command.
 It's also triggered implicitly before most command, including ``runserver``
 and ``syncdb``. For performance issues, the checks are not performed if
 ``DEBUG`` is set to False.
 
-Checking framework is really flexible and allow you to write functions (or
-other callable objects like methods) performing any kind of checks. The
-function has to receive ``**kwargs`` and return list of errors and warnings.
-If there are no errors, you still have to return an empty list. In case of
-fields and managers, you can just override ``check`` method. There is relevant
-classmethod for models. In other cases, you need to `register the function`_.
+The framework is really flexible and allow you to write functions (or other
+callable objects like methods) performing any kind of checks. The function has
+to receive ``**kwargs`` and return list of errors and warnings. If there are no
+errors, you still have to return an empty list. In case of fields and managers,
+you can just override ``check`` method. There is relevant classmethod for
+models. In other cases, you need to `register the function`_.
 
 .. _`register the function`: `registering-checks`_
 
@@ -55,8 +55,8 @@ Errors and Warnings are comparable. That allows you to easily write tests::
 
 .. _field-checking:
 
-Field checking
-==============
+Field checks
+============
 
 If you created your own field, you may want to add some checking. In that
 case, you need to override `check` method: it should call the superclass (1),
@@ -81,7 +81,7 @@ you can implement this check::
 
         def check(self, **kwargs):
             errors = super(MyField, self).check(**kwargs) # (1) call the superclass
-            # (2) Do some custom checking and add errors and warning to `errors`:
+            # (2) Do some custom checks and add errors and warning to `errors`:
             errors.extend(self._check_min_max_values(**kwargs))
             return errors # (3) return all errors and warnings
 
@@ -98,25 +98,24 @@ Database backend specific checks are performed in
 ``DatabaseValidation.check_field`` method. The API of ``DatabaseValidation``
 is not formally stable and may change in future.
 
-Manager checking
-================
-
-Manager checking is very similar to :ref:`field checking <field-checking>`.
-The only difference is that your class needs to inherit from
-``models.Manager``.
-
-Model checking
+Manager checks
 ==============
 
+Manager checks are very similar to :ref:`field checking <field-checking>`. The
+only difference is that your class needs to inherit from ``models.Manager``.
+
+Model checks
+============
+
 It's possible to check Model classes. Note that the framework verifies the
-class, not it's instances. It works exactly the same as field checking except
+class, not it's instances. It works exactly the same as field checks except that
 you need to use classmethods::
 
     class MyModel(models.Model):
         @classmethod
         def check(cls, **kwargs):
             errors = super(MyModel, cls).check(**kwargs)
-            # ... your own checking stuff ...
+            # ... your own checks ...
             return errors
 
 .. _`registering-checks`:
