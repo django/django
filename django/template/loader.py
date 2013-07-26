@@ -39,7 +39,9 @@ class BaseLoader(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def __call__(self, template_name, template_dirs=None):
+    def __call__(self, template_name, template_dirs=None, source_only = False):
+        if source_only:
+            return self.load_template_source(template_name, template_dirs)
         return self.load_template(template_name, template_dirs)
 
     def load_template(self, template_name, template_dirs=None):
@@ -110,7 +112,7 @@ def find_template_loader(loader):
     else:
         raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
 
-def find_template(name, dirs=None):
+def find_template(name, dirs=None, source_only=False):
     # Calculate template_source_loaders the first time the function is executed
     # because putting this logic in the module-level namespace may cause
     # circular import errors. See Django ticket #1292.
@@ -124,7 +126,7 @@ def find_template(name, dirs=None):
         template_source_loaders = tuple(loaders)
     for loader in template_source_loaders:
         try:
-            source, display_name = loader(name, dirs)
+            source, display_name = loader(name, dirs, source_only=source_only)
             return (source, make_origin(display_name, loader, name, dirs))
         except TemplateDoesNotExist:
             pass
@@ -139,6 +141,14 @@ def get_template(template_name):
     if not hasattr(template, 'render'):
         # template needs to be compiled
         template = get_template_from_string(template, origin, template_name)
+    return template
+
+def get_template_source(template_name):
+    """
+    Returns the source for the given template name,
+    handling template inheritance recursively.
+    """
+    template, origin = find_template(template_name, dirs=None, source_only=True)
     return template
 
 def get_template_from_string(source, origin=None, name=None):

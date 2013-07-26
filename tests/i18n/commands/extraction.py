@@ -13,6 +13,31 @@ from django.utils._os import upath
 from django.utils import six
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
+from django.template.loaders import filesystem
+from django.template import TemplateDoesNotExist
+from django.test.utils import override_settings
+import sys
+
+
+class TestLoader(filesystem.Loader):
+    def load_template_source(self, template_name, *args, **kwargs):
+        name, _extension = os.path.splitext(template_name)
+        # os.path.splitext always returns a period at the start of extension
+        extension = _extension.lstrip('.')
+        if extension in ('cl',):
+            try:
+                source, template_path = super(TestLoader, self).load_template_source(
+                    template_name, *args, **kwargs
+                )
+            except TemplateDoesNotExist:
+                pass
+            else:
+                html = source.replace('!!!', '%')
+                return html, template_path
+        raise TemplateDoesNotExist(template_name)
+
+    load_template_source.is_usable = True
+
 
 
 LOCALE='de'
@@ -455,3 +480,20 @@ class MultipleLocaleExtractionTests(ExtractorTests):
         management.call_command('makemessages', locale='pt,de,ch', verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
+
+
+class CustomLoaderExtractorTests(ExtractorTests):
+
+    def setUp(self):
+        super(CustomLoaderExtractorTests, self).setUp()
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+    @override_settings(TEMPLATE_LOADERS=('extraction.TestLoader',), TEMPLATE_DIRS=(os.path.dirname(os.path.abspath(__file__)),))
+    def test_custom_loader_extraction(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, extensions=['cl'], verbosity=0, no_wrap=True)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgId('This literal from a custom loader should be included.', po_contents)
+            self.assertTrue('This literal from a custom loader should be included.' in po_contents)

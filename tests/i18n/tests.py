@@ -39,7 +39,7 @@ if find_command('xgettext'):
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
         NoLocationExtractorTests, KeepPotFileExtractorTests,
-        MultipleLocaleExtractionTests)
+        MultipleLocaleExtractionTests, CustomLoaderExtractorTests)
 if find_command('msgfmt'):
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
