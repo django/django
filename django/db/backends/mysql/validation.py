@@ -13,7 +13,7 @@ class DatabaseValidation(BaseDatabaseValidation):
 
         errors = super(DatabaseValidation, self).check_field(field, **kwargs)
         try:
-            field_type = field.db_type(connection) or ''
+            field_type = field.db_type(connection)
         except AttributeError:
             # If the field is a relative field and the target model is
             # missing, then field.rel.to is not a model and doesn't have
