@@ -288,7 +288,7 @@ Learn about some other core functionalities of the Django framework:
 * :doc:`Signals <topics/signals>`
 * :doc:`The sites framework <ref/contrib/sites>`
 * :doc:`Unicode in Django <ref/unicode>`
-* :doc:`Checking framework <ref/checks>`
+* :doc:`System check framework <ref/checks>`
 
 The Django open-source project
 ==============================
