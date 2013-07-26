@@ -14,7 +14,7 @@ class BaseCheckMessage(object):
 
     def __eq__(self, other):
         return all(getattr(self, attr) == getattr(other, attr)
-            for attr in ['msg', 'hint', 'obj'])
+                for attr in ['msg', 'hint', 'obj'])
 
     def __ne__(self, other):
         return not (self == other)
