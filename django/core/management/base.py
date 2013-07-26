@@ -304,8 +304,9 @@ class BaseCommand(object):
 
     def validate(self, app=None, display_num_errors=False):
         """
-        Validates all apps, raising CommandError for any errors. If there are
-        only warnings, they are printed to stdout and no exception is raised.
+        Validates all apps, raising CommandError for any serious messages
+        (error and critical errors). If there are only light messages (like
+        warnings), they are printed to stdout and no exception is raised.
 
         The `app` argument is ignored.
 
@@ -316,31 +317,21 @@ class BaseCommand(object):
         if errors:
             formatted_errors = (
                 color_style().ERROR(force_str(e))
-                if isinstance(e, checks.Error)
+                if e.level >= checks.ERROR
                 else color_style().WARNING(force_str(e))
                 for e in errors)
-            msg = "\n\n".join(sorted(formatted_errors))
-            msg = "There are some errors or warnings:\n%s" % msg
-            if any(isinstance(e, checks.Error) for e in errors):
+            msg = "\n".join(sorted(formatted_errors))
+            msg = "There are some messages:\n%s" % msg
+            if any(e.level >= checks.ERROR for e in errors):
                 raise CommandError(msg)
             else:
                 self.stdout.write(msg)
 
         if display_num_errors:
-            errors_no = sum(isinstance(e, checks.Error) for e in errors)
-            warnings_no = sum(isinstance(e, checks.Warning) for e in errors)
-            error_part = (
-                "" if errors_no == 0 else
-                "1 error" if errors_no == 1 else
-                "%s errors" % errors_no)
-            warning_part = (
-                "" if warnings_no == 0 else
-                "1 warning" if warnings_no == 1 else
-                "%s warnings" % warnings_no)
-            and_part = " and " if error_part and warning_part else ""
-            msg = ("%s%s%s found" % (error_part, and_part, warning_part)
-                if error_part or warning_part
-                else "No errors/warnings found")
+            msg = (
+                "No errors/warnings found" if len(errors) == 0 else
+                "1 message found" if len(errors) == 1 else
+                "%s messages found" % len(errors))
             self.stdout.write(msg)
 
     def handle(self, *args, **options):

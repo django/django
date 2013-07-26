@@ -195,7 +195,7 @@ class CustomUserModelValidationTestCase(TestCase):
         from .test_custom_user import CustomUserBadRequiredFields
         errors = checks.run_checks()
         self.assertEqual(errors, [
-            checks.Error(
+            checks.Warning(
                 'CustomUserBadRequiredFields.USERNAME_FIELD included in '
                 'REQUIRED_FIELDS.\n'
                 'The field named as the USERNAME_FIELD should not be '
