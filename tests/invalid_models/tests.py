@@ -23,6 +23,15 @@ class IsolatedModelsTestCase(TestCase):
 
 class CharFieldTests(TestCase):
 
+    def test_valid_field(self):
+        choices = [
+            ('1', 'item1'),
+            ('2', 'item2'),
+        ]
+        field = models.CharField(max_length=255, choices=choices, db_index=True)
+        errors = field.check()
+        self.assertEqual(errors, [])
+
     def test_missing_max_length_argument(self):
         field = models.CharField()
         errors = field.check()
