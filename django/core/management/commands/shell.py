@@ -19,23 +19,35 @@ class Command(NoArgsCommand):
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_model_validation = False
 
+    def _ipython_pre_011(self):
+        """Start IPython pre-0.11"""
+        from IPython.Shell import IPShell
+        shell = IPShell(argv=[])
+        shell.mainloop()
+
+    def _ipython_pre_100(self):
+        """Start IPython pre-1.0.0"""
+        from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+        app = TerminalIPythonApp.instance()
+        app.initialize(argv=[])
+        app.start()
+
+    def _ipython(self):
+        """Start IPython >= 1.0"""
+        from IPython import start_ipython
+        start_ipython(argv=[])
+
     def ipython(self):
-        try:
-            from IPython.frontend.terminal.ipapp import TerminalIPythonApp
-            app = TerminalIPythonApp.instance()
-            app.initialize(argv=[])
-            app.start()
-        except ImportError:
-            # IPython < 0.11
-            # Explicitly pass an empty list as arguments, because otherwise
-            # IPython would use sys.argv from this script.
+        """Start any version of IPython"""
+        for ip in (self._ipython, self._ipython_pre_100, self._ipython_pre_011):
             try:
-                from IPython.Shell import IPShell
-                shell = IPShell(argv=[])
-                shell.mainloop()
+                ip()
             except ImportError:
-                # IPython not found at all, raise ImportError
-                raise
+                pass
+            else:
+                return
+        # no IPython, raise ImportError
+        raise ImportError("No IPython")
 
     def bpython(self):
         import bpython
