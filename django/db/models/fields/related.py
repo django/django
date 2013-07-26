@@ -154,8 +154,7 @@ class RelatedField(Field):
     )
 
     def _check_relation_model_exists(self, **kwargs):
-        from django.db import models
-        if self.rel.to not in models.get_models():
+        if self.rel.to not in get_models():
             if (not isinstance(self.rel.to, six.string_types) and
                 self.rel.to._meta.swapped):
                 pass
@@ -171,8 +170,7 @@ class RelatedField(Field):
         return []
 
     def _check_referencing_to_swapped_model(self, **kwargs):
-        from django.db import models
-        if (self.rel.to not in models.get_models() and
+        if (self.rel.to not in get_models() and
             not isinstance(self.rel.to, six.string_types) and
             self.rel.to._meta.swapped):
             model = "%s.%s" % (
