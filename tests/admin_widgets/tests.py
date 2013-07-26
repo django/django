@@ -83,6 +83,9 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def testCharField(self):
         self.assertFormfield(models.Member, 'name', widgets.AdminTextInputWidget)
 
+    def testEmailField(self):
+        self.assertFormfield(models.Member, 'email', widgets.AdminEmailInputWidget)
+
     def testFileField(self):
         self.assertFormfield(models.Album, 'cover_art', widgets.AdminFileWidget)
 
@@ -300,29 +303,29 @@ class AdminURLWidgetTest(DjangoTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', '')),
-            '<input class="vURLField" name="test" type="text" />'
+            '<input class="vURLField" name="test" type="url" />'
         )
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example.com')),
-            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com" /></p>'
+            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com" /></p>'
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example-äüö.com')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com" /></p>'
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
         )
 
     def test_render_quoting(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com/<sometag>some text</sometag>" /></p>'
+            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com/<sometag>some text</sometag>" /></p>'
         )
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
         )
 
 
