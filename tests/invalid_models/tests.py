@@ -33,7 +33,7 @@ class CharFieldTests(TestCase):
         errors = field.check()
         self.assertEqual(errors, [])
 
-    def test_missing_max_length_argument(self):
+    def test_missing_max_length(self):
         field = models.CharField()
         errors = field.check()
         self.assertEqual(errors, [
@@ -54,7 +54,7 @@ class CharFieldTests(TestCase):
                 hint=None, obj=field),
         ])
 
-    def test_bad_value_of_max_length(self):
+    def test_bad_max_length_value(self):
         field = models.CharField(max_length="bad")
         errors = field.check()
         self.assertEqual(errors, [
@@ -91,7 +91,7 @@ class CharFieldTests(TestCase):
                 hint=None, obj=field),
         ])
 
-    def test_bad_value_of_db_index(self):
+    def test_bad_db_index_value(self):
         field = models.CharField(max_length=10, db_index='bad')
         errors = field.check()
         self.assertEqual(errors, [
@@ -586,7 +586,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(errors, [expected_error])
 
 
-class OtherFieldTests(TestCase):
+class FileFieldTests(TestCase):
 
     def test_missing_upload_to(self):
         field = models.FileField()
@@ -596,6 +596,9 @@ class OtherFieldTests(TestCase):
                 'FileFields require an "upload_to" attribute.',
                 hint=None, obj=field),
         ])
+
+
+class BooleanFieldTests(TestCase):
 
     def test_nullable_boolean_field(self):
         field = models.BooleanField(null=True)
@@ -607,7 +610,10 @@ class OtherFieldTests(TestCase):
                 hint=None, obj=field),
         ])
 
-    def test_non_nullable_blank_GenericIPAddressField(self):
+
+class GenericIPAddressFieldTests(TestCase):
+
+    def test_non_nullable_blank(self):
         field = models.GenericIPAddressField(null=False, blank=True)
         errors = field.check()
         self.assertEqual(errors, [
@@ -618,7 +624,10 @@ class OtherFieldTests(TestCase):
                 hint=None, obj=field),
         ])
 
-    def test_FilePathField(self):
+
+class FilePathFieldTests(TestCase):
+
+    def test_forbidden_files_and_folders(self):
         field = models.FilePathField(allow_files=False, allow_folders=False)
         errors = field.check()
         self.assertEqual(errors, [
@@ -629,7 +638,10 @@ class OtherFieldTests(TestCase):
                 hint=None, obj=field)
         ])
 
-    def test_backend_specific_checks(self):
+
+class BackendSpecificChecksTests(TestCase):
+
+    def test(self):
         error = Error('an error', hint=None)
         mock = lambda self, field, **kwargs: [error]
 
@@ -649,32 +661,32 @@ class OtherFieldTests(TestCase):
 
 class AccessorClashTests(IsolatedModelsTestCase):
 
-    def test_accessor_clash_fk_to_integer(self):
+    def test_fk_to_integer(self):
         self._test_accessor_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target'))
 
-    def test_accessor_clash_fk_to_fk(self):
+    def test_fk_to_fk(self):
         self._test_accessor_clash(
             target=models.ForeignKey('Another'),
             relative=models.ForeignKey('Target'))
 
-    def test_accessor_clash_fk_to_m2m(self):
+    def test_fk_to_m2m(self):
         self._test_accessor_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target'))
 
-    def test_accessor_clash_m2m_to_integer(self):
+    def test_m2m_to_integer(self):
         self._test_accessor_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target'))
 
-    def test_accessor_clash_m2m_to_fk(self):
+    def test_m2m_to_fk(self):
         self._test_accessor_clash(
             target=models.ForeignKey('Another'),
             relative=models.ManyToManyField('Target'))
 
-    def test_accessor_clash_m2m_to_m2m(self):
+    def test_m2m_to_m2m(self):
         self._test_accessor_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target'))
@@ -699,35 +711,55 @@ class AccessorClashTests(IsolatedModelsTestCase):
                 obj=Model.rel.field),
         ])
 
+    def test_clash_between_accessors(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            foreign = models.ForeignKey(Target)
+            m2m = models.ManyToManyField(Target)
+
+        errors = Model.check()
+        self.assertEqual(errors, [
+            Error('Clash between accessors for Model.foreign and Model.m2m.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.foreign or Model.m2m.',
+                obj=Model.foreign.field),
+            Error('Clash between accessors for Model.m2m and Model.foreign.',
+                hint='Add or change a related_name argument to the definition '
+                'for Model.m2m or Model.foreign.',
+                obj=Model.m2m.field),
+        ])
+
 
 class ReverseQueryNameClashTests(IsolatedModelsTestCase):
 
-    def test_reverse_query_name_clash_fk_to_integer(self):
+    def test_fk_to_integer(self):
         self._test_reverse_query_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target'))
 
-    def test_reverse_query_name_clash_fk_to_fk(self):
+    def test_fk_to_fk(self):
         self._test_reverse_query_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ForeignKey('Target'))
 
-    def test_reverse_query_name_clash_fk_to_m2m(self):
+    def test_fk_to_m2m(self):
         self._test_reverse_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target'))
 
-    def test_reverse_query_name_clash_m2m_to_integer(self):
+    def test_m2m_to_integer(self):
         self._test_reverse_query_name_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target'))
 
-    def test_reverse_query_name_clash_m2m_to_fk(self):
+    def test_m2m_to_fk(self):
         self._test_reverse_query_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ManyToManyField('Target'))
 
-    def test_reverse_query_name_clash_m2m_to_m2m(self):
+    def test_m2m_to_m2m(self):
         self._test_reverse_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target'))
@@ -755,32 +787,32 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
 
 class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
 
-    def test_explicit_related_name_clash_fk_to_integer(self):
+    def test_fk_to_integer(self):
         self._test_explicit_related_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target', related_name='clash'))
 
-    def test_explicit_related_name_clash_fk_to_fk(self):
+    def test_fk_to_fk(self):
         self._test_explicit_related_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ForeignKey('Target', related_name='clash'))
 
-    def test_explicit_related_name_clash_fk_to_m2m(self):
+    def test_fk_to_m2m(self):
         self._test_explicit_related_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target', related_name='clash'))
 
-    def test_explicit_related_name_clash_m2m_to_integer(self):
+    def test_m2m_to_integer(self):
         self._test_explicit_related_name_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target', related_name='clash'))
 
-    def test_explicit_related_name_clash_m2m_to_fk(self):
+    def test_m2m_to_fk(self):
         self._test_explicit_related_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ManyToManyField('Target', related_name='clash'))
 
-    def test_explicit_related_name_clash_m2m_to_m2m(self):
+    def test_m2m_to_m2m(self):
         self._test_explicit_related_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target', related_name='clash'))
@@ -814,37 +846,37 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
 
 class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
 
-    def test_explicit_related_query_name_clash_fk_to_integer(self):
+    def test_fk_to_integer(self):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target',
                 related_query_name='clash'))
 
-    def test_explicit_related_query_name_clash_fk_to_fk(self):
+    def test_fk_to_fk(self):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ForeignKey('Target',
                 related_query_name='clash'))
 
-    def test_explicit_related_query_name_clash_fk_to_m2m(self):
+    def test_fk_to_m2m(self):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target',
                 related_query_name='clash'))
 
-    def test_explicit_related_query_name_clash_m2m_to_integer(self):
+    def test_m2m_to_integer(self):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ManyToManyField('Target',
                 related_query_name='clash'))
 
-    def test_explicit_related_query_name_clash_m2m_to_fk(self):
+    def test_m2m_to_fk(self):
         self._test_explicit_related_query_name_clash(
             target=models.ForeignKey('Another'),
             relative=models.ManyToManyField('Target',
                 related_query_name='clash'))
 
-    def test_explicit_related_query_name_clash_m2m_to_m2m(self):
+    def test_m2m_to_m2m(self):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ManyToManyField('Target',
@@ -872,7 +904,7 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
 
 class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
 
-    def test_self_m2m_clash(self):
+    def test_clash_between_accessors(self):
         class Model(models.Model):
             first_m2m = models.ManyToManyField('self', symmetrical=False)
             second_m2m = models.ManyToManyField('self', symmetrical=False)
@@ -891,7 +923,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 obj=Model.second_m2m.field),
         ])
 
-    def test_self_m2m_accessor_clash(self):
+    def test_accessor_clash(self):
         class Model(models.Model):
             model_set = models.ManyToManyField("self", symmetrical=False)
 
@@ -905,7 +937,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 obj=Model._meta.get_field('model_set'))
         ])
 
-    def test_self_m2m_reverse_query_name_clash(self):
+    def test_reverse_query_name_clash(self):
         class Model(models.Model):
             model = models.ManyToManyField("self", symmetrical=False)
 
@@ -918,7 +950,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 obj=Model._meta.get_field('model'))
         ])
 
-    def test_self_m2m_clash_explicit_related_name(self):
+    def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.IntegerField()
             m2m = models.ManyToManyField("self",
@@ -938,7 +970,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 obj=Model.m2m.field),
         ])
 
-    def test_valid_self_m2m(self):
+    def test_valid_model(self):
         class Model(models.Model):
             first = models.ManyToManyField("self",
                 symmetrical=False, related_name='first_accessor')
@@ -949,29 +981,9 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, [])
 
 
-class OtherClashTests(IsolatedModelsTestCase):
+class SelfReferentialFKClashTests(IsolatedModelsTestCase):
 
-    def test_clash_between_accessors(self):
-        class Target(models.Model):
-            pass
-
-        class Model(models.Model):
-            foreign = models.ForeignKey(Target)
-            m2m = models.ManyToManyField(Target)
-
-        errors = Model.check()
-        self.assertEqual(errors, [
-            Error('Clash between accessors for Model.foreign and Model.m2m.',
-                hint='Add or change a related_name argument to the definition '
-                'for Model.foreign or Model.m2m.',
-                obj=Model.foreign.field),
-            Error('Clash between accessors for Model.m2m and Model.foreign.',
-                hint='Add or change a related_name argument to the definition '
-                'for Model.m2m or Model.foreign.',
-                obj=Model.m2m.field),
-        ])
-
-    def test_self_clash_accessor(self):
+    def test_accessor_clash(self):
         class Model(models.Model):
             model_set = models.ForeignKey("Model")
 
@@ -985,7 +997,7 @@ class OtherClashTests(IsolatedModelsTestCase):
                 obj=Model._meta.get_field('model_set')),
         ])
 
-    def test_self_clash_reverse_query_name(self):
+    def test_reverse_query_name_clash(self):
         class Model(models.Model):
             model = models.ForeignKey("Model")
 
@@ -999,7 +1011,7 @@ class OtherClashTests(IsolatedModelsTestCase):
                 obj=Model._meta.get_field('model')),
         ])
 
-    def test_self_clash_explicit_related_name(self):
+    def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.CharField(max_length=10)
             foreign = models.ForeignKey("Model", related_name='clash')
@@ -1019,6 +1031,9 @@ class OtherClashTests(IsolatedModelsTestCase):
                 'for field Model.foreign.',
                 obj=Model.foreign.field),
         ])
+
+
+class ComplexClashTests(IsolatedModelsTestCase):
 
     def test_complex_clash(self):
         class Target(models.Model):
@@ -1105,9 +1120,9 @@ class OtherClashTests(IsolatedModelsTestCase):
         ])
 
 
-class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
+class IndexTogetherTests(IsolatedModelsTestCase):
 
-    def test_index_together_not_iterable(self):
+    def test_non_iterable(self):
         class Model(models.Model):
             class Meta:
                 index_together = 'not-a-list'
@@ -1121,7 +1136,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None, obj=Model),
         ])
 
-    def test_index_together_containing_non_iterable(self):
+    def test_list_containing_non_iterable(self):
         class Model(models.Model):
             class Meta:
                 index_together = [
@@ -1141,7 +1156,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None, obj=Model),
         ])
 
-    def test_index_together_pointing_to_missing_field(self):
+    def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
                 index_together = [
@@ -1158,7 +1173,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 obj=Model),
         ])
 
-    def test_index_together_pointing_to_m2m(self):
+    def test_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField('self')
 
@@ -1175,7 +1190,11 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None, obj=Model)
         ])
 
-    def test_unique_together_not_iterable(self):
+
+# unique_together tests are very similar to index_together tests.
+class UniqueTogetherTests(IsolatedModelsTestCase):
+
+    def test_non_iterable(self):
         class Model(models.Model):
             class Meta:
                 unique_together = 'not-a-list'
@@ -1189,7 +1208,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None, obj=Model),
         ])
 
-    def test_unique_together_containing_non_iterable(self):
+    def test_list_containing_non_iterable(self):
         class Model(models.Model):
             one = models.IntegerField()
             two = models.IntegerField()
@@ -1211,7 +1230,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 hint=None, obj=Model),
         ])
 
-    def test_valid_unique_together(self):
+    def test_valid_model(self):
         class Model(models.Model):
             one = models.IntegerField()
             two = models.IntegerField()
@@ -1223,7 +1242,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
         errors = Model.check()
         self.assertEqual(errors, [])
 
-    def test_unique_together_pointing_to_missing_field(self):
+    def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
                 unique_together = [
@@ -1240,7 +1259,7 @@ class IndexAndUniqueTogetherTests(IsolatedModelsTestCase):
                 obj=Model),
         ])
 
-    def test_unique_together_pointing_to_m2m(self):
+    def test_pointing_to_m2m(self):
         class Model(models.Model):
             m2m = models.ManyToManyField('self')
 
