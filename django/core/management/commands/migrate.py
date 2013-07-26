@@ -24,6 +24,8 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.'),
+        make_option('--fake', action='store_true', dest='fake', default=False,
+            help='Mark migrations as run without actually running them'),
     )
 
     help = "Updates database schema. Manages both apps with migrations and those without."
@@ -109,7 +111,7 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations needed.")
         else:
-            executor.migrate(targets, plan)
+            executor.migrate(targets, plan, fake=options.get("fake", False))
 
     def migration_progress_callback(self, action, migration):
         if self.verbosity >= 1:
@@ -181,7 +183,7 @@ class Command(BaseCommand):
                     for statement in sql:
                         cursor.execute(statement)
                     tables.append(connection.introspection.table_name_converter(model._meta.db_table))
-        
+
         # We force a commit here, as that was the previous behaviour.
         # If you can prove we don't need this, remove it.
         transaction.set_dirty(using=connection.alias)

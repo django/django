@@ -44,7 +44,7 @@ class MigrationExecutor(object):
                         applied.add(migration)
         return plan
 
-    def migrate(self, targets, plan=None):
+    def migrate(self, targets, plan=None, fake=False):
         """
         Migrates the database up to the given targets.
         """
@@ -52,32 +52,34 @@ class MigrationExecutor(object):
             plan = self.migration_plan(targets)
         for migration, backwards in plan:
             if not backwards:
-                self.apply_migration(migration)
+                self.apply_migration(migration, fake=fake)
             else:
-                self.unapply_migration(migration)
+                self.unapply_migration(migration, fake=fake)
 
-    def apply_migration(self, migration):
+    def apply_migration(self, migration, fake=False):
         """
         Runs a migration forwards.
         """
         if self.progress_callback:
             self.progress_callback("apply_start", migration)
-        with self.connection.schema_editor() as schema_editor:
-            project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
-            migration.apply(project_state, schema_editor)
+        if not fake:
+            with self.connection.schema_editor() as schema_editor:
+                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                migration.apply(project_state, schema_editor)
         self.recorder.record_applied(migration.app_label, migration.name)
         if self.progress_callback:
             self.progress_callback("apply_success", migration)
 
-    def unapply_migration(self, migration):
+    def unapply_migration(self, migration, fake=False):
         """
         Runs a migration backwards.
         """
         if self.progress_callback:
             self.progress_callback("unapply_start", migration)
-        with self.connection.schema_editor() as schema_editor:
-            project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
-            migration.unapply(project_state, schema_editor)
+        if not fake:
+            with self.connection.schema_editor() as schema_editor:
+                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                migration.unapply(project_state, schema_editor)
         self.recorder.record_unapplied(migration.app_label, migration.name)
         if self.progress_callback:
             self.progress_callback("unapply_success", migration)
