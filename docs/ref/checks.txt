@@ -34,9 +34,7 @@ there are Warnings.
 Constructor arguments are:
 
 ``msg``
-    A required string. It can consists of one or more lines. In the latter
-    case, the first line is a short description and the rest is a long
-    description.
+    A required one-line string.
 
 ``hint``
     A single-line string or ``None`` if you cannot provide any hint. Note that
