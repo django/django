@@ -1,6 +1,6 @@
-import datetime
 from django.db import models
 from django.db.models.loading import BaseAppCache
+from django.utils.timezone import now
 
 
 class MigrationRecorder(object):
@@ -19,7 +19,7 @@ class MigrationRecorder(object):
     class Migration(models.Model):
         app = models.CharField(max_length=255)
         name = models.CharField(max_length=255)
-        applied = models.DateTimeField(default=datetime.datetime.utcnow)
+        applied = models.DateTimeField(default=now)
         class Meta:
             app_cache = BaseAppCache()
             app_label = "migrations"
