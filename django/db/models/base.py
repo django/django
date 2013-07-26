@@ -1085,7 +1085,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
-                errors.append(checks.Error(
+                errors.append(checks.Warning(
                     '%s.USERNAME_FIELD included in REQUIRED_FIELDS.\n'
                     'The field named as the USERNAME_FIELD should not be '
                     'included in REQUIRED_FIELDS.' % cls._meta.object_name,
