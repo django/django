@@ -2,9 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.checks import Error
-from django.core.checks.base import CheckingFramework
-from django.db import models
-from django.db.models.loading import cache
+from django.core.checks.registration import CheckingFramework
 from django.test import TestCase
 from django.utils.encoding import force_str
 
