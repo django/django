@@ -109,7 +109,7 @@ class MigrationWriter(object):
         elif isinstance(value, (datetime.datetime, datetime.date)):
             return repr(value), set(["import datetime"])
         # Simple types
-        elif isinstance(value, (int, long, float, six.binary_type, six.text_type, bool, types.NoneType)):
+        elif isinstance(value, six.integer_types + (float, six.binary_type, six.text_type, bool, type(None))):
             return repr(value), set()
         # Django fields
         elif isinstance(value, models.Field):

@@ -70,7 +70,7 @@ class MigrationGraph(object):
         """
         roots = set()
         for node in self.nodes:
-            if not filter(lambda key: key[0] == node[0], self.dependencies.get(node, set())):
+            if not any(key[0] == node[0] for key in self.dependencies.get(node, set())):
                 roots.add(node)
         return roots
 
@@ -84,7 +84,7 @@ class MigrationGraph(object):
         """
         leaves = set()
         for node in self.nodes:
-            if not filter(lambda key: key[0] == node[0], self.dependents.get(node, set())):
+            if not any(key[0] == node[0] for key in self.dependents.get(node, set())):
                 leaves.add(node)
         return leaves
 

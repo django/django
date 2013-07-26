@@ -367,9 +367,9 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return result[0].lower() == "y"
 
     def _choice_input(self, question, choices):
-        print question
+        print(question)
         for i, choice in enumerate(choices):
-            print " %s) %s" % (i + 1, choice)
+            print(" %s) %s" % (i + 1, choice))
         result = input("Select an option: ")
         while True:
             try:
