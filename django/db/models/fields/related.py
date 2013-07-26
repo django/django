@@ -144,7 +144,6 @@ class RelatedField(Field):
         errors = super(RelatedField, self).check(**kwargs)
         errors.extend(self._check_relation_model_exists(**kwargs))
         errors.extend(self._check_referencing_to_swapped_model(**kwargs))
-        errors.extend(self._check_on_delete(**kwargs))
         return errors
 
     _MISSING_MODEL_MESSAGE = (
@@ -184,23 +183,6 @@ class RelatedField(Field):
                 'settings.%s' % self.rel.to._meta.swappable,
                 obj=self)]
         return []
-
-    def _check_on_delete(self, **kwargs):
-        if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
-            return [checks.Error(
-                'on_delete=SET_NULL but null forbidden.\n'
-                'The field specifies on_delete=SET_NULL, but cannot be null.',
-                hint='Set null=True argument on the field.',
-                obj=self)]
-        elif (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
-            not self.has_default()):
-            return [checks.Error(
-                'on_delete=SET_DEFAULT but no default value.\n'
-                'The field specifies on_delete=SET_DEFAULT, but has '
-                'no default value.',
-                hint=None, obj=self)]
-        else:
-            return []
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
@@ -1189,6 +1171,7 @@ class ForeignObject(RelatedField):
     def check(self, **kwargs):
         errors = super(ForeignObject, self).check(**kwargs)
         errors.extend(self._check_unique_target(**kwargs))
+        errors.extend(self._check_on_delete(**kwargs))
         return errors
 
     def _check_unique_target(self, **kwargs):
@@ -1219,6 +1202,24 @@ class ForeignObject(RelatedField):
                         'a foreign key references to it.' % context,
                         hint=None, obj=self)]
         return []
+
+    def _check_on_delete(self, **kwargs):
+        if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
+            return [checks.Error(
+                'on_delete=SET_NULL but null forbidden.\n'
+                'The field specifies on_delete=SET_NULL, but cannot be null.',
+                hint='Set null=True argument on the field.',
+                obj=self)]
+        elif (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
+            not self.has_default()):
+            return [checks.Error(
+                'on_delete=SET_DEFAULT but no default value.\n'
+                'The field specifies on_delete=SET_DEFAULT, but has '
+                'no default value.',
+                hint=None, obj=self)]
+        else:
+            return []
+
 
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
