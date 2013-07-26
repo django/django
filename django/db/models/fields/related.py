@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.db.models.deletion import SET_NULL, SET_DEFAULT, CASCADE
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
+from django.db.models.loading import get_models
 from django.db.models.query import QuerySet
 from django.db.models.related import RelatedObject, PathInfo
 from django.utils.encoding import smart_text
@@ -1741,7 +1742,7 @@ class ManyToManyField(RelatedField):
 
     def _check_relationship_model(self, from_model=None, **kwargs):
         errors = []
-        if isinstance(self.rel.through, six.string_types):
+        if self.rel.through not in get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(checks.Error(
                 'No intermediary model %s.\n'
