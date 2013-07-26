@@ -143,8 +143,7 @@ class RelatedField(Field):
         errors = super(RelatedField, self).check(**kwargs)
         errors.extend(self._check_relation_model_exists(**kwargs))
         errors.extend(self._check_referencing_to_swapped_model(**kwargs))
-        errors.extend(self._check_on_delete_set_null(**kwargs))
-        errors.extend(self._check_on_delete_set_default(**kwargs))
+        errors.extend(self._check_on_delete(**kwargs))
         return errors
 
     _MISSING_MODEL_MESSAGE = (
@@ -185,24 +184,22 @@ class RelatedField(Field):
                 obj=self)]
         return []
 
-    def _check_on_delete_set_null(self, **kwargs):
+    def _check_on_delete(self, **kwargs):
         if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
             return [checks.Error(
                 'on_delete=SET_NULL but null forbidden.\n'
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field.',
                 obj=self)]
-        return []
-
-    def _check_on_delete_set_default(self, **kwargs):
-        if (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
+        elif (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
             not self.has_default()):
             return [checks.Error(
                 'on_delete=SET_DEFAULT but no default value.\n'
                 'The field specifies on_delete=SET_DEFAULT, but has '
                 'no default value.',
                 hint=None, obj=self)]
-        return []
+        else:
+            return []
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
