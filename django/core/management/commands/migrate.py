@@ -12,7 +12,7 @@ from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
-from django.utils.module_loading import module_has_submodule, import_by_path
+from django.utils.module_loading import module_has_submodule
 
 
 class Command(BaseCommand):
@@ -162,7 +162,7 @@ class Command(BaseCommand):
         # Create the tables for each model
         if self.verbosity >= 1:
             self.stdout.write("  Creating tables...\n")
-        with transaction.commit_on_success_unless_managed(using=connection.alias):
+        with transaction.atomic(using=connection.alias, savepoint=False):
             for app_name, model_list in manifest.items():
                 for model in model_list:
                     # Create the model's database table, if it doesn't already exist.
@@ -181,6 +181,10 @@ class Command(BaseCommand):
                     for statement in sql:
                         cursor.execute(statement)
                     tables.append(connection.introspection.table_name_converter(model._meta.db_table))
+        
+        # We force a commit here, as that was the previous behaviour.
+        # If you can prove we don't need this, remove it.
+        transaction.set_dirty(using=connection.alias)
 
         # Send the post_syncdb signal, so individual apps can do whatever they need
         # to do at this point.
