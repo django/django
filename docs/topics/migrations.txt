@@ -154,6 +154,26 @@ developers (or your production servers) check out the code, they'll
 get both the changes to your models and the accompanying migration at the
 same time.
 
+Version control
+~~~~~~~~~~~~~~~
+
+Because migrations are stored in version control, you'll occasionally
+come across situations where you and another developer have both committed
+a migration to the same app at the same time, resulting in two migrations
+with the same number.
+
+Don't worry - the numbers are just there for developers' reference, Django
+just cares that each migration has a different name. Migrations specify which
+other migrations they depend on - including earlier migrations in the same
+app - in the file, so it's possible to detect when there's two new migrations
+for the same app that aren't ordered.
+
+When this happens, Django will prompt you and give you some options. If it
+thinks it's safe enough, it will offer to automatically linearise the two
+migrations for you. If not, you'll have to go in and modify the migrations
+yourself - don't worry, this isn't difficult, and is explained more in
+:ref:`migration-files` below.
+
 Dependencies
 ------------
 
@@ -175,6 +195,8 @@ restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
+
+.. migration-files:
 
 Migration files
 ---------------
@@ -221,3 +243,32 @@ You should rarely, if ever, need to edit migration files by hand, but
 it's entirely possible to write them manually if you need to. Some of the
 more complex operations are not autodetectable and are only available via
 a hand-written migration, so don't be scared about editing them if you have to.
+
+Adding migrations to apps
+-------------------------
+
+Adding migrations to new apps is straightforward - they come preconfigured to
+accept migrations, and so just run :djadmin:`makemigrations` once you've made
+some changes.
+
+If your app already has models and database tables, and doesn't have migrations
+yet (for example, you created it against a previous Django version), you'll
+need to convert it to use migrations; this is a simple process::
+
+    python manage.py makemigrations --force yourappname
+
+This will make a new initial migration for your app (the ``--force`` argument
+is to override Django's default behaviour, as it thinks your app does not want
+migrations). Now, when you run :djadmin:`migrate`, Django will detect that
+you have an initial migration *and* that the tables it wants to create already
+exist, and will mark the migration as already applied.
+
+Note that this only works given two things:
+
+* You have not changed your models since you made their tables. For migrations
+  to work, you must make the initial migration *first* and then make changes,
+  as Django compares changes against migration files, not the database.
+
+* You have not manually edited your database - Django won't be able to detect
+  that your database doesn't match your models, you'll just get errors when
+  migrations try and modify those tables.
