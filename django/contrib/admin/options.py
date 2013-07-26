@@ -69,6 +69,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.CharField: {'widget': widgets.AdminTextInputWidget},
     models.ImageField: {'widget': widgets.AdminFileWidget},
     models.FileField: {'widget': widgets.AdminFileWidget},
+    models.EmailField: {'widget': widgets.AdminEmailInputWidget},
 }
 
 csrf_protect_m = method_decorator(csrf_protect)
