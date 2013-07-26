@@ -7,6 +7,7 @@ from django.db import connection, models
 from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.testcases import skipIfDBFeature
 
 
 class IsolatedModelsTestCase(TestCase):
@@ -503,19 +504,17 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 obj=field),
         ])
 
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_nullable_primary_key(self):
         field = models.IntegerField(primary_key=True, null=True)
         errors = field.check()
-        if connection.features.interprets_empty_strings_as_nulls:
-            self.assertEqual(errors, [])
-        else:
-            self.assertEqual(errors, [
-                Error('null=True for primary_key.\n'
-                    'Primary key fields cannot have null=True.',
-                    hint='Set null=False on the field or '
-                    'remove primary_key=True argument.',
-                    obj=field),
-            ])
+        self.assertEqual(errors, [
+            Error('null=True for primary_key.\n'
+                'Primary key fields cannot have null=True.',
+                hint='Set null=False on the field or '
+                'remove primary_key=True argument.',
+                obj=field),
+        ])
 
     def test_not_swapped_model(self):
         class SwappableModel(models.Model):
