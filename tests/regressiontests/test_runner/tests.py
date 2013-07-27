@@ -337,7 +337,7 @@ class AliasedDatabaseTest(unittest.TestCase):
             old_config = runner.setup_databases()
             runner.teardown_databases(old_config)
 
-            self.assertEquals(destroyed_names.count('dbname'), 1)
+            self.assertEqual(destroyed_names.count('dbname'), 1)
         finally:
             DatabaseCreation.create_test_db = old_create_test_db
             DatabaseCreation.destroy_test_db = old_destroy_test_db
