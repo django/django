@@ -9,21 +9,23 @@ import os
 import posixpath
 import re
 import sys
-import socket
 import threading
 import unittest
 from unittest import skipIf         # Imported here for backward compatibility
 from unittest.util import safe_repr
 try:
-    from urllib.parse import urlsplit, urlunsplit, unquote
+    from urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+    from urllib.request import url2pathname
 except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit, unquote
+    from urlparse import urlsplit, urlunsplit, urlparse, unquote
+    from urllib import url2pathname
 
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.fs import FSFilesHandler
 from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.base import get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
@@ -170,7 +172,6 @@ class SimpleTestCase(unittest.TestCase):
         """
         testMethod = getattr(self, self._testMethodName)
         skipped = (getattr(self.__class__, "__unittest_skip__", False) or
-            getattr(testMethod, "__unittest_skip__", False))
 
         if not skipped:
             try:
@@ -935,6 +936,82 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
+class FSFilesHandler(WSGIHandler):
+    """
+    WSGI middleware that intercepts calls to the static files directory, as
+    defined by the STATIC_URL setting, and serves those files.
+    """
+    def __init__(self, application, base_dir=None):
+        self.application = application
+        if base_dir:
+            self.base_dir = base_dir
+        else:
+            self.base_dir = self.get_base_dir()
+        self.base_url = urlparse(self.get_base_url())
+        super(FSFilesHandler, self).__init__()
+
+    #def get_base_dir(self):
+    #    return settings.STATIC_ROOT
+
+    #def get_base_url(self):
+    #    return settings.STATIC_URL
+
+    def _should_handle(self, path):
+        """
+        Checks if the path should be handled. Ignores the path if:
+
+        * the host is provided as part of the base_url
+        * the request's path isn't under the media path (or equal)
+        """
+        return path.startswith(self.base_url[2]) and not self.base_url[1]
+
+    def file_path(self, url):
+        """
+        Returns the relative path to the media file on disk for the given URL.
+        """
+        relative_url = url[len(self.base_url[2]):]
+        return url2pathname(relative_url)
+
+    #def serve(self, request):
+    #    """
+    #    Actually serves the request path.
+    #    """
+    #    return serve(request, self.file_path(request.path), insecure=True)
+
+    def get_response(self, request):
+        if self._should_handle(request.path):
+            try:
+                return self.serve(request)
+            except Http404 as e:
+                if settings.DEBUG:
+                    from django.views import debug
+                    return debug.technical_404_response(request, e)
+        return super(FSFilesHandler, self).get_response(request)
+
+    def __call__(self, environ, start_response):
+        if not self._should_handle(get_path_info(environ)):
+            return self.application(environ, start_response)
+        return super(FSFilesHandler, self).__call__(environ, start_response)
+
+
+class _StaticFilesHandler(FSFilesHandler):
+    """
+    Handler for serving static files. This is a private class that is
+    meant to be used solely as a convenience by LiveServerThread.
+    """
+
+    def get_base_dir(self):
+        return settings.STATIC_ROOT
+
+    def get_base_url(self):
+        return settings.STATIC_URL
+
+    def serve(self, request):
+        path = self.file_path(request.path)
+        path2 = posixpath.normpath(unquote(path)).lstrip('/')
+        return serve(request, path2, document_root=settings.STATIC_ROOT)
+
+
 class _MediaFilesHandler(FSFilesHandler):
     """
     Handler for serving the media files. This is a private class that is
@@ -977,6 +1054,8 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
+    static_files_middleware = _StaticFilesHandler
+
     def __init__(self, host, possible_ports, connections_override=None):
         self.host = host
         self.port = None
@@ -985,6 +1064,9 @@ class LiveServerThread(threading.Thread):
         self.error = None
         self.connections_override = connections_override
         super(LiveServerThread, self).__init__()
+
+    def apply_static_middleware(self, handler):
+        return _StaticFilesHandler(handler)
 
     def run(self):
         """
@@ -998,7 +1080,9 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = _StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            #handler = _StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            #handler = self.apply_static_middleware(_MediaFilesHandler(WSGIHandler()))
+            handler = self.static_files_middleware(_MediaFilesHandler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
