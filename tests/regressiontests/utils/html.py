@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import unittest
@@ -157,3 +158,13 @@ class TestUtilsHtml(unittest.TestCase):
         )
         for value, tags, output in items:
             self.assertEqual(f(value, tags), output)
+
+    def test_smart_urlquote(self):
+        quote = html.smart_urlquote
+        # Ensure that IDNs are properly quoted
+        self.assertEqual(quote('http://öäü.com/'), 'http://xn--4ca9at.com/')
+        self.assertEqual(quote('http://öäü.com/öäü/'), 'http://xn--4ca9at.com/%C3%B6%C3%A4%C3%BC/')
+        # Ensure that everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
+        self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
+        self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
+        self.assertEqual(quote('http://example.com/?x=1&y=2'), 'http://example.com/?x=1&y=2')

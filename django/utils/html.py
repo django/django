@@ -5,13 +5,13 @@ from __future__ import unicode_literals
 import re
 import string
 try:
-    from urllib.parse import quote, urlsplit, urlunsplit
+    from urllib.parse import quote, unquote, urlsplit, urlunsplit
 except ImportError:     # Python 2
-    from urllib import quote
+    from urllib import quote, unquote
     from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.text import normalize_newlines
@@ -24,7 +24,6 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
 simple_url_re = re.compile(r'^https?://\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)$', re.IGNORECASE)
@@ -158,11 +157,9 @@ def smart_urlquote(url):
     else:
         url = urlunsplit((scheme, netloc, path, query, fragment))
 
-    # An URL is considered unquoted if it contains no % characters or
-    # contains a % not followed by two hexadecimal digits. See #9655.
-    if '%' not in url or unquoted_percents_re.search(url):
-        # See http://bugs.python.org/issue2637
-        url = quote(force_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
+    url = unquote(force_str(url))
+    # See http://bugs.python.org/issue2637
+    url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
 
