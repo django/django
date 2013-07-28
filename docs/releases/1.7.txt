@@ -89,6 +89,9 @@ Minor features
 * The admin changelist cells now have a ``field-<field_name>`` class in the
   HTML to enable style customizations.
 
+* The :func:`~django.core.mail.send_mail` now accepts an ``html_message``
+  parameter for sending a multipart text/plain and text/html email.
+
 Backwards incompatible changes in 1.7
 =====================================
 
