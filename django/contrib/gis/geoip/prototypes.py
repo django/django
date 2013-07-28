@@ -14,7 +14,7 @@ class GeoIPRecord(Structure):
                 ('longitude', c_float),
                 # TODO: In 1.4.6 this changed from `int dma_code;` to
                 # `union {int metro_code; int dma_code;};`.  Change
-                # to a `ctypes.Union` in to accomodate in future when
+                # to a `ctypes.Union` in to accommodate in future when
                 # pre-1.4.6 versions are no longer distributed.
                 ('dma_code', c_int),
                 ('area_code', c_int),

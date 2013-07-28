@@ -142,7 +142,7 @@ database tables already will have been created.
 
     If you require data for a test case, you should add it using
     either a :ref:`test fixture <topics-testing-fixtures>`, or
-    programatically add it during the ``setUp()`` of your test case.
+    programmatically add it during the ``setUp()`` of your test case.
 
 Database-backend-specific SQL data
 ----------------------------------

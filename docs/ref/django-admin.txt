@@ -233,7 +233,7 @@ probably be using this flag.
 .. django-admin-option:: --pks
 
 By default, ``dumpdata`` will output all the records of the model, but
-you can use the ``--pks`` option to specify a comma seperated list of
+you can use the ``--pks`` option to specify a comma separated list of
 primary keys on which to filter.  This is only available when dumping
 one model.
 
@@ -743,7 +743,7 @@ You can provide an IPv6 address surrounded by brackets
 A hostname containing ASCII-only characters can also be used.
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(default in new projects) the :djadmin:`runserver` command will be overriden
+(default in new projects) the :djadmin:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
 
 .. django-admin-option:: --noreload

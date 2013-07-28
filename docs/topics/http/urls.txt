@@ -623,7 +623,7 @@ change the entry in the URLconf.
 
 In some scenarios where views are of a generic nature, a many-to-one
 relationship might exist between URLs and views. For these cases the view name
-isn't a good enough identificator for it when it comes the time of reversing
+isn't a good enough identifier for it when comes the time of reversing
 URLs. Read the next section to know about the solution Django provides for this.
 
 .. _naming-url-patterns:

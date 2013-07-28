@@ -36,7 +36,7 @@ class CustomManagerTests(TestCase):
             with self.assertRaises(AttributeError):
                manager.optout_public_method()
 
-            # Test that the overriden method is called.
+            # Test that the overridden method is called.
             queryset = manager.filter()
             self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
             self.assertEqual(queryset._filter_CustomQuerySet, True)

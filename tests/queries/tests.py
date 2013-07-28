@@ -789,7 +789,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket7181(self):
-        # Ordering by related tables should accomodate nullable fields (this
+        # Ordering by related tables should accommodate nullable fields (this
         # test is a little tricky, since NULL ordering is database dependent.
         # Instead, we just count the number of results).
         self.assertEqual(len(Tag.objects.order_by('parent__name')), 5)

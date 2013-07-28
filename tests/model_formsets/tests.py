@@ -391,7 +391,7 @@ class ModelFormsetTest(TestCase):
 
     def test_custom_queryset_init(self):
         """
-        Test that a queryset can be overriden in the __init__ method.
+        Test that a queryset can be overridden in the __init__ method.
         https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
         """
         author1 = Author.objects.create(name='Charles Baudelaire')

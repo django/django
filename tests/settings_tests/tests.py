@@ -163,7 +163,7 @@ class SettingsTests(TestCase):
 
     def test_override_settings_delete(self):
         """
-        Allow deletion of a setting in an overriden settings set (#18824)
+        Allow deletion of a setting in an overridden settings set (#18824)
         """
         previous_i18n = settings.USE_I18N
         with self.settings(USE_I18N=False):
