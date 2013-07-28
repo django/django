@@ -1138,7 +1138,7 @@ class ForeignKey(ForeignObject):
     prepare_after_contribute_to_class = False
 
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
-                 db_constraint=True, **kwargs):
+                 db_constraint=True, aux_field=None, **kwargs):
         try:
             to._meta.object_name.lower()
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -1154,6 +1154,7 @@ class ForeignKey(ForeignObject):
             kwargs['db_index'] = True
 
         self.db_constraint = db_constraint
+        self._aux_field = aux_field
 
         kwargs['rel'] = rel_class(
             self, to, to_field,
@@ -1177,6 +1178,8 @@ class ForeignKey(ForeignObject):
             kwargs['db_constraint'] = self.db_constraint
         if self.rel.on_delete is not CASCADE:
             kwargs['on_delete'] = self.rel.on_delete
+        if self._aux_field is not None:
+            kwargs['aux_field'] = self._aux_field
         # Rel needs more work.
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
@@ -1192,7 +1195,7 @@ class ForeignKey(ForeignObject):
         return self.auxiliary_field.clone_for_foreignkey(*args, **kwargs)
 
     def resolve_basic_fields(self):
-        return self.model._meta.get_field(self.attname).resolve_basic_fields()
+        return self.auxiliary_field.resolve_basic_fields()
 
     @cached_property
     def related_field(self):
@@ -1228,6 +1231,8 @@ class ForeignKey(ForeignObject):
             )
 
     def get_attname(self):
+        if self._aux_field is not None:
+            return self._aux_field
         return '%s_id' % self.name
 
     def get_column(self):
@@ -1262,6 +1267,38 @@ class ForeignKey(ForeignObject):
                     return smart_text(choice_list[1][0])
         return super(ForeignKey, self).value_to_string(obj)
 
+    def contribute_to_class(self, cls, name):
+        super(ForeignKey, self).contribute_to_class(cls, name)
+        self.setup_custom_aux_field()
+
+    def setup_custom_aux_field(self, class_prepared=False):
+        if self._aux_field is not None:
+            try:
+                f = self.model._meta.get_field(self._aux_field,
+                                               many_to_many=False)
+                self.auxiliary_field = f
+                # TODO: Do we want to check here that the same field isn't
+                # auxiliary to multiple ForeignKeys?
+                f.auxiliary_to = self
+                if f.prepared:
+                    self.prepare()
+                else:
+                    def delayed_prepare(sender, **kwargs):
+                        self.prepare()
+                    signals.field_prepared.connect(delayed_prepare,
+                                                   sender=f, weak=False)
+            except FieldDoesNotExist:
+                if class_prepared:
+                    raise exceptions.FieldError('Auxiliary field name '
+                                                '%r could not be resolved '
+                                                'into a field.' %
+                                                (self._aux_field,))
+                def delayed_custom_aux_field_setup(sender, **kwargs):
+                    self.setup_custom_aux_field(class_prepared=True)
+                signals.class_prepared.connect(delayed_custom_aux_field_setup,
+                                               sender=self.model,
+                                               weak=False)
+
     def contribute_to_related_class(self, cls, related):
         super(ForeignKey, self).contribute_to_related_class(cls, related)
         if self.rel.field_name is None:
@@ -1269,6 +1306,11 @@ class ForeignKey(ForeignObject):
 
     def do_related_class(self, other, cls):
         super(ForeignKey, self).do_related_class(other, cls)
+        if self._aux_field is not None:
+            # A custom auxiliary field has been set, which means
+            # setup_custom_aux_field is responsible for preparing this
+            # field.
+            return
         if self.model._meta.abstract:
             # We don't add auxiliary fields to abstract models, that would
             # result in them being added twice. They are only added to
