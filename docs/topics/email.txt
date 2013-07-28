@@ -38,7 +38,7 @@ a secure connection is used.
 send_mail()
 ===========
 
-.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
 The simplest way to send email is using
 ``django.core.mail.send_mail()``.
@@ -66,6 +66,13 @@ are required.
   If unspecified, an instance of the default backend will be used.
   See the documentation on :ref:`Email backends <topic-email-backends>`
   for more details.
+* ``html_message``: If ``html_message`` is provided, the resulting email will be a
+  :mimetype:`multipart/alternative` email with ``message`` as the
+  :mimetype:`text/plain` content type and ``html_message`` as the
+  :mimetype:`text/html` content type.
+
+.. versionadded:: 1.7
+The html_message parameter was added
 
 send_mass_mail()
 ================

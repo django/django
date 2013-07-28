@@ -397,6 +397,34 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message.get_payload(), "Content")
         self.assertEqual(message["from"], "=?utf-8?q?Firstname_S=C3=BCrname?= <from@example.com>")
 
+    def test_plaintext_send_mail(self):
+        """
+        Test send_mail without the html_message
+        regression test for adding html_message parameter to send_mail()
+        """
+        send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'])
+        message = self.get_the_message()
+
+        self.assertEqual(message.get('subject'), 'Subject')
+        self.assertEqual(message.get_all('to'), ['nobody@example.com'])
+        self.assertFalse(message.is_multipart())
+        self.assertEqual(message.get_payload(), 'Content')
+        self.assertEqual(message.get_content_type(), 'text/plain')
+
+    def test_html_send_mail(self):
+        """Test html_message argument to send_mail"""
+        send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'], html_message='HTML Content')
+        message = self.get_the_message()
+
+        self.assertEqual(message.get('subject'), 'Subject')
+        self.assertEqual(message.get_all('to'), ['nobody@example.com'])
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertEqual(message.get_payload(0).get_payload(), 'Content')
+        self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
+        self.assertEqual(message.get_payload(1).get_payload(), 'HTML Content')
+        self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
+
     @override_settings(MANAGERS=[('nobody', 'nobody@example.com')])
     def test_html_mail_managers(self):
         """Test html_message argument to mail_managers"""
