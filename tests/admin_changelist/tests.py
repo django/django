@@ -91,7 +91,7 @@ class ChangeListTests(TestCase):
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th><a href="%s">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % link
+        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">(None)</td></tr></tbody>' % link
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -114,7 +114,7 @@ class ChangeListTests(TestCase):
         context = Context({'cl': cl})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
-        row_html = '<tbody><tr class="row1"><th><a href="%s">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % link
+        row_html = '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th><td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -150,7 +150,7 @@ class ChangeListTests(TestCase):
 
         # make sure that list editable fields are rendered in divs correctly
         editable_name_field = '<input name="form-0-name" value="name" class="vTextField" maxlength="30" type="text" id="id_form-0-name" />'
-        self.assertInHTML('<td>%s</td>' % editable_name_field, table_output, msg_prefix='Failed to find "name" list_editable field')
+        self.assertInHTML('<td class="field-name">%s</td>' % editable_name_field, table_output, msg_prefix='Failed to find "name" list_editable field')
 
     def test_result_list_editable(self):
         """

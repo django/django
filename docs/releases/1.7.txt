@@ -82,6 +82,9 @@ Minor features
 * Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
   property for rounded corners rather than GIF background images.
 
+* The admin changelist cells now have a ``field-<field_name>`` class in the
+  HTML to enable style customizations.
+
 Backwards incompatible changes in 1.7
 =====================================
 

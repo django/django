@@ -1496,7 +1496,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get(prefix)
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
         pk_final_url = escape(iri_to_uri(urlquote(quote(self.pk))))
-        should_contain = """<th><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
+        should_contain = """<th class="field-__str__"><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
@@ -2151,8 +2151,8 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, 'id="id_form-0-id"', 1)  # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
         self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
-        self.assertContains(response, '<td>%d</td>' % story1.id, 1)
-        self.assertContains(response, '<td>%d</td>' % story2.id, 1)
+        self.assertContains(response, '<td class="field-id">%d</td>' % story1.id, 1)
+        self.assertContains(response, '<td class="field-id">%d</td>' % story2.id, 1)
 
     def test_pk_hidden_fields_with_list_display_links(self):
         """ Similarly as test_pk_hidden_fields, but when the hidden pk fields are
@@ -2167,8 +2167,8 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, 'id="id_form-0-id"', 1)  # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
         self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
-        self.assertContains(response, '<th><a href="%s">%d</a></th>' % (link1, story1.id), 1)
-        self.assertContains(response, '<th><a href="%s">%d</a></th>' % (link2, story2.id), 1)
+        self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link1, story1.id), 1)
+        self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id), 1)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -3876,6 +3876,22 @@ class CSSTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class="app-admin_views model-section ')
+
+    def test_changelist_field_classes(self):
+        """
+        Cells of the change list table should contain the field name in their class attribute
+        Refs #11195.
+        """
+        Podcast.objects.create(name="Django Dose",
+            release_date=datetime.date.today())
+        response = self.client.get('/test_admin/admin/admin_views/podcast/')
+        self.assertContains(
+            response, '<th class="field-name">')
+        self.assertContains(
+            response, '<td class="field-release_date nowrap">')
+        self.assertContains(
+            response, '<td class="action-checkbox">')
+
 
 try:
     import docutils
