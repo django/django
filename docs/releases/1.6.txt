@@ -209,10 +209,6 @@ Minor features
 * The admin list columns have a ``column-<field_name>`` class in the HTML
   so the columns header can be styled with CSS, e.g. to set a column width.
 
-* Some admin templates now have ``app-<app_name>`` and ``model-<model_name>``
-  classes in their ``<body>`` tag to allow customizing the CSS per app or per
-  model.
-
 * The :ref:`isolation level<database-isolation-level>` can be customized under
   PostgreSQL.
 
