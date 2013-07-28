@@ -1071,7 +1071,8 @@ class ForeignObject(RelatedField):
                 value_list = []
                 for source in sources:
                     # Account for one-to-one relations when sent a different model
-                    while not isinstance(value, source.model) and source.rel:
+                    while not isinstance(value, source.model) and (source.rel
+                            or source.auxiliary_to is not None):
                         if source.auxiliary_to is not None:
                             source = source.auxiliary_to
                         source = source.rel.to._meta.get_field(source.rel.field_name)
