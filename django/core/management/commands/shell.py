@@ -1,4 +1,6 @@
+import datetime
 import os
+from django.conf import settings
 from django.core.management.base import NoArgsCommand
 from optparse import make_option
 
@@ -20,6 +22,17 @@ class Command(NoArgsCommand):
     requires_model_validation = False
 
     def ipython(self):
+        if settings.USE_TZ:
+            try:
+                try:
+                    from pysqlite2 import dbapi2 as Database
+                except ImportError:
+                    from sqlite3 import dbapi2 as Database
+                # remove Django's datetime adapter that issues warnings
+                Database.register_adapter(datetime.datetime,
+                        lambda x: x.isoformat(str(" ")))
+            except ImportError as exc:
+                pass
         try:
             from IPython.frontend.terminal.ipapp import TerminalIPythonApp
             app = TerminalIPythonApp.instance()
