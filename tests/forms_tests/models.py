@@ -34,7 +34,14 @@ class Defaults(models.Model):
 
 class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
+    CHOICES = [
+        ('', 'Please select one'),
+        ('f', 'Foo'),
+        ('b', 'Bar'),
+    ]
+
     name = models.CharField(max_length=10)
+    choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
 
 
 @python_2_unicode_compatible
