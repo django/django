@@ -34,10 +34,16 @@ class ChoiceFieldExclusionForm(ModelForm):
         model = ChoiceFieldModel
 
 
-class EmptyLabelChoiceForm(ModelForm):
+class EmptyCharLabelChoiceForm(ModelForm):
     class Meta:
         model = ChoiceModel
-        fields = '__all__'
+        fields = ['name', 'choice']
+
+
+class EmptyIntegerLabelChoiceForm(ModelForm):
+    class Meta:
+        model = ChoiceModel
+        fields = ['name', 'choice_integer']
 
 
 class FileForm(Form):
@@ -267,13 +273,26 @@ class ManyToManyExclusionTestCase(TestCase):
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
 
 
-class EmptyLabelCharFieldTestCase(TestCase):
-    def test_empty_field(self):
-        f = EmptyLabelChoiceForm()
-        self.assertEqual(f.as_p(),
+class EmptyLabelTestCase(TestCase):
+    def test_empty_field_char(self):
+        f = EmptyCharLabelChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
             """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
 <p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
 <option value="" selected="selected">Please select one</option>
 <option value="f">Foo</option>
 <option value="b">Bar</option>
 </select></p>""")
+
+    def test_empty_field_integer(self):
+        f = EmptyIntegerLabelChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
+<p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
+<option value="" selected="selected">Select one</option>
+<option value="1">Foo</option>
+<option value="2">Bar</option>
+</select></p>""")
+
+
+
