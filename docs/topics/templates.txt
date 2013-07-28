@@ -45,7 +45,9 @@ A template contains **variables**, which get replaced with values when the
 template is evaluated, and **tags**, which control the logic of the template.
 
 Below is a minimal template that illustrates a few basics. Each element will be
-explained later in this document.::
+explained later in this document.
+
+.. code-block:: html+django
 
     {% extends "base_generic.html" %}
 
