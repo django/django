@@ -1824,7 +1824,7 @@ class FormsTestCase(TestCase):
             # passing just one argument: overrides the field's label
             (('custom',), {}, '<label for="id_field">custom:</label>'),
 
-            # the overriden label is escaped
+            # the overridden label is escaped
             (('custom&',), {}, '<label for="id_field">custom&amp;:</label>'),
             ((mark_safe('custom&'),), {}, '<label for="id_field">custom&:</label>'),
 
@@ -1870,3 +1870,13 @@ class FormsTestCase(TestCase):
         boundfield = SomeForm()['field']
 
         self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')
+
+    def test_label_tag_override(self):
+        """
+        BoundField label_suffix (if provided) overrides Form label_suffix
+        """
+        class SomeForm(Form):
+            field = CharField()
+        boundfield = SomeForm(label_suffix='!')['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')

@@ -825,6 +825,13 @@ to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
 are saved properly.
 
+After calling ``save()``, your model formset will have three new attributes
+containing the formset's changes:
+
+.. attribute:: models.BaseModelFormSet.changed_objects
+.. attribute:: models.BaseModelFormSet.deleted_objects
+.. attribute:: models.BaseModelFormSet.new_objects
+
 .. _model-formsets-max-num:
 
 Limiting the number of editable objects

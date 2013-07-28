@@ -1389,6 +1389,15 @@ templates used by the :class:`ModelAdmin` views:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
+    .. admonition:: Note
+
+        Any ``choices`` attribute set on the formfield will limited to the form
+        field only. If the corresponding field on the model has choices set,
+        the choices provided to the form must be a valid subset of those
+        choices, otherwise the form submission will fail with
+        a :exc:`~django.core.exceptions.ValidationError` when the model itself
+        is validated before saving.
+
 .. method:: ModelAdmin.get_changelist(self, request, **kwargs)
 
     Returns the ``Changelist`` class to be used for listing. By default,

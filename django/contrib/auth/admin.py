@@ -127,6 +127,8 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
                 form.save()
+                change_message = self.construct_change_message(request, form, None)
+                self.log_change(request, request.user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
                 return HttpResponseRedirect('..')

@@ -271,7 +271,7 @@ Making actions available site-wide
 
     This makes the `export_selected_objects` action globally available as an
     action named `"export_selected_objects"`. You can explicitly give the action
-    a name -- good if you later want to programatically :ref:`remove the action
+    a name -- good if you later want to programmatically :ref:`remove the action
     <disabling-admin-actions>` -- by passing a second argument to
     :meth:`AdminSite.add_action()`::
 

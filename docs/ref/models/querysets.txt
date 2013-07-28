@@ -121,9 +121,7 @@ described here.
 QuerySet API
 ============
 
-Though you usually won't create one manually — you'll go through a
-:class:`~django.db.models.Manager` — here's the formal declaration of a
-``QuerySet``:
+Here's the formal declaration of a ``QuerySet``:
 
 .. class:: QuerySet([model=None, query=None, using=None])
 
@@ -1865,6 +1863,17 @@ DO_NOTHING do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
+
+as_manager
+~~~~~~~~~~
+
+.. classmethod:: as_manager()
+
+.. versionadded:: 1.7
+
+Class method that returns an instance of :class:`~django.db.models.Manager`
+with a copy of the ``QuerySet``'s methods. See
+:ref:`create-manager-with-queryset-methods` for more details.
 
 .. _field-lookups:
 

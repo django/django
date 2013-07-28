@@ -180,7 +180,7 @@ def items_for_result(cl, result, form):
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
-        row_class = ''
+        row_classes = ['field-%s' % field_name]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -188,7 +188,7 @@ def items_for_result(cl, result, form):
         else:
             if f is None:
                 if field_name == 'action_checkbox':
-                    row_class = mark_safe(' class="action-checkbox"')
+                    row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 if boolean:
@@ -199,7 +199,7 @@ def items_for_result(cl, result, form):
                 if allow_tags:
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
@@ -210,9 +210,10 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = display_for_field(value, f)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
         if force_text(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
+        row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.list_display_links) or field_name in cl.list_display_links:
             table_tag = {True:'th', False:'td'}[first]

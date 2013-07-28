@@ -140,6 +140,9 @@ class Article(models.Model):
         except ArticleTranslation.DoesNotExist:
             return '[No translation found]'
 
+class NewsArticle(Article):
+    pass
+
 class ArticleTranslation(models.Model):
     article = models.ForeignKey(Article)
     lang = models.CharField(max_length='2')

@@ -1421,7 +1421,7 @@ The decorator can also be applied to test case classes::
 
 
 You can also simulate the absence of a setting by deleting it after settings
-have been overriden, like this::
+have been overridden, like this::
 
     @override_settings()
     def test_something(self):
@@ -1437,7 +1437,7 @@ callbacks to clean up and otherwise reset state when settings are changed.
 Django itself uses this signal to reset various data:
 
 ================================ ========================
-Overriden settings               Data reset
+Overridden settings              Data reset
 ================================ ========================
 USE_TZ, TIME_ZONE                Databases timezone
 TEMPLATE_CONTEXT_PROCESSORS      Context processors cache
@@ -1639,7 +1639,7 @@ your test suite.
     .. versionadded:: 1.5
 
     Asserts that the strings ``xml1`` and ``xml2`` are equal. The
-    comparison is based on XML semantics. Similarily to
+    comparison is based on XML semantics. Similarly to
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
     made on parsed content, hence only semantic differences are considered, not
     syntax differences. When unvalid XML is passed in any parameter, an

@@ -509,20 +509,23 @@ class BoundField(object):
             )
         return self.field.prepare_value(data)
 
-    def label_tag(self, contents=None, attrs=None):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         contents should be 'mark_safe'd to avoid HTML escaping. If contents
         aren't given, uses the field's HTML-escaped label.
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
+
+        label_suffix allows overriding the form's label_suffix.
         """
         contents = contents or self.label
         # Only add the suffix if the label does not end in punctuation.
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
-        if self.form.label_suffix and contents and contents[-1] not in _(':?.!'):
-            contents = format_html('{0}{1}', contents, self.form.label_suffix)
+        label_suffix = label_suffix if label_suffix is not None else self.form.label_suffix
+        if label_suffix and contents and contents[-1] not in _(':?.!'):
+            contents = format_html('{0}{1}', contents, label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:

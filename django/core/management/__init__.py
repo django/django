@@ -146,7 +146,7 @@ def call_command(name, *args, **options):
 
     # Grab out a list of defaults from the options. optparse does this for us
     # when the script runs from the command line, but since call_command can
-    # be called programatically, we need to simulate the loading and handling
+    # be called programmatically, we need to simulate the loading and handling
     # of defaults (see #10080 for details).
     defaults = {}
     for opt in klass.option_list:

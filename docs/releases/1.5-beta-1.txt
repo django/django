@@ -7,7 +7,7 @@ November 27, 2012.
 Welcome to Django 1.5 beta!
 
 This is the second in a series of preview/development releases leading
-up to the eventual release of Django 1.5, scheduled for Decemeber
+up to the eventual release of Django 1.5, scheduled for December
 2012. This release is primarily targeted at developers who are
 interested in trying out new features and testing the Django codebase
 to help identify and resolve bugs prior to the final 1.5 release.

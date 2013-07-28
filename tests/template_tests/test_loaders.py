@@ -11,9 +11,14 @@ if __name__ == '__main__':
 
 import imp
 import os.path
-import pkg_resources
 import sys
 import unittest
+
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
+
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
@@ -24,23 +29,6 @@ from django.utils.six import StringIO
 
 
 # Mock classes and objects for pkg_resources functions.
-class MockProvider(pkg_resources.NullProvider):
-    def __init__(self, module):
-        pkg_resources.NullProvider.__init__(self, module)
-        self.module = module
-
-    def _has(self, path):
-        return path in self.module._resources
-
-    def _isdir(self, path):
-        return False
-
-    def get_resource_stream(self, manager, resource_name):
-        return self.module._resources[resource_name]
-
-    def _get(self, path):
-        return self.module._resources[path].read()
-
 class MockLoader(object):
     pass
 
@@ -57,8 +45,27 @@ def create_egg(name, resources):
     sys.modules[name] = egg
 
 
+@unittest.skipUnless(pkg_resources, 'setuptools is not installed')
 class EggLoaderTest(unittest.TestCase):
     def setUp(self):
+        # Defined here b/c at module scope we may not have pkg_resources
+        class MockProvider(pkg_resources.NullProvider):
+            def __init__(self, module):
+                pkg_resources.NullProvider.__init__(self, module)
+                self.module = module
+
+            def _has(self, path):
+                return path in self.module._resources
+
+            def _isdir(self, path):
+                return False
+
+            def get_resource_stream(self, manager, resource_name):
+                return self.module._resources[resource_name]
+
+            def _get(self, path):
+                return self.module._resources[path].read()
+
         pkg_resources._provider_factories[MockLoader] = MockProvider
 
         self.empty_egg = create_egg("egg_empty", {})

@@ -226,7 +226,7 @@ CachedStaticFilesStorage
 
     would be replaced by calling the
     :meth:`~django.core.files.storage.Storage.url`
-    method of the ``CachedStaticFilesStorage`` storage backend, ultimatively
+    method of the ``CachedStaticFilesStorage`` storage backend, ultimately
     saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
     content:
 

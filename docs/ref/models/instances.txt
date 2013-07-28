@@ -118,7 +118,7 @@ validation for your own manually created models. For example::
         article.full_clean()
     except ValidationError as e:
         # Do something based on the errors contained in e.message_dict.
-        # Display them to a user, or handle them programatically.
+        # Display them to a user, or handle them programmatically.
         pass
 
 The first step ``full_clean()`` performs is to clean each individual field.

@@ -22,7 +22,7 @@ class Command(BaseCommand):
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
         make_option('--pks', dest='primary_keys', help="Only dump objects with "
-            "given primary keys. Accepts a comma seperated list of keys. "
+            "given primary keys. Accepts a comma separated list of keys. "
             "This option will only work when you specify one model."),
     )
     help = ("Output the contents of the database as a fixture of the given "

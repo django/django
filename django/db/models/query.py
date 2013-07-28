@@ -8,9 +8,9 @@ import sys
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, DatabaseError
+from django.db import connections, router, transaction, DatabaseError, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField
+from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
@@ -30,10 +30,23 @@ REPR_OUTPUT_SIZE = 20
 EmptyResultSet = sql.EmptyResultSet
 
 
+def _pickle_queryset(class_bases, class_dict):
+    """
+    Used by `__reduce__` to create the initial version of the `QuerySet` class
+    onto which the output of `__getstate__` will be applied.
+
+    See `__reduce__` for more details.
+    """
+    new = Empty()
+    new.__class__ = type(class_bases[0].__name__, class_bases, class_dict)
+    return new
+
+
 class QuerySet(object):
     """
     Represents a lazy database lookup for a set of objects.
     """
+
     def __init__(self, model=None, query=None, using=None):
         self.model = model
         self._db = using
@@ -44,6 +57,13 @@ class QuerySet(object):
         self._prefetch_related_lookups = []
         self._prefetch_done = False
         self._known_related_objects = {}        # {rel_field, {pk: rel_obj}}
+
+    def as_manager(cls):
+        # Address the circular dependency between `Queryset` and `Manager`.
+        from django.db.models.manager import Manager
+        return Manager.from_queryset(cls)()
+    as_manager.queryset_only = True
+    as_manager = classmethod(as_manager)
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -69,6 +89,26 @@ class QuerySet(object):
         self._fetch_all()
         obj_dict = self.__dict__.copy()
         return obj_dict
+
+    def __reduce__(self):
+        """
+        Used by pickle to deal with the types that we create dynamically when
+        specialized queryset such as `ValuesQuerySet` are used in conjunction
+        with querysets that are *subclasses* of `QuerySet`.
+
+        See `_clone` implementation for more details.
+        """
+        if hasattr(self, '_specialized_queryset_class'):
+            class_bases = (
+                self._specialized_queryset_class,
+                self._base_queryset_class,
+            )
+            class_dict = {
+                '_specialized_queryset_class': self._specialized_queryset_class,
+                '_base_queryset_class': self._base_queryset_class,
+            }
+            return _pickle_queryset, (class_bases, class_dict), self.__getstate__()
+        return super(QuerySet, self).__reduce__()
 
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
@@ -274,9 +314,12 @@ class QuerySet(object):
 
         query = self.query.clone()
 
+        aggregate_names = []
         for (alias, aggregate_expr) in kwargs.items():
             query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=True)
+                                is_summary=True)
+            aggregate_names.append(alias)
+        query.append_aggregate_mask(aggregate_names)
 
         return query.get_aggregation(using=self.db)
 
@@ -394,34 +437,36 @@ class QuerySet(object):
                 return obj, created
         for k, v in six.iteritems(filtered_defaults):
             setattr(obj, k, v)
+
+        sid = transaction.savepoint(using=self.db)
         try:
-            sid = transaction.savepoint(using=self.db)
             obj.save(update_fields=filtered_defaults.keys(), using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, False
         except DatabaseError:
             transaction.savepoint_rollback(sid, using=self.db)
-            six.reraise(sys.exc_info())
+            six.reraise(*sys.exc_info())
 
     def _create_object_from_params(self, lookup, params):
         """
         Tries to create an object using passed params.
         Used by get_or_create and update_or_create
         """
+        obj = self.model(**params)
+        sid = transaction.savepoint(using=self.db)
         try:
-            obj = self.model(**params)
-            sid = transaction.savepoint(using=self.db)
             obj.save(force_insert=True, using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, True
-        except DatabaseError:
+        except DatabaseError as e:
             transaction.savepoint_rollback(sid, using=self.db)
             exc_info = sys.exc_info()
-            try:
-                return self.get(**lookup), False
-            except self.model.DoesNotExist:
-                # Re-raise the DatabaseError with its original traceback.
-                six.reraise(*exc_info)
+            if isinstance(e, IntegrityError):
+                try:
+                    return self.get(**lookup), False
+                except self.model.DoesNotExist:
+                    pass
+            six.reraise(*exc_info)
 
     def _extract_model_params(self, defaults, **kwargs):
         """
@@ -523,6 +568,7 @@ class QuerySet(object):
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
     delete.alters_data = True
+    delete.queryset_only = True
 
     def _raw_delete(self, using):
         """
@@ -562,6 +608,7 @@ class QuerySet(object):
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(None)
     _update.alters_data = True
+    _update.queryset_only = False
 
     def exists(self):
         if self._result_cache is None:
@@ -881,6 +928,15 @@ class QuerySet(object):
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
             klass = self.__class__
+        elif not issubclass(self.__class__, klass):
+            base_queryset_class = getattr(self, '_base_queryset_class', self.__class__)
+            class_bases = (klass, base_queryset_class)
+            class_dict = {
+                '_base_queryset_class': base_queryset_class,
+                '_specialized_queryset_class': klass,
+            }
+            klass = type(klass.__name__, class_bases, class_dict)
+
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True

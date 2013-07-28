@@ -1,7 +1,9 @@
 import datetime
 from operator import attrgetter
 
-from .models import Country, Person, Group, Membership, Friendship, Article, ArticleTranslation, ArticleTag, ArticleIdea
+from .models import (
+    Country, Person, Group, Membership, Friendship, Article,
+    ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
 from django.test import TestCase
 from django.utils.translation import activate
 from django.core.exceptions import FieldError
@@ -339,6 +341,20 @@ class MultiColumnFKTests(TestCase):
         with self.assertRaises(FieldError):
             Article.objects.filter(ideas__name="idea1")
 
+    def test_inheritance(self):
+        activate("fi")
+        na = NewsArticle.objects.create(pub_date=datetime.date.today())
+        ArticleTranslation.objects.create(
+            article=na, lang="fi", title="foo", body="bar")
+        self.assertQuerysetEqual(
+            NewsArticle.objects.select_related('active_translation'),
+            [na], lambda x: x
+        )
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                NewsArticle.objects.select_related(
+                    'active_translation')[0].active_translation.title,
+                "foo")
 
 class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs
