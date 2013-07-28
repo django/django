@@ -52,8 +52,7 @@ widget on the field. In the following example, the
 :attr:`~django.forms.extras.widgets.SelectDateWidget.years` attribute is set
 for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
 
-    from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
-    from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
+    from django import forms
     from django.forms.extras.widgets import SelectDateWidget
 
     BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
@@ -62,9 +61,9 @@ for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
                                 ('black', 'Black'))
 
     class SimpleForm(forms.Form):
-        birth_year = DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+        birth_year = forms.DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
         favorite_colors = forms.MultipleChoiceField(required=False,
-            widget=CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
+            widget=forms.CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
