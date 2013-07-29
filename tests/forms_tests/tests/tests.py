@@ -193,7 +193,7 @@ class FormsModelTestCase(TestCase):
 
         f = ExcludingForm({'name': 'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['name'], 'Hello')
+        self.assertNotIn('name', f.cleaned_data)
         obj = f.save()
         self.assertEqual(obj.name, 'class default value')
         self.assertEqual(obj.value, 99)
@@ -253,9 +253,28 @@ class ManyToManyExclusionTestCase(TestCase):
         instance.multi_choice = instance.multi_choice_int = [opt2, opt3]
         form = ChoiceFieldExclusionForm(data=data, instance=instance)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['multi_choice'], data['multi_choice'])
+        self.assertNotIn('multi_choice', form.cleaned_data)
         form.save()
         self.assertEqual(form.instance.choice.pk, data['choice'])
         self.assertEqual(form.instance.choice_int.pk, data['choice_int'])
         self.assertEqual(list(form.instance.multi_choice.all()), [opt2, opt3])
         self.assertEqual([obj.pk for obj in form.instance.multi_choice_int.all()], data['multi_choice_int'])
+
+
+class TestTicket8620(TestCase):
+    """
+    Allow exclusion of not only model fields but also form fields (as
+    might be defined in a superclass) using the exclude Meta attribute.
+    """
+
+    class ParentForm(ModelForm):
+        extra_non_model_field = CharField()
+
+    class ChildForm(ParentForm):
+        class Meta:
+            model = Defaults  # any model is suitable for this test
+            exclude = ('extra_non_model_field',)
+
+    def test_extra_non_model_field_is_excluded(self):
+        form = TestTicket8620.ChildForm()
+        self.assertNotIn('extra_non_model_field', form.fields)
