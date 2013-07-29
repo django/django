@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
+from importlib import import_module
 import os
 import pickle
 from threading import local
@@ -17,7 +18,6 @@ from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
     number_format, reset_format_cache, sanitize_separators)
-from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText

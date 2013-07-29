@@ -1,3 +1,4 @@
+from importlib import import_module
 from optparse import make_option
 import itertools
 import traceback
@@ -9,7 +10,6 @@ from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
-from django.utils.importlib import import_module
 
 
 class Command(NoArgsCommand):

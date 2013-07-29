@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 import base64
 import binascii
 import hashlib
+import importlib
 
 from django.dispatch import receiver
 from django.conf import settings
 from django.test.signals import setting_changed
-from django.utils import importlib
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured

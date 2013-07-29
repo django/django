@@ -1,3 +1,4 @@
+from importlib import import_module
 import inspect
 import os
 import re
@@ -13,7 +14,6 @@ from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
 from django.contrib.sites.models import Site
-from django.utils.importlib import import_module
 from django.utils._os import upath
 from django.utils import six
 from django.utils.translation import ugettext as _

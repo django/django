@@ -412,6 +412,8 @@ these changes.
 
 * ``django.utils.dictconfig`` will be removed.
 
+* ``django.utils.importlib`` will be removed.
+
 * ``django.utils.unittest`` will be removed.
 
 * If models are organized in a package, Django will no longer look for

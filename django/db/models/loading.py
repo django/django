@@ -1,16 +1,16 @@
 "Utilities for loading models and the modules that contain them."
 
+import imp
+from importlib import import_module
+import os
+import sys
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
-from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
 from django.utils import six
-
-import imp
-import sys
-import os
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
@@ -100,7 +100,7 @@ class AppCache(object):
         self.nesting_level += 1
         app_module = import_module(app_name)
         try:
-            models = import_module('.' + MODELS_MODULE_NAME, app_name)
+            models = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
         except ImportError:
             self.nesting_level -= 1
             # If the app doesn't have a models module, we can just ignore the

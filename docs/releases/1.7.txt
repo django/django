@@ -122,11 +122,12 @@ Miscellaneous
 Features deprecated in 1.7
 ==========================
 
-``django.utils.dictconfig``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.utils.dictconfig``/``django.utils.importlib``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django.utils.dictconfig`` was a copy of :mod:`logging.config` provided for
-Python versions prior to 2.7. It has been deprecated.
+``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
+respectively :mod:`logging.config` and :mod:`importlib` provided for Python
+versions prior to 2.7. They have been deprecated.
 
 ``django.utils.unittest``
 ~~~~~~~~~~~~~~~~~~~~~~~~~

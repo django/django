@@ -1,10 +1,10 @@
 import decimal
 import datetime
+from importlib import import_module
 import unicodedata
 
 from django.conf import settings
 from django.utils import dateformat, numberformat, datetime_safe
-from django.utils.importlib import import_module
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
@@ -54,7 +54,7 @@ def iter_format_modules(lang):
         for location in format_locations:
             for loc in locales:
                 try:
-                    yield import_module('.formats', location % loc)
+                    yield import_module('%s.formats' % (location % loc))
                 except ImportError:
                     pass
 

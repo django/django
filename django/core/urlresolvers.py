@@ -8,6 +8,7 @@ a string) and returns a tuple in this format:
 """
 from __future__ import unicode_literals
 
+from importlib import import_module
 import re
 from threading import local
 
@@ -17,7 +18,6 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import memoize, lazy
 from django.utils.http import urlquote
-from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
 from django.utils import six

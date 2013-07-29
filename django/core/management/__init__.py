@@ -1,13 +1,13 @@
 import collections
+import imp
+from importlib import import_module
+from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
-from optparse import OptionParser, NO_DEFAULT
-import imp
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
-from django.utils.importlib import import_module
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
