@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import warnings
 

@@ -2,8 +2,6 @@
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
 
-from __future__ import absolute_import
-
 import collections
 import datetime
 from itertools import repeat

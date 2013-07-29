@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import pickle
 import datetime
@@ -83,7 +83,7 @@ class PickleabilityTestCase(TestCase):
     def test_model_pickle_dynamic(self):
         class Meta:
             proxy = True
-        dynclass = type("DynamicEventSubclass", (Event, ),
+        dynclass = type(str("DynamicEventSubclass"), (Event, ),
                         {'Meta': Meta, '__module__': Event.__module__})
         original = dynclass(pk=1)
         dumped = pickle.dumps(original)

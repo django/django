@@ -1,9 +1,10 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import str_prefix
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
 
@@ -185,7 +186,8 @@ class ValidationTestCase(TestCase):
             readonly_fields = ("title", "nonexistant")
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "SongAdmin.readonly_fields[1], 'nonexistant' is not a callable or an attribute of 'SongAdmin' or found in the model 'Song'.",
+            str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistant' is not a callable "
+                       "or an attribute of 'SongAdmin' or found in the model 'Song'."),
             SongAdmin.validate,
             Song)
 
@@ -195,7 +197,8 @@ class ValidationTestCase(TestCase):
             readonly_fields=['i_dont_exist'] # Missing attribute
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "CityInline.readonly_fields[0], 'i_dont_exist' is not a callable or an attribute of 'CityInline' or found in the model 'City'.",
+            str_prefix("CityInline.readonly_fields[0], %(_)s'i_dont_exist' is not a callable "
+                       "or an attribute of 'CityInline' or found in the model 'City'."),
             CityInline.validate,
             City)
 

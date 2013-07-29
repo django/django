@@ -1,7 +1,7 @@
 """
 Tests for django test runner
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from importlib import import_module
 from optparse import make_option

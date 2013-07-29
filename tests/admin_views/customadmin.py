@@ -1,7 +1,7 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.conf.urls import patterns
 from django.contrib import admin

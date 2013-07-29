@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import absolute_import
-
 from os import path
 
 from django.conf.urls import patterns, url, include
