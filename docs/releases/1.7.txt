@@ -116,6 +116,9 @@ Miscellaneous
 * Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
   :class:`~django.core.management.CommandError`.
 
+* If you explicitly declare a field on a :class:`~django.forms.ModelForm` and
+  also list it in ``Meta.exclude`` it will no longer appear on the form.
+
 Features deprecated in 1.7
 ==========================
 

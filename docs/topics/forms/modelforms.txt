@@ -626,6 +626,26 @@ the ``Meta.fields`` or ``Meta.excludes`` lists::
 This adds the extra method from the ``EnhancedArticleForm`` and modifies
 the original ``ArticleForm.Meta`` to remove one field.
 
+.. versionchanged:: 1.7
+
+If you need to remove a field from the child form that was explicitly defined in
+a parent form, you can include it in the ``Meta.exclude`` list.
+
+An example::
+
+    class ArticleForm(ModelForm):
+        notes = TextField()
+
+        class Meta:
+            model = Article
+
+    class EnhancedArticleForm(ArticleForm):
+        class Meta(ArticleForm.Meta):
+            exclude = ('notes',)
+
+The ``EnhancedArticleForm`` will not include the field ``notes``, though it was
+explicitly declared on ``ArticleForm``.
+
 There are a couple of things to note, however.
 
 * Normal Python name resolution rules apply. If you have multiple base

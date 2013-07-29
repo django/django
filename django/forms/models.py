@@ -283,6 +283,9 @@ class ModelFormMetaclass(type):
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
+            # Leave out custom declared fields mentioned in exclude
+            if opts.exclude:
+                [declared_fields.pop(f) for f in declared_fields.keys() if f in opts.exclude]
             fields.update(declared_fields)
         else:
             fields = declared_fields
