@@ -152,25 +152,23 @@ class RelatedField(Field):
     )
 
     def _check_relation_model_exists(self, **kwargs):
-        if self.rel.to not in get_models():
-            if (not isinstance(self.rel.to, six.string_types) and
-                self.rel.to._meta.swapped):
-                pass
-            else:
-                return [checks.Error(
-                    self._MISSING_MODEL_MESSAGE
-                    % {'rel': self.rel.to},
-                    hint='Ensure that you did not misspell the model name and '
-                    'the model is not abstract. Does your INSTALLED_APPS '
-                    'setting contain the app where %s is defined?'
-                    % (self.rel.to,),
-                    obj=self)]
+        rel_is_missing = self.rel.to not in get_models()
+        rel_is_string = isinstance(self.rel.to, six.string_types)
+        if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
+            return [checks.Error(
+                self._MISSING_MODEL_MESSAGE
+                % {'rel': self.rel.to},
+                hint='Ensure that you did not misspell the model name and '
+                'the model is not abstract. Does your INSTALLED_APPS '
+                'setting contain the app where %s is defined?'
+                % (self.rel.to,),
+                obj=self)]
         return []
 
     def _check_referencing_to_swapped_model(self, **kwargs):
         if (self.rel.to not in get_models() and
-            not isinstance(self.rel.to, six.string_types) and
-            self.rel.to._meta.swapped):
+                not isinstance(self.rel.to, six.string_types) and
+                self.rel.to._meta.swapped):
             model = "%s.%s" % (
                 self.rel.to._meta.app_label,
                 self.rel.to._meta.object_name)
