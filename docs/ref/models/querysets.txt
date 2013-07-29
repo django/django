@@ -1262,6 +1262,28 @@ unexpectedly blocking.
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
 
+raw
+~~~
+
+.. method:: raw(raw_query, params=None, translations=None)
+
+.. versionchanged:: 1.7
+
+    ``raw`` was moved to the ``QuerySet`` class. It was previously only on
+    :class:`~django.db.models.Manager`.
+
+Takes a raw SQL query, executes it, and returns a
+``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+can be iterated over just like an normal QuerySet to provide object instances.
+
+See the :ref:`executing-raw-queries` for more information.
+
+.. warning::
+
+  ``raw()`` always triggers a new query and doesn't account for previous
+  filtering. As such, it should generally be called from the ``Manager`` or
+  from a fresh ``QuerySet`` instance.
+
 Methods that do not return QuerySets
 ------------------------------------
 
