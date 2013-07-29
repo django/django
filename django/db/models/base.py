@@ -707,13 +707,12 @@ class Model(six.with_metaclass(ModelBase)):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        
         # If a user sets a choice key to a value that is not of the same type
         # as it will be when returned later, the normal python dict lookup will
         # fail even though the choice is present. So we actually compare to the
         # field's python representation of the value.
         for k, v in dict(field.flatchoices).iteritems():
-            if field.to_python(k) == value:
+            if field.to_python(k) == field.to_python(value):
                 choice_value = v
                 break
         else:
