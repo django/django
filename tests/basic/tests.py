@@ -773,7 +773,9 @@ class ManagerTest(TestCase):
         'only',
         'using',
         'exists',
+        '_insert',
         '_update',
+        'raw',
     ]
 
     def test_manager_methods(self):
