@@ -18,6 +18,24 @@ class Command(NoArgsCommand):
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_model_validation = False
+    
+    def _ipython_pre_011(self):
+        """Start IPython pre-0.11"""
+        from IPython.Shell import IPShell
+        shell = IPShell(argv=[])
+        shell.mainloop()
+    
+    def _ipython_pre_100(self):
+        """Start IPython pre-1.0.0"""
+        from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+        app = TerminalIPythonApp.instance()
+        app.initialize(argv=[])
+        app.start()
+    
+    def _ipython(self):
+        """Start IPython >= 1.0"""
+        from IPython import start_ipython
+        start_ipython(argv=[])
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""
