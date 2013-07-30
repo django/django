@@ -146,18 +146,14 @@ class RelatedField(Field):
         errors.extend(self._check_referencing_to_swapped_model(**kwargs))
         return errors
 
-    _MISSING_MODEL_MESSAGE = (
-        'No %(rel)s model or it is an abstract model.\n'
-        'The field has a relation with model %(rel)s, which '
-        'has either not been installed or is abstract.'
-    )
-
     def _check_relation_model_exists(self, **kwargs):
         rel_is_missing = self.rel.to not in get_models()
         rel_is_string = isinstance(self.rel.to, six.string_types)
         if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
             return [checks.Error(
-                self._MISSING_MODEL_MESSAGE
+                'No %(rel)s model or it is an abstract model.\n'
+                'The field has a relation with model %(rel)s, which '
+                'has either not been installed or is abstract.'
                 % {'rel': self.rel.to},
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS '
@@ -1669,13 +1665,6 @@ class ManyToManyField(RelatedField):
 
     def db_parameters(self, connection):
         return {"type": None, "check": None}
-
-    _MISSING_MODEL_MESSAGE = (
-        'No %(rel)s model or it is an abstract model.\n'
-        'The field has a many to many relation with model '
-        '%(rel)s, which has either not been installed '
-        'or is abstract.'
-    )
 
     def check(self, **kwargs):
         errors = super(ManyToManyField, self).check(**kwargs)

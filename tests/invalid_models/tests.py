@@ -217,7 +217,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Model)
         self.assertEqual(errors, [
             Error('No Rel2 model or it is an abstract model.\n'
-                'The field has a many to many relation with model Rel2, '
+                'The field has a relation with model Rel2, '
                 'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
@@ -412,7 +412,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Model)
         self.assertEqual(errors, [
             Error('No AbstractModel model or it is an abstract model.\n'
-                'The field has a many to many relation with model '
+                'The field has a relation with model '
                 'AbstractModel, which has either not been installed '
                 'or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
