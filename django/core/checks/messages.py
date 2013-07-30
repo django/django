@@ -16,7 +16,6 @@ CRITICAL = 50
 class CheckMessage(object):
     def __init__(self, level, msg, hint, obj=None):
         assert isinstance(level, int), "The first argument should be level."
-        assert '\n' not in msg, msg
         self.level = level
         self.msg = msg
         self.hint = hint
