@@ -1286,10 +1286,6 @@ class CommandTypes(AdminScriptTestCase):
         call_command('color_command', no_color=True, stdout=out)
         self.assertEqual(out.getvalue(), 'BEGIN\n')
 
-        out = StringIO()
-        call_command('color_command', stdout=out)
-        self.assertEqual(out.getvalue(), '\x1b[33mBEGIN\x1b[0m\n')
-
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
         args = ['base_command', 'testlabel']
