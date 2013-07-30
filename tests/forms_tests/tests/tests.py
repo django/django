@@ -46,6 +46,12 @@ class EmptyIntegerLabelChoiceForm(ModelForm):
         fields = ['name', 'choice_integer']
 
 
+class EmptyCharLabelNoneChoiceForm(ModelForm):
+    class Meta:
+        model = ChoiceModel
+        fields = ['name', 'choice_string_w_none']
+
+
 class FileForm(Form):
     file1 = FileField()
 
@@ -284,6 +290,31 @@ class EmptyLabelTestCase(TestCase):
 <option value="b">Bar</option>
 </select></p>""")
 
+    def test_empty_field_char_none(self):
+        f = EmptyCharLabelNoneChoiceForm()
+        self.assertHTMLEqual(f.as_p(),
+            """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
+<p><label for="id_choice_string_w_none">Choice string w none:</label> <select id="id_choice_string_w_none" name="choice_string_w_none">
+<option value="" selected="selected">No Preference</option>
+<option value="f">Foo</option>
+<option value="b">Bar</option>
+</select></p>""")
+
+    def test_save_empty_label_forms(self):
+        # Test that saving a form with a blank choice results in the expected
+        # value being stored in the database.
+        for form, key, expected in [
+                (EmptyCharLabelNoneChoiceForm, 'choice_string_w_none', None),
+                (EmptyIntegerLabelChoiceForm, 'choice_integer', None),
+                (EmptyCharLabelChoiceForm, 'choice', '')
+                ]:
+            f = form({'name': "some-key", key: ''})
+            self.assertTrue(f.is_valid())
+            m = f.save()
+            self.assertEqual(expected, getattr(m, key))
+            self.assertEqual('No Preference',
+                             getattr(m, 'get_{0}_display'.format(key))())
+
     def test_empty_field_integer(self):
         f = EmptyIntegerLabelChoiceForm()
         self.assertHTMLEqual(f.as_p(),
@@ -295,8 +326,7 @@ class EmptyLabelTestCase(TestCase):
 </select></p>""")
 
     def test_get_display_value_on_none(self):
-        m = ChoiceModel(name='test', choice='', choice_integer=None)
-        m.save()
+        m = ChoiceModel.objects.create(name='test', choice='', choice_integer=None)
         self.assertEqual(None, m.choice_integer)
         self.assertEqual('No Preference', m.get_choice_integer_display())
 

@@ -147,11 +147,6 @@ a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
 `unknown` option in this example).
 
-If ``blank=True`` is set on the field then by default a label containing
-``"---------"`` will be rendered with the select box. To override this
-behaviour, simply add a tuple containing either an empty string or ``None`` at
-position 0. eg. ``('', 'Your String For Display')``.
-
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
@@ -162,6 +157,17 @@ or tuple. This lets you construct choices dynamically. But if you find yourself
 hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
 proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
 meant for static data that doesn't change much, if ever.
+
+.. versionadded:: 1.7
+
+If ``blank=True`` is set on the field then by default a label containing
+``"---------"`` will be rendered with the select box. To override this
+behaviour simply add a tuple to ``choices`` containing ``None``at position 0.
+eg. ``(None, 'Your String For Display')``. Remember to set ``null=True``
+in the field definition. Alternatively you can use an empty string instead of
+``None`` where this makes sense - ie. on a
+:class:`~django.db.models.CharField`.
+
 
 ``db_column``
 -------------
