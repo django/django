@@ -101,6 +101,10 @@ Minor features
   :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
   conditional ``GET`` requests for sitemaps which set ``lastmod``.
 
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
 Backwards incompatible changes in 1.7
 =====================================
 

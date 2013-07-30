@@ -959,6 +959,40 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     Takes ``request`` as its first positional argument, which is stored on the
     form instance for use by sub-classes.
 
+    .. method:: confirm_login_allowed(user)
+
+    .. versionadded:: 1.7
+
+    By default, ``AuthenticationForm`` rejects users whose ``is_active`` flag
+    is set to ``False``. You may override this behavior with a custom policy to
+    determine which users can log in. Do this with a custom form that subclasses
+    ``AuthenticationForm`` and overrides the ``confirm_login_allowed`` method.
+    This method should raise a :exc:`~django.core.exceptions.ValidationError`
+    if the given user may not log in.
+
+    For example, to allow all users to log in, regardless of "active" status::
+
+        from django.contrib.auth.forms import AuthenticationForm
+
+        class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+
+    Or to allow only some active users to log in::
+
+        class PickyAuthenticationForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                if not user.is_active:
+                    raise forms.ValidationError(
+                        _("This account is inactive."),
+                        code='inactive',
+                    )
+                if user.username.startswith('b'):
+                    raise forms.ValidationError(
+                        _("Sorry, accounts starting with 'b' aren't welcome here."),
+                        code='no_b_users',
+                    )
+
 .. class:: PasswordChangeForm
 
     A form for allowing a user to change their password.

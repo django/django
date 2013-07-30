@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
@@ -130,6 +131,40 @@ class AuthenticationFormTest(TestCase):
                 self.assertFalse(form.is_valid())
                 self.assertEqual(form.non_field_errors(),
                                  [force_text(form.error_messages['inactive'])])
+
+    def test_custom_login_allowed_policy(self):
+        # The user is inactive, but our custom form policy allows him to log in.
+        data = {
+            'username': 'inactive',
+            'password': 'password',
+            }
+
+        class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+
+        form = AuthenticationFormWithInactiveUsersOkay(None, data)
+        self.assertTrue(form.is_valid())
+
+        # If we want to disallow some logins according to custom logic,
+        # we should raise a django.forms.ValidationError in the form.
+        class PickyAuthenticationForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                if user.username == "inactive":
+                    raise forms.ValidationError(_("This user is disallowed."))
+                raise forms.ValidationError(_("Sorry, nobody's allowed in."))
+
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ['This user is disallowed.'])
+
+        data = {
+            'username': 'testclient',
+            'password': 'password',
+            }
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ["Sorry, nobody's allowed in."])
 
     def test_success(self):
         # The success case
