@@ -23,6 +23,8 @@ from django.utils import six
 
 lazystr = lazy(force_text, six.text_type)
 
+lazystr = lazy(force_text, six.text_type)
+
 
 class QueryDictTests(unittest.TestCase):
     def test_missing_key(self):
