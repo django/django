@@ -149,15 +149,18 @@ class RelatedField(Field):
         rel_is_missing = self.rel.to not in get_models()
         rel_is_string = isinstance(self.rel.to, six.string_types)
         if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
-            return [checks.Error(
-                'The field has a relation with model %(rel)s, which '
-                'has either not been installed or is abstract.'
-                % {'rel': self.rel.to},
-                hint='Ensure that you did not misspell the model name and '
-                'the model is not abstract. Does your INSTALLED_APPS '
-                'setting contain the app where %s is defined?'
-                % (self.rel.to,),
-                obj=self)]
+            return [
+                checks.Error(
+                    'The field has a relation with model %s, which '
+                        'has either not been installed or is abstract.'
+                        % self.rel.to,
+                    hint='Ensure that you did not misspell the model name and '
+                        'the model is not abstract. Does your INSTALLED_APPS '
+                        'setting contain the app where %s is defined?'
+                        % self.rel.to,
+                    obj=self,
+                )
+            ]
         return []
 
     def _check_referencing_to_swapped_model(self, **kwargs):
@@ -166,13 +169,17 @@ class RelatedField(Field):
                 self.rel.to._meta.swapped):
             model = "%s.%s" % (
                 self.rel.to._meta.app_label,
-                self.rel.to._meta.object_name)
-            return [checks.Error(
-                'The field defines a relation with the model '
-                '%s, which has been swapped out.' % model,
-                hint='Update the relation to point at '
-                'settings.%s' % self.rel.to._meta.swappable,
-                obj=self)]
+                self.rel.to._meta.object_name
+            )
+            return [
+                checks.Error(
+                    'The field defines a relation with the model %s, '
+                        'which has been swapped out.' % model,
+                    hint='Update the relation to point at settings.%s'
+                        % self.rel.to._meta.swappable,
+                    obj=self,
+                )
+            ]
         return []
 
 
@@ -1214,45 +1221,61 @@ class ForeignObject(RelatedField):
         return errors
 
     def _check_unique_target(self, **kwargs):
-        if (self.requires_unique_target and
-            not isinstance(self.rel.to, six.string_types)):
-            if len(self.foreign_related_fields) > 1:
-                has_unique_field = any(rel_field.unique
-                    for rel_field in self.foreign_related_fields)
-                if not has_unique_field:
-                    field_combination = ','.join(rel_field.name
-                        for rel_field in self.foreign_related_fields)
-                    model_name = self.rel.to.__name__
-                    return [checks.Error('No unique=True constraint '
+        rel_is_string = isinstance(self.rel.to, six.string_types)
+        perform_check = self.requires_unique_target and not rel_is_string
+        if not perform_check:
+            return []
+
+        has_unique_field = any(rel_field.unique
+            for rel_field in self.foreign_related_fields)
+        if not has_unique_field and len(self.foreign_related_fields) > 1:
+            field_combination = ','.join(rel_field.name
+                for rel_field in self.foreign_related_fields)
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    'No unique=True constraint '
                         'on field combination "%s" under model %s.'
                         % (field_combination, model_name),
-                        hint='Set unique=True argument on any of the fields '
+                    hint='Set unique=True argument on any of the fields '
                         '"%s" under model %s.'
                         % (field_combination, model_name),
-                        obj=self)]
-            else:
-                if not self.foreign_related_fields[0].unique:
-                    field_name = self.foreign_related_fields[0].name
-                    model_name = self.rel.to.__name__
-                    context = {'field_name': field_name, 'model_name': model_name}
-                    return [checks.Error(
-                        '%(model_name)s.%(field_name)s must have unique=True '
-                        'because it is referenced by a foreign key.' % context,
-                        hint=None, obj=self)]
-        return []
+                    obj=self,
+                )
+            ]
+        elif not has_unique_field:
+            field_name = self.foreign_related_fields[0].name
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    '%s.%s must have unique=True '
+                        'because it is referenced by a foreign key.'
+                        % (model_name, field_name),
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
 
     def _check_on_delete(self, **kwargs):
-        if getattr(self.rel, 'on_delete', None) == SET_NULL and not self.null:
-            return [checks.Error(
-                'The field specifies on_delete=SET_NULL, but cannot be null.',
-                hint='Set null=True argument on the field.',
-                obj=self)]
-        elif (getattr(self.rel, 'on_delete', None) == SET_DEFAULT and
-            not self.has_default()):
-            return [checks.Error(
-                'The field specifies on_delete=SET_DEFAULT, but has '
-                'no default value.',
-                hint=None, obj=self)]
+        on_delete = getattr(self.rel, 'on_delete', None)
+        if on_delete == SET_NULL and not self.null:
+            return [
+                checks.Error(
+                    'The field specifies on_delete=SET_NULL, but cannot be null.',
+                    hint='Set null=True argument on the field.',
+                    obj=self,
+                )
+            ]
+        elif on_delete == SET_DEFAULT and not self.has_default():
+            return [
+                checks.Error(
+                    'The field specifies on_delete=SET_DEFAULT, but has no default value.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         else:
             return []
 
@@ -1713,9 +1736,13 @@ class ManyToManyField(RelatedField):
 
     def _check_unique(self, **kwargs):
         if self.unique:
-            return [checks.Error(
-                'ManyToManyFields must not be unique.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'ManyToManyFields must not be unique.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         return []
 
     def _check_relationship_model(self, from_model=None, **kwargs):
@@ -1730,15 +1757,18 @@ class ManyToManyField(RelatedField):
 
         if self.rel.through not in get_models(include_auto_created=True):
             # The relationship model is not installed.
-            errors.append(checks.Error(
-                'The field specifies a many-to-many relation through model '
-                '%s, which has not been installed.'
-                % self.rel.through,
-                hint='Ensure that you did not misspell the model name and '
-                'the model is not abstract. Does your INSTALLED_APPS '
-                'setting contain the app where %s is defined?'
-                % self.rel.through,
-                obj=self))
+            errors.append(
+                checks.Error(
+                    'The field specifies a many-to-many relation through model '
+                        '%s, which has not been installed.'
+                        % self.rel.through,
+                    hint='Ensure that you did not misspell the model name and '
+                        'the model is not abstract. Does your INSTALLED_APPS '
+                        'setting contain the app where %s is defined?'
+                        % self.rel.through,
+                    obj=self
+                )
+            )
 
         elif not isinstance(self.rel.through, six.string_types):
 
@@ -1759,11 +1789,14 @@ class ManyToManyField(RelatedField):
 
             # Check symmetrical attribute.
             if (self_referential and self.rel.symmetrical and
-                not self.rel.through._meta.auto_created):
-                errors.append(checks.Error(
-                    'Many-to-many fields with intermediate tables must not '
-                    'be symmetrical.',
-                    hint=None, obj=self))
+                    not self.rel.through._meta.auto_created):
+                errors.append(
+                    checks.Error(
+                        'Many-to-many fields with intermediate tables must not be symmetrical.',
+                        hint=None,
+                        obj=self,
+                    )
+                )
 
             # Count foreign keys in intermediate model
             if self_referential:
@@ -1771,15 +1804,16 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_self > 2:
-                    context = {'from_model_name': from_model_name,
-                        'relationship_model_name': relationship_model_name,
-                        'field': self}
-                    errors.append(checks.Error(
-                        'The model is used as an intermediary model by '
-                        '%(field)s, but it has more than two '
-                        'foreign keys to %(from_model_name)s, which is '
-                        'ambiguous and is not permitted.' % context,
-                        hint=None, obj=self.rel.through))
+                    errors.append(
+                        checks.Error(
+                            'The model is used as an intermediary model by '
+                                '%s, but it has more than two foreign keys '
+                                'to %s, which is ambiguous and is not permitted.'
+                                % (self, from_model_name),
+                            hint=None,
+                            obj=self.rel.through,
+                        )
+                    )
 
             else:
                 # Count foreign keys in relationship model
@@ -1789,41 +1823,43 @@ class ManyToManyField(RelatedField):
                     for field in self.rel.through._meta.fields)
 
                 if seen_from > 1:
-                    context = {'from_model_name': from_model_name,
-                        'relationship_model_name': relationship_model_name,
-                        'field': self}
-                    errors.append(checks.Error(
-                        'The model is used as an intermediary model by '
-                        '%(field)s, but it has more than one '
-                        'foreign key to %(from_model_name)s, which is '
-                        'ambiguous and is not permitted.' % context,
-                        hint='If you want to create a recursive relationship, '
-                        'use ForeignKey("self", symmetrical=False, '
-                        'through="%s").' % relationship_model_name,
-                        obj=self))
+                    errors.append(
+                        checks.Error(
+                            'The model is used as an intermediary model by '
+                                '%s, but it has more than one foreign key '
+                                'to %s, which is ambiguous and is not permitted.'
+                                % (self, from_model_name),
+                            hint='If you want to create a recursive relationship, '
+                                'use ForeignKey("self", symmetrical=False, '
+                                'through="%s").'
+                                % relationship_model_name,
+                            obj=self
+                        )
+                    )
 
                 if seen_to > 1:
-                    context = {'to_model_name': to_model_name,
-                        'relationship_model_name': relationship_model_name,
-                        'field': self}
-                    errors.append(checks.Error(
-                        'The model is used as an intermediary model by '
-                        '%(field)s, but it has more than one '
-                        'foreign key to %(to_model_name)s, which is ambiguous '
-                        'and is not permitted.' % context,
-                        hint='If you want to create a recursive relationship, '
-                        'use ForeignKey("self", symmetrical=False, '
-                        'through="%s").' % relationship_model_name,
-                        obj=self))
+                    errors.append(
+                        checks.Error(
+                            'The model is used as an intermediary model by '
+                                '%s, but it has more than one foreign key '
+                                'to %s, which is ambiguous and is not permitted.'
+                                % (self, to_model_name),
+                            hint='If you want to create a recursive '
+                                'relationship, use ForeignKey("self", '
+                                'symmetrical=False, through="%s").'
+                                % relationship_model_name,
+                            obj=self,
+                        )
+                    )
 
-                if (not self.rel.through._meta.auto_created and
-                    (seen_from == 0 or seen_to == 0)):
-                    context = {'from_model_name': from_model_name,
-                        'to_model_name': to_model_name,
-                        'field': self}
-                    errors.append(checks.Error(
-                        'The model is used as an intermediary model by '
-                        '%(field)s, but it misses a foreign key to '
-                        '%(from_model_name)s or %(to_model_name)s.' % context,
-                        hint=None, obj=self.rel.through))
+                if seen_from == 0 or seen_to == 0:
+                    errors.append(
+                        checks.Error(
+                            'The model is used as an intermediary model by '
+                                '%s, but it misses a foreign key to %s or %s.'
+                                % (self, from_model_name, to_model_name),
+                            hint=None,
+                            obj=self.rel.through,
+                        )
+                    )
         return errors
