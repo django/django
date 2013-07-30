@@ -1282,17 +1282,13 @@ class CommandTypes(AdminScriptTestCase):
     def test_no_color(self):
         "--no-color prevent colorization of the output"
         out = StringIO()
-        call_command("sqlall", "admin_scripts", no_color=True, stdout=out)
-        self.assertEqual(out.getvalue(), """BEGIN;
-CREATE TABLE "admin_scripts_article" (
-    "id" integer NOT NULL PRIMARY KEY,
-    "headline" varchar(100) NOT NULL,
-    "pub_date" datetime NOT NULL
-)
-;
 
-COMMIT;
-""")
+        call_command('color_command', no_color=True, stdout=out)
+        self.assertEqual(out.getvalue(), 'BEGIN\n')
+
+        out = StringIO()
+        call_command('color_command', stdout=out)
+        self.assertEqual(out.getvalue(), '\x1b[33mBEGIN\x1b[0m\n')
 
     def test_base_command(self):
         "User BaseCommands can execute when a label is provided"
