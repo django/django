@@ -41,17 +41,16 @@ class CurrentSiteManager(models.Manager):
             field = self.model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return [checks.Error(
-                'No field %s.%s.\n'
-                'CurrentSiteManager needs a field named "%s".'
-                % (self.model._meta.object_name, field_name, field_name),
+                'CurrentSiteManager could not find a field named "%s".'
+                % field_name,
                 hint='Ensure that you did not misspell the field name. '
                 'Does the field exist?',
                 obj=self)]
 
         if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
             return [checks.Error(
-                'CurrentSiteManager uses a non-relative field.\n'
-                '%s.%s should be a ForeignKey or ManyToManyField.'
+                '%s.%s is used by a CurrentSiteManager and must be '
+                'a ForeignKey or ManyToManyField.'
                 % (self.model._meta.object_name, field_name),
                 hint=None, obj=self)]
 

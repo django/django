@@ -313,8 +313,8 @@ class FileField(Field):
 
     def _check_upload_to(self, **kwargs):
         if not self.upload_to:
-            return [checks.Error('No "upload_to" attribute.\n'
-                'FileFields require an "upload_to" attribute.',
+            return [checks.Error(
+                'The field requires an "upload_to" attribute.',
                 hint=None, obj=self)]
         return []
 
@@ -447,7 +447,6 @@ class ImageField(FileField):
             from django.utils.image import Image
         except ImproperlyConfigured:
             return [checks.Error(
-                'Pillow not installed.\n'
                 'To use ImageFields, you need to install Pillow.'
                 'Get it at https://pypi.python.org/pypi/Pillow or run '
                 'command "pip install pillow".',
