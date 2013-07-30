@@ -179,12 +179,14 @@ class CustomUserModelValidationTestCase(TestCase):
 
         from .test_custom_user import CustomUserNonListRequiredFields
         errors = checks.run_checks()
-        self.assertEqual(errors, [
+        expected = [
             checks.Error(
                 'The REQUIRED_FIELDS must be a list or tuple.',
                 hint=None,
-                obj=CustomUserNonListRequiredFields),
-        ])
+                obj=CustomUserNonListRequiredFields,
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
@@ -192,13 +194,15 @@ class CustomUserModelValidationTestCase(TestCase):
 
         from .test_custom_user import CustomUserBadRequiredFields
         errors = checks.run_checks()
-        self.assertEqual(errors, [
+        expected = [
             checks.Warning(
                 'The field named as the USERNAME_FIELD must not be included '
-                'in REQUIRED_FIELDS on a swappable user model.',
+                    'in REQUIRED_FIELDS on a swappable user model.',
                 hint=None,
-                obj=CustomUserBadRequiredFields),
-        ])
+                obj=CustomUserBadRequiredFields,
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
@@ -206,13 +210,15 @@ class CustomUserModelValidationTestCase(TestCase):
 
         from .test_custom_user import CustomUserNonUniqueUsername
         errors = checks.run_checks()
-        self.assertEqual(errors, [
+        expected = [
             checks.Error(
                 'The CustomUserNonUniqueUsername.username field must be '
-                'unique because it is pointed by USERNAME_FIELD.',
+                    'unique because it is pointed by USERNAME_FIELD.',
                 hint=None,
-                obj=CustomUserNonUniqueUsername),
-        ])
+                obj=CustomUserNonUniqueUsername
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
 
 class PermissionTestCase(TestCase):

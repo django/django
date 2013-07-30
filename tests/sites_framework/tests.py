@@ -55,12 +55,16 @@ class SitesFrameworkTestCase(TestCase):
             on_site = CurrentSiteManager("places_this_article_should_appear")
 
         errors = InvalidArticle.check()
-        self.assertEqual(errors, [checks.Error(
-            'CurrentSiteManager could not find a field named '
-            '"places_this_article_should_appear".',
-            hint='Ensure that you did not misspell the field name. '
-            'Does the field exist?',
-            obj=InvalidArticle.on_site)])
+        expected = [
+            checks.Error(
+                'CurrentSiteManager could not find a field named '
+                    '"places_this_article_should_appear".',
+                hint='Ensure that you did not misspell the field name. '
+                    'Does the field exist?',
+                obj=InvalidArticle.on_site,
+            )
+        ]
+        self.assertEqual(errors, expected)
 
     def test_invalid_field_type(self):
         from django.db import models
@@ -69,7 +73,12 @@ class SitesFrameworkTestCase(TestCase):
             site = models.IntegerField()
 
         errors = ConfusedArticle.check()
-        self.assertEqual(errors, [checks.Error(
-            'ConfusedArticle.site is used by a CurrentSiteManager and must be '
-            'a ForeignKey or ManyToManyField.',
-            hint=None, obj=ConfusedArticle.on_site)])
+        expected = [
+            checks.Error(
+                'ConfusedArticle.site is used by a CurrentSiteManager '
+                    'and must be a ForeignKey or ManyToManyField.',
+                hint=None,
+                obj=ConfusedArticle.on_site,
+            )
+        ]
+        self.assertEqual(errors, expected)

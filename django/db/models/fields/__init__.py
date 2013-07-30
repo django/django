@@ -698,41 +698,61 @@ class Field(object):
     def _check_choices(self, **kwargs):
         if self.choices:
             if (isinstance(self.choices, six.string_types) or
-                not is_iterable(self.choices)):
-                return [checks.Error(
-                    '"choices" must be a list or tuple.',
-                    hint=None, obj=self)]
+                    not is_iterable(self.choices)):
+                return [
+                    checks.Error(
+                        '"choices" must be a list or tuple.',
+                        hint=None,
+                        obj=self,
+                    )
+                ]
             elif any(isinstance(choice, six.string_types) or
                      not is_iterable(choice) or len(choice) != 2
                      for choice in self.choices):
-                return [checks.Error(
-                    'All "choices" elements must be a tuple of two elements '
-                    '(the first one is the actual value to be stored and '
-                    'the second element is the human-readable name).',
-                    hint=None, obj=self)]
-        return []
+                return [
+                    checks.Error(
+                        'All "choices" elements must be a tuple of two '
+                            'elements (the first one is the actual value '
+                            'to be stored and the second element is '
+                            'the human-readable name).',
+                        hint=None,
+                        obj=self,
+                    )
+                ]
+            else:
+                return []
+        else:
+            return []
 
     def _check_db_index(self, **kwargs):
         if self.db_index not in (None, True, False):
-            return [checks.Error(
-                '"db_index" must be either None, True or False.',
-                hint='Set "db_index" to False or True '
-                'or remove this optional argument.',
-                obj=self)]
-        return []
+            return [
+                checks.Error(
+                    '"db_index" must be either None, True or False.',
+                    hint='Set "db_index" to False or True '
+                        'or remove this optional argument.',
+                    obj=self
+                )
+            ]
+        else:
+            return []
 
     def _check_null_allowed_for_primary_keys(self, **kwargs):
         if (self.primary_key and self.null and
-            not connection.features.interprets_empty_strings_as_nulls):
+                not connection.features.interprets_empty_strings_as_nulls):
             # We cannot reliably check this for backends like Oracle which
             # consider NULL and '' to be equal (and thus set up
             # character-based fields a little differently).
-            return [checks.Error(
-                'Primary keys must not have null=True.',
-                hint='Set null=False on the field or '
-                'remove primary_key=True argument.',
-                obj=self)]
-        return []
+            return [
+                checks.Error(
+                    'Primary keys must not have null=True.',
+                    hint='Set null=False on the field or '
+                        'remove primary_key=True argument.',
+                    obj=self
+                )
+            ]
+        else:
+            return []
 
     def _check_backend_specific_checks(self, **kwargs):
         return connection.validation.check_field(self, **kwargs)
@@ -883,11 +903,15 @@ class BooleanField(Field):
 
     def _check_null(self, **kwargs):
         if getattr(self, 'null', False):
-            return [checks.Error(
-                'BooleanFields do not acceps null values.',
-                hint='Use a NullBooleanField instead.',
-                obj=self)]
-        return []
+            return [
+                checks.Error(
+                    'BooleanFields do not acceps null values.',
+                    hint='Use a NullBooleanField instead.',
+                    obj=self
+                )
+            ]
+        else:
+            return []
 
 
 class CharField(Field):
@@ -928,13 +952,21 @@ class CharField(Field):
             if max_length <= 0:
                 raise ValueError()
         except TypeError:
-            return [checks.Error(
-                'The field must have "max_length" attribute.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'The field must have "max_length" attribute.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         except ValueError:
-            return [checks.Error(
-                '"max_length" must be a positive integer.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    '"max_length" must be a positive integer.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         else:
             return []
 
@@ -1251,12 +1283,16 @@ class DecimalField(Field):
         errors = self.__check_decimal_places()
         errors += self.__check_max_digits()
         if not errors and int(self.decimal_places) > int(self.max_digits):
-            errors.append(checks.Error(
-                '"max_digits" must be greater or equal to "decimal_places". '
-                'Note how these arguments work: if you set "decimal_places" '
-                'to 2 and you want to store numbers up to 999.99 then you '
-                'need to set max_digits" to 5.',
-                hint=None, obj=self))
+            errors.append(
+                checks.Error(
+                    '"max_digits" must be greater or equal to "decimal_places". '
+                        'Note how these arguments work: if you set '
+                        '"decimal_places" to 2 and you want to store numbers '
+                        'up to 999.99 then you need to set max_digits" to 5.',
+                    hint=None,
+                    obj=self,
+                )
+            )
         return errors
 
     def __check_decimal_places(self):
@@ -1265,13 +1301,21 @@ class DecimalField(Field):
             if decimal_places < 0:
                 raise ValueError()
         except TypeError:
-            return [checks.Error(
-                'The field requires a "decimal_places" attribute.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'The field requires a "decimal_places" attribute.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         except ValueError:
-            return [checks.Error(
-                '"decimal_places" attribute must be a non-negative integer.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    '"decimal_places" attribute must be a non-negative integer.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         else:
             return []
 
@@ -1281,13 +1325,21 @@ class DecimalField(Field):
             if max_digits <= 0:
                 raise ValueError()
         except TypeError:
-            return [checks.Error(
-                'The field requires "max_digits" attribute.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'The field requires "max_digits" attribute.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         except ValueError:
-            return [checks.Error(
-                '"max_digits" attribute must be a positive integer.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    '"max_digits" attribute must be a positive integer.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         else:
             return []
 
@@ -1367,10 +1419,13 @@ class FilePathField(Field):
 
     def _check_allowing_files_or_folders(self, **kwargs):
         if not self.allow_files and not self.allow_folders:
-            return [checks.Error(
-                'The field must have either allow_files or allow_folders '
-                'set to True.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'The field must have either allow_files or allow_folders set to True.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         return []
 
 
@@ -1548,10 +1603,14 @@ class GenericIPAddressField(Field):
 
     def _check_blank_and_null_values(self, **kwargs):
         if not getattr(self, 'null', False) and getattr(self, 'blank', False):
-            return [checks.Error(
-                'The field cannot accept blank values if null values '
-                'are not allowed, as blank values are stored as null.',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'The field cannot accept blank values if null values '
+                        'are not allowed, as blank values are stored as null.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         return []
 
 

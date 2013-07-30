@@ -65,7 +65,13 @@ Messages are comparable. That allows you to easily write tests::
 
     from django.core.checks import Error
     errors = checked_object.check()
-    expected_errors = [Error('an error', hint=None, obj=checked_object)]
+    expected_errors = [
+        Error(
+            'an error',
+            hint=None,
+            obj=checked_object,
+        )
+    ]
     self.assertEqual(errors, expected_errors)
 
 There are shortcuts to make creating messages with common levels easier. You can

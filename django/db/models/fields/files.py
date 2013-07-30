@@ -313,10 +313,15 @@ class FileField(Field):
 
     def _check_upload_to(self, **kwargs):
         if not self.upload_to:
-            return [checks.Error(
-                'The field requires an "upload_to" attribute.',
-                hint=None, obj=self)]
-        return []
+            return [
+                checks.Error(
+                    'The field requires an "upload_to" attribute.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -444,11 +449,15 @@ class ImageField(FileField):
         try:
             from django.utils.image import Image
         except ImproperlyConfigured:
-            return [checks.Error(
-                'To use ImageFields, you need to install Pillow.'
-                'Get it at https://pypi.python.org/pypi/Pillow or run '
-                'command "pip install pillow".',
-                hint=None, obj=self)]
+            return [
+                checks.Error(
+                    'To use ImageFields, you need to install Pillow.'
+                        'Get it at https://pypi.python.org/pypi/Pillow or run '
+                        'command "pip install pillow".',
+                    hint=None,
+                    obj=self,
+                )
+            ]
         else:
             return []
 

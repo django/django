@@ -1033,27 +1033,35 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_swappable(cls, **kwargs):
         """ Check if the swapped model exists. """
 
+        errors = []
         if cls._meta.swapped:
             try:
                 app_label, model_name = cls._meta.swapped.split('.')
             except ValueError:
-                return [checks.Error(
-                    '"%s" is not of the form "app_label.app_name".'
-                    % cls._meta.swappable,
-                    hint=None, obj=cls)]
+                errors.append(
+                    checks.Error(
+                        '"%s" is not of the form "app_label.app_name".'
+                            % cls._meta.swappable,
+                        hint=None,
+                        obj=cls,
+                    )
+                )
             else:
                 if not get_model(app_label, model_name):
-                    context = {'app_label': app_label, 'model_name': model_name}
-                    return [checks.Error(
-                        'The model has been swapped out for '
-                        '%(app_label)s.%(model_name)s which has not been '
-                        'installed or is abstract.' % context,
-                        hint='Ensure that you did not misspell the model '
-                        'name and the app name as well as the model '
-                        'is not abstract. Does your INSTALLED_APPS setting '
-                        'contain the "%(app_label)s" app?' % context,
-                        obj=cls)]
-        return []
+                    errors.append(
+                        checks.Error(
+                            'The model has been swapped out for %s.%s '
+                                'which has not been installed or is abstract.'
+                                % (app_label, model_name),
+                            hint='Ensure that you did not misspell the model '
+                                'name and the app name as well as the model '
+                                'is not abstract. Does your INSTALLED_APPS '
+                                'setting contain the "%s" app?'
+                                % app_label,
+                            obj=cls
+                        )
+                    )
+        return errors
 
     @classmethod
     def _check_managers(cls, **kwargs):
@@ -1074,24 +1082,36 @@ class Model(six.with_metaclass(ModelBase)):
         if settings.AUTH_USER_MODEL == model_name:
             # Check that REQUIRED_FIELDS is a list
             if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
-                errors.append(checks.Error(
-                    'The REQUIRED_FIELDS must be a list or tuple.',
-                    hint=None, obj=cls))
+                errors.append(
+                    checks.Error(
+                        'The REQUIRED_FIELDS must be a list or tuple.',
+                        hint=None,
+                        obj=cls,
+                    )
+                )
 
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
-                errors.append(checks.Warning(
-                    'The field named as the USERNAME_FIELD must not be '
-                    'included in REQUIRED_FIELDS on a swappable user model.',
-                    hint=None, obj=cls))
+                errors.append(
+                    checks.Warning(
+                        'The field named as the USERNAME_FIELD '
+                            'must not be included in REQUIRED_FIELDS '
+                            'on a swappable user model.',
+                        hint=None,
+                        obj=cls,
+                    )
+                )
 
             # Check that the username field is unique
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-                errors.append(checks.Error(
-                    'The %s.%s field must be unique because it is pointed by '
-                    'USERNAME_FIELD.'
-                    % (cls._meta.object_name, cls.USERNAME_FIELD),
-                    hint=None, obj=cls))
+                errors.append(
+                    checks.Error(
+                        'The %s.%s field must be unique because it is pointed by USERNAME_FIELD.'
+                            % (cls._meta.object_name, cls.USERNAME_FIELD),
+                        hint=None,
+                        obj=cls
+                    )
+                )
 
         return errors
 
@@ -1113,9 +1133,13 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         for field in cls._meta.local_fields + cls._meta.local_many_to_many:
             if field.name.endswith('_'):
-                errors.append(checks.Error(
-                    'Field names must not end with underscores.',
-                    hint=None, obj=field))
+                errors.append(
+                    checks.Error(
+                        'Field names must not end with underscores.',
+                        hint=None,
+                        obj=field,
+                    )
+                )
         return errors
 
     @classmethod
@@ -1140,12 +1164,15 @@ class Model(six.with_metaclass(ModelBase)):
         for f in fields:
             signature = (f.rel.to, cls, f.rel.through)
             if signature in seen_intermediary_signatures:
-                errors.append(checks.Error(
-                    'The model has two many-to-many relations through '
-                    'the intermediary %s model, which is not permitted.'
-                    % f.rel.through._meta.object_name,
-                    hint=None,
-                    obj=cls))
+                errors.append(
+                    checks.Error(
+                        'The model has two many-to-many relations through '
+                            'the intermediary %s model, which is not permitted.'
+                            % f.rel.through._meta.object_name,
+                        hint=None,
+                        obj=cls,
+                    )
+                )
             else:
                 seen_intermediary_signatures.append(signature)
         return errors
@@ -1205,22 +1232,28 @@ class Model(six.with_metaclass(ModelBase)):
                 clash_name = "%s.%s" % (rel_opts.object_name,
                     clash_field.name)  # i. e. "Target.model_set"
                 if clash_field.name == rel_name:
-                    errors.append(checks.Error(
-                        'Accessor for field %s clashes with field %s.'
-                        % (field_name, clash_name),
-                        hint='Rename field %s or add/change a related_name '
-                        'argument to the definition for field %s.'
-                        % (clash_name, field_name),
-                        obj=field))
+                    errors.append(
+                        checks.Error(
+                            'Accessor for field %s clashes with field %s.'
+                                % (field_name, clash_name),
+                            hint='Rename field %s or add/change a related_name '
+                                'argument to the definition for field %s.'
+                                % (clash_name, field_name),
+                            obj=field,
+                        )
+                    )
 
                 if clash_field.name == rel_query_name:
-                    errors.append(checks.Error(
-                        'Reverse query name for field %s clashes with field %s.'
-                        % (field_name, clash_name),
-                        hint='Rename field %s or add/change a related_name '
-                        'argument to the definition for field %s.'
-                        % (clash_name, field_name),
-                        obj=field))
+                    errors.append(
+                        checks.Error(
+                            'Reverse query name for field %s clashes with field %s.'
+                                % (field_name, clash_name),
+                            hint='Rename field %s or add/change a related_name '
+                                'argument to the definition for field %s.'
+                                % (clash_name, field_name),
+                            obj=field
+                        )
+                    )
 
             # Check clashes between accessors/reverse query names of `field` and
             # any other field -- i. e. Model.foreign accessor clashes with
@@ -1233,22 +1266,28 @@ class Model(six.with_metaclass(ModelBase)):
                 clash_name = "%s.%s" % (clash_field.model._meta.object_name,
                     clash_field.field.name)  # i. e. "Model.m2m"
                 if clash_field.get_accessor_name() == rel_name:
-                    errors.append(checks.Error(
-                        'Clash between accessors for %s and %s.'
-                        % (field_name, clash_name),
-                        hint='Add or change a related_name argument '
-                        'to the definition for %s or %s.'
-                        % (field_name, clash_name),
-                        obj=field))
+                    errors.append(
+                        checks.Error(
+                            'Clash between accessors for %s and %s.'
+                                % (field_name, clash_name),
+                            hint='Add or change a related_name argument '
+                                'to the definition for %s or %s.'
+                                % (field_name, clash_name),
+                            obj=field,
+                        )
+                    )
 
                 if clash_field.get_accessor_name() == rel_query_name:
-                    errors.append(checks.Error(
-                        'Clash between reverse query names for %s and %s.'
-                        % (field_name, clash_name),
-                        hint='Add or change a related_name argument '
-                        'to the definition for %s or %s.'
-                        % (field_name, clash_name),
-                        obj=field))
+                    errors.append(
+                        checks.Error(
+                            'Clash between reverse query names for %s and %s.'
+                                % (field_name, clash_name),
+                            hint='Add or change a related_name argument '
+                                'to the definition for %s or %s.'
+                                % (field_name, clash_name),
+                            obj=field
+                        )
+                    )
 
         return errors
 
@@ -1260,54 +1299,76 @@ class Model(six.with_metaclass(ModelBase)):
             if f.name == 'id' and f != cls._meta.pk)
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
-            return [checks.Error(
-                'You cannot use "id" as a field name, because each model '
-                'automatically gets an "id" field if none of the fields '
-                'have primary_key=True.',
-                hint='Remove or rename "id" field or add primary_key=True '
-                'to a field.',
-                obj=cls)]
-        return []
+            return [
+                checks.Error(
+                    'You cannot use "id" as a field name, because each model '
+                        'automatically gets an "id" field if none '
+                        'of the fields have primary_key=True.',
+                    hint='Remove or rename "id" field '
+                        'or add primary_key=True to a field.',
+                    obj=cls,
+                )
+            ]
+        else:
+            return []
 
     @classmethod
     def _check_index_together(cls, **kwargs):
         """ Check the value of "index_together" option. """
 
         if not isinstance(cls._meta.index_together, (tuple, list)):
-            return [checks.Error(
-                '"index_together" must be a list or tuple.',
-                hint=None, obj=cls)]
+            return [
+                checks.Error(
+                    '"index_together" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
 
-        if any(not isinstance(fields, (tuple, list))
-            for fields in cls._meta.index_together):
-            return [checks.Error(
-                'All "index_together" elements must be lists or tuples.',
-                hint=None, obj=cls)]
+        elif any(not isinstance(fields, (tuple, list))
+                for fields in cls._meta.index_together):
+            return [
+                checks.Error(
+                    'All "index_together" elements must be lists or tuples.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
 
-        errors = []
-        for fields in cls._meta.index_together:
-            errors.extend(cls._check_local_fields(fields, "index_together"))
-        return errors
+        else:
+            errors = []
+            for fields in cls._meta.index_together:
+                errors.extend(cls._check_local_fields(fields, "index_together"))
+            return errors
 
     @classmethod
     def _check_unique_together(cls, **kwargs):
         """ Check the value of "unique_together" option. """
 
         if not isinstance(cls._meta.unique_together, (tuple, list)):
-            return [checks.Error(
-                '"unique_together" must be a list or tuple.',
-                hint=None, obj=cls)]
+            return [
+                checks.Error(
+                    '"unique_together" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
 
-        if any(not isinstance(fields, (tuple, list))
-            for fields in cls._meta.unique_together):
-            return [checks.Error(
-                'All "unique_together" elements must be lists or tuples.',
-                hint=None, obj=cls)]
+        elif any(not isinstance(fields, (tuple, list))
+                for fields in cls._meta.unique_together):
+            return [
+                checks.Error(
+                    'All "unique_together" elements must be lists or tuples.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
 
-        errors = []
-        for fields in cls._meta.unique_together:
-            errors.extend(cls._check_local_fields(fields, "unique_together"))
-        return errors
+        else:
+            errors = []
+            for fields in cls._meta.unique_together:
+                errors.extend(cls._check_local_fields(fields, "unique_together"))
+            return errors
 
     @classmethod
     def _check_local_fields(cls, fields, option):
@@ -1318,25 +1379,35 @@ class Model(six.with_metaclass(ModelBase)):
                 field = cls._meta.get_field(field_name,
                     many_to_many=True)
             except models.FieldDoesNotExist:
-                return [checks.Error(
-                    '"%s" points to a missing field named "%s".'
-                    % (option, field_name),
-                    hint='Ensure that you did not misspell '
-                    'the field name.',
-                    obj=cls)]
+                return [
+                    checks.Error(
+                        '"%s" points to a missing field named "%s".'
+                            % (option, field_name),
+                        hint='Ensure that you did not misspell the field name.',
+                        obj=cls
+                    )
+                ]
             else:
                 if isinstance(field.rel, models.ManyToManyRel):
-                    return [checks.Error(
-                        '"%s" refers to a m2m "%s" field, but '
-                        'ManyToManyFields are not supported in "%s".'
-                        % (option, field_name, option),
-                        hint=None, obj=cls)]
+                    return [
+                        checks.Error(
+                            '"%s" refers to a m2m "%s" field, but '
+                                'ManyToManyFields are not supported in "%s".'
+                                % (option, field_name, option),
+                            hint=None,
+                            obj=cls
+                        )
+                    ]
                 if field not in cls._meta.local_fields:
-                    return [checks.Error(
-                        '"%s" refers to "%s" field defined in parent model, '
-                        'which is not allowed.'
-                        % (option, field_name),
-                        hint=None, obj=cls)]
+                    return [
+                        checks.Error(
+                            '"%s" refers to "%s" field defined in parent '
+                                'model, which is not allowed.'
+                                % (option, field_name),
+                            hint=None,
+                            obj=cls,
+                        )
+                    ]
         return []
 
     @classmethod
@@ -1350,10 +1421,14 @@ class Model(six.with_metaclass(ModelBase)):
             return []
 
         if not isinstance(cls._meta.ordering, (list, tuple)):
-            return [checks.Error(
-                '"ordering" must be a tuple or list '
-                '(even if you want to order by only one field).',
-                hint=None, obj=cls)]
+            return [
+                checks.Error(
+                    '"ordering" must be a tuple or list '
+                        '(even if you want to order by only one field).',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
 
         errors = []
 
@@ -1380,11 +1455,13 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 cls._meta.get_field(field_name, many_to_many=False)
             except models.FieldDoesNotExist:
-                errors.append(checks.Error(
-                    '"ordering" pointing to a missing "%s" field.'
-                    % field_name,
-                    hint='Ensure that you did not misspell the field name.',
-                    obj=cls))
+                errors.append(
+                    checks.Error(
+                        '"ordering" pointing to a missing "%s" field.' % field_name,
+                        hint='Ensure that you did not misspell the field name.',
+                        obj=cls,
+                    )
+                )
         return errors
 
 
