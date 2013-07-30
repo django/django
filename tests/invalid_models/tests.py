@@ -37,9 +37,8 @@ class CharFieldTests(TestCase):
         field = models.CharField()
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No "max_length" argument.\n'
-                'CharFields require "max_length" argument that is '
-                'the maximum length (in characters) of the field.',
+            Error(
+                'The field must have "max_length" attribute.',
                 hint=None, obj=field),
         ])
 
@@ -47,10 +46,8 @@ class CharFieldTests(TestCase):
         field = models.CharField(max_length=-1)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Invalid "max_length" value.\n'
-                'CharFields require a "max_length" attribute that is '
-                'the maximum length (in characters) of the field '
-                'and is a positive integer.',
+            Error(
+                '"max_length" must be a positive integer.',
                 hint=None, obj=field),
         ])
 
@@ -58,10 +55,8 @@ class CharFieldTests(TestCase):
         field = models.CharField(max_length="bad")
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Invalid "max_length" value.\n'
-                'CharFields require a "max_length" attribute that is '
-                'the maximum length (in characters) of the field '
-                'and is a positive integer.',
+            Error(
+                '"max_length" must be a positive integer.',
                 hint=None, obj=field),
         ])
 
@@ -69,12 +64,8 @@ class CharFieldTests(TestCase):
         field = models.CharField(max_length=10, choices='bad')
         errors = field.check()
         self.assertEqual(errors, [
-            Error('"choices" is not an iterable (e.g., a tuple or list).\n'
-                '"choices" should be an iterable of pairs. The first element '
-                'in each pair is the actual value to be stored, and '
-                'the second element is the human-readable name. '
-                'An example of a valid value is '
-                '[("1", "first choice"), ("2", "second choice")].',
+            Error(
+                '"choices" must be a list or tuple.',
                 hint=None, obj=field),
         ])
 
@@ -82,12 +73,10 @@ class CharFieldTests(TestCase):
         field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Some items of "choices" are not pairs.\n'
-                '"choices" should be an iterable of pairs. The first element '
-                'in each pair is the actual value to be stored, and '
-                'the second element is the human-readable name. '
-                'An example of a valid value is '
-                '[("1", "first choice"), ("2", "second choice")].',
+            Error(
+                'All "choices" elements must be a tuple of two elements '
+                '(the first one is the actual value to be stored '
+                'and the second element is the human-readable name).',
                 hint=None, obj=field),
         ])
 
@@ -95,9 +84,8 @@ class CharFieldTests(TestCase):
         field = models.CharField(max_length=10, db_index='bad')
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Invalid "db_index" value (should be None, True or False).\n'
-                'If set to True, a database index will be created for this '
-                'field. ',
+            Error(
+                '"db_index" must be either None, True or False.',
                 hint='Set "db_index" to False or True or '
                 'remove this optional argument.',
                 obj=field),
@@ -110,20 +98,11 @@ class DecimalFieldTests(TestCase):
         field = models.DecimalField()
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No "decimal_places" attribute.\n'
-                'DecimalFields require a "decimal_places" attribute that is '
-                'the number of decimal places to store with the number and is '
-                'a non-negative integer smaller or equal to "max_digits". '
-                'For example, if you set "decimal_places" to 2 then 1.23456 '
-                'will be saved as 1.23.',
+            Error(
+                'The field requires a "decimal_places" attribute.',
                 hint=None, obj=field),
-            Error('No "max_digits" attribute.\n'
-                'DecimalFields require a "max_digits" attribute that is '
-                'the maximum number of digits allowed in the number and '
-                'is a positive integer greater or equal to "decimal_places". '
-                'For example, if you set "max_digits" to 5 and '
-                '"decimal_places" to 2 then 999.99 is the greatest number '
-                'that you can save.',
+            Error(
+                'The field requires "max_digits" attribute.',
                 hint=None, obj=field),
         ])
 
@@ -131,20 +110,11 @@ class DecimalFieldTests(TestCase):
         field = models.DecimalField(max_digits=-1, decimal_places=-1)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Invalid "decimal_places" value.\n'
-                'DecimalFields require a "decimal_places" attribute that is '
-                'the number of decimal places to store with the number and is '
-                'a non-negative integer smaller or equal to "max_digits". '
-                'For example, if you set "decimal_places" to 2 then 1.23456 '
-                'will be saved as 1.23.',
+            Error(
+                '"decimal_places" attribute must be a non-negative integer.',
                 hint=None, obj=field),
-            Error('Invalid "max_digits" value.\n'
-                'DecimalFields require a "max_digits" attribute that is '
-                'the maximum number of digits allowed in the number and '
-                'is a positive integer greater or equal to "decimal_places". '
-                'For example, if you set "max_digits" to 5 '
-                'and "decimal_places" to 2 then 999.99 is the greatest number '
-                'that you can save.',
+            Error(
+                '"max_digits" attribute must be a positive integer.',
                 hint=None, obj=field),
         ])
 
@@ -152,20 +122,11 @@ class DecimalFieldTests(TestCase):
         field = models.DecimalField(max_digits="bad", decimal_places="bad")
         errors = field.check()
         self.assertEqual(errors, [
-            Error('Invalid "decimal_places" value.\n'
-                'DecimalFields require a "decimal_places" attribute that is '
-                'the number of decimal places to store with the number and is '
-                'a non-negative integer smaller or equal to "max_digits". '
-                'For example, if you set "decimal_places" to 2 then 1.23456 '
-                'will be saved as 1.23.',
+            Error(
+                '"decimal_places" attribute must be a non-negative integer.',
                 hint=None, obj=field),
-            Error('Invalid "max_digits" value.\n'
-                'DecimalFields require a "max_digits" attribute that is '
-                'the maximum number of digits allowed in the number and '
-                'is a positive integer greater or equal to "decimal_places". '
-                'For example, if you set "max_digits" to 5 and '
-                '"decimal_places" to 2 then 999.99 is the greatest number '
-                'that you can save.',
+            Error(
+                '"max_digits" attribute must be a positive integer.',
                 hint=None, obj=field),
         ])
 
@@ -173,13 +134,11 @@ class DecimalFieldTests(TestCase):
         field = models.DecimalField(max_digits=9, decimal_places=10)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('"max_digits" smaller than "decimal_places".\n'
-                'DecimalFields require a "max_digits" argument that is '
-                'the maximum number of digits allowed in the number and '
-                'is a positive integer greater or equal to "decimal_places". '
-                'For example, if you set "decimal_places" to 2 and you '
-                'want to store numbers up to 999.99 then you should set '
-                '"max_digits" to 5.',
+            Error(
+                '"max_digits" must be greater or equal to "decimal_places". '
+                'Note how these arguments work: if you set "decimal_places" '
+                'to 2 and you want to store numbers up to 999.99 then '
+                'you need to set max_digits" to 5.',
                 hint=None, obj=field),
         ])
 
@@ -200,9 +159,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.foreign_key.field
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No Rel1 model or it is an abstract model.\n'
-                'The field has a relation with model Rel1, which '
-                'has either not been installed or is abstract.',
+            Error(
+                'The field has a relation with model Rel1, '
+                'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
                 'contain the app where Rel1 is defined?',
@@ -216,7 +175,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.m2m.field
         errors = field.check(from_model=Model)
         self.assertEqual(errors, [
-            Error('No Rel2 model or it is an abstract model.\n'
+            Error(
                 'The field has a relation with model Rel2, '
                 'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
@@ -243,10 +202,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.field.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('More than one foreign key to Person in intermediary '
-                'AmbiguousRelationship model.\n'
-                'AmbiguousRelationship has more than one foreign key '
-                'to Person, which is ambiguous and is not permitted.',
+            Error(
+                'The model is used as an intermediary model by '
+                'invalid_models.Group.field, but it has more than one '
+                'foreign key to Person, '
+                'which is ambiguous and is not permitted.',
                 hint='If you want to create a recursive relationship, use '
                 'ForeignKey("self", symmetrical=False, '
                 'through="AmbiguousRelationship").',
@@ -272,12 +232,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.members.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('No foreign key to Group or Person '
-                'in intermediary InvalidRelationship model.\n'
-                'The field is a manually-defined many to many relation '
-                'through model InvalidRelationship, which does not have '
-                'foreign keys to Group or Person.\n',
-                hint=None, obj=field),
+            Error(
+                'The model is used as an intermediary model by '
+                'invalid_models.Group.members, but it misses a foreign key '
+                'to Group or Person.',
+                hint=None, obj=InvalidRelationship),
         ])
 
     def test_relationship_model_missing_foreign_key(self):
@@ -295,12 +254,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.members.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('No foreign key to Group or Person '
-                'in intermediary InvalidRelationship model.\n'
-                'The field is a manually-defined many to many relation '
-                'through model InvalidRelationship, which does not have '
-                'foreign keys to Group or Person.\n',
-                hint=None, obj=field),
+            Error(
+                'The model is used as an intermediary model by '
+                'invalid_models.Group.members, but it misses a foreign key '
+                'to Group or Person.',
+                hint=None, obj=InvalidRelationship),
         ])
 
     def test_missing_relationship_model(self):
@@ -314,7 +272,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.members.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('No intermediary model MissingM2MModel.\n'
+            Error(
                 'The field specifies a many-to-many relation through model '
                 'MissingM2MModel, which has not been installed.',
                 hint='Ensure that you did not misspell the model name and '
@@ -335,9 +293,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Person.friends.field
         errors = field.check(from_model=Person)
         self.assertEqual(errors, [
-            Error('Symmetrical field with intermediate table.\n'
-                'Many-to-many fields with intermediate tables cannot '
-                'be symmetrical.',
+            Error(
+                'Many-to-many fields with intermediate tables '
+                'must not be symmetrical.',
                 hint=None, obj=field),
         ])
 
@@ -354,11 +312,12 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Person.friends.field
         errors = field.check(from_model=Person)
         self.assertEqual(errors, [
-            Error('More than two foreign keys to Person '
-                'in intermediary model InvalidRelationship.\n'
-                'InvalidRelationship has more than two foreign keys to '
-                'Person, which is ambiguous and is not permitted.',
-                hint=None, obj=field),
+            Error(
+                'The model is used as an intermediary model by '
+                'invalid_models.Person.friends, but it has more than two '
+                'foreign keys to Person, which is ambiguous and '
+                'is not permitted.',
+                hint=None, obj=InvalidRelationship),
         ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):
@@ -374,9 +333,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Person.friends.field
         errors = field.check(from_model=Person)
         self.assertEqual(errors, [
-            Error('Symmetrical field with intermediate table.\n'
-                'Many-to-many fields with intermediate tables cannot '
-                'be symmetrical.',
+            Error(
+                'Many-to-many fields with intermediate tables '
+                'must not be symmetrical.',
                 hint=None, obj=field),
         ])
 
@@ -391,9 +350,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.foreign_key.field
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No AbstractModel model or it is an abstract model.\n'
-                'The field has a relation with model AbstractModel, which '
-                'has either not been installed or is abstract.',
+            Error(
+                'The field has a relation with model AbstractModel, '
+                'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
                 'contain the app where AbstractModel is defined?',
@@ -411,10 +370,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.m2m.field
         errors = field.check(from_model=Model)
         self.assertEqual(errors, [
-            Error('No AbstractModel model or it is an abstract model.\n'
-                'The field has a relation with model '
-                'AbstractModel, which has either not been installed '
-                'or is abstract.',
+            Error(
+                'The field has a relation with model AbstractModel, '
+                'which has either not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the model is not abstract. Does your INSTALLED_APPS setting '
                 'contain the app where AbstractModel is defined?',
@@ -431,8 +389,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Group.members.field
         errors = field.check(from_model=Group)
         self.assertEqual(errors, [
-            Error('Unique many-to-many field.\n'
-                'ManyToManyFields cannot be unique.',
+            Error(
+                'ManyToManyFields must not be unique.',
                 hint=None, obj=field),
         ])
 
@@ -446,10 +404,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.foreign_key.field
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No unique=True constraint on field "bad" under model '
-                'Target.\n'
-                'The field "bad" has to be unique because a foreign key '
-                'references to it.',
+            Error(
+                'Target.bad must have unique=True because it is referenced '
+                'by a foreign key.',
                 hint=None, obj=field),
         ])
 
@@ -462,10 +419,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = models.ForeignKey(Target, to_field='bad')
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No unique=True constraint on field "bad" under model '
-                'Target.\n'
-                'The field "bad" has to be unique because a foreign key '
-                'references to it.',
+            Error(
+                'Target.bad must have unique=True because '
+                'it is referenced by a foreign key.',
                 hint=None, obj=field),
         ])
 
@@ -480,7 +436,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.foreign_key.field
         errors = field.check()
         self.assertEqual(errors, [
-            Error('on_delete=SET_NULL but null forbidden.\n'
+            Error(
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field.',
                 obj=field),
@@ -497,9 +453,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = Model.foreign_key.field
         errors = field.check()
         self.assertEqual(errors, [
-            Error('on_delete=SET_DEFAULT but no default value.\n'
-                'The field specifies on_delete=SET_DEFAULT, but has '
-                'no default value.',
+            Error(
+                'The field specifies on_delete=SET_DEFAULT, '
+                'but has no default value.',
                 hint=None,
                 obj=field),
         ])
@@ -509,8 +465,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         field = models.IntegerField(primary_key=True, null=True)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('null=True for primary_key.\n'
-                'Primary key fields cannot have null=True.',
+            Error(
+                'Primary keys must not have null=True.',
                 hint='Set null=False on the field or '
                 'remove primary_key=True argument.',
                 obj=field),
@@ -574,7 +530,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
 
         expected_error = Error(
-            'A relation with a swapped model.\n'
             'The field defines a relation with the model '
             'invalid_models.SwappedModel, which has been swapped out.',
             hint='Update the relation to point at '
@@ -592,8 +547,8 @@ class FileFieldTests(TestCase):
         field = models.FileField()
         errors = field.check()
         self.assertEqual(errors, [
-            Error('No "upload_to" attribute.\n'
-                'FileFields require an "upload_to" attribute.',
+            Error(
+                'The field requires an "upload_to" attribute.',
                 hint=None, obj=field),
         ])
 
@@ -604,10 +559,10 @@ class BooleanFieldTests(TestCase):
         field = models.BooleanField(null=True)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('null=True for BooleanField.\n'
-                'BooleanFields do not accept null values. Use '
-                'a NullBooleanField instead.',
-                hint=None, obj=field),
+            Error(
+                'BooleanFields do not acceps null values.',
+                hint='Use a NullBooleanField instead.',
+                obj=field),
         ])
 
 
@@ -617,10 +572,9 @@ class GenericIPAddressFieldTests(TestCase):
         field = models.GenericIPAddressField(null=False, blank=True)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('null=False and blank=True for GenericIPAddressField.\n'
-                'GenericIPAddressField cannot accept blank values '
-                'if null values are not allowed, as blank values are stored '
-                'as null.',
+            Error(
+                'The field cannot accept blank values if null values '
+                'are not allowed, as blank values are stored as null.',
                 hint=None, obj=field),
         ])
 
@@ -631,9 +585,8 @@ class FilePathFieldTests(TestCase):
         field = models.FilePathField(allow_files=False, allow_folders=False)
         errors = field.check()
         self.assertEqual(errors, [
-            Error('allow_files=False and allow_folders=False '
-                'on FilePathField.\n'
-                'FilePathFields must have either allow_files or allow_folders '
+            Error(
+                'The field must have either allow_files or allow_folders '
                 'set to True.',
                 hint=None, obj=field)
         ])
@@ -1129,10 +1082,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Non-iterable "index_together".\n'
-                '"index_together" is a list of field names that, taken '
-                'together, are indexed, so "index_together" must be '
-                'an iterable (e.g. a list). ',
+            Error(
+                '"index_together" must be a list or tuple.',
                 hint=None, obj=Model),
         ])
 
@@ -1146,13 +1097,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Some items of "index_together" are not iterable '
-                '(e.g. a list).\n'
-                '"index_together" is a list of field names '
-                '(which are nested lists) that, taken together, are '
-                'indexed, so "index_together" must be an iterable '
-                'of iterables (i. e. a list of lists), i. e. '
-                '[["first_field", "second_field"]].',
+            Error(
+                'All "index_together" elements must be lists or tuples.',
                 hint=None, obj=Model),
         ])
 
@@ -1165,10 +1111,9 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('"index_together" pointing to a missing "missing_field" '
-                'field.\n'
-                'Model.index_together points to a field "missing_field" '
-                'which does not exist.',
+            Error(
+                '"index_together" points to a missing field named '
+                '"missing_field".',
                 hint='Ensure that you did not misspell the field name.',
                 obj=Model),
         ])
@@ -1184,9 +1129,9 @@ class IndexTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('"index_together" referring to a m2m "m2m" field.\n'
-                'ManyToManyFields are not supported in '
-                '"index_together".',
+            Error(
+                '"index_together" refers to a m2m "m2m" field, '
+                'but ManyToManyFields are not supported in "index_together".',
                 hint=None, obj=Model)
         ])
 
@@ -1201,10 +1146,8 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Non-iterable "unique_together".\n'
-                '"unique_together" is a list of field names that, taken '
-                'together, are indexed, so "unique_together" must be '
-                'an iterable (e.g. a list).',
+            Error(
+                '"unique_together" must be a list or tuple.',
                 hint=None, obj=Model),
         ])
 
@@ -1218,15 +1161,8 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Some items of "unique_together" are not iterable '
-                '(e.g. a list).\n'
-                '"unique_together" is a list of field names '
-                '(which are nested lists) that, taken together, are '
-                'indexed, so "unique_together" must be an iterable '
-                'of iterables (i. e. a list of tuples), i. e. '
-                '[("first_field", "second_field")]. When dealing with '
-                'a single set of fields, a single tuple can be used: '
-                '("first_field", "second_field").',
+            Error(
+                'All "unique_together" elements must be lists or tuples.',
                 hint=None, obj=Model),
         ])
 
@@ -1251,10 +1187,9 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('"unique_together" pointing to a missing "missing_field" '
-                'field.\n'
-                'Model.unique_together points to a field "missing_field" '
-                'which does not exist.',
+            Error(
+                '"unique_together" points to a missing field '
+                'named "missing_field".',
                 hint='Ensure that you did not misspell the field name.',
                 obj=Model),
         ])
@@ -1270,9 +1205,9 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('"unique_together" referring to a m2m "m2m" field.\n'
-                'ManyToManyFields are not supported in '
-                '"unique_together".',
+            Error(
+                '"unique_together" refers to a m2m "m2m" field, but '
+                'ManyToManyFields are not supported in "unique_together".',
                 hint=None, obj=Model)
         ])
 
@@ -1285,10 +1220,10 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('"id" field is not a primary key.\n'
-                'You cannot use "id" as a field name, '
-                'because each model automatically gets an "id" field '
-                'if none of the fields have primary_key=True.',
+            Error(
+                'You cannot use "id" as a field name, because each model '
+                'automatically gets an "id" field if none of the fields have '
+                'primary_key=True.',
                 hint='Remove or rename "id" field or '
                 'add primary_key=True to a field.',
                 obj=Model)
@@ -1301,13 +1236,11 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Field name ending with an underscore.\n'
-                'Field names cannot end with underscores, because this '
-                'would lead to ambiguous queryset filters.',
+            Error(
+                'Field names must not end with underscores.',
                 hint=None, obj=Model._meta.get_field('field_')),
-            Error('Field name ending with an underscore.\n'
-                'Field names cannot end with underscores, because this '
-                'would lead to ambiguous queryset filters.',
+            Error(
+                'Field names must not end with underscores.',
                 hint=None, obj=Model._meta.get_field('m2m_')),
         ])
 
@@ -1318,10 +1251,9 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('Non iterable "ordering".\n'
-                '"ordering" must be a tuple or list of field names, i. e. '
-                '["pub_date", "author"]. If you want to order by only one '
-                'field, you still need to use a list, i. e. ["pub_date"].',
+            Error(
+                '"ordering" must be a tuple or list '
+                '(even if you want to order by only one field).',
                 hint=None, obj=Model)
         ])
 
@@ -1358,9 +1290,9 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         errors = Model.check()
         self.assertEqual(errors, [
-            Error('not_an_app.Target not installed or abstract.\n'
-                'The model has been swapped out for not_an_app.Target which '
-                'has not been installed or is abstract.',
+            Error(
+                'The model has been swapped out for not_an_app.Target '
+                'which has not been installed or is abstract.',
                 hint='Ensure that you did not misspell the model name and '
                 'the app name as well as the model is not abstract. Does your '
                 'INSTALLED_APPS setting contain the "not_an_app" app?',
@@ -1383,7 +1315,7 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         errors = Group.check()
         self.assertEqual(errors, [
-            Error('Two m2m relations through the same model.\n'
+            Error(
                 'The model has two many-to-many relations through '
                 'the intermediary Membership model, which is not permitted.',
                 hint=None,

@@ -1045,8 +1045,6 @@ class Model(six.with_metaclass(ModelBase)):
                 if not get_model(app_label, model_name):
                     context = {'app_label': app_label, 'model_name': model_name}
                     return [checks.Error(
-                        '%(app_label)s.%(model_name)s not installed '
-                        'or abstract.\n'
                         'The model has been swapped out for '
                         '%(app_label)s.%(model_name)s which has not been '
                         'installed or is abstract.' % context,
@@ -1077,26 +1075,22 @@ class Model(six.with_metaclass(ModelBase)):
             # Check that REQUIRED_FIELDS is a list
             if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
                 errors.append(checks.Error(
-                    'Non-iterable %s.REQUIRED_FIELDS.\n'
-                    'The REQUIRED_FIELDS must be an iterable (i. e. a list '
-                    'or tuple).' % cls._meta.object_name,
+                    'The REQUIRED_FIELDS must be a list or tuple.',
                     hint=None, obj=cls))
 
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
                 errors.append(checks.Warning(
-                    '%s.USERNAME_FIELD included in REQUIRED_FIELDS.\n'
-                    'The field named as the USERNAME_FIELD should not be '
-                    'included in REQUIRED_FIELDS.' % cls._meta.object_name,
+                    'The field named as the USERNAME_FIELD must not be '
+                    'included in REQUIRED_FIELDS on a swappable user model.',
                     hint=None, obj=cls))
 
             # Check that the username field is unique
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
                 errors.append(checks.Error(
-                    'Non unique %s.USERNAME_FIELD.\n'
                     'The %s.%s field must be unique because it is pointed by '
-                    'USERNAME_FIELD.' % (cls._meta.object_name,
-                    cls._meta.object_name, cls.USERNAME_FIELD),
+                    'USERNAME_FIELD.'
+                    % (cls._meta.object_name, cls.USERNAME_FIELD),
                     hint=None, obj=cls))
 
         return errors
@@ -1120,9 +1114,7 @@ class Model(six.with_metaclass(ModelBase)):
         for field in cls._meta.local_fields + cls._meta.local_many_to_many:
             if field.name.endswith('_'):
                 errors.append(checks.Error(
-                    'Field name ending with an underscore.\n'
-                    'Field names cannot end with underscores, because this '
-                    'would lead to ambiguous queryset filters.',
+                    'Field names must not end with underscores.',
                     hint=None, obj=field))
         return errors
 
@@ -1149,7 +1141,6 @@ class Model(six.with_metaclass(ModelBase)):
             signature = (f.rel.to, cls, f.rel.through)
             if signature in seen_intermediary_signatures:
                 errors.append(checks.Error(
-                    'Two m2m relations through the same model.\n'
                     'The model has two many-to-many relations through '
                     'the intermediary %s model, which is not permitted.'
                     % f.rel.through._meta.object_name,
@@ -1270,7 +1261,6 @@ class Model(six.with_metaclass(ModelBase)):
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
             return [checks.Error(
-                '"id" field is not a primary key.\n'
                 'You cannot use "id" as a field name, because each model '
                 'automatically gets an "id" field if none of the fields '
                 'have primary_key=True.',
@@ -1285,22 +1275,13 @@ class Model(six.with_metaclass(ModelBase)):
 
         if not isinstance(cls._meta.index_together, (tuple, list)):
             return [checks.Error(
-                'Non-iterable "index_together".\n'
-                '"index_together" is a list of field names that, taken '
-                'together, are indexed, so "index_together" must be '
-                'an iterable (e.g. a list). ',
+                '"index_together" must be a list or tuple.',
                 hint=None, obj=cls)]
 
         if any(not isinstance(fields, (tuple, list))
             for fields in cls._meta.index_together):
             return [checks.Error(
-                'Some items of "index_together" are not iterable '
-                '(e.g. a list).\n'
-                '"index_together" is a list of field names '
-                '(which are nested lists) that, taken together, are '
-                'indexed, so "index_together" must be an iterable '
-                'of iterables (i. e. a list of lists), i. e. '
-                '[["first_field", "second_field"]].',
+                'All "index_together" elements must be lists or tuples.',
                 hint=None, obj=cls)]
 
         errors = []
@@ -1314,24 +1295,13 @@ class Model(six.with_metaclass(ModelBase)):
 
         if not isinstance(cls._meta.unique_together, (tuple, list)):
             return [checks.Error(
-                'Non-iterable "unique_together".\n'
-                '"unique_together" is a list of field names that, taken '
-                'together, are indexed, so "unique_together" must be '
-                'an iterable (e.g. a list).',
+                '"unique_together" must be a list or tuple.',
                 hint=None, obj=cls)]
 
         if any(not isinstance(fields, (tuple, list))
             for fields in cls._meta.unique_together):
             return [checks.Error(
-                'Some items of "unique_together" are not iterable '
-                '(e.g. a list).\n'
-                '"unique_together" is a list of field names '
-                '(which are nested lists) that, taken together, are '
-                'indexed, so "unique_together" must be an iterable '
-                'of iterables (i. e. a list of tuples), i. e. '
-                '[("first_field", "second_field")]. When dealing with '
-                'a single set of fields, a single tuple can be used: '
-                '("first_field", "second_field").',
+                'All "unique_together" elements must be lists or tuples.',
                 hint=None, obj=cls)]
 
         errors = []
@@ -1349,25 +1319,23 @@ class Model(six.with_metaclass(ModelBase)):
                     many_to_many=True)
             except models.FieldDoesNotExist:
                 return [checks.Error(
-                    '"%s" pointing to a missing "%s" field.\n'
-                    '%s.%s points to a field "%s" which does not exist.'
-                    % (option, field_name, cls._meta.object_name,
-                        option, field_name),
+                    '"%s" points to a missing field named "%s".'
+                    % (option, field_name),
                     hint='Ensure that you did not misspell '
                     'the field name.',
                     obj=cls)]
             else:
                 if isinstance(field.rel, models.ManyToManyRel):
                     return [checks.Error(
-                        '"%s" referring to a m2m "%s" field.\n'
+                        '"%s" refers to a m2m "%s" field, but '
                         'ManyToManyFields are not supported in "%s".'
                         % (option, field_name, option),
                         hint=None, obj=cls)]
                 if field not in cls._meta.local_fields:
                     return [checks.Error(
-                        '"%s" pointing to field defined in parent model.\n',
-                        'You cannot refer to fields defined in parent model.'
-                        % option,
+                        '"%s" refers to "%s" field defined in parent model, '
+                        'which is not allowed.'
+                        % (option, field_name),
                         hint=None, obj=cls)]
         return []
 
@@ -1383,10 +1351,8 @@ class Model(six.with_metaclass(ModelBase)):
 
         if not isinstance(cls._meta.ordering, (list, tuple)):
             return [checks.Error(
-                'Non iterable "ordering".\n'
-                '"ordering" must be a tuple or list of field names, i. e. '
-                '["pub_date", "author"]. If you want to order by only one '
-                'field, you still need to use a list, i. e. ["pub_date"].',
+                '"ordering" must be a tuple or list '
+                '(even if you want to order by only one field).',
                 hint=None, obj=cls)]
 
         errors = []

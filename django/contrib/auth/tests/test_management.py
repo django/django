@@ -180,10 +180,8 @@ class CustomUserModelValidationTestCase(TestCase):
         from .test_custom_user import CustomUserNonListRequiredFields
         errors = checks.run_checks()
         self.assertEqual(errors, [
-            checks.Error('Non-iterable '
-                'CustomUserNonListRequiredFields.REQUIRED_FIELDS.\n'
-                'The REQUIRED_FIELDS must be an iterable (i. e. a list '
-                'or tuple).',
+            checks.Error(
+                'The REQUIRED_FIELDS must be a list or tuple.',
                 hint=None,
                 obj=CustomUserNonListRequiredFields),
         ])
@@ -196,10 +194,8 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, [
             checks.Warning(
-                'CustomUserBadRequiredFields.USERNAME_FIELD included in '
-                'REQUIRED_FIELDS.\n'
-                'The field named as the USERNAME_FIELD should not be '
-                'included in REQUIRED_FIELDS.',
+                'The field named as the USERNAME_FIELD must not be included '
+                'in REQUIRED_FIELDS on a swappable user model.',
                 hint=None,
                 obj=CustomUserBadRequiredFields),
         ])
@@ -212,7 +208,6 @@ class CustomUserModelValidationTestCase(TestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, [
             checks.Error(
-                'Non unique CustomUserNonUniqueUsername.USERNAME_FIELD.\n'
                 'The CustomUserNonUniqueUsername.username field must be '
                 'unique because it is pointed by USERNAME_FIELD.',
                 hint=None,

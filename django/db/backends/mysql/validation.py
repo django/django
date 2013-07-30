@@ -23,11 +23,9 @@ class DatabaseValidation(BaseDatabaseValidation):
         if (field_type.startswith('varchar') and field.unique
             and (field.max_length is None or int(field.max_length) > 255)):
             errors.append(checks.Error(
-                '"max_length" greated than 255 when using "unique=True" '
-                'under MySQL.\n'
                 'The field cannot have a "max_length" greated than 255 '
                 'when it is unique.',
-                hint='Set unique=False or set max_length to 255 or less.',
+                hint=None,
                 obj=field,
             ))
         return errors
