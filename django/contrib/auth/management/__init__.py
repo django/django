@@ -187,7 +187,7 @@ def get_default_username(check_db=True):
             return ''
     return default_username
 
-signals.post_syncdb.connect(create_permissions,
+signals.post_migrate.connect(create_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
-signals.post_syncdb.connect(create_superuser,
+signals.post_migrate.connect(create_superuser,
     sender=auth_app, dispatch_uid="django.contrib.auth.management.create_superuser")

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import color_style, no_style
-from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
+from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -99,10 +99,14 @@ class Command(BaseCommand):
 
         # Run the syncdb phase.
         # If you ever manage to get rid of this, I owe you many, many drinks.
+        # Note that pre_migrate is called from inside here, as it needs
+        # the list of models about to be installed.
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
+            created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
+        else:
+            created_models = []
 
         # Migrate!
         if self.verbosity >= 1:
@@ -112,6 +116,10 @@ class Command(BaseCommand):
                 self.stdout.write("  No migrations needed.")
         else:
             executor.migrate(targets, plan, fake=options.get("fake", False))
+
+        # Send the post_migrate signal, so individual apps can do whatever they need
+        # to do at this point.
+        emit_post_migrate_signal(created_models, self.verbosity, self.interactive, connection.alias)
 
     def migration_progress_callback(self, action, migration):
         if self.verbosity >= 1:
@@ -159,7 +167,7 @@ class Command(BaseCommand):
         )
 
         create_models = set([x for x in itertools.chain(*manifest.values())])
-        emit_pre_sync_signal(create_models, self.verbosity, self.interactive, connection.alias)
+        emit_pre_migrate_signal(create_models, self.verbosity, self.interactive, connection.alias)
 
         # Create the tables for each model
         if self.verbosity >= 1:
@@ -187,10 +195,6 @@ class Command(BaseCommand):
         # We force a commit here, as that was the previous behaviour.
         # If you can prove we don't need this, remove it.
         transaction.set_dirty(using=connection.alias)
-
-        # Send the post_syncdb signal, so individual apps can do whatever they need
-        # to do at this point.
-        emit_post_sync_signal(created_models, self.verbosity, self.interactive, connection.alias)
 
         # The connection may have been closed by a syncdb handler.
         cursor = connection.cursor()
@@ -220,6 +224,7 @@ class Command(BaseCommand):
 
         if self.verbosity >= 1:
             self.stdout.write("  Installing indexes...\n")
+
         # Install SQL indices for all newly created models
         for app_name, model_list in manifest.items():
             for model in model_list:
@@ -238,3 +243,5 @@ class Command(BaseCommand):
         # Load initial_data fixtures (unless that has been disabled)
         if self.load_initial_data:
             call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=connection.alias, skip_validation=True)
+
+        return created_models

@@ -6,7 +6,7 @@ from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
-from django.core.management.sql import sql_flush, emit_post_sync_signal
+from django.core.management.sql import sql_flush, emit_post_migrate_signal
 from django.utils.importlib import import_module
 from django.utils.six.moves import input
 from django.utils import six
@@ -23,8 +23,8 @@ class Command(NoArgsCommand):
             help='Tells Django not to load any initial data after database synchronization.'),
     )
     help = ('Returns the database to the state it was in immediately after '
-           'syncdb was executed. This means that all data will be removed '
-           'from the database, any post-synchronization handlers will be '
+           'migrate was first executed. This means that all data will be removed '
+           'from the database, any post-migration handlers will be '
            're-executed, and the initial_data fixture will be re-installed.')
 
     def handle_noargs(self, **options):
@@ -35,7 +35,7 @@ class Command(NoArgsCommand):
         # The following are stealth options used by Django's internals.
         reset_sequences = options.get('reset_sequences', True)
         allow_cascade = options.get('allow_cascade', False)
-        inhibit_post_syncdb = options.get('inhibit_post_syncdb', False)
+        inhibit_post_migrate = options.get('inhibit_post_migrate', False)
 
         self.style = no_style()
 
@@ -54,7 +54,7 @@ class Command(NoArgsCommand):
         if interactive:
             confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the %r database,
-and return each table to the state it was in after syncdb.
+and return each table to a fresh state.
 Are you sure you want to do this?
 
     Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['NAME'])
@@ -77,8 +77,8 @@ Are you sure you want to do this?
                     "The full error: %s") % (connection.settings_dict['NAME'], e)
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
 
-            if not inhibit_post_syncdb:
-                self.emit_post_syncdb(verbosity, interactive, db)
+            if not inhibit_post_migrate:
+                self.emit_post_migrate(verbosity, interactive, db)
 
             # Reinstall the initial_data fixture.
             if options.get('load_initial_data'):
@@ -89,13 +89,13 @@ Are you sure you want to do this?
             self.stdout.write("Flush cancelled.\n")
 
     @staticmethod
-    def emit_post_syncdb(verbosity, interactive, database):
-        # Emit the post sync signal. This allows individual applications to
-        # respond as if the database had been sync'd from scratch.
+    def emit_post_migrate(verbosity, interactive, database):
+        # Emit the post migrate signal. This allows individual applications to
+        # respond as if the database had been migrated from scratch.
         all_models = []
         for app in models.get_apps():
             all_models.extend([
                 m for m in models.get_models(app, include_auto_created=True)
                 if router.allow_syncdb(database, m)
             ])
-        emit_post_sync_signal(set(all_models), verbosity, interactive, database)
+        emit_post_migrate_signal(set(all_models), verbosity, interactive, database)

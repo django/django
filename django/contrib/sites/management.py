@@ -33,4 +33,4 @@ def create_default_site(app, created_models, verbosity, db, **kwargs):
 
     Site.objects.clear_cache()
 
-signals.post_syncdb.connect(create_default_site, sender=site_app)
+signals.post_migrate.connect(create_default_site, sender=site_app)

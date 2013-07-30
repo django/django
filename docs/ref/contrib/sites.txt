@@ -267,7 +267,7 @@ To enable the sites framework, follow these steps:
 3. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
-:data:`~django.db.models.signals.post_syncdb` signal handler which creates a
+:data:`~django.db.models.signals.post_migrate` signal handler which creates a
 default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use an :doc:`initial data
