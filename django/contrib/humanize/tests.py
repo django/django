@@ -40,11 +40,14 @@ class MockDateTime(datetime.datetime):
 
 class HumanizeTests(TransRealMixin, TestCase):
 
-    def humanize_tester(self, test_list, result_list, method):
+    def humanize_tester(self, test_list, result_list, method, filter_is_safe=False):
         for test_content, result in zip(test_list, result_list):
             t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, escape(result),
+            expected = result
+            if not filter_is_safe:
+                expected = escape(result)
+            self.assertEqual(rendered, expected,
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
 
     def test_ordinal(self):
@@ -53,10 +56,21 @@ class HumanizeTests(TransRealMixin, TestCase):
                      'something else', None)
         result_list = ('1st', '2nd', '3rd', '4th', '11th',
                        '12th', '13th', '101st', '102nd', '103rd',
-                       '111th', 'something else', None)
+                       '111th', 'something else', 'None')
 
         with translation.override('en'):
-            self.humanize_tester(test_list, result_list, 'ordinal')
+            self.humanize_tester(test_list, result_list, 'ordinal', filter_is_safe=True)
+
+    def test_intvar_ordinal_is_safe(self):
+        # related to bug #19988
+        with translation.override('fr'):
+            test_list = (1, 2, 3, 4, 11, 12, 13, 101, 102, 103, 111, None)
+            result_list = ('1<sup>er</sup>', '2<sup>e</sup>',
+                           '3<sup>e</sup>', '4<sup>e</sup>', '11<sup>e</sup>',
+                           '12<sup>e</sup>', '13<sup>e</sup>',
+                           '101<sup>er</sup>', '102<sup>e</sup>',
+                           '103<sup>e</sup>', '111<sup>e</sup>', 'None')
+            self.humanize_tester(test_list, result_list, 'ordinal', filter_is_safe=True)
 
     def test_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -64,10 +78,10 @@ class HumanizeTests(TransRealMixin, TestCase):
                      None)
         result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
                        '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
-                     None)
+                     'None')
 
         with translation.override('en'):
-            self.humanize_tester(test_list, result_list, 'intcomma')
+            self.humanize_tester(test_list, result_list, 'intcomma', filter_is_safe=True)
 
     def test_l10n_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
@@ -75,17 +89,17 @@ class HumanizeTests(TransRealMixin, TestCase):
                      None)
         result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
                        '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567', '1,234,567.1234567',
-                     None)
+                     'None')
 
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
             with translation.override('en'):
-                self.humanize_tester(test_list, result_list, 'intcomma')
+                self.humanize_tester(test_list, result_list, 'intcomma', filter_is_safe=True)
 
     def test_intcomma_without_number_grouping(self):
         # Regression for #17414
         with translation.override('ja'):
             with self.settings(USE_L10N=True):
-                self.humanize_tester([100], ['100'], 'intcomma')
+                self.humanize_tester([100], ['100'], 'intcomma', filter_is_safe=True)
 
     def test_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
@@ -103,10 +117,10 @@ class HumanizeTests(TransRealMixin, TestCase):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
                      '100', '1000', '10123', '10311', '1000000', None)
         result_list = ('100', '1.000', '10.123', '10.311', '1.000.000', '1.234.567,25',
-                       '100', '1.000', '10.123', '10.311', '1.000.000', None)
+                       '100', '1.000', '10.123', '10.311', '1.000.000', 'None')
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
             with translation.override('de'):
-                self.humanize_tester(test_list, result_list, 'intcomma')
+                self.humanize_tester(test_list, result_list, 'intcomma', filter_is_safe=True)
 
     def test_i18n_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
