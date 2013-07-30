@@ -35,13 +35,13 @@ class Defaults(models.Model):
 class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
     CHOICES = [
-        ('', 'Please select one'),
+        ('', 'No Preference'),
         ('f', 'Foo'),
         ('b', 'Bar'),
     ]
 
     INTEGER_CHOICES = [
-        (None, 'Select one'),
+        (None, 'No Preference'),
         (1, 'Foo'),
         (2, 'Bar'),
     ]

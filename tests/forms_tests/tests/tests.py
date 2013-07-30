@@ -279,7 +279,7 @@ class EmptyLabelTestCase(TestCase):
         self.assertHTMLEqual(f.as_p(),
             """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
 <p><label for="id_choice">Choice:</label> <select id="id_choice" name="choice">
-<option value="" selected="selected">Please select one</option>
+<option value="" selected="selected">No Preference</option>
 <option value="f">Foo</option>
 <option value="b">Bar</option>
 </select></p>""")
@@ -289,7 +289,7 @@ class EmptyLabelTestCase(TestCase):
         self.assertHTMLEqual(f.as_p(),
             """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" /></p>
 <p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
-<option value="" selected="selected">Select one</option>
+<option value="" selected="selected">No Preference</option>
 <option value="1">Foo</option>
 <option value="2">Bar</option>
 </select></p>""")
@@ -298,7 +298,7 @@ class EmptyLabelTestCase(TestCase):
         m = ChoiceModel(name='test', choice='', choice_integer=None)
         m.save()
         self.assertEqual(None, m.choice_integer)
-        self.assertEqual('Select one', m.get_choice_integer_display())
+        self.assertEqual('No Preference', m.get_choice_integer_display())
 
     def test_html_rendering_of_prepopulated_models(self):
         none_model = ChoiceModel(name='none-test', choice_integer=None)
@@ -307,7 +307,7 @@ class EmptyLabelTestCase(TestCase):
         self.assertHTMLEqual(f.as_p(),
             """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" value="none-test"/></p>
 <p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
-<option value="" selected="selected">Select one</option>
+<option value="" selected="selected">No Preference</option>
 <option value="1">Foo</option>
 <option value="2">Bar</option>
 </select></p>""")
@@ -318,7 +318,7 @@ class EmptyLabelTestCase(TestCase):
         self.assertHTMLEqual(f.as_p(),
             """<p><label for="id_name">Name:</label> <input id="id_name" maxlength="10" name="name" type="text" value="foo-test"/></p>
 <p><label for="id_choice_integer">Choice integer:</label> <select id="id_choice_integer" name="choice_integer">
-<option value="">Select one</option>
+<option value="">No Preference</option>
 <option value="1" selected="selected">Foo</option>
 <option value="2">Bar</option>
 </select></p>""")
