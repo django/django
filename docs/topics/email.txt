@@ -72,7 +72,8 @@ are required.
   :mimetype:`text/html` content type.
 
 .. versionadded:: 1.7
-The html_message parameter was added
+
+    The ``html_message`` parameter was added.
 
 send_mass_mail()
 ================
