@@ -5,6 +5,7 @@ import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
 from django.db import models
+from django.db.models.query_utils import InvalidQuery
 from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
 from django.utils import six
@@ -545,3 +546,16 @@ class AuxiliaryFieldTests(TestCase):
         self.assertQuerysetEqual(qs, ['<Reporter: John Smith>'])
         qs = Reporter.objects.exclude(assignments__description__contains='article')
         self.assertQuerysetEqual(qs, ['<Reporter: Paul Jones>'])
+
+    def test_custom_aux_defer_select_related(self):
+        with self.assertRaises(InvalidQuery):
+            list(Assignment.objects.defer('person_id').select_related('assignee'))
+
+    def test_custom_aux_select_related(self):
+        self.create_some_objects()
+
+        with self.assertNumQueries(1):
+            a = Assignment.objects.select_related('assignee').get()
+            self.assertEqual(a.pk, self.a.pk)
+            self.assertEqual(a.assignee.first_name, self.r.first_name)
+            self.assertEqual(a.assignee.last_name, self.r.last_name)

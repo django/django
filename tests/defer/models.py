@@ -28,3 +28,8 @@ class BigChild(Primary):
 class ChildProxy(Child):
     class Meta:
         proxy=True
+
+class RelatedWithCustomAux(models.Model):
+    secondary_custom_id = models.IntegerField()
+    secondary = models.ForeignKey(Secondary,
+                                  aux_field='secondary_custom_id')

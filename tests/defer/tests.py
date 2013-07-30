@@ -3,7 +3,8 @@ from __future__ import absolute_import
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild, ChildProxy
+from .models import (Secondary, Primary, Child, BigChild, ChildProxy,
+    RelatedWithCustomAux)
 
 
 class DeferTests(TestCase):
@@ -185,3 +186,15 @@ class DeferTests(TestCase):
         with self.assertNumQueries(0):
             bc_deferred.id
         self.assertEqual(bc_deferred.pk, bc_deferred.id)
+
+    def test_custom_aux_field(self):
+        s = Secondary.objects.create(first='x1', second='y1')
+        rel = RelatedWithCustomAux.objects.create(secondary=s)
+
+        r = RelatedWithCustomAux.objects.defer('secondary').get(pk=rel.pk)
+        self.assert_delayed(r, 1)
+        with self.assertNumQueries(2):
+            # We need to fetch the deferred attribute and the related
+            # object.
+            s2 = r.secondary
+        self.assertEqual(s2.pk, s.pk)
