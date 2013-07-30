@@ -544,7 +544,7 @@ class Field(object):
         as SelectField choices for this field."""
         blank_defined = False
         for choice, _ in self.choices:
-            if choice == '':
+            if choice in ('', None):
                 blank_defined = True
                 break
 

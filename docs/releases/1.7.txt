@@ -74,8 +74,8 @@ Minor features
 
 * In the case where the ``choices`` used for instantiating a
   :class:`~django.db.models.Field` object includes a tuple containing an
-  empty string, then its associated value is used for the blank option on html
-  rendering instead of the default ``"----------"``.
+  empty string or None, then its associated value is used for the blank option
+  on html rendering instead of the default ``"----------"``.
 
 Backwards incompatible changes in 1.7
 =====================================

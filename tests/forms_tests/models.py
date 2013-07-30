@@ -41,14 +41,14 @@ class ChoiceModel(models.Model):
     ]
 
     INTEGER_CHOICES = [
-        ('', 'Select one'),
+        (None, 'Select one'),
         (1, 'Foo'),
         (2, 'Bar'),
     ]
 
     name = models.CharField(max_length=10)
     choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
-    choice_integer = models.IntegerField(choices=INTEGER_CHOICES)
+    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, null=True)
 
 
 @python_2_unicode_compatible
