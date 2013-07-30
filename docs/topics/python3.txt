@@ -78,7 +78,7 @@ wherever possible and avoid the ``b`` prefixes.
 String handling
 ---------------
 
-Python 2's :func:`unicode` type was renamed :func:`str` in Python 3,
+Python 2's :func:`unicode` function was renamed :func:`str` in Python 3,
 :func:`str` was renamed ``bytes()``, and :func:`basestring` disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
