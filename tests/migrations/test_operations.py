@@ -1,4 +1,4 @@
-from django.db import connection, models, migrations
+from django.db import connection, models, migrations, router
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 from django.db.migrations.state import ProjectState
@@ -271,3 +271,49 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+
+
+class MigrateNothingRouter(object):
+    """
+    A router that sends all writes to the other database.
+    """
+    def allow_migrate(self, db, model):
+        return False
+
+
+class MultiDBOperationTests(MigrationTestBase):
+    multi_db = True
+
+    def setUp(self):
+        # Make the 'other' database appear to be a slave of the 'default'
+        self.old_routers = router.routers
+        router.routers = [MigrateNothingRouter()]
+
+    def tearDown(self):
+        # Restore the 'other' database as an independent database
+        router.routers = self.old_routers
+
+    def test_create_model(self):
+        """
+        Tests that CreateModel honours multi-db settings.
+        """
+        operation = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=1)),
+            ],
+        )
+        # Test the state alteration
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards("test_crmo", new_state)
+        # Test the database alteration
+        self.assertTableNotExists("test_crmo_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crmo", editor, project_state, new_state)
+        self.assertTableNotExists("test_crmo_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crmo", editor, new_state, project_state)
+        self.assertTableNotExists("test_crmo_pony")

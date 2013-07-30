@@ -1,5 +1,5 @@
 from .base import Operation
-from django.db import models
+from django.db import models, router
 from django.db.migrations.state import ModelState
 
 
@@ -17,13 +17,17 @@ class CreateModel(Operation):
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()] = ModelState(app_label, self.name, self.fields, self.options, self.bases)
 
-    def database_forwards(self, app, schema_editor, from_state, to_state):
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = to_state.render()
-        schema_editor.create_model(app_cache.get_model(app, self.name))
+        model = app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, model):
+            schema_editor.create_model(model)
 
-    def database_backwards(self, app, schema_editor, from_state, to_state):
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = from_state.render()
-        schema_editor.delete_model(app_cache.get_model(app, self.name))
+        model = app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, model):
+            schema_editor.delete_model(model)
 
     def describe(self):
         return "Create model %s" % (self.name, )
@@ -42,11 +46,15 @@ class DeleteModel(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = from_state.render()
-        schema_editor.delete_model(app_cache.get_model(app_label, self.name))
+        model = app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, model):
+            schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         app_cache = to_state.render()
-        schema_editor.create_model(app_cache.get_model(app_label, self.name))
+        model = app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, model):
+            schema_editor.create_model(model)
 
     def describe(self):
         return "Delete model %s" % (self.name, )
@@ -67,11 +75,14 @@ class AlterModelTable(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_app_cache = from_state.render()
         new_app_cache = to_state.render()
-        schema_editor.alter_db_table(
-            new_app_cache.get_model(app_label, self.name),
-            old_app_cache.get_model(app_label, self.name)._meta.db_table,
-            new_app_cache.get_model(app_label, self.name)._meta.db_table,
-        )
+        old_model = old_app_cache.get_model(app_label, self.name)
+        new_model = new_app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_db_table(
+                new_model,
+                old_model._meta.db_table,
+                new_model._meta.db_table,
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
@@ -97,11 +108,14 @@ class AlterUniqueTogether(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_app_cache = from_state.render()
         new_app_cache = to_state.render()
-        schema_editor.alter_unique_together(
-            new_app_cache.get_model(app_label, self.name),
-            getattr(old_app_cache.get_model(app_label, self.name)._meta, "unique_together", set()),
-            getattr(new_app_cache.get_model(app_label, self.name)._meta, "unique_together", set()),
-        )
+        old_model = old_app_cache.get_model(app_label, self.name)
+        new_model = new_app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_unique_together(
+                new_model,
+                getattr(old_model._meta, "unique_together", set()),
+                getattr(new_model._meta, "unique_together", set()),
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
@@ -127,11 +141,14 @@ class AlterIndexTogether(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_app_cache = from_state.render()
         new_app_cache = to_state.render()
-        schema_editor.alter_index_together(
-            new_app_cache.get_model(app_label, self.name),
-            getattr(old_app_cache.get_model(app_label, self.name)._meta, "index_together", set()),
-            getattr(new_app_cache.get_model(app_label, self.name)._meta, "index_together", set()),
-        )
+        old_model = old_app_cache.get_model(app_label, self.name)
+        new_model = new_app_cache.get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_index_together(
+                new_model,
+                getattr(old_model._meta, "index_together", set()),
+                getattr(new_model._meta, "index_together", set()),
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)

@@ -163,8 +163,14 @@ A database Router is a class that provides up to four methods:
     the router has no opinion. This method can be used to determine
     the availability of a model on a given database.
 
-    Note that if this returns ``True`` for an app with migrations but
-    ``False`` for an app those migrations depend on, Django will error.
+    Note that migrations will just silently not perform any operations
+    on a model for which this returns ``False``. This may result in broken
+    ForeignKeys, extra tables or missing tables if you change it once you
+    have applied some migrations.
+
+    The value passed for ``model`` may be a
+    :ref:`historical model <historical-models>`, and thus not have any
+    custom attributes, methods or managers. You should only rely on ``_meta``.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip

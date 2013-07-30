@@ -1,3 +1,4 @@
+from django.db import router
 from .base import Operation
 
 
@@ -17,11 +18,13 @@ class AddField(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
-        schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
-        schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
+        if router.allow_migrate(schema_editor.connection.alias, from_model):
+            schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
 
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
@@ -45,12 +48,14 @@ class RemoveField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
-        schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
+        if router.allow_migrate(schema_editor.connection.alias, from_model):
+            schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
-        schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
@@ -74,11 +79,12 @@ class AlterField(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
-        schema_editor.alter_field(
-            from_model,
-            from_model._meta.get_field_by_name(self.name)[0],
-            to_model._meta.get_field_by_name(self.name)[0],
-        )
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            schema_editor.alter_field(
+                from_model,
+                from_model._meta.get_field_by_name(self.name)[0],
+                to_model._meta.get_field_by_name(self.name)[0],
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
@@ -105,20 +111,22 @@ class RenameField(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
-        schema_editor.alter_field(
-            from_model,
-            from_model._meta.get_field_by_name(self.old_name)[0],
-            to_model._meta.get_field_by_name(self.new_name)[0],
-        )
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            schema_editor.alter_field(
+                from_model,
+                from_model._meta.get_field_by_name(self.old_name)[0],
+                to_model._meta.get_field_by_name(self.new_name)[0],
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
-        schema_editor.alter_field(
-            from_model,
-            from_model._meta.get_field_by_name(self.new_name)[0],
-            to_model._meta.get_field_by_name(self.old_name)[0],
-        )
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            schema_editor.alter_field(
+                from_model,
+                from_model._meta.get_field_by_name(self.new_name)[0],
+                to_model._meta.get_field_by_name(self.old_name)[0],
+            )
 
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)

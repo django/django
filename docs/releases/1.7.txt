@@ -110,6 +110,18 @@ Backwards incompatible changes in 1.7
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+allow_syncdb/allow_migrate
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While Django will still look at ``allow_syncdb`` methods even though they
+should be renamed to ``allow_migrate``, there is a subtle difference in which
+models get passed to these methods.
+
+For apps with migrations, ``allow_migrate`` will now get passed
+:ref:`historical models <historical-models>`, which are special versioned models
+without custom attributes, methods or managers. Make sure your ``allow_migrate``
+methods are only referring to fields or other items in ``model._meta``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
