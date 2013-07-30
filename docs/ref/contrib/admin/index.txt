@@ -1870,6 +1870,10 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site main index
     view.
 
+.. attribute:: AdminSite.app_index_template
+
+    Path to a custom template that will be used by the admin site app index view.
+
 .. attribute:: AdminSite.login_template
 
     Path to a custom template that will be used by the admin site login view.
