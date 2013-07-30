@@ -191,7 +191,7 @@ class WizardView(TemplateView):
         kwargs['form_list'] = computed_form_list
         return kwargs
 
-    def get_prefix(self, *args, **kwargs):
+    def get_prefix(self, request, *args, **kwargs):
         # TODO: Add some kind of unique id to prefix
         return normalize_name(self.__class__.__name__)
 
@@ -229,7 +229,7 @@ class WizardView(TemplateView):
         response gets updated by the storage engine (for example add cookies).
         """
         # add the storage engine to the current wizardview instance
-        self.prefix = self.get_prefix(*args, **kwargs)
+        self.prefix = self.get_prefix(request, *args, **kwargs)
         self.storage = get_storage(self.storage_name, self.prefix, request,
             getattr(self, 'file_storage', None))
         self.steps = StepsHelper(self)
