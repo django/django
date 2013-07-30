@@ -30,6 +30,30 @@ security support until the release of Django 1.8.
 What's new in Django 1.7
 ========================
 
+Schema migrations
+~~~~~~~~~~~~~~~~~
+
+Django now has built-in support for schema migrations, which allows models
+to be updated, changed and deleted and the changes stored into migration files
+and then run on any deployed database.
+
+Migrations are covered in :doc:`their own documentation</topics/migrations>`,
+but a few of the key features are:
+
+* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry - 
+   calls to ``syncdb`` will still work as before.
+
+* A new ``makemigrations`` command provides an easy way to autodetect changes
+  to your models and make migrations for them.
+
+* :data:`~django.db.models.signals.post_syncdb` and
+  :data:`~django.db.models.signals.post_syncdb` have been renamed to
+  :data:`~django.db.models.signals.pre_migrate` and
+  :data:`~django.db.models.signals.post_migrate` respectively. The
+  ``create_models``/``created_models`` argument has also been deprecated.
+
+* Routers something something.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -414,6 +414,12 @@ these changes.
 
 * ``django.utils.unittest`` will be removed.
 
+* ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` will be removed, and
+  ``django.db.models.signals.pre_migrate`` and
+  ``django.db.models.signals.post_migrate`` will lose their
+  ``create_models`` and ``created_models`` arguments.
+
 2.0
 ---
 
