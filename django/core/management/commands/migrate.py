@@ -149,7 +149,7 @@ class Command(BaseCommand):
             (app.__name__.split('.')[-2],
                 [
                     m for m in models.get_models(app, include_auto_created=True)
-                    if router.allow_syncdb(connection.alias, m)
+                    if router.allow_migrate(connection.alias, m)
                 ])
             for app in models.get_apps() if app.__name__.split('.')[-2] in apps
         ]

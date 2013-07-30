@@ -16,7 +16,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     except UnavailableApp:
         return
 
-    if not router.allow_syncdb(db, ContentType):
+    if not router.allow_migrate(db, ContentType):
         return
 
     ContentType.objects.clear_cache()

@@ -24,7 +24,7 @@ class Command(LabelCommand):
     def handle_label(self, tablename, **options):
         db = options.get('database')
         cache = BaseDatabaseCache(tablename, {})
-        if not router.allow_syncdb(db, cache.cache_model_class):
+        if not router.allow_migrate(db, cache.cache_model_class):
             return
         connection = connections[db]
         fields = (

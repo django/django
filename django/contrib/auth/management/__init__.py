@@ -64,7 +64,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
     except UnavailableApp:
         return
 
-    if not router.allow_syncdb(db, auth_app.Permission):
+    if not router.allow_migrate(db, auth_app.Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType

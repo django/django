@@ -215,8 +215,8 @@ operations to ``cache_slave``, and all write operations to
                 return 'cache_master'
             return None
 
-        def allow_syncdb(self, db, model):
-            "Only synchronize the cache model on master"
+        def allow_migrate(self, db, model):
+            "Only install the cache model on master"
             if model._meta.app_label in ('django_cache',):
                 return db == 'cache_master'
             return None
