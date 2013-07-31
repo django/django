@@ -118,6 +118,10 @@ Minor features
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
 
+* :func:`django.contrib.auth.views.password_reset` takes an optional
+  ``html_email_template_name`` parameter used to send a multipart HTML email
+  for password resets.
+
 Backwards incompatible changes in 1.7
 =====================================
 

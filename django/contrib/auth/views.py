@@ -140,7 +140,8 @@ def password_reset(request, is_admin_site=False,
                    post_reset_redirect=None,
                    from_email=None,
                    current_app=None,
-                   extra_context=None):
+                   extra_context=None,
+                   html_email_template_name=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:
@@ -155,6 +156,7 @@ def password_reset(request, is_admin_site=False,
                 'email_template_name': email_template_name,
                 'subject_template_name': subject_template_name,
                 'request': request,
+                'html_email_template_name': html_email_template_name,
             }
             if is_admin_site:
                 opts = dict(opts, domain_override=request.get_host())
