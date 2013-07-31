@@ -350,6 +350,12 @@ This view function serves static files in development.
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
 
+.. versionchanged:: 1.7
+
+    Will now raise an :exc:`~django.http.Http404` exception instead of
+    :exc:`~from django.core.exceptions.ImproperlyConfigured` when
+    :setting:`DEBUG` is ``True``.
+
 .. note::
 
     To guess the served files' content types, this view relies on the
