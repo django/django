@@ -72,6 +72,11 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+* The sitemap framework now makes use of :attr:`~Sitemap.lastmod` to set
+  a Last-Modified header in the response. This makes it possible for
+  :class:`django.middleware.http.ConditionalGetMiddleware` to handle conditional
+  GET responses for such sitemaps.
+
 Backwards incompatible changes in 1.7
 =====================================
 

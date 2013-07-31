@@ -178,6 +178,14 @@ Sitemap class reference
         representing the last-modified date/time for *every* object returned by
         :attr:`~Sitemap.items()`.
 
+        .. versionadded:: 1.7
+
+        If all items in a sitemap have a :attr:`~Sitemap.lastmod`, the outputted
+        sitemap will have a Last-Modified header. You can activate
+        :class:`django.middleware.http.ConditionalGetMiddleware` to make Django
+        respond appropriately to requests and save traffic when your sitemap
+        did not change between requests.
+
     .. attribute:: Sitemap.changefreq
 
         **Optional.** Either a method or attribute.
