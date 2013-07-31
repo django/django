@@ -122,10 +122,10 @@ Miscellaneous
 * Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
   :class:`~django.core.management.CommandError`.
 
-* :view:`~django.contrib.staticfiles.views.serve` will now raise an
+* :func:`django.contrib.staticfiles.views.serve` will now raise an
   :exc:`~django.http.Http404` exception instead of
-  :exc:`~from django.core.exceptions.ImproperlyConfigured` when :setting:`DEBUG`
-  is ``True``. This change removes the need to conditionally add the view to
+  :exc:`~django.core.exceptions.ImproperlyConfigured` when :setting:`DEBUG`
+  is ``False``. This change removes the need to conditionally add the view to
   your root URLconf, which in turn makes it safe to reverse by name. It also
   removes the ability for visitors to generate spurious HTTP 500 errors by
   requesting static files that don't exist or haven't been collected yet.
