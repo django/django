@@ -17,7 +17,7 @@ class SimpleSitemap(Sitemap):
 
 
 class FixedLastmodSitemap(SimpleSitemap):
-    lastmod = datetime(2013, 03, 13, 10, 0, 0)
+    lastmod = datetime(2013, 3, 13, 10, 0, 0)
 
 
 class FixedLastmodMixedSitemap(Sitemap):
