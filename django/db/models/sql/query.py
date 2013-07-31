@@ -1000,6 +1000,11 @@ class Query(object):
         # We want to have the alias in SELECT clause even if mask is set.
         self.append_aggregate_mask([alias])
 
+        # add aggregate alias to aggregate_select_mask if there are other
+        # masked aggregates, see #15624
+        if self.aggregate_select_mask is not None:
+            self.set_aggregate_mask(self.aggregate_select_mask.union([alias]))
+
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
 
