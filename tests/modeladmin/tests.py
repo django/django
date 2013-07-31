@@ -51,6 +51,12 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields),
             ['name', 'bio', 'sign_date'])
 
+        self.assertEqual(list(ma.get_fields(request)),
+            ['name', 'bio', 'sign_date'])
+
+        self.assertEqual(list(ma.get_fields(request, self.band)),
+            ['name', 'bio', 'sign_date'])
+
     def test_default_fieldsets(self):
         # fieldsets_add and fieldsets_change should return a special data structure that
         # is used in the templates. They should generate the "right thing" whether we
@@ -96,6 +102,10 @@ class ModelAdminTests(TestCase):
             fields = ['name']
 
         ma = BandAdmin(Band, self.site)
+
+        self.assertEqual(list(ma.get_fields(request)), ['name'])
+
+        self.assertEqual(list(ma.get_fields(request, self.band)), ['name'])
 
         self.assertEqual(ma.get_fieldsets(request),
             [(None, {'fields': ['name']})])
