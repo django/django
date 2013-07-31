@@ -806,6 +806,15 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
 
+    def testCustomAdminSiteAppIndexViewandTemplate(self):
+        try:
+            response = self.client.get('/test_admin/admin2/')
+        except TypeError:
+            self.fail('AdminSite.app_index_template should accept a list of template paths')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertTemplateUsed(response, 'custom_admin/app_index.html')
+        self.assertContains(response, 'Hello from a custom app_index template *bar*')
+
     def testCustomAdminSitePasswordChangeTemplate(self):
         response = self.client.get('/test_admin/admin2/password_change/')
         self.assertIsInstance(response, TemplateResponse)
