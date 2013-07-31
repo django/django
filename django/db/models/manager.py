@@ -2,7 +2,7 @@ import copy
 import inspect
 
 from django.db import router
-from django.db.models.query import QuerySet, insert_query, RawQuerySet
+from django.db.models.query import QuerySet
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
@@ -168,12 +168,6 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
-
-    def _insert(self, objs, fields, **kwargs):
-        return insert_query(self.model, objs, fields, **kwargs)
-
-    def raw(self, raw_query, params=None, *args, **kwargs):
-        return RawQuerySet(raw_query=raw_query, model=self.model, params=params, using=self._db, *args, **kwargs)
 
 Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
 
