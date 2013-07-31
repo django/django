@@ -13,6 +13,7 @@ from . import models, forms, admin as base_admin
 
 
 class Admin2(admin.AdminSite):
+    app_index_template = 'custom_admin/app_index.html'
     login_form = forms.CustomAdminAuthenticationForm
     login_template = 'custom_admin/login.html'
     logout_template = 'custom_admin/logout.html'

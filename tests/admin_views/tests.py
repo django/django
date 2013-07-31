@@ -806,6 +806,12 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
 
+    def testCustomAdminSiteAppIndexViewandTemplate(self):
+        response = self.client.get('/test_admin/admin2/admin_views/')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertTemplateUsed(response, 'custom_admin/app_index.html')
+        self.assertContains(response, 'Hello from a custom app_index template')
+
     def testCustomAdminSitePasswordChangeTemplate(self):
         response = self.client.get('/test_admin/admin2/password_change/')
         self.assertIsInstance(response, TemplateResponse)
