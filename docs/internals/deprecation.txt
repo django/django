@@ -426,6 +426,8 @@ these changes.
 * ``django.utils.datastructures.SortedDict`` will be removed. Use
   :class:`collections.OrderedDict` from the Python standard library instead.
 
+* ``ModelAdmin.declared_fieldsets`` will be removed.
+
 2.0
 ---
 

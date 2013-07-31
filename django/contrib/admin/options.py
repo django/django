@@ -2,6 +2,7 @@ from collections import OrderedDict
 import copy
 import operator
 from functools import partial, reduce, update_wrapper
+import warnings
 
 from django import forms
 from django.conf import settings
@@ -238,13 +239,49 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
 
         return db_field.formfield(**kwargs)
 
-    def _declared_fieldsets(self):
+    @property
+    def declared_fieldsets(self):
+        warnings.warn(
+            "ModelAdmin.declared_fieldsets is deprecated and "
+            "will be removed in Django 1.9.",
+            PendingDeprecationWarning, stacklevel=2
+        )
+
         if self.fieldsets:
             return self.fieldsets
         elif self.fields:
             return [(None, {'fields': self.fields})]
         return None
-    declared_fieldsets = property(_declared_fieldsets)
+
+    def get_fields(self, request, obj=None):
+        """
+        Hook for specifying fields.
+        """
+        return self.fields
+
+    def get_fieldsets(self, request, obj=None):
+        """
+        Hook for specifying fieldsets.
+        """
+        # We access the property and check if it triggers a warning.
+        # If it does, then it's ours and we can safely ignore it, but if
+        # it doesn't then it has been overriden so we must warn about the
+        # deprecation.
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            declared_fieldsets = self.declared_fieldsets
+        if len(w) != 1 or not issubclass(w[0].category, PendingDeprecationWarning):
+            warnings.warn(
+                "ModelAdmin.declared_fieldsets is deprecated and "
+                "will be removed in Django 1.9.",
+                PendingDeprecationWarning
+            )
+            if declared_fieldsets:
+                return declared_fieldsets
+
+        if self.fieldsets:
+            return self.fieldsets
+        return [(None, {'fields': self.get_fields(request, obj)})]
 
     def get_ordering(self, request):
         """
@@ -478,13 +515,11 @@ class ModelAdmin(BaseModelAdmin):
             'delete': self.has_delete_permission(request),
         }
 
-    def get_fieldsets(self, request, obj=None):
-        "Hook for specifying fieldsets for the add form."
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
+    def get_fields(self, request, obj=None):
+        if self.fields:
+            return self.fields
         form = self.get_form(request, obj, fields=None)
-        fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
-        return [(None, {'fields': fields})]
+        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -1657,12 +1692,11 @@ class InlineModelAdmin(BaseModelAdmin):
 
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
-    def get_fieldsets(self, request, obj=None):
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
+    def get_fields(self, request, obj=None):
+        if self.fields:
+            return self.fields
         form = self.get_formset(request, obj, fields=None).form
-        fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
-        return [(None, {'fields': fields})]
+        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_queryset(self, request):
         queryset = super(InlineModelAdmin, self).get_queryset(request)

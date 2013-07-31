@@ -113,6 +113,11 @@ Minor features
 * The admin's search fields can now be customized per-request thanks to the new
   :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
 
+* The :meth:`ModelAdmin.get_fields()
+  <django.contrib.admin.ModelAdmin.get_fields>` method may be overridden to
+  customize the value of :attr:`ModelAdmin.fields
+  <django.contrib.admin.ModelAdmin.fields>`.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -182,3 +187,11 @@ than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 <initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
 will search ``myapp/sql/`` as documented. The old location will continue to
 work until Django 1.9.
+
+``declared_fieldsets`` attribute on ``ModelAdmin.``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.declared_fieldsets`` was deprecated. Despite being a private API,
+it will go through a regular deprecation path. This attribute was mostly used
+by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
+a bug and has been addressed.
