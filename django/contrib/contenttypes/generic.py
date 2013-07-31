@@ -465,10 +465,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     formset = BaseGenericInlineFormSet
 
     def get_formset(self, request, obj=None, **kwargs):
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
+        if 'fields' in kwargs:
+            fields = kwargs.pop('fields')
         else:
-            fields = None
+            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         if self.exclude is None:
             exclude = []
         else:
