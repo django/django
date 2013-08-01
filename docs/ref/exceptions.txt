@@ -63,12 +63,16 @@ SuspiciousOperation
     a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
+    :exc:`SuspiciousOperation` is available from :mod:`django.core.exceptions`.
+
 PermissionDenied
 ----------------
 .. exception:: PermissionDenied
 
     The :exc:`PermissionDenied` exception is raised when a user does not have
     permission to perform the action requested.
+
+    :exc:`PermissionDenied` is available from :mod:`django.core.exceptions`.
 
 ViewDoesNotExist
 ----------------
@@ -77,12 +81,16 @@ ViewDoesNotExist
     The :exc:`ViewDoesNotExist` exception is raised by
     :mod:`django.core.urlresolvers` when a requested view does not exist.
 
+    :exc:`ViewDoesNotExist` is available from :mod:`django.core.exceptions`.
+
 MiddlewareNotUsed
 -----------------
 .. exception:: MiddlewareNotUsed
 
     The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
     used in the server configuration.
+
+    :exc:`MiddlewareNotUsed` is available from :mod:`django.core.exceptions`.
 
 ImproperlyConfigured
 --------------------
@@ -91,6 +99,8 @@ ImproperlyConfigured
     The :exc:`ImproperlyConfigured` exception is raised when Django is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
+
+    :exc:`ImproperlyConfigured` is available from :mod:`django.core.exceptions`.
 
 FieldError
 ----------
@@ -109,6 +119,8 @@ FieldError
     - A field name is invalid
     - A query contains invalid order_by arguments
 
+    :exc:`FieldError` is available from :mod:`django.core.exceptions`.
+
 ValidationError
 ---------------
 .. exception:: ValidationError
@@ -119,6 +131,8 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
+    :exc:`ValidationError` is available from :mod:`django.core.exceptions`.
+
 .. currentmodule:: django.core.urlresolvers
 
 NoReverseMatch
@@ -128,6 +142,8 @@ NoReverseMatch
     The :exc:`NoReverseMatch` exception is raised by
     :mod:`django.core.urlresolvers` when a matching URL in your URLconf
     cannot be identified based on the parameters supplied.
+
+    :exc:`NoReverseMatch` is available from :mod:`django.core.urlresolvers`.
 
 .. currentmodule:: django.db
 
@@ -166,7 +182,8 @@ to Python 3.)
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.PROTECT`. Subclass of :exc:`IntegrityError`.
+:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+of :exc:`IntegrityError`, both of which are available from :mod:`django.db`.
 
 .. currentmodule:: django.http
 
