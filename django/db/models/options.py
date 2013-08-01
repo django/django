@@ -41,7 +41,6 @@ class Options(object):
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
-        self.admin = None
         self.meta = meta
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
