@@ -1101,6 +1101,8 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
 
 class ComplexClashTests(IsolatedModelsTestCase):
 
+    # New tests should not be included here, because this is a single,
+    # self-contained sanity check, not a test of everything.
     def test_complex_clash(self):
         class Target(models.Model):
             tgt_safe = models.CharField(max_length=10)
