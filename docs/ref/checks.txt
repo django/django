@@ -57,7 +57,7 @@ Constructor arguments are:
 
 ``obj``
     Optional. Point to the invalid object. The object should be a model, field
-    or manager or any other object that defines ``__repr__`` method. The method
+    or manager or any other object that defines ``__str__`` method. The method
     is used while reporting all messages and its result precedes the message, i.
     e. model errors are printed using ``applabel.modellabel: message`` pattern.
 
