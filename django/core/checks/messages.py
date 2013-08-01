@@ -34,14 +34,14 @@ class CheckMessage(object):
         if self.obj is None:
             obj = "?"
         elif isinstance(self.obj, models.base.ModelBase):
-            # We need to hardcode ModelBase case because its __repr__ method
-            # doesn't return "applabel.modellabel" and cannot be changed.
+            # We need to hardcode ModelBase and Field cases because its __str__
+            # method doesn't return "applabel.modellabel" and cannot be changed.
             model = self.obj
             app = model._meta.app_label
             obj = '%s.%s' % (app, model._meta.object_name)
         else:
             obj = force_str(self.obj)
-        hint = " HINT: %s" % self.hint if self.hint else ''
+        hint = "\n\tHINT: %s" % self.hint if self.hint else ''
         return "%s: %s%s" % (obj, self.msg, hint)
 
     def __repr__(self):
