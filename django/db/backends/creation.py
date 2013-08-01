@@ -146,7 +146,7 @@ class BaseDatabaseCreation(object):
         Returns any ALTER TABLE statements to add constraints after the fact.
         """
         opts = model._meta
-        if not opts.managed or opts.proxy or opts.swapped:
+        if not opts.managed or opts.swapped:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
