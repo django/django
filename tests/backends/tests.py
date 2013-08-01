@@ -614,12 +614,19 @@ class FkConstraintsTests(TransactionTestCase):
         Try to create a model instance that violates a FK constraint. If it
         fails it should fail with IntegrityError.
         """
-        a = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
+        a1 = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
         try:
-            a.save()
+            a1.save()
         except IntegrityError:
-            return
-        self.skipTest("This backend does not support integrity checks.")
+            pass
+        else:
+            self.skipTest("This backend does not support integrity checks.")
+        # Now that we know this backend supports integrity checks we make sure
+        # constraints are also enforced for proxy models. Refs #17519
+        a2 = models.Article(headline='This is another test', reporter=self.r,
+                            pub_date=datetime.datetime(2012, 8, 3),
+                            reporter_proxy_id=30)
+        self.assertRaises(IntegrityError, a2.save)
 
     def test_integrity_checks_on_update(self):
         """
@@ -628,14 +635,26 @@ class FkConstraintsTests(TransactionTestCase):
         """
         # Create an Article.
         models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
-        # Retrive it from the DB
-        a = models.Article.objects.get(headline="Test article")
-        a.reporter_id = 30
+        # Retrieve it from the DB
+        a1 = models.Article.objects.get(headline="Test article")
+        a1.reporter_id = 30
         try:
-            a.save()
+            a1.save()
         except IntegrityError:
-            return
-        self.skipTest("This backend does not support integrity checks.")
+            pass
+        else:
+            self.skipTest("This backend does not support integrity checks.")
+        # Now that we know this backend supports integrity checks we make sure
+        # constraints are also enforced for proxy models. Refs #17519
+        # Create another article
+        r_proxy = models.ReporterProxy.objects.get(pk=self.r.pk)
+        models.Article.objects.create(headline='Another article',
+                                      pub_date=datetime.datetime(1988, 5, 15),
+                                      reporter=self.r, reporter_proxy=r_proxy)
+        # Retreive the second article from the DB
+        a2 = models.Article.objects.get(headline='Another article')
+        a2.reporter_proxy_id = 30
+        self.assertRaises(IntegrityError, a2.save)
 
     def test_disable_constraint_checks_manually(self):
         """
