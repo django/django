@@ -33,7 +33,7 @@ class MessageTests(TestCase):
 
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
-        expected = "obj: Message HINT: Hint"
+        expected = "obj: Message\n\tHINT: Hint"
         self.assertEqual(force_str(e), expected)
 
     def test_printing_no_hint(self):
@@ -43,7 +43,7 @@ class MessageTests(TestCase):
 
     def test_printing_no_object(self):
         e = Error("Message", hint="Hint", obj=None)
-        expected = "?: Message HINT: Hint"
+        expected = "?: Message\n\tHINT: Hint"
         self.assertEqual(force_str(e), expected)
 
     def test_printing_field_error(self):
