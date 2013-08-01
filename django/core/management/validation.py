@@ -3,6 +3,7 @@ import sys
 
 from django.conf import settings
 from django.core.management.color import color_style
+from django.db.models.constants import LOOKUP_SEP
 from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
 from django.utils import six
@@ -37,6 +38,28 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app, include_swapped=True):
         opts = cls._meta
 
+        # Keep record of used field names. Clashing names inside a single model
+        # (example: `book` and `book_id`) and shadowing field names in inheritance
+        # cases is not allowed as this will lead to buggy behavior. See ticket
+        # #17673 for details.
+        used_fields = {} # name or attname -> field
+
+        # Check that multi-inheritance doesn't cause field name
+        # shadowing.
+        for parent in opts.parents:
+            for f in parent._meta.local_fields:
+                clashing_field = (used_fields.get(f.name) or
+                                  used_fields.get(f.attname) or
+                                  None)
+                if clashing_field:
+                    e.add(opts, 'The field "%s" from parent model "%s" '
+                        'clashes with the field "%s" '
+                        'from another parent model "%s"' % (
+                            f.name, f.model._meta, clashing_field.name,
+                            clashing_field.model._meta))
+                used_fields[f.name] = f
+                used_fields[f.attname] = f
+
         # Check swappable attribute.
         if opts.swapped:
             try:
@@ -65,6 +88,23 @@ def get_validation_errors(outfile, app=None):
 
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
+            # check clashing
+            clashing_field = (used_fields.get(f.name) or
+                              used_fields.get(f.attname) or
+                              None)
+            if clashing_field:
+                e.add(opts, '"%s": This field clashes '
+                    'with field "%s" from "%s"' % (
+                    f.name, clashing_field.name, clashing_field.model._meta))
+            used_fields[f.name] = f
+            used_fields[f.attname] = f
+            if f.name == 'pk':
+                e.add(opts, '"%s": You can\'t use "pk" as a field name. '
+                            'It is a reserved name.' % f.name)
+            if LOOKUP_SEP in f.name:
+                e.add(opts, '"%s": Field\'s name must not contain "%s".' % (
+                                f.name, LOOKUP_SEP))
+
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if f.name.endswith('_'):
