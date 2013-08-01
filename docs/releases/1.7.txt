@@ -131,6 +131,10 @@ Minor features
   return ``self.cleaned_data``. If it does return a changed dictionary then
   that will still be used.
 
+* The new :attr:`~django.db.models.Options.default_permissions` model
+  ``Meta`` option allows you to customize (or disable) creation of the default
+  add, change, and delete permissions.
+
 Backwards incompatible changes in 1.7
 =====================================
 
