@@ -6,11 +6,11 @@ Django Exceptions
 Django raises some Django specific exceptions as well as many standard
 Python exceptions.
 
-Django-specific Exceptions
-==========================
+Django Core Exceptions
+======================
 
 .. module:: django.core.exceptions
-    :synopsis: Django specific exceptions
+    :synopsis: Django core exceptions
 
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
