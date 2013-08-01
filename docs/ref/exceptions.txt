@@ -15,18 +15,20 @@ Django Core Exceptions
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
 .. exception:: DoesNotExist
+
+    The ``DoesNotExist`` exception is raised when an object is not found for the
+    given parameters of a query. A ``DoesNotExist`` exception is provided on
+    every model class as a way of identifying the specific type of object that
+    could not be found.
+
 .. exception:: ObjectDoesNotExist
 
-    The :exc:`DoesNotExist` exception is raised when an object is not found
-    for the given parameters of a query.
-
-    :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
-    :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
-    exception that is provided on every model class as a way of
-    identifying the specific type of object that could not be found.
+    Each model's ``DoesNotExist`` exception is a subclass of
+    :exc:`ObjectDoesNotExist`, which is defined in
+    :mod:`django.core.exceptions`.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
+    on :exc:`ObjectDoesNotExist` and ``DoesNotExist``.
 
 MultipleObjectsReturned
 -----------------------
