@@ -160,7 +160,7 @@ to Python 3.)
 
 .. versionchanged:: 1.6
 
-    Previous version of Django only wrapped ``DatabaseError`` and
+    Previous versions of Django only wrapped ``DatabaseError`` and
     ``IntegrityError``, and did not provide ``__cause__``.
 
 .. exception:: models.ProtectedError
