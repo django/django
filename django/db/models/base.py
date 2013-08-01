@@ -1260,8 +1260,9 @@ class Model(six.with_metaclass(ModelBase)):
             potential_clashes = (r for r in potential_clashes
                 if r.field is not field)
             for clash_field in potential_clashes:
-                clash_name = "%s.%s" % (clash_field.model._meta.object_name,
-                    clash_field.field.name)  # i. e. "Model.m2m"
+                clash_name = "%s.%s" % (  # i. e. "Model.m2m"
+                    clash_field.model._meta.object_name,
+                    clash_field.field.name)
                 if clash_field.get_accessor_name() == rel_name:
                     errors.append(
                         checks.Error(
