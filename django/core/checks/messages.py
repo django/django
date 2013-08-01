@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from functools import partial
+
 from django.utils.encoding import python_2_unicode_compatible, force_str
 
 
@@ -14,6 +16,7 @@ CRITICAL = 50
 
 @python_2_unicode_compatible
 class CheckMessage(object):
+
     def __init__(self, level, msg, hint, obj=None):
         assert isinstance(level, int), "The first argument should be level."
         self.level = level
@@ -48,28 +51,27 @@ class CheckMessage(object):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r>" % \
             (self.__class__.__name__, self.level, self.msg, self.hint, self.obj)
 
+    def is_debug(self):
+        return self.level == DEBUG
 
-class ConcreteCheckMessage(CheckMessage):
-    def __init__(self, *args, **kwargs):
-        # At this moment self.level is a class attribute defined in derivatives.
-        super(ConcreteCheckMessage, self).__init__(self.level, *args, **kwargs)
+    def is_info(self):
+        return self.level == INFO
 
+    def is_warning(self):
+        return self.level == WARNING
 
-class Debug(ConcreteCheckMessage):
-    level = DEBUG
+    def is_error(self):
+        return self.level == ERROR
 
+    def is_critical(self):
+        return self.level == CRITICAL
 
-class Info(ConcreteCheckMessage):
-    level = INFO
-
-
-class Warning(ConcreteCheckMessage):
-    level = WARNING
-
-
-class Error(ConcreteCheckMessage):
-    level = ERROR
+    def is_serious(self):
+        return self.level >= ERROR
 
 
-class Critical(ConcreteCheckMessage):
-    level = CRITICAL
+Debug = partial(CheckMessage, DEBUG)
+Info = partial(CheckMessage, INFO)
+Warning = partial(CheckMessage, WARNING)
+Error = partial(CheckMessage, ERROR)
+Critical = partial(CheckMessage, CRITICAL)

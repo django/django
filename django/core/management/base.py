@@ -312,26 +312,45 @@ class BaseCommand(object):
 
         """
 
-        errors = checks.run_checks()
+        all_issues = checks.run_checks()
 
-        if errors:
-            formatted_errors = (
-                color_style().ERROR(force_str(e))
-                if e.level >= checks.ERROR
-                else color_style().WARNING(force_str(e))
-                for e in errors)
-            msg = "\n".join(sorted(formatted_errors))
-            msg = "There are some messages:\n%s" % msg
-            if any(e.level >= checks.ERROR for e in errors):
+        if all_issues:
+            debugs = [e for e in all_issues if e.level < checks.INFO]
+            infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING]
+            warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR]
+            errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL]
+            criticals = [e for e in all_issues if checks.CRITICAL <= e.level]
+            sorted_issues = [
+                (criticals, 'CRITICALS'),
+                (errors, 'ERRORS'),
+                (warnings, 'WARNINGS'),
+                (infos, 'INFOS'),
+                (debugs, 'DEBUGS'),
+            ]
+
+            msg = ""
+            for issues, group_name in sorted_issues:
+                if issues:
+                    formatted = (
+                        color_style().ERROR(force_str(e))
+                        if e.is_serious()
+                        else color_style().WARNING(force_str(e))
+                        for e in issues)
+                    formatted = "\n".join(sorted(formatted))
+                    msg += '\n%s:\n%s' % (group_name, formatted)
+
+            msg = "There are some issues:\n%s" % msg
+            if any(e.is_serious() for e in all_issues):
                 raise CommandError(msg)
             else:
                 self.stdout.write(msg)
 
         if display_num_errors:
             msg = (
-                "No errors/warnings found" if len(errors) == 0 else
-                "1 message found" if len(errors) == 1 else
-                "%s messages found" % len(errors))
+                "no problems" if len(all_issues) == 0 else
+                "1 issue" if len(all_issues) == 1 else
+                "%s issues" % len(all_issues))
+            msg = "\nSystem check identified %s." % msg
             self.stdout.write(msg)
 
     def handle(self, *args, **options):
