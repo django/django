@@ -1159,9 +1159,6 @@ class Model(six.with_metaclass(ModelBase)):
         # Skip when the relationship model wasn't found.
         fields = (f for f in fields if isinstance(f.rel.through, ModelBase))
 
-        # Skip all automatically generated relationship models.
-        fields = (f for f in fields if not f.rel.through._meta.auto_created)
-
         for f in fields:
             signature = (f.rel.to, cls, f.rel.through)
             if signature in seen_intermediary_signatures:

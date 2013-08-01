@@ -1748,13 +1748,6 @@ class ManyToManyField(RelatedField):
     def _check_relationship_model(self, from_model=None, **kwargs):
         errors = []
 
-        # Skip automatically created relationship models.
-        try:
-            if self.rel.through._meta.auto_created:
-                return []
-        except AttributeError:
-            pass
-
         if self.rel.through not in get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(
