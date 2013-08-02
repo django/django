@@ -17,6 +17,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
 csrf_protect_m = method_decorator(csrf_protect)
+sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
+
 
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
@@ -83,7 +85,7 @@ class UserAdmin(admin.ModelAdmin):
              self.admin_site.admin_view(self.user_change_password))
         ) + super(UserAdmin, self).get_urls()
 
-    @sensitive_post_parameters()
+    @sensitive_post_parameters_m
     @csrf_protect_m
     @transaction.commit_on_success
     def add_view(self, request, form_url='', extra_context=None):
@@ -113,7 +115,7 @@ class UserAdmin(admin.ModelAdmin):
         return super(UserAdmin, self).add_view(request, form_url,
                                                extra_context)
 
-    @sensitive_post_parameters()
+    @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=''):
         if not self.has_change_permission(request):
             raise PermissionDenied
@@ -170,4 +172,3 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
-
