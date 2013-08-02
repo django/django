@@ -12,23 +12,26 @@ Django Core Exceptions
 .. module:: django.core.exceptions
     :synopsis: Django core exceptions
 
+Django core exception classes are defined in :mod:`django.core.exceptions`.
+
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
 .. exception:: DoesNotExist
 
-    The ``DoesNotExist`` exception is raised when an object is not found for the
-    given parameters of a query. A ``DoesNotExist`` exception is provided on
-    every model class as a way of identifying the specific type of object that
-    could not be found.
+    The ``DoesNotExist`` exception is raised when an object is not found for
+    the given parameters of a query. Django provides a ``DoesNotExist``
+    exception as an attribute of each model class, thus identifying the
+    particular class of object that could not be found when an error is raised,
+    or allowing you to target a particular model class with ``try ... except``.
 
 .. exception:: ObjectDoesNotExist
 
-    Each model's ``DoesNotExist`` exception is a subclass of
-    :exc:`ObjectDoesNotExist`, which is defined in
-    :mod:`django.core.exceptions`.
+    The base class for ``DoesNotExist`` exceptions; a ``try ... except`` for
+    :exc:`ObjectDoesNotExist` will target multiple :exc:`DoesNotExist`
+    exceptions.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and ``DoesNotExist``.
+    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
 
 MultipleObjectsReturned
 -----------------------
@@ -65,16 +68,12 @@ SuspiciousOperation
     a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
-    :exc:`SuspiciousOperation` is available from :mod:`django.core.exceptions`.
-
 PermissionDenied
 ----------------
 .. exception:: PermissionDenied
 
     The :exc:`PermissionDenied` exception is raised when a user does not have
     permission to perform the action requested.
-
-    :exc:`PermissionDenied` is available from :mod:`django.core.exceptions`.
 
 ViewDoesNotExist
 ----------------
@@ -83,16 +82,12 @@ ViewDoesNotExist
     The :exc:`ViewDoesNotExist` exception is raised by
     :mod:`django.core.urlresolvers` when a requested view does not exist.
 
-    :exc:`ViewDoesNotExist` is available from :mod:`django.core.exceptions`.
-
 MiddlewareNotUsed
 -----------------
 .. exception:: MiddlewareNotUsed
 
     The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
     used in the server configuration.
-
-    :exc:`MiddlewareNotUsed` is available from :mod:`django.core.exceptions`.
 
 ImproperlyConfigured
 --------------------
@@ -101,8 +96,6 @@ ImproperlyConfigured
     The :exc:`ImproperlyConfigured` exception is raised when Django is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
-
-    :exc:`ImproperlyConfigured` is available from :mod:`django.core.exceptions`.
 
 FieldError
 ----------
@@ -121,8 +114,6 @@ FieldError
     - A field name is invalid
     - A query contains invalid order_by arguments
 
-    :exc:`FieldError` is available from :mod:`django.core.exceptions`.
-
 ValidationError
 ---------------
 .. exception:: ValidationError
@@ -133,9 +124,12 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
-    :exc:`ValidationError` is available from :mod:`django.core.exceptions`.
-
 .. currentmodule:: django.core.urlresolvers
+
+URL Resolver exceptions
+=======================
+
+URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
 
 NoReverseMatch
 --------------
@@ -145,16 +139,15 @@ NoReverseMatch
     :mod:`django.core.urlresolvers` when a matching URL in your URLconf
     cannot be identified based on the parameters supplied.
 
-    :exc:`NoReverseMatch` is available from :mod:`django.core.urlresolvers`.
-
 .. currentmodule:: django.db
 
 Database Exceptions
 ===================
 
+Database exceptions are defined in :mod:`django.db`.
+
 Django wraps the standard database exceptions so that your Django code has a
-guaranteed common implementation of these classes. These database exceptions
-are provided in :mod:`django.db`.
+guaranteed common implementation of these classes. 
 
 .. exception:: Error
 .. exception:: InterfaceError
@@ -185,28 +178,30 @@ to Python 3.)
 
 Raised to prevent deletion of referenced objects when using
 :attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
-of :exc:`IntegrityError`, both of which are available from :mod:`django.db`.
+of :exc:`IntegrityError`.
 
 .. currentmodule:: django.http
 
 Http Exceptions
 ===============
 
+Http exceptions are defined in :mod:`django.http`.
+
 .. exception:: UnreadablePostError
 
     The :exc:`UnreadablePostError` is raised when a user cancels an upload.
-    It is available from :mod:`django.http`.
 
 .. currentmodule:: django.db.transaction
 
 Transaction Exceptions
 ======================
 
+Transaction exceptions are defined in :mod:`django.db.transaction`.
+
 .. exception:: TransactionManagementError
 
     The :exc:`TransactionManagementError` is raised for any and all problems
-    related to database transactions. It is available from
-    :mod:`django.db.transaction`.
+    related to database transactions.
 
 Python Exceptions
 =================
