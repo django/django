@@ -423,6 +423,8 @@ these changes.
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 
+* ``ModelAdmin.declared_fieldsets`` will be removed.
+
 2.0
 ---
 
