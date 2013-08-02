@@ -110,7 +110,7 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-    Pickles of QuerySets are only valid for the version of Django that
+    Pickles of ``QuerySets`` are only valid for the version of Django that
     was used to generate them. If you generate a pickle using Django
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
@@ -298,14 +298,30 @@ Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
 
-It is permissible to specify a multi-valued field to order the results by (for
-example, a :class:`~django.db.models.ManyToManyField` field). Normally
-this won't be a sensible thing to do and it's really an advanced usage
-feature. However, if you know that your queryset's filtering or available data
-implies that there will only be one ordering piece of data for each of the main
-items you are selecting, the ordering may well be exactly what you want to do.
-Use ordering on multi-valued fields with care and make sure the results are
-what you expect.
+.. note::
+    It is permissible to specify a multi-valued field to order the results by
+    (for example, a :class:`~django.db.models.ManyToManyField` field, or the
+    reverse relation of a :class:`~django.db.models.ForeignKey` field).
+
+    Consider this case::
+
+         class Event(Model):
+            parent = models.ForeignKey('self', related_name='children')
+            date = models.DateField()
+
+         Event.objects.order_by('children__date')
+
+    Here, there could potentially be multiple ordering data for each ``Event``;
+    each ``Event`` with multiple ``children`` will be returned multiple times
+    into the new ``QuerySet`` that ``order_by()`` creates. In other words,
+    using ``order_by()`` on the ``QuerySet`` could return more items than you
+    were working on to begin with - which is probably neither expected nor
+    useful.
+
+    Thus, take care when using multi-valued field to order the results. **If**
+    you can be sure that there will only be one ordering piece of data for each
+    of the items you're ordering, this approach should not present problems. If
+    not, make sure the results are what you expect.
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
@@ -386,7 +402,7 @@ field names, the database will only compare the specified field names.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
-    QuerySet, and the fields in ``order_by()`` must start with the fields in
+    ``QuerySet``, and the fields in ``order_by()`` must start with the fields in
     ``distinct()``, in the same order.
 
     For example, ``SELECT DISTINCT ON (a)`` gives you the first row for each
@@ -787,8 +803,8 @@ stop the deluge of database queries that is caused by accessing related objects,
 but the strategy is quite different.
 
 ``select_related`` works by creating a SQL join and including the fields of the
-related object in the SELECT statement. For this reason, ``select_related`` gets
-the related objects in the same database query. However, to avoid the much
+related object in the ``SELECT`` statement. For this reason, ``select_related``
+gets the related objects in the same database query. However, to avoid the much
 larger result set that would result from joining across a 'many' relationship,
 ``select_related`` is limited to single-valued relationships - foreign key and
 one-to-one.
@@ -817,39 +833,54 @@ For example, suppose you have these models::
             return u"%s (%s)" % (self.name, u", ".join([topping.name
                                                         for topping in self.toppings.all()]))
 
-and run this code::
+and run::
 
     >>> Pizza.objects.all()
     [u"Hawaiian (ham, pineapple)", u"Seafood (prawns, smoked salmon)"...
 
-The problem with this code is that it will run a query on the Toppings table for
-**every** item in the Pizza ``QuerySet``.  Using ``prefetch_related``, this can
-be reduced to two:
+The problem with this is that every time ``Pizza.__unicode__()`` asks for
+``self.toppings.all()`` it has to query the database, so
+``Pizza.objects.all()`` will run a query on the Toppings table for **every**
+item in the Pizza ``QuerySet``.
+
+We can reduce to just two queries using ``prefetch_related``:
 
     >>> Pizza.objects.all().prefetch_related('toppings')
 
-All the relevant toppings will be fetched in a single query, and used to make
-``QuerySets`` that have a pre-filled cache of the relevant results. These
-``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
+``self.toppings.all()`` is called, instead of having to go to the database for
+the items, it will find them in a prefetched ``QuerySet`` cache that was
+populated in a single query.
 
-The additional queries are executed after the QuerySet has begun to be evaluated
-and the primary query has been executed. Note that the result cache of the
-primary QuerySet and all specified related objects will then be fully loaded
-into memory, which is often avoided in other cases - even after a query has been
-executed in the database, QuerySet normally tries to make uses of chunking
-between the database to avoid loading all objects into memory before you need
-them.
+That is, all the relevant toppings will have been fetched in a single query,
+and used to make ``QuerySets`` that have a pre-filled cache of the relevant
+results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 
-Also remember that, as always with QuerySets, any subsequent chained methods
-which imply a different database query will ignore previously cached results,
-and retrieve data using a fresh database query. So, if you write the following:
+The additional queries in ``prefetch_related()`` are executed after the
+``QuerySet`` has begun to be evaluated and the primary query has been executed.
 
-    >>> pizzas = Pizza.objects.prefetch_related('toppings')
-    >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
+Note that the result cache of the primary ``QuerySet`` and all specified related
+objects will then be fully loaded into memory. This changes the typical
+behavior of ``QuerySets``, which normally try to avoid loading all objects into
+memory before they are needed, even after a query has been executed in the
+database.
 
-...then the fact that ``pizza.toppings.all()`` has been prefetched will not help
-you - in fact it hurts performance, since you have done a database query that
-you haven't used. So use this feature with caution!
+.. note::
+
+    Remember that, as always with ``QuerySets``, any subsequent chained methods
+    which imply a different database query will ignore previously cached
+    results, and retrieve data using a fresh database query. So, if you write
+    the following:
+
+        >>> pizzas = Pizza.objects.prefetch_related('toppings')
+        >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
+
+    ...then the fact that ``pizza.toppings.all()`` has been prefetched will not
+    help you. The ``prefetch_related('toppings')`` implied
+    ``pizza.toppings.all()``, but ``pizza.toppings.filter()`` is a new and
+    different query. The prefetched cache can't help here; in fact it hurts
+    performance, since you have done a database query that you haven't used. So
+    use this feature with caution!
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -902,7 +933,7 @@ additional queries on the ``ContentType`` table if the relevant rows have not
 already been fetched.
 
 ``prefetch_related`` in most cases will be implemented using a SQL query that
-uses the 'IN' operator. This means that for a large QuerySet a large 'IN' clause
+uses the 'IN' operator. This means that for a large ``QuerySet`` a large 'IN' clause
 could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
@@ -1273,7 +1304,7 @@ raw
 
 Takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like an normal QuerySet to provide object instances.
+can be iterated over just like an normal ``QuerySet`` to provide object instances.
 
 See the :ref:`executing-raw-queries` for more information.
 
