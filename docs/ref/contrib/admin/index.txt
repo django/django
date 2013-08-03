@@ -1233,6 +1233,14 @@ templates used by the :class:`ModelAdmin` views:
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
 
+.. method:: ModelAdmin.get_search_fields(self, request)
+
+    .. versionadded:: 1.7
+
+    The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
+    to return the same kind of sequence type as for the
+    :attr:`~ModelAdmin.search_fields` attribute.
+
 .. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
 
     .. versionadded:: 1.5
