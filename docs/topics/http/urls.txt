@@ -412,7 +412,7 @@ For example::
     )
 
 In this example, for a request to ``/blog/2005/``, Django will call
-``blog.views.year_archive(year='2005', foo='bar')``.
+``blog.views.year_archive(request, year='2005', foo='bar')``.
 
 This technique is used in the
 :doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
