@@ -498,9 +498,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keys().index(step) + 1
-        if len(form_list.keys()) > key:
-            return form_list.keys()[key]
+        keys = list(form_list.keys())
+        key = keys.index(step) + 1
+        if len(keys) > key:
+            return keys[key]
         return None
 
     def get_prev_step(self, step=None):
@@ -512,9 +513,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keys().index(step) - 1
+        keys = list(form_list.keys())
+        key = keys.index(step) - 1
         if key >= 0:
-            return form_list.keys()[key]
+            return keys[key]
         return None
 
     def get_step_index(self, step=None):
