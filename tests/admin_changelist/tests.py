@@ -18,7 +18,8 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin)
+    SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin,
+    DynamicSearchFieldsChildAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject, CustomIdUser)
@@ -587,6 +588,13 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))
+
+    def test_dynamic_search_fields(self):
+        child = self._create_superuser('child')
+        m = DynamicSearchFieldsChildAdmin(Child, admin.site)
+        request = self._mocked_authenticated_request('/child/', child)
+        response = m.changelist_view(request)
+        self.assertEqual(response.context_data['cl'].search_fields, ('name', 'age'))
 
     def test_pagination_page_range(self):
         """
