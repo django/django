@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from importlib import import_module
 from optparse import make_option
 import itertools
@@ -9,7 +10,6 @@ from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal, emit_pre_sync_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
-from django.utils.datastructures import SortedDict
 
 
 class Command(NoArgsCommand):
@@ -76,7 +76,7 @@ class Command(NoArgsCommand):
             return not ((converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables))
 
-        manifest = SortedDict(
+        manifest = OrderedDict(
             (app_name, list(filter(model_installed, model_list)))
             for app_name, model_list in all_models
         )

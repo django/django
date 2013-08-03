@@ -105,6 +105,10 @@ to distinguish caches by the ``Accept-language`` header.
 
 .. class:: SortedDict
 
+.. deprecated:: 1.7
+    ``SortedDict`` is deprecated and will be removed in Django 1.9. Use
+    :class:`collections.OrderedDict` instead.
+
     The :class:`django.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
 

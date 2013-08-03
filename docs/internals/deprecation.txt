@@ -423,6 +423,9 @@ these changes.
 * FastCGI support via the ``runfcgi`` management command will be
   removed. Please deploy your project using WSGI.
 
+* ``django.utils.datastructures.SortedDict`` will be removed. Use
+  :class:`collections.OrderedDict` from the Python standard library instead.
+
 2.0
 ---
 
