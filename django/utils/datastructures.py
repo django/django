@@ -1,6 +1,6 @@
 import copy
-from django.utils import six
 import warnings
+from django.utils import six
 
 class MergeDict(object):
     """
@@ -500,4 +500,3 @@ class DictWrapper(dict):
         if use_func:
             return self.func(value)
         return value
-
