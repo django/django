@@ -110,6 +110,9 @@ Minor features
   or ``None`` for the key and the custom label as the value. The default blank
   option ``"----------"`` will be omitted in this case.
 
+* The admin's search fields can now be customized per-request thanks to the new
+  :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
+
 Backwards incompatible changes in 1.7
 =====================================
 
