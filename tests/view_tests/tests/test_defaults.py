@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.test.utils import setup_test_template_loader, restore_template_loaders
+from django.test.utils import (
+    setup_test_template_loader, restore_template_loaders, override_settings
+)
 
 from ..models import Author, Article, UrlArticle
 
@@ -59,3 +61,22 @@ class DefaultsTests(TestCase):
         article = UrlArticle.objects.get(pk=1)
         self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
+
+    @override_settings(DEFAULT_CONTENT_TYPE="text/xml")
+    def test_default_content_type_is_text_html(self):
+        """
+        Test that the default Content-Type headers of the error responses are all
+        text/html
+        """
+        # 400
+        response = self.client.get('/views/raises400/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+        # 403
+        response = self.client.get('/views/raises403/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+        # 404
+        response = self.client.get('/views/non_existing_url/')
+        self.assertEqual(response['Content-Type'], 'text/html')
+        # 500
+        response = self.client.get('/views/server_error/')
+        self.assertEqual(response['Content-Type'], 'text/html')
