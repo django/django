@@ -197,3 +197,16 @@ class TimestampSigner(Signer):
                 raise SignatureExpired(
                     'Signature age %s > %s seconds' % (age, max_age))
         return value
+
+class FutureTimestampSigner(TimestampSigner):
+    
+    def __init__(self, max_age=0, *args, **kwargs):
+        # Default max_age=0 is useful if a signer is only used for unsigning
+        self.max_age = max_age
+        super(FutureTimestampSigner, self).__init__(*args, **kwargs)
+        
+    def timestamp(self):
+        return baseconv.base62.encode(int(time.time())+self.max_age)
+        
+    def unsign(self, value):
+        return super(FutureTimestampSigner, self).unsign(value, 0)
