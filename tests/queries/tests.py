@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import datetime
 from operator import attrgetter
 import pickle
@@ -14,7 +15,6 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
-from django.utils.datastructures import SortedDict
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -499,7 +499,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket2902(self):
-        # Parameters can be given to extra_select, *if* you use a SortedDict.
+        # Parameters can be given to extra_select, *if* you use an OrderedDict.
 
         # (First we need to know which order the keys fall in "naturally" on
         # your system, so we can put things in the wrong way around from
@@ -513,7 +513,7 @@ class Queries1Tests(BaseQuerysetTest):
         # This slightly odd comparison works around the fact that PostgreSQL will
         # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
         # using constants here and not a real concern.
-        d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
+        d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
@@ -1987,7 +1987,7 @@ class ValuesQuerysetTests(BaseQuerysetTest):
 
     def test_extra_values(self):
         # testing for ticket 14930 issues
-        qs = Number.objects.extra(select=SortedDict([('value_plus_x', 'num+%s'),
+        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
                                                      ('value_minus_x', 'num-%s')]),
                                   select_params=(1, 2))
         qs = qs.order_by('value_minus_x')

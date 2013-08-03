@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import keyword
 import re
 from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
-from django.utils.datastructures import SortedDict
 
 
 class Command(NoArgsCommand):
@@ -69,7 +69,7 @@ class Command(NoArgsCommand):
             used_column_names = [] # Holds column names used in the table so far
             for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
-                extra_params = SortedDict()  # Holds Field parameters such as 'db_column'.
+                extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                 column_name = row[0]
                 is_relation = i in relations
 
@@ -193,7 +193,7 @@ class Command(NoArgsCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = SortedDict()
+        field_params = OrderedDict()
         field_notes = []
 
         try:

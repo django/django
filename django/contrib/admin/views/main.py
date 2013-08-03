@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import sys
 import warnings
 
@@ -7,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.datastructures import SortedDict
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext, ugettext_lazy
@@ -319,13 +319,13 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
 
     def get_ordering_field_columns(self):
         """
-        Returns a SortedDict of ordering field column numbers and asc/desc
+        Returns an OrderedDict of ordering field column numbers and asc/desc
         """
 
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = SortedDict()
+        ordering_fields = OrderedDict()
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more

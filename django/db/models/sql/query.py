@@ -7,9 +7,9 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
+from collections import OrderedDict
 import copy
 
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 from django.utils import six
@@ -142,7 +142,7 @@ class Query(object):
         self.select_related = False
 
         # SQL aggregate-related attributes
-        self.aggregates = SortedDict() # Maps alias -> SQL aggregate function
+        self.aggregates = OrderedDict() # Maps alias -> SQL aggregate function
         self.aggregate_select_mask = None
         self._aggregate_select_cache = None
 
@@ -152,7 +152,7 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra = SortedDict()  # Maps col_alias -> (col_sql, params).
+        self.extra = OrderedDict()  # Maps col_alias -> (col_sql, params).
         self.extra_select_mask = None
         self._extra_select_cache = None
 
@@ -741,7 +741,7 @@ class Query(object):
             self.group_by = [relabel_column(col) for col in self.group_by]
         self.select = [SelectInfo(relabel_column(s.col), s.field)
                        for s in self.select]
-        self.aggregates = SortedDict(
+        self.aggregates = OrderedDict(
             (key, relabel_column(col)) for key, col in self.aggregates.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
@@ -795,7 +795,7 @@ class Query(object):
         assert current < ord('Z')
         prefix = chr(current + 1)
         self.alias_prefix = prefix
-        change_map = SortedDict()
+        change_map = OrderedDict()
         for pos, alias in enumerate(self.tables):
             if alias in exceptions:
                 continue
@@ -1638,7 +1638,7 @@ class Query(object):
             # dictionary with their parameters in 'select_params' so that
             # subsequent updates to the select dictionary also adjust the
             # parameters appropriately.
-            select_pairs = SortedDict()
+            select_pairs = OrderedDict()
             if select_params:
                 param_iter = iter(select_params)
             else:
@@ -1651,7 +1651,7 @@ class Query(object):
                     entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
-            # This is order preserving, since self.extra_select is a SortedDict.
+            # This is order preserving, since self.extra_select is an OrderedDict.
             self.extra.update(select_pairs)
         if where or params:
             self.where.add(ExtraWhere(where, params), AND)
@@ -1760,7 +1760,7 @@ class Query(object):
         self._extra_select_cache = None
 
     def _aggregate_select(self):
-        """The SortedDict of aggregate columns that are not masked, and should
+        """The OrderedDict of aggregate columns that are not masked, and should
         be used in the SELECT clause.
 
         This result is cached for optimization purposes.
@@ -1768,7 +1768,7 @@ class Query(object):
         if self._aggregate_select_cache is not None:
             return self._aggregate_select_cache
         elif self.aggregate_select_mask is not None:
-            self._aggregate_select_cache = SortedDict([
+            self._aggregate_select_cache = OrderedDict([
                 (k, v) for k, v in self.aggregates.items()
                 if k in self.aggregate_select_mask
             ])
@@ -1781,7 +1781,7 @@ class Query(object):
         if self._extra_select_cache is not None:
             return self._extra_select_cache
         elif self.extra_select_mask is not None:
-            self._extra_select_cache = SortedDict([
+            self._extra_select_cache = OrderedDict([
                 (k, v) for k, v in self.extra.items()
                 if k in self.extra_select_mask
             ])

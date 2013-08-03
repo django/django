@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import base64
 import binascii
+from collections import OrderedDict
 import hashlib
 import importlib
 
 from django.dispatch import receiver
 from django.conf import settings
 from django.test.signals import setting_changed
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
@@ -243,7 +243,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('iterations'), iterations),
             (_('salt'), mask_hash(salt)),
@@ -320,7 +320,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
         assert algorithm == self.algorithm
         salt, checksum = data[:22], data[22:]
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('work factor'), work_factor),
             (_('salt'), mask_hash(salt)),
@@ -368,7 +368,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
@@ -396,7 +396,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
@@ -429,7 +429,7 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         assert encoded.startswith('sha1$$')
         hash = encoded[6:]
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), self.algorithm),
             (_('hash'), mask_hash(hash)),
         ])
@@ -462,7 +462,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), self.algorithm),
             (_('hash'), mask_hash(encoded, show=3)),
         ])
@@ -496,7 +496,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
