@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import sys
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import get_resolver
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
@@ -31,12 +31,15 @@ def raises(request):
     except Exception:
         return technical_500_response(request, *sys.exc_info())
 
-def raises404(request):
-    resolver = get_resolver(None)
-    resolver.resolve('')
+def raises400(request):
+    raise SuspiciousOperation
 
 def raises403(request):
     raise PermissionDenied
+
+def raises404(request):
+    resolver = get_resolver(None)
+    resolver.resolve('')
 
 def redirect(request):
     """
