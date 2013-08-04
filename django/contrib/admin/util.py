@@ -156,8 +156,14 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, source_attr), obj)
             else:
                 if obj._meta.proxy:
+                    # Resolve the proxy string representation for display
+                    obj_text = force_text(obj)
                     # Take concrete model's instance to avoid mismatch in edges
                     obj = obj._meta.concrete_model(pk=obj.pk)
+                    if six.PY3:
+                        obj.__str__ = lambda: obj_text
+                    else:
+                        obj.__unicode__ = lambda: obj_text
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
