@@ -938,8 +938,8 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
 
 class FSFilesHandler(WSGIHandler):
     """
-    WSGI middleware that intercepts calls to the static files directory, as
-    defined by the STATIC_URL setting, and serves those files.
+    WSGI middleware that intercepts calls to a directory, as defined by one of
+    the *_ROOT settings, and serves those files, publishing them under *_URL.
     """
     def __init__(self, application, base_dir=None):
         self.application = application
@@ -949,12 +949,6 @@ class FSFilesHandler(WSGIHandler):
             self.base_dir = self.get_base_dir()
         self.base_url = urlparse(self.get_base_url())
         super(FSFilesHandler, self).__init__()
-
-    #def get_base_dir(self):
-    #    return settings.STATIC_ROOT
-
-    #def get_base_url(self):
-    #    return settings.STATIC_URL
 
     def _should_handle(self, path):
         """
@@ -972,20 +966,9 @@ class FSFilesHandler(WSGIHandler):
         relative_url = url[len(self.base_url[2]):]
         return url2pathname(relative_url)
 
-    #def serve(self, request):
-    #    """
-    #    Actually serves the request path.
-    #    """
-    #    return serve(request, self.file_path(request.path), insecure=True)
-
     def get_response(self, request):
         if self._should_handle(request.path):
-            try:
-                return self.serve(request)
-            except Http404 as e:
-                if settings.DEBUG:
-                    from django.views import debug
-                    return debug.technical_404_response(request, e)
+            return self.serve(request)
         return super(FSFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):
@@ -1008,8 +991,8 @@ class _StaticFilesHandler(FSFilesHandler):
 
     def serve(self, request):
         path = self.file_path(request.path)
-        path2 = posixpath.normpath(unquote(path)).lstrip('/')
-        return serve(request, path2, document_root=settings.STATIC_ROOT)
+        norm_path = posixpath.normpath(unquote(path)).lstrip('/')
+        return serve(request, norm_path, document_root=settings.STATIC_ROOT)
 
 
 class _MediaFilesHandler(FSFilesHandler):
@@ -1054,19 +1037,16 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    static_files_middleware = _StaticFilesHandler
-
-    def __init__(self, host, possible_ports, connections_override=None):
+    def __init__(self, host, possible_ports, static_handler,  media_handler, connections_override=None):
         self.host = host
         self.port = None
         self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
+        self.static_handler = static_handler
+        self.media_handler = media_handler
         self.connections_override = connections_override
         super(LiveServerThread, self).__init__()
-
-    def apply_static_middleware(self, handler):
-        return _StaticFilesHandler(handler)
 
     def run(self):
         """
@@ -1080,9 +1060,7 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            #handler = _StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
-            #handler = self.apply_static_middleware(_MediaFilesHandler(WSGIHandler()))
-            handler = self.static_files_middleware(_MediaFilesHandler(WSGIHandler()))
+            handler = self.static_handler(self.media_handler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
@@ -1134,6 +1112,9 @@ class LiveServerTestCase(TransactionTestCase):
     other thread can see the changes.
     """
 
+    static_handler = _StaticFilesHandler
+    media_handler = _MediaFilesHandler
+
     @property
     def live_server_url(self):
         return 'http://%s:%s' % (
@@ -1175,8 +1156,10 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(
-            host, possible_ports, connections_override)
+        cls.server_thread = LiveServerThread(host, possible_ports,
+                                             cls.static_handler,
+                                             cls.media_handler,
+                                             connections_override=connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
