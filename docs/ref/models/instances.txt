@@ -140,15 +140,19 @@ attributes on your model if desired. For instance, you could use it to
 automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
-    def clean(self):
-        import datetime
-        from django.core.exceptions import ValidationError
-        # Don't allow draft entries to have a pub_date.
-        if self.status == 'draft' and self.pub_date is not None:
-            raise ValidationError('Draft entries may not have a publication date.')
-        # Set the pub_date for published items if it hasn't been set already.
-        if self.status == 'published' and self.pub_date is None:
-            self.pub_date = datetime.date.today()
+    import datetime
+    from django.core.exceptions import ValidationError
+    from django.db import models
+
+    class Article(models.Model):
+        ...
+        def clean(self):
+            # Don't allow draft entries to have a pub_date.
+            if self.status == 'draft' and self.pub_date is not None:
+                raise ValidationError('Draft entries may not have a publication date.')
+            # Set the pub_date for published items if it hasn't been set already.
+            if self.status == 'published' and self.pub_date is None:
+                self.pub_date = datetime.date.today()
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
