@@ -18,7 +18,7 @@ class CarTireAdmin(admin.ModelAdmin):
         return super(CarTireAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class EventAdmin(admin.ModelAdmin):
-    raw_id_fields = ['band']
+    raw_id_fields = ['main_band', 'supporting_bands']
 
 
 class SchoolAdmin(admin.ModelAdmin):

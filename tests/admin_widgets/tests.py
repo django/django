@@ -90,15 +90,15 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Album, 'cover_art', widgets.AdminFileWidget)
 
     def testForeignKey(self):
-        self.assertFormfield(models.Event, 'band', forms.Select)
+        self.assertFormfield(models.Event, 'main_band', forms.Select)
 
     def testRawIDForeignKey(self):
-        self.assertFormfield(models.Event, 'band', widgets.ForeignKeyRawIdWidget,
-                             raw_id_fields=['band'])
+        self.assertFormfield(models.Event, 'main_band', widgets.ForeignKeyRawIdWidget,
+                             raw_id_fields=['main_band'])
 
     def testRadioFieldsForeignKey(self):
-        ff = self.assertFormfield(models.Event, 'band', widgets.AdminRadioSelect,
-                                  radio_fields={'band':admin.VERTICAL})
+        ff = self.assertFormfield(models.Event, 'main_band', widgets.AdminRadioSelect,
+                                  radio_fields={'main_band':admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
     def testManyToMany(self):
@@ -201,7 +201,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": '%s' % pk,
+            "main_band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -215,7 +215,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         for test_str in ('Iñtërnâtiônàlizætiøn', "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
-                {"band": test_str})
+                {"main_band": test_str})
 
             self.assertContains(response,
                 'Select a valid choice. That choice is not one of the available choices.')
@@ -818,4 +818,97 @@ class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleni
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def setUp(self):
+        models.Band.objects.create(id=42, name='Bogey Blues')
+        models.Band.objects.create(id=98, name='Green Potatoes')
+        super(AdminRawIdWidgetSeleniumFirefoxTests, self).setUp()
+
+    def test_foreignkey(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/event/add/'))
+        main_window = self.selenium.current_window_handle
+
+        # No value has been selected yet
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '')
+
+        # Open the popup window and click on a band
+        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.switch_to_window('id_main_band')
+        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '42')
+
+        # Reopen the popup window and click on another band
+        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.switch_to_window('id_main_band')
+        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the other selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '98')
+
+    def test_many_to_many(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/event/add/'))
+        main_window = self.selenium.current_window_handle
+
+        # No value has been selected yet
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '')
+
+        # Open the popup window and click on a band
+        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.switch_to_window('id_supporting_bands')
+        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '42')
+
+        # Reopen the popup window and click on another band
+        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.switch_to_window('id_supporting_bands')
+        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the two selected bands' ids
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '42,98')
+
+class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
