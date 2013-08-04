@@ -756,10 +756,9 @@ class ModelAdmin(BaseModelAdmin):
                 return "%s__icontains" % field_name
 
         use_distinct = False
-        search_fields = self.get_search_fields(request)
-        if search_fields and search_term:
+        if self.search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
-                           for search_field in search_fields]
+                           for search_field in self.search_fields]
             for bit in search_term.split():
                 or_queries = [models.Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
