@@ -319,7 +319,7 @@ def load_all_installed_template_libraries():
             libraries = []
         for library_name in libraries:
             try:
-                lib = template.get_library(library_name)
+                template.get_library(library_name)
             except template.InvalidTemplateLibrary:
                 pass
 

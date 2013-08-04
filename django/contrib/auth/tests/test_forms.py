@@ -307,7 +307,7 @@ class UserChangeFormTest(TestCase):
                 fields = ('groups',)
 
         # Just check we can create it
-        form = MyUserForm({})
+        MyUserForm({})
 
     def test_unsuable_password(self):
         user = User.objects.get(username='empty_password')

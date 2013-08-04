@@ -25,15 +25,12 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing OGRGeomType object."
 
         # OGRGeomType should initialize on all these inputs.
-        try:
-            g = OGRGeomType(1)
-            g = OGRGeomType(7)
-            g = OGRGeomType('point')
-            g = OGRGeomType('GeometrycollectioN')
-            g = OGRGeomType('LINearrING')
-            g = OGRGeomType('Unknown')
-        except:
-            self.fail('Could not create an OGRGeomType object!')
+        OGRGeomType(1)
+        OGRGeomType(7)
+        OGRGeomType('point')
+        OGRGeomType('GeometrycollectioN')
+        OGRGeomType('LINearrING')
+        OGRGeomType('Unknown')
 
         # Should throw TypeError on this input
         self.assertRaises(OGRException, OGRGeomType, 23)
@@ -127,7 +124,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
     def test02_points(self):
         "Testing Point objects."
 
-        prev = OGRGeometry('POINT(0 0)')
+        OGRGeometry('POINT(0 0)')
         for p in self.geometries.points:
             if not hasattr(p, 'z'): # No 3D
                 pnt = OGRGeometry(p.wkt)
@@ -243,7 +240,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
         with self.assertRaises(OGRException):
-            _ = poly.centroid
+            poly.centroid
 
         poly.close_rings()
         self.assertEqual(10, poly.point_count) # Two closing points should've been added
@@ -251,7 +248,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test08_multipolygons(self):
         "Testing MultiPolygon objects."
-        prev = OGRGeometry('POINT(0 0)')
+        OGRGeometry('POINT(0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = OGRGeometry(mp.wkt)
             self.assertEqual(6, mpoly.geom_type)

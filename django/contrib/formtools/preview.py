@@ -39,7 +39,7 @@ class FormPreview(object):
         """
         while 1:
             try:
-                f = self.form.base_fields[name]
+                self.form.base_fields[name]
             except KeyError:
                 break # This field name isn't being used by the form.
             name += '_'

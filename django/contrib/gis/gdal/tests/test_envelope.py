@@ -22,9 +22,9 @@ class EnvelopeTest(unittest.TestCase):
     def test01_init(self):
         "Testing Envelope initilization."
         e1 = Envelope((0, 0, 5, 5))
-        e2 = Envelope(0, 0, 5, 5)
-        e3 = Envelope(0, '0', '5', 5) # Thanks to ww for this
-        e4 = Envelope(e1._envelope)
+        Envelope(0, 0, 5, 5)
+        Envelope(0, '0', '5', 5) # Thanks to ww for this
+        Envelope(e1._envelope)
         self.assertRaises(OGRException, Envelope, (5, 5, 0, 0))
         self.assertRaises(OGRException, Envelope, 5, 5, 0, 0)
         self.assertRaises(OGRException, Envelope, (0, 0, 5, 5, 3))

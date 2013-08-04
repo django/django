@@ -172,7 +172,7 @@ class BasePasswordHasher(object):
             if isinstance(self.library, (tuple, list)):
                 name, mod_path = self.library
             else:
-                name = mod_path = self.library
+                mod_path = self.library
             try:
                 module = importlib.import_module(mod_path)
             except ImportError as e:

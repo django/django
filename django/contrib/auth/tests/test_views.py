@@ -184,7 +184,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def _test_confirm_start(self):
         # Start by creating the email
-        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(len(mail.outbox), 1)
         return self._read_signup_email(mail.outbox[0])
 
@@ -328,7 +328,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             })
 
     def logout(self):
-        response = self.client.get('/logout/')
+        self.client.get('/logout/')
 
     def test_password_change_fails_with_invalid_old_password(self):
         self.login()
@@ -350,7 +350,7 @@ class ChangePasswordTest(AuthViewsTestCase):
 
     def test_password_change_succeeds(self):
         self.login()
-        response = self.client.post('/password_change/', {
+        self.client.post('/password_change/', {
             'old_password': 'password',
             'new_password1': 'password1',
             'new_password2': 'password1',
@@ -465,7 +465,7 @@ class LoginTest(AuthViewsTestCase):
 
     def test_login_form_contains_request(self):
         # 15198
-        response = self.client.post('/custom_requestauth_login/', {
+        self.client.post('/custom_requestauth_login/', {
             'username': 'testclient',
             'password': 'password',
         }, follow=True)
