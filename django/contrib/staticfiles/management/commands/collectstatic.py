@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 import os
 import sys
+from collections import OrderedDict
 from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
-from django.utils.datastructures import SortedDict
 from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
@@ -97,7 +97,7 @@ class Command(NoArgsCommand):
         else:
             handler = self.copy_file
 
-        found_files = SortedDict()
+        found_files = OrderedDict()
         for finder in finders.get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it

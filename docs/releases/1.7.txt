@@ -167,6 +167,13 @@ on all Python versions. Since ``unittest2`` became the standard library's
 Python versions, this module isn't useful anymore. It has been deprecated. Use
 :mod:`unittest` instead.
 
+``django.utils.datastructures.SortedDict``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As :class:`~collections.OrderedDict` was added to the standard library in
+Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
+needed and has been deprecated.
+
 Custom SQL location for models package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

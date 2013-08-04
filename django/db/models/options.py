@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import re
 from bisect import bisect
 import warnings
@@ -11,7 +12,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
 from django.utils import six
 from django.utils.functional import cached_property
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -58,7 +58,7 @@ class Options(object):
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = SortedDict()
+        self.parents = OrderedDict()
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
@@ -332,7 +332,7 @@ class Options(object):
         return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         for parent in self.parents:
             for field, model in parent._meta.get_m2m_with_model():
                 if model:
@@ -474,7 +474,7 @@ class Options(object):
         return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
@@ -519,7 +519,7 @@ class Options(object):
         return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_m2m_objects_with_model():

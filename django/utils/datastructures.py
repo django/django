@@ -1,6 +1,6 @@
 import copy
+import warnings
 from django.utils import six
-
 
 class MergeDict(object):
     """
@@ -124,6 +124,10 @@ class SortedDict(dict):
         return instance
 
     def __init__(self, data=None):
+        warnings.warn(
+            "SortedDict is deprecated and will be removed in Django 1.9.",
+            PendingDeprecationWarning, stacklevel=2
+        )
         if data is None or isinstance(data, dict):
             data = data or []
             super(SortedDict, self).__init__(data)

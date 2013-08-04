@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes
 from django.utils.html import format_html, format_html_join
 from django.utils.http import urlsafe_base64_encode
@@ -324,7 +325,7 @@ class PasswordChangeForm(SetPasswordForm):
             )
         return old_password
 
-PasswordChangeForm.base_fields = SortedDict([
+PasswordChangeForm.base_fields = OrderedDict([
     (k, PasswordChangeForm.base_fields[k])
     for k in ['old_password', 'new_password1', 'new_password2']
 ])

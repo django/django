@@ -2,8 +2,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
-from django.utils.datastructures import SortedDict
 
+from collections import OrderedDict
 from optparse import make_option
 
 class Command(BaseCommand):
@@ -66,11 +66,11 @@ class Command(BaseCommand):
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
+            app_list = OrderedDict((app, None) for app in get_apps() if app not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = SortedDict()
+            app_list = OrderedDict()
             for label in app_labels:
                 try:
                     app_label, model_label = label.split('.')

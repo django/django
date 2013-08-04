@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import copy
 import operator
 from functools import partial, reduce, update_wrapper
@@ -29,7 +30,6 @@ from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.decorators import method_decorator
-from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -672,7 +672,7 @@ class ModelAdmin(BaseModelAdmin):
         # want *any* actions enabled on this page.
         from django.contrib.admin.views.main import _is_changelist_popup
         if self.actions is None or _is_changelist_popup(request):
-            return SortedDict()
+            return OrderedDict()
 
         actions = []
 
@@ -693,8 +693,8 @@ class ModelAdmin(BaseModelAdmin):
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
-        # Convert the actions into a SortedDict keyed by name.
-        actions = SortedDict([
+        # Convert the actions into an OrderedDict keyed by name.
+        actions = OrderedDict([
             (name, (func, name, desc))
             for func, name, desc in actions
         ])
