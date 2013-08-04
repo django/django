@@ -49,17 +49,17 @@ are views which can be used in your :doc:`URLconf </topics/http/urls>`.
 A simple example
 ----------------
 
-This simple example, taken from `chicagocrime.org`_, describes a feed of the
-latest five news items::
+This simple example, taken from a hypothetical police beat news site describes
+a feed of the latest five news items::
 
     from django.contrib.syndication.views import Feed
     from django.core.urlresolvers import reverse
-    from chicagocrime.models import NewsItem
+    from policebeat.models import NewsItem
 
     class LatestEntriesFeed(Feed):
-        title = "Chicagocrime.org site news"
+        title = "Police beat site news"
         link = "/sitenews/"
-        description = "Updates on changes and additions to chicagocrime.org."
+        description = "Updates on changes and additions to police beat central."
 
         def items(self):
             return NewsItem.objects.order_by('-pub_date')[:5]
@@ -199,22 +199,20 @@ into those elements.
   are responsible for doing all necessary URL quoting and conversion to
   ASCII inside the method itself.
 
-.. _chicagocrime.org: http://www.chicagocrime.org/
-
 A complex example
 -----------------
 
 The framework also supports more complex feeds, via arguments.
 
-For example, `chicagocrime.org`_ offers an RSS feed of recent crimes for every
-police beat in Chicago. It'd be silly to create a separate
+For example, a website could offer an RSS feed of recent crimes for every
+police beat in a city. It'd be silly to create a separate
 :class:`~django.contrib.syndication.views.Feed` class for each police beat; that
 would violate the :ref:`DRY principle <dry>` and would couple data to
 programming logic. Instead, the syndication framework lets you access the
 arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can output
 items based on information in the feed's URL.
 
-On chicagocrime.org, the police-beat feeds are accessible via URLs like this:
+The police beat feeds could be accessible via URLs like this:
 
 * :file:`/beats/613/rss/` -- Returns recent crimes for beat 613.
 * :file:`/beats/1424/rss/` -- Returns recent crimes for beat 1424.
@@ -238,7 +236,7 @@ Here's the code for these beat-specific feeds::
             return get_object_or_404(Beat, pk=beat_id)
 
         def title(self, obj):
-            return "Chicagocrime.org: Crimes for beat %s" % obj.beat
+            return "Police beat central: Crimes for beat %s" % obj.beat
 
         def link(self, obj):
             return obj.get_absolute_url()
@@ -339,13 +337,13 @@ URLconf to add the extra versions.
 Here's a full example::
 
     from django.contrib.syndication.views import Feed
-    from chicagocrime.models import NewsItem
+    from policebeat.models import NewsItem
     from django.utils.feedgenerator import Atom1Feed
 
     class RssSiteNewsFeed(Feed):
-        title = "Chicagocrime.org site news"
+        title = "Police beat site news"
         link = "/sitenews/"
-        description = "Updates on changes and additions to chicagocrime.org."
+        description = "Updates on changes and additions to police beat central."
 
         def items(self):
             return NewsItem.objects.order_by('-pub_date')[:5]
