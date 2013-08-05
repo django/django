@@ -812,6 +812,10 @@ Miscellaneous
 * :meth:`~django.core.validators.validate_email` now accepts email addresses
   with ``localhost`` as the domain.
 
+* The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
+  to prevent django from deleting the temporary .pot file it generates before
+  creating the .po file.
+
 Features deprecated in 1.6
 ==========================
 
