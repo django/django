@@ -105,9 +105,9 @@ class AppCache(object):
         Loads the app with the provided fully qualified name, and returns the
         model module.
         """
+        app_module = import_module(app_name)
         self.handled.add(app_name)
         self.nesting_level += 1
-        app_module = import_module(app_name)
         try:
             models = import_module('%s.%s' % (app_name, MODELS_MODULE_NAME))
         except ImportError:
