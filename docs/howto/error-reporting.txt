@@ -120,8 +120,8 @@ Filtering sensitive information
 Error reports are really helpful for debugging errors, so it is generally
 useful to record as much relevant information about those errors as possible.
 For example, by default Django records the `full traceback`_ for the
-exception raised, each `traceback frame`_'s local variables, and the
-:class:`~django.http.HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
+exception raised, each `traceback frame`_’s local variables, and the
+:class:`~django.http.HttpRequest`’s :ref:`attributes<httprequest-attributes>`.
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or

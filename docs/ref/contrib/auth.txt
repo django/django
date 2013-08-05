@@ -243,7 +243,7 @@ Manager methods
         be called.
 
         The ``extra_fields`` keyword arguments are passed through to the
-        :class:`~django.contrib.auth.models.User`'s ``__init__`` method to
+        :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom User model
         <auth-custom-user>`.
 
