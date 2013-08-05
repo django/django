@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 """
 A series of tests to establish that the command-line managment tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
@@ -1051,21 +1053,29 @@ class ManageSettingsWithImportError(AdminScriptTestCase):
         self.assertOutput(err, "AttributeError: 'list' object has no attribute 'crash'")
 
 
-class ManageValidate(AdminScriptTestCase):
+class ManageCheck(AdminScriptTestCase):
+
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_nonexistent_app(self):
-        "manage.py validate reports an error on a non-existent app in INSTALLED_APPS"
-        self.write_settings('settings.py', apps=['admin_scriptz.broken_app'], sdict={'USE_I18N': False})
+        """ manage.py validate reports an error on a non-existent app in
+        INSTALLED_APPS """
+
+        self.write_settings('settings.py',
+            apps=['admin_scriptz.broken_app'],
+            sdict={'USE_I18N': False})
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
+        self.assertOutput(err, 'ImportError')
         self.assertOutput(err, 'No module named')
         self.assertOutput(err, 'admin_scriptz')
 
     def test_broken_app(self):
-        "manage.py validate reports an ImportError if an app's models.py raises one on import"
+        """ manage.py validate reports an ImportError if an app's models.py
+        raises one on import """
+
         self.write_settings('settings.py', apps=['admin_scripts.broken_app'])
         args = ['validate']
         out, err = self.run_manage(args)
@@ -1073,17 +1083,21 @@ class ManageValidate(AdminScriptTestCase):
         self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
-        "manage.py validate does not raise an ImportError validating a complex app with nested calls to load_app"
+        """ manage.py validate does not raise an ImportError validating a
+        complex app with nested calls to load_app """
+
         self.write_settings('settings.py',
             apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
             sdict={'DEBUG': True})
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'No errors/warnings found')
+        self.assertEqual(out, 'System check identified no problems.\n')
 
     def test_app_with_import(self):
-        "manage.py validate does not raise errors when an app imports a base class that itself has an abstract base"
+        """ manage.py validate does not raise errors when an app imports a base
+        class that itself has an abstract base. """
+
         self.write_settings('settings.py',
             apps=['admin_scripts.app_with_import',
                   'django.contrib.auth',
@@ -1093,7 +1107,53 @@ class ManageValidate(AdminScriptTestCase):
         args = ['validate']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, 'No errors/warnings found')
+        self.assertEqual(out, 'System check identified no problems.\n')
+
+    def test_output_format(self):
+        """ All errors/warnings should be sorted by level and by message. """
+
+        self.write_settings('settings.py',
+            apps=['admin_scripts.app_raising_messages'],
+            sdict={'DEBUG': True})
+        args = ['validate']
+        out, err = self.run_manage(args)
+        expected_err = (
+            "CommandError: There are some issues:\n"
+            "\n"
+            "ERRORS:\n"
+            "?: An error\n"
+            "\tHINT: Error hint\n"
+            "\n"
+            "WARNINGS:\n"
+            "a: Second warning\n"
+            "obj: First warning\n"
+            "\tHINT: Hint\n"
+            "\n"
+            "System check identified 3 issues.\n"
+        )
+        self.assertEqual(err, expected_err)
+        self.assertNoOutput(out)
+
+    def test_warning_does_not_halt(self):
+        """ When there are only warnings or less serious messages, then Django
+        should not prevent user from launching their project, so `validate`
+        command should not raise `CommandError` exception. """
+
+        self.write_settings('settings.py',
+            apps=['admin_scripts.app_raising_warning'],
+            sdict={'DEBUG': True})
+        args = ['validate']
+        out, err = self.run_manage(args)
+        expected_err = (
+            "There are some issues:\n"  # No "CommandError: " part
+            "\n"
+            "WARNINGS:\n"
+            "?: A warning\n"
+            "\n"
+            "System check identified 1 issue.\n"
+        )
+        self.assertEqual(err, expected_err)
+        self.assertNoOutput(out)
 
 
 class CustomTestRunner(DiscoverRunner):

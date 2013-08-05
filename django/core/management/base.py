@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin.py`` or ``manage.py``).
@@ -162,7 +165,7 @@ class BaseCommand(object):
     """
     # Metadata about this command.
     option_list = (
-        make_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
+        make_option('-v', '--verbosity', action='store', dest='verbosity', default=b'1',
             type='choice', choices=['0', '1', '2', '3'],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'),
         make_option('--settings',
@@ -314,6 +317,7 @@ class BaseCommand(object):
 
         all_issues = checks.run_checks()
 
+        msg = ""
         if all_issues:
             debugs = [e for e in all_issues if e.level < checks.INFO]
             infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING]
@@ -328,7 +332,6 @@ class BaseCommand(object):
                 (debugs, 'DEBUGS'),
             ]
 
-            msg = ""
             for issues, group_name in sorted_issues:
                 if issues:
                     formatted = (
@@ -337,20 +340,24 @@ class BaseCommand(object):
                         else color_style().WARNING(force_str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
-                    msg += '\n%s:\n%s' % (group_name, formatted)
+                    msg += '\n%s:\n%s\n' % (group_name, formatted)
 
             msg = "There are some issues:\n%s" % msg
-            if any(e.is_serious() for e in all_issues):
-                raise CommandError(msg)
-            else:
-                self.stdout.write(msg)
 
         if display_num_errors:
-            msg = (
+            if msg:
+                msg += '\n'
+            msg += "System check identified %s." % (
                 "no problems" if len(all_issues) == 0 else
                 "1 issue" if len(all_issues) == 1 else
-                "%s issues" % len(all_issues))
-            msg = "\nSystem check identified %s." % msg
+                "%s issues" % len(all_issues)
+            )
+
+        if any(e.is_serious() for e in all_issues):
+            raise CommandError(msg)
+        elif msg and all_issues:
+            self.stderr.write(msg)
+        elif msg:
             self.stdout.write(msg)
 
     def handle(self, *args, **options):
