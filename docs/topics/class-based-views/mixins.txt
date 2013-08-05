@@ -288,7 +288,7 @@ object. In order to do this, we need to have two different querysets:
 
 ``Book`` queryset for use by :class:`~django.views.generic.list.ListView`
     Since we have access to the ``Publisher`` whose books we want to list, we
-    simply override ``get_queryset()`` and use the ``Publisher``'s
+    simply override ``get_queryset()`` and use the ``Publisher``’s
     :ref:`reverse foreign key manager<backwards-related-objects>`.
 
 ``Publisher`` queryset for use in :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`

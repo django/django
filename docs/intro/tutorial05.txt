@@ -132,7 +132,7 @@ We identify a bug
 Fortunately, there's a little bug in the ``polls`` application for us to fix
 right away: the ``Poll.was_published_recently()`` method returns ``True`` if
 the ``Poll`` was published within the last day (which is correct) but also if
-the ``Poll``'s ``pub_date`` field is in the future (which certainly isn't).
+the ``Poll``’s ``pub_date`` field is in the future (which certainly isn't).
 
 You can see this in the Admin; create a poll whose date lies in the future;
 you'll see that the ``Poll`` change list claims it was published recently.
