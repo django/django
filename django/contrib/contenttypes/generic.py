@@ -243,6 +243,22 @@ class GenericRelation(ForeignObject):
                     [obj.pk for obj in objs]
                 })
 
+    def check(self, **kwargs):
+        print '\n\n\n\n\n\n\nBlb!'
+        errors = super(GenericRelation, self).check(**kwargs)
+        errors.extend(self._check_content_type_field())
+        errors.extend(self._check_object_id_field())
+        return errors
+
+    def _check_content_type_field(self):
+        target = self.rel.to
+        field = target._meta.get_field(self.content_type_field_name)
+        print '\n\n\n\n\n\n\n\n\n', field, '\n\n\n\n'
+        return []
+
+    def _check_object_id_field(self):
+        return []
+
 
 class ReverseGenericRelatedObjectsDescriptor(object):
     """

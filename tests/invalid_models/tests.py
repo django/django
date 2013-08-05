@@ -587,7 +587,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
     def test_not_swapped_model(self):
         class SwappableModel(models.Model):
             # A model that can be, but isn't swapped out. References to this
-            # model *shoudln't* raise any validation error.
+            # model should *not* raise any validation error.
             class Meta:
                 swappable = 'TEST_SWAPPABLE_MODEL'
 
