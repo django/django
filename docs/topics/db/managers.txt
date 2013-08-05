@@ -100,7 +100,7 @@ access ``self.model`` to get the model class to which they're attached.
 Modifying initial Manager QuerySets
 -----------------------------------
 
-A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
+A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
 
     from django.db import models
@@ -111,7 +111,7 @@ example, using this model::
 
 ...the statement ``Book.objects.all()`` will return all books in the database.
 
-You can override a ``Manager``\'s base ``QuerySet`` by overriding the
+You can override a ``Manager``’s base ``QuerySet`` by overriding the
 ``Manager.get_queryset()`` method. ``get_queryset()`` should return a
 ``QuerySet`` with the properties you require.
 
@@ -246,7 +246,7 @@ Creating ``Manager`` with ``QuerySet`` methods
 In lieu of the above approach which requires duplicating methods on both the
 ``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
 <django.db.models.query.QuerySet.as_manager>` can be used to create an instance
-of ``Manager`` with a copy of a custom ``QuerySet``'s methods::
+of ``Manager`` with a copy of a custom ``QuerySet``’s methods::
 
     class Person(models.Model):
         ...
