@@ -253,8 +253,8 @@ prompts.
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
 
---no-initial-data
-~~~~~~~~~~~~~~~~~
+``--no-initial-data``
+~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.5
 
@@ -1145,8 +1145,8 @@ prompts.
 The :djadminopt:`--database` option can be used to specify the database to
 synchronize.
 
---no-initial-data
-~~~~~~~~~~~~~~~~~
+``--no-initial-data``
+~~~~~~~~~~~~~~~~~~~~~
 
 .. versionadded:: 1.5
 
