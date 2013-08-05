@@ -1,3 +1,4 @@
+from collections import MutableMapping
 import copy
 import warnings
 from django.utils import six
@@ -211,9 +212,7 @@ class SortedDict(dict):
         def values(self):
             return [self[k] for k in self.keyOrder]
 
-    def update(self, dict_):
-        for k, v in six.iteritems(dict_):
-            self[k] = v
+    update = MutableMapping.update
 
     def setdefault(self, key, default):
         if key not in self:

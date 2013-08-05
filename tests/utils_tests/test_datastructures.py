@@ -110,6 +110,28 @@ class SortedDictTests(SimpleTestCase):
         d = SortedDict(((1, "one"), (0, "zero"), (2, "two")))
         self.assertEqual(repr(d), "{1: 'one', 0: 'zero', 2: 'two'}")
 
+    def test_update_with_dict(self):
+        d = SortedDict()
+        d.update({1: 'one', 0: 'zero', 2: 'two'})
+        self.assertEqual(set(six.iteritems(d)),
+                         set([(1, 'one'), (2, 'two'), (0, 'zero')]))
+
+    def test_update_with_tuple(self):
+        d = SortedDict()
+        d.update(((1, 'one'), (0, 'zero'), (2, 'two')))
+        self.assertEqual(repr(d), "{1: 'one', 0: 'zero', 2: 'two'}")
+
+    def test_update_with_generator(self):
+        d = SortedDict()
+        d.update(((k, v) for k, v in ((1, 'one'), (0, 'zero'), (2, 'two'))))
+        self.assertEqual(repr(d), "{1: 'one', 0: 'zero', 2: 'two'}")
+
+    def test_update_with_kwargs(self):
+        d = SortedDict()
+        d.update(one=1, zero=0)
+        self.assertEqual(d['one'], 1)
+        self.assertEqual(d['zero'], 0)
+
     def test_pickle(self):
         self.assertEqual(
             pickle.loads(pickle.dumps(self.d1, 2)),

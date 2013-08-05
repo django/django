@@ -125,6 +125,20 @@ results. Instead do::
 
     SortedDict([('b', 1), ('a', 2), ('c', 3)])
 
+Updating a SortedDict
+---------------------
+
+A ``SortedDict`` can be updated using ``SortedDict.update``. This
+method behaves just like :meth:`dict.update`. It accepts a ``dict`` or
+any iterable of pairs (for example, a list of 2-item tuples: ``[('a',
+1), ('b', 2)]``)::
+
+    sorted_dict = SortedDict()
+    sorted_dict.update([('a', 1), ('b', 2)])
+
+Note that just like when creating a ``SortedDict``, passing a ``dict``
+to ``update`` does not preserve the ordering of the new items.
+
 ``django.utils.dateparse``
 ==========================
 
