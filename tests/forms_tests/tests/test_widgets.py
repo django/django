@@ -849,6 +849,14 @@ beatle J R Ringo False""")
         w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
         self.assertHTMLEqual(w.render('name', ['john', 'lennon']), '<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />')
 
+        # Test needs_multipart_form=True if any widget needs it
+        w = MyMultiWidget(widgets=(TextInput(), FileInput()))
+        self.assertTrue(w.needs_multipart_form)
+
+        # Test needs_multipart_form=False if no widget needs it
+        w = MyMultiWidget(widgets=(TextInput(), TextInput()))
+        self.assertFalse(w.needs_multipart_form)
+
     def test_splitdatetime(self):
         w = SplitDateTimeWidget()
         self.assertHTMLEqual(w.render('date', ''), '<input type="text" name="date_0" /><input type="text" name="date_1" />')
