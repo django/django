@@ -560,7 +560,7 @@ several lines in language files.
 
 .. django-admin-option:: --no-location
 
-Use the ``--no-location`` option to not write '``#: filename:line``'
+Use the ``--no-location`` option to not write '``#: filename:line``’
 comment lines in language files. Note that using this option makes it harder
 for technically skilled translators to understand each message's context.
 
