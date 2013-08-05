@@ -847,6 +847,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
         self.selenium.switch_to_window('id_main_band')
+        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
@@ -860,6 +861,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
         self.selenium.switch_to_window('id_main_band')
+        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
@@ -884,6 +886,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
         self.selenium.switch_to_window('id_supporting_bands')
+        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
@@ -897,6 +900,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
         self.selenium.switch_to_window('id_supporting_bands')
+        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
