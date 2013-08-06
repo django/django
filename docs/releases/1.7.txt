@@ -92,11 +92,21 @@ The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
 class method has been added to :ref:`create Manager with QuerySet methods
 <create-manager-with-queryset-methods>`.
 
+<<<<<<< HEAD
 Using a custom manager when traversing reverse relations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is now possible to :ref:`specify a custom manager
 <using-custom-reverse-manager>` when traversing a reverse relationship.
+=======
+New system check framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`System check framework </ref/checks>` is a set of static checks
+validating mainly apps and models. It detects common problems and report
+them providing hints. The framework is extensible and it's possible to
+write custom checks.
+>>>>>>> deprecated BaseCommand.{requires_model_validation, validate}
 
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -584,6 +594,13 @@ The :class:`django.db.models.IPAddressField` and
 The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
 ``get_backend_timeout()``. Despite being a private API, it will go through the
 normal deprecation.
+
+``django.core.management.BaseCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``requires_model_validation`` is deprecated in favour of a new
+``requires_checks`` flag. If value for the former flag is missing, then the
+latter flag value is used. ``check`` method's replaced old ``validate``
+method.
 
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

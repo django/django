@@ -17,7 +17,7 @@ class Command(NoArgsCommand):
                          'Default values are prefixed by "###".'),
     )
 
-    requires_model_validation = False
+    requires_checks = False
 
     def handle_noargs(self, **options):
         # Inspired by Postfix's "postconf -n".

@@ -143,7 +143,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
             stdout=new_io,
-            skip_validation=True
+            skip_checks=True
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
@@ -166,7 +166,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 username="joe@somewhere.org",
                 stdout=new_io,
                 stderr=new_io,
-                skip_validation=True
+                skip_checks=True
             )
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
