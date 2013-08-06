@@ -6,10 +6,12 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from functools import partial
 
+from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, DEFAULT_DB_ALIAS
-from django.db.models import signals
+from django.db.models import signals, FieldDoesNotExist
+from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.where import Constraint
@@ -20,7 +22,7 @@ from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
 class RenameGenericForeignKeyMethods(RenameMethodsBase):
@@ -29,6 +31,7 @@ class RenameGenericForeignKeyMethods(RenameMethodsBase):
     )
 
 
+@python_2_unicode_compatible
 class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
     """
     Provides a generic relation to any object through content-type/object-id
@@ -150,6 +153,88 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         setattr(instance, self.fk_field, fk)
         setattr(instance, self.cache_attr, value)
 
+    def __str__(self):
+        model = self.model
+        app = model._meta.app_label
+        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+
+    def check(self, **kwargs):
+        errors = []
+        errors.extend(self._check_content_type_field())
+        errors.extend(self._check_object_id_field())
+        errors.extend(self._check_field_name())
+        errors.extend(self._check_clashes())
+        return errors
+
+    def _check_content_type_field(self):
+        opts = self.model._meta
+        try:
+            field = opts.get_field(self.ct_field)
+        except FieldDoesNotExist:
+            return [
+                checks.Error(
+                    'The field refers to "%s" field which is missing.'
+                        % self.ct_field,
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            if not isinstance(field, models.ForeignKey):
+                return [
+                    checks.Error(
+                        '"%s" field is used by a GenericForeignKey '
+                            'as content type field and therefore it must be '
+                            'a ForeignKey.' % self.ct_field,
+                        hint=None,
+                        obj=self,
+                    )
+                ]
+            elif field.rel.to != ContentType:
+                return [
+                    checks.Error(
+                        '"%s" field is used by a GenericForeignKey'
+                            'as content type field and therefore it must be '
+                            'a ForeignKey to ContentType.' % self.ct_field,
+                        hint=None,
+                        obj=self,
+                    )
+                ]
+            else:
+                return []
+
+    def _check_object_id_field(self):
+        opts = self.model._meta
+        try:
+            opts.get_field(self.fk_field)
+        except FieldDoesNotExist:
+            return [
+                checks.Error(
+                    'The field refers to "%s" field which is missing.'
+                        % self.fk_field,
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
+
+    def _check_field_name(self):
+        if self.name.endswith("_"):
+            return [
+                checks.Error(
+                    'Field names must not end with underscores.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
+
+    def _check_clashes(self):
+        return []
+
+
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
 
@@ -244,7 +329,6 @@ class GenericRelation(ForeignObject):
                 })
 
     def check(self, **kwargs):
-        print '\n\n\n\n\n\n\nBlb!'
         errors = super(GenericRelation, self).check(**kwargs)
         errors.extend(self._check_content_type_field())
         errors.extend(self._check_object_id_field())
@@ -252,12 +336,18 @@ class GenericRelation(ForeignObject):
 
     def _check_content_type_field(self):
         target = self.rel.to
-        field = target._meta.get_field(self.content_type_field_name)
-        print '\n\n\n\n\n\n\n\n\n', field, '\n\n\n\n'
-        return []
+        if isinstance(target, ModelBase):
+            field = target._meta.get_field(self.content_type_field_name)
+            return []
+        else:
+            return []
 
     def _check_object_id_field(self):
-        return []
+        target = self.rel.to
+        if isinstance(target, ModelBase):
+            return []
+        else:
+            return []
 
 
 class ReverseGenericRelatedObjectsDescriptor(object):

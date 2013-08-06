@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.loading import cache
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_str
 
 from .models import Author, Article
 
@@ -72,6 +73,29 @@ class IsolatedModelsTestCase(TestCase):
 
 class GenericForeignKeyTests(IsolatedModelsTestCase):
 
+    def test_str(self):
+        class Model(models.Model):
+            field = generic.GenericForeignKey()
+        expected = "contenttypes_tests.Model.field"
+        actual = force_str(Model.field)
+        self.assertEqual(expected, actual)
+
+    def test_missing_content_type_field(self):
+        class TaggedItem(models.Model):
+            # no content_type field
+            object_id = models.PositiveIntegerField()
+            content_object = generic.GenericForeignKey()
+
+        errors = TaggedItem.content_object.check()
+        expected = [
+            checks.Error(
+                'The field refers to "content_type" field which is missing.',
+                hint=None,
+                obj=TaggedItem.content_object,
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_invalid_content_type_field(self):
         class Model(models.Model):
             content_type = models.IntegerField()  # should be ForeignKey
@@ -82,8 +106,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                'The GenericForeignKey field uses content_type field '
-                    'and therefore it must be a ForeignKey.',
+                '"content_type" field is used by a GenericForeignKey '
+                    'as content type field and therefore it must be '
+                    'a ForeignKey.',
+                hint=None,
                 obj=Model.content_object,
             )
         ]
@@ -99,9 +125,27 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                'The GenericForeignKey field uses content_type field '
-                    'and therefore it must be a ForeignKey to ContentType.',
+                '"content_type" field is used by a GenericForeignKey'
+                    'as content type field and therefore it must be '
+                    'a ForeignKey to ContentType.',
+                hint=None,
                 obj=Model.content_object,
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_missing_object_id_field(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            # missing object_id field
+            content_object = generic.GenericForeignKey()
+
+        errors = TaggedItem.content_object.check()
+        expected = [
+            checks.Error(
+                'The field refers to "object_id" field which is missing.',
+                hint=None,
+                obj=TaggedItem.content_object,
             )
         ]
         self.assertEqual(errors, expected)
@@ -117,52 +161,22 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 'Field names must not end with underscores.',
+                hint=None,
                 obj=Model.content_object_,
             )
         ]
         self.assertEqual(errors, expected)
 
-    def test_missing_content_type_field(self):
-        class TaggedItem(models.Model):
-            # no content_type field
-            object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
-
-        errors = checks.run_checks()
-        expected = [
-            checks.Error(
-                'The field refers to "content_type" field which is missing.',
-                hint=None,
-                obj=TaggedItem.content_object,
-            )
-        ]
-        self.assertEqual(errors, expected)
-
-    def test_missing_object_id_field(self):
-        class TaggedItem(models.Model):
-            content_type = models.ForeignKey(ContentType)
-            # missing object_id field
-            content_object = generic.GenericForeignKey()
-
-        errors = checks.run_checks()
-        expected = [
-            checks.Error(
-                'The field refers to "object_id" field which is missing.',
-                hint=None,
-                obj=TaggedItem.content_object,
-            )
-        ]
-        self.assertEqual(errors, expected)
-
     def test_generic_foreign_key_checks_are_performed(self):
+        class MyGenericForeignKey(generic.GenericForeignKey):
+            def check(self, **kwargs):
+                return ['performed!']
+
         class Model(models.Model):
-            content_type = models.ForeignKey('self')  # should point to ContentType
-            object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey(
-                'content_type', 'object_id')
+            content_object = MyGenericForeignKey()
 
         errors = checks.run_checks()
-        self.assertNotEqual(errors, [])
+        self.assertEqual(errors, ['performed!'])
 
     def test_accessor_clash(self):
         class MyModel(models.Model):
