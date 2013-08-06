@@ -12,6 +12,8 @@ from django.test import (TransactionTestCase, skipIfDBFeature,
 
 from multiple_database.tests import TestRouter
 
+from regressiontests.multiple_database.tests import TestRouter
+
 from .models import Person
 
 # Some tests require threading, which might not be available. So create a
