@@ -22,7 +22,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together')
+                 'index_together', 'default_permissions')
 
 
 @python_2_unicode_compatible
@@ -36,6 +36,7 @@ class Options(object):
         self.ordering = []
         self.unique_together = []
         self.index_together = []
+        self.default_permissions = ('add', 'change', 'delete')
         self.permissions = []
         self.object_name, self.app_label = None, app_label
         self.get_latest_by = None

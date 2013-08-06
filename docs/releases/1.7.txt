@@ -127,6 +127,10 @@ Minor features
   for each individual field will be respected, and a new ``incomplete``
   validation error will be raised when any required fields are empty.
 
+* The new :attr:`~django.db.models.Options.default_permissions` model
+  ``Meta`` option allows you to customize (or disable) creation of the default
+  add, change, and delete permissions.
+
 Backwards incompatible changes in 1.7
 =====================================
 
