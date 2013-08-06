@@ -211,7 +211,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class Bookmark(models.Model):
             tags = generic.GenericRelation('TaggedItem')
 
-        errors = checks.run_checks()
+        errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
 
     def test_valid_generic_relationship_with_explicit_fields(self):
@@ -226,7 +226,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                 content_type_field='custom_content_type',
                 object_id_field='custom_object_id')
 
-        errors = checks.run_checks()
+        errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
 
     def test_pointing_to_missing_model(self):
@@ -266,8 +266,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class Bookmark(models.Model):
             tags = generic.GenericRelation('TaggedItem')
 
-        errors = checks.run_checks()
-        #errors = Bookmark.check()
+        errors = Bookmark.tags.field.check()
         expected = [
             checks.Error(
                 'The field refers to TaggedItem.content_type field which is missing.',
@@ -286,7 +285,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class Bookmark(models.Model):
             tags = generic.GenericRelation('TaggedItem')
 
-        errors = checks.run_checks()
+        errors = Bookmark.tags.field.check()
         expected = [
             checks.Error(
                 'The field refers to TaggedItem.object_id field which is missing.',
@@ -304,7 +303,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class Bookmark(models.Model):
             tags = generic.GenericRelation('TaggedItem')
 
-        errors = checks.run_checks()
+        errors = Bookmark.tags.field.check()
         self.assertEqual(errors, [])
 
     @override_settings(TEST_SWAPPED_MODEL='contenttypes_tests.Replacement')
@@ -344,10 +343,10 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
         class InvalidBookmark(models.Model):
             tags_ = generic.GenericRelation('TaggedItem')
 
-        errors = InvalidBookmark.check()
+        errors = InvalidBookmark.tags_.field.check()
         expected = [
             checks.Error(
-                'Fields names must not end with underscores.',
+                'Field names must not end with underscores.',
                 hint=None,
                 obj=InvalidBookmark.tags_.field,
             )
