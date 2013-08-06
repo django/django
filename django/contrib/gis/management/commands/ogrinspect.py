@@ -69,7 +69,7 @@ class Command(LabelCommand):
                     help='Generate mapping dictionary for use with `LayerMapping`.')
         )
 
-    requires_model_validation = False
+    requires_checks = False
 
     def handle(self, *args, **options):
         try:

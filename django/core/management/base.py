@@ -137,13 +137,14 @@ class BaseCommand(object):
         wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
         ``False``.
 
+    ``requires_checks``
+        A boolean; if ``True``, system checks will be performed prior to
+        executing the command. Default value is ``True``. If it's missing, the
+        value of ``requires_model_validation`` is used.
+
     ``requires_model_validation``
-        A boolean; if ``True``, validation of installed models will be
-        performed prior to executing the command. Default value is
-        ``True``. To validate an individual application's models
-        rather than all applications' models, call
-        ``self.validate(app)`` from ``handle()``, where ``app`` is the
-        application's Python module.
+        A deprecated boolean. If ``requires_checks`` is missing, then this value
+        is used; otherwise this value is ignored.
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
@@ -182,7 +183,11 @@ class BaseCommand(object):
 
     # Configuration shortcuts that alter various logic.
     can_import_settings = True
+
+    # At the end of deprecating proccess for this attribute, this line will be
+    # replaced by `requires_checks = True`.
     requires_model_validation = True
+
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
 
@@ -254,8 +259,8 @@ class BaseCommand(object):
 
     def execute(self, *args, **options):
         """
-        Try to execute this command, performing model validation if
-        needed (as controlled by the attribute
+        Try to execute this command, performing system checks if needed (as
+        controlled by attributes ``self.requires_checks`` and
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
@@ -287,8 +292,10 @@ class BaseCommand(object):
             translation.activate('en-us')
 
         try:
-            if self.requires_model_validation and not options.get('skip_validation'):
-                self.validate()
+            if (self._get_requires_checks() and
+                    not options.get('skip_validation') and  # This will be removed at the end of deprecation proccess for `skip_validation`.
+                    not options.get('skip_checks')):
+                self.check()
             output = self.handle(*args, **options)
             if output:
                 if self.output_transaction:
@@ -306,12 +313,15 @@ class BaseCommand(object):
                 translation.activate(saved_locale)
 
     def validate(self, app=None, display_num_errors=False):
-        """
-        Validates all apps, raising CommandError for any serious messages
-        (error and critical errors). If there are only light messages (like
-        warnings), they are printed to stdout and no exception is raised.
+        """ Deprecated. Delegates to ``check``. ``app`` argument is ignored. """
 
-        The `app` argument is ignored.
+        return self.check(display_num_errors)
+
+    def check(self, display_num_errors=False):
+        """
+        Perform all system checks. Raises CommandError for any serious message
+        (error or critical errors). If there are only light messages (like
+        warnings), they are printed to stderr and no exception is raised.
 
         """
 
@@ -367,6 +377,17 @@ class BaseCommand(object):
 
         """
         raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
+
+    def _get_requires_checks(self):
+        """ Use it instead of retrieving directly `requires_checks` value. If
+        the value is missing, `requires_model_validation` value is returned.
+        This method will be removed at the end of deprecation proccess for
+        `requires_model_validation`. """
+
+        if hasattr(self, 'requires_checks'):
+            return self.requires_checks
+        else:
+            return self.requires_model_validation
 
 
 class AppCommand(BaseCommand):

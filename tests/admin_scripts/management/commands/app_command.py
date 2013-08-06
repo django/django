@@ -3,7 +3,7 @@ from django.core.management.base import AppCommand
 
 class Command(AppCommand):
     help = 'Test Application-based commands'
-    requires_model_validation = False
+    requires_checks = False
     args = '[appname ...]'
 
     def handle_app(self, app, **options):
