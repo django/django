@@ -689,13 +689,28 @@ class Field(object):
 
     def check(self, **kwargs):
         errors = []
-        errors.extend(self._check_choices(**kwargs))
-        errors.extend(self._check_db_index(**kwargs))
-        errors.extend(self._check_null_allowed_for_primary_keys(**kwargs))
+        errors.extend(self._check_field_name())
+        errors.extend(self._check_choices())
+        errors.extend(self._check_db_index())
+        errors.extend(self._check_null_allowed_for_primary_keys())
         errors.extend(self._check_backend_specific_checks(**kwargs))
         return errors
 
-    def _check_choices(self, **kwargs):
+    def _check_field_name(self):
+        """ Check if field name is valid (i. e. not ending with an underscore).
+        """
+        if self.name.endswith('_'):
+            return [
+                checks.Error(
+                    'Field names must not end with underscores.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
+
+    def _check_choices(self):
         if self.choices:
             if (isinstance(self.choices, six.string_types) or
                     not is_iterable(self.choices)):
@@ -724,7 +739,7 @@ class Field(object):
         else:
             return []
 
-    def _check_db_index(self, **kwargs):
+    def _check_db_index(self):
         if self.db_index not in (None, True, False):
             return [
                 checks.Error(
@@ -737,7 +752,7 @@ class Field(object):
         else:
             return []
 
-    def _check_null_allowed_for_primary_keys(self, **kwargs):
+    def _check_null_allowed_for_primary_keys(self):
         if (self.primary_key and self.null and
                 not connection.features.interprets_empty_strings_as_nulls):
             # We cannot reliably check this for backends like Oracle which
