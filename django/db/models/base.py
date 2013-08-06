@@ -1015,23 +1015,21 @@ class Model(six.with_metaclass(ModelBase)):
     @classmethod
     def check(cls, **kwargs):
         errors = []
-        errors.extend(cls._check_swappable(**kwargs))
+        errors.extend(cls._check_swappable())
         errors.extend(cls._check_managers(**kwargs))
         if not cls._meta.swapped:
-            errors.extend(cls._check_user_model(**kwargs))
+            errors.extend(cls._check_user_model())
             errors.extend(cls._check_fields(**kwargs))
-            errors.extend(cls._check_field_names(**kwargs))
-            errors.extend(cls._check_m2m_through_same_relationship(**kwargs))
-            errors.extend(cls._check_relative_fields(**kwargs))
-            errors.extend(cls._check_id_field(**kwargs))
-            errors.extend(cls._check_column_name_clashes(**kwargs))
-            errors.extend(cls._check_index_together(**kwargs))
-            errors.extend(cls._check_unique_together(**kwargs))
-            errors.extend(cls._check_ordering(**kwargs))
+            errors.extend(cls._check_m2m_through_same_relationship())
+            errors.extend(cls._check_id_field())
+            errors.extend(cls._check_column_name_clashes())
+            errors.extend(cls._check_index_together())
+            errors.extend(cls._check_unique_together())
+            errors.extend(cls._check_ordering())
         return errors
 
     @classmethod
-    def _check_swappable(cls, **kwargs):
+    def _check_swappable(cls):
         """ Check if the swapped model exists. """
 
         errors = []
@@ -1075,7 +1073,7 @@ class Model(six.with_metaclass(ModelBase)):
         return errors
 
     @classmethod
-    def _check_user_model(cls, **kwargs):
+    def _check_user_model(cls):
         errors = []
         # If this is the current User model, check known validation problems
         # with User models
@@ -1128,23 +1126,7 @@ class Model(six.with_metaclass(ModelBase)):
         return errors
 
     @classmethod
-    def _check_field_names(cls, **kwargs):
-        """ Check if field names are valid (i. e. not ending with an
-        underscore). """
-        errors = []
-        for field in cls._meta.local_fields + cls._meta.local_many_to_many:
-            if field.name.endswith('_'):
-                errors.append(
-                    checks.Error(
-                        'Field names must not end with underscores.',
-                        hint=None,
-                        obj=field,
-                    )
-                )
-        return errors
-
-    @classmethod
-    def _check_m2m_through_same_relationship(cls, **kwargs):
+    def _check_m2m_through_same_relationship(cls):
         """ Check if no relationship model is used by more than one m2m field.
         """
 
@@ -1176,122 +1158,7 @@ class Model(six.with_metaclass(ModelBase)):
         return errors
 
     @classmethod
-    def _check_relative_fields(cls, **kwargs):
-        """ Check accessor and reverse query name clashes. """
-
-        errors = []
-        opts = cls._meta
-
-        fields = opts.local_fields + opts.local_many_to_many
-
-        # Skip all non-relative fields, because opts.local_fields may
-        # contain them.
-        fields = (f for f in fields if f.rel)
-
-        # `f.rel.to` may be a string instead of a model. Skip all not resolved
-        # model names.
-        fields = (f for f in fields if isinstance(f.rel.to, ModelBase))
-
-        # If the field doesn't install backward relation on the target model (so
-        # `is_hidden` returns True), then there are no clashes to check and we
-        # can skip these fields.
-        fields = (f for f in fields if not f.rel.is_hidden())
-
-        # Skip all fields without reverse accessors (this only occurs for
-        # symmetrical m2m relations to self). If this is the case, there are no
-        # clashes to check for this field, as there are no reverse descriptors
-        # for this field.
-        fields = (f for f in fields if f.related.get_accessor_name())
-
-        for field in fields:
-            # Consider that we are checking field `Model.foreign` and the models
-            # are:
-            #
-            #     class Target(models.Model):
-            #         model = models.IntegerField()
-            #         model_set = models.IntegerField()
-            #
-            #     class Model(models.Model):
-            #         foreign = models.ForeignKey(Target)
-            #         m2m = models.ManyToManyField(Target)
-
-            rel_opts = field.rel.to._meta
-            # rel_opts.object_name == "Target"
-            rel_name = field.related.get_accessor_name()  # i. e. "model_set"
-            rel_query_name = field.related_query_name()  # i. e. "model"
-            field_name = "%s.%s" % (opts.object_name,
-                field.name)  # i. e. "Model.field"
-
-            # Check clashes between accessor or reverse query name of `field`
-            # and any other field name -- i. e. accessor for Model.foreign is
-            # model_set and it clashes with Target.model_set.
-            potential_clashes = rel_opts.fields + rel_opts.local_many_to_many
-            for clash_field in potential_clashes:
-                clash_name = "%s.%s" % (rel_opts.object_name,
-                    clash_field.name)  # i. e. "Target.model_set"
-                if clash_field.name == rel_name:
-                    errors.append(
-                        checks.Error(
-                            'Accessor for field %s clashes with field %s.'
-                                % (field_name, clash_name),
-                            hint='Rename field %s or add/change a related_name '
-                                'argument to the definition for field %s.'
-                                % (clash_name, field_name),
-                            obj=field,
-                        )
-                    )
-
-                if clash_field.name == rel_query_name:
-                    errors.append(
-                        checks.Error(
-                            'Reverse query name for field %s clashes with field %s.'
-                                % (field_name, clash_name),
-                            hint='Rename field %s or add/change a related_name '
-                                'argument to the definition for field %s.'
-                                % (clash_name, field_name),
-                            obj=field
-                        )
-                    )
-
-            # Check clashes between accessors/reverse query names of `field` and
-            # any other field -- i. e. Model.foreign accessor clashes with
-            # Model.m2m accessor.
-            potential_clashes = rel_opts.get_all_related_many_to_many_objects()
-            potential_clashes += rel_opts.get_all_related_objects()
-            potential_clashes = (r for r in potential_clashes
-                if r.field is not field)
-            for clash_field in potential_clashes:
-                clash_name = "%s.%s" % (  # i. e. "Model.m2m"
-                    clash_field.model._meta.object_name,
-                    clash_field.field.name)
-                if clash_field.get_accessor_name() == rel_name:
-                    errors.append(
-                        checks.Error(
-                            'Clash between accessors for %s and %s.'
-                                % (field_name, clash_name),
-                            hint='Add or change a related_name argument '
-                                'to the definition for %s or %s.'
-                                % (field_name, clash_name),
-                            obj=field,
-                        )
-                    )
-
-                if clash_field.get_accessor_name() == rel_query_name:
-                    errors.append(
-                        checks.Error(
-                            'Clash between reverse query names for %s and %s.'
-                                % (field_name, clash_name),
-                            hint='Add or change a related_name argument '
-                                'to the definition for %s or %s.'
-                                % (field_name, clash_name),
-                            obj=field
-                        )
-                    )
-
-        return errors
-
-    @classmethod
-    def _check_id_field(cls, **kwargs):
+    def _check_id_field(cls):
         """ Check if `id` field is a primary key. """
 
         fields = list(f for f in cls._meta.local_fields
@@ -1312,7 +1179,7 @@ class Model(six.with_metaclass(ModelBase)):
             return []
 
     @classmethod
-    def _check_column_name_clashes(cls, **kwargs):
+    def _check_column_name_clashes(cls):
         # Store a list of column names which have already been used by other fields.
         used_column_names = []
         errors = []
@@ -1336,7 +1203,7 @@ class Model(six.with_metaclass(ModelBase)):
         return errors
 
     @classmethod
-    def _check_index_together(cls, **kwargs):
+    def _check_index_together(cls):
         """ Check the value of "index_together" option. """
 
         if not isinstance(cls._meta.index_together, (tuple, list)):
@@ -1365,7 +1232,7 @@ class Model(six.with_metaclass(ModelBase)):
             return errors
 
     @classmethod
-    def _check_unique_together(cls, **kwargs):
+    def _check_unique_together(cls):
         """ Check the value of "unique_together" option. """
 
         if not isinstance(cls._meta.unique_together, (tuple, list)):
@@ -1434,7 +1301,7 @@ class Model(six.with_metaclass(ModelBase)):
         return []
 
     @classmethod
-    def _check_ordering(cls, **kwargs):
+    def _check_ordering(cls):
         """ Check "ordering" option -- is it a list of lists and do all fields
         exist? """
 

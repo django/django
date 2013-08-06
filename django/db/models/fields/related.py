@@ -18,6 +18,7 @@ from django.utils.functional import curry, cached_property
 from django.core import exceptions
 from django import forms
 
+
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 def add_lazy_relation(cls, field, relation, operation):
@@ -141,11 +142,12 @@ class RelatedField(Field):
 
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
-        errors.extend(self._check_relation_model_exists(**kwargs))
-        errors.extend(self._check_referencing_to_swapped_model(**kwargs))
+        errors.extend(self._check_relation_model_exists())
+        errors.extend(self._check_referencing_to_swapped_model())
+        errors.extend(self._check_clashes())
         return errors
 
-    def _check_relation_model_exists(self, **kwargs):
+    def _check_relation_model_exists(self):
         rel_is_missing = self.rel.to not in get_models()
         rel_is_string = isinstance(self.rel.to, six.string_types)
         if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
@@ -163,7 +165,7 @@ class RelatedField(Field):
             ]
         return []
 
-    def _check_referencing_to_swapped_model(self, **kwargs):
+    def _check_referencing_to_swapped_model(self):
         if (self.rel.to not in get_models() and
                 not isinstance(self.rel.to, six.string_types) and
                 self.rel.to._meta.swapped):
@@ -181,6 +183,121 @@ class RelatedField(Field):
                 )
             ]
         return []
+
+    def _check_clashes(self):
+        """ Check accessor and reverse query name clashes. """
+
+        from django.db.models.base import ModelBase
+
+        errors = []
+        opts = self.model._meta
+
+        if self.rel is None:
+            return []
+
+        # `f.rel.to` may be a string instead of a model. Skip if model name is
+        # not resolved.
+        if not isinstance(self.rel.to, ModelBase):
+            return []
+
+        # If the field doesn't install backward relation on the target model (so
+        # `is_hidden` returns True), then there are no clashes to check and we
+        # can skip these fields.
+        if self.rel.is_hidden():
+            return []
+
+        # Skip all fields without reverse accessors (this only occurs for
+        # symmetrical m2m relations to self). If this is the case, there are no
+        # clashes to check for this field, as there are no reverse descriptors
+        # for this field.
+        if not self.related.get_accessor_name():
+            return []
+
+        # Consider that we are checking field `Model.foreign` and the models
+        # are:
+        #
+        #     class Target(models.Model):
+        #         model = models.IntegerField()
+        #         model_set = models.IntegerField()
+        #
+        #     class Model(models.Model):
+        #         foreign = models.ForeignKey(Target)
+        #         m2m = models.ManyToManyField(Target)
+
+        rel_opts = self.rel.to._meta
+        # rel_opts.object_name == "Target"
+        rel_name = self.related.get_accessor_name()  # i. e. "model_set"
+        rel_query_name = self.related_query_name()  # i. e. "model"
+        field_name = "%s.%s" % (opts.object_name,
+            self.name)  # i. e. "Model.field"
+
+        # Check clashes between accessor or reverse query name of `field`
+        # and any other field name -- i. e. accessor for Model.foreign is
+        # model_set and it clashes with Target.model_set.
+        potential_clashes = rel_opts.fields + rel_opts.local_many_to_many
+        for clash_field in potential_clashes:
+            clash_name = "%s.%s" % (rel_opts.object_name,
+                clash_field.name)  # i. e. "Target.model_set"
+            if clash_field.name == rel_name:
+                errors.append(
+                    checks.Error(
+                        'Accessor for field %s clashes with field %s.'
+                            % (field_name, clash_name),
+                        hint='Rename field %s or add/change a related_name '
+                            'argument to the definition for field %s.'
+                            % (clash_name, field_name),
+                        obj=self,
+                    )
+                )
+
+            if clash_field.name == rel_query_name:
+                errors.append(
+                    checks.Error(
+                        'Reverse query name for field %s clashes with field %s.'
+                            % (field_name, clash_name),
+                        hint='Rename field %s or add/change a related_name '
+                            'argument to the definition for field %s.'
+                            % (clash_name, field_name),
+                        obj=self
+                    )
+                )
+
+        # Check clashes between accessors/reverse query names of `field` and
+        # any other field accessor -- i. e. Model.foreign accessor clashes with
+        # Model.m2m accessor.
+        potential_clashes = rel_opts.get_all_related_many_to_many_objects()
+        potential_clashes += rel_opts.get_all_related_objects()
+        potential_clashes = (r for r in potential_clashes
+            if r.field is not self)
+        for clash_field in potential_clashes:
+            clash_name = "%s.%s" % (  # i. e. "Model.m2m"
+                clash_field.model._meta.object_name,
+                clash_field.field.name)
+            if clash_field.get_accessor_name() == rel_name:
+                errors.append(
+                    checks.Error(
+                        'Clash between accessors for %s and %s.'
+                            % (field_name, clash_name),
+                        hint='Add or change a related_name argument '
+                            'to the definition for %s or %s.'
+                            % (field_name, clash_name),
+                        obj=self,
+                    )
+                )
+
+            if clash_field.get_accessor_name() == rel_query_name:
+                errors.append(
+                    checks.Error(
+                        'Clash between reverse query names for %s and %s.'
+                            % (field_name, clash_name),
+                        hint='Add or change a related_name argument '
+                            'to the definition for %s or %s.'
+                            % (field_name, clash_name),
+                        obj=self
+                    )
+                )
+
+        return errors
 
 
 class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
@@ -1214,71 +1331,6 @@ class ForeignObject(RelatedField):
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
-    def check(self, **kwargs):
-        errors = super(ForeignObject, self).check(**kwargs)
-        errors.extend(self._check_unique_target(**kwargs))
-        errors.extend(self._check_on_delete(**kwargs))
-        return errors
-
-    def _check_unique_target(self, **kwargs):
-        rel_is_string = isinstance(self.rel.to, six.string_types)
-        perform_check = self.requires_unique_target and not rel_is_string
-        if not perform_check:
-            return []
-
-        has_unique_field = any(rel_field.unique
-            for rel_field in self.foreign_related_fields)
-        if not has_unique_field and len(self.foreign_related_fields) > 1:
-            field_combination = ','.join(rel_field.name
-                for rel_field in self.foreign_related_fields)
-            model_name = self.rel.to.__name__
-            return [
-                checks.Error(
-                    'No unique=True constraint '
-                        'on field combination "%s" under model %s.'
-                        % (field_combination, model_name),
-                    hint='Set unique=True argument on any of the fields '
-                        '"%s" under model %s.'
-                        % (field_combination, model_name),
-                    obj=self,
-                )
-            ]
-        elif not has_unique_field:
-            field_name = self.foreign_related_fields[0].name
-            model_name = self.rel.to.__name__
-            return [
-                checks.Error(
-                    '%s.%s must have unique=True '
-                        'because it is referenced by a foreign key.'
-                        % (model_name, field_name),
-                    hint=None,
-                    obj=self,
-                )
-            ]
-        else:
-            return []
-
-    def _check_on_delete(self, **kwargs):
-        on_delete = getattr(self.rel, 'on_delete', None)
-        if on_delete == SET_NULL and not self.null:
-            return [
-                checks.Error(
-                    'The field specifies on_delete=SET_NULL, but cannot be null.',
-                    hint='Set null=True argument on the field.',
-                    obj=self,
-                )
-            ]
-        elif on_delete == SET_DEFAULT and not self.has_default():
-            return [
-                checks.Error(
-                    'The field specifies on_delete=SET_DEFAULT, but has no default value.',
-                    hint=None,
-                    obj=self,
-                )
-            ]
-        else:
-            return []
-
 
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
@@ -1440,6 +1492,71 @@ class ForeignKey(ForeignObject):
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
+
+    def check(self, **kwargs):
+        errors = super(ForeignObject, self).check(**kwargs)
+        errors.extend(self._check_unique_target())
+        errors.extend(self._check_on_delete())
+        return errors
+
+    def _check_unique_target(self):
+        rel_is_string = isinstance(self.rel.to, six.string_types)
+        perform_check = self.requires_unique_target and not rel_is_string
+        if not perform_check:
+            return []
+
+        has_unique_field = any(rel_field.unique
+            for rel_field in self.foreign_related_fields)
+        if not has_unique_field and len(self.foreign_related_fields) > 1:
+            field_combination = ','.join(rel_field.name
+                for rel_field in self.foreign_related_fields)
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    'No unique=True constraint '
+                        'on field combination "%s" under model %s.'
+                        % (field_combination, model_name),
+                    hint='Set unique=True argument on any of the fields '
+                        '"%s" under model %s.'
+                        % (field_combination, model_name),
+                    obj=self,
+                )
+            ]
+        elif not has_unique_field:
+            field_name = self.foreign_related_fields[0].name
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    '%s.%s must have unique=True '
+                        'because it is referenced by a foreign key.'
+                        % (model_name, field_name),
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
+
+    def _check_on_delete(self):
+        on_delete = getattr(self.rel, 'on_delete', None)
+        if on_delete == SET_NULL and not self.null:
+            return [
+                checks.Error(
+                    'The field specifies on_delete=SET_NULL, but cannot be null.',
+                    hint='Set null=True argument on the field.',
+                    obj=self,
+                )
+            ]
+        elif on_delete == SET_DEFAULT and not self.has_default():
+            return [
+                checks.Error(
+                    'The field specifies on_delete=SET_DEFAULT, but has no default value.',
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
 
 
 class OneToOneField(ForeignKey):

@@ -22,20 +22,28 @@ class IsolatedModelsTestCase(TestCase):
     tearDown = setUp
 
 
-class CharFieldTests(TestCase):
+class CharFieldTests(IsolatedModelsTestCase):
 
     def test_valid_field(self):
-        choices = [
-            ('1', 'item1'),
-            ('2', 'item2'),
-        ]
-        field = models.CharField(max_length=255, choices=choices, db_index=True)
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=255,
+                choices=[
+                    ('1', 'item1'),
+                    ('2', 'item2'),
+                ],
+                db_index=True)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = []
         self.assertEqual(errors, expected)
 
     def test_missing_max_length(self):
-        field = models.CharField()
+        class Model(models.Model):
+            field = models.CharField()
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -47,7 +55,10 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_negative_max_length(self):
-        field = models.CharField(max_length=-1)
+        class Model(models.Model):
+            field = models.CharField(max_length=-1)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -59,7 +70,10 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_bad_max_length_value(self):
-        field = models.CharField(max_length="bad")
+        class Model(models.Model):
+            field = models.CharField(max_length="bad")
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -71,7 +85,10 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_non_iterable_choices(self):
-        field = models.CharField(max_length=10, choices='bad')
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices='bad')
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -83,7 +100,10 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_choices_containing_non_pairs(self):
-        field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -97,7 +117,10 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_bad_db_index_value(self):
-        field = models.CharField(max_length=10, db_index='bad')
+        class Model(models.Model):
+            field = models.CharField(max_length=10, db_index='bad')
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -109,10 +132,13 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
 
-class DecimalFieldTests(TestCase):
+class DecimalFieldTests(IsolatedModelsTestCase):
 
     def test_required_attributes(self):
-        field = models.DecimalField()
+        class Model(models.Model):
+            field = models.DecimalField()
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -129,7 +155,10 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_negative_max_digits_and_decimal_places(self):
-        field = models.DecimalField(max_digits=-1, decimal_places=-1)
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=-1, decimal_places=-1)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -146,7 +175,10 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
-        field = models.DecimalField(max_digits="bad", decimal_places="bad")
+        class Model(models.Model):
+            field = models.DecimalField(max_digits="bad", decimal_places="bad")
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -163,7 +195,10 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_decimal_places_greater_than_max_digits(self):
-        field = models.DecimalField(max_digits=9, decimal_places=10)
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=9, decimal_places=10)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -178,7 +213,10 @@ class DecimalFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_valid_field(self):
-        field = models.DecimalField(max_digits=10, decimal_places=10)
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=10, decimal_places=10)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = []
         self.assertEqual(errors, expected)
@@ -481,9 +519,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Target(models.Model):
             bad = models.IntegerField()
 
-        # We don't need to attach the field to a model, because we pass Target
-        # model explicitly.
-        field = models.ForeignKey(Target, to_field='bad')
+        class Model(models.Model):
+            field = models.ForeignKey(Target, to_field='bad')
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -534,7 +573,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_nullable_primary_key(self):
-        field = models.IntegerField(primary_key=True, null=True)
+        class Model(models.Model):
+            field = models.IntegerField(primary_key=True, null=True)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -614,10 +656,13 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(errors, [expected_error])
 
 
-class FileFieldTests(TestCase):
+class FileFieldTests(IsolatedModelsTestCase):
 
     def test_missing_upload_to(self):
-        field = models.FileField()
+        class Model(models.Model):
+            field = models.FileField()
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -629,10 +674,13 @@ class FileFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
 
-class BooleanFieldTests(TestCase):
+class BooleanFieldTests(IsolatedModelsTestCase):
 
     def test_nullable_boolean_field(self):
-        field = models.BooleanField(null=True)
+        class Model(models.Model):
+            field = models.BooleanField(null=True)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -644,10 +692,13 @@ class BooleanFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
 
-class GenericIPAddressFieldTests(TestCase):
+class GenericIPAddressFieldTests(IsolatedModelsTestCase):
 
     def test_non_nullable_blank(self):
-        field = models.GenericIPAddressField(null=False, blank=True)
+        class Model(models.Model):
+            field = models.GenericIPAddressField(null=False, blank=True)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -660,10 +711,13 @@ class GenericIPAddressFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
 
-class FilePathFieldTests(TestCase):
+class FilePathFieldTests(IsolatedModelsTestCase):
 
     def test_forbidden_files_and_folders(self):
-        field = models.FilePathField(allow_files=False, allow_folders=False)
+        class Model(models.Model):
+            field = models.FilePathField(allow_files=False, allow_folders=False)
+
+        field = Model._meta.get_field('field')
         errors = field.check()
         expected = [
             Error(
@@ -675,7 +729,7 @@ class FilePathFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
 
-class BackendSpecificChecksTests(TestCase):
+class BackendSpecificChecksTests(IsolatedModelsTestCase):
 
     def test(self):
         error = Error('an error', hint=None)
@@ -686,13 +740,17 @@ class BackendSpecificChecksTests(TestCase):
         old_check_field = v.check_field
         v.check_field = MethodType(mock, v)
 
-        try:
+        class Model(models.Model):
             field = models.IntegerField()
+
+        field = Model._meta.get_field('field')
+        try:
             errors = field.check()
-            self.assertEqual(errors, [error])
         finally:
             # Unmock connection.validation.check_field method.
             v.check_field = old_check_field
+
+        self.assertEqual(errors, [error])
 
 
 class AccessorClashTests(IsolatedModelsTestCase):
