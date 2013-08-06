@@ -116,6 +116,8 @@ def url_params_from_lookup_dict(lookups):
     if lookups and hasattr(lookups, 'items'):
         items = []
         for k, v in lookups.items():
+            if callable(v):
+                v = v()
             if isinstance(v, (tuple, list)):
                 v = ','.join([str(x) for x in v])
             elif isinstance(v, bool):
