@@ -427,6 +427,49 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
+.. class:: cached_property(object)
+
+    ``@cached_property`` caches the result of a method with a single ``self``
+    argument as a property. It will persist as long as the instance does, so
+    when the instance is passed to the context and the function invoked, the
+    saved result will be returned.
+
+    Consider a typical case, where a view might need to call a model's method
+    to perform some computation, before placing the model instance into the
+    context, where the template might invoke the method once more::
+
+        # the model
+        class Person(models.Model):
+
+            def get_enemies(self):
+                # expensive computation
+                ...
+                return enemies
+            
+    
+        # in the view:
+        if person.get_enemies():
+
+
+        # in the template:
+        {% for enemy in person.get_enemies %}
+    
+    ``get_enemies()`` will be called twice. Since the instance ``person`` in
+    the view and the template are the same, ``@cached_property`` can avoid
+    that::
+    
+        @cached_property
+        def get_enemies(self):
+            # expensive computation
+            ...
+            return enemies   
+    
+    Note that as the method is now a property, in Python code it will need to
+    be invoked appropriately::
+    
+        # in the view:
+        if person.get_enemies:
+
 .. function:: allow_lazy(func, *resultclasses)
 
     Django offers many utility functions (particularly in ``django.utils``) that
