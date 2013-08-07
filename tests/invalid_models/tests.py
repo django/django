@@ -718,7 +718,7 @@ class FilePathFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                'The field must have either allow_files or allow_folders set to True.',
+                'The field must have either "allow_files" or "allow_folders" set to True.',
                 hint=None,
                 obj=field,
             ),
