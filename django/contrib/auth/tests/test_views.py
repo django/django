@@ -128,6 +128,25 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue("http://" in mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+        # optional multipart text/html email has been added.  Make sure original,
+        # default functionality is 100% the same
+        self.assertFalse(mail.outbox[0].message().is_multipart())
+
+    def test_html_mail_template(self):
+        """
+        A multipart email with text/plain and text/html is sent
+        if the html_email_template parameter is passed to the view
+        """
+        response = self.client.post('/password_reset/html_email_template/', {'email': 'staffmember@example.com'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0].message()
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
+        self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
+        self.assertTrue('<html>' not in message.get_payload(0).get_payload())
+        self.assertTrue('<html>' in message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
         "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."

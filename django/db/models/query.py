@@ -742,6 +742,7 @@ class QuerySet(object):
         # Default to false for nowait
         nowait = kwargs.pop('nowait', False)
         obj = self._clone()
+        obj._for_write = True
         obj.query.select_for_update = True
         obj.query.select_for_update_nowait = nowait
         return obj

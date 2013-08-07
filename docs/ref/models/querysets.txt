@@ -1924,7 +1924,7 @@ as_manager
 .. versionadded:: 1.7
 
 Class method that returns an instance of :class:`~django.db.models.Manager`
-with a copy of the ``QuerySet``'s methods. See
+with a copy of the ``QuerySet``’s methods. See
 :ref:`create-manager-with-queryset-methods` for more details.
 
 .. _field-lookups:

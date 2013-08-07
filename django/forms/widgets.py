@@ -840,6 +840,11 @@ class MultiWidget(Widget):
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
 
+    @property
+    def needs_multipart_form(self):
+        return any(w.needs_multipart_form for w in self.widgets)
+
+
 class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.

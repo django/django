@@ -118,6 +118,15 @@ Minor features
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
 
+* :func:`django.contrib.auth.views.password_reset` takes an optional
+  ``html_email_template_name`` parameter used to send a multipart HTML email
+  for password resets.
+
+* :class:`~django.forms.MultiValueField` allows optional subfields by setting
+  the ``require_all_fields`` argument to ``False``. The ``required`` attribute
+  for each individual field will be respected, and a new ``incomplete``
+  validation error will be raised when any required fields are empty.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -137,7 +146,7 @@ Miscellaneous
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
 
-* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`'s no longer
+* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`’s no longer
   delete instances when ``save(commit=False)`` is called. See
   :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
   to manually delete objects from deleted forms.

@@ -793,7 +793,7 @@ patterns.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email, current_app, extra_context])
+.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email, current_app, extra_context, html_email_template_name])
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
@@ -855,6 +855,14 @@ patterns.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    * ``html_email_template_name``: The full name of a template to use
+      for generating a ``text/html`` multipart email with the password reset
+      link. By default, HTML email is not sent.
+
+    .. versionadded:: 1.7
+
+        ``html_email_template_name`` was added.
 
     **Template context:**
 

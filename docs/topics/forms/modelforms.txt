@@ -392,7 +392,7 @@ these security concerns do not apply to you:
                model = Author
                fields = '__all__'
 
-2. Set the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class to
+2. Set the ``exclude`` attribute of the ``ModelForm``’s inner ``Meta`` class to
    a list of fields to be excluded from the form.
 
    For example::
@@ -757,7 +757,7 @@ Specifying widgets to use in the form with ``widgets``
 .. versionadded:: 1.6
 
 Using the ``widgets`` parameter, you can specify a dictionary of values to
-customize the ``ModelForm``'s widget class for a particular field. This
+customize the ``ModelForm``’s widget class for a particular field. This
 works the same way as the ``widgets`` dictionary on the inner ``Meta``
 class of a ``ModelForm`` works::
 

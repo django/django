@@ -193,7 +193,7 @@ Attributes
 ----------
 
 All attributes can be set in your derived class and can be used in
-:class:`BaseCommand`'s :ref:`subclasses<ref-basecommand-subclasses>`.
+:class:`BaseCommand`’s :ref:`subclasses<ref-basecommand-subclasses>`.
 
 .. attribute:: BaseCommand.args
 
@@ -267,7 +267,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. admonition:: Implementing a constructor in a subclass
 
   If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
-  you must call :class:`BaseCommand`'s ``__init__``.
+  you must call :class:`BaseCommand`’s ``__init__``.
 
   .. code-block:: python
 

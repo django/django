@@ -230,7 +230,7 @@ class PasswordResetForm(forms.Form):
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None):
+             from_email=None, request=None, html_email_template_name=None):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
@@ -263,7 +263,12 @@ class PasswordResetForm(forms.Form):
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
             email = loader.render_to_string(email_template_name, c)
-            send_mail(subject, email, from_email, [user.email])
+
+            if html_email_template_name:
+                html_email = loader.render_to_string(html_email_template_name, c)
+            else:
+                html_email = None
+            send_mail(subject, email, from_email, [user.email], html_message=html_email)
 
 
 class SetPasswordForm(forms.Form):

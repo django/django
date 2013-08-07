@@ -90,7 +90,7 @@ Django quotes column and table names behind the scenes.
 
     The name of an orderable field in the model, typically a :class:`DateField`,
     :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`'s
+    field to use in your model :class:`Manager`’s
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
