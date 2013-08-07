@@ -202,10 +202,7 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"max_digits" must be greater or equal to "decimal_places". '
-                    'Note how these arguments work: if you set '
-                    '"decimal_places" to 2 and you want to store numbers '
-                    'up to 999.99 then you need to set max_digits" to 5.',
+                '"max_digits" must be greater or equal to "decimal_places".',
                 hint=None,
                 obj=field,
             ),
