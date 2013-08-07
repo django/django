@@ -528,6 +528,11 @@ The permission_required decorator
     (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
     login page.
 
+    .. versionchanged:: 1.7
+
+        The :func:`~django.contrib.auth.decorators.permission_required`
+        decorator can take a list of permissions as well as a single permission.
+
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
