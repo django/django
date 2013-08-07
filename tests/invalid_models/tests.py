@@ -92,7 +92,7 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                '"choices" must be a list or tuple.',
+                '"choices" must be an iterable (e.g., a list or tuple).',
                 hint=None,
                 obj=field,
             ),

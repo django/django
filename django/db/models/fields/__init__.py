@@ -716,7 +716,7 @@ class Field(object):
                     not is_iterable(self.choices)):
                 return [
                     checks.Error(
-                        '"choices" must be a list or tuple.',
+                        '"choices" must be an iterable (e.g., a list or tuple).',
                         hint=None,
                         obj=self,
                     )
