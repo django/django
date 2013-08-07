@@ -44,17 +44,27 @@ class CommentNode(Node):
         return ''
 
 class CsrfTokenNode(Node):
+    def __init__(self, max_age_var=None, bare=False):
+        self.max_age_var = max_age_var
+        self.bare = bare
     def render(self, context):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+                max_age = None
+                if self.max_age_var:
+                    from django.middleware.csrf import get_token
+                    max_age = self.max_age_var.resolve(context)                    
+                    csrf_token = get_token(context.get('request'), max_age)
+                if self.bare:
+                    return format_html("{0}", csrf_token)
+                else:
+                    return format_html("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
-            from django.conf import settings
             if settings.DEBUG:
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
@@ -623,6 +633,45 @@ def cycle(parser, token, escape=False):
 
 @register.tag
 def csrf_token(parser, token):
+    """
+    Outputs a signed CSRF token. Takes an optional max_age for the CSRF token (in seconds),
+    which defaults to a setting.
+    
+    Can take an argument to specify the max-age of the generated token (i.e. when it expires),
+    and a "bare" flag to specify that the token is not to be wrapped in a hidden input field.
+    So:
+    
+        {% csrf_token %} 
+    or 
+        {% csrf_token 5000 %} 
+    
+    will render as
+    
+        <input type='hidden' name='csrfmiddlewaretoken' value='the_token' />
+    
+    and
+    
+        {% csrf_token bare %}
+    or 
+        {% csrf_token 5000 bare %} 
+
+    will render as
+    
+        the_token
+    
+    (this is useful for inclusion in scripts for use of AJAX calls with time-limited tokens)
+    """
+    args = token.split_contents()
+    bare = (args[-1]=='bare')
+    if bare:
+        del args[-1]
+    if len(args)==1:
+        return CsrfTokenNode(bare=bare)
+    if len(args)==2:
+        arg = parser.compile_filter(args[1])
+        return CsrfTokenNode(arg, bare)
+    else:
+        raise TemplateSyntaxError("'csrf_token' tag can take only one argument and/or the 'bare' flag.")
     return CsrfTokenNode()
 
 @register.tag

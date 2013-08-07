@@ -125,3 +125,33 @@ class TestTimestampSigner(TestCase):
                 signing.SignatureExpired, signer.unsign, ts, max_age=10)
         finally:
             time.time = _time
+
+class TestFutureTimestampSigner(TestCase):
+
+    def test_future_signer(self):
+        value = 'hello'
+        _time = time.time
+        time.time = lambda: 123456789
+        try:
+            fts11 = signing.FutureTimestampSigner('predictable-key', max_age=11)
+            fts12 = signing.FutureTimestampSigner('predictable-key', max_age=12)
+            signed11 = fts11.sign(value)
+            signed12 = fts12.sign(value)
+            timestamped = signing.TimestampSigner('predictable-key').sign(value)
+            just_signed = signing.Signer('predictable-key').sign(value)
+            signed_values = set([just_signed, timestamped, signed11, signed12])
+            self.assertEqual(len(signed_values), 4,
+                             "Values from different signers should be unique")
+
+            self.assertEqual(fts11.unsign(signed11), value)
+            self.assertEqual(fts12.unsign(signed12), value)
+            self.assertEqual(fts11.unsign(signed12), value)
+            self.assertEqual(fts12.unsign(signed11), value)
+            time.time = lambda: 123456801
+            for signer in (fts11, fts12, 
+                           signing.FutureTimestampSigner(key='predictable-key')):
+                self.assertEqual(signer.unsign(signed12), value)
+                self.assertRaises(signing.SignatureExpired, 
+                                  signer.unsign, signed11)
+        finally:
+            time.time = _time

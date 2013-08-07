@@ -548,6 +548,8 @@ CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 
+# Settings for CSRF token (which may be different from cookie)
+CSRF_TOKEN_MAX_AGE = None
 ############
 # MESSAGES #
 ############

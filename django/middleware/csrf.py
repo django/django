@@ -10,13 +10,14 @@ import logging
 import re
 
 from django.conf import settings
-from django.core.signing import get_cookie_signer, FutureTimestampSigner, BadSignature,\
+from django.core.signing import get_cookie_signer, FutureTimestampSignerMixin, BadSignature,\
     SignatureExpired
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
+from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_text, force_str
 from django.utils.http import same_origin
-from django.utils.crypto import constant_time_compare, get_random_string
+from django.utils.module_loading import import_by_path
 
 
 logger = logging.getLogger('django.request')
@@ -39,26 +40,29 @@ def _get_failure_view():
 def _get_new_csrf_key():
     return get_random_string(CSRF_KEY_LENGTH)
 
+_FutureTimestampSigner = None
+def get_token_signer(max_age=None,
+                     salt='django.middleware.csrf.get_token_signer'):
+    global _FutureTimestampSigner
+    if max_age is None:
+        max_age = settings.CSRF_TOKEN_MAX_AGE
+    if max_age is None:
+        return get_cookie_signer()
+    Signer = import_by_path(settings.SIGNING_BACKEND)
+    if not _FutureTimestampSigner:
+        class FutureTimestampSigner(FutureTimestampSignerMixin, Signer):
+            pass
+        _FutureTimestampSigner = FutureTimestampSigner
+    token_signer_key = 'django.csrf.token' + settings.SECRET_KEY
+    return _FutureTimestampSigner(key=token_signer_key, salt=salt, max_age=max_age)
 
-class _CSRFTokenSigner(FutureTimestampSigner):
-    """
-    Same as FutureTimestampSigner, except that the signature is appended as well as prepended
-    """
-    def sign(self, value):
-        signed = super(_CSRFTokenSigner, self).sign(value)
-        signed = force_str(signed)
-        _,signature = signed.rsplit(self.sep, 1)
-        return str("%s%s%s") % (signature, self.sep, signed)
-     
-    def unsign(self, signed_value):
-        signed_value = force_str(signed_value)
-        if not self.sep in signed_value:
-            raise BadSignature('No "%s" found in value' % self.sep)
-        prefix_sig, signed_value = signed_value.split(self.sep, 1)
-        _, suffix_sig = signed_value.rsplit(self.sep, 1)
-        if not constant_time_compare(prefix_sig, suffix_sig):
-            raise BadSignature("prefix and suffix signatures do not match")
-        return super(_CSRFTokenSigner, self).unsign(signed_value)
+
+def _get_signed_token(csrf_token, max_age=None):
+    signed_token = None
+    if csrf_token is not None:
+        signer = get_token_signer(max_age)
+        signed_token = signer.sign(csrf_token)
+    return signed_token
 
 def get_token(request, max_age=None):
     """
@@ -72,27 +76,26 @@ def get_token(request, max_age=None):
     """
     request.META["CSRF_COOKIE_USED"] = True
     csrf_token = request.META.get("CSRF_COOKIE", None)
-    if csrf_token is None:
-        return None
-    if max_age is None:
-        max_age = settings.CSRF_TOKEN_MAX_AGE
-    signer = _CSRFTokenSigner(max_age) if max_age else get_cookie_signer() 
-    signed_token = signer.sign(csrf_token)
+    signed_token = _get_signed_token(csrf_token, max_age)
     return signed_token
 
-def validate_token(request, request_csrf_token, csrf_token):
-    time_limited = request.META.get("CSRF_TIME_LIMITED", None)
-    signer = _CSRFTokenSigner() if time_limited else get_cookie_signer() 
+def validate_token(request_csrf_token, csrf_token, time_limited):
+    #print "validating: time-limited", bool(time_limited)
+    #print "validating: request-token", request_csrf_token
+    signer = get_token_signer(max_age=0 if time_limited else None) 
     try:
         request_token = signer.unsign(request_csrf_token)
-        if not constant_time_compare(request_token, csrf_token):
-            return REASON_BAD_TOKEN
-        else:
-            return None
     except SignatureExpired:
         return REASON_TOKEN_EXPIRED
     except BadSignature:
+        #print ("sig doesn't validate")
         return REASON_BAD_TOKEN
+    else:
+        if not constant_time_compare(request_token, csrf_token):
+            #print ("sig doesn't compare")
+            return REASON_BAD_TOKEN
+        else:
+            return None
 
 def rotate_token(request):
     """
@@ -104,7 +107,11 @@ def rotate_token(request):
 
 def _sanitize_token(token):
     # Check signature
-    token = get_cookie_signer().unsign(token)
+    try:
+        token = get_cookie_signer().unsign(token)
+    except BadSignature:
+        #print("bad cookie token", token)
+        return _get_new_csrf_key()
     # Allow only alphanum
     if len(token) > CSRF_KEY_LENGTH:
         return _get_new_csrf_key()
@@ -207,7 +214,7 @@ class CsrfViewMiddleware(object):
                 # and in this way we can avoid all CSRF attacks, including login
                 # CSRF.
                 return self._reject(request, REASON_NO_CSRF_COOKIE)
-
+            
             # Check non-cookie token for match.
             request_csrf_token = ""
             if request.method == "POST":
@@ -218,8 +225,12 @@ class CsrfViewMiddleware(object):
                 # and possible for PUT/DELETE.
                 request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
 
-            reason = validate_token(request_csrf_token, csrf_token)
+            time_limited = getattr(callback, 'csrf_time_limited', False) or \
+                           settings.CSRF_TOKEN_MAX_AGE is not None 
+                
+            reason = validate_token(request_csrf_token, csrf_token, time_limited)
             if reason:
+                #print reason
                 return self._reject(request, reason)
 
         return self._accept(request)
@@ -240,6 +251,8 @@ class CsrfViewMiddleware(object):
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
         signed_csrf_token = get_cookie_signer().sign(request.META["CSRF_COOKIE"])
+        #print "process_response:", settings.SIGNING_BACKEND, get_cookie_signer()
+        #print "process_response:", signed_csrf_token
         response.set_cookie(settings.CSRF_COOKIE_NAME,
                             signed_csrf_token,
                             max_age = 60 * 60 * 24 * 7 * 52,

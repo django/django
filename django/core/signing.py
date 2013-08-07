@@ -171,8 +171,7 @@ class Signer(object):
             return force_text(value)
         raise BadSignature('Signature "%s" does not match' % sig)
 
-
-class TimestampSigner(Signer):
+class TimestampSignerMixin(object):
 
     def timestamp(self):
         return baseconv.base62.encode(int(time.time()))
@@ -180,14 +179,14 @@ class TimestampSigner(Signer):
     def sign(self, value):
         value = force_str(value)
         value = str('%s%s%s') % (value, self.sep, self.timestamp())
-        return super(TimestampSigner, self).sign(value)
+        return super(TimestampSignerMixin, self).sign(value)
 
     def unsign(self, value, max_age=None):
         """
         Retrieve original value and check it wasn't signed more
         than max_age seconds ago.
         """
-        result =  super(TimestampSigner, self).unsign(value)
+        result =  super(TimestampSignerMixin, self).unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:
@@ -198,15 +197,26 @@ class TimestampSigner(Signer):
                     'Signature age %s > %s seconds' % (age, max_age))
         return value
 
-class FutureTimestampSigner(TimestampSigner):
-    
-    def __init__(self, max_age=0, *args, **kwargs):
+class TimestampSigner(TimestampSignerMixin, Signer): 
+    pass
+
+class FutureTimestampSignerMixin(TimestampSignerMixin):
+    """
+    This is the same as TimestampSignerMixin, except that
+    the expiration time is set at signing -- the timestamp
+    is set to the future, and the unsigning verifies that
+    it has not passed.
+    """
+    def __init__(self, key=None, sep=':', salt=None, max_age=0):
         # Default max_age=0 is useful if a signer is only used for unsigning
         self.max_age = max_age
-        super(FutureTimestampSigner, self).__init__(*args, **kwargs)
+        super(FutureTimestampSignerMixin, self).__init__(key=key, sep=sep, salt=salt)
         
     def timestamp(self):
         return baseconv.base62.encode(int(time.time())+self.max_age)
         
     def unsign(self, value):
-        return super(FutureTimestampSigner, self).unsign(value, 0)
+        return super(FutureTimestampSignerMixin, self).unsign(value, 0)
+
+class FutureTimestampSigner(FutureTimestampSignerMixin, Signer):
+    pass

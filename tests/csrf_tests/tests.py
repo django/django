@@ -5,11 +5,12 @@ import logging
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
+from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH, get_token
 from django.template import RequestContext, Template
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+from django.core.signing import get_cookie_signer
 
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
@@ -29,6 +30,24 @@ def token_view(request):
     """A view that uses {% csrf_token %}"""
     context = RequestContext(request, processors=[csrf])
     template = Template("{% csrf_token %}")
+    return HttpResponse(template.render(context))
+
+def timed_token_view(request):
+    """A view that uses {% csrf_token %} with a time limit"""
+    context = RequestContext(request, processors=[csrf])
+    template = Template("{% csrf_token 10 %}")
+    return HttpResponse(template.render(context))
+
+def bare_token_view(request):
+    """A view that uses a bare {% csrf_token %}"""
+    context = RequestContext(request, processors=[csrf])
+    template = Template("{% csrf_token bare %}")
+    return HttpResponse(template.render(context))
+
+def bare_timed_token_view(request):
+    """A view that uses a bare {% csrf_token %} with a time limit"""
+    context = RequestContext(request, processors=[csrf])
+    template = Template("{% csrf_token 10 bare %}")
     return HttpResponse(template.render(context))
 
 def non_token_view_using_request_processor(request):
@@ -58,7 +77,8 @@ class CsrfViewMiddlewareTest(TestCase):
 
     def _get_GET_csrf_cookie_request(self):
         req = TestingHttpRequest()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie
+        self._get_valid_token()
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = self.csrf_cookie
         return req
 
     def _get_POST_csrf_cookie_request(self):
@@ -79,6 +99,19 @@ class CsrfViewMiddlewareTest(TestCase):
     def _check_token_present(self, response, csrf_id=None):
         self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
 
+    def _get_valid_token(self):
+        req = self._get_GET_no_csrf_cookie_request()
+        CsrfViewMiddleware().process_view(req, token_view, (), {})
+        resp = token_view(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        self.csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME).value
+        self.csrf_token = self.csrf_cookie.split(":",1)[0]
+        self._csrf_id = self.csrf_cookie
+        return self._csrf_id
+
+    def _token_from_cookie(self, cookie):
+        return cookie
+    
     def test_process_view_token_too_long(self):
         """
         Check that if the token is longer than expected, it is ignored and
@@ -90,7 +123,8 @@ class CsrfViewMiddlewareTest(TestCase):
         resp = token_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
-        self.assertEqual(len(csrf_cookie.value), CSRF_KEY_LENGTH)
+        csrf_token = get_cookie_signer().unsign(csrf_cookie.value)
+        self.assertEqual(len(csrf_token), CSRF_KEY_LENGTH)
 
     def test_process_response_get_token_used(self):
         """
@@ -269,7 +303,7 @@ class CsrfViewMiddlewareTest(TestCase):
         resp = token_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies[settings.CSRF_COOKIE_NAME]
-        self._check_token_present(resp, csrf_id=csrf_cookie.value)
+        self._check_token_present(resp, csrf_id=self._token_from_cookie(csrf_cookie.value))
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_bad_referer(self):
@@ -380,3 +414,33 @@ class CsrfViewMiddlewareTest(TestCase):
         finally:
             logger.removeHandler(test_handler)
             logger.setLevel(old_log_level)
+
+class CsrfMaxAgeTest(CsrfViewMiddlewareTest):
+
+    """
+    Repeat the same tests mostly, but with max_age set
+    """
+    def setUp(self):
+        self.temp_settings = self.settings(CSRF_TOKEN_MAX_AGE=1800)
+        self.temp_settings.enable()
+        
+    def tearDown(self):
+        self.temp_settings.disable()
+        
+    def _get_valid_token(self):
+        from django.middleware.csrf import _get_signed_token
+        super(CsrfMaxAgeTest, self)._get_valid_token()
+        self._csrf_id = _get_signed_token(self.csrf_token)
+        #print "In max age"
+        #print "Key:\t", self.csrf_token
+        #print "Cookie:\t", self.csrf_cookie
+        #print "Token:\t", self._csrf_id
+        return self._csrf_id
+
+    def _token_from_cookie(self, cookie):
+        # TODO: This can turn out to be timing-sensitive -- that is,
+        # if tests run so slow that this is called on a different
+        # second from the call to render the tag, we will get intermittent
+        # failures.
+        from django.middleware.csrf import _get_signed_token
+        return _get_signed_token(cookie.split(":",1)[0])
