@@ -883,6 +883,9 @@ are converted to lowercase.
     ``192.0.2.1``. Default is disabled. Can only be used
     when ``protocol`` is set to ``'both'``.
 
+If you allow for blank values, you have to allow for null values since blank
+values are stored as null.
+
 ``NullBooleanField``
 --------------------
 
