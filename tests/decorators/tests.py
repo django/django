@@ -1,5 +1,7 @@
 from functools import wraps
 
+from django.contrib.auth import models
+from django.test.client import RequestFactory
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
@@ -11,7 +13,7 @@ from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
-
+from django.core.exceptions import PermissionDenied
 
 def fully_decorated(request):
     """Expected __doc__"""
@@ -248,3 +250,41 @@ class XFrameOptionsDecoratorsTests(TestCase):
         # the middleware's functionality, let's make sure it actually works...
         r = XFrameOptionsMiddleware().process_response(req, resp)
         self.assertEqual(r.get('X-Frame-Options', None), None)
+
+class PermissionsRequiredDecoratorTest(TestCase):
+    """
+    Tests for the permission_required decorator
+    """
+    def setUp(self):
+        self.user = models.User.objects.db_manager('other').create_user(username='joe', password='qwerty')
+        self.factory = RequestFactory()
+        # Add permissions shared_models.add_tag and shared_models.change_tag
+        self.user.user_permissions.add(1, 2)
+
+    def test_many_permissions_pass(self):
+
+        @permission_required(['shared_models.add_tag', 'shared_models.change_tag'], raise_exception=True)
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+        
+        @permission_required('shared_models.add_tag')
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+        
+        @permission_required(['shared_models.add_tag', 'shared_models.change_tag', 'non-existant-permission'])
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 302)
+
+        

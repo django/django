@@ -72,4 +72,15 @@ def permission_required(perm, login_url=None, raise_exception=False):
             raise PermissionDenied
         # As the last resort, show the login form
         return False
-    return user_passes_test(check_perms, login_url=login_url)
+    
+    def check_many_perms(user):
+        if user.has_perms(perm):
+            return True
+        if raise_exception:
+            raise PermissionDenied
+        return False
+
+    if isinstance(perm, list):
+        return user_passes_test(check_many_perms, login_url=login_url)
+    else:
+        return user_passes_test(check_perms, login_url=login_url)
