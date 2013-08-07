@@ -194,6 +194,11 @@ Miscellaneous
   removes the ability for visitors to generate spurious HTTP 500 errors by
   requesting static files that don't exist or haven't been collected yet.
 
+* The :meth:`django.db.models.Model.__eq__` method is now defined in a
+  way where instances of a proxy model and its base model are considered
+  equal when primary keys match. Previously only instances of exact same
+  class were considered equal on primary key match.
+
 Features deprecated in 1.7
 ==========================
 
