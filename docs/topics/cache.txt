@@ -19,21 +19,13 @@ That's where optimization and caching come in.
 **Optimization** can include caching, but it's the general process of
 re-configuring and re-writing code and software systems so that they work more
 efficiently - faster, and consuming fewer resources - while perfoming the same
-function.
+function. 
 
-Django offers some readily-available tools to help optimize your code.
+Django offers some readily-available tools to help optimize the performance of
+your code.
 
-To **cache** something is to save the result of an expensive calculation so that
-you don't have to perform the calculation next time. Here's some pseudocode
-explaining how this would work for a dynamically generated Web page::
-
-    given a URL, try finding that page in the cache
-    if the page is in the cache:
-        return the cached page
-    else:
-        generate the page
-        save the generated page in the cache (for next time)
-        return the generated page
+**Caching** saves the result of an expensive calculation so that you don't have
+to perform the calculation next time. 
 
 General optimization tools
 ==========================
@@ -41,7 +33,7 @@ General optimization tools
 Middleware
 ----------
 
-Django comes with a few other pieces of middleware that can help optimize your
+Django comes with a few pieces of middleware that can help optimize your
 site's performance:
 
 * :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
@@ -55,10 +47,11 @@ site's performance:
 Order of MIDDLEWARE_CLASSES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use caching middleware, it's important to put each half in the right
-place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
-middleware needs to know which headers by which to vary the cache storage.
-Middleware always adds something to the ``Vary`` response header when it can.
+If you use caching middleware - see `The per-site cache`_ below - it's
+important to put each half in the right place within the
+:setting:`MIDDLEWARE_CLASSES` setting. That's because the cache middleware
+needs to know which headers by which to vary the cache storage. Middleware
+always adds something to the ``Vary`` response header when it can.
 
 ``UpdateCacheMiddleware`` runs during the response phase, where middleware is
 run in reverse order, so an item at the top of the list runs *last* during the
@@ -94,10 +87,22 @@ Django's cache framework
 ========================
 
 Django comes with a robust cache system that lets you save dynamic pages so
-they don't have to be calculated for each request. For convenience, Django
-offers different levels of cache granularity: You can cache the output of
-specific views, you can cache only the pieces that are difficult to produce,
-or you can cache your entire site.
+they don't have to be calculated for each request. 
+
+Here's some pseudocode explaining how caching would work for a dynamically
+generated Web page::
+
+    given a URL, try finding that page in the cache
+    if the page is in the cache:
+        return the cached page
+    else:
+        generate the page
+        save the generated page in the cache (for next time)
+        return the generated page
+
+In fact, Django offers different levels of cache granularity: You can cache the
+output of specific views, you can cache only the pieces that are difficult to
+produce, or you can cache your entire site.
 
 Django also works well with "upstream" caches, such as `Squid
 <http://www.squid-cache.org>`_ and browser-based caches. These are the types of
@@ -493,7 +498,7 @@ entire site. You'll need to add
 
     No, that's not a typo: the "update" middleware must be first in the list,
     and the "fetch" middleware must be last. The details are a bit obscure, but
-    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
+    see `Order of MIDDLEWARE_CLASSES`_ above if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 

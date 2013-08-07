@@ -449,6 +449,11 @@ Atom1Feed
 
 .. class:: cached_property(object)
 
+    ``@cached_property`` caches the result of a method with a single ``self``
+    argument as a property. It will persist as long as the instance does, so
+    when the instance is passed to the context and the function invoked, the
+    saved result will be returned.
+
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
     context, where the template might invoke the method once more::
@@ -477,12 +482,7 @@ Atom1Feed
         def get_enemies(self):
             # expensive computation
             ...
-            return enemies
-    
-    ``@cached_property`` caches the result of a method with a single ``self``
-    argument as a property. It will persist as long as the instance does, so
-    when the instance is passed to the context and the function invoked, the
-    saved result will be returned.
+            return enemies   
     
     Note that as the method is now a property, in Python code it will need to
     be invoked appropriately::
