@@ -362,6 +362,9 @@ class ProxyModelTests(TestCase):
         p = MyPerson.objects.get(pk=100)
         self.assertEqual(p.name, 'Elvis Presley')
 
+    def test_eq(self):
+        self.assertEqual(MyPerson(id=100), Person(id=100))
+
 
 class ProxyModelAdminTests(TestCase):
     fixtures = ['myhorses']
