@@ -744,8 +744,7 @@ class Field(object):
             return [
                 checks.Error(
                     '"db_index" must be either None, True or False.',
-                    hint='Set "db_index" to False or True '
-                        'or remove this optional argument.',
+                    hint=None,
                     obj=self
                 )
             ]
