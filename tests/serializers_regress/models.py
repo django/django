@@ -115,6 +115,7 @@ class NaturalKeyAnchor(models.Model):
     objects = NaturalKeyAnchorManager()
 
     data = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=100, null=True)
 
     def natural_key(self):
         return (self.data,)
@@ -277,17 +278,3 @@ class LengthModel(models.Model):
 
     def __len__(self):
         return self.data
-
-#Tests for natural keys.
-class BookManager(models.Manager):
-    def get_by_natural_key(self, isbn13):
-        return self.get(isbn13=isbn13)
-
-class Book(models.Model):
-    isbn13 = models.CharField(max_length=14)
-    title = models.CharField(max_length=100)
-
-    objects = BookManager()
-
-    def natural_key(self):
-        return (self.isbn13,)

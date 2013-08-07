@@ -41,7 +41,7 @@ from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, 
     AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
     ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel,
     ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel,
-    NaturalKeyAnchor, FKDataNaturalKey, Book)
+    NaturalKeyAnchor, FKDataNaturalKey)
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -524,17 +524,17 @@ def streamTest(format, self):
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
 def naturalKeyTest(format, self):
-    book1 = {'isbn13': '978-1590597255', 'title': 'The Definitive Guide to '
+    book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
              'Django: Web Development Done Right'}
-    book2 = {'isbn13':'978-1590599969', 'title': 'Practical Django Projects'}
+    book2 = {'data':'978-1590599969', 'title': 'Practical Django Projects'}
 
     # Create the books.
-    adrian = Book.objects.create(**book1)
-    james = Book.objects.create(**book2)
+    adrian = NaturalKeyAnchor.objects.create(**book1)
+    james = NaturalKeyAnchor.objects.create(**book2)
 
     # Serialize the books.
-    string_data = serializers.serialize(format, Book.objects.all(), indent=2,
-                                        use_natural_foreign_keys=True,
+    string_data = serializers.serialize(format, NaturalKeyAnchor.objects.all(),
+                                        indent=2, use_natural_foreign_keys=True,
                                         use_natural_primary_keys=True)
 
     # Delete one book (to prove that the natural key generation will only
