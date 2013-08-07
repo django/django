@@ -1,5 +1,5 @@
 ========================
-Django's cache framework
+Optimization and caching
 ========================
 
 A fundamental trade-off in dynamic Web sites is, well, they're dynamic. Each
@@ -14,11 +14,83 @@ applications aren't washingtonpost.com or slashdot.org; they're simply small-
 to medium-sized sites with so-so traffic. But for medium- to high-traffic
 sites, it's essential to cut as much overhead as possible.
 
-That's where caching comes in.
+That's where optimization and caching come in.
 
-To cache something is to save the result of an expensive calculation so that
-you don't have to perform the calculation next time. Here's some pseudocode
-explaining how this would work for a dynamically generated Web page::
+**Optimization** can include caching, but it's the general process of
+re-configuring and re-writing code and software systems so that they work more
+efficiently - faster, and consuming fewer resources - while perfoming the same
+function. 
+
+Django offers some readily-available tools to help optimize the performance of
+your code.
+
+**Caching** saves the result of an expensive calculation so that you don't have
+to perform the calculation next time. 
+
+General optimization tools
+==========================
+
+Middleware
+----------
+
+Django comes with a few pieces of middleware that can help optimize your
+site's performance:
+
+* :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
+  modern browsers, saving bandwidth and transfer time.
+
+* :class:`django.middleware.http.ConditionalGetMiddleware` adds support for
+  modern browsers to conditionally GET responses based on the ``ETag``
+  and ``Last-Modified`` headers.
+
+
+Order of MIDDLEWARE_CLASSES
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use caching middleware - see `The per-site cache`_ below - it's
+important to put each half in the right place within the
+:setting:`MIDDLEWARE_CLASSES` setting. That's because the cache middleware
+needs to know which headers by which to vary the cache storage. Middleware
+always adds something to the ``Vary`` response header when it can.
+
+``UpdateCacheMiddleware`` runs during the response phase, where middleware is
+run in reverse order, so an item at the top of the list runs *last* during the
+response phase. Thus, you need to make sure that ``UpdateCacheMiddleware``
+appears *before* any other middleware that might add something to the ``Vary``
+header. The following middleware modules do so:
+
+* ``SessionMiddleware`` adds ``Cookie``
+* ``GZipMiddleware`` adds ``Accept-Encoding``
+* ``LocaleMiddleware`` adds ``Accept-Language``
+
+``FetchFromCacheMiddleware``, on the other hand, runs during the request phase,
+where middleware is applied first-to-last, so an item at the top of the list
+runs *first* during the request phase. The ``FetchFromCacheMiddleware`` also
+needs to run after other middleware updates the ``Vary`` header, so
+``FetchFromCacheMiddleware`` must be *after* any item that does so.
+
+Decorators
+----------
+
+:class:`django.utils.functional.cached_property`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's common to have to call a class instances's method more than once. If
+that function is expensive, then doing so is wasteful. 
+
+Using the ``@cached_property`` decorator saves the value returned by a
+property; the next time the function is called on that instance, it will return
+the saved value rather than re-computing it.
+
+
+Django's cache framework
+========================
+
+Django comes with a robust cache system that lets you save dynamic pages so
+they don't have to be calculated for each request. 
+
+Here's some pseudocode explaining how caching would work for a dynamically
+generated Web page::
 
     given a URL, try finding that page in the cache
     if the page is in the cache:
@@ -28,11 +100,9 @@ explaining how this would work for a dynamically generated Web page::
         save the generated page in the cache (for next time)
         return the generated page
 
-Django comes with a robust cache system that lets you save dynamic pages so
-they don't have to be calculated for each request. For convenience, Django
-offers different levels of cache granularity: You can cache the output of
-specific views, you can cache only the pieces that are difficult to produce,
-or you can cache your entire site.
+In fact, Django offers different levels of cache granularity: You can cache the
+output of specific views, you can cache only the pieces that are difficult to
+produce, or you can cache your entire site.
 
 Django also works well with "upstream" caches, such as `Squid
 <http://www.squid-cache.org>`_ and browser-based caches. These are the types of
@@ -42,7 +112,7 @@ HTTP headers) about which parts of your site should be cached, and how.
 .. _setting-up-the-cache:
 
 Setting up the cache
-====================
+--------------------
 
 The cache system requires a small amount of setup. Namely, you have to tell it
 where your cached data should live -- whether in a database, on the filesystem
@@ -56,7 +126,7 @@ settings file. Here's an explanation of all available values for
 .. _memcached:
 
 Memcached
----------
+~~~~~~~~~
 
 By far the fastest, most efficient type of cache available to Django,
 Memcached__ is an entirely memory-based cache framework originally developed to
@@ -157,7 +227,7 @@ particularly temporary.
 .. _database-caching:
 
 Database caching
-----------------
+~~~~~~~~~~~~~~~~
 
 To use a database table as your cache backend, first create a cache table in
 your database by running this command::
@@ -190,7 +260,7 @@ settings file. You can't use a different database backend for your cache table.
 Database caching works best if you've got a fast, well-indexed database server.
 
 Database caching and multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you use database caching with multiple databases, you'll also need
 to set up routing instructions for your database cache table. For the
@@ -233,7 +303,7 @@ to worry about providing routing instructions for the database cache
 model.
 
 Filesystem caching
-------------------
+~~~~~~~~~~~~~~~~~~
 
 To store cached items on a filesystem, use
 ``"django.core.cache.backends.filebased.FileBasedCache"`` for
@@ -273,7 +343,7 @@ cache data saved in a serialized ("pickled") format, using Python's ``pickle``
 module. Each file's name is the cache key, escaped for safe filesystem use.
 
 Local-memory caching
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 If you want the speed advantages of in-memory caching but don't have the
 capability of running Memcached, consider the local-memory cache backend. This
@@ -300,7 +370,7 @@ cache isn't particularly memory-efficient, so it's probably not a good choice
 for production environments. It's nice for development.
 
 Dummy caching (for development)
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, Django comes with a "dummy" cache that doesn't actually cache -- it
 just implements the cache interface without doing anything.
@@ -317,7 +387,7 @@ activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
     }
 
 Using a custom cache backend
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While Django includes support for a number of cache backends out-of-the-box,
 sometimes you might want to use a customized cache backend. To use an external
@@ -339,7 +409,7 @@ them, you should stick to the cache backends included with Django. They've
 been well-tested and are easy to use.
 
 Cache arguments
----------------
+~~~~~~~~~~~~~~~
 
 In addition to the defining the engine and name of the each cache
 backend, each cache backend can be given additional arguments to
@@ -414,7 +484,7 @@ Invalid arguments are silently ignored, as are invalid values of known
 arguments.
 
 The per-site cache
-==================
+------------------
 
 Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
@@ -432,7 +502,7 @@ entire site. You'll need to add
 
     No, that's not a typo: the "update" middleware must be first in the list,
     and the "fetch" middleware must be last. The details are a bit obscure, but
-    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
+    see `Order of MIDDLEWARE_CLASSES`_ above if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 
@@ -487,7 +557,7 @@ Cache keys also include the active :term:`language <language code>` when
 __ `Controlling cache: Using other headers`_
 
 The per-view cache
-==================
+------------------
 
 .. function:: django.views.decorators.cache.cache_page
 
@@ -544,7 +614,7 @@ a ``key_prefix``, you will get all the settings of the requested cache
 alias, but with the key_prefix overridden.
 
 Specifying per-view cache in the URLconf
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The examples in the previous section have hard-coded the fact that the view is
 cached, because ``cache_page`` alters the ``my_view`` function in place. This
@@ -573,7 +643,7 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
 .. templatetag:: cache
 
 Template fragment caching
-=========================
+-------------------------
 
 If you're after even more control, you can also cache template fragments using
 the ``cache`` template tag. To give your template access to this tag, put
@@ -655,7 +725,7 @@ a cached item, for example:
 
 
 The low-level cache API
-=======================
+-----------------------
 
 .. highlight:: python
 
@@ -677,7 +747,7 @@ can be pickled; refer to the Python documentation for more information about
 pickling.)
 
 Accessing the cache
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. function:: django.core.cache.get_cache(backend, **kwargs)
 
@@ -697,7 +767,7 @@ If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
 
 
 Basic usage
------------
+~~~~~~~~~~~
 
 The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
 
@@ -818,7 +888,7 @@ the cache backend.
 .. _cache_key_prefixing:
 
 Cache key prefixing
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 If you are sharing a cache instance between servers, or between your
 production and development environments, it's possible for data cached
@@ -838,7 +908,7 @@ collisions in cache values.
 .. _cache_versioning:
 
 Cache versioning
-----------------
+~~~~~~~~~~~~~~~~
 
 When you change running code that uses cached values, you may need to
 purge any existing cached values. The easiest way to do this is to
@@ -885,7 +955,7 @@ keys unaffected. Continuing our previous example::
 .. _cache_key_transformation:
 
 Cache key transformation
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 As described in the previous two sections, the cache key provided by a
 user is not used verbatim -- it is combined with the cache prefix and
@@ -905,7 +975,7 @@ specifies a dotted-path to a function matching the prototype of
 be used instead of the default key combining function.
 
 Cache key warnings
-------------------
+~~~~~~~~~~~~~~~~~~
 
 Memcached, the most commonly-used production cache backend, does not allow
 cache keys longer than 250 characters or containing whitespace or control
@@ -942,7 +1012,7 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
 Upstream caches
-===============
+---------------
 
 So far, this document has focused on caching your *own* data. But another type
 of caching is relevant to Web development, too: caching performed by "upstream"
@@ -986,7 +1056,7 @@ pages. We'll look at some of these headers in the sections that follow.
 .. _using-vary-headers:
 
 Using Vary headers
-==================
+------------------
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
@@ -1066,7 +1136,7 @@ For more on Vary headers, see the `official Vary spec`_.
 .. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
 
 Controlling cache: Using other headers
-======================================
+--------------------------------------
 
 Other problems with caching are the privacy of data and the question of where
 data should be stored in a cascade of caches.
@@ -1165,39 +1235,3 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Other optimizations
-===================
-
-Django comes with a few other pieces of middleware that can help optimize your
-site's performance:
-
-* ``django.middleware.http.ConditionalGetMiddleware`` adds support for
-  modern browsers to conditionally GET responses based on the ``ETag``
-  and ``Last-Modified`` headers.
-
-* :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
-  modern browsers, saving bandwidth and transfer time.
-
-Order of MIDDLEWARE_CLASSES
-===========================
-
-If you use caching middleware, it's important to put each half in the right
-place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
-middleware needs to know which headers by which to vary the cache storage.
-Middleware always adds something to the ``Vary`` response header when it can.
-
-``UpdateCacheMiddleware`` runs during the response phase, where middleware is
-run in reverse order, so an item at the top of the list runs *last* during the
-response phase. Thus, you need to make sure that ``UpdateCacheMiddleware``
-appears *before* any other middleware that might add something to the ``Vary``
-header. The following middleware modules do so:
-
-* ``SessionMiddleware`` adds ``Cookie``
-* ``GZipMiddleware`` adds ``Accept-Encoding``
-* ``LocaleMiddleware`` adds ``Accept-Language``
-
-``FetchFromCacheMiddleware``, on the other hand, runs during the request phase,
-where middleware is applied first-to-last, so an item at the top of the list
-runs *first* during the request phase. The ``FetchFromCacheMiddleware`` also
-needs to run after other middleware updates the ``Vary`` header, so
-``FetchFromCacheMiddleware`` must be *after* any item that does so.
