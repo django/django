@@ -127,6 +127,11 @@ Minor features
   for each individual field will be respected, and a new ``incomplete``
   validation error will be raised when any required fields are empty.
 
+* The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`
+  options for :djadmin:`dumpdata`, and the new ``use_natural_foreign_keys`` and
+  ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
+  the use of natural primary keys when serializing.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -161,6 +166,13 @@ Miscellaneous
   your root URLconf, which in turn makes it safe to reverse by name. It also
   removes the ability for visitors to generate spurious HTTP 500 errors by
   requesting static files that don't exist or haven't been collected yet.
+
+* The :djadminopt:`--natural` and :djadminopt:`-n` options for
+  :djadmin:`dumpdata` have been deprecated. Use :djadminopt:`--natural-foreign`
+  instead.
+
+* The ``use_natural_keys`` argument for ``serializers.serialize()`` has been
+  deprecated. Use ``use_natural_foreign_keys`` instead.
 
 Features deprecated in 1.7
 ==========================
