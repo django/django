@@ -147,7 +147,7 @@ class DecimalFieldTests(IsolatedModelsTestCase):
                 obj=field,
             ),
             Error(
-                'The field requires "max_digits" attribute.',
+                'The field requires a "max_digits" attribute.',
                 hint=None,
                 obj=field,
             ),
