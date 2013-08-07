@@ -8,6 +8,7 @@ a string) and returns a tuple in this format:
 """
 from __future__ import unicode_literals
 
+from importlib import import_module
 import re
 from threading import local
 
@@ -17,7 +18,6 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import memoize, lazy
 from django.utils.http import urlquote
-from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
 from django.utils import six
@@ -75,8 +75,7 @@ class Resolver404(Http404):
     pass
 
 class NoReverseMatch(Exception):
-    # Don't make this raise an error when used in a template.
-    silent_variable_failure = True
+    pass
 
 def get_callable(lookup_view, can_fail=False):
     """
@@ -360,6 +359,9 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
+    def resolve400(self):
+        return self._resolve_special('400')
+
     def resolve403(self):
         return self._resolve_special('403')
 
@@ -420,8 +422,11 @@ class RegexURLResolver(LocaleRegexProvider):
             lookup_view_s = "%s.%s" % (m, n)
         else:
             lookup_view_s = lookup_view
+
+        patterns = [pattern for (possibility, pattern, defaults) in possibilities]
         raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
-                "arguments '%s' not found." % (lookup_view_s, args, kwargs))
+                "arguments '%s' not found. %d pattern(s) tried: %s" %
+                             (lookup_view_s, args, kwargs, len(patterns), patterns))
 
 class LocaleRegexURLResolver(RegexURLResolver):
     """

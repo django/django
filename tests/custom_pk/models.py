@@ -6,7 +6,7 @@ By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.db import models
 

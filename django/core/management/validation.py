@@ -51,6 +51,10 @@ def get_validation_errors(outfile, app=None):
 
         # If this is the current User model, check known validation problems with User models
         if settings.AUTH_USER_MODEL == '%s.%s' % (opts.app_label, opts.object_name):
+            # Check that REQUIRED_FIELDS is a list
+            if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
+                e.add(opts, 'The REQUIRED_FIELDS must be a list or tuple.')
+
             # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
             if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
                 e.add(opts, 'The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.')
@@ -105,25 +109,23 @@ def get_validation_errors(outfile, app=None):
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
-                # Try to import PIL in either of the two ways it can end up installed.
                 try:
-                    from PIL import Image
+                    from django.utils.image import Image
                 except ImportError:
-                    try:
-                        import Image
-                    except ImportError:
-                        e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
+                    e.add(opts, '"%s": To use ImageFields, you need to install Pillow. Get it at https://pypi.python.org/pypi/Pillow.' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
                 e.add(opts, '"%s": BooleanFields do not accept null values. Use a NullBooleanField instead.' % f.name)
             if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
                 e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
+            if isinstance(f, models.GenericIPAddressField) and not getattr(f, 'null', False) and getattr(f, 'blank', False):
+                e.add(opts, '"%s": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.' % f.name)
             if f.choices:
                 if isinstance(f.choices, six.string_types) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
-                        if not isinstance(c, (list, tuple)) or len(c) != 2:
-                            e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
+                        if isinstance(c, six.string_types) or not is_iterable(c) or len(c) != 2:
+                            e.add(opts, '"%s": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 

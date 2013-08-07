@@ -6,11 +6,11 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import decimal
-from django.core.serializers.xml_serializer import DTDForbidden
+from unittest import expectedFailure, skipUnless
 
 try:
     import yaml
@@ -20,13 +20,13 @@ except ImportError:
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import DeserializationError
+from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import curry
-from django.utils.unittest import skipUnless
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
@@ -458,6 +458,11 @@ def serializerTest(format, self):
     # same as the number that was serialized.
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
+
+if connection.vendor == 'mysql' and six.PY3:
+    # Existing MySQL DB-API drivers fail on binary data.
+    serializerTest = expectedFailure(serializerTest)
+
 
 def naturalKeySerializerTest(format, self):
     # Create all the objects defined in the test data

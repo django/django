@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import errno
 import os
@@ -7,6 +7,11 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
+try:
+    from urllib.request import urlopen
+except ImportError:     # Python 2
+    from urllib2 import urlopen
 import zlib
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -22,23 +27,15 @@ from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
-from django.test import SimpleTestCase
+from django.test import LiveServerTestCase, SimpleTestCase
 from django.utils import six
-from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
-from servers.tests import LiveServerBase
 
-# Try to import PIL in either of the two ways it can end up installed.
-# Checking for the existence of Image is enough for CPython, but
-# for PyPy, you need to check for the underlying modules
 try:
-    from PIL import Image, _imaging
-except ImportError:
-    try:
-        import Image, _imaging
-    except ImportError:
-        Image = None
+    from django.utils.image import Image
+except ImproperlyConfigured:
+    Image = None
 
 
 class GetStorageClassTests(SimpleTestCase):
@@ -367,6 +364,14 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
 
+    def test_delete_no_name(self):
+        """
+        Calling delete with an empty name should not try to remove the base
+        storage directory, but fail loudly (#20660).
+        """
+        with self.assertRaises(AssertionError):
+            self.storage.delete('')
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
@@ -494,7 +499,7 @@ class DimensionClosingBug(unittest.TestCase):
     """
     Test that get_image_dimensions() properly closes files (#8817)
     """
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_not_closing_of_files(self):
         """
         Open files passed into get_image_dimensions() should stay opened.
@@ -505,7 +510,7 @@ class DimensionClosingBug(unittest.TestCase):
         finally:
             self.assertTrue(not empty_io.closed)
 
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_closing_of_filenames(self):
         """
         get_image_dimensions() called with a filename should closed the file.
@@ -542,7 +547,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     Test that get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_multiple_calls(self):
         """
         Multiple calls of get_image_dimensions() should return the same size.
@@ -556,7 +561,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
-    @unittest.skipUnless(Image, "PIL not installed")
+    @unittest.skipUnless(Image, "Pillow/PIL not installed")
     def test_bug_19457(self):
         """
         Regression test for #19457
@@ -594,11 +599,11 @@ class ContentFileTestCase(unittest.TestCase):
         Test that ContentFile can accept both bytes and unicode and that the
         retrieved content is of the same type.
         """
-        self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
+        self.assertIsInstance(ContentFile(b"content").read(), bytes)
         if six.PY3:
-            self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+            self.assertIsInstance(ContentFile("español").read(), six.text_type)
         else:
-            self.assertTrue(isinstance(ContentFile("español").read(), bytes))
+            self.assertIsInstance(ContentFile("español").read(), bytes)
 
     def test_content_saving(self):
         """
@@ -619,10 +624,15 @@ class NoNameFileTestCase(unittest.TestCase):
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
 
-class FileLikeObjectTestCase(LiveServerBase):
+
+class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
+
+    available_apps = []
+    urls = 'file_storage.urls'
+
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(location=self.temp_dir)
@@ -634,12 +644,10 @@ class FileLikeObjectTestCase(LiveServerBase):
         """
         Test the File storage API with a file like object coming from urllib2.urlopen()
         """
-
-        file_like_object = self.urlopen('/example_view/')
+        file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)
         stored_filename = self.storage.save("remote_file.html", f)
 
-        remote_file = self.urlopen('/example_view/')
-
+        remote_file = urlopen(self.live_server_url + '/')
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())

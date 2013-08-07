@@ -30,6 +30,10 @@ class ExtractorTests(SimpleTestCase):
             return
         shutil.rmtree(dname)
 
+    def rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
     def tearDown(self):
         os.chdir(self.test_dir)
         try:
@@ -126,18 +130,22 @@ class BasicExtractorTests(ExtractorTests):
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
+    def test_unicode_decode_error(self):
+        os.chdir(self.test_dir)
+        shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
+                      force_text(stdout.getvalue()))
+
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
         stdout = StringIO()
-        try:
-            management.call_command('makemessages', locale=LOCALE, stdout=stdout)
-        finally:
-            try:
-                os.remove('./code_sample.py')
-            except OSError:
-                pass
+        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
         self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
 
     def test_template_message_context_extractor(self):
@@ -271,17 +279,22 @@ class IgnoredExtractorTests(ExtractorTests):
 
     def test_ignore_option(self):
         os.chdir(self.test_dir)
-        pattern1 = os.path.join('ignore_dir', '*')
+        ignore_patterns = [
+            os.path.join('ignore_dir', '*'),
+            'xxx_*',
+        ]
         stdout = StringIO()
         management.call_command('makemessages', locale=LOCALE, verbosity=2,
-            ignore_patterns=[pattern1], stdout=stdout)
+            ignore_patterns=ignore_patterns, stdout=stdout)
         data = stdout.getvalue()
         self.assertTrue("ignoring directory ignore_dir" in data)
+        self.assertTrue("ignoring file xxx_ignored.html" in data)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should be included.', po_contents)
             self.assertNotMsgId('This should be ignored.', po_contents)
+            self.assertNotMsgId('This should be ignored too.', po_contents)
 
 
 class SymlinkExtractorTests(ExtractorTests):
@@ -316,6 +329,15 @@ class SymlinkExtractorTests(ExtractorTests):
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
+    PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
+
+    def tearDown(self):
+        os.chdir(self.test_dir)
+        try:
+            self._rmrf('locale/es')
+        except OSError:
+            pass
+        os.chdir(self._cwd)
 
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
@@ -324,6 +346,16 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+
+    def test_override_plural_forms(self):
+        """Ticket #20311."""
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale='es', extensions=['djtpl'], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE_ES))
+        with open(self.PO_FILE_ES, 'r') as fp:
+            po_contents = force_text(fp.read())
+            found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
+            self.assertEqual(1, len(found))
 
 
 class NoWrapExtractorTests(ExtractorTests):

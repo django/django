@@ -270,6 +270,7 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = generic.GenericForeignKey('content_type', 'object_id')
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.tag
 
@@ -303,6 +304,15 @@ model:
        :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
        look for.
 
+    .. attribute:: GenericForeignKey.for_concrete_model
+
+       .. versionadded:: 1.6
+
+       If ``False``, the field will be able to reference proxy models. Default
+       is ``True``. This mirrors the ``for_concrete_model`` argument to
+       :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
+
+
 .. admonition:: Primary key type compatibility
 
    The "object_id" field doesn't have to be the same type as the
@@ -329,7 +339,7 @@ model:
 .. admonition:: Serializing references to ``ContentType`` objects
 
    If you're serializing data (for example, when generating
-   :class:`~django.test.TestCase.fixtures`) from a model that implements
+   :class:`~django.test.TransactionTestCase.fixtures`) from a model that implements
    generic relations, you should probably be using a natural key to uniquely
    identify related :class:`~django.contrib.contenttypes.models.ContentType`
    objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
@@ -492,13 +502,19 @@ information.
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
 
-.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False)
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True)
 
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.
 
-    You must provide ``ct_field`` and ``object_id`` if they different from the
-    defaults, ``content_type`` and ``object_id`` respectively. Other parameters
-    are similar to those documented in
+    You must provide ``ct_field`` and ``fk_field`` if they are different from
+    the defaults, ``content_type`` and ``object_id`` respectively. Other
+    parameters are similar to those documented in
     :func:`~django.forms.models.modelformset_factory` and
     :func:`~django.forms.models.inlineformset_factory`.
+
+    .. versionadded:: 1.6
+
+        The ``for_concrete_model`` argument corresponds to the
+        :class:`~django.contrib.contenttypes.generic.GenericForeignKey.for_concrete_model`
+        argument on ``GenericForeignKey``.

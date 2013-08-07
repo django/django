@@ -97,7 +97,7 @@ class BaseDatabaseCreation(object):
                           style.SQL_TABLE(qn(opts.db_table)) + ' (']
         for i, line in enumerate(table_output):  # Combine and add commas.
             full_statement.append(
-                '    %s%s' % (line, i < len(table_output) - 1 and ',' or ''))
+                '    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(')')
         if opts.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(
@@ -251,12 +251,13 @@ class BaseDatabaseCreation(object):
             r_col = model._meta.get_field(f.rel.field_name).column
             r_name = '%s_refs_%s_%s' % (
                 col, r_col, self._digest(table, r_table))
-            output.append('%s %s %s %s;' % \
-                (style.SQL_KEYWORD('ALTER TABLE'),
+            output.append('%s %s %s %s;' % (
+                style.SQL_KEYWORD('ALTER TABLE'),
                 style.SQL_TABLE(qn(table)),
                 style.SQL_KEYWORD(self.connection.ops.drop_foreignkey_sql()),
                 style.SQL_FIELD(qn(truncate_name(
-                    r_name, self.connection.ops.max_name_length())))))
+                    r_name, self.connection.ops.max_name_length())))
+            ))
         del references_to_delete[model]
         return output
 
@@ -465,7 +466,7 @@ class BaseDatabaseCreation(object):
         """
         warnings.warn(
             "set_autocommit was moved from BaseDatabaseCreation to "
-            "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
+            "BaseDatabaseWrapper.", DeprecationWarning, stacklevel=2)
         return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):

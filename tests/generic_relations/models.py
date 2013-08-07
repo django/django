@@ -98,3 +98,26 @@ class Gecko(models.Model):
 # To test fix for #11263
 class Rock(Mineral):
     tags = generic.GenericRelation(TaggedItem)
+
+class ManualPK(models.Model):
+    id = models.IntegerField(primary_key=True)
+    tags = generic.GenericRelation(TaggedItem)
+
+
+class ForProxyModelModel(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    obj = generic.GenericForeignKey(for_concrete_model=False)
+    title = models.CharField(max_length=255, null=True)
+
+class ForConcreteModelModel(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    obj = generic.GenericForeignKey()
+
+class ConcreteRelatedModel(models.Model):
+    bases = generic.GenericRelation(ForProxyModelModel, for_concrete_model=False)
+
+class ProxyRelatedModel(ConcreteRelatedModel):
+    class Meta:
+        proxy = True

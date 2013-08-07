@@ -7,18 +7,17 @@ from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
-from django.db.models.sql.constants import *
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
-from django.utils.functional import Promise
-from django.utils.encoding import force_text
 from django.utils import six
 from django.utils import timezone
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
         'DateTimeQuery', 'AggregateQuery']
+
 
 class DeleteQuery(Query):
     """
@@ -41,12 +40,12 @@ class DeleteQuery(Query):
         lot of values in pk_list.
         """
         if not field:
-            field = self.model._meta.pk
+            field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
                        pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
-            self.do_query(self.model._meta.db_table, where, using=using)
+            self.do_query(self.get_meta().db_table, where, using=using)
 
     def delete_qs(self, query, using):
         """
@@ -77,7 +76,9 @@ class DeleteQuery(Query):
                 return
             else:
                 innerq.clear_select_clause()
-                innerq.select = [SelectInfo((self.get_initial_alias(), pk.column), None)]
+                innerq.select = [
+                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                ]
                 values = innerq
             where = self.where_class()
             where.add((Constraint(None, pk.column, pk), 'in', values), AND)
@@ -112,7 +113,7 @@ class UpdateQuery(Query):
                 related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
-        pk_field = self.model._meta.pk
+        pk_field = self.get_meta().pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
@@ -129,7 +130,7 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.model._meta.get_field_by_name(name)
+            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
             if not direct or m2m:
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
             if model:
@@ -144,10 +145,6 @@ class UpdateQuery(Query):
         Used by add_update_values() as well as the "fast" update path when
         saving models.
         """
-        # Check that no Promise object passes to the query. Refs #10498.
-        values_seq = [(value[0], value[1], force_text(value[2]))
-                      if isinstance(value[2], Promise) else value
-                      for value in values_seq]
         self.values.extend(values_seq)
 
     def add_related_update(self, model, field, value):
@@ -178,6 +175,7 @@ class UpdateQuery(Query):
             result.append(query)
         return result
 
+
 class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
@@ -206,14 +204,9 @@ class InsertQuery(Query):
         into the query, for example.
         """
         self.fields = fields
-        # Check that no Promise object reaches the DB. Refs #10498.
-        for field in fields:
-            for obj in objs:
-                value = getattr(obj, field.attname)
-                if isinstance(value, Promise):
-                    setattr(obj, field.attname, force_text(value))
         self.objs = objs
         self.raw = raw
+
 
 class DateQuery(Query):
     """
@@ -236,7 +229,7 @@ class DateQuery(Query):
             )
         except FieldError:
             raise FieldDoesNotExist("%s has no field named '%s'" % (
-                self.model._meta.object_name, field_name
+                self.get_meta().object_name, field_name
             ))
         field = result[0]
         self._check_field(field)                # overridden in DateTimeQuery
@@ -245,7 +238,7 @@ class DateQuery(Query):
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]
         self.distinct = True
-        self.order_by = order == 'ASC' and [1] or [-1]
+        self.order_by = [1] if order == 'ASC' else [-1]
 
         if field.null:
             self.add_filter(("%s__isnull" % field_name, False))
@@ -259,6 +252,7 @@ class DateQuery(Query):
 
     def _get_select(self, col, lookup_type):
         return Date(col, lookup_type)
+
 
 class DateTimeQuery(DateQuery):
     """
@@ -279,6 +273,7 @@ class DateTimeQuery(DateQuery):
         else:
             tzname = timezone._get_timezone_name(self.tzinfo)
         return DateTime(col, lookup_type, tzname)
+
 
 class AggregateQuery(Query):
     """

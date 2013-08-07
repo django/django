@@ -1,5 +1,4 @@
 import os
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase, Client
@@ -16,6 +15,7 @@ from django.test.utils import override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ),
+    CSRF_FAILURE_VIEW='django.views.csrf.csrf_failure',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),

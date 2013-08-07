@@ -1,17 +1,12 @@
 import os
 import tempfile
 
-# Try to import PIL in either of the two ways it can end up installed.
-# Checking for the existence of Image is enough for CPython, but for PyPy,
-# you need to check for the underlying modules.
+from django.core.exceptions import ImproperlyConfigured
 
 try:
-    from PIL import Image, _imaging
-except ImportError:
-    try:
-        import Image, _imaging
-    except ImportError:
-        Image = None
+    from django.utils.image import Image
+except ImproperlyConfigured:
+    Image = None
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -87,7 +82,7 @@ class VerboseNameField(models.Model):
     field9 = models.FileField("verbose field9", upload_to="unused")
     field10 = models.FilePathField("verbose field10")
     field11 = models.FloatField("verbose field11")
-    # Don't want to depend on PIL in this test
+    # Don't want to depend on Pillow/PIL in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
     field13 = models.IPAddressField("verbose field13")
@@ -119,7 +114,7 @@ class Document(models.Model):
 ###############################################################################
 # ImageField
 
-# If PIL available, do these tests.
+# If Pillow/PIL available, do these tests.
 if Image:
     class TestImageFieldFile(ImageFieldFile):
         """

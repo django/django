@@ -1,15 +1,16 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
-from django.forms.widgets import Media, HiddenInput
+from django.forms.widgets import HiddenInput
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
-from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext, ugettext as _
 
 
 __all__ = ('BaseFormSet', 'all_valid')
@@ -55,8 +56,6 @@ class BaseFormSet(object):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
-        # construct the forms in the formset
-        self._construct_forms()
 
     def __str__(self):
         return self.as_table()
@@ -85,7 +84,10 @@ class BaseFormSet(object):
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
-                raise ValidationError('ManagementForm data is missing or has been tampered with')
+                raise ValidationError(
+                    _('ManagementForm data is missing or has been tampered with'),
+                    code='missing_management_form',
+                )
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -119,15 +121,17 @@ class BaseFormSet(object):
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
             # Use the length of the initial data if it's there, 0 otherwise.
-            initial_forms = self.initial and len(self.initial) or 0
+            initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
-    def _construct_forms(self):
-        # instantiate all the forms and put them in self.forms
-        self.forms = []
+    @cached_property
+    def forms(self):
+        """
+        Instantiate forms at first property access.
+        """
         # DoS protection is included in total_form_count()
-        for i in xrange(self.total_form_count()):
-            self.forms.append(self._construct_form(i))
+        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        return forms
 
     def _construct_form(self, i, **kwargs):
         """
@@ -250,9 +254,9 @@ class BaseFormSet(object):
         form -- i.e., from formset.clean(). Returns an empty ErrorList if there
         are none.
         """
-        if self._non_form_errors is not None:
-            return self._non_form_errors
-        return self.error_class()
+        if self._non_form_errors is None:
+            self.full_clean()
+        return self._non_form_errors
 
     @property
     def errors(self):
@@ -262,6 +266,13 @@ class BaseFormSet(object):
         if self._errors is None:
             self.full_clean()
         return self._errors
+
+    def total_error_count(self):
+        """
+        Returns the number of errors across all forms in the formset.
+        """
+        return len(self.non_form_errors()) +\
+            sum(len(form_errors) for form_errors in self.errors)
 
     def _should_delete_form(self, form):
         """
@@ -291,18 +302,26 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors.
+        Cleans all of self.data and populates self._errors and
+        self._non_form_errors.
         """
         self._errors = []
+        self._non_form_errors = self.error_class()
+
         if not self.is_bound: # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             self._errors.append(form.errors)
         try:
-            if (self.validate_max and self.total_form_count() > self.max_num) or \
+            if (self.validate_max and
+                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
-                raise ValidationError(_("Please submit %s or fewer forms." % self.max_num))
+                raise ValidationError(ungettext(
+                    "Please submit %d or fewer forms.",
+                    "Please submit %d or fewer forms.", self.max_num) % self.max_num,
+                    code='too_many_forms',
+                )
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:

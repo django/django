@@ -33,7 +33,6 @@ ArchiveIndexView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.ArchiveIndexView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseArchiveIndexView`
@@ -64,7 +63,7 @@ ArchiveIndexView
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.dates import ArchiveIndexView
@@ -100,7 +99,6 @@ YearArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.YearArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseYearArchiveView`
@@ -162,7 +160,7 @@ YearArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import YearArchiveView
 
@@ -174,7 +172,7 @@ YearArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -216,7 +214,6 @@ MonthArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.MonthArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseMonthArchiveView`
@@ -258,7 +255,7 @@ MonthArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import MonthArchiveView
 
@@ -270,7 +267,7 @@ MonthArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -317,7 +314,6 @@ WeekArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.WeekArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseWeekArchiveView`
@@ -352,7 +348,7 @@ WeekArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import WeekArchiveView
 
@@ -365,7 +361,7 @@ WeekArchiveView
             week_format = "%W"
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -422,7 +418,6 @@ DayArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.DayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseDayArchiveView`
@@ -468,7 +463,7 @@ DayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import DayArchiveView
 
@@ -480,7 +475,7 @@ DayArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -526,7 +521,6 @@ TodayArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.TodayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseTodayArchiveView`
@@ -543,7 +537,7 @@ TodayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_today``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import TodayArchiveView
 
@@ -555,7 +549,7 @@ TodayArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -585,7 +579,6 @@ DateDetailView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.DateDetailView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseDateDetailView`
@@ -606,7 +599,7 @@ DateDetailView
 
     * Uses a default ``template_name_suffix`` of ``_detail``.
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.dates import DateDetailView

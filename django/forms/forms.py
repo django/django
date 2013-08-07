@@ -2,7 +2,7 @@
 Form classes
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
 import warnings
@@ -77,7 +77,7 @@ class BaseForm(object):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
+                 initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
@@ -86,7 +86,8 @@ class BaseForm(object):
         self.prefix = prefix
         self.initial = initial or {}
         self.error_class = error_class
-        self.label_suffix = label_suffix
+        # Translators: This is the default suffix added to form field labels
+        self.label_suffix = label_suffix if label_suffix is not None else _(':')
         self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
         self._changed_data = None
@@ -134,7 +135,7 @@ class BaseForm(object):
 
         Subclasses may wish to override.
         """
-        return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
+        return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
         """
@@ -170,11 +171,6 @@ class BaseForm(object):
 
                 if bf.label:
                     label = conditional_escape(force_text(bf.label))
-                    # Only add the suffix if the label does not end in
-                    # punctuation.
-                    if self.label_suffix:
-                        if label[-1] not in ':?.!':
-                            label = format_html('{0}{1}', label, self.label_suffix)
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
@@ -342,6 +338,8 @@ class BaseForm(object):
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
                 if not field.show_hidden_initial:
                     initial_value = self.initial.get(name, field.initial)
+                    if callable(initial_value):
+                        initial_value = initial_value()
                 else:
                     initial_prefixed_name = self.add_initial_prefix(name)
                     hidden_widget = field.hidden_widget()
@@ -355,7 +353,7 @@ class BaseForm(object):
                 if hasattr(field.widget, '_has_changed'):
                     warnings.warn("The _has_changed method on widgets is deprecated,"
                         " define it at field level instead.",
-                        PendingDeprecationWarning, stacklevel=2)
+                        DeprecationWarning, stacklevel=2)
                     if field.widget._has_changed(initial_value, data_value):
                         self._changed_data.append(name)
                 elif field._has_changed(initial_value, data_value):
@@ -511,22 +509,31 @@ class BoundField(object):
             )
         return self.field.prepare_value(data)
 
-    def label_tag(self, contents=None, attrs=None):
+    def label_tag(self, contents=None, attrs=None, label_suffix=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         contents should be 'mark_safe'd to avoid HTML escaping. If contents
         aren't given, uses the field's HTML-escaped label.
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
+
+        label_suffix allows overriding the form's label_suffix.
         """
         contents = contents or self.label
+        # Only add the suffix if the label does not end in punctuation.
+        # Translators: If found as last label character, these punctuation
+        # characters will prevent the default label_suffix to be appended to the label
+        label_suffix = label_suffix if label_suffix is not None else self.form.label_suffix
+        if label_suffix and contents and contents[-1] not in _(':?.!'):
+            contents = format_html('{0}{1}', contents, label_suffix)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
-            attrs = attrs and flatatt(attrs) or ''
-            contents = format_html('<label for="{0}"{1}>{2}</label>',
-                                   widget.id_for_label(id_), attrs, contents
-                                   )
+            id_for_label = widget.id_for_label(id_)
+            if id_for_label:
+                attrs = dict(attrs or {}, **{'for': id_for_label})
+            attrs = flatatt(attrs) if attrs else ''
+            contents = format_html('<label{0}>{1}</label>', attrs, contents)
         else:
             contents = conditional_escape(contents)
         return mark_safe(contents)

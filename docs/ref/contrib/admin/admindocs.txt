@@ -30,8 +30,8 @@ the following:
 * Install the docutils Python module (http://docutils.sf.net/).
 * **Optional:** Linking to templates requires the :setting:`ADMIN_FOR`
   setting to be configured.
-* **Optional:** Using the admindocs bookmarklets requires the
-  :mod:`XViewMiddleware<django.middleware.doc>` to be installed.
+* **Optional:** Using the admindocs bookmarklets requires
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` to be installed.
 
 Once those steps are complete, you can start browsing the documentation by
 going to your admin interface and clicking the "Documentation" link in the
@@ -57,9 +57,10 @@ Model reference
 ===============
 
 The **models** section of the ``admindocs`` page describes each model in the
-system along with all the fields and methods available on it. Relationships to
-other models appear as hyperlinks. Descriptions are pulled from ``help_text``
-attributes on fields or from docstrings on model methods.
+system along with all the fields and methods (without any arguments) available
+on it. While model properties don't have any arguments, they are not listed.
+Relationships to other models appear as hyperlinks. Descriptions are pulled
+from ``help_text`` attributes on fields or from docstrings on model methods.
 
 A model with useful documentation might look like this::
 
@@ -155,7 +156,6 @@ Edit this object
 Using these bookmarklets requires that you are either logged into the
 :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or
-that the :mod:`django.middleware.doc` middleware and
-:mod:`XViewMiddleware <django.middleware.doc>` are installed and you
-are accessing the site from an IP address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or that the
+``XViewMiddleware`` is installed and you are accessing the site from an IP
+address listed in :setting:`INTERNAL_IPS`.

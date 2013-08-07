@@ -30,9 +30,15 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
 from MySQLdb.converters import conversions, Thing2Literal
 from MySQLdb.constants import FIELD_TYPE, CLIENT
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 from django.conf import settings
 from django.db import utils
-from django.db.backends import *
+from django.db.backends import (util, BaseDatabaseFeatures,
+    BaseDatabaseOperations, BaseDatabaseWrapper)
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
@@ -52,12 +58,14 @@ IntegrityError = Database.IntegrityError
 # It's impossible to import datetime_or_None directly from MySQLdb.times
 parse_datetime = conversions[FIELD_TYPE.DATETIME]
 
+
 def parse_datetime_with_timezone_support(value):
     dt = parse_datetime(value)
     # Confirm that dt is naive before overwriting its tzinfo.
     if dt is not None and settings.USE_TZ and timezone.is_naive(dt):
         dt = dt.replace(tzinfo=timezone.utc)
     return dt
+
 
 def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
@@ -93,6 +101,7 @@ django_conversions.update({
 # http://dev.mysql.com/doc/refman/5.0/en/news.html .
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
+
 # MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
 # MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
 # point is to raise Warnings as exceptions, this can be done with the Python
@@ -120,7 +129,7 @@ class CursorWrapper(object):
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
-            if e[0] in self.codes_for_integrityerror:
+            if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 
@@ -130,7 +139,7 @@ class CursorWrapper(object):
         except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
-            if e[0] in self.codes_for_integrityerror:
+            if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 
@@ -142,6 +151,7 @@ class CursorWrapper(object):
 
     def __iter__(self):
         return iter(self.cursor)
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -186,9 +196,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def has_zoneinfo_database(self):
+        # MySQL accepts full time zones names (eg. Africa/Nairobi) but rejects
+        # abbreviations (eg. EAT). When pytz isn't installed and the current
+        # time zone is LocalTimezone (the only sensible value in this
+        # context), the current time zone name will be an abbreviation. As a
+        # consequence, MySQL cannot perform time zone conversions reliably.
+        if pytz is None:
+            return False
+
+        # Test if the time zone definitions are installed.
         cursor = self.connection.cursor()
         cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
         return cursor.fetchone() is not None
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
@@ -270,7 +290,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(cursor._last_executed, errors='replace')
+        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -284,14 +304,17 @@ class DatabaseOperations(BaseDatabaseOperations):
     def random_function_sql(self):
         return 'RAND()'
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # NB: The generated SQL below is specific to MySQL
         # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
         # to clear all tables of all data
         if tables:
             sql = ['SET FOREIGN_KEY_CHECKS = 0;']
             for table in tables:
-                sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(self.quote_name(table))))
+                sql.append('%s %s;' % (
+                    style.SQL_KEYWORD('TRUNCATE'),
+                    style.SQL_FIELD(self.quote_name(table)),
+                ))
             sql.append('SET FOREIGN_KEY_CHECKS = 1;')
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))
             return sql
@@ -302,7 +325,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Truncate already resets the AUTO_INCREMENT field from
         # MySQL version 5.0.13 onwards. Refs #16961.
         if self.connection.mysql_version < (5, 0, 13):
-            return ["%s %s %s %s %s;" % \
+            return ["%s %s %s %s %s;" %
                     (style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('TABLE'),
                     style.SQL_TABLE(self.quote_name(sequence['table'])),
@@ -356,6 +379,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
     operators = {
@@ -391,8 +415,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'conv': django_conversions,
             'charset': 'utf8',
-            'use_unicode': True,
         }
+        if not six.PY3:
+            kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']

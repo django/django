@@ -122,3 +122,36 @@ class Tag(models.Model):
 
 class Board(models.Model):
     name = models.CharField(primary_key=True, max_length=15)
+
+class HasLinks(models.Model):
+    links = generic.GenericRelation(Link)
+
+    class Meta:
+        abstract = True
+
+class HasLinkThing(HasLinks):
+    pass
+
+class A(models.Model):
+    flag = models.NullBooleanField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+class B(models.Model):
+    a = generic.GenericRelation(A)
+
+    class Meta:
+        ordering = ('id',)
+
+class C(models.Model):
+    b = models.ForeignKey(B)
+
+    class Meta:
+        ordering = ('id',)
+
+class D(models.Model):
+    b = models.ForeignKey(B, null=True)
+
+    class Meta:
+        ordering = ('id',)

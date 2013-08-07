@@ -37,6 +37,8 @@ class HandlerTests(TestCase):
 
 
 class TransactionsPerRequestTests(TransactionTestCase):
+
+    available_apps = []
     urls = 'handlers.urls'
 
     def test_no_transaction(self):
@@ -60,6 +62,7 @@ class TransactionsPerRequestTests(TransactionTestCase):
         finally:
             connection.settings_dict['ATOMIC_REQUESTS'] = old_atomic_requests
         self.assertContains(response, 'False')
+
 
 class SignalsTests(TestCase):
     urls = 'handlers.urls'
@@ -89,3 +92,11 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started'])
         self.assertEqual(b''.join(response.streaming_content), b"streaming content")
         self.assertEqual(self.signals, ['started', 'finished'])
+
+
+class HandlerSuspiciousOpsTest(TestCase):
+    urls = 'handlers.urls'
+
+    def test_suspiciousop_in_view_returns_400(self):
+        response = self.client.get('/suspicious/')
+        self.assertEqual(response.status_code, 400)

@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.utils.functional import cached_property
 

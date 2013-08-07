@@ -25,6 +25,7 @@ class FieldErrors(models.Model):
     index = models.CharField(max_length=10, db_index='bad')
     field_ = models.CharField(max_length=10)
     nullbool = models.BooleanField(null=True)
+    generic_ip_notnull_blank = models.GenericIPAddressField(null=False, blank=True)
 
 
 class Target(models.Model):
@@ -375,11 +376,12 @@ invalid_models.fielderrors: "decimalfield3": DecimalFields require a "max_digits
 invalid_models.fielderrors: "decimalfield4": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).
-invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
-invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
+invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
 invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 invalid_models.fielderrors: "nullbool": BooleanFields do not accept null values. Use a NullBooleanField instead.
+invalid_models.fielderrors: "generic_ip_notnull_blank": GenericIPAddressField can not accept blank values if null values are not allowed, as blank values are stored as null.
 invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Reverse query name for field 'foreign' clashes with field 'Target.clash1'. Add a related_name argument to the definition for 'foreign'.

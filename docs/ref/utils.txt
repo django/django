@@ -107,20 +107,6 @@ to distinguish caches by the ``Accept-language`` header.
 
     The :class:`django.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
-    ``SortedDict`` adds two additional methods to the standard Python ``dict``
-    class:
-
-    .. method:: insert(index, key, value)
-
-        .. deprecated:: 1.5
-
-        Inserts the key, value pair before the item with the given index.
-
-    .. method:: value_for_index(index)
-
-        .. deprecated:: 1.5
-
-        Returns the value of the item at the given zero-based index.
 
 Creating a new SortedDict
 -------------------------
@@ -202,18 +188,7 @@ The functions defined in this module share the following properties:
 =========================
 
 .. module:: django.utils.encoding
-   :synopsis: A series of helper classes and function to manage character encoding.
-
-.. class:: StrAndUnicode
-
-    A class that derives ``__str__`` from ``__unicode__``.
-
-    On Python 2, ``__str__`` returns the output of ``__unicode__`` encoded as
-    a UTF-8 bytestring. On Python 3, ``__str__`` returns the output of
-    ``__unicode__``.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define ``__unicode__``.
+   :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
 
@@ -367,11 +342,15 @@ SyndicationFeed
         All parameters should be Unicode objects, except ``categories``, which
         should be a sequence of Unicode objects.
 
-    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
+    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs])
 
         Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate``, which is a ``datetime.datetime`` object, and
-        ``enclosure``, which is an instance of the ``Enclosure`` class.
+        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
+
+        .. versionadded:: 1.7
+
+            The optional ``updateddate`` argument was added.
 
     .. method:: num_items()
 
@@ -405,8 +384,9 @@ SyndicationFeed
 
     .. method:: latest_post_date()
 
-        Returns the latest item's ``pubdate``. If none of them have a
-        ``pubdate``, this returns the current date/time.
+        Returns the latest ``pubdate`` or ``updateddate`` for all items in the
+        feed. If no items have either of these attributes this returns the
+        current date/time.
 
 Enclosure
 ---------
@@ -439,7 +419,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://www.atomenabled.org/developers/syndication/atom-format-spec.php
+    Spec: http://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================
@@ -471,12 +451,14 @@ Atom1Feed
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
+        # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
     The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
     a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode`` here
-    and ensure that your function returns only Unicode strings.
+    original function can return. Usually, it's enough to include ``unicode``
+    (or ``str`` on Python 3) here and ensure that your function returns only
+    Unicode strings.
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at the
@@ -490,7 +472,7 @@ Atom1Feed
 
 Usually you should build up HTML using Django's templates to make use of its
 autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
-where appropriate. This module provides some additional low level utilitiesfor
+where appropriate. This module provides some additional low level utilities for
 escaping HTML.
 
 .. function:: escape(text)
@@ -564,7 +546,13 @@ escaping HTML.
         strip_tags(value)
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel is a slug"``.
+    return value will be ``"Joel is a slug"``. Note that ``strip_tags`` result
+    may still contain unsafe HTML content, so you might use
+    :func:`~django.utils.html.escape` to make it a safe string.
+
+    .. versionchanged:: 1.6
+
+        For improved safety, ``strip_tags`` is now parser-based.
 
 .. function:: remove_tags(value, tags)
 
@@ -643,6 +631,20 @@ escaping HTML.
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than :data:`sys.maxint`.
 
+.. function:: urlsafe_base64_encode(s)
+
+    .. versionadded:: 1.6
+
+    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    equal signs.
+
+.. function::  urlsafe_base64_decode(s)
+
+    .. versionadded:: 1.6
+
+    Decodes a base64 encoded string, adding back any trailing equal signs that
+    might have been stripped.
+
 ``django.utils.module_loading``
 ===============================
 
@@ -653,17 +655,19 @@ Functions for working with Python modules.
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
+    .. versionadded:: 1.6
+
     Imports a dotted module path and returns the attribute/class designated by
     the last name in the path. Raises
     :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes
     wrong. For example::
 
         from django.utils.module_loading import import_by_path
-        import_by_path = import_by_path('django.utils.module_loading.import_by_path')
+        ImproperlyConfigured = import_by_path('django.core.exceptions.ImproperlyConfigured')
 
     is equivalent to::
 
-        from django.utils.module_loading import import_by_path
+        from django.core.exceptions import ImproperlyConfigured
 
 ``django.utils.safestring``
 ===========================
@@ -923,9 +927,21 @@ For a complete discussion on the usage of the following see the
 
 .. function:: now()
 
-    Returns an aware or naive :class:`~datetime.datetime` that represents the
-    current point in time when :setting:`USE_TZ` is ``True`` or ``False``
-    respectively.
+    Returns a :class:`~datetime.datetime` that represents the
+    current point in time. Exactly what's returned depends on the value of
+    :setting:`USE_TZ`:
+
+    * If :setting:`USE_TZ` is ``False``, this will be be a
+      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
+      without an associated timezone) that represents the current time
+      in the system's local timezone.
+
+    * If :setting:`USE_TZ` is ``True``, this will be an
+      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
+      current time in UTC. Note that :func:`now` will always return
+      times in UTC regardless of the value of :setting:`TIME_ZONE`;
+      you can use :func:`localtime` to convert to a time in the current
+      time zone.
 
 .. function:: is_aware(value)
 

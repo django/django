@@ -11,7 +11,7 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
@@ -48,8 +48,8 @@ class MultiPartParser(object):
             The standard ``META`` dictionary in Django request objects.
         :input_data:
             The raw post data, as a file-like object.
-        :upload_handler:
-            An UploadHandler instance that performs operations on the uploaded
+        :upload_handlers:
+            A list of UploadHandler instances that perform operations on the uploaded
             data.
         :encoding:
             The encoding with which to treat the incoming data.
@@ -113,14 +113,15 @@ class MultiPartParser(object):
         if self._content_length == 0:
             return QueryDict('', encoding=self._encoding), MultiValueDict()
 
-        # See if the handler will want to take care of the parsing.
-        # This allows overriding everything if somebody wants it.
+        # See if any of the handlers take care of the parsing.
+        # This allows overriding everything if need be.
         for handler in handlers:
             result = handler.handle_raw_input(self._input_data,
                                               self._meta,
                                               self._content_length,
                                               self._boundary,
                                               encoding)
+            #Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
 
@@ -176,11 +177,9 @@ class MultiPartParser(object):
                     file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
-                    content_type = meta_data.get('content-type', ('',))[0].strip()
-                    try:
-                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
-                    except:
-                        charset = None
+                    content_type, content_type_extra = meta_data.get('content-type', ('', {}))
+                    content_type = content_type.strip()
+                    charset = content_type_extra.get('charset')
 
                     try:
                         content_length = int(meta_data.get('content-length')[0])
@@ -193,7 +192,7 @@ class MultiPartParser(object):
                             try:
                                 handler.new_file(field_name, file_name,
                                                  content_type, content_length,
-                                                 charset)
+                                                 charset, content_type_extra)
                             except StopFutureHandlers:
                                 break
 
@@ -292,7 +291,7 @@ class LazyStream(six.Iterator):
 
     def read(self, size=None):
         def parts():
-            remaining = (size is not None and [size] or [self._remaining])[0]
+            remaining = self._remaining if size is None else size
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
                 yield b''.join(self)
@@ -369,7 +368,7 @@ class LazyStream(six.Iterator):
                             if current_number == num_bytes])
 
         if number_equal > 40:
-            raise SuspiciousOperation(
+            raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
                 " if there is none, report this to the Django developers."

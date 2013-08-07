@@ -371,7 +371,7 @@ displayed if the given array is empty or could not be found::
     {% for athlete in athlete_list %}
         <li>{{ athlete.name }}</li>
     {% empty %}
-        <li>Sorry, no athlete in this list!</li>
+        <li>Sorry, no athletes in this list.</li>
     {% endfor %}
     <ul>
 
@@ -862,6 +862,8 @@ above would result in the following output:
     * New York: 20,000,000
 * India
     * Calcutta: 15,000,000
+* USA
+    * Chicago: 7,000,000
 * Japan
     * Tokyo: 33,000,000
 
@@ -2399,7 +2401,7 @@ It is also able to consume standard context variables, e.g. assuming a
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
 
 If you'd like to retrieve a static URL without displaying it, you can use a
-slightly different call::
+slightly different call:
 
 .. versionadded:: 1.5
 

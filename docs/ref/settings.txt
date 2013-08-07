@@ -79,6 +79,20 @@ responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
 :setting:`MIDDLEWARE_CLASSES`).
 
+.. note::
+
+    If you want to also allow the `fully qualified domain name (FQDN)`_, which
+    some browsers can send in the Host header, you must explicitly add another
+    ALLOWED_HOSTS entry that includes a trailing period. This entry can also be
+    a subdomain wildcard::
+
+        ALLOWED_HOSTS = [
+            '.example.com', # Allow domain and subdomains
+            '.example.com.', # Also allow FQDN and subdomains
+        ]
+
+.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
+
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
@@ -266,14 +280,18 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY
 
 Default: ``False``
 
+.. deprecated:: 1.6
+
+    This setting was largely ineffective because of using cookies for sessions
+    and CSRF. See the :doc:`Django 1.6 release notes</releases/1.6>` for more
+    information.
+
 If the value of this setting is ``True``, only anonymous requests (i.e., not
 those made by a logged-in user) will be cached.  Otherwise, the middleware
 caches every page that doesn't have GET or POST parameters.
 
 If you set the value of this setting to ``True``, you should make sure you've
 activated ``AuthenticationMiddleware``.
-
-See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
@@ -326,9 +344,9 @@ CSRF_COOKIE_HTTPONLY
 
 Default: ``False``
 
-Whether to use HttpOnly flag on the CSRF cookie. If this is set to ``True``,
-client-side JavaScript will not to be able to access the CSRF cookie. See
-:setting:`SESSION_COOKIE_HTTPONLY` for details on HttpOnly.
+Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -495,7 +513,7 @@ CONN_MAX_AGE
 
 .. versionadded:: 1.6
 
-Default: ``600``
+Default: ``0``
 
 The lifetime of a database connection, in seconds. Use ``0`` to close database
 connections at the end of each request — Django's historical behavior — and
@@ -834,6 +852,10 @@ It is also important to remember that when running with :setting:`DEBUG`
 turned on, Django will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
+Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
+the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
+requests being returned as "Bad Request (400)".
+
 .. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
@@ -1033,6 +1055,26 @@ EMAIL_USE_TLS
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL_USE_SSL`.
+
+.. setting:: EMAIL_USE_SSL
+
+EMAIL_USE_SSL
+-------------
+
+.. versionadded:: 1.7
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
+
+Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
+exclusive, so only set one of those settings to ``True``.
 
 .. setting:: FILE_CHARSET
 
@@ -1225,7 +1267,7 @@ Default: ``()`` (Empty tuple)
 A tuple of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
-* Receive X headers if the ``XViewMiddleware`` is installed (see
+* Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
   :doc:`/topics/http/middleware`)
 
 .. setting:: LANGUAGE_CODE
@@ -1328,15 +1370,21 @@ A data structure containing configuration information. The contents of
 this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
-The default logging configuration passes HTTP 500 server errors to an
-email log handler; all other log messages are given to a NullHandler.
+Among other things, the default logging configuration passes HTTP 500 server
+errors to an email log handler when :setting:`DEBUG` is ``False``. See also
+:ref:`configuring-logging`.
+
+You can see the default logging configuration by looking in
+``django/utils/log.py`` (or view the `online source`__).
+
+__ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
 LOGGING_CONFIG
 --------------
 
-Default: ``'django.utils.log.dictConfig'``
+Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
 Django project. Points at a instance of Python's `dictConfig`_
@@ -1344,6 +1392,10 @@ configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. versionchanged:: 1.7
+
+    Previously, the default value was ``'django.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -1711,10 +1763,15 @@ misspelled) variables. See :ref:`invalid-template-variables`..
 TEST_RUNNER
 -----------
 
-Default: ``'django.test.simple.DjangoTestSuiteRunner'``
+Default: ``'django.test.runner.DiscoverRunner'``
 
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
+
+.. versionchanged:: 1.6
+
+    Previously the default ``TEST_RUNNER`` was
+    ``django.test.simple.DjangoTestSuiteRunner``.
 
 .. setting:: THOUSAND_SEPARATOR
 
@@ -2016,22 +2073,6 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
-.. setting:: AUTH_PROFILE_MODULE
-
-AUTH_PROFILE_MODULE
--------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Default: Not defined
-
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
-
 .. setting:: AUTH_USER_MODEL
 
 AUTH_USER_MODEL
@@ -2208,6 +2249,9 @@ Controls where Django stores message data. Valid values are:
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
+The backends that use cookies -- ``CookieStorage`` and ``FallbackStorage`` --
+use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
+
 .. setting:: MESSAGE_TAGS
 
 MESSAGE_TAGS
@@ -2238,18 +2282,6 @@ to override. See :ref:`message-displaying` above for more details.
    If desired, you may specify the numeric values for the constants directly
    according to the values in the above :ref:`constants table
    <message-level-constants>`.
-
-.. _messages-session_cookie_domain:
-
-SESSION_COOKIE_DOMAIN
----------------------
-
-Default: ``None``
-
-The storage backends that use cookies -- ``CookieStorage`` and
-``FallbackStorage`` -- use the value of :setting:`SESSION_COOKIE_DOMAIN` in
-setting their cookies.
-
 
 .. _settings-sessions:
 
@@ -2301,7 +2333,7 @@ SESSION_COOKIE_HTTPONLY
 
 Default: ``True``
 
-Whether to use HTTPOnly flag on the session cookie. If this is set to
+Whether to use ``HTTPOnly`` flag on the session cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the
 session cookie.
 
@@ -2463,7 +2495,7 @@ URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
-:ref:`media definitions<form-media-paths>` and the
+:ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.
@@ -2546,7 +2578,9 @@ various locations.
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
 (using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+files with the same name are present, the first file that is found will be
+used.
 
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to

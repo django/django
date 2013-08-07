@@ -373,4 +373,3 @@ behavior:
 * :setting:`MESSAGE_LEVEL`
 * :setting:`MESSAGE_STORAGE`
 * :setting:`MESSAGE_TAGS`
-* :ref:`SESSION_COOKIE_DOMAIN<messages-session_cookie_domain>`

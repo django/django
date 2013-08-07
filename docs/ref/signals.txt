@@ -255,7 +255,7 @@ Arguments sent with this signal:
 
 ``pk_set``
     For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-    actions, this is a list of primary key values that have been added to
+    actions, this is a set of primary key values that have been added to
     or removed from the relation.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
@@ -284,7 +284,7 @@ If we connected a handler like this::
 
 and then did something like this::
 
-    >>> p = Pizza.object.create(...)
+    >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
@@ -307,7 +307,7 @@ Argument        Value
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
 
-``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``set([t.id])`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
@@ -334,7 +334,7 @@ Argument        Value
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)
 
-``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+``pk_set``      ``set([p.id])`` (since only ``Pizza p`` was removed from the
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
@@ -359,6 +359,53 @@ Management signals
 ==================
 
 Signals sent by :doc:`django-admin </ref/django-admin>`.
+
+pre_syncdb
+----------
+
+.. data:: django.db.models.signals.pre_syncdb
+   :module:
+
+Sent by the :djadmin:`syncdb` command before it starts to install an
+application.
+
+Any handlers that listen to this signal need to be written in a particular
+place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+handlers are registered anywhere else they may not be loaded by
+:djadmin:`syncdb`.
+
+Arguments sent with this signal:
+
+``sender``
+    The ``models`` module that was just installed. That is, if
+    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+    ``sender`` will be the ``foo.bar.myapp.models`` module.
+
+``app``
+    Same as ``sender``.
+
+``create_models``
+    A list of the model classes from any app which :djadmin:`syncdb` plans to
+    create.
+
+
+``verbosity``
+    Indicates how much information manage.py is printing on screen. See
+    the :djadminopt:`--verbosity` flag for details.
+
+    Functions which listen for :data:`pre_syncdb` should adjust what they
+    output to the screen based on the value of this argument.
+
+``interactive``
+    If ``interactive`` is ``True``, it's safe to prompt the user to input
+    things on the command line. If ``interactive`` is ``False``, functions
+    which listen for this signal should not try to prompt for anything.
+
+    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    superuser when ``interactive`` is ``True``.
+
+``db``
+    The alias of database on which a command will operate.
 
 post_syncdb
 -----------
@@ -451,17 +498,20 @@ request_finished
 
 Sent when Django finishes processing an HTTP request.
 
-.. note::
-
-    When a view returns a :ref:`streaming response <httpresponse-streaming>`,
-    this signal is sent only after the entire response is consumed by the
-    client (strictly speaking, by the WSGI gateway).
-
 .. versionchanged:: 1.5
 
-    Before Django 1.5, this signal was fired before sending the content to the
-    client. In order to accomodate streaming responses, it is now fired after
-    sending the content.
+    Before Django 1.5, this signal was sent before delivering content to the
+    client. In order to accommodate :ref:`streaming responses
+    <httpresponse-streaming>`, it is now sent after the response has been fully
+    delivered to the client.
+
+.. note::
+
+    Some WSGI servers and middleware do not always call ``close`` on the
+    response object after handling a request, most notably uWSGI prior to 1.2.6
+    and Sentry's error reporting middleware up to 2.0.7. In those cases this
+    signal isn't sent at all. This can result in idle connections to database
+    and memcache servers.
 
 Arguments sent with this signal:
 
@@ -503,7 +553,8 @@ This signal is sent when the value of a setting is changed through the
 :func:`django.test.utils.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
-original value is restored ("teardown").
+original value is restored ("teardown"). Use the ``enter`` argument to
+distinguish between the two.
 
 Arguments sent with this signal:
 
@@ -516,6 +567,11 @@ Arguments sent with this signal:
 ``value``
     The value of the setting after the change. For settings that initially
     don't exist, in the "teardown" phase, ``value`` is ``None``.
+
+``enter``
+    .. versionadded:: 1.7
+
+        A boolean; ``True`` if the setting is applied, ``False`` if restored.
 
 template_rendered
 -----------------

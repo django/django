@@ -7,11 +7,10 @@ import os
 import sys
 
 from optparse import make_option, OptionParser
-import traceback
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
 
@@ -60,7 +59,7 @@ class OutputWrapper(object):
         return getattr(self._out, name)
 
     def write(self, msg, style_func=None, ending=None):
-        ending = ending is None and self.ending or ending
+        ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = [f for f in (style_func, self.style_func, lambda x:x)
@@ -171,7 +170,9 @@ class BaseCommand(object):
         make_option('--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
-            help='Print traceback on exception'),
+            help='Raise on exception'),
+        make_option('--no-color', action='store_true', dest='no_color', default=False,
+            help="Don't colorize the command output."),
     )
     help = ''
     args = ''
@@ -231,7 +232,8 @@ class BaseCommand(object):
         Set up any environment changes requested (e.g., Python path
         and Django settings), then run this command. If the
         command raises a ``CommandError``, intercept it and print it sensibly
-        to stderr.
+        to stderr. If the ``--traceback`` option is present or the raised
+        ``Exception`` is not ``CommandError``, raise it.
         """
         parser = self.create_parser(argv[0], argv[1])
         options, args = parser.parse_args(argv[2:])
@@ -239,12 +241,12 @@ class BaseCommand(object):
         try:
             self.execute(*args, **options.__dict__)
         except Exception as e:
+            if options.traceback or not isinstance(e, CommandError):
+                raise
+
             # self.stderr is not guaranteed to be set here
             stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
-            if options.traceback or not isinstance(e, CommandError):
-                stderr.write(traceback.format_exc())
-            else:
-                stderr.write('%s: %s' % (e.__class__.__name__, e))
+            stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -254,7 +256,11 @@ class BaseCommand(object):
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
-        self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+        if options.get('no_color'):
+            self.style = no_style()
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
+        else:
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
             from django.conf import settings
@@ -311,7 +317,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, num_errors != 1 and 's' or ''))
+            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
 
     def handle(self, *args, **options):
         """

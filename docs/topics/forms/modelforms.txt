@@ -23,11 +23,13 @@ class from a Django model.
 For example::
 
     >>> from django.forms import ModelForm
+    >>> from myapp.models import Article
 
     # Create the form class.
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
     ...         model = Article
+    ...         fields = ['pub_date', 'headline', 'content', 'reporter']
 
     # Creating a form to add an article.
     >>> form = ArticleForm()
@@ -39,11 +41,13 @@ For example::
 Field types
 -----------
 
-The generated ``Form`` class will have a form field for every model field. Each
-model field has a corresponding default form field. For example, a
-``CharField`` on a model is represented as a ``CharField`` on a form. A
-model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
-the full list of conversions:
+The generated ``Form`` class will have a form field for every model field
+specified, in the order specified in the ``fields`` attribute.
+
+Each model field has a corresponding default form field. For example, a
+``CharField`` on a model is represented as a ``CharField`` on a form. A model
+``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is the
+full list of conversions:
 
 ===============================  ========================================
 Model field                      Form field
@@ -71,7 +75,7 @@ Model field                      Form field
 
 ``FileField``                    ``FileField``
 
-``FilePathField``                ``CharField``
+``FilePathField``                ``FilePathField``
 
 ``FloatField``                   ``FloatField``
 
@@ -137,7 +141,7 @@ In addition, each generated form field has attributes set as follows:
   ``default`` value will be initially selected instead).
 
 Finally, note that you can override the form field used for a given model
-field. See `Overriding the default field types or widgets`_ below.
+field. See `Overriding the default fields`_ below.
 
 A full example
 --------------
@@ -158,6 +162,7 @@ Consider this set of models::
         title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -168,10 +173,13 @@ Consider this set of models::
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
+            fields = ['name', 'title', 'birth_date']
 
     class BookForm(ModelForm):
         class Meta:
             model = Book
+            fields = ['name', 'authors']
+
 
 With these models, the ``ModelForm`` subclasses above would be roughly
 equivalent to this (the only difference being the ``save()`` method, which
@@ -189,32 +197,95 @@ we'll discuss in a moment.)::
         name = forms.CharField(max_length=100)
         authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
 
-.. _modelform-is-valid-and-errors:
+.. _validation-on-modelform:
 
-The ``is_valid()`` method and ``errors``
-----------------------------------------
+Validation on a ``ModelForm``
+-----------------------------
 
-The first time you call ``is_valid()`` or access the ``errors`` attribute of a
-``ModelForm`` triggers :ref:`form validation <form-and-field-validation>` as
-well as :ref:`model validation <validating-objects>`. This has the side-effect
-of cleaning the model you pass to the ``ModelForm`` constructor. For instance,
-calling ``is_valid()`` on your form will convert any date fields on your model
-to actual date objects. If form validation fails, only some of the updates
-may be applied. For this reason, you'll probably want to avoid reusing the
-model instance passed to the form, especially if validation fails.
+There are two main steps involved in validating a ``ModelForm``:
 
+1. :ref:`Validating the form <form-and-field-validation>`
+2. :ref:`Validating the model instance <validating-objects>`
+
+Just like normal form validation, model form validation is triggered implicitly
+when calling :meth:`~django.forms.Form.is_valid()` or accessing the
+:attr:`~django.forms.Form.errors` attribute and explicitly when calling
+``full_clean()``, although you will typically not use the latter method in
+practice.
+
+``Model`` validation (:meth:`Model.full_clean()
+<django.db.models.Model.full_clean()>`) is triggered from within the form
+validation step, right after the form's ``clean()`` method is called.
+
+.. warning::
+
+    The cleaning process modifies the model instance passed to the
+    ``ModelForm`` constructor in various ways. For instance, any date fields on
+    the model are converted into actual date objects. Failed validation may
+    leave the underlying model instance in an inconsistent state and therefore
+    it's not recommended to reuse it.
+
+.. _overriding-modelform-clean-method:
+
+Overriding the clean() method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can override the ``clean()`` method on a model form to provide additional
+validation in the same way you can on a normal form.
+
+A model form instance bound to a model object will contain an ``instance``
+attribute that gives its methods access to that specific model instance.
+
+.. warning::
+
+    The ``ModelForm.clean()`` method sets a flag that makes the :ref:`model
+    validation <validating-objects>` step validate the uniqueness of model
+    fields that are marked as ``unique``, ``unique_together`` or
+    ``unique_for_date|month|year``.
+
+    If you would like to override the ``clean()`` method and maintain this
+    validation, you must call the parent class's ``clean()`` method.
+
+Interaction with model validation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As part of the validation process, ``ModelForm`` will call the ``clean()``
+method of each field on your model that has a corresponding field on your form.
+If you have excluded any model fields, validation will not be run on those
+fields. See the :doc:`form validation </ref/forms/validation>` documentation
+for more on how field cleaning and validation work.
+
+The model's ``clean()`` method will be called before any uniqueness checks are
+made. See :ref:`Validating objects <validating-objects>` for more information
+on the model's ``clean()`` hook.
+
+Considerations regarding fields' ``error_messages``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error messages defined at the
+:attr:`form field <django.forms.Field.error_messages>` level or at the
+:ref:`form Meta <modelforms-overriding-default-fields>` level always take
+precedence over the error messages defined at the
+:attr:`model field <django.db.models.Field.error_messages>` level.
+Error messages  defined on :attr:`model fields
+<django.db.models.Field.error_messages>` are only used when the
+``ValidationError`` is raised during the :ref:`model validation
+<validating-objects>` step and no corresponding error messages are defined at
+the form level.
 
 The ``save()`` method
 ---------------------
 
-Every form produced by ``ModelForm`` also has a ``save()``
-method. This method creates and saves a database object from the data
-bound to the form. A subclass of ``ModelForm`` can accept an existing
-model instance as the keyword argument ``instance``; if this is
-supplied, ``save()`` will update that instance. If it's not supplied,
+Every ``ModelForm`` also has a ``save()`` method. This method creates and saves
+a database object from the data bound to the form. A subclass of ``ModelForm``
+can accept an existing model instance as the keyword argument ``instance``; if
+this is supplied, ``save()`` will update that instance. If it's not supplied,
 ``save()`` will create a new instance of the specified model:
 
 .. code-block:: python
+
+    >>> from myapp.models import Article
+    >>> from myapp.forms import ArticleForm
 
     # Create a form instance from POST data.
     >>> f = ArticleForm(request.POST)
@@ -229,7 +300,7 @@ supplied, ``save()`` will update that instance. If it's not supplied,
     >>> f.save()
 
 Note that if the form :ref:`hasn't been validated
-<modelform-is-valid-and-errors>`, calling ``save()`` will do so by checking
+<validation-on-modelform>`, calling ``save()`` will do so by checking
 ``form.errors``. A ``ValueError`` will be raised if the data in the form
 doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
@@ -252,7 +323,9 @@ exists in the database.
 To work around this problem, every time you save a form using ``commit=False``,
 Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data. For example::
+``save_m2m()`` to save the many-to-many form data. For example:
+
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
@@ -272,7 +345,9 @@ you've manually saved the instance produced by the form, you can invoke
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a simple ``save()`` on a form, all data -- including
 many-to-many data -- is saved without the need for any additional method calls.
-For example::
+For example:
+
+.. code-block:: python
 
     # Create a form instance with POST data.
     >>> a = Author()
@@ -288,47 +363,68 @@ method is used to determine whether a form requires multipart file upload (and
 hence whether ``request.FILES`` must be passed to the form), etc. See
 :ref:`binding-uploaded-files` for more information.
 
-Using a subset of fields on the form
-------------------------------------
+.. _modelforms-selecting-fields:
 
-In some cases, you may not want all the model fields to appear on the generated
-form. There are three ways of telling ``ModelForm`` to use only a subset of the
-model fields:
+Selecting the fields to use
+---------------------------
 
-1. Set ``editable=False`` on the model field. As a result, *any* form
-   created from the model via ``ModelForm`` will not include that
-   field.
+It is strongly recommended that you explicitly set all fields that should be
+edited in the form using the ``fields`` attribute. Failure to do so can easily
+lead to security problems when a form unexpectedly allows a user to set certain
+fields, especially when new fields are added to a model. Depending on how the
+form is rendered, the problem may not even be visible on the web page.
 
-2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to include in the form. The order in which the fields names are specified
-   in that list is respected when the form renders them.
+The alternative approach would be to include all fields automatically, or
+blacklist only some. This fundamental approach is known to be much less secure
+and has led to serious exploits on major websites (e.g. `GitHub
+<https://github.com/blog/1068-public-key-security-vulnerability-and-mitigation>`_).
 
-3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
-   class.  This attribute, if given, should be a list of field names
-   to exclude from the form.
+There are, however, two shortcuts available for cases where you can guarantee
+these security concerns do not apply to you:
 
-For example, if you want a form for the ``Author`` model (defined
-above) that includes only the ``name`` and ``birth_date`` fields, you would
-specify ``fields`` or ``exclude`` like this::
+1. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
+   that all fields in the model should be used. For example::
 
-    class PartialAuthorForm(ModelForm):
-        class Meta:
-            model = Author
-            fields = ('name', 'birth_date')
+       from django.forms import ModelForm
 
-    class PartialAuthorForm(ModelForm):
-        class Meta:
-            model = Author
-            exclude = ('title',)
+       class AuthorForm(ModelForm):
+           class Meta:
+               model = Author
+               fields = '__all__'
 
-Since the Author model has only 3 fields, 'name', 'title', and
-'birth_date', the forms above will contain exactly the same fields.
+2. Set the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class to
+   a list of fields to be excluded from the form.
+
+   For example::
+
+       class PartialAuthorForm(ModelForm):
+           class Meta:
+               model = Author
+               exclude = ['title']
+
+   Since the ``Author`` model has the 3 fields ``name``, ``title`` and
+   ``birth_date``, this will result in the fields ``name`` and ``birth_date``
+   being present on the form.
+
+If either of these are used, the order the fields appear in the form will be the
+order the fields are defined in the model, with ``ManyToManyField`` instances
+appearing last.
+
+In addition, Django applies the following rule: if you set ``editable=False`` on
+the model field, *any* form created from the model via ``ModelForm`` will not
+include that field.
+
+.. versionchanged:: 1.6
+
+    Before version 1.6, the ``'__all__'`` shortcut did not exist, but omitting
+    the ``fields`` attribute had the same effect. Omitting both ``fields`` and
+    ``exclude`` is now deprecated, but will continue to work as before until
+    version 1.8
+
 
 .. note::
 
-    If you specify ``fields`` or ``exclude`` when creating a form with
-    ``ModelForm``, then the fields that are not in the resulting form
+    Any fields not included in a form by the above logic
     will not be set by the form's ``save()`` method. Also, if you
     manually add the excluded fields back to the form, they will not
     be initialized from the model instance.
@@ -357,8 +453,10 @@ Since the Author model has only 3 fields, 'name', 'title', and
 
 .. _section on saving forms: `The save() method`_
 
-Overriding the default field types or widgets
----------------------------------------------
+.. _modelforms-overriding-default-fields:
+
+Overriding the default fields
+-----------------------------
 
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
@@ -376,6 +474,7 @@ of its default ``<input type="text">``, you can override the field's
 widget::
 
     from django.forms import ModelForm, Textarea
+    from myapp.models import Author
 
     class AuthorForm(ModelForm):
         class Meta:
@@ -388,28 +487,65 @@ widget::
 The ``widgets`` dictionary accepts either widget instances (e.g.,
 ``Textarea(...)``) or classes (e.g., ``Textarea``).
 
-If you want to further customize a field -- including its type, label, etc. --
-you can do this by declaratively specifying fields like you would in a regular
-``Form``. Declared fields will override the default ones generated by using the
-``model`` attribute.
+.. versionadded:: 1.6
 
-For example, if you wanted to use ``MyDateFormField`` for the ``pub_date``
+    The ``labels``, ``help_texts`` and ``error_messages`` options were added.
+
+Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
+attributes of the inner ``Meta`` class if you want to further customize a field.
+
+For example if you wanted to customize the wording of all user facing strings for
+the ``name`` field::
+
+    class AuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            fields = ('name', 'title', 'birth_date')
+            labels = {
+                'name': _('Writer'),
+            }
+            help_texts = {
+                'name': _('Some useful help text.'),
+            }
+            error_messages = {
+                'name': {
+                    'max_length': _("This writer's name is too long."),
+                },
+            }
+
+Finally, if you want complete control over of a field -- including its type,
+validators, etc. -- you can do this by declaratively specifying fields like you
+would in a regular ``Form``. Declared fields will override the default ones
+generated by using the ``model`` attribute. Fields declared like this will
+ignore any customizations in the ``widgets``, ``labels``, ``help_texts``, and
+``error_messages`` options declared on ``Meta``.
+
+For example, if you wanted to use ``MySlugFormField`` for the ``slug``
 field, you could do the following::
 
+    from django.forms import ModelForm
+    from myapp.models import Article
+
     class ArticleForm(ModelForm):
-        pub_date = MyDateFormField()
+        slug = MySlugFormField()
 
         class Meta:
             model = Article
+            fields = ['pub_date', 'headline', 'content', 'reporter']
 
-If you want to override a field's default label, then specify the ``label``
-parameter when declaring the form field::
 
-   >>> class ArticleForm(ModelForm):
-   ...     pub_date = DateField(label='Publication date')
-   ...
-   ...     class Meta:
-   ...         model = Article
+If you want to override a field's default validators, then specify the
+``validators`` parameter when declaring the form field::
+
+    from django.forms import ModelForm, DateField
+    from myapp.models import Article
+
+    class ArticleForm(ModelForm):
+        slug = CharField(validators=[validate_slug])
+
+        class Meta:
+            model = Article
+            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
 
 .. note::
 
@@ -436,6 +572,7 @@ parameter when declaring the form field::
 
             class Meta:
                 model = Article
+                fields = ['headline', 'content']
 
     You must ensure that the type of the form field can be used to set the
     contents of the corresponding model field. When they are not compatible,
@@ -444,50 +581,25 @@ parameter when declaring the form field::
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
-Changing the order of fields
-----------------------------
 
-By default, a ``ModelForm`` will render fields in the same order that they are
-defined on the model, with ``ManyToManyField`` instances appearing last. If
-you want to change the order in which fields are rendered, you can use the
-``fields`` attribute on the ``Meta`` class.
+Enabling localization of fields
+-------------------------------
 
-The ``fields`` attribute defines the subset of model fields that will be
-rendered, and the order in which they will be rendered. For example given this
-model::
+.. versionadded:: 1.6
 
-    class Book(models.Model):
-        author = models.ForeignKey(Author)
-        title = models.CharField(max_length=100)
+By default, the fields in a ``ModelForm`` will not localize their data. To
+enable localization for fields, you can use the ``localized_fields``
+attribute on the ``Meta`` class.
 
-the ``author`` field would be rendered first. If we wanted the title field
-to be rendered first, we could specify the following ``ModelForm``::
-
-    >>> class BookForm(ModelForm):
+    >>> from django.forms import ModelForm
+    >>> from myapp.models import Author
+    >>> class AuthorForm(ModelForm):
     ...     class Meta:
-    ...         model = Book
-    ...         fields = ('title', 'author')
+    ...         model = Author
+    ...         localized_fields = ('birth_date',)
 
-.. _overriding-modelform-clean-method:
-
-Overriding the clean() method
------------------------------
-
-You can override the ``clean()`` method on a model form to provide additional
-validation in the same way you can on a normal form.
-
-In this regard, model forms have two specific characteristics when compared to
-forms:
-
-By default the ``clean()`` method validates the uniqueness of fields that are
-marked as ``unique``, ``unique_together`` or ``unique_for_date|month|year`` on
-the model.  Therefore, if you would like to override the ``clean()`` method and
-maintain the default validation, you must call the parent class's ``clean()``
-method.
-
-Also, a model form instance bound to a model object will contain a
-``self.instance`` attribute that gives model form methods access to that
-specific model instance.
+If ``localized_fields`` is set to the special value ``'__all__'``, all fields
+will be localized.
 
 Form inheritance
 ----------------
@@ -527,18 +639,6 @@ There are a couple of things to note, however.
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.
 
-Interaction with model validation
----------------------------------
-
-As part of its validation process, ``ModelForm`` will call the ``clean()``
-method of each field on your model that has a corresponding field on your form.
-If you have excluded any model fields, validation will not be run on those
-fields. See the :doc:`form validation </ref/forms/validation>` documentation
-for more on how field cleaning and validation work. Also, your model's
-``clean()`` method will be called before any uniqueness checks are made. See
-:ref:`Validating objects <validating-objects>` for more information on the
-model's ``clean()`` hook.
-
 .. _modelforms-factory:
 
 ModelForm factory function
@@ -550,21 +650,24 @@ definition. This may be more convenient if you do not have many customizations
 to make::
 
     >>> from django.forms.models import modelform_factory
-    >>> BookForm = modelform_factory(Book)
+    >>> from myapp.models import Book
+    >>> BookForm = modelform_factory(Book, fields=("author", "title"))
 
 This can also be used to make simple modifications to existing forms, for
-example by specifying which fields should be displayed::
-
-    >>> Form = modelform_factory(Book, form=BookForm, fields=("author",))
-
-... or which fields should be excluded::
-
-    >>> Form = modelform_factory(Book, form=BookForm, exclude=("title",))
-
-You can also specify the widgets to be used for a given field::
+example by specifying the widgets to be used for a given field::
 
     >>> from django.forms import Textarea
-    >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
+    >>> Form = modelform_factory(Book, form=BookForm,
+    ...                          widgets={"title": Textarea()})
+
+The fields to include can be specified using the ``fields`` and ``exclude``
+keyword arguments, or the corresponding attributes on the ``ModelForm`` inner
+``Meta`` class. Please see the ``ModelForm`` :ref:`modelforms-selecting-fields`
+documentation.
+
+... or enable localization for specific fields::
+
+    >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=("birth_date",))
 
 .. _model-formsets:
 
@@ -578,6 +681,7 @@ of enhanced formset classes that make it easy to work with Django models. Let's
 reuse the ``Author`` model from above::
 
     >>> from django.forms.models import modelformset_factory
+    >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author)
 
 This will create a formset that is capable of working with the data associated
@@ -616,6 +720,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
 
     from django.forms.models import BaseModelFormSet
+    from myapp.models import Author
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
@@ -659,6 +764,20 @@ class of a ``ModelForm`` works::
     >>> AuthorFormSet = modelformset_factory(
     ...     Author, widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})
 
+Enabling localization for fields with ``localized_fields``
+----------------------------------------------------------
+
+.. versionadded:: 1.6
+
+Using the ``localized_fields`` parameter, you can enable localization for
+fields in the form.
+
+    >>> AuthorFormSet = modelformset_factory(
+    ...     Author, localized_fields=('value',))
+
+If ``localized_fields`` is set to the special value ``'__all__'``, all fields
+will be localized.
+
 Providing initial values
 ------------------------
 
@@ -688,11 +807,10 @@ database. If a given instance's data didn't change in the bound data, the
 instance won't be saved to the database and won't be included in the return
 value (``instances``, in the above example).
 
-When fields are missing from the form (for example because they have
-been excluded), these fields will not be set by the ``save()``
-method. You can find more information about this restriction, which
-also holds for regular ``ModelForms``, in `Using a subset of fields on
-the form`_.
+When fields are missing from the form (for example because they have been
+excluded), these fields will not be set by the ``save()`` method. You can find
+more information about this restriction, which also holds for regular
+``ModelForms``, in `Selecting the fields to use`_.
 
 Pass ``commit=False`` to return the unsaved model instances::
 
@@ -706,6 +824,13 @@ This gives you the ability to attach data to the instances before saving them
 to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
 are saved properly.
+
+After calling ``save()``, your model formset will have three new attributes
+containing the formset's changes:
+
+.. attribute:: models.BaseModelFormSet.changed_objects
+.. attribute:: models.BaseModelFormSet.deleted_objects
+.. attribute:: models.BaseModelFormSet.new_objects
 
 .. _model-formsets-max-num:
 
@@ -748,6 +873,10 @@ Using a model formset in a view
 Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
+    from django.forms.models import modelformset_factory
+    from django.shortcuts import render_to_response
+    from myapp.models import Author
+
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
         if request.method == 'POST':
@@ -766,15 +895,19 @@ than that of a "normal" formset. The only difference is that we call
 ``formset.save()`` to save the data into the database. (This was described
 above, in :ref:`saving-objects-in-the-formset`.)
 
-Overiding ``clean()`` on a ``model_formset``
+.. _model-formsets-overriding-clean:
+
+Overriding ``clean()`` on a ``ModelFormSet``
 --------------------------------------------
 
 Just like with ``ModelForms``, by default the ``clean()`` method of a
-``model_formset`` will validate that none of the items in the formset violate
+``ModelFormSet`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
 ``unique_for_date|month|year``).  If you want to override the ``clean()`` method
-on a ``model_formset`` and maintain this validation, you must call the parent
+on a ``ModelFormSet`` and maintain this validation, you must call the parent
 class's ``clean`` method::
+
+    from django.forms.models import BaseModelFormSet
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
@@ -782,12 +915,17 @@ class's ``clean`` method::
             # example custom validation across forms in the formset:
             for form in self.forms:
                 # your custom formset validation
+                pass
 
 Using a custom queryset
 -----------------------
 
 As stated earlier, you can override the default queryset used by the model
 formset::
+
+    from django.forms.models import modelformset_factory
+    from django.shortcuts import render_to_response
+    from myapp.models import Author
 
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author)
@@ -839,7 +977,7 @@ Third, you can manually render each field::
         {{ formset.management_form }}
         {% for form in formset %}
             {% for field in form %}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             {% endfor %}
         {% endfor %}
     </form>
@@ -871,9 +1009,13 @@ primary key that isn't called ``id``, make sure it gets rendered.)
 Inline formsets
 ===============
 
+.. class:: models.BaseInlineFormSet
+
 Inline formsets is a small abstraction layer on top of model formsets. These
 simplify the case of working with related objects via a foreign key. Suppose
 you have these two models::
+
+    from django.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -899,6 +1041,13 @@ a particular author, you could do this::
 .. seealso::
 
     :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
+
+Overriding ``clean()`` on an ``InlineFormSet``
+----------------------------------------------
+
+See :ref:`model-formsets-overriding-clean`, but subclass
+:class:`~models.BaseInlineFormSet` rather than
+:class:`~models.BaseModelFormSet`.
 
 More than one foreign key to the same model
 -------------------------------------------

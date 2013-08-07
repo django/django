@@ -12,41 +12,43 @@ from django.utils import six
 
 class SQLCommandsTestCase(TestCase):
     """Tests for several functions in django/core/management/sql.py"""
+    def count_ddl(self, output, cmd):
+        return len([o for o in output if o.startswith(cmd)])
+
     def test_sql_create(self):
         app = models.get_app('commands_sql')
         output = sql_create(app, no_style(), connections[DEFAULT_DB_ALIAS])
+        create_tables = [o for o in output if o.startswith('CREATE TABLE')]
+        self.assertEqual(len(create_tables), 3)
         # Lower so that Oracle's upper case tbl names wont break
-        sql = output[0].lower()
+        sql = create_tables[-1].lower()
         six.assertRegex(self, sql, r'^create table .commands_sql_book.*')
 
     def test_sql_delete(self):
         app = models.get_app('commands_sql')
         output = sql_delete(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        # Oracle produces DROP SEQUENCE and DROP TABLE for this command.
-        if connections[DEFAULT_DB_ALIAS].vendor == 'oracle':
-            sql = output[1].lower()
-        else:
-            sql = output[0].lower()
-        six.assertRegex(self, sql, r'^drop table .commands_sql_book.*')
+        drop_tables = [o for o in output if o.startswith('DROP TABLE')]
+        self.assertEqual(len(drop_tables), 3)
+        # Lower so that Oracle's upper case tbl names wont break
+        sql = drop_tables[-1].lower()
+        six.assertRegex(self, sql, r'^drop table .commands_sql_comment.*')
 
     def test_sql_indexes(self):
         app = models.get_app('commands_sql')
         output = sql_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates two indexes
-        self.assertIn(len(output), [1, 2])
-        self.assertTrue(output[0].startswith("CREATE INDEX"))
+        # PostgreSQL creates one additional index for CharField
+        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
 
     def test_sql_destroy_indexes(self):
         app = models.get_app('commands_sql')
         output = sql_destroy_indexes(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates two indexes
-        self.assertIn(len(output), [1, 2])
-        self.assertTrue(output[0].startswith("DROP INDEX"))
+        # PostgreSQL creates one additional index for CharField
+        self.assertIn(self.count_ddl(output, 'DROP INDEX'), [3, 4])
 
     def test_sql_all(self):
         app = models.get_app('commands_sql')
         output = sql_all(app, no_style(), connections[DEFAULT_DB_ALIAS])
-        # PostgreSQL creates two indexes
-        self.assertIn(len(output), [2, 3])
-        self.assertTrue(output[0].startswith('CREATE TABLE'))
-        self.assertTrue(output[1].startswith('CREATE INDEX'))
+
+        self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
+        # PostgreSQL creates one additional index for CharField
+        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])

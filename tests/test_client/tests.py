@@ -20,7 +20,7 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core import mail

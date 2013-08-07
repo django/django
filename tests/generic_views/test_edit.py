@@ -1,12 +1,15 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import warnings
+from unittest import expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
-from django.utils.unittest import expectedFailure
+from django.test.client import RequestFactory
 from django.views.generic.base import View
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
@@ -19,6 +22,24 @@ class FormMixinTests(TestCase):
         initial_1['foo'] = 'bar'
         initial_2 = FormMixin().get_initial()
         self.assertNotEqual(initial_1, initial_2)
+
+    def test_get_prefix(self):
+        """ Test prefix can be set (see #18872) """
+        test_string = 'test'
+
+        rf = RequestFactory()
+        get_request = rf.get('/')
+
+        class TestFormMixin(FormMixin):
+            request = get_request
+
+        default_kwargs = TestFormMixin().get_form_kwargs()
+        self.assertEqual(None, default_kwargs.get('prefix'))
+
+        set_mixin = TestFormMixin()
+        set_mixin.prefix = test_string
+        set_kwargs = set_mixin.get_form_kwargs()
+        self.assertEqual(test_string, set_kwargs.get('prefix'))
 
 
 class BasicFormTests(TestCase):
@@ -34,14 +55,15 @@ class ModelFormMixinTests(TestCase):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
         self.assertEqual(form_class._meta.model, Author)
 
+
 class CreateViewTests(TestCase):
     urls = 'generic_views.urls'
 
     def test_create(self):
         res = self.client.get('/edit/authors/create/')
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
-        self.assertTrue(isinstance(res.context['view'], View))
+        self.assertIsInstance(res.context['form'], forms.ModelForm)
+        self.assertIsInstance(res.context['view'], View)
         self.assertFalse('object' in res.context)
         self.assertFalse('author' in res.context)
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
@@ -86,7 +108,7 @@ class CreateViewTests(TestCase):
     def test_create_with_special_properties(self):
         res = self.client.get('/edit/authors/create/special/')
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(isinstance(res.context['form'], views.AuthorForm))
+        self.assertIsInstance(res.context['form'], views.AuthorForm)
         self.assertFalse('object' in res.context)
         self.assertFalse('author' in res.context)
         self.assertTemplateUsed(res, 'generic_views/form.html')
@@ -112,6 +134,45 @@ class CreateViewTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertRedirects(res, 'http://testserver/accounts/login/?next=/edit/authors/create/restricted/')
 
+    def test_create_view_with_restricted_fields(self):
+
+        class MyCreateView(CreateView):
+            model = Author
+            fields = ['name']
+
+        self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                         ['name'])
+
+    def test_create_view_all_fields(self):
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", DeprecationWarning)
+
+            class MyCreateView(CreateView):
+                model = Author
+                fields = '__all__'
+
+            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                             ['name', 'slug'])
+        self.assertEqual(len(w), 0)
+
+
+    def test_create_view_without_explicit_fields(self):
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", DeprecationWarning)
+
+            class MyCreateView(CreateView):
+                model = Author
+
+            # Until end of the deprecation cycle, should still create the form
+            # as before:
+            self.assertEqual(list(MyCreateView().get_form_class().base_fields),
+                             ['name', 'slug'])
+
+        # but with a warning:
+        self.assertEqual(w[0].category, DeprecationWarning)
+
 
 class UpdateViewTests(TestCase):
     urls = 'generic_views.urls'
@@ -123,7 +184,7 @@ class UpdateViewTests(TestCase):
         )
         res = self.client.get('/edit/author/%d/update/' % a.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
+        self.assertIsInstance(res.context['form'], forms.ModelForm)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
         self.assertTemplateUsed(res, 'generic_views/author_form.html')
@@ -205,7 +266,7 @@ class UpdateViewTests(TestCase):
         )
         res = self.client.get('/edit/author/%d/update/special/' % a.pk)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(isinstance(res.context['form'], views.AuthorForm))
+        self.assertIsInstance(res.context['form'], views.AuthorForm)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['thingy'], Author.objects.get(pk=a.pk))
         self.assertFalse('author' in res.context)
@@ -237,8 +298,8 @@ class UpdateViewTests(TestCase):
         )
         res = self.client.get('/edit/author/update/')
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(isinstance(res.context['form'], forms.ModelForm))
-        self.assertTrue(isinstance(res.context['view'], View))
+        self.assertIsInstance(res.context['form'], forms.ModelForm)
+        self.assertIsInstance(res.context['view'], View)
         self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
         self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
         self.assertTemplateUsed(res, 'generic_views/author_form.html')

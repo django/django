@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
-
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 from datetime import datetime
+import unittest
 from xml.dom import minidom
 
 from django.conf import settings
@@ -11,7 +12,6 @@ from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
 from django.utils import six
 from django.utils.six import StringIO
-from django.utils import unittest
 
 from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
@@ -259,6 +259,9 @@ class SerializersTestBase(object):
 
 
 class SerializersTransactionTestBase(object):
+
+    available_apps = ['serializers']
+
     def test_forward_refs(self):
         """
         Tests that objects ids can be referenced before they are

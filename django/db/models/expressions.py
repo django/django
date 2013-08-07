@@ -4,6 +4,7 @@ from django.db.models.aggregates import refs_aggregate
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
+
 class ExpressionNode(tree.Node):
     """
     Base class for all query expressions.
@@ -128,6 +129,7 @@ class ExpressionNode(tree.Node):
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
 
+
 class F(ExpressionNode):
     """
     An expression representing the value of the given field.
@@ -146,6 +148,7 @@ class F(ExpressionNode):
 
     def evaluate(self, evaluator, qn, connection):
         return evaluator.evaluate_leaf(self, qn, connection)
+
 
 class DateModifierNode(ExpressionNode):
     """

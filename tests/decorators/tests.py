@@ -1,4 +1,5 @@
 from functools import wraps
+from unittest import TestCase
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -6,7 +7,6 @@ from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
-from django.utils.unittest import TestCase
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
@@ -126,15 +126,15 @@ class DecoratorsTest(TestCase):
         my_safe_view = require_safe(my_view)
         request = HttpRequest()
         request.method = 'GET'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        self.assertIsInstance(my_safe_view(request), HttpResponse)
         request.method = 'HEAD'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponse))
+        self.assertIsInstance(my_safe_view(request), HttpResponse)
         request.method = 'POST'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
         request.method = 'PUT'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
         request.method = 'DELETE'
-        self.assertTrue(isinstance(my_safe_view(request), HttpResponseNotAllowed))
+        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
 
 
 # For testing method_decorator, a decorator that assumes a single argument.

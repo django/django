@@ -29,9 +29,7 @@ use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
 You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and
-``'django.middleware.locale.LocaleMiddleware'`` from your
-:setting:`MIDDLEWARE_CLASSES` setting.
+from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. note::
 
@@ -80,6 +78,7 @@ In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
     from django.utils.translation import ugettext as _
+    from django.http import HttpResponse
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -89,6 +88,7 @@ Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
     from django.utils.translation import ugettext
+    from django.http import HttpResponse
 
     def my_view(request):
         output = ugettext("Welcome to my site.")
@@ -192,6 +192,7 @@ of its value.)
 For example::
 
     from django.utils.translation import ungettext
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         page = ungettext(
@@ -208,6 +209,7 @@ languages as the ``count`` variable.
 Lets see a slightly more complex usage example::
 
     from django.utils.translation import ungettext
+    from myapp.models import Report
 
     count = Report.objects.count()
     if count == 1:
@@ -283,6 +285,7 @@ For example::
 
 or::
 
+    from django.db import models
     from django.utils.translation import pgettext_lazy
 
     class MyThing(models.Model):
@@ -328,6 +331,7 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -335,8 +339,6 @@ model, do the following::
 
 You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
 relationship as translatable by using their ``verbose_name`` options::
-
-    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
@@ -355,6 +357,7 @@ It is recommended to always provide explicit
 relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs by looking at the model's class name::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -370,6 +373,7 @@ Model methods ``short_description`` attribute values
 For model methods, you can provide translations to Django and the admin site
 with the ``short_description`` attribute::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -404,6 +408,7 @@ If you ever see output that looks like ``"hello
 If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
+    from django.db import models
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
@@ -428,6 +433,9 @@ generally don't know the ``number`` argument at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
+
+    from django import forms
+    from django.utils.translation import ugettext_lazy
 
     class MyForm(forms.Form):
         error_message = ungettext_lazy("You only provided %(num)d argument",
@@ -461,6 +469,7 @@ that concatenates its contents *and* converts them to strings only when the
 result is included in a string. For example::
 
     from django.utils.translation import string_concat
+    from django.utils.translation import ugettext_lazy
     ...
     name = ugettext_lazy('John Lennon')
     instrument = ugettext_lazy('guitar')
@@ -687,7 +696,7 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
 
 .. code-block:: html+django
 
-    {# Translators: Label of a button that triggers search{% endcomment #}
+    {# Translators: Label of a button that triggers search #}
     <button type="submit">{% trans "Go" %}</button>
 
     {# Translators: This is a text of the base template #}
@@ -721,6 +730,31 @@ or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-commen
         # path/to/template/file.html:103
         msgid "Ambiguous translatable block of text"
         msgstr ""
+
+.. templatetag:: language
+
+Switching language in templates
+-------------------------------
+
+If you want to select a language within a template, you can use the
+``language`` template tag:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    <!-- Current language: {{ LANGUAGE_CODE }} -->
+    <p>{% trans "Welcome to our page" %}</p>
+
+    {% language 'en' %}
+        {% get_current_language as LANGUAGE_CODE %}
+        <!-- Current language: {{ LANGUAGE_CODE }} -->
+        <p>{% trans "Welcome to our page" %}</p>
+    {% endlanguage %}
+
+While the first occurrence of "Welcome to our page" uses the current language,
+the second will always be in English.
 
 .. _template-translation-vars:
 
@@ -1126,13 +1160,11 @@ active language. Example::
 
 .. _reversing_in_templates:
 
-.. templatetag:: language
-
 Reversing in templates
 ----------------------
 
 If localized URLs get reversed in templates they always use the current
-language. To link to a URL in another language use the ``language``
+language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
 .. code-block:: html+django
@@ -1204,13 +1236,16 @@ German.
 
 The script should be run from one of two places:
 
-* The root directory of your Django project.
-* The root directory of your Django app.
+* The root directory of your Django project (the one that contains
+  ``manage.py``).
+* The root directory of one of your Django apps.
 
 The script runs over your project source tree or your application source tree
-and pulls out all strings marked for translation. It creates (or updates) a
-message file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de``
-example, the file will be ``locale/de/LC_MESSAGES/django.po``.
+and pulls out all strings marked for translation (see
+:ref:`how-django-discovers-translations` and be sure :setting:`LOCALE_PATHS`
+is configured correctly). It creates (or updates) a message file in the
+directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
+``locale/de/LC_MESSAGES/django.po``.
 
 By default :djadmin:`django-admin.py makemessages <makemessages>` examines every
 file that has the ``.html`` or ``.txt`` file extension. In case you want to
@@ -1437,7 +1472,9 @@ Here's example HTML template code:
     <select name="language">
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
-    <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+    <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
+        {{ language.name_local }} ({{ language.code }})
+    </option>
     {% endfor %}
     </select>
     <input type="submit" value="Go" />
@@ -1524,15 +1561,9 @@ If you want to let each individual user specify which language he or she
 prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
 selection based on data from the request. It customizes content for each user.
 
-``LocaleMiddleware`` is enabled in the default settings file: the
-:setting:`MIDDLEWARE_CLASSES` setting contains
-``'django.middleware.locale.LocaleMiddleware'``.
-
-.. versionchanged:: 1.6
-
-    In previous versions, ``LocaleMiddleware``  wasn't enabled by default.
-
-Because middleware order matters, you should follow these guidelines:
+To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
+to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
+matters, you should follow these guidelines:
 
 * Make sure it's one of the first middlewares installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
@@ -1637,6 +1668,8 @@ Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
 :class:`~django.http.HttpRequest`. Feel free to read this value in your view
 code. Here's a simple example::
+
+    from django.http import HttpResponse
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':

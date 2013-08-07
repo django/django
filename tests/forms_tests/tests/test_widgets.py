@@ -1028,6 +1028,8 @@ class WidgetTests(TestCase):
 
 
 class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
+
+    available_apps = ['forms_tests'] + AdminSeleniumWebDriverTestCase.available_apps
     urls = 'forms_tests.urls'
 
     def test_textarea_trailing_newlines(self):

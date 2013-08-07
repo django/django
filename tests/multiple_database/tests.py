@@ -1,15 +1,15 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import pickle
 from operator import attrgetter
-import warnings
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
+from django.db.utils import ConnectionRouter
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
@@ -918,6 +918,7 @@ class QueryTestCase(TestCase):
                                   published=datetime.date(2009, 5, 4),
                                   extra_arg=True)
 
+
 class TestRouter(object):
     # A test router. The behavior is vaguely master/slave, but the
     # databases aren't assumed to propagate changes.
@@ -971,6 +972,30 @@ class WriteRouter(object):
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'
+
+
+class ConnectionRouterTestCase(TestCase):
+    @override_settings(DATABASE_ROUTERS=[
+        'multiple_database.tests.TestRouter',
+        'multiple_database.tests.WriteRouter'])
+    def test_router_init_default(self):
+        router = ConnectionRouter()
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
+    def test_router_init_arg(self):
+        router = ConnectionRouter([
+            'multiple_database.tests.TestRouter',
+            'multiple_database.tests.WriteRouter'
+        ])
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
+        # Init with instances instead of strings
+        router = ConnectionRouter([TestRouter(), WriteRouter()])
+        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+                             ['TestRouter', 'WriteRouter'])
+
 
 class RouterTestCase(TestCase):
     multi_db = True
@@ -1599,25 +1624,6 @@ class AuthTestCase(TestCase):
         command_output = new_io.getvalue().strip()
         self.assertTrue('"email": "alice@example.com"' in command_output)
 
-
-@override_settings(AUTH_PROFILE_MODULE='multiple_database.UserProfile')
-class UserProfileTestCase(TestCase):
-
-    def test_user_profiles(self):
-        alice = User.objects.create_user('alice', 'alice@example.com')
-        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
-
-        alice_profile = UserProfile(user=alice, flavor='chocolate')
-        alice_profile.save()
-
-        bob_profile = UserProfile(user=bob, flavor='crunchy frog')
-        bob_profile.save()
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.assertEqual(alice.get_profile().flavor, 'chocolate')
-            self.assertEqual(bob.get_profile().flavor, 'crunchy frog')
-
 class AntiPetRouter(object):
     # A router that only expresses an opinion on syncdb,
     # passing pets to the 'other' database
@@ -1916,6 +1922,12 @@ class SyncOnlyDefaultDatabaseRouter(object):
 
 
 class SyncDBTestCase(TestCase):
+
+    available_apps  = [
+        'multiple_database',
+        'django.contrib.auth',
+        'django.contrib.contenttypes'
+    ]
     multi_db = True
 
     def test_syncdb_to_other_database(self):

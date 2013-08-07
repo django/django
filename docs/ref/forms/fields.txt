@@ -30,6 +30,8 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid email address.']
 
+.. _core-field-arguments:
+
 Core field arguments
 --------------------
 
@@ -46,6 +48,7 @@ By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
 ``clean()`` will raise a ``ValidationError`` exception::
 
+    >>> from django import forms
     >>> f = forms.CharField()
     >>> f.clean('foo')
     u'foo'
@@ -105,6 +108,7 @@ behavior doesn't result in an adequate label.
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
     ...     url = forms.URLField(label='Your Web site', required=False)
@@ -128,6 +132,7 @@ To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 The use-case for this is when you want to display an "empty" form in which a
 field is initialized to a particular value. For example::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
     ...     url = forms.URLField(initial='http://')
@@ -203,6 +208,7 @@ methods (e.g., ``as_ul()``).
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
@@ -234,6 +240,7 @@ The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override. For example, here is the default error message::
 
+    >>> from django import forms
     >>> generic = forms.CharField()
     >>> generic.clean('')
     Traceback (most recent call last):
@@ -608,19 +615,21 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by PIL.
+      file is of an image format understood by Pillow/PIL.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
-    is installed and supports the image formats you use. If you encounter a
-    ``corrupt image`` error when you upload an image, it usually means PIL
+    Using an ``ImageField`` requires that either `Pillow`_ (recommended) or the
+    `Python Imaging Library`_ (PIL) are installed and supports the image
+    formats you use. If you encounter a ``corrupt image`` error when you
+    upload an image, it usually means either Pillow or PIL
     doesn't understand its format. To fix this, install the appropriate
-    library and reinstall PIL.
+    library and reinstall Pillow or PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+.. _Pillow: http://python-imaging.github.io/Pillow/
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
@@ -849,6 +858,7 @@ Slightly complex built-in ``Field`` classes
         The list of fields that should be used to validate the field's value (in
         the order in which they are provided).
 
+            >>> from django.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
             >>> f.clean('test@example.com')
             u'test@example.com'
@@ -990,12 +1000,14 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
         initial value, no empty choice is created (regardless of the value
         of ``empty_label``).
 
-    The ``__unicode__`` method of the model will be called to generate
-    string representations of the objects for use in the field's choices;
-    to provide customized representations, subclass ``ModelChoiceField``
-    and override ``label_from_instance``. This method will receive a model
-    object, and should return a string suitable for representing it. For
-    example::
+    The ``__unicode__`` (``__str__`` on Python 3) method of the model will be
+    called to generate string representations of the objects for use in the
+    field's choices; to provide customized representations, subclass
+    ``ModelChoiceField`` and override ``label_from_instance``. This method will
+    receive a model object, and should return a string suitable for representing
+    it. For example::
+
+        from django.forms import ModelChoiceField
 
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):

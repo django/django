@@ -43,7 +43,7 @@ class TemplateCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--template',
                     action='store', dest='template',
-                    help='The dotted import path to load the template from.'),
+                    help='The path or URL to load the template from.'),
         make_option('--extension', '-e', dest='extensions',
                     action='append', default=['py'],
                     help='The file extension(s) to render (default: "py"). '
@@ -105,7 +105,7 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
-        if django.VERSION[-1] == 0:
+        if django.VERSION[-2] != 'final':
             docs_version = 'dev'
         else:
             docs_version = '%d.%d' % django.VERSION[:2]

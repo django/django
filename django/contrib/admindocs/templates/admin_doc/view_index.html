@@ -9,17 +9,17 @@
 &rsaquo; {% trans 'Views' %}
 </div>
 {% endblock %}
-{% block title %}Views{% endblock %}
+{% block title %}{% trans 'Views' %}{% endblock %}
 
 {% block content %}
 
-<h1>View documentation</h1>
+<h1>{% trans 'View documentation' %}</h1>
 
 {% regroup views|dictsort:"site_id" by site as views_by_site %}
 
 <div id="content-related" class="sidebar">
 <div class="module">
-<h2>Jump to site</h2>
+<h2>{% trans 'Jump to site' %}</h2>
 <ul>
     {% for site_views in views_by_site %}
     <li><a href="#site{{ site_views.grouper.id }}">{{ site_views.grouper.name }}</a></li>
@@ -32,12 +32,12 @@
 
 {% for site_views in views_by_site %}
 <div class="module">
-<h2 id="site{{ site_views.grouper.id }}">Views by URL on {{ site_views.grouper.name }}</h2>
+<h2 id="site{{ site_views.grouper.id }}">{% blocktrans with site_views.grouper.name as name %}Views by URL on {{ name }}{% endblocktrans %}</h2>
 
 {% for view in site_views.list|dictsort:"url" %}
 {% ifchanged %}
 <h3><a href="{% url 'django-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
-<p class="small quiet">View function: {{ view.full_name }}</p>
+<p class="small quiet">{% blocktrans with view.full_name as name %}View function: {{ name }}{% endblocktrans %}</p>
 <p>{{ view.title }}</p>
 <hr />
 {% endifchanged %}
@@ -46,5 +46,3 @@
 {% endfor %}
 </div>
 {% endblock %}
-
-

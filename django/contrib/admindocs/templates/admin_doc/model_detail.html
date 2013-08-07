@@ -18,7 +18,7 @@
 </div>
 {% endblock %}
 
-{% block title %}Model: {{ name }}{% endblock %}
+{% block title %}{% blocktrans %}Model: {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <div id="content-main">
@@ -32,9 +32,9 @@
 <table class="model">
 <thead>
 <tr>
-    <th>Field</th>
-    <th>Type</th>
-    <th>Description</th>
+    <th>{% trans 'Field' %}</th>
+    <th>{% trans 'Type' %}</th>
+    <th>{% trans 'Description' %}</th>
 </tr>
 </thead>
 <tbody>
@@ -49,6 +49,6 @@
 </table>
 </div>
 
-<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; Back to Models Documentation</a></p>
+<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% trans 'Back to Models Documentation' %}</a></p>
 </div>
 {% endblock %}

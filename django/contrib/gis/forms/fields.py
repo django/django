@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 # While this couples the geographic forms to the GEOS library,
 # it decouples from database (by not importing SpatialBackend).
 from django.contrib.gis.geos import GEOSException, GEOSGeometry, fromstr
+from .widgets import OpenLayersWidget
 
 
 class GeometryField(forms.Field):
@@ -17,7 +16,8 @@ class GeometryField(forms.Field):
     accepted by GEOSGeometry is accepted by this form.  By default,
     this includes WKT, HEXEWKB, WKB (in a buffer), and GeoJSON.
     """
-    widget = forms.Textarea
+    widget = OpenLayersWidget
+    geom_type = 'GEOMETRY'
 
     default_error_messages = {
         'required' : _('No geometry value provided.'),
@@ -31,12 +31,9 @@ class GeometryField(forms.Field):
         # Pop out attributes from the database field, or use sensible
         # defaults (e.g., allow None).
         self.srid = kwargs.pop('srid', None)
-        self.geom_type = kwargs.pop('geom_type', 'GEOMETRY')
-        if 'null' in kwargs:
-            kwargs.pop('null', True)
-            warnings.warn("Passing 'null' keyword argument to GeometryField is deprecated.",
-                DeprecationWarning, stacklevel=2)
+        self.geom_type = kwargs.pop('geom_type', self.geom_type)
         super(GeometryField, self).__init__(**kwargs)
+        self.widget.attrs['geom_type'] = self.geom_type
 
     def to_python(self, value):
         """
@@ -47,7 +44,7 @@ class GeometryField(forms.Field):
         try:
             return GEOSGeometry(value)
         except (GEOSException, ValueError, TypeError):
-            raise forms.ValidationError(self.error_messages['invalid_geom'])
+            raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
 
     def clean(self, value):
         """
@@ -62,7 +59,7 @@ class GeometryField(forms.Field):
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).
         if str(geom.geom_type).upper() != self.geom_type and not self.geom_type == 'GEOMETRY':
-            raise forms.ValidationError(self.error_messages['invalid_geom_type'])
+            raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
 
         # Transforming the geometry if the SRID was set.
         if self.srid:
@@ -73,7 +70,7 @@ class GeometryField(forms.Field):
                 try:
                     geom.transform(self.srid)
                 except:
-                    raise forms.ValidationError(self.error_messages['transform_error'])
+                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
 
         return geom
 
@@ -98,3 +95,31 @@ class GeometryField(forms.Field):
         else:
             # Check for change of state of existence
             return bool(initial) != bool(data)
+
+
+class GeometryCollectionField(GeometryField):
+    geom_type = 'GEOMETRYCOLLECTION'
+
+
+class PointField(GeometryField):
+    geom_type = 'POINT'
+
+
+class MultiPointField(GeometryField):
+    geom_type = 'MULTIPOINT'
+
+
+class LineStringField(GeometryField):
+    geom_type = 'LINESTRING'
+
+
+class MultiLineStringField(GeometryField):
+    geom_type = 'MULTILINESTRING'
+
+
+class PolygonField(GeometryField):
+    geom_type = 'POLYGON'
+
+
+class MultiPolygonField(GeometryField):
+    geom_type = 'MULTIPOLYGON'

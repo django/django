@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 import threading
@@ -6,12 +6,13 @@ import threading
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import Field, FieldDoesNotExist
-from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article
+from .models import Article, SelfRef
 
 
 class ModelTest(TestCase):
@@ -87,23 +88,14 @@ class ModelTest(TestCase):
         # parameters don't match any object.
         six.assertRaisesRegex(self,
             ObjectDoesNotExist,
-            "Article matching query does not exist. Lookup parameters were "
-            "{'id__exact': 2000}",
+            "Article matching query does not exist.",
             Article.objects.get,
             id__exact=2000,
         )
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.
-        six.assertRaisesRegex(self,
+        self.assertRaises(
             ObjectDoesNotExist,
-            ".*'pub_date__year': 2005.*",
-            Article.objects.get,
-            pub_date__year=2005,
-            pub_date__month=8,
-        )
-        six.assertRaisesRegex(self,
-            ObjectDoesNotExist,
-            ".*'pub_date__month': 8.*",
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=8,
@@ -111,8 +103,7 @@ class ModelTest(TestCase):
 
         six.assertRaisesRegex(self,
             ObjectDoesNotExist,
-            "Article matching query does not exist. Lookup parameters were "
-            "{'pub_date__week_day': 6}",
+            "Article matching query does not exist.",
             Article.objects.get,
             pub_date__week_day=6,
         )
@@ -163,6 +154,28 @@ class ModelTest(TestCase):
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=7,
+        )
+
+    def test_multiple_objects_max_num_fetched(self):
+        """
+        #6785 - get() should fetch a limited number of results.
+        """
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(MAX_GET_RESULTS)
+        )
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area %s' % MAX_GET_RESULTS, pub_date=datetime(2005, 7, 28))
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned more than %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
         )
 
     def test_object_creation(self):
@@ -442,7 +455,7 @@ class ModelTest(TestCase):
             Article.objects.all()[0:-5]
         except Exception as e:
             error = e
-        self.assertTrue(isinstance(error, AssertionError))
+        self.assertIsInstance(error, AssertionError)
         self.assertEqual(str(error), "Negative indexing is not supported.")
 
         # An Article instance doesn't have access to the "objects" attribute.
@@ -647,15 +660,15 @@ class ModelTest(TestCase):
         # Can't be instantiated
         with self.assertRaises(TypeError):
             EmptyQuerySet()
-        self.assertTrue(isinstance(Article.objects.none(), EmptyQuerySet))
+        self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
 
     def test_emptyqs_values(self):
         # test for #15959
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             qs = Article.objects.none().values_list('pk')
-            self.assertTrue(isinstance(qs, EmptyQuerySet))
-            self.assertTrue(isinstance(qs, ValuesListQuerySet))
+            self.assertIsInstance(qs, EmptyQuerySet)
+            self.assertIsInstance(qs, ValuesListQuerySet)
             self.assertEqual(len(qs), 0)
 
     def test_emptyqs_customqs(self):
@@ -670,7 +683,7 @@ class ModelTest(TestCase):
         qs = qs.none()
         with self.assertNumQueries(0):
             self.assertEqual(len(qs), 0)
-            self.assertTrue(isinstance(qs, EmptyQuerySet))
+            self.assertIsInstance(qs, EmptyQuerySet)
             self.assertEqual(qs.do_something(), 'did something')
 
     def test_emptyqs_values_order(self):
@@ -689,7 +702,16 @@ class ModelTest(TestCase):
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)
 
+    def test_ticket_20278(self):
+        sr = SelfRef.objects.create()
+        with self.assertRaises(ObjectDoesNotExist):
+            SelfRef.objects.get(selfref=sr)
+
+
 class ConcurrentSaveTests(TransactionTestCase):
+
+    available_apps = ['basic']
+
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_concurrent_delete_with_save(self):
         """
@@ -713,3 +735,59 @@ class ConcurrentSaveTests(TransactionTestCase):
         t.join()
         a.save()
         self.assertEqual(Article.objects.get(pk=a.pk).headline, 'foo')
+
+
+class ManagerTest(TestCase):
+    QUERYSET_PROXY_METHODS = [
+        'none',
+        'count',
+        'dates',
+        'datetimes',
+        'distinct',
+        'extra',
+        'get',
+        'get_or_create',
+        'update_or_create',
+        'create',
+        'bulk_create',
+        'filter',
+        'aggregate',
+        'annotate',
+        'complex_filter',
+        'exclude',
+        'in_bulk',
+        'iterator',
+        'earliest',
+        'latest',
+        'first',
+        'last',
+        'order_by',
+        'select_for_update',
+        'select_related',
+        'prefetch_related',
+        'values',
+        'values_list',
+        'update',
+        'reverse',
+        'defer',
+        'only',
+        'using',
+        'exists',
+        '_insert',
+        '_update',
+        'raw',
+    ]
+
+    def test_manager_methods(self):
+        """
+        This test ensures that the correct set of methods from `QuerySet`
+        are copied onto `Manager`.
+
+        It's particularly useful to prevent accidentally leaking new methods
+        into `Manager`. New `QuerySet` methods that should also be copied onto
+        `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
+        """
+        self.assertEqual(
+            sorted(BaseManager._get_queryset_methods(QuerySet).keys()),
+            sorted(self.QUERYSET_PROXY_METHODS),
+        )

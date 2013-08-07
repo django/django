@@ -2,14 +2,27 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.test_custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
+from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.contrib.auth.hashers import MD5PasswordHasher
+
+
+class CountingMD5PasswordHasher(MD5PasswordHasher):
+    """Hasher that counts how many times it computes a hash."""
+
+    calls = 0
+
+    def encode(self, *args, **kwargs):
+        type(self).calls += 1
+        return super(CountingMD5PasswordHasher, self).encode(*args, **kwargs)
 
 
 class BaseModelBackendTest(object):
@@ -105,9 +118,25 @@ class BaseModelBackendTest(object):
         self.assertEqual(user.get_all_permissions(), set(['auth.test']))
 
     def test_get_all_superuser_permissions(self):
-        "A superuser has all permissions. Refs #14795"
+        """A superuser has all permissions. Refs #14795."""
         user = self.UserModel._default_manager.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
+
+    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher',))
+    def test_authentication_timing(self):
+        """Hasher is run once regardless of whether the user exists. Refs #20760."""
+        # Re-set the password, because this tests overrides PASSWORD_HASHERS
+        self.user.set_password('test')
+        self.user.save()
+
+        CountingMD5PasswordHasher.calls = 0
+        username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+        authenticate(username=username, password='test')
+        self.assertEqual(CountingMD5PasswordHasher.calls, 1)
+
+        CountingMD5PasswordHasher.calls = 0
+        authenticate(username='no_such_user', password='test')
+        self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
 
 @skipIfCustomUser
@@ -402,3 +431,52 @@ class PermissionDeniedBackendTest(TestCase):
             settings.AUTHENTICATION_BACKENDS) + (backend, ))
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
+
+class NewModelBackend(ModelBackend):
+    pass
+
+
+@skipIfCustomUser
+class ChangedBackendSettingsTest(TestCase):
+    """
+    Tests for changes in the settings.AUTHENTICATION_BACKENDS
+    """
+    backend = 'django.contrib.auth.tests.test_auth_backends.NewModelBackend'
+
+    TEST_USERNAME = 'test_user'
+    TEST_PASSWORD = 'test_password'
+    TEST_EMAIL = 'test@example.com'
+
+    def setUp(self):
+        User.objects.create_user(self.TEST_USERNAME,
+                                 self.TEST_EMAIL,
+                                 self.TEST_PASSWORD)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    def test_changed_backend_settings(self):
+        """
+        Tests that removing a backend configured in AUTHENTICATION_BACKENDS
+        make already logged-in users disconnect.
+        """
+
+        # Get a session for the test user
+        self.assertTrue(self.client.login(
+            username=self.TEST_USERNAME,
+            password=self.TEST_PASSWORD)
+        )
+
+        # Prepare a request object
+        request = HttpRequest()
+        request.session = self.client.session
+
+        # Remove NewModelBackend
+        with self.settings(AUTHENTICATION_BACKENDS=(
+                'django.contrib.auth.backends.ModelBackend',)):
+            # Get the user from the request
+            user = get_user(request)
+
+            # Assert that the user retrieval is successful and the user is
+            # anonymous as the backend is not longer available.
+            self.assertIsNotNone(user)
+            self.assertTrue(user.is_anonymous())

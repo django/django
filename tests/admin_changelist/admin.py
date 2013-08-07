@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 from django.core.paginator import Paginator
 
@@ -65,6 +63,11 @@ class QuartetAdmin(admin.ModelAdmin):
 
 class ChordsBandAdmin(admin.ModelAdmin):
     list_filter = ['members']
+
+
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ('band', 'player')
+    list_select_related = ('player',)
 
 
 class DynamicListDisplayChildAdmin(admin.ModelAdmin):

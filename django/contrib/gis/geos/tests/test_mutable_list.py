@@ -3,9 +3,11 @@
 #
 # Modified from original contribution by Aryeh Leib Taurog, which was
 # released under the New BSD license.
+
+import unittest
+
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.utils import six
-from django.utils import unittest
 
 
 class UserListA(ListMixin):
@@ -395,15 +397,3 @@ class ListMixinTest(unittest.TestCase):
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(ListMixinTest))
-    s.addTest(unittest.makeSuite(ListMixinTestSingle))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-if __name__ == '__main__':
-    run()

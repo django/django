@@ -92,8 +92,14 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
+        self.context.append(self.compact_p)
+        self.compact_p = True
         self._table_row_index = 0 # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
+
+    def depart_table(self, node):
+        self.compact_p = self.context.pop()
+        self.body.append('</table>\n')
 
     # <big>? Really?
     def visit_desc_parameterlist(self, node):
@@ -137,7 +143,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         )
         title = "%s%s" % (
             self.version_text[node['type']] % node['version'],
-            len(node) and ":" or "."
+            ":" if len(node) else "."
         )
         self.body.append('<span class="title">%s</span> ' % title)
 

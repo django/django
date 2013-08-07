@@ -108,6 +108,8 @@ The ``ModelAdmin`` is very flexible. It has several options for dealing with
 customizing the interface. All options are defined on the ``ModelAdmin``
 subclass::
 
+    from django.contrib import admin
+
     class AuthorAdmin(admin.ModelAdmin):
         date_hierarchy = 'pub_date'
 
@@ -157,6 +159,8 @@ subclass::
 
     For example, let's consider the following model::
 
+        from django.db import models
+
         class Author(models.Model):
             name = models.CharField(max_length=100)
             title = models.CharField(max_length=3)
@@ -165,6 +169,8 @@ subclass::
     If you want a form for the ``Author`` model that includes only the ``name``
     and ``title`` fields, you would specify ``fields`` or ``exclude`` like
     this::
+
+        from django.contrib import admin
 
         class AuthorAdmin(admin.ModelAdmin):
             fields = ('name', 'title')
@@ -233,6 +239,8 @@ subclass::
 
     A full example, taken from the
     :class:`django.contrib.flatpages.models.FlatPage` model::
+
+        from django.contrib import admin
 
         class FlatPageAdmin(admin.ModelAdmin):
             fieldsets = (
@@ -337,8 +345,28 @@ subclass::
 
     .. admonition:: Note
 
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        since the admin has its own way of defining fields, the ``Meta.fields``
+        attribute will be ignored.
+
+        If the ``ModelForm`` is only going to be used for the admin, the easiest
+        solution is to omit the ``Meta.model`` attribute, since ``ModelAdmin``
+        will provide the correct model to use. Alternatively, you can set
+        ``fields = []`` in the ``Meta`` class to satisfy the validation on the
+        ``ModelForm``.
+
+    .. admonition:: Note
+
         If your ``ModelForm`` and ``ModelAdmin`` both define an ``exclude``
         option then ``ModelAdmin`` takes precedence::
+
+            from django import forms
+            from django.contrib import admin
+            from myapp.models import Person
 
             class PersonForm(forms.ModelForm):
 
@@ -410,7 +438,8 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__unicode__()`` representation of each object.
+    column that displays the ``__unicode__()`` (``__str__()`` on Python 3)
+    representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -436,12 +465,15 @@ subclass::
               list_display = ('upper_case_name',)
 
               def upper_case_name(self, obj):
-                return ("%s %s" % (obj.first_name, obj.last_name)).upper()
+                  return ("%s %s" % (obj.first_name, obj.last_name)).upper()
               upper_case_name.short_description = 'Name'
 
     * A string representing an attribute on the model. This behaves almost
       the same as the callable, but ``self`` in this context is the model
       instance. Here's a full model example::
+
+          from django.db import models
+          from django.contrib import admin
 
           class Person(models.Model):
               name = models.CharField(max_length=50)
@@ -457,7 +489,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` of the related object.
+      ``__unicode__()`` (``__str__()`` on Python 3) of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -478,6 +510,8 @@ subclass::
 
       Here's a full example model::
 
+          from django.db import models
+          from django.contrib import admin
           from django.utils.html import format_html
 
           class Person(models.Model):
@@ -502,6 +536,9 @@ subclass::
       whose value is ``True``.
 
       Here's a full example model::
+
+          from django.db import models
+          from django.contrib import admin
 
           class Person(models.Model):
               first_name = models.CharField(max_length=50)
@@ -531,6 +568,8 @@ subclass::
 
       For example::
 
+        from django.db import models
+        from django.contrib import admin
         from django.utils.html import format_html
 
         class Person(models.Model):
@@ -550,6 +589,27 @@ subclass::
 
       The above will tell Django to order by the ``first_name`` field when
       trying to sort by ``colored_first_name`` in the admin.
+
+    * Elements of ``list_display`` can also be properties. Please note however,
+      that due to the way properties work in Python, setting
+      ``short_description`` on a property is only possible when using the
+      ``property()`` function and **not** with the ``@property`` decorator.
+
+      For example::
+
+          class Person(object):
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+
+              def my_property(self):
+                  return self.first_name + ' ' + self.last_name
+              my_property.short_description = "Full name of the person"
+
+              full_name = property(my_property)
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('full_name',)
+
 
     * .. versionadded:: 1.6
 
@@ -618,13 +678,13 @@ subclass::
       ``BooleanField``, ``CharField``, ``DateField``, ``DateTimeField``,
       ``IntegerField``, ``ForeignKey`` or ``ManyToManyField``, for example::
 
-          class PersonAdmin(ModelAdmin):
+          class PersonAdmin(admin.ModelAdmin):
               list_filter = ('is_staff', 'company')
 
       Field names in ``list_filter`` can also span relations
       using the ``__`` lookup, for example::
 
-          class PersonAdmin(UserAdmin):
+          class PersonAdmin(admin.UserAdmin):
               list_filter = ('company__name',)
 
     * a class inheriting from ``django.contrib.admin.SimpleListFilter``,
@@ -634,10 +694,10 @@ subclass::
 
            from datetime import date
 
+           from django.contrib import admin
            from django.utils.translation import ugettext_lazy as _
-           from django.contrib.admin import SimpleListFilter
 
-           class DecadeBornListFilter(SimpleListFilter):
+           class DecadeBornListFilter(admin.SimpleListFilter):
                # Human-readable title which will be displayed in the
                # right admin sidebar just above the filter options.
                title = _('decade born')
@@ -673,7 +733,7 @@ subclass::
                        return queryset.filter(birthday__gte=date(1990, 1, 1),
                                                birthday__lte=date(1999, 12, 31))
 
-           class PersonAdmin(ModelAdmin):
+           class PersonAdmin(admin.ModelAdmin):
                list_filter = (DecadeBornListFilter,)
 
       .. note::
@@ -716,11 +776,9 @@ subclass::
       element is a class inheriting from
       ``django.contrib.admin.FieldListFilter``, for example::
 
-          from django.contrib.admin import BooleanFieldListFilter
-
-          class PersonAdmin(ModelAdmin):
+          class PersonAdmin(admin.ModelAdmin):
               list_filter = (
-                  ('is_staff', BooleanFieldListFilter),
+                  ('is_staff', admin.BooleanFieldListFilter),
               )
 
       .. note::
@@ -730,7 +788,7 @@ subclass::
 
     It is possible to specify a custom template for rendering a list filter::
 
-        class FilterWithCustomTemplate(SimpleListFilter):
+        class FilterWithCustomTemplate(admin.SimpleListFilter):
             template = "custom_template.html"
 
     See the default template provided by django (``admin/filter.html``) for
@@ -755,12 +813,24 @@ subclass::
     the list of objects on the admin change list page. This can save you a
     bunch of database queries.
 
-    The value should be either ``True`` or ``False``. Default is ``False``.
+    .. versionchanged:: dev
 
-    Note that Django will use
-    :meth:`~django.db.models.query.QuerySet.select_related`,
-    regardless of this setting if one of the ``list_display`` fields is a
-    ``ForeignKey``.
+    The value should be either a boolean, a list or a tuple. Default is
+    ``False``.
+
+    When value is ``True``, ``select_related()`` will always be called. When
+    value is set to ``False``, Django will look at ``list_display`` and call
+    ``select_related()`` if any ``ForeignKey`` is present.
+
+    If you need more fine-grained control, use a tuple (or list) as value for
+    ``list_select_related``. Empty tuple will prevent Django from calling
+    ``select_related`` at all. Any other tuple will be passed directly to
+    ``select_related`` as parameters. For example::
+
+        class ArticleAdmin(admin.ModelAdmin):
+            list_select_related = ('author', 'category')
+
+    will call ``select_related('author', 'category')``.
 
 .. attribute:: ModelAdmin.ordering
 
@@ -800,6 +870,14 @@ subclass::
 
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     nor ``ManyToManyField`` fields.
+
+.. attribute:: ModelAdmin.preserve_filters
+
+    .. versionadded:: 1.6
+
+    The admin now preserves filters on the list view after creating, editing
+    or deleting an object. You can restore the previous behavior of clearing
+    filters by setting this attribute to ``False``.
 
 .. attribute:: ModelAdmin.radio_fields
 
@@ -860,10 +938,11 @@ subclass::
     the admin interface to provide feedback on the status of the objects being
     edited, for example::
 
+        from django.contrib import admin
         from django.utils.html import format_html_join
         from django.utils.safestring import mark_safe
 
-        class PersonAdmin(ModelAdmin):
+        class PersonAdmin(admin.ModelAdmin):
             readonly_fields = ('address_report',)
 
             def address_report(self, instance):
@@ -968,6 +1047,10 @@ subclass::
         Performs a full-text match. This is like the default search method but
         uses an index. Currently this is only available for MySQL.
 
+    If you need to customize search you can use
+    :meth:`ModelAdmin.get_search_results` to provide additional or alternate
+    search behavior.
+
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1022,6 +1105,8 @@ templates used by the :class:`ModelAdmin` views:
 
     For example to attach ``request.user`` to the object prior to saving::
 
+        from django.contrib import admin
+
         class ArticleAdmin(admin.ModelAdmin):
             def save_model(self, request, obj, form, change):
                 obj.user = request.user
@@ -1055,13 +1140,46 @@ templates used by the :class:`ModelAdmin` views:
     is expected to return a ``list`` or ``tuple`` for ordering similar
     to the :attr:`ordering` attribute. For example::
 
-        class PersonAdmin(ModelAdmin):
+        class PersonAdmin(admin.ModelAdmin):
 
             def get_ordering(self, request):
                 if request.user.is_superuser:
                     return ['name', 'rank']
                 else:
                     return ['name']
+
+.. method:: ModelAdmin.get_search_results(self, request, queryset, search_term)
+
+    .. versionadded:: 1.6
+
+    The ``get_search_results`` method modifies the list of objects displayed in
+    to those that match the provided search term. It accepts the request, a
+    queryset that applies the current filters, and the user-provided search term.
+    It returns a tuple containing a queryset modified to implement the search, and
+    a boolean indicating if the results may contain duplicates.
+
+    The default implementation searches the fields named in :attr:`ModelAdmin.search_fields`.
+
+    This method may be overridden with your own custom search method. For
+    example, you might wish to search by an integer field, or use an external
+    tool such as Solr or Haystack. You must establish if the queryset changes
+    implemented by your search method may introduce duplicates into the results,
+    and return ``True`` in the second element of the return value.
+
+    For example, to enable search by integer field, you could use::
+
+        class PersonAdmin(admin.ModelAdmin):
+            list_display = ('name', 'age')
+            search_fields = ('name',)
+
+            def get_search_results(self, request, queryset, search_term):
+                queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
+                try:
+                    search_term_as_int = int(search_term)
+                    queryset |= self.model.objects.filter(age=search_term_as_int)
+                except:
+                    pass
+                return queryset, use_distinct
 
 .. method:: ModelAdmin.save_related(self, request, form, formsets, change)
 
@@ -1271,6 +1389,15 @@ templates used by the :class:`ModelAdmin` views:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
 
+    .. admonition:: Note
+
+        Any ``choices`` attribute set on the formfield will limited to the form
+        field only. If the corresponding field on the model has choices set,
+        the choices provided to the form must be a valid subset of those
+        choices, otherwise the form submission will fail with
+        a :exc:`~django.core.exceptions.ValidationError` when the model itself
+        is validated before saving.
+
 .. method:: ModelAdmin.get_changelist(self, request, **kwargs)
 
     Returns the ``Changelist`` class to be used for listing. By default,
@@ -1282,13 +1409,26 @@ templates used by the :class:`ModelAdmin` views:
     Returns a :class:`~django.forms.ModelForm` class for use in the ``Formset``
     on the changelist page. To use a custom form, for example::
 
+        from django import forms
+
         class MyForm(forms.ModelForm):
-            class Meta:
-                model = MyModel
+            pass
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_changelist_form(self, request, **kwargs):
                 return MyForm
+
+    .. admonition:: Note
+
+        .. versionchanged:: 1.6
+
+        If you define the ``Meta.model`` attribute on a
+        :class:`~django.forms.ModelForm`, you must also define the
+        ``Meta.fields`` attribute (or the ``Meta.exclude`` attribute). However,
+        ``ModelAdmin`` ignores this value, overriding it with the
+        :attr:`ModelAdmin.list_editable` attribute. The easiest solution is to
+        omit the ``Meta.model`` attribute, since ``ModelAdmin`` will provide the
+        correct model to use.
 
 .. method::  ModelAdmin.get_changelist_formset(self, request, **kwargs)
 
@@ -1423,13 +1563,13 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
 
-.. _modeladmin-media-definitions:
+.. _modeladmin-asset-definitions:
 
-``ModelAdmin`` media definitions
+``ModelAdmin`` asset definitions
 --------------------------------
 
 There are times where you would like add a bit of CSS and/or JavaScript to
-the add/change views. This can be accomplished by using a Media inner class
+the add/change views. This can be accomplished by using a ``Media`` inner class
 on your ``ModelAdmin``::
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -1441,8 +1581,8 @@ on your ``ModelAdmin``::
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
-``None``) to any media paths. The same rules apply as :ref:`regular media
-definitions on forms <form-media-paths>`.
+``None``) to any asset paths. The same rules apply as :ref:`regular asset
+definitions on forms <form-asset-paths>`.
 
 jQuery
 ~~~~~~
@@ -1490,9 +1630,6 @@ needed. Now within your form you can add your own custom validation for
 any field::
 
     class MyArticleAdminForm(forms.ModelForm):
-        class Meta:
-            model = Article
-
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]
@@ -1515,6 +1652,8 @@ information.
     The admin interface has the ability to edit models on the same page as a
     parent model. These are called inlines. Suppose you have these two models::
 
+         from django.db import models
+
          class Author(models.Model):
             name = models.CharField(max_length=100)
 
@@ -1524,6 +1663,8 @@ information.
 
     You can edit the books authored by an author on the author page. You add
     inlines to a model by specifying them in a ``ModelAdmin.inlines``::
+
+        from django.contrib import admin
 
         class BookInline(admin.TabularInline):
             model = Book
@@ -1581,9 +1722,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.formset
 
-    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-    many possibilities of customization. Inlines are built around
-    :ref:`model formsets <model-formsets>`.
+    This defaults to :class:`~django.forms.models.BaseInlineFormSet`. Using
+    your own formset can give you many possibilities of customization. Inlines
+    are built around :ref:`model formsets <model-formsets>`.
 
 .. attribute:: InlineModelAdmin.form
 
@@ -1605,6 +1746,11 @@ The ``InlineModelAdmin`` class adds:
     The dynamic link will not appear if the number of currently displayed forms
     exceeds ``max_num``, or if the user does not have JavaScript enabled.
 
+    .. versionadded:: 1.6
+
+    :meth:`InlineModelAdmin.get_extra` also allows you to customize the number
+    of extra forms.
+
     .. _ref-contrib-admin-inline-max-num:
 
 .. attribute:: InlineModelAdmin.max_num
@@ -1612,6 +1758,11 @@ The ``InlineModelAdmin`` class adds:
     This controls the maximum number of forms to show in the inline. This
     doesn't directly correlate to the number of objects, but can if the value
     is small enough. See :ref:`model-formsets-max-num` for more information.
+
+    .. versionadded:: 1.6
+
+    :meth:`InlineModelAdmin.get_max_num` also allows you to customize the
+    maximum number of extra forms.
 
 .. attribute:: InlineModelAdmin.raw_id_fields
 
@@ -1649,14 +1800,58 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
 
-    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
-    See the example for :class:`ModelAdmin.get_formsets`.
+    Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
+    admin add/change views. See the example for
+    :class:`ModelAdmin.get_formsets`.
+
+.. method:: InlineModelAdmin.get_extra(self, request, obj=None, **kwargs)
+
+    .. versionadded:: 1.6
+
+    Returns the number of extra inline forms to use. By default, returns the
+    :attr:`InlineModelAdmin.extra` attribute.
+
+    Override this method to programmatically determine the number of extra
+    inline forms. For example, this may be based on the model instance
+    (passed as the keyword argument ``obj``)::
+
+        class BinaryTreeAdmin(admin.TabularInline):
+            model = BinaryTree
+
+            def get_extra(self, request, obj=None, **kwargs):
+                extra = 2
+                if obj:
+                    return extra - obj.binarytree_set.count()
+                return extra
+
+.. method:: InlineModelAdmin.get_max_num(self, request, obj=None, **kwargs)
+
+    .. versionadded:: 1.6
+
+    Returns the maximum number of extra inline forms to use. By default,
+    returns the :attr:`InlineModelAdmin.max_num` attribute.
+
+    Override this method to programmatically determine the maximum number of
+    inline forms. For example, this may be based on the model instance
+    (passed as the keyword argument ``obj``)::
+
+        class BinaryTreeAdmin(admin.TabularInline):
+            model = BinaryTree
+
+            def get_max_num(self, request, obj=None, **kwargs):
+                max_num = 10
+                if obj.parent:
+                    return max_num - 5
+                return max_num
+
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
 
 It is sometimes possible to have more than one foreign key to the same model.
 Take this model for instance::
+
+    from django.db import models
 
     class Friendship(models.Model):
         to_person = models.ForeignKey(Person, related_name="friends")
@@ -1665,6 +1860,9 @@ Take this model for instance::
 If you wanted to display an inline on the ``Person`` admin add/change pages
 you need to explicitly define the foreign key since it is unable to do so
 automatically::
+
+    from django.contrib import admin
+    from myapp.models import Friendship
 
     class FriendshipInline(admin.TabularInline):
         model = Friendship
@@ -1688,6 +1886,8 @@ widgets with inlines.
 
 Suppose we have the following models::
 
+    from django.db import models
+
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
@@ -1697,6 +1897,8 @@ Suppose we have the following models::
 
 If you want to display many-to-many relations using an inline, you can do
 so by defining an ``InlineModelAdmin`` object for the relationship::
+
+    from django.contrib import admin
 
     class MembershipInline(admin.TabularInline):
         model = Group.members.through
@@ -1743,6 +1945,8 @@ model.
 However, we still want to be able to edit that information inline. Fortunately,
 this is easy to do with inline admin models. Suppose we have the following
 models::
+
+    from django.db import models
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
@@ -1791,6 +1995,8 @@ Using generic relations as an inline
 
 It is possible to use an inline with generically related objects. Let's say
 you have the following models::
+
+    from django.db import models
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
@@ -1965,6 +2171,10 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site main index
     view.
 
+.. attribute:: AdminSite.app_index_template
+
+    Path to a custom template that will be used by the admin site app index view.
+
 .. attribute:: AdminSite.login_template
 
     Path to a custom template that will be used by the admin site login view.
@@ -2082,9 +2292,14 @@ your URLconf. Specifically, add these four patterns:
 .. code-block:: python
 
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
-    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+    url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', name='password_reset_confirm'),
+    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
+
+.. versionchanged:: 1.6
+
+    The pattern for :func:`~django.contrib.auth.views.password_reset_confirm`
+    changed as the ``uid`` is now base 64 encoded.
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app

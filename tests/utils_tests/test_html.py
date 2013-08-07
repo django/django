@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from datetime import datetime
 import os
+from unittest import TestCase
 
 from django.utils import html
 from django.utils._os import upath
-from django.utils.unittest import TestCase
+from django.utils.encoding import force_text
 
 
 class TestUtilsHtml(TestCase):
@@ -63,10 +65,15 @@ class TestUtilsHtml(TestCase):
     def test_strip_tags(self):
         f = html.strip_tags
         items = (
+            ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
+             'See: &#39;&eacute; is an apostrophe followed by e acute'),
             ('<adf>a', 'a'),
             ('</adf>a', 'a'),
             ('<asdf><asdf>e', 'e'),
-            ('<f', '<f'),
+            ('hi, <f x', 'hi, <f x'),
+            ('234<235, right?', '234<235, right?'),
+            ('a4<a5 right?', 'a4<a5 right?'),
+            ('b7>b2!', 'b7>b2!'),
             ('</fe', '</fe'),
             ('<x>b<y>', 'b'),
             ('a<p onclick="alert(\'<test>\')">b</p>c', 'abc'),
@@ -81,8 +88,9 @@ class TestUtilsHtml(TestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
             with open(path, 'r') as fp:
+                content = force_text(fp.read())
                 start = datetime.now()
-                stripped = html.strip_tags(fp.read())
+                stripped = html.strip_tags(content)
                 elapsed = datetime.now() - start
             self.assertEqual(elapsed.seconds, 0)
             self.assertIn("Please try again.", stripped)
@@ -174,3 +182,13 @@ class TestUtilsHtml(TestCase):
         )
         for value, tags, output in items:
             self.assertEqual(f(value, tags), output)
+
+    def test_smart_urlquote(self):
+        quote = html.smart_urlquote
+        # Ensure that IDNs are properly quoted
+        self.assertEqual(quote('http://öäü.com/'), 'http://xn--4ca9at.com/')
+        self.assertEqual(quote('http://öäü.com/öäü/'), 'http://xn--4ca9at.com/%C3%B6%C3%A4%C3%BC/')
+        # Ensure that everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
+        self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
+        self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
+        self.assertEqual(quote('http://example.com/?x=1&y=2'), 'http://example.com/?x=1&y=2')

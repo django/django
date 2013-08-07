@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
 import os
@@ -14,7 +14,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.utils import six
@@ -39,6 +39,10 @@ class HttpRequest(object):
     _upload_handlers = []
 
     def __init__(self):
+        # WARNING: The `WSGIRequest` subclass doesn't call `super`.
+        # Any variable assignment made here should also happen in
+        # `WSGIRequest.__init__()`.
+
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
         self.path_info = ''
@@ -64,15 +68,20 @@ class HttpRequest(object):
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
 
-        allowed_hosts = ['*'] if settings.DEBUG else settings.ALLOWED_HOSTS
+        # There is no hostname validation when DEBUG=True
+        if settings.DEBUG:
+            return host
+
         domain, port = split_domain_port(host)
-        if domain and validate_host(domain, allowed_hosts):
+        if domain and validate_host(domain, settings.ALLOWED_HOSTS):
             return host
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
                 msg += "You may need to add %r to ALLOWED_HOSTS." % domain
-            raise SuspiciousOperation(msg)
+            else:
+                msg += "The domain name provided is not valid according to RFC 1034/1035"
+            raise DisallowedHost(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -238,11 +247,17 @@ class HttpRequest(object):
 
     def read(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.read(*args, **kwargs)
+        try:
+            return self._stream.read(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def readline(self, *args, **kwargs):
         self._read_started = True
-        return self._stream.readline(*args, **kwargs)
+        try:
+            return self._stream.readline(*args, **kwargs)
+        except IOError as e:
+            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
 
     def xreadlines(self):
         while True:

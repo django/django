@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import gzip
 from io import BytesIO
 import random
 import re
+from unittest import expectedFailure, skipIf
 import warnings
 
 from django.conf import settings
@@ -18,13 +19,10 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.transaction import TransactionMiddleware
 from django.test import TransactionTestCase, TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import xrange
-from django.utils.unittest import expectedFailure
-
-from transactions.tests import IgnorePendingDeprecationWarningsMixin
 
 from .models import Band
 
@@ -251,7 +249,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('regular_url/that/does/not/exist')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 1)
@@ -263,7 +261,7 @@ class CommonMiddlewareTest(TestCase):
     def test_404_error_reporting_no_referer(self):
         request = self._get_request('regular_url/that/does/not/exist')
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -275,7 +273,7 @@ class CommonMiddlewareTest(TestCase):
         request = self._get_request('foo_url/that/does/not/exist/either')
         request.META['HTTP_REFERER'] = '/another/url/'
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PendingDeprecationWarning)
+            warnings.simplefilter("ignore", DeprecationWarning)
             response = self.client.get(request.path)
             CommonMiddleware().process_response(request, response)
         self.assertEqual(len(mail.outbox), 0)
@@ -320,6 +318,33 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
 
+    @skipIf(six.PY3, "HTTP_REFERER is str type on Python 3")
+    def test_404_error_nonascii_referrer(self):
+        # Such referer strings should not happen, but anyway, if it happens,
+        # let's not crash
+        self.req.META['HTTP_REFERER'] = b'http://testserver/c/\xd0\xbb\xd0\xb8/'
+        BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_custom_request_checker(self):
+        class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
+            ignored_user_agent_patterns = (re.compile(r'Spider.*'),
+                                           re.compile(r'Robot.*'))
+            def is_ignorable_request(self, request, uri, domain, referer):
+                '''Check user-agent in addition to normal checks.'''
+                if super(SubclassedMiddleware, self).is_ignorable_request(request, uri, domain, referer):
+                    return True
+                user_agent = request.META['HTTP_USER_AGENT']
+                return any(pattern.search(user_agent) for pattern in
+                               self.ignored_user_agent_patterns)
+
+        self.req.META['HTTP_REFERER'] = '/another/url/'
+        self.req.META['HTTP_USER_AGENT'] = 'Spider machine 3.4'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 0)
+        self.req.META['HTTP_USER_AGENT'] = 'My user agent'
+        SubclassedMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 1)
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'middleware.cond_get_urls'
@@ -678,10 +703,13 @@ class ETagGZipMiddlewareTest(TestCase):
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
 
-class TransactionMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestCase):
     """
     Test the transaction middleware.
     """
+
+    available_apps = ['middleware']
+
     def setUp(self):
         super(TransactionMiddlewareTest, self).setUp()
         self.request = HttpRequest()

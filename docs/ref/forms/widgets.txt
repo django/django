@@ -52,8 +52,7 @@ widget on the field. In the following example, the
 :attr:`~django.forms.extras.widgets.SelectDateWidget.years` attribute is set
 for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
 
-    from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
-    from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
+    from django import forms
     from django.forms.extras.widgets import SelectDateWidget
 
     BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
@@ -62,9 +61,9 @@ for a :class:`~django.forms.extras.widgets.SelectDateWidget`::
                                 ('black', 'Black'))
 
     class SimpleForm(forms.Form):
-        birth_year = DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+        birth_year = forms.DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
         favorite_colors = forms.MultipleChoiceField(required=False,
-            widget=CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
+            widget=forms.CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
@@ -163,21 +162,23 @@ Django will then include the extra attributes in the rendered output:
     <tr><th>Url:</th><td><input type="url" name="url"/></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
 
+You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
+:attr:`BoundField.id_for_label` for an example.
+
 .. _styling-widget-classes:
 
 Styling widget classes
 ^^^^^^^^^^^^^^^^^^^^^^
 
-With widgets, it is possible to add media (``css`` and ``javascript``)
+With widgets, it is possible to add assets (``css`` and ``javascript``)
 and more deeply customize their appearance and behavior.
 
 In a nutshell, you will need to subclass the widget and either
-:ref:`define a class "Media" <media-as-a-static-definition>` as a member of the
-subclass, or :ref:`create a property "media" <dynamic-property>`, returning an
-instance of that class.
+:ref:`define a "Media" inner class  <assets-as-a-static-definition>` or
+:ref:`create a "media" property <dynamic-property>`.
 
 These methods involve somewhat advanced Python programming and are described in
-detail in the :doc:`Form Media </topics/forms/media>` topic guide.
+detail in the :doc:`Form Assets </topics/forms/media>` topic guide.
 
 .. _base-widget-classes:
 
@@ -201,6 +202,7 @@ foundation for custom widgets.
 
         .. code-block:: python
 
+            >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
             u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
@@ -248,6 +250,8 @@ foundation for custom widgets.
         An example of this is how :class:`SplitDateTimeWidget` turns a
         :class:`~datetime.datetime` value into a list with date and time split
         into two separate values::
+
+            from django.forms import MultiWidget
 
             class SplitDateTimeWidget(MultiWidget):
 

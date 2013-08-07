@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.conf import settings
 
@@ -8,11 +8,11 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import date, datetime, timedelta
-import time
+from datetime import date, datetime
 import os
 import sys
 import traceback
+import unittest
 try:
     from urllib.parse import urljoin
 except ImportError:     # Python 2
@@ -27,32 +27,14 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
-from django.utils import unittest
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
-from django.utils.translation import activate, deactivate, ugettext as _
+from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.tzinfo import LocalTimezone
 
-from .test_callables import CallableVariablesTests
-from .test_context import ContextTests
-from .test_custom import CustomTagTests, CustomFilterTests
-from .test_parser import ParserTests
-from .test_unicode import UnicodeTests
-from .test_nodelist import NodelistTest, ErrorIndexTest
-from .test_smartif import SmartIfTests
-from .test_response import (TemplateResponseTest, CacheMiddlewareTest,
-    SimpleTemplateResponseTest, CustomURLConfTest)
-
-try:
-    from .loaders import RenderToStringTest, EggLoaderTest
-except ImportError as e:
-    if "pkg_resources" in e.args[0]:
-        pass # If setuptools isn't installed, that's fine. Just move on.
-    else:
-        raise
+from i18n import TransRealMixin
 
 # NumPy installed?
 try:
@@ -163,8 +145,8 @@ class UTF8Class:
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
-@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
-class Templates(TestCase):
+
+class TemplateLoaderTests(TestCase):
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
@@ -356,6 +338,9 @@ class Templates(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+
+class TemplateRegressionTests(TestCase):
+
     def test_token_smart_split(self):
         # Regression test for #7027
         token = template.Token(template.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
@@ -453,6 +438,18 @@ class Templates(TestCase):
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
+    def test_super_errors(self):
+        """
+        Test behavior of the raise errors into included blocks.
+        See #18169
+        """
+        t = loader.get_template('included_content.html')
+        with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(Context({}))
+
+
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
+class TemplateTests(TransRealMixin, TestCase):
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
@@ -527,7 +524,7 @@ class Templates(TestCase):
                         try:
                             with warnings.catch_warnings():
                                 # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.template.base')
+                                warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
                                 test_template = loader.get_template(name)
                         except ShouldNotExecuteException:
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -847,6 +844,10 @@ class Templates(TestCase):
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
             'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
+            'filter05': ('{% filter safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter05bis': ('{% filter upper|safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06': ('{% filter escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06bis': ('{% filter upper|escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),

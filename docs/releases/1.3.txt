@@ -299,7 +299,7 @@ requests. These include:
   in tests.
 
 * A new test assertion --
-  :meth:`~django.test.TestCase.assertNumQueries` -- making it
+  :meth:`~django.test.TransactionTestCase.assertNumQueries` -- making it
   easier to test the database activity associated with a view.
 
 * Support for lookups spanning relations in admin's
@@ -650,6 +650,15 @@ Prior to Django 1.3, inactive users were able to request a password reset email
 and reset their password. In Django 1.3 inactive users will receive the same
 message as a nonexistent account.
 
+Password reset view now accepts ``from_email``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :func:`django.contrib.auth.views.password_reset` view now accepts a
+``from_email`` parameter, which is passed to the ``password_reset_form``'s
+``save()`` method as a keyword argument. If you are using this view with a
+custom password reset form, then you will need to ensure your form's ``save()``
+method accepts this keyword argument.
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3
@@ -799,7 +808,7 @@ GeoDjango
 * The function-based :setting:`TEST_RUNNER` previously used to execute
   the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``, was
   deprecated for the class-based runner,
-  :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`.
+  ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner``.
 
 * Previously, calling
   :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would

@@ -10,6 +10,7 @@ PathInfo = namedtuple('PathInfo',
                       'from_opts to_opts target_fields join_field '
                       'm2m direct')
 
+
 class RelatedObject(object):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
@@ -27,7 +28,7 @@ class RelatedObject(object):
         Analogue of django.db.models.fields.Field.get_choices, provided
         initially for utilisation by RelatedFieldListFilter.
         """
-        first_choice = include_blank and blank_choice or []
+        first_choice = blank_choice if include_blank else []
         queryset = self.model._default_manager.all()
         if limit_to_currently_related:
             queryset = queryset.complex_filter(

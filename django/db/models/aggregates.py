@@ -3,6 +3,7 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.db.models.constants import LOOKUP_SEP
 
+
 def refs_aggregate(lookup_parts, aggregates):
     """
     A little helper method to check if the lookup_parts contains references
@@ -14,6 +15,7 @@ def refs_aggregate(lookup_parts, aggregates):
         if LOOKUP_SEP.join(lookup_parts[0:i]) in aggregates:
             return True
     return False
+
 
 class Aggregate(object):
     """
@@ -58,23 +60,30 @@ class Aggregate(object):
         aggregate = klass(col, source=source, is_summary=is_summary, **self.extra)
         query.aggregates[alias] = aggregate
 
+
 class Avg(Aggregate):
     name = 'Avg'
+
 
 class Count(Aggregate):
     name = 'Count'
 
+
 class Max(Aggregate):
     name = 'Max'
+
 
 class Min(Aggregate):
     name = 'Min'
 
+
 class StdDev(Aggregate):
     name = 'StdDev'
 
+
 class Sum(Aggregate):
     name = 'Sum'
+
 
 class Variance(Aggregate):
     name = 'Variance'

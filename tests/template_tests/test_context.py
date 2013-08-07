@@ -1,6 +1,8 @@
 # coding: utf-8
+
+from unittest import TestCase
+
 from django.template import Context
-from django.utils.unittest import TestCase
 
 
 class ContextTests(TestCase):
@@ -14,3 +16,12 @@ class ContextTests(TestCase):
         self.assertEqual(c.pop(), {"a": 2})
         self.assertEqual(c["a"], 1)
         self.assertEqual(c.get("foo", 42), 42)
+
+        with c.push():
+            c['a'] = 2
+            self.assertEqual(c['a'], 2)
+        self.assertEqual(c['a'], 1)
+
+        with c.push(a=3):
+            self.assertEqual(c['a'], 3)
+        self.assertEqual(c['a'], 1)

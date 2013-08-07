@@ -1,4 +1,5 @@
-import warnings
+from calendar import timegm
+from functools import wraps
 
 from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
@@ -6,16 +7,20 @@ from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils import six
+from django.utils.http import http_date
 
+def x_robots_tag(func):
+    @wraps(func)
+    def inner(request, *args, **kwargs):
+        response = func(request, *args, **kwargs)
+        response['X-Robots-Tag'] = 'noindex, noodp, noarchive'
+        return response
+    return inner
+
+@x_robots_tag
 def index(request, sitemaps,
           template_name='sitemap_index.xml', content_type='application/xml',
-          sitemap_url_name='django.contrib.sitemaps.views.sitemap',
-          mimetype=None):
-
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
+          sitemap_url_name='django.contrib.sitemaps.views.sitemap'):
 
     req_protocol = 'https' if request.is_secure() else 'http'
     req_site = get_current_site(request)
@@ -35,14 +40,9 @@ def index(request, sitemaps,
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
 
+@x_robots_tag
 def sitemap(request, sitemaps, section=None,
-            template_name='sitemap.xml', content_type='application/xml',
-            mimetype=None):
-
-    if mimetype:
-        warnings.warn("The mimetype keyword argument is deprecated, use "
-            "content_type instead", DeprecationWarning, stacklevel=2)
-        content_type = mimetype
+            template_name='sitemap.xml', content_type='application/xml'):
 
     req_protocol = 'https' if request.is_secure() else 'http'
     req_site = get_current_site(request)
@@ -66,5 +66,11 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("Page %s empty" % page)
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
-    return TemplateResponse(request, template_name, {'urlset': urls},
-                            content_type=content_type)
+    response = TemplateResponse(request, template_name, {'urlset': urls},
+                                content_type=content_type)
+    if hasattr(site, 'latest_lastmod'):
+        # if latest_lastmod is defined for site, set header so as
+        # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        response['Last-Modified'] = http_date(
+            timegm(site.latest_lastmod.utctimetuple()))
+    return response

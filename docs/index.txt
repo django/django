@@ -185,13 +185,12 @@ testing of Django applications:
 * **Testing:**
   :doc:`Introduction <topics/testing/index>` |
   :doc:`Writing and running tests <topics/testing/overview>` |
-  :doc:`Advanced topics <topics/testing/advanced>` |
-  :doc:`Doctests <topics/testing/doctests>`
+  :doc:`Advanced topics <topics/testing/advanced>`
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
-  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` (deprecated) |
   :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 

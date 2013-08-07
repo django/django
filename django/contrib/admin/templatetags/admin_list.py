@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.util import (lookup_field, display_for_field,
     display_for_value, label_for_field)
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
@@ -10,7 +11,7 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import formats
-from django.utils.html import format_html
+from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -62,7 +63,7 @@ def pagination(cl):
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
             if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range.extend(range(0, ON_EACH_SIDE - 1))
+                page_range.extend(range(0, ON_ENDS))
                 page_range.append(DOT)
                 page_range.extend(range(page_num - ON_EACH_SIDE, page_num + 1))
             else:
@@ -179,7 +180,7 @@ def items_for_result(cl, result, form):
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
-        row_class = ''
+        row_classes = ['field-%s' % field_name]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -187,7 +188,7 @@ def items_for_result(cl, result, form):
         else:
             if f is None:
                 if field_name == 'action_checkbox':
-                    row_class = mark_safe(' class="action-checkbox"')
+                    row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 if boolean:
@@ -198,7 +199,7 @@ def items_for_result(cl, result, form):
                 if allow_tags:
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
@@ -209,14 +210,16 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = display_for_field(value, f)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
         if force_text(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
+        row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.list_display_links) or field_name in cl.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
+            url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
             # Convert the pk to something that can be used in Javascript.
             # Problem cases are long ints (23L) and non-ASCII strings.
             if cl.to_field:
@@ -224,12 +227,12 @@ def items_for_result(cl, result, form):
             else:
                 attr = pk
             value = result.serializable_value(attr)
-            result_id = repr(force_text(value))[1:]
+            result_id = escapejs(value)
             yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
                               table_tag,
                               row_class,
                               url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, {0}); return false;"', result_id)
+                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
                                 if cl.is_popup else '',
                               result_repr,
                               table_tag)

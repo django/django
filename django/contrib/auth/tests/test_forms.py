@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+
+from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
     PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm,
@@ -13,6 +16,7 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import translation
+from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
 
@@ -128,6 +132,40 @@ class AuthenticationFormTest(TestCase):
                 self.assertEqual(form.non_field_errors(),
                                  [force_text(form.error_messages['inactive'])])
 
+    def test_custom_login_allowed_policy(self):
+        # The user is inactive, but our custom form policy allows him to log in.
+        data = {
+            'username': 'inactive',
+            'password': 'password',
+            }
+
+        class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+
+        form = AuthenticationFormWithInactiveUsersOkay(None, data)
+        self.assertTrue(form.is_valid())
+
+        # If we want to disallow some logins according to custom logic,
+        # we should raise a django.forms.ValidationError in the form.
+        class PickyAuthenticationForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                if user.username == "inactive":
+                    raise forms.ValidationError(_("This user is disallowed."))
+                raise forms.ValidationError(_("Sorry, nobody's allowed in."))
+
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ['This user is disallowed.'])
+
+        data = {
+            'username': 'testclient',
+            'password': 'password',
+            }
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ["Sorry, nobody's allowed in."])
+
     def test_success(self):
         # The success case
         data = {
@@ -145,6 +183,24 @@ class AuthenticationFormTest(TestCase):
 
         form = CustomAuthenticationForm()
         self.assertEqual(form['username'].label, "Name")
+
+    def test_username_field_label_not_set(self):
+
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = CharField()
+
+        form = CustomAuthenticationForm()
+        UserModel = get_user_model()
+        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
+
+    def test_username_field_label_empty_string(self):
+
+        class CustomAuthenticationForm(AuthenticationForm):
+            username = CharField(label='')
+
+        form = CustomAuthenticationForm()
+        self.assertEqual(form.fields['username'].label, "")
 
 
 @skipIfCustomUser

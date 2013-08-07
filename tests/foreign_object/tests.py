@@ -1,9 +1,12 @@
 import datetime
 from operator import attrgetter
 
-from .models import Country, Person, Group, Membership, Friendship, Article, ArticleTranslation
+from .models import (
+    Country, Person, Group, Membership, Friendship, Article,
+    ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
 from django.test import TestCase
 from django.utils.translation import activate
+from django.core.exceptions import FieldError
 from django import forms
 
 class MultiColumnFKTests(TestCase):
@@ -316,12 +319,50 @@ class MultiColumnFKTests(TestCase):
             list(Article.objects.filter(active_translation__abstract=None)),
             [a1, a2])
 
+    def test_foreign_key_raises_informative_does_not_exist(self):
+        referrer = ArticleTranslation()
+        with self.assertRaisesMessage(Article.DoesNotExist, 'ArticleTranslation has no article'):
+            referrer.article
+
+    def test_foreign_key_related_query_name(self):
+        a1 = Article.objects.create(pub_date=datetime.date.today())
+        ArticleTag.objects.create(article=a1, name="foo")
+        self.assertEqual(Article.objects.filter(tag__name="foo").count(), 1)
+        self.assertEqual(Article.objects.filter(tag__name="bar").count(), 0)
+        with self.assertRaises(FieldError):
+            Article.objects.filter(tags__name="foo")
+
+    def test_many_to_many_related_query_name(self):
+        a1 = Article.objects.create(pub_date=datetime.date.today())
+        i1 = ArticleIdea.objects.create(name="idea1")
+        a1.ideas.add(i1)
+        self.assertEqual(Article.objects.filter(idea_things__name="idea1").count(), 1)
+        self.assertEqual(Article.objects.filter(idea_things__name="idea2").count(), 0)
+        with self.assertRaises(FieldError):
+            Article.objects.filter(ideas__name="idea1")
+
+    def test_inheritance(self):
+        activate("fi")
+        na = NewsArticle.objects.create(pub_date=datetime.date.today())
+        ArticleTranslation.objects.create(
+            article=na, lang="fi", title="foo", body="bar")
+        self.assertQuerysetEqual(
+            NewsArticle.objects.select_related('active_translation'),
+            [na], lambda x: x
+        )
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                NewsArticle.objects.select_related(
+                    'active_translation')[0].active_translation.title,
+                "foo")
+
 class FormsTests(TestCase):
     # ForeignObjects should not have any form fields, currently the user needs
     # to manually deal with the foreignobject relation.
     class ArticleForm(forms.ModelForm):
         class Meta:
             model = Article
+            fields = '__all__'
 
     def test_foreign_object_form(self):
         # A very crude test checking that the non-concrete fields do not get form fields.

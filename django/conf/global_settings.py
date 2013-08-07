@@ -131,7 +131,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar", "fa")
+LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -184,6 +184,7 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
@@ -562,7 +563,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 ###########
 
 # The callable to use to configure logging
-LOGGING_CONFIG = 'django.utils.log.dictConfig'
+LOGGING_CONFIG = 'logging.config.dictConfig'
 
 # Custom logging configuration.
 LOGGING = {}
@@ -576,7 +577,7 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 ###########
 
 # The name of the class to use to run the test suite
-TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ############
 # FIXTURES #

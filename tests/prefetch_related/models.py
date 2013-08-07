@@ -195,3 +195,23 @@ class Employee(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+### Ticket 19607
+
+@python_2_unicode_compatible
+class LessonEntry(models.Model):
+    name1 = models.CharField(max_length=200)
+    name2 = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "%s %s" % (self.name1, self.name2)
+
+
+@python_2_unicode_compatible
+class WordEntry(models.Model):
+    lesson_entry = models.ForeignKey(LessonEntry)
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.id)

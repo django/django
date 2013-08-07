@@ -245,7 +245,7 @@ def find(path, all=False):
     if matches:
         return matches
     # No match.
-    return all and [] or None
+    return [] if all else None
 
 
 def get_finders():

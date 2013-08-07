@@ -1,6 +1,7 @@
+import unittest
+
 from django.db.models import get_app
-from django.test.simple import build_suite
-from django.utils import unittest
+from django.test.utils import IgnoreAllDeprecationWarningsMixin
 
 
 def suite():
@@ -9,7 +10,8 @@ def suite():
     return testSuite
 
 
-class SuiteOverrideTest(unittest.TestCase):
+class SuiteOverrideTest(IgnoreAllDeprecationWarningsMixin, unittest.TestCase):
+
     def test_suite_override(self):
         """
         Validate that you can define a custom suite when running tests with
@@ -17,6 +19,7 @@ class SuiteOverrideTest(unittest.TestCase):
         suite using ``build_suite``).
         """
 
+        from django.test.simple import build_suite
         app = get_app("test_suite_override")
         suite = build_suite(app)
         self.assertEqual(suite.countTestCases(), 1)

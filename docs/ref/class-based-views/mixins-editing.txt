@@ -35,6 +35,12 @@ FormMixin
 
         The URL to redirect to when the form is successfully processed.
 
+    .. attribute:: prefix
+
+        .. versionadded:: 1.6
+
+        The :attr:`~django.forms.Form.prefix` for the generated form.
+
     .. method:: get_initial()
 
         Retrieve initial data for the form. By default, returns a copy of
@@ -57,6 +63,13 @@ FormMixin
         The ``initial`` argument is set to :meth:`.get_initial`. If the
         request is a ``POST`` or ``PUT``, the request data (``request.POST``
         and ``request.FILES``) will also be provided.
+
+    .. method:: get_prefix()
+
+        .. versionadded:: 1.6
+
+        Determine the :attr:`~django.forms.Form.prefix` for the generated form.
+        Returns :attr:`~django.views.generic.edit.FormMixin.prefix` by default.
 
     .. method:: get_success_url()
 
@@ -115,6 +128,18 @@ ModelFormMixin
         A model class. Can be explicitly provided, otherwise will be determined
         by examining ``self.object`` or
         :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`.
+
+    .. attribute:: fields
+
+        .. versionadded:: 1.6
+
+        A list of names of fields. This is interpreted the same way as the
+        ``Meta.fields`` attribute of :class:`~django.forms.ModelForm`.
+
+        This is a required attribute if you are generating the form class
+        automatically (e.g. using ``model``). Omitting this attribute will
+        result in all fields being used, but this behavior is deprecated
+        and will be removed in Django 1.8.
 
     .. attribute:: success_url
 

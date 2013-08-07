@@ -54,6 +54,8 @@ FAQ <time-zones-faq>`.
 Concepts
 ========
 
+.. _naive_vs_aware_datetimes:
+
 Naive and aware datetime objects
 --------------------------------
 
@@ -189,6 +191,8 @@ Add the following middleware to :setting:`MIDDLEWARE_CLASSES`::
             tz = request.session.get('django_timezone')
             if tz:
                 timezone.activate(tz)
+            else:
+                timezone.deactivate()
 
 Create a view that can set the current timezone::
 

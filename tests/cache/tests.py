@@ -2,17 +2,18 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import hashlib
 import os
+import pickle
 import random
 import re
 import string
 import tempfile
 import time
+import unittest
 import warnings
-import pickle
 
 from django.conf import settings
 from django.core import management
@@ -28,8 +29,10 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import override_settings, six
-from django.utils import timezone, translation, unittest
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
+from django.utils import six
+from django.utils import timezone
+from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.utils.encoding import force_text
@@ -441,6 +444,34 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('key3'), 'sausage')
         self.assertEqual(self.cache.get('key4'), 'lobster bisque')
 
+    def test_forever_timeout(self):
+        '''
+        Passing in None into timeout results in a value that is cached forever
+        '''
+        self.cache.set('key1', 'eggs', None)
+        self.assertEqual(self.cache.get('key1'), 'eggs')
+
+        self.cache.add('key2', 'ham', None)
+        self.assertEqual(self.cache.get('key2'), 'ham')
+
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
+        self.assertEqual(self.cache.get('key3'), 'sausage')
+        self.assertEqual(self.cache.get('key4'), 'lobster bisque')
+
+    def test_zero_timeout(self):
+        '''
+        Passing in None into timeout results in a value that is cached forever
+        '''
+        self.cache.set('key1', 'eggs', 0)
+        self.assertEqual(self.cache.get('key1'), None)
+
+        self.cache.add('key2', 'ham', 0)
+        self.assertEqual(self.cache.get('key2'), None)
+
+        self.cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
+        self.assertEqual(self.cache.get('key3'), None)
+        self.assertEqual(self.cache.get('key4'), None)
+
     def test_float_timeout(self):
         # Make sure a timeout given as a float doesn't crash anything.
         self.cache.set("key1", "spam", 100.2)
@@ -482,13 +513,13 @@ class BaseCacheTests(object):
                 # memcached does not allow whitespace or control characters in keys
                 self.cache.set('key with spaces', 'value')
                 self.assertEqual(len(w), 2)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 # memcached limits key length to 250
                 self.cache.set('a' * 251, 'value')
                 self.assertEqual(len(w), 1)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
         finally:
             self.cache.key_func = old_func
 
@@ -799,6 +830,8 @@ def custom_key_func(key, key_prefix, version):
 
 
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
+
+    available_apps = ['cache']
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
@@ -1069,10 +1102,10 @@ class GetCacheTests(unittest.TestCase):
     def test_simple(self):
         cache = get_cache('locmem://')
         from django.core.cache.backends.locmem import LocMemCache
-        self.assertTrue(isinstance(cache, LocMemCache))
+        self.assertIsInstance(cache, LocMemCache)
 
         from django.core.cache import cache
-        self.assertTrue(isinstance(cache, get_cache('default').__class__))
+        self.assertIsInstance(cache, get_cache('default').__class__)
 
         cache = get_cache(
             'django.core.cache.backends.dummy.DummyCache', **{'TIMEOUT': 120})
@@ -1564,9 +1597,10 @@ def hello_world_view(request, value):
             },
         },
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def setUp(self):
+        super(CacheMiddlewareTest, self).setUp()
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
@@ -1574,6 +1608,7 @@ class CacheMiddlewareTest(TestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
+        super(CacheMiddlewareTest, self).tearDown()
 
     def test_constructor(self):
         """

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.db import models
 from django.test import TestCase
@@ -59,10 +59,6 @@ class ManyToOneRegressionTests(TestCase):
         # creation (regression for #9649).
         self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
         self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
-
-        # Trying to assign to unbound attribute raises AttributeError
-        six.assertRaisesRegex(self, AttributeError, "must be accessed via instance",
-            Child.parent.__set__, None, p)
 
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")

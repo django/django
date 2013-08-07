@@ -1,7 +1,8 @@
 # encoding: utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from unittest import TestCase
 
 from django import forms
 from django.conf import settings
@@ -13,9 +14,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import translation
 from django.utils.html import conditional_escape
-from django.utils.unittest import TestCase
 
 from . import models
 from .widgetadmin import site as widget_admin_site
@@ -82,6 +83,9 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def testCharField(self):
         self.assertFormfield(models.Member, 'name', widgets.AdminTextInputWidget)
 
+    def testEmailField(self):
+        self.assertFormfield(models.Member, 'email', widgets.AdminEmailInputWidget)
+
     def testFileField(self):
         self.assertFormfield(models.Album, 'cover_art', widgets.AdminFileWidget)
 
@@ -138,6 +142,17 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testInheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
+
+    def test_m2m_widgets(self):
+        """m2m fields help text as it applies to admin app (#9321)."""
+        class AdvisorAdmin(admin.ModelAdmin):
+            filter_vertical=['companies']
+
+        self.assertFormfield(models.Advisor, 'companies', widgets.FilteredSelectMultiple,
+                             filter_vertical=['companies'])
+        ma = AdvisorAdmin(models.Advisor, admin.site)
+        f = ma.formfield_for_dbfield(models.Advisor._meta.get_field('companies'), request=None)
+        self.assertEqual(six.text_type(f.help_text), ' Hold down "Control", or "Command" on a Mac, to select more than one.')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -288,29 +303,29 @@ class AdminURLWidgetTest(DjangoTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', '')),
-            '<input class="vURLField" name="test" type="text" />'
+            '<input class="vURLField" name="test" type="url" />'
         )
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example.com')),
-            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com" /></p>'
+            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com" /></p>'
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example-äüö.com')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com" /></p>'
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
         )
 
     def test_render_quoting(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com/<sometag>some text</sometag>" /></p>'
+            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com/<sometag>some text</sometag>" /></p>'
         )
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
+            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
         )
 
 
@@ -458,9 +473,11 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
     urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_show_hide_date_time_picker_widgets(self):
         """
@@ -512,11 +529,71 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(TIME_ZONE='Asia/Singapore')
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
-class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
     urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_date_time_picker_shortcuts(self):
+        """
+        Ensure that date/time/datetime picker shortcuts work in the current time zone.
+        Refs #20663.
+
+        This test case is fairly tricky, it relies on selenium still running the browser
+        in the default time zone "America/Chicago" despite `override_settings` changing
+        the time zone to "Asia/Singapore".
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        now = datetime.now()
+        error_margin = timedelta(seconds=10)
+
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        self.selenium.find_element_by_id('id_name').send_keys('test')
+
+        # Click on the "today" and "now" shortcuts.
+        shortcuts = self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .datetimeshortcuts')
+
+        for shortcut in shortcuts:
+            shortcut.find_element_by_tag_name('a').click()
+
+        # Check that there is a time zone mismatch warning.
+        # Warning: This would effectively fail if the TIME_ZONE defined in the
+        # settings has the same UTC offset as "Asia/Singapore" because the
+        # mismatch warning would be rightfully missing from the page.
+        self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .timezonewarning')
+
+        # Submit the form.
+        self.selenium.find_element_by_tag_name('form').submit()
+        self.wait_page_loaded()
+
+        # Make sure that "now" in javascript is within 10 seconds
+        # from "now" on the server side.
+        member = models.Member.objects.get(name='test')
+        self.assertGreater(member.birthdate, now - error_margin)
+        self.assertLess(member.birthdate, now + error_margin)
+
+class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
         self.lisa = models.Student.objects.create(name='Lisa')

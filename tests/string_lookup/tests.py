@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.test import TestCase
 from .models import Foo, Whiz, Bar, Article, Base, Child
@@ -73,9 +73,11 @@ class StringLookupTests(TestCase):
         """
         Regression test for #708
 
-        "like" queries on IP address fields require casting to text (on PostgreSQL).
+        "like" queries on IP address fields require casting with HOST() (on PostgreSQL).
         """
         a = Article(name='IP test', text='The body', submitted_from='192.0.2.100')
         a.save()
         self.assertEqual(repr(Article.objects.filter(submitted_from__contains='192.0.2')),
             repr([a]))
+        # Test that the searches do not match the subnet mask (/32 in this case)
+        self.assertEqual(Article.objects.filter(submitted_from__contains='32').count(), 0)

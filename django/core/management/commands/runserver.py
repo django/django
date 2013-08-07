@@ -40,6 +40,11 @@ class Command(BaseCommand):
         return get_internal_wsgi_application()
 
     def handle(self, addrport='', *args, **options):
+        from django.conf import settings
+
+        if not settings.DEBUG and not settings.ALLOWED_HOSTS:
+            raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
@@ -65,7 +70,7 @@ class Command(BaseCommand):
                 elif self.use_ipv6 and not _fqdn:
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
-            self.addr = self.use_ipv6 and '::1' or '127.0.0.1'
+            self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
             self._raw_ipv6 = bool(self.use_ipv6)
         self.run(*args, **options)
 
@@ -86,7 +91,7 @@ class Command(BaseCommand):
 
         threading = options.get('use_threading')
         shutdown_message = options.get('shutdown_message', '')
-        quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
+        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
         self.stdout.write("Validating models...\n\n")
         self.validate(display_num_errors=True)
@@ -99,7 +104,7 @@ class Command(BaseCommand):
             "started_at": datetime.now().strftime('%B %d, %Y - %X'),
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
-            "addr": self._raw_ipv6 and '[%s]' % self.addr or self.addr,
+            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })

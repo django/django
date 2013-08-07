@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 
@@ -391,7 +391,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
             def decompress(self, value):
                 if value:
                     data = value.split(',')
-                    return [data[0], data[1], datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S")]
+                    return [data[0], list(data[1]), datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S")]
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
@@ -568,6 +568,14 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
         f = GenericIPAddressField(unpack_ipv4=True)
         self.assertEqual(f.clean(' ::ffff:0a0a:0a0a'), '10.10.10.10')
+
+    def test_slugfield_normalization(self):
+        f = SlugField()
+        self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    def test_urlfield_normalization(self):
+        f = URLField()
+        self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
 
     def test_smart_text(self):
         class Test:

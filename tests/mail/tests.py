@@ -9,6 +9,8 @@ import smtpd
 import sys
 import tempfile
 import threading
+from smtplib import SMTPException
+from ssl import SSLError
 
 from django.core import mail
 from django.core.mail import (EmailMessage, mail_admins, mail_managers,
@@ -251,16 +253,16 @@ class MailTests(TestCase):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        self.assertTrue(isinstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend))
-        self.assertTrue(isinstance(mail.get_connection('django.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend))
-        self.assertTrue(isinstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend))
-        self.assertTrue(isinstance(mail.get_connection('django.core.mail.backends.console.EmailBackend'), console.EmailBackend))
+        self.assertIsInstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
+        self.assertIsInstance(mail.get_connection('django.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend)
+        self.assertIsInstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
+        self.assertIsInstance(mail.get_connection('django.core.mail.backends.console.EmailBackend'), console.EmailBackend)
         tmp_dir = tempfile.mkdtemp()
         try:
-            self.assertTrue(isinstance(mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend))
+            self.assertIsInstance(mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend)
         finally:
             shutil.rmtree(tmp_dir)
-        self.assertTrue(isinstance(mail.get_connection(), locmem.EmailBackend))
+        self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
@@ -394,6 +396,34 @@ class BaseEmailBackendTests(object):
         self.assertEqual(message["subject"], "Subject")
         self.assertEqual(message.get_payload(), "Content")
         self.assertEqual(message["from"], "=?utf-8?q?Firstname_S=C3=BCrname?= <from@example.com>")
+
+    def test_plaintext_send_mail(self):
+        """
+        Test send_mail without the html_message
+        regression test for adding html_message parameter to send_mail()
+        """
+        send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'])
+        message = self.get_the_message()
+
+        self.assertEqual(message.get('subject'), 'Subject')
+        self.assertEqual(message.get_all('to'), ['nobody@example.com'])
+        self.assertFalse(message.is_multipart())
+        self.assertEqual(message.get_payload(), 'Content')
+        self.assertEqual(message.get_content_type(), 'text/plain')
+
+    def test_html_send_mail(self):
+        """Test html_message argument to send_mail"""
+        send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'], html_message='HTML Content')
+        message = self.get_the_message()
+
+        self.assertEqual(message.get('subject'), 'Subject')
+        self.assertEqual(message.get_all('to'), ['nobody@example.com'])
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertEqual(message.get_payload(0).get_payload(), 'Content')
+        self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
+        self.assertEqual(message.get_payload(1).get_payload(), 'HTML Content')
+        self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
 
     @override_settings(MANAGERS=[('nobody', 'nobody@example.com')])
     def test_html_mail_managers(self):
@@ -621,11 +651,23 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
 
 
+class FakeSMTPChannel(smtpd.SMTPChannel):
+
+    def collect_incoming_data(self, data):
+        try:
+            super(FakeSMTPChannel, self).collect_incoming_data(data)
+        except UnicodeDecodeError:
+            # ignore decode error in SSL/TLS connection tests as we only care
+            # whether the connection attempt was made
+            pass
+
+
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
     """
     Asyncore SMTP server wrapped into a thread. Based on DummyFTPServer from:
     http://svn.python.org/view/python/branches/py3k/Lib/test/test_ftplib.py?revision=86061&view=markup
     """
+    channel_class = FakeSMTPChannel
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
@@ -738,3 +780,44 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
             backend.close()
         except Exception as e:
             self.fail("close() unexpectedly raised an exception: %s" % e)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_tls)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_override_settings(self):
+        backend = smtp.EmailBackend(use_tls=False)
+        self.assertFalse(backend.use_tls)
+
+    def test_email_tls_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertFalse(backend.use_tls)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_ssl)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_override_settings(self):
+        backend = smtp.EmailBackend(use_ssl=False)
+        self.assertFalse(backend.use_ssl)
+
+    def test_email_ssl_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertFalse(backend.use_ssl)
+
+    @override_settings(EMAIL_USE_TLS=True)
+    def test_email_tls_attempts_starttls(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_tls)
+        self.assertRaisesMessage(SMTPException,
+            'STARTTLS extension not supported by server.', backend.open)
+
+    @override_settings(EMAIL_USE_SSL=True)
+    def test_email_ssl_attempts_ssl_connection(self):
+        backend = smtp.EmailBackend()
+        self.assertTrue(backend.use_ssl)
+        self.assertRaises(SSLError, backend.open)

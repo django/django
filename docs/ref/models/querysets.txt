@@ -121,9 +121,7 @@ described here.
 QuerySet API
 ============
 
-Though you usually won't create one manually — you'll go through a
-:class:`~django.db.models.Manager` — here's the formal declaration of a
-``QuerySet``:
+Here's the formal declaration of a ``QuerySet``:
 
 .. class:: QuerySet([model=None, query=None, using=None])
 
@@ -232,6 +230,7 @@ the model field that is being aggregated.
 For example, if you were manipulating a list of blogs, you may want
 to determine how many entries have been made in each blog::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.annotate(Count('entry'))
     # The name of the first blog
     >>> q[0].name
@@ -328,7 +327,7 @@ Use the ``reverse()`` method to reverse the order in which a queryset's
 elements are returned. Calling ``reverse()`` a second time restores the
 ordering back to the normal direction.
 
-To retrieve the ''last'' five items in a queryset, you could do this::
+To retrieve the "last" five items in a queryset, you could do this::
 
     my_queryset.reverse()[:5]
 
@@ -378,15 +377,12 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
-You can pass positional arguments (``*fields``) in order to specify the names
-of fields to which the ``DISTINCT`` should apply. This translates to a
-``SELECT DISTINCT ON`` SQL query. Here's the difference. For a normal
-``distinct()`` call, the database compares *each* field in each row when
+On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
+specify the names of fields to which the ``DISTINCT`` should apply. This
+translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a
+normal ``distinct()`` call, the database compares *each* field in each row when
 determining which rows are distinct. For a ``distinct()`` call with specified
 field names, the database will only compare the specified field names.
-
-.. note::
-    This ability to specify field names is only available in PostgreSQL.
 
 .. note::
     When you specify field names, you *must* provide an ``order_by()`` in the
@@ -397,7 +393,7 @@ field names, the database will only compare the specified field names.
     value in column ``a``. If you don't specify an order, you'll get some
     arbitrary row.
 
-Examples::
+Examples (those after the first will only work on PostgreSQL)::
 
     >>> Author.objects.distinct()
     [...]
@@ -544,6 +540,11 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+Note that this method returns a ``ValuesListQuerySet``. This class behaves
+like a list. Most of the time this is enough, but if you require an actual
+Python list object, you can simply call ``list()`` on it, which will evaluate
+the queryset.
+
 dates
 ~~~~~
 
@@ -627,7 +628,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     - SQLite: install pytz_ — conversions are actually performed in Python.
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
-    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
+    - MySQL: install pytz_ and load the time zone tables with
+      `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
@@ -693,6 +695,8 @@ And here's ``select_related`` lookup::
 ``select_related()`` follows foreign keys as far as possible. If you have the
 following models::
 
+    from django.db import models
+
     class City(models.Model):
         # ...
         pass
@@ -755,8 +759,6 @@ You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
 passed to ``select_related()``. This includes foreign keys that have
 ``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
-It's an error to use both a list of fields and the ``depth`` parameter in the
-same ``select_related()`` call; they are conflicting options.
 
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
@@ -765,19 +767,12 @@ You can also refer to the reverse direction of a
 is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related object.
 
-.. deprecated:: 1.5
-    The ``depth`` parameter to ``select_related()`` has been deprecated. You
-    should replace it with the use of the ``(*fields)`` listing specific
-    related fields instead as documented above.
+.. versionadded:: 1.6
 
-A depth limit of relationships to follow can also be specified::
+If you need to clear the list of related fields added by past calls of
+``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
 
-    b = Book.objects.select_related(depth=1).get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Requires a database call.
-
-A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
-direction if you are performing a depth-based ``select_related()`` call.
+   >>> without_relations = queryset.select_related(None)
 
 prefetch_related
 ~~~~~~~~~~~~~~~~
@@ -808,6 +803,8 @@ that are supported by ``select_related``. It also supports prefetching of
 
 For example, suppose you have these models::
 
+    from django.db import models
+
     class Topping(models.Model):
         name = models.CharField(max_length=30)
 
@@ -815,6 +812,7 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s (%s)" % (self.name, u", ".join([topping.name
                                                         for topping in self.toppings.all()]))
@@ -1264,6 +1262,28 @@ unexpectedly blocking.
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
 
+raw
+~~~
+
+.. method:: raw(raw_query, params=None, translations=None)
+
+.. versionchanged:: 1.7
+
+    ``raw`` was moved to the ``QuerySet`` class. It was previously only on
+    :class:`~django.db.models.Manager`.
+
+Takes a raw SQL query, executes it, and returns a
+``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
+can be iterated over just like an normal QuerySet to provide object instances.
+
+See the :ref:`executing-raw-queries` for more information.
+
+.. warning::
+
+  ``raw()`` always triggers a new query and doesn't account for previous
+  filtering. As such, it should generally be called from the ``Manager`` or
+  from a fresh ``QuerySet`` instance.
+
 Methods that do not return QuerySets
 ------------------------------------
 
@@ -1330,17 +1350,20 @@ prepared to handle the exception if you are using manual primary keys.
 get_or_create
 ~~~~~~~~~~~~~
 
-.. method:: get_or_create(**kwargs)
+.. method:: get_or_create(defaults=None, **kwargs)
 
-A convenience method for looking up an object with the given kwargs, creating
-one if necessary.
+A convenience method for looking up an object with the given ``kwargs`` (may be
+empty if your model has defaults for all fields), creating one if necessary.
+
+.. versionchanged:: 1.6
+
+    Older versions of Django required ``kwargs``.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
 
-This is meant as a shortcut to boilerplatish code and is mostly useful for
-data-import scripts. For example::
+This is meant as a shortcut to boilerplatish code. For example::
 
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
@@ -1363,7 +1386,6 @@ found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
-    defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
     params.update(defaults)
     obj = self.model(**params)
@@ -1388,15 +1410,105 @@ when you're using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an
 :exc:`~django.db.IntegrityError` will be raised.
 
-Finally, a word on using ``get_or_create()`` in Django views. As mentioned
-earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
-data and create new records if existing ones aren't available. But if you need
-to use ``get_or_create()`` in a view, please make sure to use it only in
-``POST`` requests unless you have a good reason not to. ``GET`` requests
-shouldn't have any effect on data; use ``POST`` whenever a request to a page
-has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
+This method is atomic assuming correct usage, correct database configuration,
+and correct behavior of the underlying database. However, if uniqueness is not
+enforced at the database level for the ``kwargs`` used in a ``get_or_create``
+call (see :attr:`~django.db.models.Field.unique` or
+:attr:`~django.db.models.Options.unique_together`), this method is prone to a
+race-condition which can result in multiple rows with the same parameters being
+inserted simultaneously.
+
+If you are using MySQL, be sure to use the ``READ COMMITTED`` isolation level
+rather than ``REPEATABLE READ`` (the default), otherwise you may see cases
+where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
+object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
+call.
+
+Finally, a word on using ``get_or_create()`` in Django views: please make sure
+to use it only in ``POST`` requests unless you have a good reason not to
+``GET`` requests shouldn't have any effect on data; use ``POST`` whenever a
+request to a page as a side effect on your data. For more, see `Safe methods`_
+in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+
+.. warning::
+
+  You can use ``get_or_create()`` through :class:`~django.db.models.ManyToManyField`
+  attributes and reverse relations. In that case you will restrict the queries
+  inside the context of that relation. That could lead you to some integrity
+  problems if you don't use it consistently.
+
+  Being the following models::
+
+      class Chapter(models.Model):
+          title = models.CharField(max_length=255, unique=True)
+
+      class Book(models.Model):
+          title = models.CharField(max_length=256)
+          chapters = models.ManyToManyField(Chapter)
+
+  You can use ``get_or_create()`` through Book's chapters field, but it only
+  fetches inside the context of that book::
+
+      >>> book = Book.objects.create(title="Ulysses")
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, True)
+      >>> book.chapters.get_or_create(title="Telemachus")
+      (<Chapter: Telemachus>, False)
+      >>> Chapter.objects.create(title="Chapter 1")
+      <Chapter: Chapter 1>
+      >>> book.chapters.get_or_create(title="Chapter 1")
+      # Raises IntegrityError
+
+  This is happening because it's trying to get or create "Chapter 1" through the
+  book "Ulysses", but it can't do any of them: the relation can't fetch that
+  chapter because it isn't related to that book, but it can't create it either
+  because ``title`` field should be unique.
+
+update_or_create
+~~~~~~~~~~~~~~~~
+
+.. method:: update_or_create(defaults=None, **kwargs)
+
+.. versionadded:: 1.7
+
+A convenience method for updating an object with the given ``kwargs``, creating
+a new one if necessary. The ``defaults`` is a dictionary of (field, value)
+pairs used to update the object.
+
+Returns a tuple of ``(object, created)``, where ``object`` is the created or
+updated object and ``created`` is a boolean specifying whether a new object was
+created.
+
+The ``update_or_create`` method tries to fetch an object from database based on
+the given ``kwargs``. If a match is found, it updates the fields passed in the
+``defaults`` dictionary.
+
+This is meant as a shortcut to boilerplatish code. For example::
+
+    try:
+        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        for key, value in updated_values.iteritems():
+            setattr(obj, key, value)
+        obj.save()
+    except Person.DoesNotExist:
+        updated_values.update({'first_name': 'John', 'last_name': 'Lennon'})
+        obj = Person(**updated_values)
+        obj.save()
+
+This pattern gets quite unwieldy as the number of fields in a model goes up.
+The above example can be rewritten using ``update_or_create()`` like so::
+
+    obj, created = Person.objects.update_or_create(
+        first_name='John', last_name='Lennon', defaults=updated_values)
+
+For detailed description how names passed in ``kwargs`` are resolved see
+:meth:`get_or_create`.
+
+As described above in :meth:`get_or_create`, this method is prone to a
+race-condition which can result in multiple rows being inserted simultaneously
+if uniqueness is not enforced at the database level.
 
 bulk_create
 ~~~~~~~~~~~
@@ -1485,7 +1597,7 @@ internally so that repeated evaluations do not result in additional queries. In
 contrast, ``iterator()`` will read results directly, without doing any caching
 at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
 and caches the return value). For a ``QuerySet`` which returns a large number of
-objects that you only need to access once, this can results in better
+objects that you only need to access once, this can result in better
 performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
@@ -1539,6 +1651,36 @@ earliest
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
+first
+~~~~~
+.. method:: first()
+
+.. versionadded:: 1.6
+
+Returns the first object matched by the queryset, or ``None`` if there
+is no matching object. If the ``QuerySet`` has no ordering defined, then the
+queryset is automatically ordered by the primary key.
+
+Example::
+
+    p = Article.objects.order_by('title', 'pub_date').first()
+
+Note that ``first()`` is a convenience method, the following code sample is
+equivalent to the above example::
+
+    try:
+        p = Article.objects.order_by('title', 'pub_date')[0]
+    except IndexError:
+        p = None
+
+last
+~~~~
+.. method:: last()
+
+.. versionadded:: 1.6
+
+Works like  :meth:`first()`, but returns the last object in the queryset.
+
 aggregate
 ~~~~~~~~~
 
@@ -1559,6 +1701,7 @@ aggregated.
 For example, when you are working with blog entries, you may want to know the
 number of authors that have contributed blog entries::
 
+    >>> from django.db.models import Count
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
 
@@ -1742,6 +1885,17 @@ DO_NOTHING do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
+
+as_manager
+~~~~~~~~~~
+
+.. classmethod:: as_manager()
+
+.. versionadded:: 1.7
+
+Class method that returns an instance of :class:`~django.db.models.Manager`
+with a copy of the ``QuerySet``'s methods. See
+:ref:`create-manager-with-queryset-methods` for more details.
 
 .. _field-lookups:
 
@@ -2036,6 +2190,7 @@ Range test (inclusive).
 
 Example::
 
+    import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))

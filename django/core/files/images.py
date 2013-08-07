@@ -1,7 +1,7 @@
 """
 Utility functions for handling images.
 
-Requires PIL, as you might imagine.
+Requires Pillow (or PIL), as you might imagine.
 """
 import zlib
 
@@ -35,11 +35,7 @@ def get_image_dimensions(file_or_path, close=False):
     'close' to True to close the file at the end if it is initially in an open
     state.
     """
-    # Try to import PIL in either of the two ways it can end up installed.
-    try:
-        from PIL import ImageFile as PILImageFile
-    except ImportError:
-        import ImageFile as PILImageFile
+    from django.utils.image import ImageFile as PILImageFile
 
     p = PILImageFile.Parser()
     if hasattr(file_or_path, 'read'):

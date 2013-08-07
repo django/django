@@ -1,7 +1,6 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -85,15 +84,18 @@ class ContactView(generic.FormView):
 
 class ArtistCreate(generic.CreateView):
     model = Artist
+    fields = '__all__'
 
 
 class NaiveAuthorCreate(generic.CreateView):
     queryset = Author.objects.all()
+    fields = '__all__'
 
 
 class AuthorCreate(generic.CreateView):
     model = Author
     success_url = '/list/authors/'
+    fields = '__all__'
 
 
 class SpecializedAuthorCreate(generic.CreateView):
@@ -112,19 +114,23 @@ class AuthorCreateRestricted(AuthorCreate):
 
 class ArtistUpdate(generic.UpdateView):
     model = Artist
+    fields = '__all__'
 
 
 class NaiveAuthorUpdate(generic.UpdateView):
     queryset = Author.objects.all()
+    fields = '__all__'
 
 
 class AuthorUpdate(generic.UpdateView):
     model = Author
     success_url = '/list/authors/'
+    fields = '__all__'
 
 
 class OneAuthorUpdate(generic.UpdateView):
     success_url = '/list/authors/'
+    fields = '__all__'
 
     def get_object(self):
         return Author.objects.get(pk=1)
@@ -184,6 +190,8 @@ class BookDetail(BookConfig, generic.DateDetailView):
     pass
 
 class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
+    fields = '__all__'
+
     def get_queryset(self):
         return Author.objects.all()
 
@@ -191,6 +199,17 @@ class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
         return super(BookDetailGetObjectCustomQueryset,self).get_object(
             queryset=Book.objects.filter(pk=2))
+
+
+class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):
+    queryset = [
+        {'name': 'John'},
+        {'name': 'Yoko'},
+    ]
+
+    def get(self, request):
+        self.object_list = self.get_queryset()
+
 
 class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     model = Book
@@ -206,6 +225,10 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
 
     def get_context_object_name(self, obj):
         return "test_name"
+
+class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
+    model = Book
+    object = Book(name="dummy")
 
 class BookSigningConfig(object):
     model = BookSigning

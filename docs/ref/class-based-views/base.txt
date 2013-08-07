@@ -9,7 +9,7 @@ required for projects, in which case there are Mixins and Generic class-based
 views.
 
 Many of Django's built-in class-based views inherit from other class-based
-views or various mixins. Because this inheritence chain is very important, the
+views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 
@@ -55,7 +55,7 @@ View
 
         Default::
 
-            ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
     **Methods**
 
@@ -114,7 +114,6 @@ TemplateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
 
@@ -193,22 +192,24 @@ RedirectView
 
             permanent = False
             query_string = True
+            pattern_name = 'article-detail'
 
-            def get_redirect_url(self, pk):
+            def get_redirect_url(self, *args, **kwargs):
                 article = get_object_or_404(Article, pk=pk)
                 article.update_counter()
-                return reverse('product_detail', args=(pk,))
+                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView
+        from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = patterns('',
 
-            url(r'r^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
@@ -218,6 +219,13 @@ RedirectView
 
         The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
         HTTP error.
+
+    .. attribute:: pattern_name
+
+        .. versionadded:: 1.6
+
+        The name of the URL pattern to redirect to. Reversing will be done
+        using the same args and kwargs as are passed in for this view.
 
     .. attribute:: permanent
 

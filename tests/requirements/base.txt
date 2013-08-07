@@ -1,0 +1,6 @@
+bcrypt
+docutils
+Pillow
+PyYAML
+pytz
+selenium

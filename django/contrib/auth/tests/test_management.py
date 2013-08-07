@@ -5,8 +5,9 @@ from django.contrib.auth import models, management
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
-from django.contrib.auth.tests import CustomUser
+from django.contrib.auth.tests.test_custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
@@ -173,6 +174,13 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 
 class CustomUserModelValidationTestCase(TestCase):
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    def test_required_fields_is_list(self):
+        "REQUIRED_FIELDS should be a list."
+        new_io = StringIO()
+        get_validation_errors(new_io, get_app('auth'))
+        self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
+
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
@@ -195,6 +203,7 @@ class PermissionDuplicationTestCase(TestCase):
 
     def tearDown(self):
         models.Permission._meta.permissions = self._original_permissions
+        ContentType.objects.clear_cache()
 
     def test_duplicated_permissions(self):
         """

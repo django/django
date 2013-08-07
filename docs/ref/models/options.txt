@@ -24,11 +24,16 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of the standard :file:`models.py` (for instance,
-    if the app's models are in submodules of ``myapp.models``), the model must
-    define which app it is part of::
+    If a model exists outside of the standard locations (:file:`models.py` or
+    a ``models`` package in an app), the model must define which app it is part
+    of::
 
         app_label = 'myapp'
+
+    .. versionadded:: 1.7
+
+        ``app_label`` is no longer required for models that are defined
+        in a ``models`` package within an app.
 
 ``db_table``
 ------------
@@ -145,6 +150,12 @@ Django quotes column and table names behind the scenes.
     and a question has more than one answer, and the order of answers matters, you'd
     do this::
 
+        from django.db import models
+
+        class Question(models.Model):
+            text = models.TextField()
+            # ...
+
         class Answer(models.Model):
             question = models.ForeignKey(Question)
             # ...
@@ -216,9 +227,8 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.permissions
 
     Extra permissions to enter into the permissions table when creating this object.
-    Add, delete and change permissions are automatically created for each object
-    that has ``admin`` set. This example specifies an extra permission,
-    ``can_deliver_pizzas``::
+    Add, delete and change permissions are automatically created for each
+    model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
         permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 

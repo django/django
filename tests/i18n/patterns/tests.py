@@ -52,8 +52,10 @@ class URLPrefixTests(URLTestCaseBase):
     def test_not_prefixed(self):
         with translation.override('en'):
             self.assertEqual(reverse('not-prefixed'), '/not-prefixed/')
+            self.assertEqual(reverse('not-prefixed-included-url'), '/not-prefixed-include/foo/')
         with translation.override('nl'):
             self.assertEqual(reverse('not-prefixed'), '/not-prefixed/')
+            self.assertEqual(reverse('not-prefixed-included-url'), '/not-prefixed-include/foo/')
 
     def test_prefixed(self):
         with translation.override('en'):
@@ -183,7 +185,7 @@ class URLRedirectTests(URLTestCaseBase):
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
     Tests that 'Accept-Language' is not added to the Vary header when using
-    prefixed URLs. 
+    prefixed URLs.
     """
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')

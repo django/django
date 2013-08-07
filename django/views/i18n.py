@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import gettext as gettext_module
@@ -5,8 +6,7 @@ import gettext as gettext_module
 from django import http
 from django.conf import settings
 from django.template import Context, Template
-from django.utils import importlib
-from django.utils.translation import check_for_language, activate, to_locale, get_language
+from django.utils.translation import check_for_language, to_locale, get_language
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
@@ -184,38 +184,9 @@ def render_javascript_catalog(catalog=None, plural=None):
     return http.HttpResponse(template.render(context), 'text/javascript')
 
 
-def null_javascript_catalog(request, domain=None, packages=None):
-    """
-    Returns "identity" versions of the JavaScript i18n functions -- i.e.,
-    versions that don't actually do anything.
-    """
-    return render_javascript_catalog()
-
-
-def javascript_catalog(request, domain='djangojs', packages=None):
-    """
-    Returns the selected language catalog as a javascript library.
-
-    Receives the list of packages to check for translations in the
-    packages parameter either from an infodict or as a +-delimited
-    string from the request. Default is 'django.conf'.
-
-    Additionally you can override the gettext domain for this view,
-    but usually you don't want to do that, as JavaScript messages
-    go to the djangojs domain. But this might be needed if you
-    deliver your JavaScript source from Django templates.
-    """
-    if request.GET:
-        if 'language' in request.GET:
-            if check_for_language(request.GET['language']):
-                activate(request.GET['language'])
-    if packages is None:
-        packages = ['django.conf']
-    if isinstance(packages, six.string_types):
-        packages = packages.split('+')
-    packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
+def get_javascript_catalog(locale, domain, packages):
     default_locale = to_locale(settings.LANGUAGE_CODE)
-    locale = to_locale(get_language())
+    packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
     t = {}
     paths = []
     en_selected = locale.startswith('en')
@@ -295,4 +266,40 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     for k, v in pdict.items():
         catalog[k] = [v.get(i, '') for i in range(maxcnts[msgid] + 1)]
 
+    return catalog, plural
+
+
+def null_javascript_catalog(request, domain=None, packages=None):
+    """
+    Returns "identity" versions of the JavaScript i18n functions -- i.e.,
+    versions that don't actually do anything.
+    """
+    return render_javascript_catalog()
+
+
+def javascript_catalog(request, domain='djangojs', packages=None):
+    """
+    Returns the selected language catalog as a javascript library.
+
+    Receives the list of packages to check for translations in the
+    packages parameter either from an infodict or as a +-delimited
+    string from the request. Default is 'django.conf'.
+
+    Additionally you can override the gettext domain for this view,
+    but usually you don't want to do that, as JavaScript messages
+    go to the djangojs domain. But this might be needed if you
+    deliver your JavaScript source from Django templates.
+    """
+    locale = to_locale(get_language())
+
+    if request.GET and 'language' in request.GET:
+        if check_for_language(request.GET['language']):
+            locale = to_locale(request.GET['language'])
+
+    if packages is None:
+        packages = ['django.conf']
+    if isinstance(packages, six.string_types):
+        packages = packages.split('+')
+
+    catalog, plural = get_javascript_catalog(locale, domain, packages)
     return render_javascript_catalog(catalog, plural)

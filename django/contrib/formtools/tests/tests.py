@@ -3,18 +3,14 @@ from __future__ import unicode_literals
 
 import datetime
 import os
-import pickle
-import re
+import unittest
 import warnings
 
 from django import http
-from django.conf import settings
 from django.contrib.formtools import preview, utils
 from django.test import TestCase
-from django.test.html import parse_html
 from django.test.utils import override_settings
 from django.utils._os import upath
-from django.utils import unittest
 
 from django.contrib.formtools.tests.forms import *
 

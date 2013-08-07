@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django import forms
 from django.forms.extras import SelectDateWidget
 
@@ -24,3 +22,4 @@ class CompanyForm(forms.ModelForm):
 
     class Meta:
         model = Company
+        fields = '__all__'

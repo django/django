@@ -1,14 +1,14 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import sys
 import time
+import unittest
 
 from django.conf import settings
 from django.db import transaction, connection
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.utils import unittest
 
 from .models import Person
 
@@ -22,6 +22,8 @@ requires_threading = unittest.skipUnless(threading, 'requires threading')
 
 
 class SelectForUpdateTests(TransactionTestCase):
+
+    available_apps = ['select_for_update']
 
     def setUp(self):
         transaction.enter_transaction_management()
@@ -97,15 +99,8 @@ class SelectForUpdateTests(TransactionTestCase):
         list(Person.objects.all().select_for_update(nowait=True))
         self.assertTrue(self.has_for_update_sql(connection, nowait=True))
 
-    # In Python 2.6 beta and some final releases, exceptions raised in __len__
-    # are swallowed (Python issue 1242657), so these cases return an empty
-    # list, rather than raising an exception. Not a lot we can do about that,
-    # unfortunately, due to the way Python handles list() calls internally.
-    # Python 2.6.1 is the "in the wild" version affected by this, so we skip
-    # the test for that version.
     @requires_threading
     @skipUnlessDBFeature('has_select_for_update_nowait')
-    @unittest.skipIf(sys.version_info[:3] == (2, 6, 1), "Python version is 2.6.1")
     def test_nowait_raises_error_on_block(self):
         """
         If nowait is specified, we expect an error to be raised rather
@@ -126,15 +121,8 @@ class SelectForUpdateTests(TransactionTestCase):
         self.end_blocking_transaction()
         self.assertIsInstance(status[-1], DatabaseError)
 
-    # In Python 2.6 beta and some final releases, exceptions raised in __len__
-    # are swallowed (Python issue 1242657), so these cases return an empty
-    # list, rather than raising an exception. Not a lot we can do about that,
-    # unfortunately, due to the way Python handles list() calls internally.
-    # Python 2.6.1 is the "in the wild" version affected by this, so we skip
-    # the test for that version.
     @skipIfDBFeature('has_select_for_update_nowait')
     @skipUnlessDBFeature('has_select_for_update')
-    @unittest.skipIf(sys.version_info[:3] == (2, 6, 1), "Python version is 2.6.1")
     def test_unsupported_nowait_raises_error(self):
         """
         If a SELECT...FOR UPDATE NOWAIT is run on a database backend
