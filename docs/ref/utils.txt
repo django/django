@@ -434,8 +434,9 @@ Atom1Feed
 .. class:: cached_property(object)
 
     The ``@cached_property`` decorator caches the result of a method with a
-    single ``self`` argument as a property. The cached result will persist as
-    long as the instance does.
+    single ``self`` argument as a property. The cached result will persist
+    as long as the instance does, so if the instance is passed around and the
+    function subsequently invoked, the cached result will be returned.
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
@@ -455,7 +456,7 @@ Atom1Feed
         # in the template:
         {% for friend in person.friends %}
 
-    ``friends()`` will be called twice. Since the instance ``person`` in
+    Here, ``friends()`` will be called twice. Since the instance ``person`` in
     the view and the template are the same, ``@cached_property`` can avoid
     that::
 
@@ -473,7 +474,20 @@ Atom1Feed
         # in the view:
         if person.friends:
 
-    You may clear the cached result using ``del person.friends``.
+    The cached value can be treated like an ordinary attribute of the instance::
+
+        # clear it, requiring re-computation next time it's called
+        del person.friends # or delattr(person, "friends")
+
+        # set a value manually, that will persist on the instance until cleared
+        person.friends = ["Huckleberry Finn", "Tom Sawyer"]
+
+    As well as offering potential performance advantages, ``@cached_property``
+    can ensure that an attribute's value does not change unexpectedly over the
+    life of an instance. This could occur with a method whose computation is
+    based on ``datetime.now()``, or simply if a change were saved to the
+    database by some other process in the brief interval between subsequent
+    invocations of a method on the same instance.
 
 .. function:: allow_lazy(func, *resultclasses)
 
