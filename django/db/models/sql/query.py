@@ -480,7 +480,7 @@ class Query(object):
             rhs_used_joins = set(change_map.values())
             to_promote = [alias for alias in self.tables
                           if alias not in rhs_used_joins]
-            self.promote_joins(to_promote, True)
+            self.promote_joins(to_promote)
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
@@ -659,7 +659,7 @@ class Query(object):
         """ Decreases the reference count for this alias. """
         self.alias_refcount[alias] -= amount
 
-    def promote_joins(self, aliases, unconditional=False):
+    def promote_joins(self, aliases):
         """
         Promotes recursively the join type of given aliases and its children to
         an outer join. If 'unconditional' is False, the join is only promoted if
@@ -682,12 +682,14 @@ class Query(object):
                 # isn't really joined at all in the query, so we should not
                 # alter its join type.
                 continue
+            # Only the first alias (skipped above) should have None join_type
+            assert self.alias_map[alias].join_type is not None
             parent_alias = self.alias_map[alias].lhs_alias
             parent_louter = (parent_alias
                 and self.alias_map[parent_alias].join_type == self.LOUTER)
             already_louter = self.alias_map[alias].join_type == self.LOUTER
-            if ((unconditional or self.alias_map[alias].nullable
-                 or parent_louter) and not already_louter):
+            if ((self.alias_map[alias].nullable or parent_louter) and
+                    not already_louter):
                 data = self.alias_map[alias]._replace(join_type=self.LOUTER)
                 self.alias_map[alias] = data
                 # Join type of 'alias' changed, so re-examine all aliases that
@@ -986,7 +988,7 @@ class Query(object):
             # If the aggregate references a model or field that requires a join,
             # those joins must be LEFT OUTER - empty join rows must be returned
             # in order for zeros to be returned for those aggregates.
-            self.promote_joins(join_list, True)
+            self.promote_joins(join_list)
 
             col = targets[0].column
             source = sources[0]
