@@ -272,6 +272,8 @@ write a cleaning method that operates on the ``recipients`` field, like so::
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. method:: django.forms.Form.clean
+
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
 performing validation on more than one field at a time, so the form's
