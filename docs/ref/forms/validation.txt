@@ -75,10 +75,8 @@ overridden:
   any validation that requires access to multiple fields from the form at
   once. This is where you might put in things to check that if field ``A``
   is supplied, field ``B`` must contain a valid email address and the
-  like. The data that this method returns is the final ``cleaned_data``
-  attribute for the form, so don't forget to return the full list of
-  cleaned data if you override this method (by default, ``Form.clean()``
-  just returns ``self.cleaned_data``).
+  like. This method can return a completely different dictionary if it wishes,
+  which will be used as the ``cleaned_data``.
 
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
@@ -403,9 +401,6 @@ example::
                     raise forms.ValidationError("Did not send for 'help' in "
                             "the subject despite CC'ing yourself.")
 
-            # Always return the full collection of cleaned data.
-            return cleaned_data
-
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 
@@ -442,9 +437,6 @@ sample) looks like this::
                 # cleaned data.
                 del cleaned_data["cc_myself"]
                 del cleaned_data["subject"]
-
-            # Always return the full collection of cleaned data.
-            return cleaned_data
 
 As you can see, this approach requires a bit more effort, not withstanding the
 extra design effort to create a sensible form display. The details are worth

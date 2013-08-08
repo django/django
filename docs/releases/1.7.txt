@@ -127,6 +127,11 @@ Minor features
   for each individual field will be respected, and a new ``incomplete``
   validation error will be raised when any required fields are empty.
 
+* The :meth:`~django.forms.Form.clean` method on a form no longer needs to
+  return ``self.cleaned_data``. If it does return a changed dictionary then
+  that will still be used. The default implementation no longer returns
+  ``self.cleaned_data``.
+
 Backwards incompatible changes in 1.7
 =====================================
 

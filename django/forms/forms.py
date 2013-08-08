@@ -297,9 +297,12 @@ class BaseForm(object):
 
     def _clean_form(self):
         try:
-            self.cleaned_data = self.clean()
+            cleaned_data = self.clean()
         except ValidationError as e:
             self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+        else:
+            if cleaned_data is not None:
+                self.cleaned_data = cleaned_data
 
     def _post_clean(self):
         """
@@ -315,7 +318,7 @@ class BaseForm(object):
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
         """
-        return self.cleaned_data
+        pass
 
     def has_changed(self):
         """
