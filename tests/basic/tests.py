@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 import threading
@@ -773,7 +773,9 @@ class ManagerTest(TestCase):
         'only',
         'using',
         'exists',
+        '_insert',
         '_update',
+        'raw',
     ]
 
     def test_manager_methods(self):

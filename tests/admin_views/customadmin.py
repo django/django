@@ -1,7 +1,7 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.conf.urls import patterns
 from django.contrib import admin
@@ -13,6 +13,7 @@ from . import models, forms, admin as base_admin
 
 
 class Admin2(admin.AdminSite):
+    app_index_template = 'custom_admin/app_index.html'
     login_form = forms.CustomAdminAuthenticationForm
     login_template = 'custom_admin/login.html'
     logout_template = 'custom_admin/logout.html'

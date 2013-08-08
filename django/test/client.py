@@ -5,6 +5,7 @@ import os
 import re
 import mimetypes
 from copy import copy
+from importlib import import_module
 from io import BytesIO
 try:
     from urllib.parse import unquote, urlparse, urlsplit
@@ -25,7 +26,6 @@ from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
-from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils import six
 from django.test.utils import ContextList

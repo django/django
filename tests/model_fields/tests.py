@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
@@ -8,11 +8,21 @@ from django import test
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import connection, models, IntegrityError
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields import (
+    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
+    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
+    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
+    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField)
+from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
+from django.utils.functional import lazy
+from django.utils.unittest import skipIf
 
-from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
-    NullBooleanModel, BooleanModel, DataModel, Document, RenamedField,
+from .models import (
+    Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
+    BooleanModel, DataModel, Document, RenamedField,
     VerboseNameField, FksToBooleans)
 
 
@@ -64,7 +74,7 @@ class BasicFieldTests(test.TestCase):
         m = VerboseNameField
         for i in range(1, 23):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name,
-                    'verbose field%d' % i)
+                             'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
@@ -290,9 +300,9 @@ class SlugFieldTests(test.TestCase):
         """
         Make sure SlugField honors max_length (#9706)
         """
-        bs = BigS.objects.create(s = 'slug'*50)
+        bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
-        self.assertEqual(bs.s, 'slug'*50)
+        self.assertEqual(bs.s, 'slug' * 50)
 
 
 class ValidationTest(test.TestCase):
@@ -313,15 +323,21 @@ class ValidationTest(test.TestCase):
         self.assertRaises(ValidationError, f.clean, "a", None)
 
     def test_charfield_with_choices_cleans_valid_choice(self):
-        f = models.CharField(max_length=1, choices=[('a','A'), ('b','B')])
+        f = models.CharField(max_length=1,
+                             choices=[('a', 'A'), ('b', 'B')])
         self.assertEqual('a', f.clean('a', None))
 
     def test_charfield_with_choices_raises_error_on_invalid_choice(self):
-        f = models.CharField(choices=[('a','A'), ('b','B')])
+        f = models.CharField(choices=[('a', 'A'), ('b', 'B')])
         self.assertRaises(ValidationError, f.clean, "not a", None)
 
+    def test_charfield_get_choices_with_blank_defined(self):
+        f = models.CharField(choices=[('', '<><>'), ('a', 'A')])
+        self.assertEqual(f.get_choices(True), [('', '<><>'), ('a', 'A')])
+
     def test_choices_validation_supports_named_groups(self):
-        f = models.IntegerField(choices=(('group',((10,'A'),(20,'B'))),(30,'C')))
+        f = models.IntegerField(
+            choices=(('group', ((10, 'A'), (20, 'B'))), (30, 'C')))
         self.assertEqual(10, f.clean(10, None))
 
     def test_nullable_integerfield_raises_error_with_blank_false(self):
@@ -370,7 +386,7 @@ class BigIntegerFieldTests(test.TestCase):
         self.assertEqual(qs[0].value, minval)
 
     def test_types(self):
-        b = BigInt(value = 0)
+        b = BigInt(value=0)
         self.assertIsInstance(b.value, six.integer_types)
         b.save()
         self.assertIsInstance(b.value, six.integer_types)
@@ -378,8 +394,8 @@ class BigIntegerFieldTests(test.TestCase):
         self.assertIsInstance(b.value, six.integer_types)
 
     def test_coercing(self):
-        BigInt.objects.create(value ='10')
-        b = BigInt.objects.get(value = '10')
+        BigInt.objects.create(value='10')
+        b = BigInt.objects.get(value='10')
         self.assertEqual(b.value, 10)
 
 class TypeCoercionTests(test.TestCase):
@@ -466,7 +482,7 @@ class BinaryFieldTests(test.TestCase):
         test_set_and_retrieve = unittest.expectedFailure(test_set_and_retrieve)
 
     def test_max_length(self):
-        dm = DataModel(short_data=self.binary_data*4)
+        dm = DataModel(short_data=self.binary_data * 4)
         self.assertRaises(ValidationError, dm.full_clean)
 
 class GenericIPAddressFieldTests(test.TestCase):
@@ -481,3 +497,156 @@ class GenericIPAddressFieldTests(test.TestCase):
         model_field = models.GenericIPAddressField(protocol='IPv6')
         form_field = model_field.formfield()
         self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')
+
+
+class PromiseTest(test.TestCase):
+    def test_AutoField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            AutoField(primary_key=True).get_prep_value(lazy_func()),
+            int)
+
+    @skipIf(six.PY3, "Python 3 has no `long` type.")
+    def test_BigIntegerField(self):
+        lazy_func = lazy(lambda: long(9999999999999999999), long)
+        self.assertIsInstance(
+            BigIntegerField().get_prep_value(lazy_func()),
+            long)
+
+    def test_BinaryField(self):
+        lazy_func = lazy(lambda: b'', bytes)
+        self.assertIsInstance(
+            BinaryField().get_prep_value(lazy_func()),
+            bytes)
+
+    def test_BooleanField(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(
+            BooleanField().get_prep_value(lazy_func()),
+            bool)
+
+    def test_CharField(self):
+        lazy_func = lazy(lambda: '', six.text_type)
+        self.assertIsInstance(
+            CharField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_CommaSeparatedIntegerField(self):
+        lazy_func = lazy(lambda: '1,2', six.text_type)
+        self.assertIsInstance(
+            CommaSeparatedIntegerField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_DateField(self):
+        lazy_func = lazy(lambda: datetime.date.today(), datetime.date)
+        self.assertIsInstance(
+            DateField().get_prep_value(lazy_func()),
+            datetime.date)
+
+    def test_DateTimeField(self):
+        lazy_func = lazy(lambda: datetime.datetime.now(), datetime.datetime)
+        self.assertIsInstance(
+            DateTimeField().get_prep_value(lazy_func()),
+            datetime.datetime)
+
+    def test_DecimalField(self):
+        lazy_func = lazy(lambda: Decimal('1.2'), Decimal)
+        self.assertIsInstance(
+            DecimalField().get_prep_value(lazy_func()),
+            Decimal)
+
+    def test_EmailField(self):
+        lazy_func = lazy(lambda: 'mailbox@domain.com', six.text_type)
+        self.assertIsInstance(
+            EmailField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FileField(self):
+        lazy_func = lazy(lambda: 'filename.ext', six.text_type)
+        self.assertIsInstance(
+            FileField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FilePathField(self):
+        lazy_func = lazy(lambda: 'tests.py', six.text_type)
+        self.assertIsInstance(
+            FilePathField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_FloatField(self):
+        lazy_func = lazy(lambda: 1.2, float)
+        self.assertIsInstance(
+            FloatField().get_prep_value(lazy_func()),
+            float)
+
+    def test_ImageField(self):
+        lazy_func = lazy(lambda: 'filename.ext', six.text_type)
+        self.assertIsInstance(
+            ImageField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_IntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            IntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_IPAddressField(self):
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            IPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_GenericIPAddressField(self):
+        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            GenericIPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_NullBooleanField(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(
+            NullBooleanField().get_prep_value(lazy_func()),
+            bool)
+
+    def test_PositiveIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            PositiveIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_PositiveSmallIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            PositiveSmallIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_SlugField(self):
+        lazy_func = lazy(lambda: 'slug', six.text_type)
+        self.assertIsInstance(
+            SlugField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_SmallIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(
+            SmallIntegerField().get_prep_value(lazy_func()),
+            int)
+
+    def test_TextField(self):
+        lazy_func = lazy(lambda: 'Abc', six.text_type)
+        self.assertIsInstance(
+            TextField().get_prep_value(lazy_func()),
+            six.text_type)
+
+    def test_TimeField(self):
+        lazy_func = lazy(lambda: datetime.datetime.now().time(), datetime.time)
+        self.assertIsInstance(
+            TimeField().get_prep_value(lazy_func()),
+            datetime.time)
+
+    def test_URLField(self):
+        lazy_func = lazy(lambda: 'http://domain.com', six.text_type)
+        self.assertIsInstance(
+            URLField().get_prep_value(lazy_func()),
+            six.text_type)

@@ -11,7 +11,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_str, force_text, iri_to_uri
+from django.utils.encoding import force_str
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT

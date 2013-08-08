@@ -183,7 +183,7 @@ Minor features
 
 * The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
   :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
-  its ``object``\'s ``__dict__``.
+  its ``object``’s ``__dict__``.
 
 * :class:`~django.http.HttpResponseRedirect` and
   :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
@@ -330,7 +330,7 @@ Minor features
 
 * :class:`~django.forms.ModelForm` fields can now override error messages
   defined in model fields by using the
-  :attr:`~django.forms.Field.error_messages` argument of a ``Field``'s
+  :attr:`~django.forms.Field.error_messages` argument of a ``Field``’s
   constructor. To take advantage of this new feature with your custom fields,
   :ref:`see the updated recommendation <raising-validation-error>` for raising
   a ``ValidationError``.
@@ -811,6 +811,10 @@ Miscellaneous
 
 * :meth:`~django.core.validators.validate_email` now accepts email addresses
   with ``localhost`` as the domain.
+
+* The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
+  to prevent django from deleting the temporary .pot file it generates before
+  creating the .po file.
 
 Features deprecated in 1.6
 ==========================

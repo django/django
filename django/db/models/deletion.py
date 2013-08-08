@@ -1,8 +1,8 @@
+from collections import OrderedDict
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
-from django.utils.datastructures import SortedDict
 from django.utils import six
 
 
@@ -234,7 +234,7 @@ class Collector(object):
                     found = True
             if not found:
                 return
-        self.data = SortedDict([(model, self.data[model])
+        self.data = OrderedDict([(model, self.data[model])
                                 for model in sorted_models])
 
     def delete(self):

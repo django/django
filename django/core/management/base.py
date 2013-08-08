@@ -10,7 +10,7 @@ from optparse import make_option, OptionParser
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
 
@@ -171,6 +171,8 @@ class BaseCommand(object):
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
             help='Raise on exception'),
+        make_option('--no-color', action='store_true', dest='no_color', default=False,
+            help="Don't colorize the command output."),
     )
     help = ''
     args = ''
@@ -254,7 +256,11 @@ class BaseCommand(object):
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
-        self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+        if options.get('no_color'):
+            self.style = no_style()
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
+        else:
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
             from django.conf import settings

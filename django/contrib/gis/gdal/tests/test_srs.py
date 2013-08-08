@@ -58,7 +58,7 @@ class SpatialRefTest(unittest.TestCase):
     def test01_wkt(self):
         "Testing initialization on valid OGC WKT."
         for s in srlist:
-            srs = SpatialReference(s.wkt)
+            SpatialReference(s.wkt)
 
     def test02_bad_wkt(self):
         "Testing initialization on invalid WKT."
@@ -150,7 +150,7 @@ class SpatialRefTest(unittest.TestCase):
         target = SpatialReference('WGS84')
         for s in srlist:
             if s.proj:
-                ct = CoordTransform(SpatialReference(s.wkt), target)
+                CoordTransform(SpatialReference(s.wkt), target)
 
     def test13_attr_value(self):
         "Testing the attr_value() method."

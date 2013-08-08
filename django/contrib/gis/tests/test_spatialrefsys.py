@@ -24,7 +24,7 @@ test_srs = ({'srid' : 4326,
              'srtext' : 'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980"',
              'proj4_re' : r'\+proj=lcc \+lat_1=30.28333333333333 \+lat_2=28.38333333333333 \+lat_0=27.83333333333333 '
                           r'\+lon_0=-99 \+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?'
-                          r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0)?\+units=m \+no_defs ',
+                          r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ',
              'spheroid' : 'GRS 1980', 'name' : 'NAD83 / Texas South Central',
              'geographic' : False, 'projected' : True, 'spatialite' : False,
              'ellipsoid' : (6378137.0, 6356752.31414, 298.257222101), # From proj's "cs2cs -le" and Wikipedia (semi-minor only)

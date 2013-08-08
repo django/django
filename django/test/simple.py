@@ -3,6 +3,7 @@ This module is pending deprecation as of Django 1.6 and will be removed in
 version 1.8.
 
 """
+from importlib import import_module
 import json
 import re
 import unittest as real_unittest
@@ -15,7 +16,6 @@ from django.test.utils import compare_xml, strip_quotes
 # django.utils.unittest is deprecated, but so is django.test.simple,
 # and the latter will be removed before the former.
 from django.utils import unittest
-from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
 __all__ = ('DjangoTestSuiteRunner',)

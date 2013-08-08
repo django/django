@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.contrib.syndication import views
 from django.core.exceptions import ObjectDoesNotExist

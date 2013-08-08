@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import os
 import re
@@ -806,6 +806,12 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertTemplateUsed(response, 'custom_admin/index.html')
         self.assertContains(response, 'Hello from a custom index template *bar*')
 
+    def testCustomAdminSiteAppIndexViewandTemplate(self):
+        response = self.client.get('/test_admin/admin2/admin_views/')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertTemplateUsed(response, 'custom_admin/app_index.html')
+        self.assertContains(response, 'Hello from a custom app_index template')
+
     def testCustomAdminSitePasswordChangeTemplate(self):
         response = self.client.get('/test_admin/admin2/password_change/')
         self.assertIsInstance(response, TemplateResponse)
@@ -1526,6 +1532,17 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         counted_presence_after = response.content.count(force_bytes(should_contain))
         self.assertEqual(counted_presence_before - 1,
                           counted_presence_after)
+
+    def test_logentry_get_admin_url(self):
+        "LogEntry.get_admin_url returns a URL to edit the entry's object or None for non-existent (possibly deleted) models"
+        log_entry_name = "Model with string primary key"  # capitalized in Recent Actions
+        logentry = LogEntry.objects.get(content_type__name__iexact=log_entry_name)
+        model = "modelwithstringprimarykey"
+        desired_admin_url = "/test_admin/admin/admin_views/%s/%s/" % (model, escape(iri_to_uri(urlquote(quote(self.pk)))))
+        self.assertEqual(logentry.get_admin_url(), desired_admin_url)
+
+        logentry.content_type.model = "non-existent"
+        self.assertEqual(logentry.get_admin_url(), None)
 
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
@@ -3437,6 +3454,50 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
             slug1='tabular-inline-ignored-characters-1981-08-22',
             slug2='option-one-tabular-inline-ignored-characters',
         )
+
+    def test_populate_existing_object(self):
+        """
+        Ensure that the prepopulation works for existing objects too, as long
+        as the original field is empty.
+        Refs #19082.
+        """
+        # Slugs are empty to start with.
+        item = MainPrepopulated.objects.create(
+            name=' this is the mAin nÀMë',
+            pubdate='2012-02-18',
+            status='option two',
+            slug1='',
+            slug2='',
+        )
+        self.admin_login(username='super',
+                         password='secret',
+                         login_url='/test_admin/admin/')
+
+        object_url = '%s%s' % (
+            self.live_server_url,
+            '/test_admin/admin/admin_views/mainprepopulated/{}/'.format(item.id))
+
+        self.selenium.get(object_url)
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' the best')
+
+        # The slugs got prepopulated since they were originally empty
+        slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
+        self.assertEqual(slug1, 'main-name-best-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-best')
+
+        # Save the object
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        self.selenium.get(object_url)
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' hello')
+
+        # The slugs got prepopulated didn't change since they were originally not empty
+        slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
+        self.assertEqual(slug1, 'main-name-best-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-best')
 
     def test_collapsible_fieldset(self):
         """

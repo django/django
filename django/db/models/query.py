@@ -319,7 +319,6 @@ class QuerySet(object):
             query.add_aggregate(aggregate_expr, self.model, alias,
                                 is_summary=True)
             aggregate_names.append(alias)
-        query.append_aggregate_mask(aggregate_names)
 
         return query.get_aggregation(using=self.db)
 
@@ -414,8 +413,8 @@ class QuerySet(object):
         specifying whether an object was created.
         """
         lookup, params, _ = self._extract_model_params(defaults, **kwargs)
+        self._for_write = True
         try:
-            self._for_write = True
             return self.get(**lookup), False
         except self.model.DoesNotExist:
             return self._create_object_from_params(lookup, params)
@@ -428,8 +427,8 @@ class QuerySet(object):
         specifying whether an object was created.
         """
         lookup, params, filtered_defaults = self._extract_model_params(defaults, **kwargs)
+        self._for_write = True
         try:
-            self._for_write = True
             obj = self.get(**lookup)
         except self.model.DoesNotExist:
             obj, created = self._create_object_from_params(lookup, params)
@@ -624,6 +623,13 @@ class QuerySet(object):
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
 
+    def raw(self, raw_query, params=None, translations=None, using=None):
+        if using is None:
+            using = self.db
+        return RawQuerySet(raw_query, model=self.model,
+                params=params, translations=translations,
+                using=using)
+
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
 
@@ -736,6 +742,7 @@ class QuerySet(object):
         # Default to false for nowait
         nowait = kwargs.pop('nowait', False)
         obj = self._clone()
+        obj._for_write = True
         obj.query.select_for_update = True
         obj.query.select_for_update_nowait = nowait
         return obj
@@ -910,6 +917,21 @@ class QuerySet(object):
     ###################
     # PRIVATE METHODS #
     ###################
+
+    def _insert(self, objs, fields, return_id=False, raw=False, using=None):
+        """
+        Inserts a new record for the given model. This provides an interface to
+        the InsertQuery class and is how Model.save() is implemented.
+        """
+        self._for_write = True
+        if using is None:
+            using = self.db
+        query = sql.InsertQuery(self.model)
+        query.insert_values(fields, objs, raw=raw)
+        return query.get_compiler(using=using).execute_sql(return_id)
+    _insert.alters_data = True
+    _insert.queryset_only = False
+
     def _batched_insert(self, objs, fields, batch_size):
         """
         A little helper method for bulk_insert to insert the bulk one batch
@@ -1601,17 +1623,6 @@ class RawQuerySet(object):
                 column = field.column
                 self._model_fields[converter(column)] = field
         return self._model_fields
-
-
-def insert_query(model, objs, fields, return_id=False, raw=False, using=None):
-    """
-    Inserts a new record for the given model. This provides an interface to
-    the InsertQuery class and is how Model.save() is implemented. It is not
-    part of the public API.
-    """
-    query = sql.InsertQuery(model)
-    query.insert_values(fields, objs, raw=raw)
-    return query.get_compiler(using=using).execute_sql(return_id)
 
 
 def prefetch_related_objects(result_cache, related_lookups):

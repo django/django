@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory

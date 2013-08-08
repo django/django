@@ -161,7 +161,7 @@ class AuthContextProcessorTests(TestCase):
         #    Exception RuntimeError: 'maximum recursion depth exceeded while
         #    calling a Python object' in <type 'exceptions.AttributeError'>
         #    ignored"
-        query = Q(user=response.context['user']) & Q(someflag=True)
+        Q(user=response.context['user']) & Q(someflag=True)
 
         # Tests for user equality.  This is hard because User defines
         # equality in a non-duck-typing way

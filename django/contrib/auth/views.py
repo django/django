@@ -7,10 +7,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.translation import ugettext as _
 from django.shortcuts import resolve_url
-from django.utils.encoding import force_bytes, force_text
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -141,7 +140,8 @@ def password_reset(request, is_admin_site=False,
                    post_reset_redirect=None,
                    from_email=None,
                    current_app=None,
-                   extra_context=None):
+                   extra_context=None,
+                   html_email_template_name=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:
@@ -156,6 +156,7 @@ def password_reset(request, is_admin_site=False,
                 'email_template_name': email_template_name,
                 'subject_template_name': subject_template_name,
                 'request': request,
+                'html_email_template_name': html_email_template_name,
             }
             if is_admin_site:
                 opts = dict(opts, domain_override=request.get_host())

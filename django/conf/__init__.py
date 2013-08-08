@@ -6,6 +6,7 @@ variable, and then from django.conf.global_settings; see the global settings fil
 a list of all possible variables.
 """
 
+import importlib
 import logging
 import os
 import sys
@@ -15,7 +16,6 @@ import warnings
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils import importlib
 from django.utils.module_loading import import_by_path
 from django.utils import six
 

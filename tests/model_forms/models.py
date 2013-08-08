@@ -12,7 +12,7 @@ import os
 import tempfile
 
 from django.core import validators
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
@@ -296,3 +296,7 @@ class CustomErrorMessage(models.Model):
     name2 = models.CharField(max_length=50,
         validators=[validators.validate_slug],
         error_messages={'invalid': 'Model custom error message.'})
+
+    def clean(self):
+        if self.name1 == 'FORBIDDEN_VALUE':
+            raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})

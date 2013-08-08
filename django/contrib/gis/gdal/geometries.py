@@ -101,7 +101,7 @@ class OGRGeometry(GDALBase):
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
-                ogr_t = OGRGeomType(geom_input)
+                OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, memoryview):
             # WKB was passed in
@@ -341,7 +341,7 @@ class OGRGeometry(GDALBase):
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
+        capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 

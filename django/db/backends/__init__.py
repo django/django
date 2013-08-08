@@ -9,6 +9,7 @@ except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 from collections import namedtuple
 from contextlib import contextmanager
+from importlib import import_module
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
@@ -17,7 +18,6 @@ from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
-from django.utils.importlib import import_module
 from django.utils import six
 from django.utils import timezone
 
