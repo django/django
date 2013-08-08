@@ -251,20 +251,6 @@ The model's ``clean()`` method will be called before any uniqueness checks are
 made. See :ref:`Validating objects <validating-objects>` for more information
 on the model's ``clean()`` hook.
 
-Considerations regarding fields' ``error_messages``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Error messages defined at the
-:attr:`form field <django.forms.Field.error_messages>` level or at the
-:ref:`form Meta <modelforms-overriding-default-fields>` level always take
-precedence over the error messages defined at the
-:attr:`model field <django.db.models.Field.error_messages>` level.
-Error messages  defined on :attr:`model fields
-<django.db.models.Field.error_messages>` are only used when the
-``ValidationError`` is raised during the :ref:`model validation
-<validating-objects>` step and no corresponding error messages are defined at
-the form level.
-
 The ``save()`` method
 ---------------------
 
