@@ -100,16 +100,19 @@ this by adding the following snippet to your urls.py::
     the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
     ``http://static.example.com/``).
 
+.. _staticfiles-testing-support:
+
 Testing
 =======
 
 When running tests that use actual HTTP requests instead of the built-in
 testing client (i.e. when using the built-in :class:`LiveServerTestCase
-<django.test.LiveServerTestCase>`) the static assets need to be published but
-``LiveServerTestCase`` has only very basic static files serving
-functionality: It doesn't know about the finders feature of the
-``staticfiles`` application and assumes the static content has already been
-collected under :setting:`STATIC_ROOT`.
+<django.test.LiveServerTestCase>`) the static assets need to be served so the
+test environment reproduces the real one as faithfully as possible, but
+``LiveServerTestCase`` has only very basic static files serving functionality:
+It doesn't know about the finders feature of the ``staticfiles`` application
+and assumes the static content has already been collected under
+:setting:`STATIC_ROOT`.
 
 Because of this, ``staticfiles`` ships its own
 :class:`django.contrib.staticfiles.testing.StaticLiveServerCase`, a subclass
