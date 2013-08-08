@@ -677,8 +677,9 @@ class AutoField(Field):
     }
 
     def __init__(self, *args, **kwargs):
-        assert kwargs.get('primary_key', False) is True, \
-               "%ss must have primary_key=True." % self.__class__.__name__
+        assert kwargs.get('primary_key', True) is True, \
+                "%ss must have primary_key=True." % self.__class__.__name__
+        kwargs['primary_key'] = True
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 

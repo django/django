@@ -87,6 +87,16 @@ class BasicFieldTests(test.TestCase):
         klass = CustomChoiceField
         self.assertIsInstance(field.formfield(form_class=klass), klass)
 
+class AutoFieldTests(test.TestCase):
+    def test_default(self):
+        f = models.AutoField()
+        self.assertTrue(f.primary_key)
+
+        f = models.AutoField(primary_key=True)
+        self.assertTrue(f.primary_key)
+
+        with self.assertRaises(AssertionError):
+            models.AutoField(primary_key=False)
 
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
