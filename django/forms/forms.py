@@ -318,7 +318,7 @@ class BaseForm(object):
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
         """
-        pass
+        return self.cleaned_data
 
     def has_changed(self):
         """

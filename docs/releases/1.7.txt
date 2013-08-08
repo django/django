@@ -129,8 +129,7 @@ Minor features
 
 * The :meth:`~django.forms.Form.clean` method on a form no longer needs to
   return ``self.cleaned_data``. If it does return a changed dictionary then
-  that will still be used. The default implementation no longer returns
-  ``self.cleaned_data``.
+  that will still be used.
 
 Backwards incompatible changes in 1.7
 =====================================
