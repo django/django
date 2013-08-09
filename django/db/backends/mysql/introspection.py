@@ -182,5 +182,4 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Convert the sorted sets to lists
         for constraint in constraints.values():
             constraint['columns'] = list(constraint['columns'])
-        # Return
         return constraints
