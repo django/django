@@ -6,7 +6,7 @@ import traceback
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.color import color_style, no_style
+from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
@@ -37,8 +37,6 @@ class Command(BaseCommand):
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
         self.test_database = options.get('test_database', False)
-
-        self.style = color_style()
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
