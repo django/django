@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models.query import QuerySet
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
@@ -22,18 +23,25 @@ class MultipleObjectMixin(ContextMixin):
 
     def get_queryset(self):
         """
-        Get the list of items for this view. This must be an iterable, and may
-        be a queryset (in which qs-specific behavior will be enabled).
+        Return the list of items for this view.
+
+        The return value must be an iterable and may be an instance of
+        `QuerySet` in which case `QuerySet` specific behavior will be enabled.
         """
         if self.queryset is not None:
             queryset = self.queryset
-            if hasattr(queryset, '_clone'):
-                queryset = queryset._clone()
+            if isinstance(queryset, QuerySet):
+                queryset = queryset.all()
         elif self.model is not None:
             queryset = self.model._default_manager.all()
         else:
-            raise ImproperlyConfigured("'%s' must define 'queryset' or 'model'"
-                                       % self.__class__.__name__)
+            raise ImproperlyConfigured(
+                "%(cls)s is missing a QuerySet. Define "
+                "%(cls)s.model, %(cls)s.queryset, or override "
+                "%(cls)s.get_queryset()." % {
+                    'cls': self.__class__.__name__
+                }
+            )
         return queryset
 
     def paginate_queryset(self, queryset, page_size):

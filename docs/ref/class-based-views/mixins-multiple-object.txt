@@ -63,6 +63,14 @@ MultipleObjectMixin
         A ``QuerySet`` that represents the objects. If provided, the value of
         ``queryset`` supersedes the value provided for :attr:`model`.
 
+        .. warning::
+
+            ``queryset`` is a class attribute with a *mutable* value so care
+            must be taken when using it directly. Before using it, either call
+            its :meth:`~django.db.models.query.QuerySet.all` method or
+            retrieve it with :meth:`get_queryset` which takes care of the
+            cloning behind the scenes.
+
     .. attribute:: paginate_by
 
         An integer specifying how many objects should be displayed per page. If
