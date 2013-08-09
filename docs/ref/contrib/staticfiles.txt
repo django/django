@@ -421,9 +421,9 @@ This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
 Just like its parent, you can use it to write tests that involve running the
 code under test and consuming it with testing tools through HTTP (e.g. Selenium,
 PhantomJS, etc.), because of which it's needed that the static assets are also
-published at their right URLs.
+published.
 
-But given the fact that it makes uses of the
+But given the fact that it makes use of the
 :func:`django.contrib.staticfiles.views.serve` view described above, it can
 transparently overlay at test execution-time the assets provided by the
 ``staticfiles`` finders. This means you don't need to run

@@ -1091,7 +1091,7 @@ out the `full reference`_ for more details.
     Before Django 1.7 ``LiveServerTestCase`` used to rely on the
     :doc:`staticfiles contrib app </howto/static-files/index>` to get the
     static assets of the application(s) under test transparently served at their
-    right locations during the execution of these tests.
+    expected locations during the execution of these tests.
 
     In Django 1.7 this dependency of core functionality on a ``contrib``
     appplication has been removed, because of which ``LiveServerTestCase``
