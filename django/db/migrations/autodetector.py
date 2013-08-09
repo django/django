@@ -360,8 +360,10 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
     def __init__(self, specified_apps=set()):
         self.specified_apps = specified_apps
 
-    def _boolean_input(self, question):
+    def _boolean_input(self, question, default=None):
         result = input("%s " % question)
+        if not result and default is not None:
+            return default
         while len(result) < 1 or result[0].lower() not in "yn":
             result = input("Please answer yes or no: ")
         return result[0].lower() == "y"
@@ -390,7 +392,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         if app_label in self.specified_apps:
             return True
         # Now ask
-        return self._boolean_input("Do you want to enable migrations for app '%s'?" % app_label)
+        return self._boolean_input("Do you want to enable migrations for app '%s'? [y/N]" % app_label, False)
 
     def ask_not_null_addition(self, field_name, model_name):
         "Adding a NOT NULL field to a model"
@@ -423,4 +425,4 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"
-        return self._boolean_input("Did you rename %s.%s to %s.%s (a %s)?" % (model_name, old_name, model_name, new_name, field_instance.__class__.__name__))
+        return self._boolean_input("Did you rename %s.%s to %s.%s (a %s)? [y/N]" % (model_name, old_name, model_name, new_name, field_instance.__class__.__name__), False)
