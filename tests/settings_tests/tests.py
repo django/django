@@ -226,7 +226,7 @@ class TestComplexSettingOverride(TestCase):
             self.assertEqual('Overriding setting TEST_WARN can lead to unexpected behaviour.', str(w[-1].message))
 
 
-class UniqueSettngsTests(TestCase):
+class UniqueSettingsTests(TestCase):
     """
     Tests for the INSTALLED_APPS setting.
     """

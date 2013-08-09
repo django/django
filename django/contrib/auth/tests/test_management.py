@@ -196,13 +196,15 @@ class CustomUserModelValidationTestCase(TestCase):
         self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
 
 
-class PermissionDuplicationTestCase(TestCase):
+class PermissionTestCase(TestCase):
 
     def setUp(self):
         self._original_permissions = models.Permission._meta.permissions[:]
+        self._original_default_permissions = models.Permission._meta.default_permissions
 
     def tearDown(self):
         models.Permission._meta.permissions = self._original_permissions
+        models.Permission._meta.default_permissions = self._original_default_permissions
         ContentType.objects.clear_cache()
 
     def test_duplicated_permissions(self):
@@ -235,3 +237,23 @@ class PermissionDuplicationTestCase(TestCase):
             ('other_one', 'Some other permission'),
         ]
         create_permissions(models, [], verbosity=0)
+
+    def test_default_permissions(self):
+        models.Permission._meta.permissions = [
+            ('my_custom_permission', 'Some permission'),
+        ]
+        create_permissions(models, [], verbosity=0)
+
+        # add/change/delete permission by default + custom permission
+        self.assertEqual(models.Permission.objects.filter(content_type=
+            ContentType.objects.get_by_natural_key('auth', 'permission')
+        ).count(), 4)
+
+        models.Permission.objects.all().delete()
+        models.Permission._meta.default_permissions = []
+        create_permissions(models, [], verbosity=0)
+
+        # custom permission only since default permissions is empty
+        self.assertEqual(models.Permission.objects.filter(content_type=
+            ContentType.objects.get_by_natural_key('auth', 'permission')
+        ).count(), 1)

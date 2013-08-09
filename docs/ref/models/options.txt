@@ -235,6 +235,19 @@ Django quotes column and table names behind the scenes.
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
 
+``default_permissions``
+------------------------------
+
+.. attribute:: Options.default_permissions
+
+    .. versionadded:: 1.7
+
+    Defaults to ``('add', 'change', 'delete')``. You may customize this list,
+    for example, by setting this to an empty list if your app doesn't require
+    any of the default permissions. It must be specified on the model before
+    the model is created by :djadmin:`syncdb` in order to prevent any omitted
+    permissions from being created.
+
 ``proxy``
 ---------
 
