@@ -1280,7 +1280,7 @@ class Model(six.with_metaclass(ModelBase)):
         """ Check "ordering" option -- is it a list of lists and do all fields
         exist? """
 
-        from django.db import models
+        from django.db.models import FieldDoesNotExist
 
         if not cls._meta.ordering:
             return []
@@ -1319,7 +1319,7 @@ class Model(six.with_metaclass(ModelBase)):
         for field_name in fields:
             try:
                 cls._meta.get_field(field_name, many_to_many=False)
-            except models.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 errors.append(
                     checks.Error(
                         '"ordering" pointing to a missing "%s" field.' % field_name,
