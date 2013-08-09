@@ -1105,7 +1105,7 @@ class Model(six.with_metaclass(ModelBase)):
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
                 errors.append(
                     checks.Error(
-                        'The %s.%s field must be unique because it is pointed by USERNAME_FIELD.'
+                        'The %s.%s field must be unique because it is pointed to by USERNAME_FIELD.'
                             % (cls._meta.object_name, cls.USERNAME_FIELD),
                         hint=None,
                         obj=cls

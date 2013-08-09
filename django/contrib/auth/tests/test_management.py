@@ -213,7 +213,7 @@ class CustomUserModelValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 'The CustomUserNonUniqueUsername.username field must be '
-                    'unique because it is pointed by USERNAME_FIELD.',
+                    'unique because it is pointed to by USERNAME_FIELD.',
                 hint=None,
                 obj=CustomUserNonUniqueUsername
             ),
