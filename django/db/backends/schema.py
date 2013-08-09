@@ -80,7 +80,7 @@ class BaseDatabaseSchemaEditor(object):
 
     # Core utility functions
 
-    def execute(self, sql, params=[], fetch_results=False):
+    def execute(self, sql, params=[]):
         """
         Executes the given SQL statement, with optional parameters.
         """
