@@ -1264,22 +1264,23 @@ class Model(six.with_metaclass(ModelBase)):
     def _check_local_fields(cls, fields, option):
         from django.db import models
 
+        errors = []
         for field_name in fields:
             try:
                 field = cls._meta.get_field(field_name,
                     many_to_many=True)
             except models.FieldDoesNotExist:
-                return [
+                errors.append(
                     checks.Error(
                         '"%s" points to a missing field named "%s".'
                             % (option, field_name),
                         hint='Ensure that you did not misspell the field name.',
                         obj=cls
                     )
-                ]
+                )
             else:
                 if isinstance(field.rel, models.ManyToManyRel):
-                    return [
+                    errors.append(
                         checks.Error(
                             '"%s" refers to a m2m "%s" field, but '
                                 'ManyToManyFields are not supported in "%s".'
@@ -1287,9 +1288,9 @@ class Model(six.with_metaclass(ModelBase)):
                             hint=None,
                             obj=cls
                         )
-                    ]
-                if field not in cls._meta.local_fields:
-                    return [
+                    )
+                elif field not in cls._meta.local_fields:
+                    errors.append(
                         checks.Error(
                             '"%s" refers to "%s" field defined in parent '
                                 'model, which is not allowed.'
@@ -1297,8 +1298,8 @@ class Model(six.with_metaclass(ModelBase)):
                             hint=None,
                             obj=cls,
                         )
-                    ]
-        return []
+                    )
+        return errors
 
     @classmethod
     def _check_ordering(cls):
