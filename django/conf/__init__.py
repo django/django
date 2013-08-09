@@ -107,8 +107,10 @@ class BaseSettings(object):
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
-        elif name == "INSTALLED_APPS" and len(value) != len(set(value)):
-            raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
+        elif name == "INSTALLED_APPS":
+            value = list(value)  # force evaluation of generators on Python 3
+            if len(value) != len(set(value)):
+                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
 
         object.__setattr__(self, name, value)
 
