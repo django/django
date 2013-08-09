@@ -106,8 +106,12 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
+4. Post a notice to the `django-announce`_ mailing list that links to the blog
+   post.
+
 .. _the Python Package Index: http://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
+.. _django-announce: http://groups.google.com/group/django-announce
 
 If a reported issue is believed to be particularly time-sensitive --
 due to a known exploit in the wild, for example -- the time between
