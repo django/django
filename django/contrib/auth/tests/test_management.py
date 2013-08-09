@@ -239,21 +239,22 @@ class PermissionTestCase(TestCase):
         create_permissions(models, [], verbosity=0)
 
     def test_default_permissions(self):
+        permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
         ]
         create_permissions(models, [], verbosity=0)
 
         # add/change/delete permission by default + custom permission
-        self.assertEqual(models.Permission.objects.filter(content_type=
-            ContentType.objects.get_by_natural_key('auth', 'permission')
+        self.assertEqual(models.Permission.objects.filter(
+            content_type=permission_content_type,
         ).count(), 4)
 
-        models.Permission.objects.all().delete()
+        models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.default_permissions = []
         create_permissions(models, [], verbosity=0)
 
         # custom permission only since default permissions is empty
-        self.assertEqual(models.Permission.objects.filter(content_type=
-            ContentType.objects.get_by_natural_key('auth', 'permission')
+        self.assertEqual(models.Permission.objects.filter(
+            content_type=permission_content_type,
         ).count(), 1)
