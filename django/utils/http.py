@@ -109,8 +109,7 @@ def http_date(epoch_seconds=None):
 
     Outputs a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
     """
-    rfcdate = formatdate(epoch_seconds)
-    return '%s GMT' % rfcdate[:25]
+    return formatdate(epoch_seconds, usegmt=True)
 
 def parse_http_date(date):
     """
