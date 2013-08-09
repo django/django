@@ -17,7 +17,7 @@ from django import forms
 from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.functional import curry, total_ordering
+from django.utils.functional import curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -90,7 +90,7 @@ class Field(object):
                     'already exists.'),
     }
 
-    # Generic field type description, usually overriden by subclasses
+    # Generic field type description, usually overridden by subclasses
     def _description(self):
         return _('Field of type: %(field_type)s') % {
             'field_type': self.__class__.__name__
@@ -441,6 +441,8 @@ class Field(object):
         """
         Perform preliminary non-db specific value checks and conversions.
         """
+        if isinstance(value, Promise):
+            value = value._proxy____cast()
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -562,7 +564,14 @@ class Field(object):
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
-        first_choice = blank_choice if include_blank else []
+        blank_defined = False
+        for choice, _ in self.choices:
+            if choice in ('', None):
+                blank_defined = True
+                break
+
+        first_choice = (blank_choice if include_blank and
+                        not blank_defined else [])
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
@@ -724,6 +733,7 @@ class AutoField(Field):
         return value
 
     def get_prep_value(self, value):
+        value = super(AutoField, self).get_prep_value(value)
         if value is None:
             return None
         return int(value)
@@ -783,6 +793,7 @@ class BooleanField(Field):
         return super(BooleanField, self).get_prep_lookup(lookup_type, value)
 
     def get_prep_value(self, value):
+        value = super(BooleanField, self).get_prep_value(value)
         if value is None:
             return None
         return bool(value)
@@ -816,6 +827,7 @@ class CharField(Field):
         return smart_text(value)
 
     def get_prep_value(self, value):
+        value = super(CharField, self).get_prep_value(value)
         return self.to_python(value)
 
     def formfield(self, **kwargs):
@@ -931,6 +943,7 @@ class DateField(Field):
         return super(DateField, self).get_prep_lookup(lookup_type, value)
 
     def get_prep_value(self, value):
+        value = super(DateField, self).get_prep_value(value)
         return self.to_python(value)
 
     def get_db_prep_value(self, value, connection, prepared=False):
@@ -1028,6 +1041,7 @@ class DateTimeField(DateField):
     # get_prep_lookup is inherited from DateField
 
     def get_prep_value(self, value):
+        value = super(DateTimeField, self).get_prep_value(value)
         value = self.to_python(value)
         if value is not None and settings.USE_TZ and timezone.is_naive(value):
             # For backwards compatibility, interpret naive datetimes in local
@@ -1116,6 +1130,7 @@ class DecimalField(Field):
                 self.max_digits, self.decimal_places)
 
     def get_prep_value(self, value):
+        value = super(DecimalField, self).get_prep_value(value)
         return self.to_python(value)
 
     def formfield(self, **kwargs):
@@ -1205,6 +1220,7 @@ class FloatField(Field):
     description = _("Floating point number")
 
     def get_prep_value(self, value):
+        value = super(FloatField, self).get_prep_value(value)
         if value is None:
             return None
         return float(value)
@@ -1238,6 +1254,7 @@ class IntegerField(Field):
     description = _("Integer")
 
     def get_prep_value(self, value):
+        value = super(IntegerField, self).get_prep_value(value)
         if value is None:
             return None
         return int(value)
@@ -1346,6 +1363,7 @@ class GenericIPAddressField(Field):
         return value or None
 
     def get_prep_value(self, value):
+        value = super(GenericIPAddressField, self).get_prep_value(value)
         if value and ':' in value:
             try:
                 return clean_ipv6_address(value, self.unpack_ipv4)
@@ -1411,6 +1429,7 @@ class NullBooleanField(Field):
                                                              value)
 
     def get_prep_value(self, value):
+        value = super(NullBooleanField, self).get_prep_value(value)
         if value is None:
             return None
         return bool(value)
@@ -1493,6 +1512,7 @@ class TextField(Field):
         return "TextField"
 
     def get_prep_value(self, value):
+        value = super(TextField, self).get_prep_value(value)
         if isinstance(value, six.string_types) or value is None:
             return value
         return smart_text(value)
@@ -1569,6 +1589,7 @@ class TimeField(Field):
             return super(TimeField, self).pre_save(model_instance, add)
 
     def get_prep_value(self, value):
+        value = super(TimeField, self).get_prep_value(value)
         return self.to_python(value)
 
     def get_db_prep_value(self, value, connection, prepared=False):

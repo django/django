@@ -8,6 +8,7 @@ except ImportError:     # Python 2
 
 from django.conf import global_settings, settings
 from django.contrib.sites.models import Site, RequestSite
+from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -53,6 +54,11 @@ class AuthViewsTestCase(TestCase):
             })
         self.assertTrue(SESSION_KEY in self.client.session)
         return response
+
+    def logout(self):
+        response = self.client.get('/admin/logout/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(SESSION_KEY not in self.client.session)
 
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
@@ -122,6 +128,25 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue("http://" in mail.outbox[0].body)
         self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+        # optional multipart text/html email has been added.  Make sure original,
+        # default functionality is 100% the same
+        self.assertFalse(mail.outbox[0].message().is_multipart())
+
+    def test_html_mail_template(self):
+        """
+        A multipart email with text/plain and text/html is sent
+        if the html_email_template parameter is passed to the view
+        """
+        response = self.client.post('/password_reset/html_email_template/', {'email': 'staffmember@example.com'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0].message()
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
+        self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
+        self.assertTrue('<html>' not in message.get_payload(0).get_payload())
+        self.assertTrue('<html>' in message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
         "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
@@ -178,7 +203,7 @@ class PasswordResetTest(AuthViewsTestCase):
 
     def _test_confirm_start(self):
         # Start by creating the email
-        response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
+        self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(len(mail.outbox), 1)
         return self._read_signup_email(mail.outbox[0])
 
@@ -322,7 +347,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             })
 
     def logout(self):
-        response = self.client.get('/logout/')
+        self.client.get('/logout/')
 
     def test_password_change_fails_with_invalid_old_password(self):
         self.login()
@@ -344,7 +369,7 @@ class ChangePasswordTest(AuthViewsTestCase):
 
     def test_password_change_succeeds(self):
         self.login()
-        response = self.client.post('/password_change/', {
+        self.client.post('/password_change/', {
             'old_password': 'password',
             'new_password1': 'password1',
             'new_password2': 'password1',
@@ -459,7 +484,7 @@ class LoginTest(AuthViewsTestCase):
 
     def test_login_form_contains_request(self):
         # 15198
-        response = self.client.post('/custom_requestauth_login/', {
+        self.client.post('/custom_requestauth_login/', {
             'username': 'testclient',
             'password': 'password',
         }, follow=True)
@@ -670,18 +695,70 @@ class LogoutTest(AuthViewsTestCase):
             self.confirm_logged_out()
 
 @skipIfCustomUser
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+)
 class ChangelistTests(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls_admin'
+
+    def setUp(self):
+        # Make me a superuser before logging in.
+        User.objects.filter(username='testclient').update(is_staff=True, is_superuser=True)
+        self.login()
+        self.admin = User.objects.get(pk=1)
+
+    def get_user_data(self, user):
+        return {
+            'username': user.username,
+            'password': user.password,
+            'email': user.email,
+            'is_active': user.is_active,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'last_login_0': user.last_login.strftime('%Y-%m-%d'),
+            'last_login_1': user.last_login.strftime('%H:%M:%S'),
+            'initial-last_login_0': user.last_login.strftime('%Y-%m-%d'),
+            'initial-last_login_1': user.last_login.strftime('%H:%M:%S'),
+            'date_joined_0': user.date_joined.strftime('%Y-%m-%d'),
+            'date_joined_1': user.date_joined.strftime('%H:%M:%S'),
+            'initial-date_joined_0': user.date_joined.strftime('%Y-%m-%d'),
+            'initial-date_joined_1': user.date_joined.strftime('%H:%M:%S'),
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
 
     # #20078 - users shouldn't be allowed to guess password hashes via
     # repeated password__startswith queries.
     def test_changelist_disallows_password_lookups(self):
-        # Make me a superuser before loging in.
-        User.objects.filter(username='testclient').update(is_staff=True, is_superuser=True)
-        self.login()
-
         # A lookup that tries to filter on password isn't OK
         with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as logger_calls:
             response = self.client.get('/admin/auth/user/?password__startswith=sha1$')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(logger_calls), 1)
+
+    def test_user_change_email(self):
+        data = self.get_user_data(self.admin)
+        data['email'] = 'new_' + data['email']
+        response = self.client.post('/admin/auth/user/%s/' % self.admin.pk, data)
+        self.assertRedirects(response, '/admin/auth/user/')
+        row = LogEntry.objects.latest('id')
+        self.assertEqual(row.change_message, 'Changed email.')
+
+    def test_user_not_change(self):
+        response = self.client.post('/admin/auth/user/%s/' % self.admin.pk,
+            self.get_user_data(self.admin)
+        )
+        self.assertRedirects(response, '/admin/auth/user/')
+        row = LogEntry.objects.latest('id')
+        self.assertEqual(row.change_message, 'No fields changed.')
+
+    def test_user_change_password(self):
+        response = self.client.post('/admin/auth/user/%s/password/' % self.admin.pk, {
+            'password1': 'password1',
+            'password2': 'password1',
+        })
+        self.assertRedirects(response, '/admin/auth/user/%s/' % self.admin.pk)
+        row = LogEntry.objects.latest('id')
+        self.assertEqual(row.change_message, 'Changed password.')
+        self.logout()
+        self.login(password='password1')

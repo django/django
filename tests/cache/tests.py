@@ -2,7 +2,7 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import hashlib
 import os

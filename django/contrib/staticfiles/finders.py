@@ -1,8 +1,9 @@
+from collections import OrderedDict
 import os
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
-from django.utils.datastructures import SortedDict
 from django.utils.functional import empty, memoize, LazyObject
 from django.utils.module_loading import import_by_path
 from django.utils._os import safe_join
@@ -11,7 +12,7 @@ from django.utils import six
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
 
-_finders = SortedDict()
+_finders = OrderedDict()
 
 
 class BaseFinder(object):
@@ -47,7 +48,7 @@ class FileSystemFinder(BaseFinder):
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
-        self.storages = SortedDict()
+        self.storages = OrderedDict()
         if not isinstance(settings.STATICFILES_DIRS, (list, tuple)):
             raise ImproperlyConfigured(
                 "Your STATICFILES_DIRS setting is not a tuple or list; "
@@ -118,7 +119,7 @@ class AppDirectoriesFinder(BaseFinder):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app module paths to storage instances
-        self.storages = SortedDict()
+        self.storages = OrderedDict()
         if apps is None:
             apps = settings.INSTALLED_APPS
         for app in apps:

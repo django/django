@@ -87,7 +87,7 @@ class SimpleListFilter(ListFilter):
 
     def lookups(self, request, model_admin):
         """
-        Must be overriden to return a list of tuples (value, verbose value)
+        Must be overridden to return a list of tuples (value, verbose value)
         """
         raise NotImplementedError
 

@@ -1,9 +1,11 @@
 import os
+
 from django.conf import settings
 from django.core.cache import get_cache
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.creation import DatabaseCreation
+
 
 class SpatiaLiteCreation(DatabaseCreation):
 
@@ -53,8 +55,6 @@ class SpatiaLiteCreation(DatabaseCreation):
             interactive=False,
             database=self.connection.alias)
 
-        from django.core.cache import get_cache
-        from django.core.cache.backends.db import BaseDatabaseCache
         for cache_alias in settings.CACHES:
             cache = get_cache(cache_alias)
             if isinstance(cache, BaseDatabaseCache):
@@ -62,7 +62,7 @@ class SpatiaLiteCreation(DatabaseCreation):
 
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.
-        cursor = self.connection.cursor()
+        self.connection.cursor()
 
         return test_database_name
 

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 
@@ -301,7 +301,7 @@ class UtilTests(SimpleTestCase):
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
                              '<label for="id_text" class="required inline"><i>text</i>:</label>')
         self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                             '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i>:</label>')
+                             '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
 
         # normal strings needs to be escaped
         class MyForm(forms.Form):
@@ -312,7 +312,7 @@ class UtilTests(SimpleTestCase):
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
                              '<label for="id_text" class="required inline">&amp;text:</label>')
         self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                             '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb:</label>')
+                             '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
 
     def test_flatten_fieldsets(self):
         """

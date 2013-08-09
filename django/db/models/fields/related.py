@@ -294,10 +294,15 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
                 params = dict(
                     (rh_field.attname, getattr(instance, lh_field.attname))
                     for lh_field, rh_field in self.field.related_fields)
-                params.update(self.field.get_extra_descriptor_filter(instance))
                 qs = self.get_queryset(instance=instance)
+                extra_filter = self.field.get_extra_descriptor_filter(instance)
+                if isinstance(extra_filter, dict):
+                    params.update(extra_filter)
+                    qs = qs.filter(**params)
+                else:
+                    qs = qs.filter(extra_filter, **params)
                 # Assuming the database enforces foreign keys, this won't fail.
-                rel_obj = qs.get(**params)
+                rel_obj = qs.get()
                 if not self.field.rel.multiple:
                     setattr(rel_obj, self.field.related.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
@@ -1003,10 +1008,11 @@ class ForeignObject(RelatedField):
         user does 'instance.fieldname', that is the extra filter is used in
         the descriptor of the field.
 
-        The filter should be something usable in .filter(**kwargs) call, and
-        will be ANDed together with the joining columns condition.
+        The filter should be either a dict usable in .filter(**kwargs) call or
+        a Q-object. The condition will be ANDed together with the relation's
+        joining columns.
 
-        A parallel method is get_extra_relation_restriction() which is used in
+        A parallel method is get_extra_restriction() which is used in
         JOIN and subquery conditions.
         """
         return {}
@@ -1054,7 +1060,7 @@ class ForeignObject(RelatedField):
                 value_list = []
                 for source in sources:
                     # Account for one-to-one relations when sent a different model
-                    while not isinstance(value, source.model):
+                    while not isinstance(value, source.model) and source.rel:
                         source = source.rel.to._meta.get_field(source.rel.field_name)
                     value_list.append(getattr(value, source.attname))
                 return tuple(value_list)
@@ -1119,7 +1125,7 @@ class ForeignObject(RelatedField):
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _('Model %(model)s with pk %(pk)r does not exist.')
+        'invalid': _('%(model)s instance with pk %(pk)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
 

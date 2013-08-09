@@ -18,7 +18,6 @@ from django.contrib.gis.geos.base import GEOSBase, gdal
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOS_PREPARE
-from django.contrib.gis.geos.mutable_list import ListMixin
 
 # All other functions in this module come from the ctypes
 # prototypes module -- which handles all interaction with

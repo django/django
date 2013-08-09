@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+import re
 
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
@@ -130,6 +132,40 @@ class AuthenticationFormTest(TestCase):
                 self.assertFalse(form.is_valid())
                 self.assertEqual(form.non_field_errors(),
                                  [force_text(form.error_messages['inactive'])])
+
+    def test_custom_login_allowed_policy(self):
+        # The user is inactive, but our custom form policy allows him to log in.
+        data = {
+            'username': 'inactive',
+            'password': 'password',
+            }
+
+        class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+
+        form = AuthenticationFormWithInactiveUsersOkay(None, data)
+        self.assertTrue(form.is_valid())
+
+        # If we want to disallow some logins according to custom logic,
+        # we should raise a django.forms.ValidationError in the form.
+        class PickyAuthenticationForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                if user.username == "inactive":
+                    raise forms.ValidationError(_("This user is disallowed."))
+                raise forms.ValidationError(_("Sorry, nobody's allowed in."))
+
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ['This user is disallowed.'])
+
+        data = {
+            'username': 'testclient',
+            'password': 'password',
+            }
+        form = PickyAuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.non_field_errors(), ["Sorry, nobody's allowed in."])
 
     def test_success(self):
         # The success case
@@ -272,7 +308,7 @@ class UserChangeFormTest(TestCase):
                 fields = ('groups',)
 
         # Just check we can create it
-        form = MyUserForm({})
+        MyUserForm({})
 
     def test_unsuable_password(self):
         user = User.objects.get(username='empty_password')
@@ -416,6 +452,60 @@ class PasswordResetFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(
+        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
+        TEMPLATE_DIRS=(
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+        ),
+    )
+    def test_save_plaintext_email(self):
+        """
+        Test the PasswordResetForm.save() method with no html_email_template_name
+        parameter passed in.
+        Test to ensure original behavior is unchanged after the parameter was added.
+        """
+        (user, username, email) = self.create_dummy_user()
+        form = PasswordResetForm({"email": email})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0].message()
+        self.assertFalse(message.is_multipart())
+        self.assertEqual(message.get_content_type(), 'text/plain')
+        self.assertEqual(message.get('subject'), 'Custom password reset on example.com')
+        self.assertEqual(len(mail.outbox[0].alternatives), 0)
+        self.assertEqual(message.get_all('to'), [email])
+        self.assertTrue(re.match(r'^http://example.com/reset/[\w+/-]', message.get_payload()))
+
+    @override_settings(
+        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
+        TEMPLATE_DIRS=(
+            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+        ),
+    )
+    def test_save_html_email_template_name(self):
+        """
+        Test the PasswordResetFOrm.save() method with html_email_template_name
+        parameter specified.
+        Test to ensure that a multipart email is sent with both text/plain
+        and text/html parts.
+        """
+        (user, username, email) = self.create_dummy_user()
+        form = PasswordResetForm({"email": email})
+        self.assertTrue(form.is_valid())
+        form.save(html_email_template_name='registration/html_password_reset_email.html')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox[0].alternatives), 1)
+        message = mail.outbox[0].message()
+        self.assertEqual(message.get('subject'), 'Custom password reset on example.com')
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(message.get_payload(0).get_content_type(), 'text/plain')
+        self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
+        self.assertEqual(message.get_all('to'), [email])
+        self.assertTrue(re.match(r'^http://example.com/reset/[\w/-]+', message.get_payload(0).get_payload()))
+        self.assertTrue(re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$', message.get_payload(1).get_payload()))
 
 
 class ReadOnlyPasswordHashTest(TestCase):

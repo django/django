@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
@@ -585,3 +585,35 @@ class BaseAggregateTestCase(TestCase):
                 "datetime.date(2008, 1, 1)"
             ]
         )
+
+    def test_values_aggregation(self):
+        # Refs #20782
+        max_rating = Book.objects.values('rating').aggregate(max_rating=Max('rating'))
+        self.assertEqual(max_rating['max_rating'], 5)
+        max_books_per_rating = Book.objects.values('rating').annotate(
+            books_per_rating=Count('id')
+        ).aggregate(Max('books_per_rating'))
+        self.assertEqual(
+            max_books_per_rating,
+            {'books_per_rating__max': 3})
+
+    def test_ticket17424(self):
+        """
+        Check that doing exclude() on a foreign model after annotate()
+        doesn't crash.
+        """
+        all_books = list(Book.objects.values_list('pk', flat=True).order_by('pk'))
+        annotated_books = Book.objects.order_by('pk').annotate(one=Count("id"))
+
+        # The value doesn't matter, we just need any negative
+        # constraint on a related model that's a noop.
+        excluded_books = annotated_books.exclude(publisher__name="__UNLIKELY_VALUE__")
+
+        # Try to generate query tree
+        str(excluded_books.query)
+
+        self.assertQuerysetEqual(excluded_books, all_books, lambda x: x.pk)
+
+        # Check internal state
+        self.assertIsNone(annotated_books.query.alias_map["aggregation_book"].join_type)
+        self.assertIsNone(excluded_books.query.alias_map["aggregation_book"].join_type)

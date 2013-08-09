@@ -1,6 +1,4 @@
 # -*- coding:utf-8 -*-
-from __future__ import absolute_import
-
 import gettext
 import os
 from os import path
@@ -200,26 +198,22 @@ class JavascriptI18nTests(LiveServerTestCase):
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests']
-        with self.settings(INSTALLED_APPS=extended_apps):
-            self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
+        self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
 
-            elem = self.selenium.find_element_by_id("gettext")
-            self.assertEqual(elem.text, "Entfernen")
-            elem = self.selenium.find_element_by_id("ngettext_sing")
-            self.assertEqual(elem.text, "1 Element")
-            elem = self.selenium.find_element_by_id("ngettext_plur")
-            self.assertEqual(elem.text, "455 Elemente")
-            elem = self.selenium.find_element_by_id("pgettext")
-            self.assertEqual(elem.text, "Kann")
-            elem = self.selenium.find_element_by_id("npgettext_sing")
-            self.assertEqual(elem.text, "1 Resultat")
-            elem = self.selenium.find_element_by_id("npgettext_plur")
-            self.assertEqual(elem.text, "455 Resultate")
+        elem = self.selenium.find_element_by_id("gettext")
+        self.assertEqual(elem.text, "Entfernen")
+        elem = self.selenium.find_element_by_id("ngettext_sing")
+        self.assertEqual(elem.text, "1 Element")
+        elem = self.selenium.find_element_by_id("ngettext_plur")
+        self.assertEqual(elem.text, "455 Elemente")
+        elem = self.selenium.find_element_by_id("pgettext")
+        self.assertEqual(elem.text, "Kann")
+        elem = self.selenium.find_element_by_id("npgettext_sing")
+        self.assertEqual(elem.text, "1 Resultat")
+        elem = self.selenium.find_element_by_id("npgettext_plur")
+        self.assertEqual(elem.text, "455 Resultate")
 
     def test_escaping(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['view_tests']
-        with self.settings(INSTALLED_APPS=extended_apps):
-            # Force a language via GET otherwise the gettext functions are a noop!
-            response = self.client.get('/jsi18n_admin/?language=de')
-            self.assertContains(response, '\\x04')
+        # Force a language via GET otherwise the gettext functions are a noop!
+        response = self.client.get('/jsi18n_admin/?language=de')
+        self.assertContains(response, '\\x04')

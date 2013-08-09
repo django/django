@@ -338,7 +338,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if 'check_same_thread' in kwargs and kwargs['check_same_thread']:
             warnings.warn(
                 'The `check_same_thread` option was provided and set to '
-                'True. It will be overriden with False. Use the '
+                'True. It will be overridden with False. Use the '
                 '`DatabaseWrapper.allow_thread_sharing` property instead '
                 'for controlling thread shareability.',
                 RuntimeWarning

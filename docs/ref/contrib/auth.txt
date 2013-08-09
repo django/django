@@ -114,11 +114,13 @@ Methods
         Always returns ``True`` (as opposed to
         ``AnonymousUser.is_authenticated()`` which always returns ``False``).
         This is a way to tell if the user has been authenticated. This does not
-        imply any permissions, and doesn't check if the user is active - it
-        only indicates that ``request.user`` has been populated by the
-        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` with
-        a :class:`~django.contrib.auth.models.User` object representing the
-        currently logged-in user.
+        imply any permissions, and doesn't check if the user is active or has
+        a valid session. Even though normally you will call this method on
+        ``request.user`` to find out whether it has been populated by the
+        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        (representing the currently logged-in user), you should know this method
+        returns ``True`` for any :class:`~django.contrib.auth.models.User`
+        instance.
 
     .. method:: get_full_name()
 
@@ -243,7 +245,7 @@ Manager methods
         be called.
 
         The ``extra_fields`` keyword arguments are passed through to the
-        :class:`~django.contrib.auth.models.User`'s ``__init__`` method to
+        :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom User model
         <auth-custom-user>`.
 

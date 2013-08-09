@@ -174,7 +174,7 @@ Advanced features of ``TransactionTestCase``
     .. warning::
 
         This attribute is a private API. It may be changed or removed without
-        a deprecation period in the future, for instance to accomodate changes
+        a deprecation period in the future, for instance to accommodate changes
         in application loading.
 
         It's used to optimize Django's own test suite, which contains hundreds

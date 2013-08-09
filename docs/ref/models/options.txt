@@ -90,7 +90,7 @@ Django quotes column and table names behind the scenes.
 
     The name of an orderable field in the model, typically a :class:`DateField`,
     :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`'s
+    field to use in your model :class:`Manager`’s
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
@@ -227,9 +227,8 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.permissions
 
     Extra permissions to enter into the permissions table when creating this object.
-    Add, delete and change permissions are automatically created for each object
-    that has ``admin`` set. This example specifies an extra permission,
-    ``can_deliver_pizzas``::
+    Add, delete and change permissions are automatically created for each
+    model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
         permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 

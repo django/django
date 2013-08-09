@@ -3,8 +3,9 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
+from collections import OrderedDict
 import warnings
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
@@ -15,7 +16,6 @@ from django.forms.util import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text
-from django.utils.datastructures import SortedDict
 from django.utils import six
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext, string_concat
@@ -142,7 +142,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      formfield_callback=None, localized_fields=None,
                      labels=None, help_texts=None, error_messages=None):
     """
-    Returns a ``SortedDict`` containing form fields for the given model.
+    Returns a ``OrderedDict`` containing form fields for the given model.
 
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned fields.
@@ -199,9 +199,9 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
             field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
-    field_dict = SortedDict(field_list)
+    field_dict = OrderedDict(field_list)
     if fields:
-        field_dict = SortedDict(
+        field_dict = OrderedDict(
             [(f, field_dict.get(f)) for f in fields
                 if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
         )
@@ -717,7 +717,8 @@ class BaseModelFormSet(BaseFormSet):
             obj = self._existing_object(pk_value)
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
-                obj.delete()
+                if commit:
+                    obj.delete()
                 continue
             if form.has_changed():
                 self.changed_objects.append((obj, form.changed_data))

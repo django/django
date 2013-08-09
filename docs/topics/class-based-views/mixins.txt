@@ -170,7 +170,7 @@ being taken from the
 :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 attribute. (The date based generic views use suffixes such as ``_archive``,
 ``_archive_year`` and so on to use different templates for the various
-specialised date-based list views.)
+specialized date-based list views.)
 
 Using Django's class-based view mixins
 ======================================
@@ -288,7 +288,7 @@ object. In order to do this, we need to have two different querysets:
 
 ``Book`` queryset for use by :class:`~django.views.generic.list.ListView`
     Since we have access to the ``Publisher`` whose books we want to list, we
-    simply override ``get_queryset()`` and use the ``Publisher``'s
+    simply override ``get_queryset()`` and use the ``Publisher``’s
     :ref:`reverse foreign key manager<backwards-related-objects>`.
 
 ``Publisher`` queryset for use in :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
@@ -345,7 +345,7 @@ The ``paginate_by`` is deliberately small in the example so you don't
 have to create lots of books to see the pagination working! Here's the
 template you'd want to use:
 
-.. code-block: html+django
+.. code-block:: html+django
 
     {% extends "base.html" %}
 

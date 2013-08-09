@@ -579,7 +579,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except utils.DatabaseError:
+            except DatabaseError: 
                 self.operators = self._likec_operators
             else:
                 self.operators = self._standard_operators

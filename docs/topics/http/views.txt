@@ -140,18 +140,18 @@ The 404 (page not found) view
 
 .. function:: django.views.defaults.page_not_found(request, template_name='404.html')
 
-When you raise an ``Http404`` exception, Django loads a special view devoted
-to handling 404 errors. By default, it's the view
-``django.views.defaults.page_not_found``, which either produces a very simple
-"Not Found" message or loads and renders the template ``404.html`` if you
-created it in your root template directory.
+When you raise :exc:`~django.http.Http404` from within a view, Django loads a
+special view devoted to handling 404 errors. By default, it's the view
+:func:`django.views.defaults.page_not_found`, which either produces a very
+simple "Not Found" message or loads and renders the template ``404.html`` if
+you created it in your root template directory.
 
 The default 404 view will pass one variable to the template: ``request_path``,
 which is the URL that resulted in the error.
 
 The ``page_not_found`` view should suffice for 99% of Web applications, but if
-you want to override it, you can specify ``handler404`` in your URLconf, like
-so::
+you want to override it, you can specify ``handler404`` in your root URLconf
+(setting ``handler404`` anywhere else will have no effect), like so::
 
     handler404 = 'mysite.views.my_custom_404_view'
 

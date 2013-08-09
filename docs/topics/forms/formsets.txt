@@ -3,7 +3,10 @@
 Formsets
 ========
 
-.. class:: django.forms.formsets.BaseFormSet
+.. module:: django.forms.formsets
+    :synopsis: An abstraction for working with multiple forms on the same page.
+
+.. class:: BaseFormSet
 
 A formset is a layer of abstraction to work with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
@@ -164,9 +167,7 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
-.. currentmodule:: django.forms.formsets.BaseFormSet
-
-.. method:: total_error_count(self)
+.. method:: BaseFormSet.total_error_count(self)
 
 .. versionadded:: 1.6
 
@@ -353,6 +354,8 @@ formsets and deletion of forms from a formset.
 ``can_order``
 ~~~~~~~~~~~~~
 
+.. attribute:: BaseFormSet.can_order
+
 Default: ``False``
 
 Lets you create a formset with the ability to order::
@@ -411,6 +414,8 @@ happen when the user changes these values::
 ``can_delete``
 ~~~~~~~~~~~~~~
 
+.. attribute:: BaseFormSet.can_delete
+
 Default: ``False``
 
 Lets you create a formset with the ability to select forms for deletion::
@@ -463,10 +468,23 @@ delete fields you can access them with ``deleted_forms``::
 
 If you are using a :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`,
 model instances for deleted forms will be deleted when you call
-``formset.save()``. On the other hand, if you are using a plain ``FormSet``,
-it's up to you to handle ``formset.deleted_forms``, perhaps in your formset's
-``save()`` method, as there's no general notion of what it means to delete a
-form.
+``formset.save()``.
+
+.. versionchanged:: 1.7
+
+    If you call ``formset.save(commit=False)``, objects will not be deleted
+    automatically.  You'll need to call ``delete()`` on each of the
+    :attr:`formset.deleted_objects
+    <django.forms.models.BaseModelFormSet.deleted_objects>` to actually delete
+    them::
+
+        >>> instances = formset.save(commit=False)
+        >>> for obj in formset.deleted_objects:
+        ...     obj.delete()
+
+On the other hand, if you are using a plain ``FormSet``, it's up to you to
+handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
+as there's no general notion of what it means to delete a form.
 
 Adding additional fields to a formset
 -------------------------------------

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import re
 from bisect import bisect
 import warnings
@@ -11,7 +12,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -40,7 +40,6 @@ class Options(object):
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
-        self.admin = None
         self.meta = meta
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
@@ -58,7 +57,7 @@ class Options(object):
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = SortedDict()
+        self.parents = OrderedDict()
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
@@ -212,9 +211,10 @@ class Options(object):
 
     def pk_index(self):
         """
-        Returns the index of the primary key field in the self.fields list.
+        Returns the index of the primary key field in the self.concrete_fields
+        list.
         """
-        return self.fields.index(self.pk)
+        return self.concrete_fields.index(self.pk)
 
     def setup_proxy(self, target):
         """
@@ -340,7 +340,7 @@ class Options(object):
         return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         for parent in self.parents:
             for field, model in parent._meta.get_m2m_with_model():
                 if model:
@@ -411,12 +411,13 @@ class Options(object):
         for f, model in self.get_all_related_objects_with_model():
             cache[f.field.related_query_name()] = (f, model, False, False)
         for f, model in self.get_m2m_with_model():
-            cache[f.name] = (f, model, True, True)
+            cache[f.name] = cache[f.attname] = (f, model, True, True)
         for f, model in self.get_fields_with_model():
-            cache[f.name] = (f, model, True, False)
+            cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
             if hasattr(f, 'related'):
-                cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
+                cache[f.name] = cache[f.attname] = (
+                    f.related, None if f.model == self.model else f.model, True, False)
         if app_cache_ready():
             self._name_map = cache
         return cache
@@ -481,7 +482,7 @@ class Options(object):
         return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
@@ -526,7 +527,7 @@ class Options(object):
         return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_m2m_objects_with_model():

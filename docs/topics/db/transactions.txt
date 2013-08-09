@@ -619,7 +619,7 @@ context managers breaks atomicity.
 Managing autocommit
 ~~~~~~~~~~~~~~~~~~~
 
-Django 1.6 introduces an explicit :ref:`API for mananging autocommit
+Django 1.6 introduces an explicit :ref:`API for managing autocommit
 <managing-autocommit>`.
 
 To disable autocommit temporarily, instead of::

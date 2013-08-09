@@ -644,8 +644,8 @@ class MainPrepopulated(models.Model):
         max_length=20,
         choices=(('option one', 'Option One'),
                  ('option two', 'Option Two')))
-    slug1 = models.SlugField()
-    slug2 = models.SlugField()
+    slug1 = models.SlugField(blank=True)
+    slug2 = models.SlugField(blank=True)
 
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated)

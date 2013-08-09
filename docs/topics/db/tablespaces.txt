@@ -30,7 +30,7 @@ Declaring tablespaces for indexes
 ---------------------------------
 
 You can pass the :attr:`~django.db.models.Field.db_tablespace` option to a
-``Field`` constructor to specify an alternate tablespace for the ``Field``'s
+``Field`` constructor to specify an alternate tablespace for the ``Field``’s
 column index. If no index would be created for the column, the option is
 ignored.
 

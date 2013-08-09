@@ -1,6 +1,8 @@
+from collections import OrderedDict
 import copy
 import operator
 from functools import partial, reduce, update_wrapper
+import warnings
 
 from django import forms
 from django.conf import settings
@@ -29,7 +31,6 @@ from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.decorators import method_decorator
-from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -69,6 +70,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.CharField: {'widget': widgets.AdminTextInputWidget},
     models.ImageField: {'widget': widgets.AdminFileWidget},
     models.FileField: {'widget': widgets.AdminFileWidget},
+    models.EmailField: {'widget': widgets.AdminEmailInputWidget},
 }
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -237,13 +239,49 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
 
         return db_field.formfield(**kwargs)
 
-    def _declared_fieldsets(self):
+    @property
+    def declared_fieldsets(self):
+        warnings.warn(
+            "ModelAdmin.declared_fieldsets is deprecated and "
+            "will be removed in Django 1.9.",
+            PendingDeprecationWarning, stacklevel=2
+        )
+
         if self.fieldsets:
             return self.fieldsets
         elif self.fields:
             return [(None, {'fields': self.fields})]
         return None
-    declared_fieldsets = property(_declared_fieldsets)
+
+    def get_fields(self, request, obj=None):
+        """
+        Hook for specifying fields.
+        """
+        return self.fields
+
+    def get_fieldsets(self, request, obj=None):
+        """
+        Hook for specifying fieldsets.
+        """
+        # We access the property and check if it triggers a warning.
+        # If it does, then it's ours and we can safely ignore it, but if
+        # it doesn't then it has been overriden so we must warn about the
+        # deprecation.
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            declared_fieldsets = self.declared_fieldsets
+        if len(w) != 1 or not issubclass(w[0].category, PendingDeprecationWarning):
+            warnings.warn(
+                "ModelAdmin.declared_fieldsets is deprecated and "
+                "will be removed in Django 1.9.",
+                PendingDeprecationWarning
+            )
+            if declared_fieldsets:
+                return declared_fieldsets
+
+        if self.fieldsets:
+            return self.fieldsets
+        return [(None, {'fields': self.get_fields(request, obj)})]
 
     def get_ordering(self, request):
         """
@@ -262,34 +300,6 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         Hook for specifying custom prepopulated fields.
         """
         return self.prepopulated_fields
-
-    def get_search_results(self, request, queryset, search_term):
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
-
-        use_distinct = False
-        if self.search_fields and search_term:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in self.search_fields]
-            for bit in search_term.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.opts, search_spec):
-                        use_distinct = True
-                        break
-
-        return queryset, use_distinct
 
     def get_queryset(self, request):
         """
@@ -505,13 +515,11 @@ class ModelAdmin(BaseModelAdmin):
             'delete': self.has_delete_permission(request),
         }
 
-    def get_fieldsets(self, request, obj=None):
-        "Hook for specifying fieldsets for the add form."
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
+    def get_fields(self, request, obj=None):
+        if self.fields:
+            return self.fields
         form = self.get_form(request, obj, fields=None)
-        fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
-        return [(None, {'fields': fields})]
+        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -670,7 +678,7 @@ class ModelAdmin(BaseModelAdmin):
         # want *any* actions enabled on this page.
         from django.contrib.admin.views.main import _is_changelist_popup
         if self.actions is None or _is_changelist_popup(request):
-            return SortedDict()
+            return OrderedDict()
 
         actions = []
 
@@ -691,8 +699,8 @@ class ModelAdmin(BaseModelAdmin):
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
-        # Convert the actions into a SortedDict keyed by name.
-        actions = SortedDict([
+        # Convert the actions into an OrderedDict keyed by name.
+        actions = OrderedDict([
             (name, (func, name, desc))
             for func, name, desc in actions
         ])
@@ -766,11 +774,50 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self.list_filter
 
+    def get_search_fields(self, request):
+        """
+        Returns a sequence containing the fields to be searched whenever
+        somebody submits a search query.
+        """
+        return self.search_fields
+
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Returns a tuple containing a queryset to implement the search,
+        and a boolean indicating if the results may contain duplicates.
+        """
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        search_fields = self.get_search_fields(request)
+        if search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in search_fields]
+            for bit in search_term.split():
+                or_queries = [models.Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+            if not use_distinct:
+                for search_spec in orm_lookups:
+                    if lookup_needs_distinct(self.opts, search_spec):
+                        use_distinct = True
+                        break
+
+        return queryset, use_distinct
+
     def get_preserved_filters(self, request):
         """
         Returns the preserved filters querystring.
         """
-
         match = request.resolver_match
         if self.preserve_filters and match:
             opts = self.model._meta
@@ -1106,17 +1153,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form_validated = False
                 new_object = self.model()
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(data=request.POST, files=request.FILES,
-                                  instance=new_object,
-                                  save_as_new="_saveasnew" in request.POST,
-                                  prefix=prefix, queryset=inline.get_queryset(request))
-                formsets.append(formset)
+            formsets = self._create_formsets(request, new_object, inline_instances)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, False)
                 self.save_related(request, form, formsets, False)
@@ -1134,15 +1171,7 @@ class ModelAdmin(BaseModelAdmin):
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
             form = ModelForm(initial=initial)
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(instance=self.model(), prefix=prefix,
-                                  queryset=inline.get_queryset(request))
-                formsets.append(formset)
+            formsets = self._create_formsets(request, self.model(), inline_instances)
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
             self.get_prepopulated_fields(request),
@@ -1194,7 +1223,6 @@ class ModelAdmin(BaseModelAdmin):
                                     current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
-        formsets = []
         inline_instances = self.get_inline_instances(request, obj)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
@@ -1204,18 +1232,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form_validated = False
                 new_object = obj
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request, new_object), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(request.POST, request.FILES,
-                                  instance=new_object, prefix=prefix,
-                                  queryset=inline.get_queryset(request))
-
-                formsets.append(formset)
-
+            formsets = self._create_formsets(request, new_object, inline_instances)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, True)
                 self.save_related(request, form, formsets, True)
@@ -1225,15 +1242,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             form = ModelForm(instance=obj)
-            prefixes = {}
-            for FormSet, inline in zip(self.get_formsets(request, obj), inline_instances):
-                prefix = FormSet.get_default_prefix()
-                prefixes[prefix] = prefixes.get(prefix, 0) + 1
-                if prefixes[prefix] != 1 or not prefix:
-                    prefix = "%s-%s" % (prefix, prefixes[prefix])
-                formset = FormSet(instance=obj, prefix=prefix,
-                                  queryset=inline.get_queryset(request))
-                formsets.append(formset)
+            formsets = self._create_formsets(request, obj, inline_instances)
 
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
             self.get_prepopulated_fields(request, obj),
@@ -1280,6 +1289,7 @@ class ModelAdmin(BaseModelAdmin):
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
         list_filter = self.get_list_filter(request)
+        search_fields = self.get_search_fields(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1291,9 +1301,9 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = ChangeList(request, self.model, list_display,
                 list_display_links, list_filter, self.date_hierarchy,
-                self.search_fields, self.list_select_related,
-                self.list_per_page, self.list_max_show_all, self.list_editable,
-                self)
+                search_fields, self.list_select_related, self.list_per_page,
+                self.list_max_show_all, self.list_editable, self)
+
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -1532,6 +1542,32 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
 
+    def _create_formsets(self, request, obj, inline_instances):
+        "Helper function to generate formsets for add/change_view."
+        formsets = []
+        prefixes = {}
+        get_formsets_args = [request]
+        if obj.pk:
+            get_formsets_args.append(obj)
+        for FormSet, inline in zip(self.get_formsets(*get_formsets_args), inline_instances):
+            prefix = FormSet.get_default_prefix()
+            prefixes[prefix] = prefixes.get(prefix, 0) + 1
+            if prefixes[prefix] != 1 or not prefix:
+                prefix = "%s-%s" % (prefix, prefixes[prefix])
+            formset_params = {
+                'instance': obj,
+                'prefix': prefix,
+                'queryset': inline.get_queryset(request),
+            }
+            if request.method == 'POST':
+                formset_params.update({
+                    'data': request.POST,
+                    'files': request.FILES,
+                    'save_as_new': '_saveasnew' in request.POST
+                })
+            formsets.append(FormSet(**formset_params))
+        return formsets
+
 
 class InlineModelAdmin(BaseModelAdmin):
     """
@@ -1656,12 +1692,11 @@ class InlineModelAdmin(BaseModelAdmin):
 
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
-    def get_fieldsets(self, request, obj=None):
-        if self.declared_fieldsets:
-            return self.declared_fieldsets
+    def get_fields(self, request, obj=None):
+        if self.fields:
+            return self.fields
         form = self.get_formset(request, obj, fields=None).form
-        fields = list(form.base_fields) + list(self.get_readonly_fields(request, obj))
-        return [(None, {'fields': fields})]
+        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_queryset(self, request):
         queryset = super(InlineModelAdmin, self).get_queryset(request)

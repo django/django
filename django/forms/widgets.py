@@ -2,7 +2,7 @@
 HTML Widget classes
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
 from itertools import chain
@@ -511,6 +511,8 @@ class Select(Widget):
         return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
+        if option_value == None:
+            option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
@@ -837,6 +839,11 @@ class MultiWidget(Widget):
         obj = super(MultiWidget, self).__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
+
+    @property
+    def needs_multipart_form(self):
+        return any(w.needs_multipart_form for w in self.widgets)
+
 
 class SplitDateTimeWidget(MultiWidget):
     """

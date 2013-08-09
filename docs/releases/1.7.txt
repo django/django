@@ -57,6 +57,13 @@ but a few of the key features are:
   will still work, but that method name is deprecated and you should change
   it as soon as possible (nothing more than renaming is required).
 
+Calling custom ``QuerySet`` methods from the ``Manager``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
+class method has been added to :ref:`create Manager with QuerySet methods
+<create-manager-with-queryset-methods>`.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -99,6 +106,58 @@ Minor features
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
+* Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
+  property for rounded corners rather than GIF background images.
+
+* Some admin templates now have ``app-<app_name>`` and ``model-<model_name>``
+  classes in their ``<body>`` tag to allow customizing the CSS per app or per
+  model.
+
+* The admin changelist cells now have a ``field-<field_name>`` class in the
+  HTML to enable style customizations.
+
+* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
+  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+
+* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+  disable the colorization of management command output.
+
+* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
+  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
+  header in the response. This makes it possible for the
+  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
+  conditional ``GET`` requests for sitemaps which set ``lastmod``.
+
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
+* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
+  customize the "empty choice" label by including a tuple with an empty string
+  or ``None`` for the key and the custom label as the value. The default blank
+  option ``"----------"`` will be omitted in this case.
+
+* The admin's search fields can now be customized per-request thanks to the new
+  :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
+
+* The :meth:`ModelAdmin.get_fields()
+  <django.contrib.admin.ModelAdmin.get_fields>` method may be overridden to
+  customize the value of :attr:`ModelAdmin.fields
+  <django.contrib.admin.ModelAdmin.fields>`.
+
+* :func:`django.contrib.auth.views.password_reset` takes an optional
+  ``html_email_template_name`` parameter used to send a multipart HTML email
+  for password resets.
+
+* :class:`~django.forms.MultiValueField` allows optional subfields by setting
+  the ``require_all_fields`` argument to ``False``. The ``required`` attribute
+  for each individual field will be respected, and a new ``incomplete``
+  validation error will be raised when any required fields are empty.
+
+* The :meth:`~django.forms.Form.clean` method on a form no longer needs to
+  return ``self.cleaned_data``. If it does return a changed dictionary then
+  that will still be used.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -130,14 +189,31 @@ Miscellaneous
   have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
   that implements ``new_file()``, be sure it accepts this new parameter.
 
+* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`’s no longer
+  delete instances when ``save(commit=False)`` is called. See
+  :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
+  to manually delete objects from deleted forms.
+
+* Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
+  :class:`~django.core.management.CommandError`.
+
+* :func:`django.contrib.staticfiles.views.serve` will now raise an
+  :exc:`~django.http.Http404` exception instead of
+  :exc:`~django.core.exceptions.ImproperlyConfigured` when :setting:`DEBUG`
+  is ``False``. This change removes the need to conditionally add the view to
+  your root URLconf, which in turn makes it safe to reverse by name. It also
+  removes the ability for visitors to generate spurious HTTP 500 errors by
+  requesting static files that don't exist or haven't been collected yet.
+
 Features deprecated in 1.7
 ==========================
 
-``django.utils.dictconfig``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.utils.dictconfig``/``django.utils.importlib``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``django.utils.dictconfig`` was a copy of :mod:`logging.config` provided for
-Python versions prior to 2.7. It has been deprecated.
+``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
+respectively :mod:`logging.config` and :mod:`importlib` provided for Python
+versions prior to 2.7. They have been deprecated.
 
 ``django.utils.unittest``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,3 +223,27 @@ on all Python versions. Since ``unittest2`` became the standard library's
 :mod:`unittest` module in Python 2.7, and Django 1.7 drops support for older
 Python versions, this module isn't useful anymore. It has been deprecated. Use
 :mod:`unittest` instead.
+
+``django.utils.datastructures.SortedDict``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As :class:`~collections.OrderedDict` was added to the standard library in
+Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
+needed and has been deprecated.
+
+Custom SQL location for models package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if models were organized in a package (``myapp/models/``) rather
+than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
+<initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
+will search ``myapp/sql/`` as documented. The old location will continue to
+work until Django 1.9.
+
+``declared_fieldsets`` attribute on ``ModelAdmin.``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.declared_fieldsets`` was deprecated. Despite being a private API,
+it will go through a regular deprecation path. This attribute was mostly used
+by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
+a bug and has been addressed.

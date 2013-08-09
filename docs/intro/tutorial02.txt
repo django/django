@@ -352,12 +352,6 @@ representation of the output.
 You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
 
-    import datetime
-    from django.utils import timezone
-    from django.db import models
-
-    from polls.models import Poll
-
     class Poll(models.Model):
         # ...
         def was_published_recently(self):

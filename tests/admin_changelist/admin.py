@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 from django.core.paginator import Paginator
 
@@ -107,3 +105,10 @@ class DynamicListFilterChildAdmin(admin.ModelAdmin):
             my_list_filter.remove('parent')
         return my_list_filter
 
+class DynamicSearchFieldsChildAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+    def get_search_fields(self, request):
+        search_fields = super(DynamicSearchFieldsChildAdmin, self).get_search_fields(request)
+        search_fields += ('age',)
+        return search_fields

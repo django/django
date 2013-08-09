@@ -1,4 +1,5 @@
 import sys
+from importlib import import_module
 from optparse import make_option
 
 from django.conf import settings

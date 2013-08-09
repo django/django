@@ -68,11 +68,18 @@ class Reporter(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
+class ReporterProxy(Reporter):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
+    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
+                                       related_name='reporter_proxy')
 
     def __str__(self):
         return self.headline

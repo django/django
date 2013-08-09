@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import os
@@ -1780,6 +1780,14 @@ class OldFormForXTests(TestCase):
         self.assertHTMLEqual(
             str(errors['name2']),
             '<ul class="errorlist"><li>Model custom error message.</li></ul>'
+        )
+
+    def test_model_clean_error_messages(self) :
+        data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(
+            str(errors['name1']),
+            '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>'
         )
 
 

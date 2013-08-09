@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import re
 
 from django import forms
@@ -5,7 +6,6 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.forms import formsets, ValidationError
 from django.views.generic import TemplateView
-from django.utils.datastructures import SortedDict
 from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext as _
 from django.utils import six
@@ -17,7 +17,7 @@ from django.contrib.formtools.wizard.forms import ManagementForm
 
 def normalize_name(name):
     """
-    Converts camel-case style names into underscore seperated words. Example::
+    Converts camel-case style names into underscore separated words. Example::
 
         >>> normalize_name('oneTwoThree')
         'one_two_three'
@@ -158,7 +158,7 @@ class WizardView(TemplateView):
         form_list = form_list or kwargs.pop('form_list',
             getattr(cls, 'form_list', None)) or []
 
-        computed_form_list = SortedDict()
+        computed_form_list = OrderedDict()
 
         assert len(form_list) > 0, 'at least one form is needed'
 
@@ -206,7 +206,7 @@ class WizardView(TemplateView):
         The form_list is always generated on the fly because condition methods
         could use data from other (maybe previous forms).
         """
-        form_list = SortedDict()
+        form_list = OrderedDict()
         for form_key, form_class in six.iteritems(self.form_list):
             # try to fetch the value from condition list, by default, the form
             # gets passed to the new list.
@@ -498,9 +498,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keyOrder.index(step) + 1
-        if len(form_list.keyOrder) > key:
-            return form_list.keyOrder[key]
+        keys = list(form_list.keys())
+        key = keys.index(step) + 1
+        if len(keys) > key:
+            return keys[key]
         return None
 
     def get_prev_step(self, step=None):
@@ -512,9 +513,10 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         form_list = self.get_form_list()
-        key = form_list.keyOrder.index(step) - 1
+        keys = list(form_list.keys())
+        key = keys.index(step) - 1
         if key >= 0:
-            return form_list.keyOrder[key]
+            return keys[key]
         return None
 
     def get_step_index(self, step=None):
@@ -524,7 +526,7 @@ class WizardView(TemplateView):
         """
         if step is None:
             step = self.steps.current
-        return self.get_form_list().keyOrder.index(step)
+        return list(self.get_form_list().keys()).index(step)
 
     def get_context_data(self, form, **kwargs):
         """

@@ -1,10 +1,11 @@
+from collections import OrderedDict
+from optparse import make_option
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
-from django.utils.datastructures import SortedDict
 
-from optparse import make_option
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -22,7 +23,7 @@ class Command(BaseCommand):
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, including those that would otherwise be filtered or modified by a custom manager."),
         make_option('--pks', dest='primary_keys', help="Only dump objects with "
-            "given primary keys. Accepts a comma seperated list of keys. "
+            "given primary keys. Accepts a comma separated list of keys. "
             "This option will only work when you specify one model."),
     )
     help = ("Output the contents of the database as a fixture of the given "
@@ -66,11 +67,11 @@ class Command(BaseCommand):
         if len(app_labels) == 0:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = SortedDict((app, None) for app in get_apps() if app not in excluded_apps)
+            app_list = OrderedDict((app, None) for app in get_apps() if app not in excluded_apps)
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = SortedDict()
+            app_list = OrderedDict()
             for label in app_labels:
                 try:
                     app_label, model_label = label.split('.')

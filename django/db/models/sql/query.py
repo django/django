@@ -7,9 +7,9 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
+from collections import OrderedDict
 import copy
 
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 from django.utils import six
@@ -142,7 +142,7 @@ class Query(object):
         self.select_related = False
 
         # SQL aggregate-related attributes
-        self.aggregates = SortedDict() # Maps alias -> SQL aggregate function
+        self.aggregates = OrderedDict() # Maps alias -> SQL aggregate function
         self.aggregate_select_mask = None
         self._aggregate_select_cache = None
 
@@ -152,7 +152,7 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra = SortedDict()  # Maps col_alias -> (col_sql, params).
+        self.extra = OrderedDict()  # Maps col_alias -> (col_sql, params).
         self.extra_select_mask = None
         self._extra_select_cache = None
 
@@ -321,6 +321,7 @@ class Query(object):
         # information but retrieves only the first row. Aggregate
         # over the subquery instead.
         if self.group_by is not None:
+
             from django.db.models.sql.subqueries import AggregateQuery
             query = AggregateQuery(self.model)
 
@@ -479,7 +480,7 @@ class Query(object):
             rhs_used_joins = set(change_map.values())
             to_promote = [alias for alias in self.tables
                           if alias not in rhs_used_joins]
-            self.promote_joins(to_promote, True)
+            self.promote_joins(to_promote)
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
@@ -658,7 +659,7 @@ class Query(object):
         """ Decreases the reference count for this alias. """
         self.alias_refcount[alias] -= amount
 
-    def promote_joins(self, aliases, unconditional=False):
+    def promote_joins(self, aliases):
         """
         Promotes recursively the join type of given aliases and its children to
         an outer join. If 'unconditional' is False, the join is only promoted if
@@ -681,12 +682,14 @@ class Query(object):
                 # isn't really joined at all in the query, so we should not
                 # alter its join type.
                 continue
+            # Only the first alias (skipped above) should have None join_type
+            assert self.alias_map[alias].join_type is not None
             parent_alias = self.alias_map[alias].lhs_alias
             parent_louter = (parent_alias
                 and self.alias_map[parent_alias].join_type == self.LOUTER)
             already_louter = self.alias_map[alias].join_type == self.LOUTER
-            if ((unconditional or self.alias_map[alias].nullable
-                 or parent_louter) and not already_louter):
+            if ((self.alias_map[alias].nullable or parent_louter) and
+                    not already_louter):
                 data = self.alias_map[alias]._replace(join_type=self.LOUTER)
                 self.alias_map[alias] = data
                 # Join type of 'alias' changed, so re-examine all aliases that
@@ -740,7 +743,7 @@ class Query(object):
             self.group_by = [relabel_column(col) for col in self.group_by]
         self.select = [SelectInfo(relabel_column(s.col), s.field)
                        for s in self.select]
-        self.aggregates = SortedDict(
+        self.aggregates = OrderedDict(
             (key, relabel_column(col)) for key, col in self.aggregates.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
@@ -794,7 +797,7 @@ class Query(object):
         assert current < ord('Z')
         prefix = chr(current + 1)
         self.alias_prefix = prefix
-        change_map = SortedDict()
+        change_map = OrderedDict()
         for pos, alias in enumerate(self.tables):
             if alias in exceptions:
                 continue
@@ -985,7 +988,7 @@ class Query(object):
             # If the aggregate references a model or field that requires a join,
             # those joins must be LEFT OUTER - empty join rows must be returned
             # in order for zeros to be returned for those aggregates.
-            self.promote_joins(join_list, True)
+            self.promote_joins(join_list)
 
             col = targets[0].column
             source = sources[0]
@@ -996,6 +999,8 @@ class Query(object):
             field_name = field_list[0]
             source = opts.get_field(field_name)
             col = field_name
+        # We want to have the alias in SELECT clause even if mask is set.
+        self.append_aggregate_mask([alias])
 
         # Add the aggregate to the query
         aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
@@ -1091,8 +1096,7 @@ class Query(object):
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                    parts, opts, alias, can_reuse, allow_many,
-                    allow_explicit_fk=True)
+                    parts, opts, alias, can_reuse, allow_many,)
             if can_reuse is not None:
                 can_reuse.update(join_list)
         except MultiJoin as e:
@@ -1237,15 +1241,14 @@ class Query(object):
                                      len(q_object.children))
         return target_clause
 
-    def names_to_path(self, names, opts, allow_many, allow_explicit_fk):
+    def names_to_path(self, names, opts, allow_many):
         """
         Walks the names path and turns them PathInfo tuples. Note that a
         single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
         'names' is the path of names to travle, 'opts' is the model Options we
-        start the name resolving from, 'allow_many' and 'allow_explicit_fk'
-        are as for setup_joins().
+        start the name resolving from, 'allow_many' is as for setup_joins().
 
         Returns a list of PathInfo tuples. In addition returns the final field
         (the last used join field), and target (which is a field guaranteed to
@@ -1258,17 +1261,9 @@ class Query(object):
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
-                for f in opts.fields:
-                    if allow_explicit_fk and name == f.attname:
-                        # XXX: A hack to allow foo_id to work in values() for
-                        # backwards compatibility purposes. If we dropped that
-                        # feature, this could be removed.
-                        field, model, direct, m2m = opts.get_field_by_name(f.name)
-                        break
-                else:
-                    available = opts.get_all_field_names() + list(self.aggregate_select)
-                    raise FieldError("Cannot resolve keyword %r into field. "
-                                     "Choices are: %s" % (name, ", ".join(available)))
+                available = opts.get_all_field_names() + list(self.aggregate_select)
+                raise FieldError("Cannot resolve keyword %r into field. "
+                                 "Choices are: %s" % (name, ", ".join(available)))
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
@@ -1314,7 +1309,7 @@ class Query(object):
         return path, final_field, targets
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
-                    allow_explicit_fk=False, outer_if_first=False):
+                    outer_if_first=False):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1329,9 +1324,6 @@ class Query(object):
         If 'allow_many' is False, then any reverse foreign key seen will
         generate a MultiJoin exception.
 
-        The 'allow_explicit_fk' controls if field.attname is allowed in the
-        lookups.
-
         Returns the final field involved in the joins, the target field (used
         for any 'where' constraint), the final 'opts' value, the joins and the
         field path travelled to generate the joins.
@@ -1345,7 +1337,7 @@ class Query(object):
         joins = [alias]
         # First, generate the path for the names
         path, final_field, targets = self.names_to_path(
-            names, opts, allow_many, allow_explicit_fk)
+            names, opts, allow_many)
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
@@ -1648,7 +1640,7 @@ class Query(object):
             # dictionary with their parameters in 'select_params' so that
             # subsequent updates to the select dictionary also adjust the
             # parameters appropriately.
-            select_pairs = SortedDict()
+            select_pairs = OrderedDict()
             if select_params:
                 param_iter = iter(select_params)
             else:
@@ -1661,7 +1653,7 @@ class Query(object):
                     entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
-            # This is order preserving, since self.extra_select is a SortedDict.
+            # This is order preserving, since self.extra_select is an OrderedDict.
             self.extra.update(select_pairs)
         if where or params:
             self.where.add(ExtraWhere(where, params), AND)
@@ -1753,6 +1745,10 @@ class Query(object):
             self.aggregate_select_mask = set(names)
         self._aggregate_select_cache = None
 
+    def append_aggregate_mask(self, names):
+        if self.aggregate_select_mask is not None:
+            self.set_aggregate_mask(set(names).union(self.aggregate_select_mask))
+
     def set_extra_mask(self, names):
         """
         Set the mask of extra select items that will be returned by SELECT,
@@ -1766,7 +1762,7 @@ class Query(object):
         self._extra_select_cache = None
 
     def _aggregate_select(self):
-        """The SortedDict of aggregate columns that are not masked, and should
+        """The OrderedDict of aggregate columns that are not masked, and should
         be used in the SELECT clause.
 
         This result is cached for optimization purposes.
@@ -1774,7 +1770,7 @@ class Query(object):
         if self._aggregate_select_cache is not None:
             return self._aggregate_select_cache
         elif self.aggregate_select_mask is not None:
-            self._aggregate_select_cache = SortedDict([
+            self._aggregate_select_cache = OrderedDict([
                 (k, v) for k, v in self.aggregates.items()
                 if k in self.aggregate_select_mask
             ])
@@ -1787,7 +1783,7 @@ class Query(object):
         if self._extra_select_cache is not None:
             return self._extra_select_cache
         elif self.extra_select_mask is not None:
-            self._extra_select_cache = SortedDict([
+            self._extra_select_cache = OrderedDict([
                 (k, v) for k, v in self.extra.items()
                 if k in self.extra_select_mask
             ])

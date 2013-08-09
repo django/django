@@ -163,7 +163,7 @@ class SettingsTests(TestCase):
 
     def test_override_settings_delete(self):
         """
-        Allow deletion of a setting in an overriden settings set (#18824)
+        Allow deletion of a setting in an overridden settings set (#18824)
         """
         previous_i18n = settings.USE_I18N
         with self.settings(USE_I18N=False):
@@ -224,6 +224,27 @@ class TestComplexSettingOverride(TestCase):
 
             self.assertEqual(len(w), 1)
             self.assertEqual('Overriding setting TEST_WARN can lead to unexpected behaviour.', str(w[-1].message))
+
+
+class UniqueSettngsTests(TestCase):
+    """
+    Tests for the INSTALLED_APPS setting.
+    """
+    settings_module = settings
+
+    def setUp(self):
+        self._installed_apps = self.settings_module.INSTALLED_APPS
+
+    def tearDown(self):
+        self.settings_module.INSTALLED_APPS = self._installed_apps
+
+    def test_unique(self):
+        """
+        An ImproperlyConfigured exception is raised if the INSTALLED_APPS contains
+        any duplicate strings.
+        """
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.INSTALLED_APPS = ("myApp1", "myApp1", "myApp2", "myApp3")
 
 
 class TrailingSlashURLTests(TestCase):

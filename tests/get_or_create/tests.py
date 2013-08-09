@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from datetime import date
 import traceback
@@ -65,7 +65,7 @@ class GetOrCreateTests(TestCase):
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
         except IntegrityError as e:
             formatted_traceback = traceback.format_exc()
-            self.assertIn('obj.save', formatted_traceback)
+            self.assertIn(str('obj.save'), formatted_traceback)
 
     def test_savepoint_rollback(self):
         # Regression test for #20463: the database connection should still be

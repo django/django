@@ -293,7 +293,7 @@ You can edit it multiple times.
       expiration (or those set to expire at browser close), this will equal the
       date :setting:`SESSION_COOKIE_AGE` seconds from now.
 
-      This function accepts the same keyword argumets as :meth:`get_expiry_age`.
+      This function accepts the same keyword arguments as :meth:`get_expiry_age`.
 
     .. method:: get_expire_at_browser_close
 

@@ -877,7 +877,7 @@ Slightly complex built-in ``Field`` classes
     * Normalizes to: the type returned by the ``compress`` method of the subclass.
     * Validates that the given value against each of the fields specified
       as an argument to the ``MultiValueField``.
-    * Error message keys: ``required``, ``invalid``
+    * Error message keys: ``required``, ``invalid``, ``incomplete``
 
     Aggregates the logic of multiple fields that together produce a single
     value.
@@ -897,6 +897,45 @@ Slightly complex built-in ``Field`` classes
         first field, the second value is cleaned by the second field, etc.
         Once all fields are cleaned, the list of clean values is combined into
         a single value by :meth:`~MultiValueField.compress`.
+
+    Also takes one extra optional argument:
+
+    .. attribute:: require_all_fields
+
+        .. versionadded:: 1.7
+
+        Defaults to ``True``, in which case a ``required`` validation error
+        will be raised if no value is supplied for any field.
+
+        When set to ``False``, the :attr:`Field.required` attribute can be set
+        to ``False`` for individual fields to make them optional. If no value
+        is supplied for a required field, an ``incomplete`` validation error
+        will be raised.
+
+        A default ``incomplete`` error message can be defined on the
+        :class:`MultiValueField` subclass, or different messages can be defined
+        on each individual field. For example::
+
+            from django.core.validators import RegexValidator
+
+            class PhoneField(MultiValueField):
+                def __init__(self, *args, **kwargs):
+                    # Define one message for all fields.
+                    error_messages = {
+                        'incomplete': 'Enter a country code and phone number.',
+                    }
+                    # Or define a different message for each field.
+                    fields = (
+                        CharField(error_messages={'incomplete': 'Enter a country code.'},
+                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid country code.')]),
+                        CharField(error_messages={'incomplete': 'Enter a phone number.'},
+                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid phone number.')]),
+                        CharField(validators=[RegexValidator(r'^\d+$', 'Enter a valid extension.')],
+                                  required=False),
+                    )
+                    super(PhoneField, self).__init__(
+                        self, error_messages=error_messages, fields=fields,
+                        require_all_fields=False, *args, **kwargs)
 
     .. attribute:: MultiValueField.widget
 

@@ -392,7 +392,7 @@ these security concerns do not apply to you:
                model = Author
                fields = '__all__'
 
-2. Set the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class to
+2. Set the ``exclude`` attribute of the ``ModelForm``’s inner ``Meta`` class to
    a list of fields to be excluded from the form.
 
    For example::
@@ -757,7 +757,7 @@ Specifying widgets to use in the form with ``widgets``
 .. versionadded:: 1.6
 
 Using the ``widgets`` parameter, you can specify a dictionary of values to
-customize the ``ModelForm``'s widget class for a particular field. This
+customize the ``ModelForm``’s widget class for a particular field. This
 works the same way as the ``widgets`` dictionary on the inner ``Meta``
 class of a ``ModelForm`` works::
 
@@ -824,6 +824,13 @@ This gives you the ability to attach data to the instances before saving them
 to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
 are saved properly.
+
+After calling ``save()``, your model formset will have three new attributes
+containing the formset's changes:
+
+.. attribute:: models.BaseModelFormSet.changed_objects
+.. attribute:: models.BaseModelFormSet.deleted_objects
+.. attribute:: models.BaseModelFormSet.new_objects
 
 .. _model-formsets-max-num:
 

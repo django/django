@@ -2,7 +2,7 @@
 Field classes.
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
 import datetime
@@ -118,6 +118,8 @@ class Field(object):
         super(Field, self).__init__()
 
     def prepare_value(self, value):
+        if self.widget.is_localized:
+            value = formats.localize_input(value)
         return value
 
     def to_python(self, value):
@@ -460,6 +462,7 @@ class DateTimeField(BaseTemporalField):
     }
 
     def prepare_value(self, value):
+        value = super(DateTimeField, self).prepare_value(value)
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)
         return value
@@ -952,15 +955,20 @@ class MultiValueField(Field):
     """
     default_error_messages = {
         'invalid': _('Enter a list of values.'),
+        'incomplete': _('Enter a complete value.'),
     }
 
     def __init__(self, fields=(), *args, **kwargs):
+        self.require_all_fields = kwargs.pop('require_all_fields', True)
         super(MultiValueField, self).__init__(*args, **kwargs)
-        # Set 'required' to False on the individual fields, because the
-        # required validation will be handled by MultiValueField, not by those
-        # individual fields.
         for f in fields:
-            f.required = False
+            f.error_messages.setdefault('incomplete',
+                                        self.error_messages['incomplete'])
+            if self.require_all_fields:
+                # Set 'required' to False on the individual fields, because the
+                # required validation will be handled by MultiValueField, not
+                # by those individual fields.
+                f.required = False
         self.fields = fields
 
     def validate(self, value):
@@ -990,15 +998,26 @@ class MultiValueField(Field):
                 field_value = value[i]
             except IndexError:
                 field_value = None
-            if self.required and field_value in self.empty_values:
-                raise ValidationError(self.error_messages['required'], code='required')
+            if field_value in self.empty_values:
+                if self.require_all_fields:
+                    # Raise a 'required' error if the MultiValueField is
+                    # required and any field is empty.
+                    if self.required:
+                        raise ValidationError(self.error_messages['required'], code='required')
+                elif field.required:
+                    # Otherwise, add an 'incomplete' error to the list of
+                    # collected errors and skip field cleaning, if a required
+                    # field is empty.
+                    if field.error_messages['incomplete'] not in errors:
+                        errors.append(field.error_messages['incomplete'])
+                    continue
             try:
                 clean_data.append(field.clean(field_value))
             except ValidationError as e:
                 # Collect all validation errors in a single list, which we'll
                 # raise at the end of clean(), rather than raising a single
-                # exception for the first error we encounter.
-                errors.extend(e.error_list)
+                # exception for the first error we encounter. Skip duplicates.
+                errors.extend(m for m in e.error_list if m not in errors)
         if errors:
             raise ValidationError(errors)
 

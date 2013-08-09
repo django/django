@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .test_error_messages import (FormsErrorMessagesTestCase,
     ModelChoiceFieldErrorMessagesTestCase)
 from .test_extra import FormsExtraTestCase, FormsExtraL10NTestCase

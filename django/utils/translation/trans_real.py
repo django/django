@@ -1,16 +1,16 @@
 """Translation helper functions."""
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import locale
 import os
 import re
 import sys
 import gettext as gettext_module
+from importlib import import_module
 from threading import local
 import warnings
 
-from django.utils.importlib import import_module
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import memoize
 from django.utils._os import upath
@@ -369,7 +369,7 @@ def get_supported_language_variant(lang_code, supported=None, strict=False):
     """
     if supported is None:
         from django.conf import settings
-        supported = SortedDict(settings.LANGUAGES)
+        supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
         # if fr-CA is not supported, try fr-ca; if that fails, fallback to fr.
         generic_lang_code = lang_code.split('-')[0]
@@ -396,7 +396,7 @@ def get_language_from_path(path, supported=None, strict=False):
     """
     if supported is None:
         from django.conf import settings
-        supported = SortedDict(settings.LANGUAGES)
+        supported = OrderedDict(settings.LANGUAGES)
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:
         return None
@@ -418,7 +418,7 @@ def get_language_from_request(request, check_path=False):
     """
     global _accepted
     from django.conf import settings
-    supported = SortedDict(settings.LANGUAGES)
+    supported = OrderedDict(settings.LANGUAGES)
 
     if check_path:
         lang_code = get_language_from_path(request.path_info, supported)

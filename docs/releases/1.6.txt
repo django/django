@@ -32,6 +32,16 @@ deprecation process for some features`_.
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.6`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.6`_
 
+Python compatibility
+====================
+
+Django 1.6, like Django 1.5, requires Python 2.6.5 or above. Python 3 is also
+officially supported. We **highly recommend** the latest minor release for each
+supported Python series (2.6.X, 2.7.X, 3.2.X, and 3.3.X).
+
+Django 1.6 will be the final release series to support Python 2.6; beginning
+with Django 1.7, the minimum supported Python version will be 2.7.
+
 What's new in Django 1.6
 ========================
 
@@ -173,7 +183,7 @@ Minor features
 
 * The :attr:`~django.views.generic.edit.DeletionMixin.success_url` of
   :class:`~django.views.generic.edit.DeletionMixin` is now interpolated with
-  its ``object``\'s ``__dict__``.
+  its ``object``’s ``__dict__``.
 
 * :class:`~django.http.HttpResponseRedirect` and
   :class:`~django.http.HttpResponsePermanentRedirect` now provide an ``url``
@@ -198,10 +208,6 @@ Minor features
 
 * The admin list columns have a ``column-<field_name>`` class in the HTML
   so the columns header can be styled with CSS, e.g. to set a column width.
-
-* Some admin templates now have ``app-<app_name>`` and ``model-<model_name>``
-  classes in their ``<body>`` tag to allow customizing the CSS per app or per
-  model.
 
 * The :ref:`isolation level<database-isolation-level>` can be customized under
   PostgreSQL.
@@ -324,7 +330,7 @@ Minor features
 
 * :class:`~django.forms.ModelForm` fields can now override error messages
   defined in model fields by using the
-  :attr:`~django.forms.Field.error_messages` argument of a ``Field``'s
+  :attr:`~django.forms.Field.error_messages` argument of a ``Field``’s
   constructor. To take advantage of this new feature with your custom fields,
   :ref:`see the updated recommendation <raising-validation-error>` for raising
   a ``ValidationError``.
@@ -654,7 +660,9 @@ will render something like:
     <label for="id_my_field">My Field:</label> <input id="id_my_field" type="text" name="my_field" />
 
 If you want to keep the current behavior of rendering ``label_tag`` without
-the ``label_suffix``, instantiate the form ``label_suffix=''``.
+the ``label_suffix``, instantiate the form ``label_suffix=''``. You can also
+customize the ``label_suffix`` on a per-field basis using the new
+``label_suffix`` parameter on :meth:`~django.forms.BoundField.label_tag`.
 
 Admin views ``_changelist_filters`` GET parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -800,6 +808,13 @@ Miscellaneous
   This parameter has been renamed to ``_popup`` to be consistent with the rest
   of the admin views. You should update your custom templates if they use the
   previous parameter name.
+
+* :meth:`~django.core.validators.validate_email` now accepts email addresses
+  with ``localhost`` as the domain.
+
+* The :djadminopt:`--keep-pot` option was added to :djadmin:`makemessages`
+  to prevent django from deleting the temporary .pot file it generates before
+  creating the .po file.
 
 Features deprecated in 1.6
 ==========================

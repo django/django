@@ -100,7 +100,7 @@ access ``self.model`` to get the model class to which they're attached.
 Modifying initial Manager QuerySets
 -----------------------------------
 
-A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
+A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
 
     from django.db import models
@@ -111,7 +111,7 @@ example, using this model::
 
 ...the statement ``Book.objects.all()`` will return all books in the database.
 
-You can override a ``Manager``\'s base ``QuerySet`` by overriding the
+You can override a ``Manager``’s base ``QuerySet`` by overriding the
 ``Manager.get_queryset()`` method. ``get_queryset()`` should return a
 ``QuerySet`` with the properties you require.
 
@@ -200,6 +200,125 @@ as the default manager for your model by setting the ``use_for_related_fields``
 attribute on the manager class. This is documented fully below_.
 
 .. _below: manager-types_
+
+.. _calling-custom-queryset-methods-from-manager:
+
+Calling custom ``QuerySet`` methods from the ``Manager``
+--------------------------------------------------------
+
+While most methods from the standard ``QuerySet`` are accessible directly from
+the ``Manager``, this is only the case for the extra methods defined on a
+custom ``QuerySet`` if you also implement them on the ``Manager``::
+
+    class PersonQuerySet(models.QuerySet):
+        def male(self):
+            return self.filter(sex='M')
+
+        def female(self):
+            return self.filter(sex='F')
+
+    class PersonManager(models.Manager):
+        def get_queryset(self):
+            return PersonQuerySet()
+
+        def male(self):
+            return self.get_queryset().male()
+
+        def female(self):
+            return self.get_queryset().female()
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+        sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')))
+        people = PersonManager()
+
+This example allows you to call both ``male()`` and ``female()`` directly from
+the manager ``Person.people``.
+
+.. _create-manager-with-queryset-methods:
+
+Creating ``Manager`` with ``QuerySet`` methods
+----------------------------------------------
+
+.. versionadded:: 1.7
+
+In lieu of the above approach which requires duplicating methods on both the
+``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
+<django.db.models.query.QuerySet.as_manager>` can be used to create an instance
+of ``Manager`` with a copy of a custom ``QuerySet``’s methods::
+
+    class Person(models.Model):
+        ...
+        people = PersonQuerySet.as_manager()
+
+The ``Manager`` instance created by :meth:`QuerySet.as_manager()
+<django.db.models.query.QuerySet.as_manager>` will be virtually
+identical to the ``PersonManager`` from the previous example.
+
+Not every ``QuerySet`` method makes sense at the ``Manager`` level; for
+instance we intentionally prevent the :meth:`QuerySet.delete()
+<django.db.models.query.QuerySet.delete>` method from being copied onto
+the ``Manager`` class.
+
+Methods are copied according to the following rules:
+
+- Public methods are copied by default.
+- Private methods (starting with an underscore) are not copied by default.
+- Methods with a `queryset_only` attribute set to `False` are always copied.
+- Methods with a `queryset_only` attribute set to `True` are never copied.
+
+For example::
+
+    class CustomQuerySet(models.QuerySet):
+        # Available on both Manager and QuerySet.
+        def public_method(self):
+            return
+
+        # Available only on QuerySet.
+        def _private_method(self):
+            return
+
+        # Available only on QuerySet.
+        def opted_out_public_method(self):
+            return
+        opted_out_public_method.queryset_only = True
+
+        # Available on both Manager and QuerySet.
+        def _opted_in_private_method(self):
+            return
+        _opted_in_private_method.queryset_only = False
+
+from_queryset
+~~~~~~~~~~~~~
+
+.. classmethod:: from_queryset(queryset_class)
+
+For advance usage you might want both a custom ``Manager`` and a custom
+``QuerySet``. You can do that by calling ``Manager.from_queryset()`` which
+returns a *subclass* of your base ``Manager`` with a copy of the custom
+``QuerySet`` methods::
+
+    class BaseManager(models.Manager):
+        def __init__(self, *args, **kwargs):
+            ...
+
+        def manager_only_method(self):
+            return
+
+    class CustomQuerySet(models.QuerySet):
+        def manager_and_queryset_method(self):
+            return
+
+    class MyModel(models.Model):
+        objects = BaseManager.from_queryset(CustomQueryset)(*args, **kwargs)
+
+You may also store the generated class into a variable::
+
+    CustomManager = BaseManager.from_queryset(CustomQueryset)
+
+    class MyModel(models.Model):
+        objects = CustomManager(*args, **kwargs)
 
 .. _custom-managers-and-inheritance:
 

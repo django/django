@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 from operator import attrgetter
@@ -470,7 +470,8 @@ class LookupTests(TestCase):
             self.fail('FieldError not raised')
         except FieldError as ex:
             self.assertEqual(str(ex), "Cannot resolve keyword 'pub_date_year' "
-                             "into field. Choices are: author, headline, id, pub_date, tag")
+                             "into field. Choices are: author, author_id, headline, "
+                             "id, pub_date, tag")
         try:
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
