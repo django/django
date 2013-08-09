@@ -113,7 +113,7 @@ class Options(object):
             # calling code can uniformly expect that.
             ut = meta_attrs.pop('unique_together', self.unique_together)
             if (ut and isinstance(ut, (tuple, list)) and
-                all(not isinstance(i, (list, tuple)) for i in ut)):
+                    all(not isinstance(i, (list, tuple)) for i in ut)):
                 ut = (ut,)
             self.unique_together = ut
 
