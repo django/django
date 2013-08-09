@@ -453,10 +453,9 @@ class ImageField(FileField):
         except ImproperlyConfigured:
             return [
                 checks.Error(
-                    'To use ImageFields, you need to install Pillow.'
-                        'Get it at https://pypi.python.org/pypi/Pillow or run '
-                        'command "pip install pillow".',
-                    hint=None,
+                    'To use ImageFields, Pillow must be installed.',
+                    hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
+                        'or run command "pip install pillow".',
                     obj=self,
                 )
             ]
