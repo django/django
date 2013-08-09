@@ -8,6 +8,7 @@ be executed through ``django-admin.py`` or ``manage.py``).
 """
 import os
 import sys
+import warnings
 
 from optparse import make_option, OptionParser
 
@@ -183,16 +184,33 @@ class BaseCommand(object):
 
     # Configuration shortcuts that alter various logic.
     can_import_settings = True
-
-    # At the end of deprecating proccess for this attribute, this line will be
-    # replaced by `requires_checks = True`.
-    requires_model_validation = True
-
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
 
     def __init__(self):
         self.style = color_style()
+
+        # `requires_model_validation` is deprecated in favour of
+        # `requires_checks`. If both options are present, `requires_checks`
+        # shadows the `requires_model_validation`. Otherwise the present option
+        # is used. If none of them is defined, the default value (True) is used.
+        has_old_option = hasattr(self, 'requires_model_validation')
+        has_new_option = hasattr(self, 'requires_checks')
+
+        if has_old_option:
+            warnings.warn(
+                "requires_model_validation is deprecated "
+                "in favour of requires_checks",
+                DeprecationWarning)
+        if has_old_option and has_new_option:
+            warnings.warn(
+                "requires_model_validation value is ignored "
+                "since you defined requires_checks too.")
+
+        self.requires_checks = (
+            self.requires_checks if has_new_option else
+            self.requires_model_validation if has_old_option else
+            True)
 
     def get_version(self):
         """
