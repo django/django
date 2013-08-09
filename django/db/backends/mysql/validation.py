@@ -24,7 +24,8 @@ class DatabaseValidation(BaseDatabaseValidation):
             and (field.max_length is None or int(field.max_length) > 255)):
             errors.append(
                 checks.Error(
-                    'The field cannot have a "max_length" greated than 255 when it is unique.',
+                    'Under mysql backend, the field cannot have a "max_length" '
+                        'greated than 255 when it is unique.',
                     hint=None,
                     obj=field,
                 )
