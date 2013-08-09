@@ -197,7 +197,7 @@ class CustomUserModelValidationTestCase(TestCase):
         expected = [
             checks.Warning(
                 'The field named as the USERNAME_FIELD must not be included '
-                    'in REQUIRED_FIELDS on a swappable user model.',
+                    'in REQUIRED_FIELDS on a custom user model.',
                 hint=None,
                 obj=CustomUserBadRequiredFields,
             ),

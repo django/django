@@ -1095,7 +1095,7 @@ class Model(six.with_metaclass(ModelBase)):
                     checks.Warning(
                         'The field named as the USERNAME_FIELD '
                             'must not be included in REQUIRED_FIELDS '
-                            'on a swappable user model.',
+                            'on a custom user model.',
                         hint=None,
                         obj=cls,
                     )
