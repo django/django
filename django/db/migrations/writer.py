@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 import datetime
 import types
 import os
+from importlib import import_module
 from django.utils import six
-from django.utils.importlib import import_module
 from django.db import models
 from django.db.models.loading import cache
 from django.db.migrations.loader import MigrationLoader

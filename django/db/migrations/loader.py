@@ -1,5 +1,5 @@
 import os
-from django.utils.importlib import import_module
+from importlib import import_module
 from django.utils.functional import cached_property
 from django.db.models.loading import cache
 from django.db.migrations.recorder import MigrationRecorder

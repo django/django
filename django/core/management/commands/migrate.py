@@ -1,5 +1,6 @@
 from optparse import make_option
 from collections import OrderedDict
+from importlib import import_module
 import itertools
 import traceback
 
@@ -11,7 +12,6 @@ from django.core.management.sql import custom_sql_for_model, emit_post_migrate_s
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
-from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
 
