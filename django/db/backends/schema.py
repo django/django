@@ -88,7 +88,6 @@ class BaseDatabaseSchemaEditor(object):
         cursor = self.connection.cursor()
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
-        #print("%s; (params %r)" % (sql, params))
         cursor.execute(sql, params)
 
     def quote_name(self, name):
