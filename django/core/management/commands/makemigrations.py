@@ -3,7 +3,6 @@ import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from django.core.management.color import color_style
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
@@ -26,7 +25,6 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
-        self.style = color_style()
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
