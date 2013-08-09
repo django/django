@@ -157,7 +157,9 @@ class NestedObjects(Collector):
             else:
                 if obj._meta.proxy:
                     # Take concrete model's instance to avoid mismatch in edges
-                    obj = obj._meta.concrete_model(pk=obj.pk)
+                    cobj = obj._meta.concrete_model()
+                    cobj.__dict__ = obj.__dict__
+                    obj = cobj
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
