@@ -57,6 +57,33 @@ but a few of the key features are:
   will still work, but that method name is deprecated and you should change
   it as soon as possible (nothing more than renaming is required).
 
+New method on Field subclasses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To help power both schema migrations and composite keys, the Field API now
+has a new required method: ``deconstruct()``.
+
+This method takes no arguments, and returns a tuple of four items:
+
+* ``name``: The field's attribute name on its parent model, or None if it is not part of a model
+* ``path``: A dotted, Python path to the class of this field, including the class name.
+* ``args``: Positional arguments, as a list
+* ``kwargs``: Keyword arguments, as a dict
+
+These four values allow any field to be serialized into a file, as well as
+allowing the field to be copied safely, both essential parts of these new features.
+
+This change should not affect you unless you write custom Field subclasses;
+if you do, you may need to reimplement the ``deconstruct()`` method if your
+subclass changes the method signature of ``__init__`` in any way. If your
+field just inherits from a built-in Django field and doesn't override ``__init__``,
+no changes are necessary.
+
+If you do need to override ``deconstruct()``, a good place to start is the
+built-in Django fields (``django/db/models/fields/__init__.py``) as several
+fields, including ``DecimalField`` and ``DateField``, override it and show how
+to call the method on the superclass and simply add or remove extra arguments.
+
 Calling custom ``QuerySet`` methods from the ``Manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
