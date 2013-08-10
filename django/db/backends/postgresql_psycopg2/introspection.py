@@ -169,7 +169,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "columns": [],
                     "primary_key": False,
                     "unique": False,
-                    "foreign_key": False,
+                    "foreign_key": None,
                     "check": True,
                     "index": False,
                 }
@@ -197,7 +197,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "columns": list(columns),
                     "primary_key": primary,
                     "unique": unique,
-                    "foreign_key": False,
+                    "foreign_key": None,
                     "check": False,
                     "index": True,
                 }
