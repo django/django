@@ -237,7 +237,7 @@ class SortedDict(dict):
         super(SortedDict, self).clear()
         self.keyOrder = []
 
-class SortedSet(object):
+class OrderedSet(object):
     """
     A set which keeps the ordering of the inserted items.
     Currently backs onto OrderedDict.

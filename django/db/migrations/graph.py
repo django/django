@@ -1,4 +1,4 @@
-from django.utils.datastructures import SortedSet
+from django.utils.datastructures import OrderedSet
 from django.db.migrations.state import ProjectState
 
 
@@ -13,7 +13,7 @@ class MigrationGraph(object):
     branch merges can be detected and resolved.
 
     Migrations files can be marked as replacing another set of migrations -
-    this is to support the "squash" feature. The graph handler isn't resposible
+    this is to support the "squash" feature. The graph handler isn't responsible
     for these; instead, the code to load them in here should examine the
     migration files and if the replaced migrations are all either unapplied
     or not present, it should ignore the replaced ones, load in just the
@@ -109,8 +109,8 @@ class MigrationGraph(object):
             for n in children:
                 results = _dfs(n, get_children, path) + results
             path.pop()
-            # Use SortedSet to ensure only one instance of each result
-            results = list(SortedSet(results))
+            # Use OrderedSet to ensure only one instance of each result
+            results = list(OrderedSet(results))
             # Populate DP cache
             cache[(start, get_children)] = results
             # Done!

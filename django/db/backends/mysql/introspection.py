@@ -1,6 +1,6 @@
 import re
 from .base import FIELD_TYPE
-from django.utils.datastructures import SortedSet
+from django.utils.datastructures import OrderedSet
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
 from django.utils.encoding import force_text
 
@@ -142,7 +142,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for constraint, column, ref_table, ref_column in cursor.fetchall():
             if constraint not in constraints:
                 constraints[constraint] = {
-                    'columns': SortedSet(),
+                    'columns': OrderedSet(),
                     'primary_key': False,
                     'unique': False,
                     'index': False,
@@ -170,7 +170,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         for table, non_unique, index, colseq, column in [x[:5] for x in cursor.fetchall()]:
             if index not in constraints:
                 constraints[index] = {
-                    'columns': SortedSet(),
+                    'columns': OrderedSet(),
                     'primary_key': False,
                     'unique': False,
                     'index': True,

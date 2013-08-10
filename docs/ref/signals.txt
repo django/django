@@ -403,7 +403,6 @@ Arguments sent with this signal:
 ``db``
     The alias of database on which a command will operate.
 
-
 pre_syncdb
 ----------
 
@@ -420,7 +419,6 @@ is present, for backwards-compatability this signal has an extra argument it sen
 ``create_models``
     A list of the model classes from any app which :djadmin:`migrate` is
     going to create, **only if the app has no migrations**.
-
 
 post_migrate
 ------------
@@ -479,7 +477,6 @@ For example, ``yourapp/management/__init__.py`` could be written like::
 
     post_migrate.connect(my_callback, sender=yourapp.models)
 
-
 post_syncdb
 -----------
 
@@ -496,8 +493,6 @@ is present, for backwards-compatability this signal has an extra argument it sen
 ``created_models``
     A list of the model classes from any app which :djadmin:`migrate` has
     created, **only if the app has no migrations**.
-
-
 
 Request/response signals
 ========================

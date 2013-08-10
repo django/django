@@ -49,7 +49,7 @@ The migration files for each app live in a "migrations" directory inside
 of that app, and are designed to be committed to, and distributed as part
 of, its codebase. You should be making them once on your development machine
 and then running the same migrations on your colleagues' machines, your
-staging machines and eventually your production machines.
+staging machines, and eventually your production machines.
 
 Migrations will run the same way every time and produce consistent results,
 meaning that what you see in development and staging is exactly what will
@@ -60,7 +60,7 @@ Backend Support
 
 Migrations are supported on all backends that Django ships with, as well
 as any third-party backends if they have programmed in support for schema
-alteration (done via the SchemaEditor class).
+alteration (done via the ``SchemaEditor`` class).
 
 However, some databases are more capable than others when it comes to
 schema migrations; some of the caveats are covered below.
@@ -169,7 +169,7 @@ app - in the file, so it's possible to detect when there's two new migrations
 for the same app that aren't ordered.
 
 When this happens, Django will prompt you and give you some options. If it
-thinks it's safe enough, it will offer to automatically linearise the two
+thinks it's safe enough, it will offer to automatically linearize the two
 migrations for you. If not, you'll have to go in and modify the migrations
 yourself - don't worry, this isn't difficult, and is explained more in
 :ref:`migration-files` below.
@@ -184,8 +184,8 @@ you add a ForeignKey in your ``books`` app to your ``authors`` app - the
 resulting migration will contain a dependency on a migration in ``authors``.
 
 This means that when you run the migrations, the ``authors`` migration runs
-first and creates the table the ForeignKey references, and then the migration
-that makes the ForeignKey column runs afterwards and creates the constraint.
+first and creates the table the ``ForeignKey`` references, and then the migration
+that makes the ``ForeignKey`` column runs afterwards and creates the constraint.
 If this didn't happen, the migration would try to create the ForeignKey column
 without the table it's referencing existing and your database would
 throw an error.
@@ -271,7 +271,7 @@ Note that this only works given two things:
 
 * You have not manually edited your database - Django won't be able to detect
   that your database doesn't match your models, you'll just get errors when
-  migrations try and modify those tables.
+  migrations try to modify those tables.
 
 
 .. historical-models:

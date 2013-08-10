@@ -33,15 +33,16 @@ What's new in Django 1.7
 Schema migrations
 ~~~~~~~~~~~~~~~~~
 
-Django now has built-in support for schema migrations, which allows models
-to be updated, changed and deleted and the changes stored into migration files
-and then run on any deployed database.
+Django now has built-in support for schema migrations. It allows models
+to be updated, changed, and deleted by creating migration files that represent
+the model changes and which can be run on any development, staging or production
+database.
 
 Migrations are covered in :doc:`their own documentation</topics/migrations>`,
 but a few of the key features are:
 
 * ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry - 
-   calls to ``syncdb`` will still work as before.
+  calls to ``syncdb`` will still work as before.
 
 * A new ``makemigrations`` command provides an easy way to autodetect changes
   to your models and make migrations for them.
@@ -60,7 +61,7 @@ but a few of the key features are:
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To help power both schema migrations and composite keys, the Field API now
+To help power both schema migrations and composite keys, the :class:`~django.db.models.Field` API now
 has a new required method: ``deconstruct()``.
 
 This method takes no arguments, and returns a tuple of four items:
@@ -278,3 +279,10 @@ work until Django 1.9.
 it will go through a regular deprecation path. This attribute was mostly used
 by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
 a bug and has been addressed.
+
+``syncdb``
+~~~~~~~~~~
+
+The ``syncdb`` command has been deprecated in favour of the new ``migrate``
+command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
+more, so it's safe to just change the name you're calling and nothing else.

@@ -29,7 +29,7 @@ class MigrationAutodetector(object):
         """
         Returns a dict of migration plans which will achieve the
         change from from_state to to_state. The dict has app labels
-        as kays and a list of migrations as values.
+        as keys and a list of migrations as values.
 
         The resulting migrations aren't specially named, but the names
         do matter for dependencies inside the set.

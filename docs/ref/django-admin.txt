@@ -575,20 +575,22 @@ makemigrations [<appname>]
 
 .. django-admin:: makemigrations
 
+.. versionadded:: 1.7
+
 Creates new migrations based on the changes detected to your models.
 Migrations, their relationship with apps and more are covered in depth in
 :doc:`the migrations documentation</topics/migrations>`.
 
 Providing one or more app names as arguments will limit the migrations created
-to the app specified and any dependencies needed (the table at the other end
-of a ForeignKey, for example)
+to the app(s) specified and any dependencies needed (the table at the other end
+of a ``ForeignKey``, for example).
 
 .. django-admin-option:: --empty
 
 The ``--empty`` option will cause ``makemigrations`` to output an empty
 migration for the specified apps, for manual editing. This option is only
 for advanced users and should not be used unless you are familiar with
-the migration format, migration operations and the dependencies between
+the migration format, migration operations, and the dependencies between
 your migrations.
 
 migrate [<appname> [<migrationname>]]
@@ -596,11 +598,13 @@ migrate [<appname> [<migrationname>]]
 
 .. django-admin:: migrate
 
-Synchronises the database state with the current set of models and migrations.
+.. versionadded:: 1.7
+
+Synchronizes the database state with the current set of models and migrations.
 Migrations, their relationship with apps and more are covered in depth in
 :doc:`the migrations documentation</topics/migrations>`.
 
-The behaviour of this command changes depending on the arguments provided:
+The behavior of this command changes depending on the arguments provided:
 
 * No arguments: All migrated apps have all of their migrations run,
   and all unmigrated apps are synchronized with the database,
