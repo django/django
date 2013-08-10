@@ -1,5 +1,6 @@
 import copy
 import warnings
+from collections import OrderedDict
 from django.utils import six
 
 class MergeDict(object):
@@ -239,11 +240,11 @@ class SortedDict(dict):
 class SortedSet(object):
     """
     A set which keeps the ordering of the inserted items.
-    Currently backs onto SortedDict.
+    Currently backs onto OrderedDict.
     """
 
     def __init__(self, iterable=None):
-        self.dict = SortedDict(((x, None) for x in iterable) if iterable else [])
+        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
 
     def add(self, item):
         self.dict[item] = None
