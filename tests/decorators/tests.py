@@ -1,11 +1,13 @@
 from functools import wraps
 
 from django.contrib.auth import models
-from django.test.client import RequestFactory
+from django.core.exceptions import PermissionDenied
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.models import Permission
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.test.client import RequestFactory
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
@@ -13,7 +15,6 @@ from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
-from django.core.exceptions import PermissionDenied
 
 def fully_decorated(request):
     """Expected __doc__"""
@@ -256,10 +257,13 @@ class PermissionsRequiredDecoratorTest(TestCase):
     Tests for the permission_required decorator
     """
     def setUp(self):
-        self.user = models.User.objects.db_manager('other').create_user(username='joe', password='qwerty')
+        self.user = models.User.objects.create(username='joe', password='qwerty')
         self.factory = RequestFactory()
         # Add permissions shared_models.add_tag and shared_models.change_tag
-        self.user.user_permissions.add(1, 2)
+        perm_add_tag = Permission.objects.get(codename='add_tag')
+        perm_change_tag = Permission.objects.get(codename='change_tag')
+        self.user.user_permissions.add(perm_add_tag)
+        self.user.user_permissions.add(perm_change_tag)
 
     def test_many_permissions_pass(self):
 
@@ -286,5 +290,3 @@ class PermissionsRequiredDecoratorTest(TestCase):
         request.user = self.user
         resp = a_view(request)
         self.assertEqual(resp.status_code, 302)
-
-        
