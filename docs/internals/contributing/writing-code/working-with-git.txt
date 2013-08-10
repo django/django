@@ -157,7 +157,7 @@ using interactive rebase::
 The HEAD~2 above is shorthand for two latest commits. The above command
 will open an editor showing the two commits, prefixed with the word "pick".
 
-Change the second line to "squash" instead. This will keep the
+Change "pick" on the second line to "squash" instead. This will keep the
 first commit, and squash the second commit into the first one. Save and quit
 the editor. A second editor window should open, so you can reword the
 commit message for the commit now that it includes both your steps.
