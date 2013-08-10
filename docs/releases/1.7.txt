@@ -152,6 +152,10 @@ Minor features
   Each radio button or checkbox includes an ``id_for_label`` attribute to
   output the element's ID.
 
+* Any ``**kwargs`` passed to
+  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
+  underlying :meth:`~django.core.mail.send_mail()` call.
+
 Backwards incompatible changes in 1.7
 =====================================
 
