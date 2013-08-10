@@ -437,7 +437,7 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
         # Drop any FK constraints, we'll remake them later
-        if getattr(old_field, "rel"):
+        if old_field.rel:
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
@@ -584,7 +584,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if getattr(new_field, "rel"):
+        if new_field.rel:
             self.execute(
                 self.sql_create_fk % {
                     "table": self.quote_name(model._meta.db_table),

@@ -46,8 +46,8 @@ class MigrationAutodetector(object):
             # Are there any relationships out from this model? if so, punt it to the next phase.
             related_fields = []
             for field in new_app_cache.get_model(app_label, model_name)._meta.fields:
-                if hasattr(field, "rel"):
-                    if hasattr(field.rel, "to"):
+                if field.rel:
+                    if field.rel.to:
                         related_fields.append((field.name, field.rel.to._meta.app_label.lower(), field.rel.to._meta.object_name.lower()))
                     if hasattr(field.rel, "through") and not field.rel.though._meta.auto_created:
                         related_fields.append((field.name, field.rel.through._meta.app_label.lower(), field.rel.through._meta.object_name.lower()))
