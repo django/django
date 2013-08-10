@@ -60,6 +60,7 @@ ALWAYS_INSTALLED_APPS = [
     'staticfiles_tests',
     'staticfiles_tests.apps.test',
     'staticfiles_tests.apps.no_label',
+    'servers.another_app',
 ]
 
 
