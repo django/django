@@ -7,6 +7,10 @@ import posixpath
 import shutil
 import sys
 import tempfile
+try:
+    from urllib.request import urlopen
+except ImportError:     # Python 2
+    from urllib2 import urlopen
 
 from django.template import loader, Context
 from django.conf import settings
@@ -21,6 +25,8 @@ from django.utils._os import rmtree_errorhandler, upath
 from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
+from django.contrib.staticfiles.testing import StaticLiveServerCase
+
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
@@ -803,3 +809,50 @@ class TestAppStaticStorage(TestCase):
             st.path('bar')
         finally:
             sys.getfilesystemencoding = old_enc_func
+
+
+class LiveServerBase(StaticLiveServerCase):
+
+    available_apps = [
+        'servers',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+    ]
+    fixtures = ['testdata.json']
+    urls = 'servers.urls'
+
+    @classmethod
+    def setUpClass(cls):
+        # Override settings
+        cls.settings_override = override_settings(**TEST_SETTINGS)
+        cls.settings_override.enable()
+        super(LiveServerBase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        # Restore original settings
+        cls.settings_override.disable()
+        super(LiveServerBase, cls).tearDownClass()
+
+    def urlopen(self, url):
+        return urlopen(self.live_server_url + url)
+
+
+class LiveServerViews(LiveServerBase):
+
+    def test_static_files(self):
+        """
+        Ensure that the StaticLiveServerCase serves static files.
+        Refs #2879.
+        """
+        f = self.urlopen('/static/testfile.txt')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
+
+    def test_collectstatic_emulation(self):
+        """
+        Test StaticLiveServerCase use of staticfiles' serve() allows it to
+        discover app's static assets without having to collectstatic first.
+        """
+        f = self.urlopen('/static/test/file.txt')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'In app media directory.')
