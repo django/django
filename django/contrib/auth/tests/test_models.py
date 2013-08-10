@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, User, UserManager
+from django.contrib.auth.models import Group, User, UserManager, AbstractUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.core import mail
 from django.db.models.signals import post_save
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -72,6 +73,27 @@ class UserManagerTestCase(TestCase):
                                  'The given username must be set',
                                   User.objects.create_user, username='')
 
+
+class AbstractUserTestCase(TestCase):
+    def test_email_user(self):
+        keyword_args = {
+            "fail_silently": False,
+            "auth_user": None,
+            "auth_password": None,
+            "connection": None,
+            "html_message": None,
+        }
+        abstract_user = AbstractUser()
+        abstract_user.email_user(subject="Subject here",
+            message="This is a message", from_email="from@domain.com",
+            **keyword_args)
+        # Test that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        # Verify that test email contains the correct attributes: subject, body,
+        # and from_email.
+        self.assertEqual(mail.outbox[0].subject, "Subject here")
+        self.assertEqual(mail.outbox[0].body, "This is a message")
+        self.assertEqual(mail.outbox[0].from_email, "from@domain.com")
 
 class IsActiveTestCase(TestCase):
     """
