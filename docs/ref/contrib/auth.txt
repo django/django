@@ -215,10 +215,11 @@ Methods
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
 
-    .. method:: email_user(subject, message, from_email=None)
+    .. method:: email_user(subject, message, from_email=None, **kwargs)
 
         Sends an email to the user. If ``from_email`` is ``None``, Django uses
-        the :setting:`DEFAULT_FROM_EMAIL`.
+        the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` will be passed
+        directly to :meth:`~django.core.mail.send_mail()`.
 
 Manager methods
 ---------------
