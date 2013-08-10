@@ -16,6 +16,7 @@ from django.views.decorators.clickjacking import xframe_options_deny, xframe_opt
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 
+
 def fully_decorated(request):
     """Expected __doc__"""
     return HttpResponse('<html><body>dummy</body></html>')
@@ -260,14 +261,12 @@ class PermissionsRequiredDecoratorTest(TestCase):
         self.user = models.User.objects.create(username='joe', password='qwerty')
         self.factory = RequestFactory()
         # Add permissions shared_models.add_tag and shared_models.change_tag
-        perm_add_tag = Permission.objects.get(codename='add_tag')
-        perm_change_tag = Permission.objects.get(codename='change_tag')
-        self.user.user_permissions.add(perm_add_tag)
-        self.user.user_permissions.add(perm_change_tag)
+        perms = Permission.objects.filter(codename__in=('add_tag', 'change_tag'))
+        self.user.user_permissions.add(*perms)
 
     def test_many_permissions_pass(self):
 
-        @permission_required(['shared_models.add_tag', 'shared_models.change_tag'], raise_exception=True)
+        @permission_required(['shared_models.add_tag', 'shared_models.change_tag'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -290,3 +289,10 @@ class PermissionsRequiredDecoratorTest(TestCase):
         request.user = self.user
         resp = a_view(request)
         self.assertEqual(resp.status_code, 302)
+        
+        @permission_required(['shared_models.add_tag', 'shared_models.change_tag', 'non-existant-permission'], raise_exception=True)
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        self.assertRaises(PermissionDenied, a_view, request)
