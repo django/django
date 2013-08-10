@@ -29,12 +29,15 @@ from django.contrib.staticfiles.testing import StaticLiveServerCase
 
 
 TEST_ROOT = os.path.dirname(upath(__file__))
-TEST_SETTINGS = {
-    'DEBUG': True,
+BASE_TEST_SETTINGS = {
+    'DEBUG': False,
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
+}
+TEST_SETTINGS = dict(BASE_TEST_SETTINGS, **{
+    'DEBUG': True,
     'STATICFILES_DIRS': (
         os.path.join(TEST_ROOT, 'project', 'documents'),
         ('prefix', os.path.join(TEST_ROOT, 'project', 'prefixed')),
@@ -44,7 +47,7 @@ TEST_SETTINGS = {
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
-}
+})
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
@@ -811,43 +814,25 @@ class TestAppStaticStorage(TestCase):
             sys.getfilesystemencoding = old_enc_func
 
 
-class LiveServerBase(StaticLiveServerCase):
+class LiveServerStaticHandling(StaticLiveServerCase):
 
-    available_apps = [
-        'servers',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-    ]
-    fixtures = ['testdata.json']
-    urls = 'servers.urls'
+    available_apps = []
 
     @classmethod
     def setUpClass(cls):
         # Override settings
-        cls.settings_override = override_settings(**TEST_SETTINGS)
+        cls.settings_override = override_settings(**BASE_TEST_SETTINGS)
         cls.settings_override.enable()
-        super(LiveServerBase, cls).setUpClass()
+        super(LiveServerStaticHandling, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
         # Restore original settings
         cls.settings_override.disable()
-        super(LiveServerBase, cls).tearDownClass()
+        super(LiveServerStaticHandling, cls).tearDownClass()
 
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
-
-
-class LiveServerViews(LiveServerBase):
-
-    def test_static_files(self):
-        """
-        Ensure that the StaticLiveServerCase serves static files.
-        Refs #2879.
-        """
-        f = self.urlopen('/static/testfile.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_collectstatic_emulation(self):
         """
