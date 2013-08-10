@@ -28,12 +28,16 @@ class Command(BaseCommand):
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
+        bad_app_labels = set()
         for app_label in app_labels:
             try:
                 cache.get_app(app_label)
             except ImproperlyConfigured:
-                self.stderr.write("The app you specified - '%s' - could not be found. Is it in INSTALLED_APPS?" % app_label)
-                sys.exit(2)
+                bad_app_labels.add(app_label)
+        if bad_app_labels:
+            for app_label in bad_app_labels:
+                self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
+            sys.exit(2)
 
         # Load the current graph state
         loader = MigrationLoader(connections["default"])
