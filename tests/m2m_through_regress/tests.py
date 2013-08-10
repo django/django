@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core import management
 from django.contrib.auth.models import User
@@ -10,6 +10,7 @@ from .models import (Person, Group, Membership, UserMembership, Car, Driver,
 
 
 class M2MThroughTestCase(TestCase):
+
     def test_everything(self):
         bob = Person.objects.create(name="Bob")
         jim = Person.objects.create(name="Jim")

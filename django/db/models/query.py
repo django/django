@@ -5,13 +5,12 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import itertools
 import sys
-import warnings
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, DatabaseError
+from django.db import connections, router, transaction, DatabaseError, IntegrityError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField
+from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
@@ -20,6 +19,10 @@ from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
 
+# The maximum number (one less than the max to be precise) of results to fetch
+# in a get() query
+MAX_GET_RESULTS = 20
+
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -27,10 +30,23 @@ REPR_OUTPUT_SIZE = 20
 EmptyResultSet = sql.EmptyResultSet
 
 
+def _pickle_queryset(class_bases, class_dict):
+    """
+    Used by `__reduce__` to create the initial version of the `QuerySet` class
+    onto which the output of `__getstate__` will be applied.
+
+    See `__reduce__` for more details.
+    """
+    new = Empty()
+    new.__class__ = type(class_bases[0].__name__, class_bases, class_dict)
+    return new
+
+
 class QuerySet(object):
     """
     Represents a lazy database lookup for a set of objects.
     """
+
     def __init__(self, model=None, query=None, using=None):
         self.model = model
         self._db = using
@@ -41,6 +57,13 @@ class QuerySet(object):
         self._prefetch_related_lookups = []
         self._prefetch_done = False
         self._known_related_objects = {}        # {rel_field, {pk: rel_obj}}
+
+    def as_manager(cls):
+        # Address the circular dependency between `Queryset` and `Manager`.
+        from django.db.models.manager import Manager
+        return Manager.from_queryset(cls)()
+    as_manager.queryset_only = True
+    as_manager = classmethod(as_manager)
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -66,6 +89,26 @@ class QuerySet(object):
         self._fetch_all()
         obj_dict = self.__dict__.copy()
         return obj_dict
+
+    def __reduce__(self):
+        """
+        Used by pickle to deal with the types that we create dynamically when
+        specialized queryset such as `ValuesQuerySet` are used in conjunction
+        with querysets that are *subclasses* of `QuerySet`.
+
+        See `_clone` implementation for more details.
+        """
+        if hasattr(self, '_specialized_queryset_class'):
+            class_bases = (
+                self._specialized_queryset_class,
+                self._base_queryset_class,
+            )
+            class_dict = {
+                '_specialized_queryset_class': self._specialized_queryset_class,
+                '_base_queryset_class': self._base_queryset_class,
+            }
+            return _pickle_queryset, (class_bases, class_dict), self.__getstate__()
+        return super(QuerySet, self).__reduce__()
 
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
@@ -271,9 +314,11 @@ class QuerySet(object):
 
         query = self.query.clone()
 
+        aggregate_names = []
         for (alias, aggregate_expr) in kwargs.items():
             query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=True)
+                                is_summary=True)
+            aggregate_names.append(alias)
 
         return query.get_aggregation(using=self.db)
 
@@ -298,6 +343,7 @@ class QuerySet(object):
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter():
             clone = clone.order_by()
+        clone = clone[:MAX_GET_RESULTS + 1]
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -306,8 +352,11 @@ class QuerySet(object):
                 "%s matching query does not exist." %
                 self.model._meta.object_name)
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num))
+            "get() returned more than one %s -- it returned %s!" % (
+                self.model._meta.object_name,
+                num if num <= MAX_GET_RESULTS else 'more than %s' % MAX_GET_RESULTS
+            )
+        )
 
     def create(self, **kwargs):
         """
@@ -352,42 +401,91 @@ class QuerySet(object):
                 if objs_with_pk:
                     self._batched_insert(objs_with_pk, fields, batch_size)
                 if objs_without_pk:
-                    fields= [f for f in fields if not isinstance(f, AutoField)]
+                    fields = [f for f in fields if not isinstance(f, AutoField)]
                     self._batched_insert(objs_without_pk, fields, batch_size)
 
         return objs
 
-    def get_or_create(self, **kwargs):
+    def get_or_create(self, defaults=None, **kwargs):
         """
         Looks up an object with the given kwargs, creating one if necessary.
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        defaults = kwargs.pop('defaults', {})
-        lookup = kwargs.copy()
-        for f in self.model._meta.fields:
-            if f.attname in lookup:
-                lookup[f.name] = lookup.pop(f.attname)
+        lookup, params, _ = self._extract_model_params(defaults, **kwargs)
+        self._for_write = True
         try:
-            self._for_write = True
             return self.get(**lookup), False
         except self.model.DoesNotExist:
-            try:
-                params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
-                params.update(defaults)
-                obj = self.model(**params)
-                sid = transaction.savepoint(using=self.db)
-                obj.save(force_insert=True, using=self.db)
-                transaction.savepoint_commit(sid, using=self.db)
-                return obj, True
-            except DatabaseError:
-                transaction.savepoint_rollback(sid, using=self.db)
-                exc_info = sys.exc_info()
+            return self._create_object_from_params(lookup, params)
+
+    def update_or_create(self, defaults=None, **kwargs):
+        """
+        Looks up an object with the given kwargs, updating one with defaults
+        if it exists, otherwise creates a new one.
+        Returns a tuple (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        lookup, params, filtered_defaults = self._extract_model_params(defaults, **kwargs)
+        self._for_write = True
+        try:
+            obj = self.get(**lookup)
+        except self.model.DoesNotExist:
+            obj, created = self._create_object_from_params(lookup, params)
+            if created:
+                return obj, created
+        for k, v in six.iteritems(filtered_defaults):
+            setattr(obj, k, v)
+
+        sid = transaction.savepoint(using=self.db)
+        try:
+            obj.save(update_fields=filtered_defaults.keys(), using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, False
+        except DatabaseError:
+            transaction.savepoint_rollback(sid, using=self.db)
+            six.reraise(*sys.exc_info())
+
+    def _create_object_from_params(self, lookup, params):
+        """
+        Tries to create an object using passed params.
+        Used by get_or_create and update_or_create
+        """
+        obj = self.model(**params)
+        sid = transaction.savepoint(using=self.db)
+        try:
+            obj.save(force_insert=True, using=self.db)
+            transaction.savepoint_commit(sid, using=self.db)
+            return obj, True
+        except DatabaseError as e:
+            transaction.savepoint_rollback(sid, using=self.db)
+            exc_info = sys.exc_info()
+            if isinstance(e, IntegrityError):
                 try:
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
-                    # Re-raise the DatabaseError with its original traceback.
-                    six.reraise(*exc_info)
+                    pass
+            six.reraise(*exc_info)
+
+    def _extract_model_params(self, defaults, **kwargs):
+        """
+        Prepares `lookup` (kwargs that are valid model attributes), `params`
+        (for creating a model instance) and `filtered_defaults` (defaults
+        that are valid model attributes) based on given kwargs; for use by
+        get_or_create and update_or_create.
+        """
+        defaults = defaults or {}
+        filtered_defaults = {}
+        lookup = kwargs.copy()
+        for f in self.model._meta.fields:
+            # Filter out fields that don't belongs to the model.
+            if f.attname in lookup:
+                lookup[f.name] = lookup.pop(f.attname)
+            if f.attname in defaults:
+                filtered_defaults[f.name] = defaults.pop(f.attname)
+        params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
+        params.update(filtered_defaults)
+        return lookup, params, filtered_defaults
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
         """
@@ -469,6 +567,7 @@ class QuerySet(object):
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
     delete.alters_data = True
+    delete.queryset_only = True
 
     def _raw_delete(self, using):
         """
@@ -508,6 +607,7 @@ class QuerySet(object):
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(None)
     _update.alters_data = True
+    _update.queryset_only = False
 
     def exists(self):
         if self._result_cache is None:
@@ -522,6 +622,13 @@ class QuerySet(object):
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
+
+    def raw(self, raw_query, params=None, translations=None, using=None):
+        if using is None:
+            using = self.db
+        return RawQuerySet(raw_query, model=self.model,
+                params=params, translations=translations,
+                using=using)
 
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
@@ -635,11 +742,12 @@ class QuerySet(object):
         # Default to false for nowait
         nowait = kwargs.pop('nowait', False)
         obj = self._clone()
+        obj._for_write = True
         obj.query.select_for_update = True
         obj.query.select_for_update_nowait = nowait
         return obj
 
-    def select_related(self, *fields, **kwargs):
+    def select_related(self, *fields):
         """
         Returns a new QuerySet instance that will select related objects.
 
@@ -648,24 +756,13 @@ class QuerySet(object):
 
         If select_related(None) is called, the list is cleared.
         """
-        if 'depth' in kwargs:
-            warnings.warn('The "depth" keyword argument has been deprecated.\n'
-                    'Use related field names instead.', DeprecationWarning, stacklevel=2)
-        depth = kwargs.pop('depth', 0)
-        if kwargs:
-            raise TypeError('Unexpected keyword arguments to select_related: %s'
-                    % (list(kwargs),))
         obj = self._clone()
         if fields == (None,):
             obj.query.select_related = False
         elif fields:
-            if depth:
-                raise TypeError('Cannot pass both "depth" and fields to select_related()')
             obj.query.add_select_related(fields)
         else:
             obj.query.select_related = True
-        if depth:
-            obj.query.max_depth = depth
         return obj
 
     def prefetch_related(self, *lookups):
@@ -820,6 +917,21 @@ class QuerySet(object):
     ###################
     # PRIVATE METHODS #
     ###################
+
+    def _insert(self, objs, fields, return_id=False, raw=False, using=None):
+        """
+        Inserts a new record for the given model. This provides an interface to
+        the InsertQuery class and is how Model.save() is implemented.
+        """
+        self._for_write = True
+        if using is None:
+            using = self.db
+        query = sql.InsertQuery(self.model)
+        query.insert_values(fields, objs, raw=raw)
+        return query.get_compiler(using=using).execute_sql(return_id)
+    _insert.alters_data = True
+    _insert.queryset_only = False
+
     def _batched_insert(self, objs, fields, batch_size):
         """
         A little helper method for bulk_insert to insert the bulk one batch
@@ -830,7 +942,7 @@ class QuerySet(object):
             return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
-        for batch in [objs[i:i+batch_size]
+        for batch in [objs[i:i + batch_size]
                       for i in range(0, len(objs), batch_size)]:
             self.model._base_manager._insert(batch, fields=fields,
                                              using=self.db)
@@ -838,6 +950,15 @@ class QuerySet(object):
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
             klass = self.__class__
+        elif not issubclass(self.__class__, klass):
+            base_queryset_class = getattr(self, '_base_queryset_class', self.__class__)
+            class_bases = (klass, base_queryset_class)
+            class_dict = {
+                '_base_queryset_class': base_queryset_class,
+                '_specialized_queryset_class': klass,
+            }
+            klass = type(klass.__name__, class_bases, class_dict)
+
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True
@@ -911,9 +1032,11 @@ class QuerySet(object):
     # empty" result.
     value_annotation = True
 
+
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
         return instance.query.is_empty()
+
 
 class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
     """
@@ -923,6 +1046,7 @@ class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
 
     def __init__(self, *args, **kwargs):
         raise TypeError("EmptyQuerySet can't be instantiated")
+
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -1252,7 +1376,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
                 parent = klass if issubclass(o.model, klass) else None
-                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
+                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth + 1,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:
@@ -1263,7 +1387,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
 
-def get_cached_row(row, index_start, using,  klass_info, offset=0,
+def get_cached_row(row, index_start, using, klass_info, offset=0,
                    parent_data=()):
     """
     Helper function that recursively returns an object with the specified
@@ -1288,11 +1412,10 @@ def get_cached_row(row, index_start, using,  klass_info, offset=0,
         return None
     klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx = klass_info
 
-
-    fields = row[index_start : index_start + field_count]
+    fields = row[index_start:index_start + field_count]
     # If the pk column is None (or the Oracle equivalent ''), then the related
     # object must be non-existent - set the relation to None.
-    if fields[pk_idx] == None or fields[pk_idx] == '':
+    if fields[pk_idx] is None or fields[pk_idx] == '':
         obj = None
     elif field_names:
         fields = list(fields)
@@ -1445,7 +1568,10 @@ class RawQuerySet(object):
             yield instance
 
     def __repr__(self):
-        return "<RawQuerySet: %r>" % (self.raw_query % tuple(self.params))
+        text = self.raw_query
+        if self.params:
+            text = text % (self.params if hasattr(self.params, 'keys') else tuple(self.params))
+        return "<RawQuerySet: %r>" % text
 
     def __getitem__(self, k):
         return list(self)[k]
@@ -1498,17 +1624,6 @@ class RawQuerySet(object):
         return self._model_fields
 
 
-def insert_query(model, objs, fields, return_id=False, raw=False, using=None):
-    """
-    Inserts a new record for the given model. This provides an interface to
-    the InsertQuery class and is how Model.save() is implemented. It is not
-    part of the public API.
-    """
-    query = sql.InsertQuery(model)
-    query.insert_values(fields, objs, raw=raw)
-    return query.get_compiler(using=using).execute_sql(return_id)
-
-
 def prefetch_related_objects(result_cache, related_lookups):
     """
     Helper function for prefetch_related functionality
@@ -1518,8 +1633,6 @@ def prefetch_related_objects(result_cache, related_lookups):
     """
     if len(result_cache) == 0:
         return # nothing to do
-
-    model = result_cache[0].__class__
 
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
@@ -1547,7 +1660,7 @@ def prefetch_related_objects(result_cache, related_lookups):
             if len(obj_list) == 0:
                 break
 
-            current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
+            current_lookup = LOOKUP_SEP.join(attrs[:level + 1])
             if current_lookup in done_queries:
                 # Skip any prefetching, and any object preparation
                 obj_list = done_queries[current_lookup]

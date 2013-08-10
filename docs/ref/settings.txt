@@ -852,6 +852,10 @@ It is also important to remember that when running with :setting:`DEBUG`
 turned on, Django will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
+Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
+the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
+requests being returned as "Bad Request (400)".
+
 .. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
@@ -1051,6 +1055,26 @@ EMAIL_USE_TLS
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL_USE_SSL`.
+
+.. setting:: EMAIL_USE_SSL
+
+EMAIL_USE_SSL
+-------------
+
+.. versionadded:: 1.7
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
+
+Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
+exclusive, so only set one of those settings to ``True``.
 
 .. setting:: FILE_CHARSET
 
@@ -1346,15 +1370,21 @@ A data structure containing configuration information. The contents of
 this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
-The default logging configuration passes HTTP 500 server errors to an
-email log handler; all other log messages are given to a NullHandler.
+Among other things, the default logging configuration passes HTTP 500 server
+errors to an email log handler when :setting:`DEBUG` is ``False``. See also
+:ref:`configuring-logging`.
+
+You can see the default logging configuration by looking in
+``django/utils/log.py`` (or view the `online source`__).
+
+__ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
 LOGGING_CONFIG
 --------------
 
-Default: ``'django.utils.log.dictConfig'``
+Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
 Django project. Points at a instance of Python's `dictConfig`_
@@ -1362,6 +1392,10 @@ configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. versionchanged:: 1.7
+
+    Previously, the default value was ``'django.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -1710,7 +1744,7 @@ Default::
 
 A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
-used instead of a string. The first item in the tuple should be the ``Loader``'s
+used instead of a string. The first item in the tuple should be the ``Loader``’s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
@@ -2038,22 +2072,6 @@ Default: ``('django.contrib.auth.backends.ModelBackend',)``
 A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
-
-.. setting:: AUTH_PROFILE_MODULE
-
-AUTH_PROFILE_MODULE
--------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Default: Not defined
-
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
 
 .. setting:: AUTH_USER_MODEL
 
@@ -2460,7 +2478,7 @@ files</howto/static-files/index>` for more details about usage.
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
-    :doc:`staticfiles</ref/contrib/staticfiles>`'s
+    :doc:`staticfiles</ref/contrib/staticfiles>`’s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
     :setting:`STATICFILES_DIRS`).
@@ -2477,7 +2495,7 @@ URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
-:ref:`media definitions<form-media-paths>` and the
+:ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.
@@ -2560,7 +2578,9 @@ various locations.
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
 (using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+files with the same name are present, the first file that is found will be
+used.
 
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to

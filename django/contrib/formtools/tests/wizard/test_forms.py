@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
+from importlib import import_module
+
 from django import forms, http
 from django.conf import settings
 from django.db import models
 from django.test import TestCase
 from django.template.response import TemplateResponse
-from django.utils.importlib import import_module
 
 from django.contrib.auth.models import User
 

@@ -2,10 +2,9 @@
 HTML Widget classes
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
-import datetime
 from itertools import chain
 try:
     from urllib.parse import urljoin
@@ -16,8 +15,8 @@ import warnings
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.html import conditional_escape, format_html, format_html_join
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.html import conditional_escape, format_html
+from django.utils.translation import ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
@@ -512,6 +511,8 @@ class Select(Widget):
         return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
+        if option_value == None:
+            option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
@@ -637,7 +638,7 @@ class RadioChoiceInput(ChoiceInput):
 class RadioInput(RadioChoiceInput):
     def __init__(self, *args, **kwargs):
         msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
         super(RadioInput, self).__init__(*args, **kwargs)
 
 
@@ -838,6 +839,11 @@ class MultiWidget(Widget):
         obj = super(MultiWidget, self).__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
+
+    @property
+    def needs_multipart_form(self):
+        return any(w.needs_multipart_form for w in self.widgets)
+
 
 class SplitDateTimeWidget(MultiWidget):
     """

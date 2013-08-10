@@ -5,6 +5,7 @@ import os
 import re
 import mimetypes
 from copy import copy
+from importlib import import_module
 from io import BytesIO
 try:
     from urllib.parse import unquote, urlparse, urlsplit
@@ -25,7 +26,6 @@ from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
-from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils import six
 from django.test.utils import ContextList
@@ -180,7 +180,11 @@ def encode_multipart(boundary, data):
 
 def encode_file(boundary, key, file):
     to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
-    content_type = mimetypes.guess_type(file.name)[0]
+    if hasattr(file, 'content_type'):
+        content_type = file.content_type
+    else:
+        content_type = mimetypes.guess_type(file.name)[0]
+
     if content_type is None:
         content_type = 'application/octet-stream'
     return [
@@ -272,7 +276,6 @@ class RequestFactory(object):
 
         parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
             'REQUEST_METHOD':  str('GET'),
@@ -303,7 +306,6 @@ class RequestFactory(object):
 
         parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
             'PATH_INFO':       self._get_path(parsed),
             'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
             'REQUEST_METHOD':  str('HEAD'),
@@ -404,7 +406,8 @@ class Client(RequestFactory):
         # callback function.
         data = {}
         on_template_render = curry(store_rendered_templates, data)
-        signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
+        signal_uid = "template-render-%s" % id(request)
+        signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
         got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
         try:
@@ -450,7 +453,7 @@ class Client(RequestFactory):
 
             return response
         finally:
-            signals.template_rendered.disconnect(dispatch_uid="template-render")
+            signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
     def get(self, path, data={}, follow=False, **extra):

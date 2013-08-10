@@ -1,7 +1,8 @@
+from importlib import import_module
+
 from django.core.urlresolvers import (RegexURLPattern,
     RegexURLResolver, LocaleRegexURLResolver)
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
 from django.utils import six
 
 

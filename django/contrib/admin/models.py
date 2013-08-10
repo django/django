@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.util import quote
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.encoding import smart_text
 from django.utils.encoding import python_2_unicode_compatible
@@ -74,5 +74,8 @@ class LogEntry(models.Model):
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
-            return reverse(url_name, args=(quote(self.object_id),))
+            try:
+                return reverse(url_name, args=(quote(self.object_id),))
+            except NoReverseMatch:
+                pass
         return None

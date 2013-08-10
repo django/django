@@ -30,8 +30,15 @@ TEST_SETTINGS = {
 
 
 class LiveServerBase(LiveServerTestCase):
-    urls = 'servers.urls'
+
+    available_apps = [
+        'servers',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+    ]
     fixtures = ['testdata.json']
+    urls = 'servers.urls'
 
     @classmethod
     def setUpClass(cls):
@@ -89,6 +96,11 @@ class LiveServerAddress(LiveServerBase):
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
     @classmethod
+    def tearDownClass(cls):
+        # skip it, as setUpClass doesn't call its parent either
+        pass
+
+    @classmethod
     def raises_exception(cls, address, exception):
         os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
         try:
@@ -101,7 +113,7 @@ class LiveServerAddress(LiveServerBase):
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
-        # test runner and the overriden setUpClass() method is executed.
+        # test runner and the overridden setUpClass() method is executed.
         pass
 
 class LiveServerViews(LiveServerBase):

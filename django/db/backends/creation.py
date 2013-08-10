@@ -146,7 +146,7 @@ class BaseDatabaseCreation(object):
         Returns any ALTER TABLE statements to add constraints after the fact.
         """
         opts = model._meta
-        if not opts.managed or opts.proxy or opts.swapped:
+        if not opts.managed or opts.swapped:
             return []
         qn = self.connection.ops.quote_name
         final_output = []
@@ -251,12 +251,13 @@ class BaseDatabaseCreation(object):
             r_col = model._meta.get_field(f.rel.field_name).column
             r_name = '%s_refs_%s_%s' % (
                 col, r_col, self._digest(table, r_table))
-            output.append('%s %s %s %s;' % \
-                (style.SQL_KEYWORD('ALTER TABLE'),
+            output.append('%s %s %s %s;' % (
+                style.SQL_KEYWORD('ALTER TABLE'),
                 style.SQL_TABLE(qn(table)),
                 style.SQL_KEYWORD(self.connection.ops.drop_foreignkey_sql()),
                 style.SQL_FIELD(qn(truncate_name(
-                    r_name, self.connection.ops.max_name_length())))))
+                    r_name, self.connection.ops.max_name_length())))
+            ))
         del references_to_delete[model]
         return output
 
@@ -465,7 +466,7 @@ class BaseDatabaseCreation(object):
         """
         warnings.warn(
             "set_autocommit was moved from BaseDatabaseCreation to "
-            "BaseDatabaseWrapper.", PendingDeprecationWarning, stacklevel=2)
+            "BaseDatabaseWrapper.", DeprecationWarning, stacklevel=2)
         return self.connection.set_autocommit(True)
 
     def sql_table_creation_suffix(self):

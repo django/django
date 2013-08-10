@@ -110,7 +110,7 @@ class CommonMiddleware(object):
         if settings.SEND_BROKEN_LINK_EMAILS:
             warnings.warn("SEND_BROKEN_LINK_EMAILS is deprecated. "
                 "Use BrokenLinkEmailsMiddleware instead.",
-                PendingDeprecationWarning, stacklevel=2)
+                DeprecationWarning, stacklevel=2)
             BrokenLinkEmailsMiddleware().process_response(request, response)
 
         if settings.USE_ETAGS:

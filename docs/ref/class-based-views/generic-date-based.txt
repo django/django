@@ -63,7 +63,7 @@ ArchiveIndexView
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.dates import ArchiveIndexView
@@ -160,7 +160,7 @@ YearArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import YearArchiveView
 
@@ -172,7 +172,7 @@ YearArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -255,7 +255,7 @@ MonthArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import MonthArchiveView
 
@@ -267,7 +267,7 @@ MonthArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -348,7 +348,7 @@ WeekArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import WeekArchiveView
 
@@ -361,7 +361,7 @@ WeekArchiveView
             week_format = "%W"
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -463,7 +463,7 @@ DayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import DayArchiveView
 
@@ -475,7 +475,7 @@ DayArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -537,7 +537,7 @@ TodayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_today``.
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.dates import TodayArchiveView
 
@@ -549,7 +549,7 @@ TodayArchiveView
             make_object_list = True
             allow_future = True
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -599,7 +599,7 @@ DateDetailView
 
     * Uses a default ``template_name_suffix`` of ``_detail``.
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.dates import DateDetailView

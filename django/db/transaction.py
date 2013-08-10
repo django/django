@@ -27,6 +27,7 @@ class TransactionManagementError(Exception):
     """
     pass
 
+
 ################
 # Private APIs #
 ################
@@ -39,6 +40,7 @@ def get_connection(using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     return connections[using]
+
 
 ###########################
 # Deprecated private APIs #
@@ -56,6 +58,7 @@ def abort(using=None):
     """
     get_connection(using).abort()
 
+
 def enter_transaction_management(managed=True, using=None, forced=False):
     """
     Enters transaction management for a running thread. It must be balanced with
@@ -68,6 +71,7 @@ def enter_transaction_management(managed=True, using=None, forced=False):
     """
     get_connection(using).enter_transaction_management(managed, forced)
 
+
 def leave_transaction_management(using=None):
     """
     Leaves transaction management for a running thread. A dirty flag is carried
@@ -76,12 +80,14 @@ def leave_transaction_management(using=None):
     """
     get_connection(using).leave_transaction_management()
 
+
 def is_dirty(using=None):
     """
     Returns True if the current transaction requires a commit for changes to
     happen.
     """
     return get_connection(using).is_dirty()
+
 
 def set_dirty(using=None):
     """
@@ -91,6 +97,7 @@ def set_dirty(using=None):
     """
     get_connection(using).set_dirty()
 
+
 def set_clean(using=None):
     """
     Resets a dirty flag for the current thread and code streak. This can be used
@@ -99,21 +106,26 @@ def set_clean(using=None):
     """
     get_connection(using).set_clean()
 
+
 def is_managed(using=None):
     warnings.warn("'is_managed' is deprecated.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
+
 
 def managed(flag=True, using=None):
     warnings.warn("'managed' no longer serves a purpose.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
+
 
 def commit_unless_managed(using=None):
     warnings.warn("'commit_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
+
 
 def rollback_unless_managed(using=None):
     warnings.warn("'rollback_unless_managed' is now a no-op.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
+
 
 ###############
 # Public APIs #
@@ -123,7 +135,8 @@ def get_autocommit(using=None):
     """
     Get the autocommit status of the connection.
     """
-    return get_connection(using).autocommit
+    return get_connection(using).get_autocommit()
+
 
 def set_autocommit(autocommit, using=None):
     """
@@ -131,17 +144,20 @@ def set_autocommit(autocommit, using=None):
     """
     return get_connection(using).set_autocommit(autocommit)
 
+
 def commit(using=None):
     """
     Commits a transaction and resets the dirty flag.
     """
     get_connection(using).commit()
 
+
 def rollback(using=None):
     """
     Rolls back a transaction and resets the dirty flag.
     """
     get_connection(using).rollback()
+
 
 def savepoint(using=None):
     """
@@ -151,12 +167,14 @@ def savepoint(using=None):
     """
     return get_connection(using).savepoint()
 
+
 def savepoint_rollback(sid, using=None):
     """
     Rolls back the most recent savepoint (if one exists). Does nothing if
     savepoints are not supported.
     """
     get_connection(using).savepoint_rollback(sid)
+
 
 def savepoint_commit(sid, using=None):
     """
@@ -165,11 +183,35 @@ def savepoint_commit(sid, using=None):
     """
     get_connection(using).savepoint_commit(sid)
 
+
 def clean_savepoints(using=None):
     """
     Resets the counter used to generate unique savepoint ids in this thread.
     """
     get_connection(using).clean_savepoints()
+
+
+def get_rollback(using=None):
+    """
+    Gets the "needs rollback" flag -- for *advanced use* only.
+    """
+    return get_connection(using).get_rollback()
+
+
+def set_rollback(rollback, using=None):
+    """
+    Sets or unsets the "needs rollback" flag -- for *advanced use* only.
+
+    When `rollback` is `True`, it triggers a rollback when exiting the
+    innermost enclosing atomic block that has `savepoint=True` (that's the
+    default). Use this to force a rollback without raising an exception.
+
+    When `rollback` is `False`, it prevents such a rollback. Use this only
+    after rolling back to a known-good state! Otherwise, you break the atomic
+    block and data corruption may occur.
+    """
+    return get_connection(using).set_rollback(rollback)
+
 
 #################################
 # Decorators / context managers #
@@ -209,15 +251,11 @@ class Atomic(object):
     def __enter__(self):
         connection = get_connection(self.using)
 
-        # Ensure we have a connection to the database before testing
-        # autocommit status.
-        connection.ensure_connection()
-
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
-            if not connection.autocommit:
+            if not connection.get_autocommit():
                 # Some database adapters (namely sqlite3) don't handle
                 # transactions and savepoints properly when autocommit is off.
                 # Turning autocommit back on isn't an option; it would trigger
@@ -382,6 +420,7 @@ class Transaction(object):
                 return func(*args, **kwargs)
         return inner
 
+
 def _transaction_func(entering, exiting, using):
     """
     Takes 3 things, an entering function (what to do to start this block of
@@ -410,7 +449,7 @@ def autocommit(using=None):
     your settings file and want the default behavior in some view functions.
     """
     warnings.warn("autocommit is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(managed=False, using=using)
@@ -420,6 +459,7 @@ def autocommit(using=None):
 
     return _transaction_func(entering, exiting, using)
 
+
 def commit_on_success(using=None):
     """
     This decorator activates commit on response. This way, if the view function
@@ -428,7 +468,7 @@ def commit_on_success(using=None):
     control in Web apps.
     """
     warnings.warn("commit_on_success is deprecated in favor of atomic.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -450,6 +490,7 @@ def commit_on_success(using=None):
 
     return _transaction_func(entering, exiting, using)
 
+
 def commit_manually(using=None):
     """
     Decorator that activates manual transaction control. It just disables
@@ -458,7 +499,7 @@ def commit_manually(using=None):
     themselves.
     """
     warnings.warn("commit_manually is deprecated in favor of set_autocommit.",
-        PendingDeprecationWarning, stacklevel=2)
+        DeprecationWarning, stacklevel=2)
 
     def entering(using):
         enter_transaction_management(using=using)
@@ -467,6 +508,7 @@ def commit_manually(using=None):
         leave_transaction_management(using=using)
 
     return _transaction_func(entering, exiting, using)
+
 
 def commit_on_success_unless_managed(using=None, savepoint=False):
     """
@@ -480,7 +522,7 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
     legacy behavior.
     """
     connection = get_connection(using)
-    if connection.autocommit or connection.in_atomic_block:
+    if connection.get_autocommit() or connection.in_atomic_block:
         return atomic(using, savepoint)
     else:
         def entering(using):

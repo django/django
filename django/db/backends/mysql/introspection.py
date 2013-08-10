@@ -7,6 +7,7 @@ from django.utils.encoding import force_text
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
+
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = {
         FIELD_TYPE.BLOB: 'TextField',
@@ -116,4 +117,3 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
         return indexes
-

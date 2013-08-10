@@ -82,7 +82,7 @@ How can I customize the functionality of the admin interface?
 You've got several options. If you want to piggyback on top of an add/change
 form that Django automatically generates, you can attach arbitrary JavaScript
 modules to the page via the model's class Admin :ref:`js parameter
-<modeladmin-media-definitions>`. That parameter is a list of URLs, as strings,
+<modeladmin-asset-definitions>`. That parameter is a list of URLs, as strings,
 pointing to JavaScript modules that will be included within the admin form via
 a ``<script>`` tag.
 

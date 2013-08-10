@@ -3,6 +3,7 @@ Testing of admin inline formsets.
 
 """
 from __future__ import unicode_literals
+import random
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
@@ -46,6 +47,25 @@ class Book(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=50)
     books = models.ManyToManyField(Book)
+
+
+class NonAutoPKBook(models.Model):
+    rand_pk = models.IntegerField(primary_key=True, editable=False)
+    author = models.ForeignKey(Author)
+    title = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        while not self.rand_pk:
+            test_pk = random.randint(1, 99999)
+            if not NonAutoPKBook.objects.filter(rand_pk=test_pk).exists():
+                self.rand_pk = test_pk
+        super(NonAutoPKBook, self).save(*args, **kwargs)
+
+
+class EditablePKBook(models.Model):
+    manual_pk = models.IntegerField(primary_key=True)
+    author = models.ForeignKey(Author)
+    title = models.CharField(max_length=50)
 
 
 class Holder(models.Model):

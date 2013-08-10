@@ -101,7 +101,7 @@ class OGRGeometry(GDALBase):
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
-                ogr_t = OGRGeomType(geom_input)
+                OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, memoryview):
             # WKB was passed in
@@ -198,14 +198,6 @@ class OGRGeometry(GDALBase):
 
     def _get_coord_dim(self):
         "Returns the coordinate dimension of the Geometry."
-        if isinstance(self, GeometryCollection) and GDAL_VERSION < (1, 5, 2):
-            # On GDAL versions prior to 1.5.2, there exists a bug in which
-            # the coordinate dimension of geometry collections is always 2:
-            #   http://trac.osgeo.org/gdal/ticket/2334
-            # Here we workaround by returning the coordinate dimension of the
-            # first geometry in the collection instead.
-            if len(self):
-                return capi.get_coord_dim(capi.get_geom_ref(self.ptr, 0))
         return capi.get_coord_dim(self.ptr)
 
     def _set_coord_dim(self, dim):
@@ -349,7 +341,7 @@ class OGRGeometry(GDALBase):
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
+        capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 

@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.conf import settings
 from django.utils.html import format_html, format_html_join
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
@@ -22,6 +23,11 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
+    if [v for v in attrs.values() if v is True or v is False]:
+        warnings.warn(
+            'The meaning of boolean values for widget attributes will change in Django 1.8',
+            DeprecationWarning
+        )
     return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
 @python_2_unicode_compatible
@@ -80,12 +86,17 @@ def from_current_timezone(value):
         try:
             return timezone.make_aware(value, current_timezone)
         except Exception:
-            msg = _(
+            message = _(
                 '%(datetime)s couldn\'t be interpreted '
                 'in time zone %(current_timezone)s; it '
-                'may be ambiguous or it may not exist.') % {'datetime': value, 'current_timezone':
-                current_timezone}
-            six.reraise(ValidationError, ValidationError(msg), sys.exc_info()[2])
+                'may be ambiguous or it may not exist.'
+            )
+            params = {'datetime': value, 'current_timezone': current_timezone}
+            six.reraise(ValidationError, ValidationError(
+                message,
+                code='ambiguous_timezone',
+                params=params,
+            ), sys.exc_info()[2])
     return value
 
 def to_current_timezone(value):

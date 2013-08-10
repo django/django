@@ -1,11 +1,9 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import pickle
 from operator import attrgetter
-import warnings
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -1626,25 +1624,6 @@ class AuthTestCase(TestCase):
         command_output = new_io.getvalue().strip()
         self.assertTrue('"email": "alice@example.com"' in command_output)
 
-
-@override_settings(AUTH_PROFILE_MODULE='multiple_database.UserProfile')
-class UserProfileTestCase(TestCase):
-
-    def test_user_profiles(self):
-        alice = User.objects.create_user('alice', 'alice@example.com')
-        bob = User.objects.db_manager('other').create_user('bob', 'bob@example.com')
-
-        alice_profile = UserProfile(user=alice, flavor='chocolate')
-        alice_profile.save()
-
-        bob_profile = UserProfile(user=bob, flavor='crunchy frog')
-        bob_profile.save()
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.assertEqual(alice.get_profile().flavor, 'chocolate')
-            self.assertEqual(bob.get_profile().flavor, 'crunchy frog')
-
 class AntiPetRouter(object):
     # A router that only expresses an opinion on syncdb,
     # passing pets to the 'other' database
@@ -1943,6 +1922,12 @@ class SyncOnlyDefaultDatabaseRouter(object):
 
 
 class SyncDBTestCase(TestCase):
+
+    available_apps  = [
+        'multiple_database',
+        'django.contrib.auth',
+        'django.contrib.contenttypes'
+    ]
     multi_db = True
 
     def test_syncdb_to_other_database(self):

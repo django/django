@@ -9,6 +9,7 @@ except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 from collections import namedtuple
 from contextlib import contextmanager
+from importlib import import_module
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
@@ -17,7 +18,6 @@ from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
-from django.utils.importlib import import_module
 from django.utils import six
 from django.utils import timezone
 
@@ -70,7 +70,9 @@ class BaseDatabaseWrapper(object):
         self._thread_ident = thread.get_ident()
 
     def __eq__(self, other):
-        return self.alias == other.alias
+        if isinstance(other, BaseDatabaseWrapper):
+            return self.alias == other.alias
+        return NotImplemented
 
     def __ne__(self, other):
         return not self == other
@@ -204,7 +206,7 @@ class BaseDatabaseWrapper(object):
 
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
-        return self.features.uses_savepoints and not self.autocommit
+        return self.features.uses_savepoints and not self.get_autocommit()
 
     ##### Generic savepoint management methods #####
 
@@ -279,15 +281,13 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_no_atomic_block()
 
-        self.ensure_connection()
-
         self.transaction_state.append(managed)
 
         if not managed and self.is_dirty() and not forced:
             self.commit()
             self.set_clean()
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
@@ -297,8 +297,6 @@ class BaseDatabaseWrapper(object):
         those from outside. (Commits are on connection level.)
         """
         self.validate_no_atomic_block()
-
-        self.ensure_connection()
 
         if self.transaction_state:
             del self.transaction_state[-1]
@@ -313,13 +311,20 @@ class BaseDatabaseWrapper(object):
 
         if self._dirty:
             self.rollback()
-            if managed == self.autocommit:
+            if managed == self.get_autocommit():
                 self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
+
+    def get_autocommit(self):
+        """
+        Check the autocommit state.
+        """
+        self.ensure_connection()
+        return self.autocommit
 
     def set_autocommit(self, autocommit):
         """
@@ -329,6 +334,24 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
+
+    def get_rollback(self):
+        """
+        Get the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        return self.needs_rollback
+
+    def set_rollback(self, rollback):
+        """
+        Set or unset the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        self.needs_rollback = rollback
 
     def validate_no_atomic_block(self):
         """
@@ -361,7 +384,7 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        if not self.autocommit:
+        if not self.get_autocommit():
             self._dirty = True
 
     def set_clean(self):
@@ -390,7 +413,7 @@ class BaseDatabaseWrapper(object):
     def disable_constraint_checking(self):
         """
         Backends can implement as needed to temporarily disable foreign key
-        constraint checking. Should return True if the constraints were 
+        constraint checking. Should return True if the constraints were
         disabled and will need to be reenabled.
         """
         return False
@@ -427,7 +450,7 @@ class BaseDatabaseWrapper(object):
         if self.connection is not None:
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
-            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+            if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
                 self.close()
                 return
 
@@ -603,6 +626,11 @@ class BaseDatabaseFeatures(object):
     # Does the backend decide to commit before SAVEPOINT statements
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
+
+    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # parameter passing? Note this can be provided by the backend even if not
+    # supported by the Python driver
+    supports_paramstyle_pyformat = True
 
     def __init__(self, connection):
         self.connection = connection
@@ -947,7 +975,7 @@ class BaseDatabaseOperations(object):
         """
         return ''
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         """
         Returns a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
@@ -958,6 +986,10 @@ class BaseDatabaseOperations(object):
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
+
+        The `allow_cascade` argument determines whether truncation may cascade
+        to tables with foreign keys pointing the tables being truncated.
+        PostgreSQL requires a cascade even if these tables are empty.
         """
         raise NotImplementedError()
 
@@ -1134,6 +1166,7 @@ class BaseDatabaseOperations(object):
 FieldInfo = namedtuple('FieldInfo',
     'name type_code display_size internal_size precision scale null_ok'
 )
+
 
 class BaseDatabaseIntrospection(object):
     """

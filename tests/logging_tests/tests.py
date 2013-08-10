@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import copy
 import logging
 import sys
+from unittest import skipUnless
 import warnings
 
 from django.conf import LazySettings
@@ -13,13 +14,11 @@ from django.utils.encoding import force_text
 from django.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue)
 from django.utils.six import StringIO
-from django.utils.unittest import skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from .logconfig import MyEmailBackend
 
-PYVERS = sys.version_info[:2]
 
 # logging config prior to using filter with mail_admins
 OLD_LOGGING = {
@@ -87,7 +86,6 @@ class DefaultLoggingTest(TestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(output.getvalue(), 'Hey, this is an error.\n')
 
-@skipUnless(PYVERS > (2,6), "warnings captured only in Python >= 2.7")
 class WarningLoggerTests(TestCase):
     """
     Tests that warnings output for DeprecationWarnings is enabled

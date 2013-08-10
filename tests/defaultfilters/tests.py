@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import unittest
 
 from django.template.defaultfilters import *
 from django.test import TestCase
 from django.utils import six
-from django.utils import unittest, translation
+from django.utils import translation
 from django.utils.safestring import SafeData
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -248,9 +249,10 @@ class DefaultFiltersTests(TestCase):
             '<a href="https://google.com" rel="nofollow">https://google.com</a>')
 
         # Check urlize doesn't overquote already quoted urls - see #9655
-        self.assertEqual(urlize('http://hi.baidu.com/%D6%D8%D0%C2%BF'),
-            '<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
-            'http://hi.baidu.com/%D6%D8%D0%C2%BF</a>')
+        # The teststring is the urlquoted version of 'http://hi.baidu.com/重新开始'
+        self.assertEqual(urlize('http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B'),
+            '<a href="http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B" rel="nofollow">'
+            'http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B</a>')
         self.assertEqual(urlize('www.mystore.com/30%OffCoupons!'),
             '<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
             'www.mystore.com/30%OffCoupons!</a>')

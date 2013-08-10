@@ -37,7 +37,7 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the `authentication backend reference
+See the :ref:`authentication backend reference
 <authentication-backends-reference>` for information on the authentication
 backends included with Django.
 
@@ -354,40 +354,6 @@ model and adding the related fields may be your better option.  However
 existing links to the default User model within your project's apps may justify
 the extra database load.
 
-.. _auth-profiles:
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Prior to 1.5, a single profile model could be specified site-wide with the
-setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
-following items, separated by a dot:
-
-1. The name of the application (case sensitive) in which the user
-   profile model is defined (in other words, the
-   name which was passed to :djadmin:`manage.py startapp <startapp>` to create
-   the application).
-
-2. The name of the model (not case sensitive) class.
-
-For example, if the profile model was a class named ``UserProfile`` and was
-defined inside an application named ``accounts``, the appropriate setting would
-be::
-
-    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
-
-When a user profile model has been defined and specified in this manner, each
-:class:`~django.contrib.auth.models.User` object will have a method --
-:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
-instance of the user profile model associated with that
-:class:`~django.contrib.auth.models.User`.
-
-The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create a profile if one does not exist.
-
 .. _auth-custom-user:
 
 Substituting a custom User model
@@ -583,11 +549,27 @@ The following methods are available on any subclass of
         password hashing. Doesn't save the
         :class:`~django.contrib.auth.models.AbstractBaseUser` object.
 
+        When the raw_password is ``None``, the password will be set to an
+        unusable password, as if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
+        were used.
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally stored
+            as an unsable password as well.
+
     .. method:: models.AbstractBaseUser.check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally
+            considered to be an unusable password, resulting in this method
+            returning ``False`` for such a password.
 
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
@@ -607,8 +589,9 @@ The following methods are available on any subclass of
         been called for this user.
 
 You should also define a custom manager for your ``User`` model. If your
-``User`` model defines ``username`` and ``email`` fields the same as Django's
-default ``User``, you can just install Django's
+``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
+``is_superuser``, ``last_login``, and ``date_joined`` fields the same as
+Django's default ``User``, you can just install Django's
 :class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
 model defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
@@ -985,6 +968,7 @@ authentication app::
             # The user is identified by their email address
             return self.email
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.email
 
@@ -1076,6 +1060,8 @@ code would be required in the app's ``admin.py`` file::
             ('Personal info', {'fields': ('date_of_birth',)}),
             ('Permissions', {'fields': ('is_admin',)}),
         )
+        # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
+        # overrides get_fieldsets to use this attribute when creating a user.
         add_fieldsets = (
             (None, {
                 'classes': ('wide',),

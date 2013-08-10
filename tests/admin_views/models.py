@@ -137,7 +137,7 @@ class Thing(models.Model):
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
-    title = models.CharField(max_length=50, null=True)
+    title = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -644,8 +644,8 @@ class MainPrepopulated(models.Model):
         max_length=20,
         choices=(('option one', 'Option One'),
                  ('option two', 'Option Two')))
-    slug1 = models.SlugField()
-    slug2 = models.SlugField()
+    slug1 = models.SlugField(blank=True)
+    slug2 = models.SlugField(blank=True)
 
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated)

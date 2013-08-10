@@ -1,8 +1,8 @@
 from datetime import datetime
+from importlib import import_module
 
 from django.http import HttpRequest
 from django.conf import settings
-from django.utils.importlib import import_module
 
 from django.contrib.auth.models import User
 

@@ -1,7 +1,9 @@
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
+
+import unittest
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -12,7 +14,7 @@ from django.core.urlresolvers import (reverse, resolve, get_callable,
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
-from django.utils import unittest, six
+from django.utils import six
 
 from . import urlconf_outer, middleware, views
 
@@ -191,6 +193,20 @@ class URLPatternReverse(TestCase):
         # Regression for #20022
         self.assertEqual('/%7Eme/places/1/',
                 reverse('places', args=[1], prefix='/~me/'))
+
+    def test_patterns_reported(self):
+        # Regression for #17076
+        try:
+            # this url exists, but requires an argument
+            reverse("people", args=[])
+        except NoReverseMatch as e:
+            pattern_description = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+            self.assertIn(pattern_description, str(e))
+        else:
+            # we can't use .assertRaises, since we want to inspect the
+            # exception
+            self.fail("Expected a NoReverseMatch, but none occurred.")
+
 
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):

@@ -8,7 +8,6 @@ try:
     from urllib.parse import quote
 except ImportError:     # Python 2
     from urllib import quote
-import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
@@ -22,29 +21,6 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         original = UnicodeDecodeError.__str__(self)
         return '%s. You passed in %r (%s)' % (original, self.obj,
                 type(self.obj))
-
-class StrAndUnicode(object):
-    """
-    A class that derives __str__ from __unicode__.
-
-    On Python 2, __str__ returns the output of __unicode__ encoded as a UTF-8
-    bytestring. On Python 3, __str__ returns the output of __unicode__.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define __unicode__.
-    """
-    def __init__(self, *args, **kwargs):
-        warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
-                      "and apply the @python_2_unicode_compatible decorator "
-                      "instead.", DeprecationWarning, stacklevel=2)
-        super(StrAndUnicode, self).__init__(*args, **kwargs)
-
-    if six.PY3:
-        def __str__(self):
-            return self.__unicode__()
-    else:
-        def __str__(self):
-            return self.__unicode__().encode('utf-8')
 
 def python_2_unicode_compatible(klass):
     """

@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.conf import settings
-from django.utils.unittest import skipUnless
 
 from .base import SitemapTestsBase
 

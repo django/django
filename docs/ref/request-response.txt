@@ -165,10 +165,11 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.user
 
-    A ``django.contrib.auth.models.User`` object representing the currently
+    An object of type :setting:`AUTH_USER_MODEL` representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
-    can tell them apart with ``is_authenticated()``, like so::
+    to an instance of :class:`django.contrib.auth.models.AnonymousUser`. You
+    can tell them apart with
+    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
 
         if request.user.is_authenticated():
             # Do something for logged-in users.
@@ -176,8 +177,8 @@ All attributes should be considered read-only, unless stated otherwise below.
             # Do something for anonymous users.
 
     ``user`` is only available if your Django installation has the
-    ``AuthenticationMiddleware`` activated. For more, see
-    :doc:`/topics/auth/index`.
+    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+    activated. For more, see :doc:`/topics/auth/index`.
 
 .. attribute:: HttpRequest.session
 
@@ -494,6 +495,26 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.lists()
         [(u'a', [u'1', u'2', u'3'])]
 
+.. method:: QueryDict.pop(key)
+
+    Returns a list of values for the given key and removes them from the
+    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.pop('a')
+        [u'1', u'2', u'3']
+
+.. method:: QueryDict.popitem()
+
+    Removes an arbitrary member of the dictionary (since there's no concept
+    of ordering), and returns a two value tuple containing the key and a list
+    of all values for the key. Raises ``KeyError`` when called on an empty
+    dictionary. For example::
+
+        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+        >>> q.popitem()
+        (u'a', [u'1', u'2', u'3'])
+
 .. method:: QueryDict.dict()
 
     Returns ``dict`` representation of ``QueryDict``. For every (key, list)
@@ -555,28 +576,12 @@ file-like object::
 Passing iterators
 ~~~~~~~~~~~~~~~~~
 
-Finally, you can pass ``HttpResponse`` an iterator rather than strings. If you
-use this technique, the iterator should return strings.
+Finally, you can pass ``HttpResponse`` an iterator rather than strings.
+``HttpResponse`` will consume the iterator immediately, store its content as a
+string, and discard it.
 
-Passing an iterator as content to :class:`HttpResponse` creates a
-streaming response if (and only if) no middleware accesses the
-:attr:`HttpResponse.content` attribute before the response is returned.
-
-.. versionchanged:: 1.5
-
-    This technique is fragile and was deprecated in Django 1.5. If you need the
-    response to be streamed from the iterator to the client, you should use the
-    :class:`StreamingHttpResponse` class instead.
-
-    As of Django 1.7, when :class:`HttpResponse` is instantiated with an
-    iterator, it will consume it immediately, store the response content as a
-    string, and discard the iterator.
-
-.. versionchanged:: 1.5
-
-    You can now use :class:`HttpResponse` as a file-like object even if it was
-    instantiated with an iterator. Django will consume and save the content of
-    the iterator on first access.
+If you need the response to be streamed from the iterator to the client, you
+must use the :class:`StreamingHttpResponse` class instead.
 
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~

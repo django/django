@@ -1,5 +1,5 @@
 #! -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import base64
 import errno
@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import tempfile as sys_tempfile
+import unittest
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,7 +17,6 @@ from django.test import TestCase, client
 from django.test.utils import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
-from django.utils import unittest
 
 from . import uploadhandler
 from .models import FileModel
@@ -186,6 +186,27 @@ class FileUploadTests(TestCase):
         }
         got = json.loads(self.client.request(**r).content.decode('utf-8'))
         self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
+
+    def test_content_type_extra(self):
+        """Uploaded files may have content type parameters available."""
+        tdir = tempfile.gettempdir()
+
+        no_content_type = tempfile.NamedTemporaryFile(suffix=".ctype_extra", dir=tdir)
+        no_content_type.write(b'something')
+        no_content_type.seek(0)
+
+        simple_file = tempfile.NamedTemporaryFile(suffix=".ctype_extra", dir=tdir)
+        simple_file.write(b'something')
+        simple_file.seek(0)
+        simple_file.content_type = 'text/plain; test-key=test_value'
+
+        response = self.client.post('/file_uploads/echo_content_type_extra/', {
+            'no_content_type': no_content_type,
+            'simple_file': simple_file,
+        })
+        received = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(received['no_content_type'], {})
+        self.assertEqual(received['simple_file'], {'test-key': 'test_value'})
 
     def test_truncated_multipart_handled_gracefully(self):
         """

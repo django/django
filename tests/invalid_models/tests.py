@@ -1,11 +1,10 @@
 import copy
 import sys
+import unittest
 
 from django.core.management.validation import get_validation_errors
 from django.db.models.loading import cache, load_app
-
 from django.test.utils import override_settings
-from django.utils import unittest
 from django.utils.six import StringIO
 
 

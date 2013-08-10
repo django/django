@@ -1,8 +1,11 @@
 from __future__ import unicode_literals
 
 import datetime
+import unittest
 
-from django.utils import feedgenerator, tzinfo, unittest
+from django.utils import feedgenerator
+from django.utils import tzinfo
+
 
 class FeedgeneratorTest(unittest.TestCase):
     """

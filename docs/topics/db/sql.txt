@@ -166,9 +166,17 @@ argument to ``raw()``::
     >>> lname = 'Doe'
     >>> Person.objects.raw('SELECT * FROM myapp_person WHERE last_name = %s', [lname])
 
-``params`` is a list of parameters. You'll use ``%s`` placeholders in the
-query string (regardless of your database engine); they'll be replaced with
-parameters from the ``params`` list.
+``params`` is a list or dictionary of parameters. You'll use ``%s``
+placeholders in the query string for a list, or ``%(key)s``
+placeholders for a dictionary (where ``key`` is replaced by a
+dictionary key, of course), regardless of your database engine.  Such
+placeholders will be replaced with parameters from the ``params``
+argument.
+
+.. note:: Dictionary params not supported with SQLite
+
+   Dictionary params are not supported with the SQLite backend; with
+   this backend, you must pass parameters as a list.
 
 .. warning::
 
@@ -181,13 +189,20 @@ parameters from the ``params`` list.
 
     **Don't.**
 
-    Using the ``params`` list completely protects you from `SQL injection
+    Using the ``params`` argument completely protects you from `SQL injection
     attacks`__, a common exploit where attackers inject arbitrary SQL into
     your database. If you use string interpolation, sooner or later you'll
     fall victim to SQL injection. As long as you remember to always use the
-    ``params`` list you'll be protected.
+    ``params`` argument you'll be protected.
 
 __ http://en.wikipedia.org/wiki/SQL_injection
+
+.. versionchanged:: 1.6
+
+    In Django 1.5 and earlier, you could pass parameters as dictionaries
+    when using PostgreSQL or MySQL, although this wasn't documented. Now
+    you can also do this whem using Oracle, and it is officially supported.
+
 
 .. _executing-custom-sql:
 

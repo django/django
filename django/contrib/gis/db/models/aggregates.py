@@ -1,5 +1,4 @@
 from django.db.models import Aggregate
-from django.contrib.gis.db.models.sql import GeomField
 
 class Collect(Aggregate):
     name = 'Collect'

@@ -190,8 +190,8 @@ the foreign key relation to the model::
 
         # ...
 
-In the view, ensure that you exclude ``created_by`` in the list of fields to
-edit, and override
+In the view, ensure that you don't include ``created_by`` in the list of fields
+to edit, and override
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user::
 
     # views.py
@@ -256,3 +256,4 @@ works for AJAX requests as well as 'normal' form POSTs::
 
     class AuthorCreate(AjaxableResponseMixin, CreateView):
         model = Author
+        fields = ['name']

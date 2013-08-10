@@ -6,8 +6,9 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 import logging
 import sys
 
-from django.db import utils
-from django.db.backends import *
+from django.conf import settings
+from django.db.backends import (BaseDatabaseFeatures, BaseDatabaseWrapper,
+    BaseDatabaseValidation)
 from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
 from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
@@ -16,7 +17,6 @@ from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrosp
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
-from django.utils import six
 from django.utils.timezone import utc
 
 try:
@@ -35,10 +35,12 @@ psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
 logger = logging.getLogger('django.db.backends')
 
+
 def utc_tzinfo_factory(offset):
     if offset != 0:
         raise AssertionError("database connection isn't set to UTC")
     return utc
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
@@ -53,6 +55,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_transactions = True
     can_distinct_on_fields = True
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
@@ -134,7 +137,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 # Set the time zone in autocommit mode (see #17062)
                 self.set_autocommit(True)
                 self.connection.cursor().execute(
-                        self.ops.set_time_zone_sql(), [tz])
+                    self.ops.set_time_zone_sql(), [tz]
+                )
         self.connection.set_isolation_level(self.isolation_level)
 
     def create_cursor(self):

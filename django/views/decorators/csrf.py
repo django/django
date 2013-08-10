@@ -1,5 +1,3 @@
-import warnings
-
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from functools import wraps

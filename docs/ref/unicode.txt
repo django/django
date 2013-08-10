@@ -240,6 +240,13 @@ Django will convert it to Unicode when it needs to.
 Choosing between ``__str__()`` and ``__unicode__()``
 ----------------------------------------------------
 
+.. note::
+
+    If you are on Python 3, you can skip this section because you'll always
+    create ``__str__()`` rather than ``__unicode__()``. If you'd like
+    compatibility with Python 2, you can decorate your model class with
+    :func:`~django.utils.encoding.python_2_unicode_compatible`.
+
 One consequence of using Unicode by default is that you have to take some care
 when printing data from the model.
 

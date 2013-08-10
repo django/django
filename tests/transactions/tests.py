@@ -1,13 +1,12 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import sys
-import warnings
+from unittest import skipIf, skipUnless
 
-from django.db import connection, transaction, IntegrityError
+from django.db import connection, transaction, DatabaseError, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
-from django.utils.unittest import skipIf, skipUnless
 
 from .models import Reporter
 
@@ -25,6 +24,8 @@ class AtomicTests(TransactionTestCase):
     implementation), there are only a few basic tests with the decorator
     syntax and the bulk of the tests use the context manager syntax.
     """
+
+    available_apps = ['transactions']
 
     def test_decorator_syntax_commit(self):
         @transaction.atomic
@@ -186,6 +187,29 @@ class AtomicTests(TransactionTestCase):
                 raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
+    def test_force_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            # atomic block shouldn't rollback, but force it.
+            self.assertFalse(transaction.get_rollback())
+            transaction.set_rollback(True)
+        self.assertQuerysetEqual(Reporter.objects.all(), [])
+
+    def test_prevent_rollback(self):
+        with transaction.atomic():
+            Reporter.objects.create(first_name="Tintin")
+            sid = transaction.savepoint()
+            # trigger a database error inside an inner atomic without savepoint
+            with self.assertRaises(DatabaseError):
+                with transaction.atomic(savepoint=False):
+                    connection.cursor().execute(
+                            "SELECT no_such_col FROM transactions_reporter")
+            transaction.savepoint_rollback(sid)
+            # atomic block should rollback, but prevent it, as we just did it.
+            self.assertTrue(transaction.get_rollback())
+            transaction.set_rollback(False)
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
 
 class AtomicInsideTransactionTests(AtomicTests):
     """All basic tests for atomic should also pass within an existing transaction."""
@@ -231,6 +255,8 @@ class AtomicInsideLegacyTransactionManagementTests(AtomicTests):
         "'atomic' requires transactions and savepoints.")
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
+
+    available_apps = ['transactions']
 
     def test_merged_outer_rollback(self):
         with transaction.atomic():
@@ -286,6 +312,8 @@ class AtomicMergeTests(TransactionTestCase):
         "'atomic' requires transactions and savepoints.")
 class AtomicErrorsTests(TransactionTestCase):
 
+    available_apps = []
+
     def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
@@ -311,6 +339,8 @@ class AtomicErrorsTests(TransactionTestCase):
 
 class AtomicMiscTests(TransactionTestCase):
 
+    available_apps = []
+
     def test_wrap_callable_instance(self):
         # Regression test for #20028
         class Callable(object):
@@ -320,7 +350,9 @@ class AtomicMiscTests(TransactionTestCase):
         transaction.atomic(Callable())
 
 
-class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
 
     def create_a_reporter_then_fail(self, first, last):
         a = Reporter(first_name=first, last_name=last)
@@ -476,7 +508,10 @@ class TransactionTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCas
         )
 
 
-class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionRollbackTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
+
     def execute_bad_sql(self):
         cursor = connection.cursor()
         cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
@@ -493,7 +528,10 @@ class TransactionRollbackTests(IgnorePendingDeprecationWarningsMixin, Transactio
         self.assertRaises(IntegrityError, execute_bad_sql)
         transaction.rollback()
 
-class TransactionContextManagerTests(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
+class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
+
+    available_apps = ['transactions']
+
     def create_reporter_and_fail(self):
         Reporter.objects.create(first_name="Bob", last_name="Holtzman")
         raise Exception

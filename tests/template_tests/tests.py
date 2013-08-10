@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.conf import settings
 
@@ -8,11 +8,11 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import date, datetime, timedelta
-import time
+from datetime import date, datetime
 import os
 import sys
 import traceback
+import unittest
 try:
     from urllib.parse import urljoin
 except ImportError:     # Python 2
@@ -27,24 +27,14 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
-from django.utils import unittest
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
-from django.utils.translation import activate, deactivate, ugettext as _
+from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.tzinfo import LocalTimezone
 
 from i18n import TransRealMixin
-
-try:
-    from .loaders import RenderToStringTest, EggLoaderTest
-except ImportError as e:
-    if "pkg_resources" in e.args[0]:
-        pass # If setuptools isn't installed, that's fine. Just move on.
-    else:
-        raise
 
 # NumPy installed?
 try:
@@ -534,7 +524,7 @@ class TemplateTests(TransRealMixin, TestCase):
                         try:
                             with warnings.catch_warnings():
                                 # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.template.base')
+                                warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
                                 test_template = loader.get_template(name)
                         except ShouldNotExecuteException:
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -854,6 +844,10 @@ class TemplateTests(TransRealMixin, TestCase):
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
             'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
+            'filter05': ('{% filter safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter05bis': ('{% filter upper|safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06': ('{% filter escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06bis': ('{% filter upper|escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),

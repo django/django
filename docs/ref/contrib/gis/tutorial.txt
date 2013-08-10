@@ -244,6 +244,7 @@ model to represent this data::
         objects = models.GeoManager()
 
         # Returns the string representation of the model.
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import sys
 import warnings
 
@@ -7,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.datastructures import SortedDict
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext, ugettext_lazy
@@ -15,7 +15,7 @@ from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import DisallowedModelAdminLookup
-from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
 
@@ -26,7 +26,6 @@ ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
 TO_FIELD_VAR = 't'
-IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (
@@ -36,9 +35,32 @@ IGNORED_PARAMS = (
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 
+def _is_changelist_popup(request):
+    """
+    Returns True if the popup GET parameter is set.
+
+    This function is introduced to facilitate deprecating the legacy
+    value for IS_POPUP_VAR and should be removed at the end of the
+    deprecation cycle.
+    """
+
+    if IS_POPUP_VAR in request.GET:
+        return True
+
+    IS_LEGACY_POPUP_VAR = 'pop'
+    if IS_LEGACY_POPUP_VAR in request.GET:
+        warnings.warn(
+        "The `%s` GET parameter has been renamed to `%s`." %
+        (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
+        DeprecationWarning, 2)
+        return True
+
+    return False
+
+
 class RenameChangeListMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
     )
 
 
@@ -59,6 +81,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
+        self.preserved_filters = model_admin.get_preserved_filters(request)
 
         # Get search parameters from the query string.
         try:
@@ -66,7 +89,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         except ValueError:
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
-        self.is_popup = IS_POPUP_VAR in request.GET
+        self.is_popup = _is_changelist_popup(request)
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
@@ -92,14 +115,14 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def root_query_set(self):
         warnings.warn("`ChangeList.root_query_set` is deprecated, "
                       "use `root_queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.root_queryset
 
     @property
     def query_set(self):
         warnings.warn("`ChangeList.query_set` is deprecated, "
                       "use `queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.queryset
 
     def get_filters_params(self, params=None):
@@ -296,13 +319,13 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
 
     def get_ordering_field_columns(self):
         """
-        Returns a SortedDict of ordering field column numbers and asc/desc
+        Returns an OrderedDict of ordering field column numbers and asc/desc
         """
 
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = SortedDict()
+        ordering_fields = OrderedDict()
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more

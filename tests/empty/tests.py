@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.loading import get_app
 from django.test import TestCase

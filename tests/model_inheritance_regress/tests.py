@@ -1,14 +1,14 @@
 """
 Regression tests for Model inheritance behavior.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 from operator import attrgetter
-from django import forms
+from unittest import expectedFailure
 
+from django import forms
 from django.test import TestCase
-from django.utils.unittest import expectedFailure
 
 from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,

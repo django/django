@@ -34,7 +34,30 @@ class Defaults(models.Model):
 
 class ChoiceModel(models.Model):
     """For ModelChoiceField and ModelMultipleChoiceField tests."""
+    CHOICES = [
+        ('', 'No Preference'),
+        ('f', 'Foo'),
+        ('b', 'Bar'),
+    ]
+
+    INTEGER_CHOICES = [
+        (None, 'No Preference'),
+        (1, 'Foo'),
+        (2, 'Bar'),
+    ]
+
+    STRING_CHOICES_WITH_NONE = [
+        (None, 'No Preference'),
+        ('f', 'Foo'),
+        ('b', 'Bar'),
+    ]
+
     name = models.CharField(max_length=10)
+    choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
+    choice_string_w_none = models.CharField(
+        max_length=2, blank=True, null=True, choices=STRING_CHOICES_WITH_NONE)
+    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True,
+                                         null=True)
 
 
 @python_2_unicode_compatible

@@ -234,10 +234,11 @@ a model's ``Meta`` class, you can also create permissions directly. For
 example, you can create the ``can_publish`` permission for a ``BlogPost`` model
 in ``myapp``::
 
+    from myapp.models import BlogPost
     from django.contrib.auth.models import Group, Permission
     from django.contrib.contenttypes.models import ContentType
 
-    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    content_type = ContentType.objects.get_for_model(BlogPost)
     permission = Permission.objects.create(codename='can_publish',
                                            name='Can Publish Posts',
                                            content_type=content_type)
@@ -317,7 +318,7 @@ If you have an authenticated user you want to attach to the current session
     which authentication backend successfully authenticated that user (see the
     :ref:`backends documentation <authentication-backends>` for details), and
     this information is needed later during the login process. An error will be
-    raise if you try to login a user object retrieved from the database
+    raised if you try to login a user object retrieved from the database
     directly.
 
 How to log a user out
@@ -565,12 +566,32 @@ Most built-in authentication views provide a URL name for easier reference. See
 patterns.
 
 
-.. function:: login(request, [template_name, redirect_field_name, authentication_form])
+.. function:: login(request, [template_name, redirect_field_name, authentication_form, current_app, extra_context])
 
     **URL name:** ``login``
 
     See :doc:`the URL documentation </topics/http/urls>` for details on using
     named URL patterns.
+
+    **Optional arguments:**
+
+    * ``template_name``: The name of a template to display for the view used to
+      log the user in. Defaults to :file:`registration/login.html`.
+
+    * ``redirect_field_name``: The name of a ``GET`` field containing the
+      URL to redirect to after login. Overrides ``next`` if the given
+      ``GET`` parameter is passed.
+
+    * ``authentication_form``: A callable (typically just a form class) to
+      use for authentication. Defaults to
+      :class:`~django.contrib.auth.forms.AuthenticationForm`.
+
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
 
     Here's what ``django.contrib.auth.views.login`` does:
 
@@ -661,7 +682,7 @@ patterns.
     .. _site framework docs: ../sites/
 
 
-.. function:: logout(request, [next_page, template_name, redirect_field_name])
+.. function:: logout(request, [next_page, template_name, redirect_field_name, current_app, extra_context])
 
     Logs a user out.
 
@@ -679,6 +700,13 @@ patterns.
       URL to redirect to after log out. Overrides ``next_page`` if the given
       ``GET`` parameter is passed.
 
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
     **Template context:**
 
     * ``title``: The string "Logged out", localized.
@@ -695,7 +723,14 @@ patterns.
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
-.. function:: logout_then_login(request[, login_url])
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
+.. function:: logout_then_login(request[, login_url, current_app, extra_context])
 
     Logs a user out, then redirects to the login page.
 
@@ -706,7 +741,14 @@ patterns.
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-.. function:: password_change(request[, template_name, post_change_redirect, password_change_form])
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
+.. function:: password_change(request[, template_name, post_change_redirect, password_change_form, current_app, extra_context])
 
     Allows a user to change their password.
 
@@ -726,11 +768,18 @@ patterns.
       actually changing the user's password. Defaults to
       :class:`~django.contrib.auth.forms.PasswordChangeForm`.
 
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
     **Template context:**
 
     * ``form``: The password change form (see ``password_change_form`` above).
 
-.. function:: password_change_done(request[, template_name])
+.. function:: password_change_done(request[, template_name, current_app, extra_context])
 
     The page shown after a user has changed their password.
 
@@ -742,7 +791,14 @@ patterns.
       Defaults to :file:`registration/password_change_done.html` if not
       supplied.
 
-.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
+.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email, current_app, extra_context, html_email_template_name])
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
@@ -798,6 +854,21 @@ patterns.
     * ``from_email``: A valid email address. By default Django uses
       the :setting:`DEFAULT_FROM_EMAIL`.
 
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
+    * ``html_email_template_name``: The full name of a template to use
+      for generating a ``text/html`` multipart email with the password reset
+      link. By default, HTML email is not sent.
+
+    .. versionadded:: 1.7
+
+        ``html_email_template_name`` was added.
+
     **Template context:**
 
     * ``form``: The form (see ``password_reset_form`` above) for resetting
@@ -822,7 +893,7 @@ patterns.
 
     * ``protocol``: http or https
 
-    * ``uid``: The user's id encoded in base 36.
+    * ``uid``: The user's primary key encoded in base 64.
 
     * ``token``: Token to check that the reset link is valid.
 
@@ -831,13 +902,18 @@ patterns.
     .. code-block:: html+django
 
         Someone asked for password reset for email {{ email }}. Follow the link below:
-        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb36=uid token=token %}
+        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+    .. versionchanged:: 1.6
+
+      Reversing ``password_reset_confirm`` takes a ``uidb64`` argument instead
+      of ``uidb36``.
 
     The same template context is used for subject template. Subject must be
     single line plain text string.
 
 
-.. function:: password_reset_done(request[, template_name])
+.. function:: password_reset_done(request[, template_name, current_app, extra_context])
 
     The page shown after a user has been emailed a link to reset their
     password. This view is called by default if the :func:`password_reset` view
@@ -851,7 +927,14 @@ patterns.
       Defaults to :file:`registration/password_reset_done.html` if not
       supplied.
 
-.. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
+.. function:: password_reset_confirm(request[, uidb64, token, template_name, token_generator, set_password_form, post_reset_redirect, current_app, extra_context])
 
     Presents a form for entering a new password.
 
@@ -859,7 +942,12 @@ patterns.
 
     **Optional arguments:**
 
-    * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+    * ``uidb64``: The user's id encoded in base 64. Defaults to ``None``.
+
+      .. versionchanged:: 1.6
+
+          The ``uidb64`` parameter was previously base 36 encoded and named
+          ``uidb36``.
 
     * ``token``: Token to check that the password is valid. Defaults to
       ``None``.
@@ -877,15 +965,22 @@ patterns.
     * ``post_reset_redirect``: URL to redirect after the password reset
       done. Defaults to ``None``.
 
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
+
     **Template context:**
 
     * ``form``: The form (see ``set_password_form`` above) for setting the
       new user's password.
 
-    * ``validlink``: Boolean, True if the link (combination of uidb36 and
-      token) is valid or unused yet.
+    * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
+      ``token``) is valid or unused yet.
 
-.. function:: password_reset_complete(request[,template_name])
+.. function:: password_reset_complete(request[,template_name, current_app, extra_context])
 
    Presents a view which informs the user that the password has been
    successfully changed.
@@ -896,6 +991,13 @@ patterns.
 
    * ``template_name``: The full name of a template to display the view.
      Defaults to :file:`registration/password_reset_complete.html`.
+
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
+
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
 
 Helper functions
 ----------------
@@ -952,6 +1054,40 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     Takes ``request`` as its first positional argument, which is stored on the
     form instance for use by sub-classes.
+
+    .. method:: confirm_login_allowed(user)
+
+    .. versionadded:: 1.7
+
+    By default, ``AuthenticationForm`` rejects users whose ``is_active`` flag
+    is set to ``False``. You may override this behavior with a custom policy to
+    determine which users can log in. Do this with a custom form that subclasses
+    ``AuthenticationForm`` and overrides the ``confirm_login_allowed`` method.
+    This method should raise a :exc:`~django.core.exceptions.ValidationError`
+    if the given user may not log in.
+
+    For example, to allow all users to log in, regardless of "active" status::
+
+        from django.contrib.auth.forms import AuthenticationForm
+
+        class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+
+    Or to allow only some active users to log in::
+
+        class PickyAuthenticationForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                if not user.is_active:
+                    raise forms.ValidationError(
+                        _("This account is inactive."),
+                        code='inactive',
+                    )
+                if user.username.startswith('b'):
+                    raise forms.ValidationError(
+                        _("Sorry, accounts starting with 'b' aren't welcome here."),
+                        code='no_b_users',
+                    )
 
 .. class:: PasswordChangeForm
 

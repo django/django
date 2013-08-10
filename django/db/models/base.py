@@ -19,7 +19,7 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import register_models, get_model
+from django.db.models.loading import register_models, get_model, MODELS_MODULE_NAME
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
@@ -86,10 +86,22 @@ class ModelBase(type):
         base_meta = getattr(new_class, '_meta', None)
 
         if getattr(meta, 'app_label', None) is None:
-            # Figure out the app_label by looking one level up.
+            # Figure out the app_label by looking one level up from the package
+            # or module named 'models'. If no such package or module exists,
+            # fall back to looking one level up from the module this model is
+            # defined in.
+
             # For 'django.contrib.sites.models', this would be 'sites'.
+            # For 'geo.models.places' this would be 'geo'.
+
             model_module = sys.modules[new_class.__module__]
-            kwargs = {"app_label": model_module.__name__.split('.')[-2]}
+            package_components = model_module.__name__.split('.')
+            package_components.reverse()  # find the last occurrence of 'models'
+            try:
+                app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
+            except ValueError:
+                app_label_index = 1
+            kwargs = {"app_label": package_components[app_label_index]}
         else:
             kwargs = {}
 
@@ -226,9 +238,9 @@ class ModelBase(type):
             # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '\
-                                     'with field of similar name from '\
-                                     'abstract base class %r' % \
+                    raise FieldError('Local field %r in class %r clashes '
+                                     'with field of similar name from '
+                                     'abstract base class %r' %
                                         (field.name, name, base.__name__))
                 new_class.add_to_class(field.name, copy.deepcopy(field))
 
@@ -451,16 +463,18 @@ class Model(six.with_metaclass(ModelBase)):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
-        if not self._deferred:
-            return super(Model, self).__reduce__()
         data = self.__dict__
+        if not self._deferred:
+            class_id = self._meta.app_label, self._meta.object_name
+            return model_unpickle, (class_id, [], simple_class_factory), data
         defers = []
         for field in self._meta.fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
-                    DeferredAttribute):
+                          DeferredAttribute):
                 defers.append(field.attname)
         model = self._meta.proxy_for_model
-        return (model_unpickle, (model, defers), data)
+        class_id = model._meta.app_label, model._meta.object_name
+        return (model_unpickle, (class_id, defers, deferred_class_factory), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -908,7 +922,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'field_label': six.text_type(field_labels)
             }
 
-    def full_clean(self, exclude=None):
+    def full_clean(self, exclude=None, validate_unique=True):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
         and raises a ``ValidationError`` for any errors that occurred.
@@ -930,13 +944,14 @@ class Model(six.with_metaclass(ModelBase)):
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
-        for name in errors.keys():
-            if name != NON_FIELD_ERRORS and name not in exclude:
-                exclude.append(name)
-        try:
-            self.validate_unique(exclude=exclude)
-        except ValidationError as e:
-            errors = e.update_error_dict(errors)
+        if validate_unique:
+            for name in errors.keys():
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.append(name)
+            try:
+                self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
 
         if errors:
             raise ValidationError(errors)
@@ -961,7 +976,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
             except ValidationError as e:
-                errors[f.name] = e.messages
+                errors[f.name] = e.error_list
 
         if errors:
             raise ValidationError(errors)
@@ -1005,15 +1020,24 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 # MISC #
 ########
 
-class Empty(object):
-    pass
+
+def simple_class_factory(model, attrs):
+    """
+    Needed for dynamic classes.
+    """
+    return model
 
 
-def model_unpickle(model, attrs):
+def model_unpickle(model_id, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    cls = deferred_class_factory(model, attrs)
+    if isinstance(model_id, tuple):
+        model = get_model(*model_id)
+    else:
+        # Backwards compat - the model was cached directly in earlier versions.
+        model = model_id
+    cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

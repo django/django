@@ -1,6 +1,7 @@
+import unittest
+
 from django.dispatch.saferef import safeRef
 from django.utils.six.moves import xrange
-from django.utils import unittest
 
 class Test1(object):
     def x(self):

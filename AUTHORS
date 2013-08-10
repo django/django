@@ -45,6 +45,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Donald Stufft
     * Daniel Lindsley
     * Marc Tamlyn
+    * Baptiste Mispelon
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -96,6 +97,7 @@ answer newbie questions, and generally made Django that much better:
     Ned Batchelder <http://www.nedbatchelder.com/>
     batiste@dosimple.ch
     Batman
+    Oliver Beattie <oliver@obeattie.com>
     Brian Beck <http://blog.brianbeck.com/>
     Shannon -jj Behrens <http://jjinux.blogspot.com/>
     Esdras Beleza <linux@esdrasbeleza.com>
@@ -150,6 +152,7 @@ answer newbie questions, and generally made Django that much better:
     Antonis Christofides <anthony@itia.ntua.gr>
     Michal Chruszcz <troll@pld-linux.org>
     Can Burak Çilingir <canburak@cs.bilgi.edu.tr>
+    Andrew Clark <amclark7@gmail.com>
     Ian Clelland <clelland@gmail.com>
     Travis Cline <travis.cline@gmail.com>
     Russell Cloran <russell@rucus.net>
@@ -158,6 +161,7 @@ answer newbie questions, and generally made Django that much better:
     Paul Collier <paul@paul-collier.com>
     Paul Collins <paul.collins.iii@gmail.com>
     Robert Coup
+    Alex Couper <http://alexcouper.com/>
     Deric Crago <deric.crago@gmail.com>
     Brian Fabian Crain <http://www.bfc.do/>
     David Cramer <dcramer@gmail.com>
@@ -201,6 +205,7 @@ answer newbie questions, and generally made Django that much better:
     Clint Ecker
     Nick Efford <nick@efford.org>
     Marc Egli <frog32@me.com>
+    Matt Deacalion Stevens <matt@dirtymonkey.co.uk>
     eibaan@gmail.com
     David Eklund
     Julia Elman
@@ -247,6 +252,7 @@ answer newbie questions, and generally made Django that much better:
     martin.glueck@gmail.com
     Ben Godfrey <http://aftnn.org>
     GomoX <gomo@datafull.com>
+    Gil Gonçalves <lursty@gmail.com>
     Guilherme Mesquita Gondim <semente@taurinus.org>
     Mario Gonzalez <gonzalemario@gmail.com>
     David Gouldin <dgouldin@gmail.com>
@@ -270,6 +276,7 @@ answer newbie questions, and generally made Django that much better:
     Brian Harring <ferringb@gmail.com>
     Brant Harris
     Ronny Haryanto <http://ronny.haryan.to/>
+    Axel Haustant <noirbizarre@gmail.com>
     Hawkeye
     Kent Hauser <kent@khauser.net>
     Joe Heck <http://www.rhonabwy.com/wp/>
@@ -410,10 +417,11 @@ answer newbie questions, and generally made Django that much better:
     Zain Memon
     Christian Metts
     michal@plovarna.cz
+    Justin Michalicek <jmichalicek@gmail.com>
+    Bojan Mihelac <bmihelac@mihelac.org>
     Slawek Mikula <slawek dot mikula at gmail dot com>
     Katie Miller <katie@sub50.com>
     Shawn Milochik <shawn@milochik.com>
-    Baptiste Mispelon <bmispelon@gmail.com>
     mitakummaa@gmail.com
     Taylor Mitchell <taylor.mitchell@gmail.com>
     mmarshall
@@ -486,7 +494,7 @@ answer newbie questions, and generally made Django that much better:
     Brian Ray <http://brianray.chipy.org/>
     Lee Reilly <lee@leereilly.net>
     Łukasz Rekucki <lrekucki@gmail.com>
-    remco@diji.biz
+    Remco Wendt <remco.wendt@gmail.com>
     Marc Remolt <m.remolt@webmasters.de>
     Bruno Renié <buburno@gmail.com>
     David Reynolds <david@reynoldsfamily.org.uk>
@@ -526,6 +534,7 @@ answer newbie questions, and generally made Django that much better:
     Leo Shklovskii
     jason.sidabras@gmail.com
     Mikołaj Siedlarek <mikolaj.siedlarek@gmail.com>
+    Karol Sikora <elektrrrus@gmail.com>
     Brenton Simpson <http://theillustratedlife.com>
     Jozko Skrablin <jozko.skrablin@gmail.com>
     Ben Slavin <benjamin.slavin@gmail.com>
@@ -536,8 +545,10 @@ answer newbie questions, and generally made Django that much better:
     smurf@smurf.noris.de
     Vsevolod Solovyov
     George Song <george@damacy.net>
+    Jimmy Song <jaejoon@gmail.com>
     sopel
     Leo Soto <leo.soto@gmail.com>
+    Thomas Sorrel
     Wiliam Alves de Souza <wiliamsouza83@gmail.com>
     Don Spaulding <donspauldingii@gmail.com>
     Calvin Spealman <ironfroggy@gmail.com>
@@ -608,6 +619,7 @@ answer newbie questions, and generally made Django that much better:
     Filip Wasilewski <filip.wasilewski@gmail.com>
     Dan Watson <http://danwatson.net/>
     Joel Watts <joel@joelwatts.com>
+    Russ Webber
     Lakin Wecker <lakin@structuredabstraction.com>
     Chris Wesseling <Chris.Wesseling@cwi.nl>
     Benjamin Wohlwend <piquadrat@gmail.com>

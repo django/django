@@ -2,17 +2,18 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import hashlib
 import os
+import pickle
 import random
 import re
 import string
 import tempfile
 import time
+import unittest
 import warnings
-import pickle
 
 from django.conf import settings
 from django.core import management
@@ -28,8 +29,10 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
-from django.utils import six, timezone, translation, unittest
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
+from django.utils import six
+from django.utils import timezone
+from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.utils.encoding import force_text
@@ -827,6 +830,8 @@ def custom_key_func(key, key_prefix, version):
 
 
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
+
+    available_apps = ['cache']
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
@@ -1592,7 +1597,7 @@ def hello_world_view(request, value):
             },
         },
 )
-class CacheMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TestCase):
+class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()

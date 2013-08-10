@@ -1,13 +1,13 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import re
 from functools import partial
+from importlib import import_module
 from inspect import getargspec
 
 from django.conf import settings
 from django.template.context import (Context, RequestContext,
     ContextPopException)
-from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
@@ -1101,6 +1101,7 @@ class Library(object):
                     # for decorators that need it e.g. stringfilter
                     if hasattr(filter_func, "_decorated_function"):
                         setattr(filter_func._decorated_function, attr, value)
+            filter_func._filter_name = name
             return filter_func
         else:
             raise InvalidTemplateLibrary("Unsupported arguments to "

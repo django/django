@@ -3,7 +3,6 @@ Module for abstract serializer/unserializer base classes.
 """
 
 from django.db import models
-from django.utils.encoding import smart_text
 from django.utils import six
 
 class SerializerDoesNotExist(KeyError):

@@ -84,12 +84,18 @@ need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
-.. method:: Model.full_clean(exclude=None)
+.. method:: Model.full_clean(exclude=None, validate_unique=True)
+
+.. versionchanged:: 1.6
+
+  The ``validate_unique`` parameter was added to allow skipping
+  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
+  was always called by ``full_clean``.
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()`, in that order and raises a
-:exc:`~django.core.exceptions.ValidationError` that has a ``message_dict``
-attribute containing errors from all three stages.
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
+``message_dict`` attribute containing errors from all three stages.
 
 The optional ``exclude`` argument can be used to provide a list of field names
 that can be excluded from validation and cleaning.
@@ -112,7 +118,7 @@ validation for your own manually created models. For example::
         article.full_clean()
     except ValidationError as e:
         # Do something based on the errors contained in e.message_dict.
-        # Display them to a user, or handle them programatically.
+        # Display them to a user, or handle them programmatically.
         pass
 
 The first step ``full_clean()`` performs is to clean each individual field.
@@ -134,15 +140,19 @@ attributes on your model if desired. For instance, you could use it to
 automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
-    def clean(self):
-        import datetime
-        from django.core.exceptions import ValidationError
-        # Don't allow draft entries to have a pub_date.
-        if self.status == 'draft' and self.pub_date is not None:
-            raise ValidationError('Draft entries may not have a publication date.')
-        # Set the pub_date for published items if it hasn't been set already.
-        if self.status == 'published' and self.pub_date is None:
-            self.pub_date = datetime.date.today()
+    import datetime
+    from django.core.exceptions import ValidationError
+    from django.db import models
+
+    class Article(models.Model):
+        ...
+        def clean(self):
+            # Don't allow draft entries to have a pub_date.
+            if self.status == 'draft' and self.pub_date is not None:
+                raise ValidationError('Draft entries may not have a publication date.')
+            # Set the pub_date for published items if it hasn't been set already.
+            if self.status == 'published' and self.pub_date is None:
+                self.pub_date = datetime.date.today()
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
@@ -424,6 +434,12 @@ Other model instance methods
 
 A few object methods have special purposes.
 
+.. note::
+    On Python 3, as all strings are natively considered Unicode, only use the
+    ``__str__()`` method (the ``__unicode__()`` method is obsolete).
+    If you'd like compatibility with Python 2, you can decorate your model class
+    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
+
 ``__unicode__``
 ---------------
 
@@ -673,8 +689,11 @@ For every :class:`~django.db.models.DateField` and
 returns the next and previous object with respect to the date field, raising
 a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
 
-Both methods accept optional keyword arguments, which should be in the format
-described in :ref:`Field lookups <field-lookups>`.
+Both of these methods will perform their queries using the default
+manager for the model. If you need to emulate filtering used by a
+custom manager, or want to perform one-off custom filtering, both
+methods also accept optional keyword arguments, which should be in the
+format described in :ref:`Field lookups <field-lookups>`.
 
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or

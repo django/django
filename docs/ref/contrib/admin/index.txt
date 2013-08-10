@@ -438,7 +438,8 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__unicode__()`` representation of each object.
+    column that displays the ``__unicode__()`` (``__str__()`` on Python 3)
+    representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -488,7 +489,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__unicode__()`` of the related object.
+      ``__unicode__()`` (``__str__()`` on Python 3) of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -870,6 +871,14 @@ subclass::
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     nor ``ManyToManyField`` fields.
 
+.. attribute:: ModelAdmin.preserve_filters
+
+    .. versionadded:: 1.6
+
+    The admin now preserves filters on the list view after creating, editing
+    or deleting an object. You can restore the previous behavior of clearing
+    filters by setting this attribute to ``False``.
+
 .. attribute:: ModelAdmin.radio_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -1209,6 +1218,14 @@ templates used by the :class:`ModelAdmin` views:
     changelist that will be linked to the change view, as described in the
     :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_fields(self, request, obj=None)
+
+    .. versionadded:: 1.7
+
+    The ``get_fields`` method is given the ``HttpRequest`` and the ``obj``
+    being edited (or ``None`` on an add form) and is expected to return a list
+    of fields, as described above in the :attr:`ModelAdmin.fields` section.
+
 .. method:: ModelAdmin.get_fieldsets(self, request, obj=None)
 
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
@@ -1223,6 +1240,14 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
+
+.. method:: ModelAdmin.get_search_fields(self, request)
+
+    .. versionadded:: 1.7
+
+    The ``get_search_fields`` method is given the ``HttpRequest`` and is expected
+    to return the same kind of sequence type as for the
+    :attr:`~ModelAdmin.search_fields` attribute.
 
 .. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
 
@@ -1379,6 +1404,15 @@ templates used by the :class:`ModelAdmin` views:
                     if request.user.is_superuser:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
                 return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+
+    .. admonition:: Note
+
+        Any ``choices`` attribute set on the formfield will limited to the form
+        field only. If the corresponding field on the model has choices set,
+        the choices provided to the form must be a valid subset of those
+        choices, otherwise the form submission will fail with
+        a :exc:`~django.core.exceptions.ValidationError` when the model itself
+        is validated before saving.
 
 .. method:: ModelAdmin.get_changelist(self, request, **kwargs)
 
@@ -1545,13 +1579,13 @@ instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
 
-.. _modeladmin-media-definitions:
+.. _modeladmin-asset-definitions:
 
-``ModelAdmin`` media definitions
+``ModelAdmin`` asset definitions
 --------------------------------
 
 There are times where you would like add a bit of CSS and/or JavaScript to
-the add/change views. This can be accomplished by using a Media inner class
+the add/change views. This can be accomplished by using a ``Media`` inner class
 on your ``ModelAdmin``::
 
     class ArticleAdmin(admin.ModelAdmin):
@@ -1563,8 +1597,8 @@ on your ``ModelAdmin``::
 
 The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
-``None``) to any media paths. The same rules apply as :ref:`regular media
-definitions on forms <form-media-paths>`.
+``None``) to any asset paths. The same rules apply as :ref:`regular asset
+definitions on forms <form-asset-paths>`.
 
 jQuery
 ~~~~~~
@@ -1581,7 +1615,7 @@ in your own admin JavaScript without including a second copy, you can use the
     The embedded jQuery has been upgraded from 1.4.2 to 1.9.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
-to add jQuery to your ``ModelAdmin``'s list of media resources unless you have
+to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specifc need. For example, if you require the jQuery library to be in the
 global namespace (for example when using third-party jQuery plugins) or if you
 need a newer version of jQuery, you will have to include your own copy.
@@ -1704,9 +1738,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.formset
 
-    This defaults to ``BaseInlineFormSet``. Using your own formset can give you
-    many possibilities of customization. Inlines are built around
-    :ref:`model formsets <model-formsets>`.
+    This defaults to :class:`~django.forms.models.BaseInlineFormSet`. Using
+    your own formset can give you many possibilities of customization. Inlines
+    are built around :ref:`model formsets <model-formsets>`.
 
 .. attribute:: InlineModelAdmin.form
 
@@ -1782,8 +1816,9 @@ The ``InlineModelAdmin`` class adds:
 
 .. method:: InlineModelAdmin.get_formset(self, request, obj=None, **kwargs)
 
-    Returns a ``BaseInlineFormSet`` class for use in admin add/change views.
-    See the example for :class:`ModelAdmin.get_formsets`.
+    Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
+    admin add/change views. See the example for
+    :class:`ModelAdmin.get_formsets`.
 
 .. method:: InlineModelAdmin.get_extra(self, request, obj=None, **kwargs)
 
@@ -2152,6 +2187,10 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site main index
     view.
 
+.. attribute:: AdminSite.app_index_template
+
+    Path to a custom template that will be used by the admin site app index view.
+
 .. attribute:: AdminSite.login_template
 
     Path to a custom template that will be used by the admin site login view.
@@ -2269,9 +2308,14 @@ your URLconf. Specifically, add these four patterns:
 .. code-block:: python
 
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
-    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+    url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', name='password_reset_confirm'),
+    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
+
+.. versionchanged:: 1.6
+
+    The pattern for :func:`~django.contrib.auth.views.password_reset_confirm`
+    changed as the ``uid`` is now base 64 encoded.
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app

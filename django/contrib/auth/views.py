@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int, is_safe_url
+from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.translation import ugettext as _
 from django.shortcuts import resolve_url
 from django.views.decorators.debug import sensitive_post_parameters
@@ -140,7 +140,8 @@ def password_reset(request, is_admin_site=False,
                    post_reset_redirect=None,
                    from_email=None,
                    current_app=None,
-                   extra_context=None):
+                   extra_context=None,
+                   html_email_template_name=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:
@@ -155,6 +156,7 @@ def password_reset(request, is_admin_site=False,
                 'email_template_name': email_template_name,
                 'subject_template_name': subject_template_name,
                 'request': request,
+                'html_email_template_name': html_email_template_name,
             }
             if is_admin_site:
                 opts = dict(opts, domain_override=request.get_host())
@@ -164,6 +166,7 @@ def password_reset(request, is_admin_site=False,
         form = password_reset_form()
     context = {
         'form': form,
+        'title': _('Password reset'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -174,7 +177,9 @@ def password_reset(request, is_admin_site=False,
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         current_app=None, extra_context=None):
-    context = {}
+    context = {
+        'title': _('Password reset successful'),
+    }
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,
@@ -184,7 +189,7 @@ def password_reset_done(request,
 # Doesn't need csrf_protect since no-one can guess the URL
 @sensitive_post_parameters()
 @never_cache
-def password_reset_confirm(request, uidb36=None, token=None,
+def password_reset_confirm(request, uidb64=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
@@ -195,19 +200,20 @@ def password_reset_confirm(request, uidb36=None, token=None,
     form for entering a new password.
     """
     UserModel = get_user_model()
-    assert uidb36 is not None and token is not None  # checked by URLconf
+    assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_complete')
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
-        uid_int = base36_to_int(uidb36)
-        user = UserModel._default_manager.get(pk=uid_int)
-    except (ValueError, OverflowError, UserModel.DoesNotExist):
+        uid = urlsafe_base64_decode(uidb64)
+        user = UserModel._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):
         validlink = True
+        title = _('Enter new password')
         if request.method == 'POST':
             form = set_password_form(user, request.POST)
             if form.is_valid():
@@ -218,8 +224,10 @@ def password_reset_confirm(request, uidb36=None, token=None,
     else:
         validlink = False
         form = None
+        title = _('Password reset unsuccessful')
     context = {
         'form': form,
+        'title': title,
         'validlink': validlink,
     }
     if extra_context is not None:
@@ -227,12 +235,12 @@ def password_reset_confirm(request, uidb36=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
-
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):
     context = {
-        'login_url': resolve_url(settings.LOGIN_URL)
+        'login_url': resolve_url(settings.LOGIN_URL),
+        'title': _('Password reset complete'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -261,6 +269,7 @@ def password_change(request,
         form = password_change_form(user=request.user)
     context = {
         'form': form,
+        'title': _('Password change'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -272,7 +281,9 @@ def password_change(request,
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
                          current_app=None, extra_context=None):
-    context = {}
+    context = {
+        'title': _('Password change successful'),
+    }
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context,

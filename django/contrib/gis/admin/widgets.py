@@ -2,7 +2,6 @@ import logging
 
 from django.forms.widgets import Textarea
 from django.template import loader, Context
-from django.templatetags.static import static
 from django.utils import six
 from django.utils import translation
 

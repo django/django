@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+from unittest import skipIf, skipUnless
 import warnings
 from xml.dom.minidom import parseString
 
@@ -25,7 +26,6 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
-from django.utils.unittest import skipIf, skipUnless
 
 from .forms import EventForm, EventSplitForm, EventModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent

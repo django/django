@@ -10,6 +10,7 @@ PathInfo = namedtuple('PathInfo',
                       'from_opts to_opts target_fields join_field '
                       'm2m direct')
 
+
 class RelatedObject(object):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model

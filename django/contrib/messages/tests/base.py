@@ -1,3 +1,5 @@
+from unittest import skipIf
+
 from django import http
 from django.conf import settings, global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
@@ -7,7 +9,6 @@ from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy
-from django.utils.unittest import skipIf
 
 
 def skipUnlessAuthIsInstalled(func):

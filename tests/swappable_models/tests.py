@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.utils.six import StringIO
 
@@ -13,6 +13,13 @@ from swappable_models.models import Article
 
 
 class SwappableModelTests(TestCase):
+
+    available_apps = [
+        'swappable_models',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
+
     def setUp(self):
         # This test modifies the installed apps, so we need to make sure
         # we're not dealing with a cached app list.

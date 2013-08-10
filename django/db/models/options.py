@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import re
 from bisect import bisect
 import warnings
@@ -11,7 +12,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
 from django.utils import six
 from django.utils.functional import cached_property
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -22,7 +22,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together')
+                 'index_together', 'default_permissions')
 
 
 @python_2_unicode_compatible
@@ -36,12 +36,12 @@ class Options(object):
         self.ordering = []
         self.unique_together = []
         self.index_together = []
+        self.default_permissions = ('add', 'change', 'delete')
         self.permissions = []
         self.object_name, self.app_label = None, app_label
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
-        self.admin = None
         self.meta = meta
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
@@ -59,7 +59,7 @@ class Options(object):
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = SortedDict()
+        self.parents = OrderedDict()
         self.auto_created = False
 
         # To handle various inheritance situations, we need to track where
@@ -130,7 +130,7 @@ class Options(object):
         """
         warnings.warn(
             "Options.module_name has been deprecated in favor of model_name",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         return self.model_name
 
     def _prepare(self, model):
@@ -204,9 +204,10 @@ class Options(object):
 
     def pk_index(self):
         """
-        Returns the index of the primary key field in the self.fields list.
+        Returns the index of the primary key field in the self.concrete_fields
+        list.
         """
-        return self.fields.index(self.pk)
+        return self.concrete_fields.index(self.pk)
 
     def setup_proxy(self, target):
         """
@@ -332,7 +333,7 @@ class Options(object):
         return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         for parent in self.parents:
             for field, model in parent._meta.get_m2m_with_model():
                 if model:
@@ -403,23 +404,48 @@ class Options(object):
         for f, model in self.get_all_related_objects_with_model():
             cache[f.field.related_query_name()] = (f, model, False, False)
         for f, model in self.get_m2m_with_model():
-            cache[f.name] = (f, model, True, True)
+            cache[f.name] = cache[f.attname] = (f, model, True, True)
         for f, model in self.get_fields_with_model():
-            cache[f.name] = (f, model, True, False)
+            cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
             if hasattr(f, 'related'):
-                cache[f.name] = (f.related, None if f.model == self.model else f.model, True, False)
+                cache[f.name] = cache[f.attname] = (
+                    f.related, None if f.model == self.model else f.model, True, False)
         if app_cache_ready():
             self._name_map = cache
         return cache
 
     def get_add_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_add_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            DeprecationWarning, stacklevel=2)
         return 'add_%s' % self.model_name
 
     def get_change_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_change_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            DeprecationWarning, stacklevel=2)
         return 'change_%s' % self.model_name
 
     def get_delete_permission(self):
+        """
+        This method has been deprecated in favor of
+        `django.contrib.auth.get_permission_codename`. refs #20642
+        """
+        warnings.warn(
+            "`Options.get_delete_permission` has been deprecated in favor "
+            "of `django.contrib.auth.get_permission_codename`.",
+            DeprecationWarning, stacklevel=2)
         return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
@@ -449,7 +475,7 @@ class Options(object):
         return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
@@ -494,7 +520,7 @@ class Options(object):
         return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
-        cache = SortedDict()
+        cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_m2m_objects_with_model():

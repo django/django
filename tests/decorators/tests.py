@@ -1,4 +1,5 @@
 from functools import wraps
+from unittest import TestCase
 
 from django.contrib.auth import models
 from django.core.exceptions import PermissionDenied
@@ -10,7 +11,6 @@ from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test.client import RequestFactory
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
-from django.utils.unittest import TestCase
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition

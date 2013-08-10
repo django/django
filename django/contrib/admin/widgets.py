@@ -116,6 +116,8 @@ def url_params_from_lookup_dict(lookups):
     if lookups and hasattr(lookups, 'items'):
         items = []
         for k, v in lookups.items():
+            if callable(v):
+                v = v()
             if isinstance(v, (tuple, list)):
                 v = ','.join([str(x) for x in v])
             elif isinstance(v, bool):
@@ -285,7 +287,14 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
-class AdminURLFieldWidget(forms.TextInput):
+class AdminEmailInputWidget(forms.EmailInput):
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vTextField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminEmailInputWidget, self).__init__(attrs=final_attrs)
+
+class AdminURLFieldWidget(forms.URLInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:

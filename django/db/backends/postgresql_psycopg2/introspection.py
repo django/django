@@ -25,7 +25,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1266: 'TimeField',
         1700: 'DecimalField',
     }
-        
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("""
@@ -47,7 +47,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE table_name = %s""", [table_name])
         null_map = dict(cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])]=='YES',)))
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])] == 'YES',)))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
@@ -81,7 +81,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 ON ccu.constraint_catalog = tc.constraint_catalog
                     AND ccu.constraint_schema = tc.constraint_schema
                     AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""" , [table_name])
+            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""", [table_name])
         key_columns.extend(cursor.fetchall())
         return key_columns
 

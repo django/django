@@ -37,6 +37,8 @@ class HandlerTests(TestCase):
 
 
 class TransactionsPerRequestTests(TransactionTestCase):
+
+    available_apps = []
     urls = 'handlers.urls'
 
     def test_no_transaction(self):

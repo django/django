@@ -105,56 +105,6 @@ Finally, do the same for the SpatiaLite tools::
 
 __ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
-.. _pysqlite2:
-
-pysqlite2
-^^^^^^^^^
-
-If you are on Python 2.6, you will also have to compile pysqlite2, because
-``SpatiaLite`` must be loaded as an external extension, and the required
-``enable_load_extension`` method is only available in versions 2.5+ of
-pysqlite2. Thus, download pysqlite2 2.6, and untar::
-
-    $ wget http://pysqlite.googlecode.com/files/pysqlite-2.6.3.tar.gz
-    $ tar xzf pysqlite-2.6.3.tar.gz
-    $ cd pysqlite-2.6.3
-
-Next, use a text editor (e.g., ``emacs`` or ``vi``) to edit the ``setup.cfg`` file
-to look like the following:
-
-.. code-block:: ini
-
-    [build_ext]
-    #define=
-    include_dirs=/usr/local/include
-    library_dirs=/usr/local/lib
-    libraries=sqlite3
-    #define=SQLITE_OMIT_LOAD_EXTENSION
-
-or if you are on Mac OS X:
-
-.. code-block:: ini
-
-    [build_ext]
-    #define=
-    include_dirs=/Library/Frameworks/SQLite3.framework/unix/include
-    library_dirs=/Library/Frameworks/SQLite3.framework/unix/lib
-    libraries=sqlite3
-    #define=SQLITE_OMIT_LOAD_EXTENSION
-
-.. note::
-
-    The important thing here is to make sure you comment out the
-    ``define=SQLITE_OMIT_LOAD_EXTENSION`` flag and that the ``include_dirs``
-    and ``library_dirs`` settings are uncommented and set to the appropriate
-    path if the SQLite header files and libraries are not in ``/usr/include``
-    and ``/usr/lib``, respectively.
-
-After modifying ``setup.cfg`` appropriately, then run the ``setup.py`` script
-to build and install::
-
-    $ sudo python setup.py install
-
 .. _spatialite_macosx:
 
 Mac OS X-specific instructions

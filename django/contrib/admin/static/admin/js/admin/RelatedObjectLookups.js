@@ -32,9 +32,9 @@ function showRelatedObjectLookupPopup(triggeringLink) {
     name = id_to_windowname(name);
     var href;
     if (triggeringLink.href.search(/\?/) >= 0) {
-        href = triggeringLink.href + '&pop=1';
+        href = triggeringLink.href + '&_popup=1';
     } else {
-        href = triggeringLink.href + '?pop=1';
+        href = triggeringLink.href + '?_popup=1';
     }
     var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
     win.focus();
@@ -55,7 +55,7 @@ function dismissRelatedLookupPopup(win, chosenId) {
 function showAddAnotherPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^add_/, '');
     name = id_to_windowname(name);
-    href = triggeringLink.href
+    var href = triggeringLink.href;
     if (href.indexOf('?') == -1) {
         href += '?_popup=1';
     } else {
@@ -73,10 +73,11 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
     newRepr = html_unescape(newRepr);
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
+    var o;
     if (elem) {
         var elemName = elem.nodeName.toUpperCase();
         if (elemName == 'SELECT') {
-            var o = new Option(newRepr, newId);
+            o = new Option(newRepr, newId);
             elem.options[elem.options.length] = o;
             o.selected = true;
         } else if (elemName == 'INPUT') {
@@ -88,8 +89,7 @@ function dismissAddAnotherPopup(win, newId, newRepr) {
         }
     } else {
         var toId = name + "_to";
-        elem = document.getElementById(toId);
-        var o = new Option(newRepr, newId);
+        o = new Option(newRepr, newId);
         SelectBox.add_to_cache(toId, o);
         SelectBox.redisplay(toId);
     }

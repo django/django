@@ -6,22 +6,9 @@ from django.core import mail
 from django.core.mail import get_connection
 from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
-
-# Make sure a NullHandler is available
-# This was added in Python 2.7/3.2
-try:
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-
-# Make sure that dictConfig is available
-# This was added in Python 2.7/3.2
-try:
-    from logging.config import dictConfig
-except ImportError:
-    from django.utils.dictconfig import dictConfig
+# Imports kept for backwards-compatibility in Django 1.7.
+from logging import NullHandler
+from logging.config import dictConfig
 
 getLogger = logging.getLogger
 
@@ -46,7 +33,7 @@ DEFAULT_LOGGING = {
             'class': 'logging.StreamHandler',
         },
         'null': {
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
         'mail_admins': {
             'level': 'ERROR',

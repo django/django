@@ -13,6 +13,7 @@ class Loader(BaseLoader):
 
     def __init__(self, loaders):
         self.template_cache = {}
+        self.find_template_cache = {}
         self._loaders = loaders
         self._cached_loaders = []
 
@@ -28,21 +29,34 @@ class Loader(BaseLoader):
             self._cached_loaders = cached_loaders
         return self._cached_loaders
 
-    def find_template(self, name, dirs=None):
-        for loader in self.loaders:
-            try:
-                template, display_name = loader(name, dirs)
-                return (template, make_origin(display_name, loader, name, dirs))
-            except TemplateDoesNotExist:
-                pass
-        raise TemplateDoesNotExist(name)
-
-    def load_template(self, template_name, template_dirs=None):
-        key = template_name
+    def cache_key(self, template_name, template_dirs):
         if template_dirs:
             # If template directories were specified, use a hash to differentiate
-            key = '-'.join([template_name, hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()])
+            return '-'.join([template_name, hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()])
+        else:
+            return template_name
 
+    def find_template(self, name, dirs=None):
+        key = self.cache_key(name, dirs)
+        try:
+            result = self.find_template_cache[key]
+        except KeyError:
+            result = None
+            for loader in self.loaders:
+                try:
+                    template, display_name = loader(name, dirs)
+                except TemplateDoesNotExist:
+                    pass
+                else:
+                    result = (template, make_origin(display_name, loader, name, dirs))
+        self.find_template_cache[key] = result
+        if result:
+            return result
+        else:
+            raise TemplateDoesNotExist(name)
+
+    def load_template(self, template_name, template_dirs=None):
+        key = self.cache_key(template_name, template_dirs)
         try:
             template = self.template_cache[key]
         except KeyError:
@@ -62,3 +76,4 @@ class Loader(BaseLoader):
     def reset(self):
         "Empty the template cache."
         self.template_cache.clear()
+        self.find_template_cache.clear()

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -34,10 +32,6 @@ class GeometryField(forms.Field):
         # defaults (e.g., allow None).
         self.srid = kwargs.pop('srid', None)
         self.geom_type = kwargs.pop('geom_type', self.geom_type)
-        if 'null' in kwargs:
-            kwargs.pop('null', True)
-            warnings.warn("Passing 'null' keyword argument to GeometryField is deprecated.",
-                DeprecationWarning, stacklevel=2)
         super(GeometryField, self).__init__(**kwargs)
         self.widget.attrs['geom_type'] = self.geom_type
 
@@ -50,7 +44,7 @@ class GeometryField(forms.Field):
         try:
             return GEOSGeometry(value)
         except (GEOSException, ValueError, TypeError):
-            raise forms.ValidationError(self.error_messages['invalid_geom'])
+            raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
 
     def clean(self, value):
         """
@@ -65,7 +59,7 @@ class GeometryField(forms.Field):
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).
         if str(geom.geom_type).upper() != self.geom_type and not self.geom_type == 'GEOMETRY':
-            raise forms.ValidationError(self.error_messages['invalid_geom_type'])
+            raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
 
         # Transforming the geometry if the SRID was set.
         if self.srid:
@@ -76,7 +70,7 @@ class GeometryField(forms.Field):
                 try:
                     geom.transform(self.srid)
                 except:
-                    raise forms.ValidationError(self.error_messages['transform_error'])
+                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
 
         return geom
 

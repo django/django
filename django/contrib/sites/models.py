@@ -22,7 +22,9 @@ def _simple_domain_name_validator(value):
     checks = ((s in value) for s in string.whitespace)
     if any(checks):
         raise ValidationError(
-            _("The domain name cannot contain any spaces or tabs."))
+            _("The domain name cannot contain any spaces or tabs."),
+            code='invalid',
+        )
 
 
 class SiteManager(models.Manager):

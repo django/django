@@ -7,11 +7,12 @@ from __future__ import unicode_literals
 
 import decimal
 import re
+import platform
 import sys
 import warnings
 
+
 def _setup_environment(environ):
-    import platform
     # Cygwin requires some special voodoo to set the environment variables
     # properly so that Oracle will see them.
     if platform.system().upper().startswith('CYGWIN'):
@@ -89,6 +90,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -267,7 +269,7 @@ WHEN (new.%(col_name)s IS NULL)
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        if not six.PY3 and not isinstance(statement, unicode):
+        if statement and not six.PY3 and not isinstance(statement, unicode):
             statement = statement.decode('utf-8')
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
@@ -308,7 +310,7 @@ WHEN (new.%(col_name)s IS NULL)
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
-        name = name.replace('%','%%')
+        name = name.replace('%', '%%')
         return name.upper()
 
     def random_function_sql(self):
@@ -339,17 +341,17 @@ WHEN (new.%(col_name)s IS NULL)
     def savepoint_rollback_sql(self, sid):
         return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
 
-    def sql_flush(self, style, tables, sequences):
+    def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
         # 'TRUNCATE z;'... style SQL statements
         if tables:
             # Oracle does support TRUNCATE, but it seems to get us into
             # FK referential trouble, whereas DELETE FROM table works.
-            sql = ['%s %s %s;' % \
-                    (style.SQL_KEYWORD('DELETE'),
-                     style.SQL_KEYWORD('FROM'),
-                     style.SQL_FIELD(self.quote_name(table)))
-                    for table in tables]
+            sql = ['%s %s %s;' % (
+                style.SQL_KEYWORD('DELETE'),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_FIELD(self.quote_name(table))
+            ) for table in tables]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             sql.extend(self.sequence_reset_by_name_sql(style, sequences))
@@ -576,7 +578,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except utils.DatabaseError:
+            except DatabaseError: 
                 self.operators = self._likec_operators
             else:
                 self.operators = self._standard_operators
@@ -757,20 +759,37 @@ class FormatStylePlaceholderCursor(object):
         self.cursor.arraysize = 100
 
     def _format_params(self, params):
-        return tuple([OracleParam(p, self, True) for p in params])
+        try:
+            return dict((k, OracleParam(v, self, True)) for k, v in params.items())
+        except AttributeError:
+            return tuple([OracleParam(p, self, True) for p in params])
 
     def _guess_input_sizes(self, params_list):
-        sizes = [None] * len(params_list[0])
-        for params in params_list:
-            for i, value in enumerate(params):
-                if value.input_size:
-                    sizes[i] = value.input_size
-        self.setinputsizes(*sizes)
+        # Try dict handling; if that fails, treat as sequence
+        if hasattr(params_list[0], 'keys'):
+            sizes = {}
+            for params in params_list:
+                for k, value in params.items():
+                    if value.input_size:
+                        sizes[k] = value.input_size
+            self.setinputsizes(**sizes)
+        else:
+            # It's not a list of dicts; it's a list of sequences
+            sizes = [None] * len(params_list[0])
+            for params in params_list:
+                for i, value in enumerate(params):
+                    if value.input_size:
+                        sizes[i] = value.input_size
+            self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
-        return [p.force_bytes for p in params]
+        # Try dict handling; if that fails, treat as sequence
+        if hasattr(params, 'items'):
+            return dict((k, v.force_bytes) for k, v in params.items())
+        else:
+            return [p.force_bytes for p in params]
 
-    def execute(self, query, params=None):
+    def _fix_for_params(self, query, params):
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
@@ -780,10 +799,18 @@ class FormatStylePlaceholderCursor(object):
         if params is None:
             params = []
             query = convert_unicode(query, self.charset)
+        elif hasattr(params, 'keys'):
+            # Handle params as dict
+            args = dict((k, ":%s" % k) for k in params.keys())
+            query = convert_unicode(query % args, self.charset)
         else:
-            params = self._format_params(params)
+            # Handle params as sequence
             args = [(':arg%d' % i) for i in range(len(params))]
             query = convert_unicode(query % tuple(args), self.charset)
+        return query, self._format_params(params)
+
+    def execute(self, query, params=None):
+        query, params = self._fix_for_params(query, params)
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
@@ -794,22 +821,15 @@ class FormatStylePlaceholderCursor(object):
             raise
 
     def executemany(self, query, params=None):
-        # cx_Oracle doesn't support iterators, convert them to lists
-        if params is not None and not isinstance(params, (list, tuple)):
-            params = list(params)
-        try:
-            args = [(':arg%d' % i) for i in range(len(params[0]))]
-        except (IndexError, TypeError):
+        if not params:
             # No params given, nothing to do
             return None
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
-        # it does want a trailing ';' but not a trailing '/'.  However, these
-        # characters must be included in the original query in case the query
-        # is being passed to SQL*Plus.
-        if query.endswith(';') or query.endswith('/'):
-            query = query[:-1]
-        query = convert_unicode(query % tuple(args), self.charset)
-        formatted = [self._format_params(i) for i in params]
+        # uniform treatment for sequences and iterables
+        params_iter = iter(params)
+        query, firstparams = self._fix_for_params(query, next(params_iter))
+        # we build a list of formatted params; as we're going to traverse it
+        # more than once, we can't make it lazy by using a generator
+        formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
         try:
             return self.cursor.executemany(query,

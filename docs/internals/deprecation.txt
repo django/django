@@ -295,7 +295,7 @@ these changes.
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
   :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemamp views, :func:`~django.contrib.sitemaps.views.index` and
+  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
@@ -325,6 +325,14 @@ these changes.
   following an accelerated deprecation. Users subclassing this form should
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
+
+* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+  supports base36 encoded user IDs
+  (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
+  removed. If your site has been running Django 1.6 for more than
+  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
+  not, then any password reset links generated before you upgrade to Django 1.7
+  won't work after the upgrade.
 
 1.8
 ---
@@ -395,6 +403,30 @@ these changes.
   more than one.* string to override or append to user-provided ``help_text`` in
   forms for ManyToMany model fields will not be performed by Django anymore
   either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods will
+  be removed.
+
+1.9
+---
+
+* ``django.utils.dictconfig`` will be removed.
+
+* ``django.utils.importlib`` will be removed.
+
+* ``django.utils.unittest`` will be removed.
+
+* If models are organized in a package, Django will no longer look for
+  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
+  custom SQL files to ``myapp/sql/``.
+
+* FastCGI support via the ``runfcgi`` management command will be
+  removed. Please deploy your project using WSGI.
+
+* ``django.utils.datastructures.SortedDict`` will be removed. Use
+  :class:`collections.OrderedDict` from the Python standard library instead.
+
+* ``ModelAdmin.declared_fieldsets`` will be removed.
 
 2.0
 ---

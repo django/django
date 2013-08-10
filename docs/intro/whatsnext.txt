@@ -66,6 +66,11 @@ different needs:
   where you'll turn to find the details of a particular function or
   whathaveyou.
 
+* If you are interested in deploying a project for public use, our docs have
+  :doc:`several guides</howto/deployment/index>` for various deployment
+  setups as well as a :doc:`deployment checklist</howto/deployment/checklist>`
+  for some things you'll need to think about.
+
 * Finally, there's some "specialized" documentation not usually relevant to
   most developers. This includes the :doc:`release notes </releases/index>` and
   :doc:`internals documentation </internals/index>` for those who want to add

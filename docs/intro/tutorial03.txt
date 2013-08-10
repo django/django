@@ -182,7 +182,7 @@ slightly different, because they take an argument::
     def vote(request, poll_id):
         return HttpResponse("You're voting on poll %s." % poll_id)
 
-Wire these news views into the ``polls.urls`` module by adding the following
+Wire these new views into the ``polls.urls`` module by adding the following
 :func:`~django.conf.urls.url` calls::
 
     from django.conf.urls import patterns, url
@@ -339,14 +339,14 @@ Put the following code in that template:
 Now let's update our ``index`` view in ``polls/views.py`` to use the template::
 
     from django.http import HttpResponse
-    from django.template import Context, loader
+    from django.template import RequestContext, loader
 
     from polls.models import Poll
 
     def index(request):
         latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
         template = loader.get_template('polls/index.html')
-        context = Context({
+        context = RequestContext(request, {
             'latest_poll_list': latest_poll_list,
         })
         return HttpResponse(template.render(context))
@@ -377,7 +377,7 @@ rewritten::
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
-:mod:`~django.template.loader`, :class:`~django.template.Context` and
+:mod:`~django.template.loader`, :class:`~django.template.RequestContext` and
 :class:`~django.http.HttpResponse` (you'll want to keep ``HttpResponse`` if you
 still have the stub methods for ``detail``, ``results``, and ``vote``).
 
@@ -453,44 +453,6 @@ just as :func:`~django.shortcuts.get_object_or_404` -- except using
 :meth:`~django.db.models.query.QuerySet.filter` instead of
 :meth:`~django.db.models.query.QuerySet.get`. It raises
 :exc:`~django.http.Http404` if the list is empty.
-
-Write a 404 (page not found) view
-=================================
-
-When you raise :exc:`~django.http.Http404` from within a view, Django
-will load a special view devoted to handling 404 errors. It finds it
-by looking for the variable ``handler404`` in your root URLconf (and
-only in your root URLconf; setting ``handler404`` anywhere else will
-have no effect), which is a string in Python dotted syntax -- the same
-format the normal URLconf callbacks use. A 404 view itself has nothing
-special: It's just a normal view.
-
-You normally won't have to bother with writing 404 views. If you don't set
-``handler404``, the built-in view :func:`django.views.defaults.page_not_found`
-is used by default. Optionally, you can create a ``404.html`` template
-in the root of your template directory. The default 404 view will then use that
-template for all 404 errors when :setting:`DEBUG` is set to ``False`` (in your
-settings module). If you do create the template, add at least some dummy
-content like "Page not found".
-
-A couple more things to note about 404 views:
-
-* If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
-  404 view will never be used (and thus the ``404.html`` template will never
-  be rendered) because the traceback will be displayed instead.
-
-* The 404 view is also called if Django doesn't find a match after checking
-  every regular expression in the URLconf.
-
-Write a 500 (server error) view
-===============================
-
-Similarly, your root URLconf may define a ``handler500``, which points
-to a view to call in case of server errors. Server errors happen when
-you have runtime errors in view code.
-
-Likewise, you should create a ``500.html`` template at the root of your
-template directory and add some content like "Something went wrong".
 
 Use the template system
 =======================

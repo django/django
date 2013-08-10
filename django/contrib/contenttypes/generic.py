@@ -25,7 +25,7 @@ from django.utils.encoding import smart_text
 
 class RenameGenericForeignKeyMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_prefetch_query_set', 'get_prefetch_queryset', PendingDeprecationWarning),
+        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
     )
 
 
@@ -66,7 +66,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
                 obj, for_concrete_model=self.for_concrete_model)
-        elif id:
+        elif id is not None:
             return ContentType.objects.db_manager(using).get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
@@ -130,7 +130,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
             # performance when dealing with GFKs in loops and such.
             f = self.model._meta.get_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
-            if ct_id:
+            if ct_id is not None:
                 ct = self.get_content_type(id=ct_id, using=instance._state.db)
                 try:
                     rel_obj = ct.get_object_for_this_type(pk=getattr(instance, self.fk_field))
@@ -434,8 +434,8 @@ def generic_inlineformset_factory(model, form=ModelForm,
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 
-    You must provide ``ct_field`` and ``object_id`` if they different from the
-    defaults ``content_type`` and ``object_id`` respectively.
+    You must provide ``ct_field`` and ``fk_field`` if they are different from
+    the defaults ``content_type`` and ``object_id`` respectively.
     """
     opts = model._meta
     # if there is no field called `ct_field` let the exception propagate
@@ -465,10 +465,10 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     formset = BaseGenericInlineFormSet
 
     def get_formset(self, request, obj=None, **kwargs):
-        if self.declared_fieldsets:
-            fields = flatten_fieldsets(self.declared_fieldsets)
+        if 'fields' in kwargs:
+            fields = kwargs.pop('fields')
         else:
-            fields = None
+            fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         if self.exclude is None:
             exclude = []
         else:

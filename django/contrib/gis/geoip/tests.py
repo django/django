@@ -2,11 +2,12 @@
 from __future__ import unicode_literals
 
 import os
+import unittest
+from unittest import skipUnless
+
 from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.geoip import HAS_GEOIP
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 from django.utils import six
 

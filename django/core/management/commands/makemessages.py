@@ -402,11 +402,11 @@ class Command(NoArgsCommand):
                     if self.verbosity > 1:
                         self.stdout.write("copying plural forms: %s\n" % m.group('value'))
                     lines = []
-                    seen = False
+                    found = False
                     for line in msgs.split('\n'):
-                        if not line and not seen:
+                        if not found and (not line or plural_forms_re.search(line)):
                             line = '%s\n' % m.group('value')
-                            seen = True
+                            found = True
                         lines.append(line)
                     msgs = '\n'.join(lines)
                     break
