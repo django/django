@@ -39,7 +39,8 @@ class Command(BaseCommand):
                 self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % app_label)
             sys.exit(2)
 
-        # Load the current graph state
+        # Load the current graph state. Takes a connection, but it's not used
+        # (makemigrations doesn't look at the database state).
         loader = MigrationLoader(connections["default"])
 
         # Detect changes
