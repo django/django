@@ -198,6 +198,7 @@ A similar class-based view might look like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
+    from django.views.generic.base import View
 
     from .forms import MyForm
 
