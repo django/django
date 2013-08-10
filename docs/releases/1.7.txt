@@ -135,6 +135,9 @@ Minor features
   ``Meta`` option allows you to customize (or disable) creation of the default
   add, change, and delete permissions.
 
+* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
+  take a list of permissions as well as a single permission.
+
 Backwards incompatible changes in 1.7
 =====================================
 
