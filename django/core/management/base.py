@@ -201,7 +201,7 @@ class BaseCommand(object):
             warnings.warn(
                 "requires_model_validation is deprecated "
                 "in favour of requires_checks",
-                DeprecationWarning)
+                PendingDeprecationWarning)
         if has_old_option and has_new_option:
             warnings.warn(
                 "requires_model_validation value is ignored "
