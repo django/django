@@ -265,10 +265,23 @@ class BooleanFieldTests(unittest.TestCase):
         Check that a BooleanField defaults to None -- which isn't
         a valid value (#15124).
         """
-        b = BooleanModel()
-        self.assertIsNone(b.bfield)
-        with self.assertRaises(IntegrityError):
-            b.save()
+        # Patch the boolean field's default value. We give it a default
+        # value when defining the model to satisfy the check tests
+        # #20895.
+        boolean_field = BooleanModel._meta.get_field('bfield')
+        self.assertTrue(boolean_field.has_default())
+        old_default = boolean_field.default
+        try:
+            boolean_field.default = models.NOT_PROVIDED
+            # check patch was succcessful
+            self.assertFalse(boolean_field.has_default())
+            b = BooleanModel()
+            self.assertIsNone(b.bfield)
+            with self.assertRaises(IntegrityError):
+                b.save()
+        finally:
+            boolean_field.default = old_default
+
         nb = NullBooleanModel()
         self.assertIsNone(nb.nbfield)
         nb.save()           # no error

@@ -20,8 +20,8 @@ class Place(models.Model):
 
 @python_2_unicode_compatible
 class Restaurant(Place):
-    serves_sushi = models.BooleanField()
-    serves_steak = models.BooleanField()
+    serves_sushi = models.BooleanField(default=False)
+    serves_steak = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the restaurant" % self.name

@@ -64,7 +64,7 @@ class Store(models.Model):
 class Entries(models.Model):
     EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
     Entry = models.CharField(unique=True, max_length=50)
-    Exclude = models.BooleanField()
+    Exclude = models.BooleanField(default=False)
 
 
 class Clues(models.Model):

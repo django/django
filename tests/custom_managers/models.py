@@ -24,7 +24,7 @@ class PersonManager(models.Manager):
 class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    fun = models.BooleanField()
+    fun = models.BooleanField(default=False)
     objects = PersonManager()
 
     def __str__(self):
@@ -40,7 +40,7 @@ class PublishedBookManager(models.Manager):
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
-    is_published = models.BooleanField()
+    is_published = models.BooleanField(default=False)
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
 
