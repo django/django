@@ -1018,7 +1018,6 @@ class Model(six.with_metaclass(ModelBase)):
         errors.extend(cls._check_swappable())
         errors.extend(cls._check_managers(**kwargs))
         if not cls._meta.swapped:
-            errors.extend(cls._check_user_model())
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_m2m_through_same_relationship())
             errors.extend(cls._check_id_field())
@@ -1069,62 +1068,6 @@ class Model(six.with_metaclass(ModelBase)):
         managers = cls._meta.concrete_managers + cls._meta.abstract_managers
         for (_, _, manager) in managers:
             errors.extend(manager.check(**kwargs))
-        return errors
-
-    @classmethod
-    def _check_user_model(cls):
-        errors = []
-        # If this is the current User model, check known validation problems
-        # with User models
-        model_name = '%s.%s' % (cls._meta.app_label, cls._meta.object_name)
-        if settings.AUTH_USER_MODEL == model_name:
-            # Check that REQUIRED_FIELDS is a list
-            if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):
-                errors.append(
-                    checks.Error(
-                        'The REQUIRED_FIELDS must be a list or tuple.',
-                        hint=None,
-                        obj=cls,
-                    )
-                )
-
-            # Check that the USERNAME FIELD isn't included in REQUIRED_FIELDS.
-            if cls.USERNAME_FIELD in cls.REQUIRED_FIELDS:
-                errors.append(
-                    checks.Error(
-                        'The field named as the USERNAME_FIELD '
-                            'must not be included in REQUIRED_FIELDS '
-                            'on a custom user model.',
-                        hint=None,
-                        obj=cls,
-                    )
-                )
-
-            # Check that the username field is unique
-            if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-                if 'django.contrib.auth.backends.ModelBackend' in settings.AUTHENTICATION_BACKENDS:
-                    errors.append(
-                        checks.Error(
-                            'The %s.%s field must be unique because it is '
-                                'pointed to by USERNAME_FIELD.'
-                                % (cls._meta.object_name, cls.USERNAME_FIELD),
-                            hint=None,
-                            obj=cls,
-                        )
-                    )
-                else:
-                    errors.append(
-                        checks.Warning(
-                            'The %s.%s field is pointed to by USERNAME_FIELD, '
-                                'but it is not unique. Ensure that '
-                                'your authentication backend can handle '
-                                'non-unique usernames.'
-                                % (cls._meta.object_name, cls.USERNAME_FIELD),
-                            hint=None,
-                            obj=cls,
-                        )
-                    )
-
         return errors
 
     @classmethod

@@ -4,10 +4,11 @@ import os
 import sys
 
 from django.conf import settings
+from django.core.checks.registration import framework as check_framework
 from django.core.management import call_command
 from django.db.models.loading import cache, load_app
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, override_system_checks
 from django.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
@@ -30,6 +31,12 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         for app in settings.INSTALLED_APPS:
             load_app(app)
 
+        # We need to mock list of registered checks, because checks of `auth`
+        # app are registered, but we don't want to perform checks of not
+        # installed app.
+        #self.old_checks = check_framework.registered_checks
+        #check_framework.registered_checks = []
+
     def tearDown(self):
         sys.path = self.old_sys_path
         del cache.app_store[cache.app_labels['app1']]
@@ -38,7 +45,9 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         del cache.app_labels['app2']
         del cache.app_models['app1']
         del cache.app_models['app2']
+        #check_framework.registered_checks = self.old_checks
 
+    @override_system_checks([])
     def test_table_exists(self):
         try:
             cache.set_available_apps(settings.INSTALLED_APPS)

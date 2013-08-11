@@ -22,12 +22,13 @@ from django import conf, get_version
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
-from django.test.runner import DiscoverRunner
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import six
 from django.utils.six import StringIO
 from django.test import LiveServerTestCase
+from django.test.runner import DiscoverRunner
+from django.test.utils import override_system_checks
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -1099,6 +1100,11 @@ class ManageCheck(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, 'ImportError')
 
+    # We will override `INSTALLED_APPS` so it won't include `auth` app. However,
+    # checks of `auth` app are still registered, so we need to override list of
+    # system checks that should be performed.
+    #@override_system_checks([check_all_models])
+    @override_system_checks([])
     def test_complex_app(self):
         """ manage.py check does not raise an ImportError validating a
         complex app with nested calls to load_app """
