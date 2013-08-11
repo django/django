@@ -210,6 +210,15 @@ class BaseDatabaseSchemaEditor(object):
             "definition": ", ".join(column_sqls)
         }
         self.execute(sql, params)
+        # Add any index_togethers
+        for fields in model._meta.index_together:
+            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            self.execute(self.sql_create_index % {
+                "table": self.quote_name(model._meta.db_table),
+                "name": self._create_index_name(model, columns, suffix="_idx"),
+                "columns": ", ".join(self.quote_name(column) for column in columns),
+                "extra": "",
+            })
         # Make M2M tables
         for field in model._meta.local_many_to_many:
             self.create_model(field.rel.through)

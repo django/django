@@ -168,7 +168,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         # Don't use PRAGMA because that causes issues with some transactions
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        results = cursor.fetchone()[0].strip()
+        row = cursor.fetchone()
+        if row is None:
+            raise ValueError("Table %s does not exist" % table_name)
+        results = row[0].strip()
         results = results[results.index('(') + 1:results.rindex(')')]
         for field_desc in results.split(','):
             field_desc = field_desc.strip()

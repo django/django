@@ -6,7 +6,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
-from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest
+from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TransactionTestCase):
@@ -499,6 +499,23 @@ class SchemaTests(TransactionTestCase):
             any(
                 c["index"]
                 for c in connection.introspection.get_constraints(connection.cursor(), "schema_tag").values()
+                if c['columns'] == ["slug", "title"]
+            ),
+        )
+
+    def test_create_index_together(self):
+        """
+        Tests creating models with index_together already defined
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(TagIndexed)
+        # Ensure there is an index
+        self.assertEqual(
+            True,
+            any(
+                c["index"]
+                for c in connection.introspection.get_constraints(connection.cursor(), "schema_tagindexed").values()
                 if c['columns'] == ["slug", "title"]
             ),
         )

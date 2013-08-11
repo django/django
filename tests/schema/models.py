@@ -62,6 +62,15 @@ class Tag(models.Model):
         app_cache = new_app_cache
 
 
+class TagIndexed(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        app_cache = new_app_cache
+        index_together = [["slug", "title"]]
+
+
 class TagUniqueRename(models.Model):
     title = models.CharField(max_length=255)
     slug2 = models.SlugField(unique=True)
