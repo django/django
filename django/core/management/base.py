@@ -209,7 +209,7 @@ class BaseCommand(object):
         if has_old_option and has_new_option:
             raise ImproperlyConfigured(
                 'Command %s defines both "requires_model_validation" '
-                'and "requires_checks" which is illegal. Use only '
+                'and "requires_checks", which is illegal. Use only '
                 '"requires_checks".' % self.__class__.__name__)
 
         self.requires_checks = (
@@ -342,9 +342,10 @@ class BaseCommand(object):
 
     def check(self, display_num_errors=False):
         """
-        Perform all system checks. Raises CommandError for any serious message
-        (error or critical errors). If there are only light messages (like
-        warnings), they are printed to stderr and no exception is raised.
+        Uses the system check framework to validate entire Django project.
+        Raises CommandError for any serious message (error or critical errors).
+        If there are only light messages (like warnings), they are printed to
+        stderr and no exception is raised.
 
         """
 
