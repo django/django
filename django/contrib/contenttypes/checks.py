@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .generic import GenericForeignKey, GenericRelation
-
 
 # This check is registered in __init__.py file.
 def check_generic_foreign_keys(**kwargs):
+    from .generic import GenericForeignKey
     from django.db import models
 
     errors = []
@@ -18,6 +17,7 @@ def check_generic_foreign_keys(**kwargs):
     return errors
 
 def check_generic_relationships(**kwargs):
+    from .generic import GenericRelation
     from django.db import models
 
     errors = []

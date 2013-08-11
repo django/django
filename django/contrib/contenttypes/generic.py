@@ -328,7 +328,7 @@ class GenericRelation(ForeignObject):
         errors = super(GenericRelation, self).check(**kwargs)
         errors.extend(self._check_content_type_field())
         errors.extend(self._check_object_id_field())
-        errors.extend(self._check_field_name())
+        errors.extend(self._check_generic_foreign_key_existence())
         return errors
 
     def _check_content_type_field(self):
@@ -394,15 +394,25 @@ class GenericRelation(ForeignObject):
         else:
             return []
 
-    def _check_field_name(self):
-        if self.name.endswith("_"):
-            return [
-                checks.Error(
-                    'Field names must not end with underscores.',
-                    hint=None,
-                    obj=self,
-                )
-            ]
+    def _check_generic_foreign_key_existence(self):
+        target = self.rel.to
+        if isinstance(target, ModelBase):
+            fields = vars(target).itervalues()
+            if any(isinstance(field, GenericForeignKey) and
+                    field.ct_field == self.content_type_field_name and
+                    field.fk_field == self.object_id_field_name
+                    for field in fields):
+                return []
+            else:
+                return [
+                    checks.Warning(
+                        'The field defines a generic relation with the model '
+                            '%s.%s, but the model lacks GenericForeignKey.'
+                            % (target._meta.app_label, target._meta.object_name),
+                        hint=None,
+                        obj=self,
+                    )
+                ]
         else:
             return []
 

@@ -178,27 +178,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
 
-    def test_accessor_clash(self):
-        class MyModel(models.Model):
-            content_type = models.ForeignKey(ContentType)
-            object_id = models.PositiveIntegerField()
-            content_object = generic.GenericForeignKey()
-
-        class AnotherModel(models.Model):
-            rel = models.ForeignKey('MyModel', related_name='content_object')
-
-        errors = checks.run_checks()
-        expected = [
-            checks.Error(
-                'Accessor for field AnotherModel.rel clashes with '
-                    'field MyModel.content_object.',
-                hint='Rename field MyModel.content_object or add/change '
-                    'a related_name argument to the definition '
-                    'for field AnotherModel.rel.',
-                obj=AnotherModel.rel.field,
-            )
-        ]
-        self.assertEqual(errors, expected)
 
 class GenericRelationshipTests(IsolatedModelsTestCase):
 
@@ -304,7 +283,16 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             tags = generic.GenericRelation('TaggedItem')
 
         errors = Bookmark.tags.field.check()
-        self.assertEqual(errors, [])
+        expected = [
+            checks.Warning(
+                'The field defines a generic relation with the model '
+                    'contenttypes_tests.TaggedItem, but the model lacks '
+                    'GenericForeignKey.',
+                hint=None,
+                obj=Bookmark.tags.field,
+            )
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(TEST_SWAPPED_MODEL='contenttypes_tests.Replacement')
     def test_pointing_to_swapped_model(self):
