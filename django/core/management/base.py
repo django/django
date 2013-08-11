@@ -171,7 +171,7 @@ class BaseCommand(object):
     """
     # Metadata about this command.
     option_list = (
-        make_option('-v', '--verbosity', action='store', dest='verbosity', default=b'1',
+        make_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
             type='choice', choices=['0', '1', '2', '3'],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'),
         make_option('--settings',
