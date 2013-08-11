@@ -140,12 +140,16 @@ class BaseCommand(object):
 
     ``requires_checks``
         A boolean; if ``True``, system checks will be performed prior to
-        executing the command. Default value is ``True``. If it's missing, the
-        value of ``requires_model_validation`` is used.
+        executing the command. If it's missing, the value of
+        ``requires_model_validation`` is used. If the latter flag is missing
+        too, the default value (``True``) is used. Defining both
+        ``requires_checks`` and ``requires_model_validation`` results in an
+        error.
 
     ``requires_model_validation``
         A deprecated boolean. If ``requires_checks`` is missing, then this value
-        is used; otherwise this value is ignored.
+        is used. Defining both ``requires_checks`` and
+        ``requires_model_validation`` results in an error.
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
@@ -191,21 +195,22 @@ class BaseCommand(object):
         self.style = color_style()
 
         # `requires_model_validation` is deprecated in favour of
-        # `requires_checks`. If both options are present, `requires_checks`
-        # shadows the `requires_model_validation`. Otherwise the present option
-        # is used. If none of them is defined, the default value (True) is used.
+        # `requires_checks`. If both options are present, an error is raised.
+        # Otherwise the present option is used. If none of them is defined, the
+        # default value (True) is used.
         has_old_option = hasattr(self, 'requires_model_validation')
         has_new_option = hasattr(self, 'requires_checks')
 
         if has_old_option:
             warnings.warn(
-                "requires_model_validation is deprecated "
-                "in favour of requires_checks",
+                '"requires_model_validation" is deprecated '
+                'in favour of "requires_checks".',
                 PendingDeprecationWarning)
         if has_old_option and has_new_option:
-            warnings.warn(
-                "requires_model_validation value is ignored "
-                "since you defined requires_checks too.")
+            raise ImproperlyConfigured(
+                'Command %s defines both "requires_model_validation" '
+                'and "requires_checks" which is illegal. Use only '
+                '"requires_checks".' % self.__class__.__name__)
 
         self.requires_checks = (
             self.requires_checks if has_new_option else
