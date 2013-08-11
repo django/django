@@ -1103,14 +1103,29 @@ class Model(six.with_metaclass(ModelBase)):
 
             # Check that the username field is unique
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-                errors.append(
-                    checks.Error(
-                        'The %s.%s field must be unique because it is pointed to by USERNAME_FIELD.'
-                            % (cls._meta.object_name, cls.USERNAME_FIELD),
-                        hint=None,
-                        obj=cls
+                if settings.AUTHENTICATION_BACKENDS == \
+                        ('django.contrib.auth.backends.ModelBackend',):
+                    errors.append(
+                        checks.Error(
+                            'The %s.%s field must be unique because it is '
+                                'pointed to by USERNAME_FIELD.'
+                                % (cls._meta.object_name, cls.USERNAME_FIELD),
+                            hint=None,
+                            obj=cls,
+                        )
                     )
-                )
+                else:
+                    errors.append(
+                        checks.Warning(
+                            'The %s.%s field is pointed to by USERNAME_FIELD, '
+                                'but it is not unique. Ensure that '
+                                'your authentication backend can handle '
+                                'non-unique usernames.'
+                                % (cls._meta.object_name, cls.USERNAME_FIELD),
+                            hint=None,
+                            obj=cls,
+                        )
+                    )
 
         return errors
 

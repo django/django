@@ -175,7 +175,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
     def test_required_fields_is_list(self):
-        "REQUIRED_FIELDS should be a list."
+        """ REQUIRED_FIELDS should be a list. """
 
         from .test_custom_user import CustomUserNonListRequiredFields
         errors = checks.run_checks()
@@ -190,7 +190,7 @@ class CustomUserModelValidationTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
     def test_username_not_in_required_fields(self):
-        "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
+        """ USERNAME_FIELD should not appear in REQUIRED_FIELDS. """
 
         from .test_custom_user import CustomUserBadRequiredFields
         errors = checks.run_checks()
@@ -206,7 +206,7 @@ class CustomUserModelValidationTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
     def test_username_non_unique(self):
-        "A non-unique USERNAME_FIELD should raise a model validation error."
+        """ A non-unique USERNAME_FIELD should raise an error. """
 
         from .test_custom_user import CustomUserNonUniqueUsername
         errors = checks.run_checks()
@@ -217,6 +217,29 @@ class CustomUserModelValidationTestCase(TestCase):
                 hint=None,
                 obj=CustomUserNonUniqueUsername
             ),
+        ]
+        self.assertEqual(errors, expected)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+                       AUTHENTICATION_BACKENDS=[
+                           'my.custom.backend',
+                       ])
+    def test_username_non_unique_with_custom_backend(self):
+        """ A non-unique USERNAME_FIELD should raise an error only if we use the
+        default authentication backend. Otherwise, an warning should be raised.
+        """
+
+        from .test_custom_user import CustomUserNonUniqueUsername
+        errors = checks.run_checks()
+        expected = [
+            checks.Warning(
+                'The CustomUserNonUniqueUsername.username field is pointed to '
+                    'by USERNAME_FIELD, but it is not unique. Ensure that '
+                    'your authentication backend can handle non-unique '
+                    'usernames.',
+                hint=None,
+                obj=CustomUserNonUniqueUsername,
+            )
         ]
         self.assertEqual(errors, expected)
 
