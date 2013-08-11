@@ -139,8 +139,8 @@ class BaseCommand(object):
         ``False``.
 
     ``requires_checks``
-        A boolean; if ``True``, system checks will be performed prior to
-        executing the command. If it's missing, the value of
+        A boolean; if ``True``, entire Django project will be checked for errors
+        prior to executing the command. If it's missing, the value of
         ``requires_model_validation`` is used. If the latter flag is missing
         too, the default value (``True``) is used. Defining both
         ``requires_checks`` and ``requires_model_validation`` results in an
