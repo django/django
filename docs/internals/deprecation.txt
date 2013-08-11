@@ -461,6 +461,9 @@ these changes.
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
   ``get_backend_timeout()``.
 
+* ``BaseCommand.requires_model_validation`` will be removed in favour of
+  ``requires_checks``.
+
 2.0
 ---
 
