@@ -33,10 +33,15 @@ class MigrationExecutor(object):
             # If the migration is already applied, do backwards mode,
             # otherwise do forwards mode.
             elif target in applied:
-                for migration in self.loader.graph.backwards_plan(target)[:-1]:
-                    if migration in applied:
-                        plan.append((self.loader.graph.nodes[migration], True))
-                        applied.remove(migration)
+                backwards_plan = self.loader.graph.backwards_plan(target)[:-1]
+                # We only do this if the migration is not the most recent one
+                # in its app - that is, another migration with the same app
+                # label is in the backwards plan
+                if any(node[0] == target[0] for node in backwards_plan):
+                    for migration in backwards_plan:
+                        if migration in applied:
+                            plan.append((self.loader.graph.nodes[migration], True))
+                            applied.remove(migration)
             else:
                 for migration in self.loader.graph.forwards_plan(target):
                     if migration not in applied:
