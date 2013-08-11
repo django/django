@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db import models
 
 def check_test_runner():
     """
@@ -24,6 +25,31 @@ def check_test_runner():
         ]
         return ' '.join(message)
 
+def check_boolean_field_default_value():
+    """
+    Checks if there are any BooleanFields without a default value, &
+    warns the user that the default has changed from False to Null.
+    """
+    fields = []
+    for cls in models.get_models():
+        opts = cls._meta
+        for f in opts.local_fields:
+            if isinstance(f, models.BooleanField) and not f.has_default():
+                fields.append(
+                    '%s.%s: "%s"' % (opts.app_label, opts.object_name, f.name)
+                )
+    if fields:
+        fieldnames = ", ".join(fields)
+        message = [
+            "You have not set a default value for one or more BooleanFields:",
+            "%s." % fieldnames,
+            "In Django 1.6 the default value of BooleanField was changed from",
+            "False to Null when Field.default isn't defined. See",
+            "https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield"
+            "for more information."
+        ]
+        return ' '.join(message)
+
 
 def run_checks():
     """
@@ -31,7 +57,8 @@ def run_checks():
     messages from all the relevant check functions for this version of Django.
     """
     checks = [
-        check_test_runner()
+        check_test_runner(),
+        check_boolean_field_default_value(),
     ]
     # Filter out the ``None`` or empty strings.
     return [output for output in checks if output]
