@@ -318,7 +318,7 @@ class BaseDatabaseSchemaEditor(object):
             "new_tablespace": self.quote_name(new_db_tablespace),
         })
 
-    def add_field(self, model, field, keep_default=False):
+    def add_field(self, model, field):
         """
         Creates a field on a model.
         Usually involves adding a column, but may involve adding a
@@ -345,7 +345,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not keep_default and field.default is not None:
+        if field.default is not None:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
