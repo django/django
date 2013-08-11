@@ -194,6 +194,7 @@ Create a file ``django-polls/setup.py`` with the following contents::
         url='http://www.example.com/',
         author='Your Name',
         author_email='yourname@example.com',
+        zip_safe=False,
         classifiers=[
             'Environment :: Web Environment',
             'Framework :: Django',
