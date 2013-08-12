@@ -6,7 +6,7 @@ from importlib import import_module
 from inspect import getargspec
 
 from django.conf import settings
-from django.template.context import (Context, RequestContext,
+from django.template.context import (BaseContext, Context, RequestContext,
     ContextPopException)
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
@@ -765,6 +765,9 @@ class Variable(object):
                     current = current[bit]
                 except (TypeError, AttributeError, KeyError, ValueError):
                     try:  # attribute lookup
+                        # Don't return class attributes if the class is the context:
+                        if isinstance(current, BaseContext) and getattr(type(current), bit):
+                            raise AttributeError
                         current = getattr(current, bit)
                     except (TypeError, AttributeError):
                         try:  # list-index lookup
