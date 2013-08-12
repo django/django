@@ -1279,16 +1279,6 @@ class Model(six.with_metaclass(ModelBase)):
                             obj=cls
                         )
                     )
-                elif field not in cls._meta.local_fields:
-                    errors.append(
-                        checks.Error(
-                            '"%s" refers to "%s" field defined in parent '
-                                'model, which is not allowed.'
-                                % (option, field_name),
-                            hint=None,
-                            obj=cls,
-                        )
-                    )
         return errors
 
     @classmethod
