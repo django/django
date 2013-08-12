@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.checks import Error
+from django.core.checks.messages import CheckMessage
 from django.core.checks.registration import CheckFramework
 from django.test import TestCase
 from django.utils.encoding import force_str
@@ -62,3 +63,7 @@ class MessageTests(TestCase):
         e = Error("Error", hint=None, obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_str(e), expected)
+
+    def test_is_error(self):
+        e = CheckMessage(40, "Error", hint=None)
+        self.assertTrue(e.is_error())
