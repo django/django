@@ -3,7 +3,7 @@ from django.core.management.base import NoArgsCommand
 
 class Command(NoArgsCommand):
     help = "Test No-args commands"
-    requires_checks = False
+    requires_system_checks = False
 
 
     def handle_noargs(self, **options):

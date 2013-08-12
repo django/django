@@ -227,19 +227,21 @@ All attributes can be set in your derived class and can be used in
   wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
   ``False``.
 
-.. attribute:: BaseCommand.requires_checks
+.. attribute:: BaseCommand.requires_system_checks
 
   A boolean; if ``True``, entire Django project will be checked for errors
   prior to executing the command. If it's missing, the value of
   ``requires_model_validation`` is used. If the latter flag is missing too,
-  the default value (``True``) is used. Defining both ``requires_checks`` and
-  ``requires_model_validation`` results in an error.
+  the default value (``True``) is used. Defining both
+  ``requires_system_checks`` and ``requires_model_validation`` results in an
+  error.
 
 .. attribute:: BaseCommand.requires_model_validation
 
-  A deprecated boolean. Use ``requires_checks`` instead. If
-  ``requires_checks`` is missing, then this value is used. Defining both
-  ``requires_checks`` and ``requires_model_validation`` results in an error.
+  A deprecated boolean. Use ``requires_system_checks`` instead. If
+  ``requires_system_checks`` is missing, then this value is used. Defining
+  both ``requires_system_checks`` and ``requires_model_validation`` results in
+  an error.
 
 .. attribute:: BaseCommand.leave_locale_alone
 

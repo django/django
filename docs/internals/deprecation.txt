@@ -445,7 +445,7 @@ these changes.
 * ``ModelAdmin.declared_fieldsets`` will be removed.
 
 * ``BaseCommand.requires_model_validation`` will be removed in favour of
-  ``requires_checks``.
+  ``requires_system_checks``.
 
 2.0
 ---

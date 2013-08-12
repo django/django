@@ -31,7 +31,7 @@ class Command(BaseCommand):
     args = '[optional port number, or ipaddr:port]'
 
     # Validation is called explicitly each time the server is reloaded.
-    requires_checks = False
+    requires_system_checks = False
 
     def get_handler(self, *args, **options):
         """

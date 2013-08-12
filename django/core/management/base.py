@@ -138,17 +138,17 @@ class BaseCommand(object):
         wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
         ``False``.
 
-    ``requires_checks``
+    ``requires_system_checks``
         A boolean; if ``True``, entire Django project will be checked for errors
         prior to executing the command. If it's missing, the value of
         ``requires_model_validation`` is used. If the latter flag is missing
         too, the default value (``True``) is used. Defining both
-        ``requires_checks`` and ``requires_model_validation`` results in an
-        error.
+        ``requires_system_checks`` and ``requires_model_validation`` results in
+        an error.
 
     ``requires_model_validation``
-        A deprecated boolean. If ``requires_checks`` is missing, then this value
-        is used. Defining both ``requires_checks`` and
+        A deprecated boolean. If ``requires_system_checks`` is missing, then
+        this value is used. Defining both ``requires_system_checks`` and
         ``requires_model_validation`` results in an error.
 
     ``leave_locale_alone``
@@ -195,25 +195,25 @@ class BaseCommand(object):
         self.style = color_style()
 
         # `requires_model_validation` is deprecated in favour of
-        # `requires_checks`. If both options are present, an error is raised.
-        # Otherwise the present option is used. If none of them is defined, the
-        # default value (True) is used.
+        # `requires_system_checks`. If both options are present, an error is
+        # raised. Otherwise the present option is used. If none of them is
+        # defined, the default value (True) is used.
         has_old_option = hasattr(self, 'requires_model_validation')
-        has_new_option = hasattr(self, 'requires_checks')
+        has_new_option = hasattr(self, 'requires_system_checks')
 
         if has_old_option:
             warnings.warn(
                 '"requires_model_validation" is deprecated '
-                'in favour of "requires_checks".',
+                'in favour of "requires_system_checks".',
                 PendingDeprecationWarning)
         if has_old_option and has_new_option:
             raise ImproperlyConfigured(
                 'Command %s defines both "requires_model_validation" '
-                'and "requires_checks", which is illegal. Use only '
-                '"requires_checks".' % self.__class__.__name__)
+                'and "requires_system_checks", which is illegal. Use only '
+                '"requires_system_checks".' % self.__class__.__name__)
 
-        self.requires_checks = (
-            self.requires_checks if has_new_option else
+        self.requires_system_checks = (
+            self.requires_system_checks if has_new_option else
             self.requires_model_validation if has_old_option else
             True)
 
@@ -283,7 +283,7 @@ class BaseCommand(object):
     def execute(self, *args, **options):
         """
         Try to execute this command, performing system checks if needed (as
-        controlled by attributes ``self.requires_checks`` and
+        controlled by attributes ``self.requires_system_checks`` and
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
@@ -315,7 +315,7 @@ class BaseCommand(object):
             translation.activate('en-us')
 
         try:
-            if (self._get_requires_checks() and
+            if (self.requires_system_checks and
                     not options.get('skip_validation') and  # This will be removed at the end of deprecation proccess for `skip_validation`.
                     not options.get('skip_checks')):
                 self.check()
@@ -401,17 +401,6 @@ class BaseCommand(object):
 
         """
         raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
-
-    def _get_requires_checks(self):
-        """ Use it instead of retrieving directly `requires_checks` value. If
-        the value is missing, `requires_model_validation` value is returned.
-        This method will be removed at the end of deprecation proccess for
-        `requires_model_validation`. """
-
-        if hasattr(self, 'requires_checks'):
-            return self.requires_checks
-        else:
-            return self.requires_model_validation
 
 
 class AppCommand(BaseCommand):
