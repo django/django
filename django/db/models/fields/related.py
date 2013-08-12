@@ -192,9 +192,6 @@ class RelatedField(Field):
         errors = []
         opts = self.model._meta
 
-        if self.rel is None:
-            return []
-
         # `f.rel.to` may be a string instead of a model. Skip if model name is
         # not resolved.
         if not isinstance(self.rel.to, ModelBase):
