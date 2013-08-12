@@ -14,7 +14,8 @@ from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
-    InternalCertificationAudit, BusStation, TrainStation, User, Profile)
+    InternalCertificationAudit, BusStation, TrainStation, User, Profile,
+    ParkingLot4A, ParkingLot4B)
 
 
 class ModelInheritanceTest(TestCase):
@@ -310,6 +311,19 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(
             ParkingLot3._meta.get_ancestor_link(Place).name,
             "parent")
+
+    def test_use_explicit_o2o_to_parent_from_abstract_model(self):
+        self.assertEqual(ParkingLot4A._meta.pk.name, "parent")
+        ParkingLot4A.objects.create(
+            name="Parking4A",
+            address='21 Jump Street',
+        )
+
+        self.assertEqual(ParkingLot4B._meta.pk.name, "parent")
+        ParkingLot4A.objects.create(
+            name="Parking4B",
+            address='21 Jump Street',
+        )
 
     def test_all_fields_from_abstract_base_class(self):
         """
