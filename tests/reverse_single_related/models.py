@@ -6,7 +6,7 @@ class SourceManager(models.Manager):
         return super(SourceManager, self).get_queryset().filter(is_public=True)
 
 class Source(models.Model):
-    is_public = models.BooleanField()
+    is_public = models.BooleanField(default=False)
     objects = SourceManager()
 
 class Item(models.Model):

@@ -63,7 +63,7 @@ class Attachment(models.Model):
         return self.content
 
 class Comment(Attachment):
-    is_spam = models.BooleanField()
+    is_spam = models.BooleanField(default=False)
 
 class Link(Attachment):
     url = models.URLField()
@@ -96,8 +96,8 @@ class Rating(models.Model):
 
 @python_2_unicode_compatible
 class Restaurant(Place, Rating):
-    serves_hot_dogs = models.BooleanField()
-    serves_pizza = models.BooleanField()
+    serves_hot_dogs = models.BooleanField(default=False)
+    serves_pizza = models.BooleanField(default=False)
     chef = models.ForeignKey(Chef, null=True, blank=True)
 
     class Meta(Rating.Meta):
@@ -108,7 +108,7 @@ class Restaurant(Place, Rating):
 
 @python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
-    serves_gnocchi = models.BooleanField()
+    serves_gnocchi = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the italian restaurant" % self.name
