@@ -221,6 +221,17 @@ class DecimalFieldTests(IsolatedModelsTestCase):
 
 class RelativeFieldTests(IsolatedModelsTestCase):
 
+    def test_valid_foreign_key_without_accessor(self):
+        class Target(models.Model):
+            # There would be a clash if Model.field installed an accessor.
+            model = models.IntegerField()
+
+        class Model(models.Model):
+            field = models.ForeignKey(Target, related_name='+')
+
+        errors = Model.field.field.check()
+        self.assertEqual(errors, [])
+
     def test_foreign_key_to_missing_model(self):
         # Model names are resolved when a model is being created, so we cannot
         # test relative fields in isolation and we need to attach them to a
