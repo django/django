@@ -203,10 +203,8 @@ class RelatedField(Field):
         if self.rel.is_hidden():
             return []
 
-        # Skip all fields without reverse accessors (this only occurs for
-        # symmetrical m2m relations to self). If this is the case, there are no
-        # clashes to check for this field, as there are no reverse descriptors
-        # for this field.
+        # Skip all fields without reverse accessors because there are no
+        # clashes to check for these fields.
         if not self.related.get_accessor_name():
             return []
 
