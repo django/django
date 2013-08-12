@@ -1,10 +1,10 @@
 ==========================
-Django 1.4.2 release notes
+Django 1.3.4 release notes
 ==========================
 
 *October 17, 2012*
 
-This is the second security release in the Django 1.4 series.
+This is the fourth release in the Django 1.3 series.
 
 Host header poisoning
 ---------------------
@@ -35,22 +35,3 @@ username/password pairs) now raise the exception
 Details of this issue were initially posted online as a `security advisory`_.
 
 .. _security advisory: https://www.djangoproject.com/weblog/2012/oct/17/security/
-
-Backwards incompatible changes
-==============================
-
-* The newly introduced :class:`~django.db.models.GenericIPAddressField`
-  constructor arguments have been adapted to match those of all other model
-  fields. The first two keyword arguments are now verbose_name and name.
-
-Other bugfixes and changes
-==========================
-
-* Subclass HTMLParser only for appropriate Python versions (#18239).
-* Added batch_size argument to qs.bulk_create() (#17788).
-* Fixed a small regression in the admin filters where wrongly formatted dates passed as url parameters caused an unhandled ValidationError (#18530).
-* Fixed an endless loop bug when accessing permissions in templates (#18979)
-* Fixed some Python 2.5 compatibility issues
-* Fixed an issue with quoted filenames in Content-Disposition header (#19006)
-* Made the context option in ``trans`` and ``blocktrans`` tags accept literals wrapped in single quotes (#18881).
-* Numerous documentation improvements and fixes.
