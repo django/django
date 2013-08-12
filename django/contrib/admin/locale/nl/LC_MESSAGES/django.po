@@ -268,7 +268,7 @@ msgstr "0 van de %(cnt)s geselecteerd"
 #: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Gebruiker %(name)s \"%(obj)s\" is verwijderd."
+msgstr "\"%(obj)s\" van het type \"%(name)s\" is verwijderd."
 
 #: options.py:1382
 #, python-format
