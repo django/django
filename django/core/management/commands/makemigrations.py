@@ -4,7 +4,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connections
+from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector, InteractiveMigrationQuestioner
 from django.db.migrations.state import ProjectState
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         # Load the current graph state. Takes a connection, but it's not used
         # (makemigrations doesn't look at the database state).
-        loader = MigrationLoader(connections["default"])
+        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
 
         # Detect changes
         autodetector = MigrationAutodetector(
