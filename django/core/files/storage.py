@@ -176,8 +176,10 @@ class FileSystemStorage(Storage):
                     # os.makedirs applies the global umask, so we reset it,
                     # for consistency with FILE_UPLOAD_PERMISSIONS behaviour.
                     old_umask = os.umask(0)
-                    os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
-                    os.umask(old_umask)
+                    try:
+                        os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
+                    finally:
+                        os.umask(old_umask)
                 else:
                     os.makedirs(directory)
             except OSError as e:

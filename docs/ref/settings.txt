@@ -1113,7 +1113,7 @@ the file system. See :doc:`/topics/files` for details.
 FILE_UPLOAD_DIRECTORY_PERMISSIONS
 ---------------------------------
 
-.. versionadded:: 1.6
+.. versionadded:: 1.7
 
 Default: ``None``
 
