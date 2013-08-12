@@ -91,6 +91,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    supports_combined_alters = False
 
 
 class DatabaseOperations(BaseDatabaseOperations):
