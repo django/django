@@ -203,11 +203,6 @@ class RelatedField(Field):
         if self.rel.is_hidden():
             return []
 
-        # Skip all fields without reverse accessors because there are no
-        # clashes to check for these fields.
-        if not self.related.get_accessor_name():
-            return []
-
         # Consider that we are checking field `Model.foreign` and the models
         # are:
         #
