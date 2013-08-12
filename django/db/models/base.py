@@ -1103,8 +1103,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             # Check that the username field is unique
             if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-                if settings.AUTHENTICATION_BACKENDS == \
-                        ('django.contrib.auth.backends.ModelBackend',):
+                if 'django.contrib.auth.backends.ModelBackend' in settings.AUTHENTICATION_BACKENDS:
                     errors.append(
                         checks.Error(
                             'The %s.%s field must be unique because it is '
