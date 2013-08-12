@@ -89,7 +89,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = TaggedItem.content_object.check()
         expected = [
             checks.Error(
-                'The field refers to "content_type" field which is missing.',
+                'The field refers to TaggedItem.content_type field which is missing.',
                 hint=None,
                 obj=TaggedItem.content_object,
             )
@@ -125,7 +125,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = Model.content_object.check()
         expected = [
             checks.Error(
-                '"content_type" field is used by a GenericForeignKey'
+                '"content_type" field is used by a GenericForeignKey '
                     'as content type field and therefore it must be '
                     'a ForeignKey to ContentType.',
                 hint=None,
