@@ -142,6 +142,9 @@ Minor features
   the file system permissions of directories created during file upload, like
   :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
 
+* Explicit :class:`~django.db.models.OneToOneField` for
+  :ref:`multi-table-inheritance` are now discovered in abstract classes.
+
 Backwards incompatible changes in 1.7
 =====================================
 
