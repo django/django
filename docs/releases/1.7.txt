@@ -598,8 +598,8 @@ normal deprecation.
 ``django.core.management.BaseCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``requires_model_validation`` is deprecated in favour of a new
-``requires_checks`` flag. If the latter flag is missing, then the former flag
-value is used. Defining both ``requires_checks`` and
+``requires_system_checks`` flag. If the latter flag is missing, then the former flag
+value is used. Defining both ``requires_system_checks`` and
 ``requires_model_validation`` results in an error.
 
 ``check`` method's replaced old ``validate`` method.

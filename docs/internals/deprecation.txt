@@ -462,7 +462,7 @@ these changes.
   ``get_backend_timeout()``.
 
 * ``BaseCommand.requires_model_validation`` will be removed in favour of
-  ``requires_checks``.
+  ``requires_system_checks``.
 
 2.0
 ---

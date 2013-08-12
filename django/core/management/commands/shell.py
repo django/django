@@ -17,7 +17,7 @@ class Command(NoArgsCommand):
 
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
-    requires_checks = False
+    requires_system_checks = False
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""

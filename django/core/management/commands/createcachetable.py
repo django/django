@@ -19,7 +19,7 @@ class Command(LabelCommand):
                 'Defaults to the "default" database.'),
     )
 
-    requires_checks = False
+    requires_system_checks = False
 
     def handle_label(self, tablename, **options):
         db = options.get('database')
