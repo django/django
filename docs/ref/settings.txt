@@ -1108,6 +1108,19 @@ Default: ``2621440`` (i.e. 2.5 MB).
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
 
+.. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
+
+FILE_UPLOAD_DIRECTORY_PERMISSIONS
+---------------------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The numeric mode to apply to directories created in the process of
+uploading files. This value mirrors the functionality and caveats of
+the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
+
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
 FILE_UPLOAD_PERMISSIONS
