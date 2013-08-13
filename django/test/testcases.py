@@ -941,12 +941,8 @@ class FSFilesHandler(WSGIHandler):
     WSGI middleware that intercepts calls to a directory, as defined by one of
     the *_ROOT settings, and serves those files, publishing them under *_URL.
     """
-    def __init__(self, application, base_dir=None):
+    def __init__(self, application):
         self.application = application
-        if base_dir:
-            self.base_dir = base_dir
-        else:
-            self.base_dir = self.get_base_dir()
         self.base_url = urlparse(self.get_base_url())
         super(FSFilesHandler, self).__init__()
 
@@ -1014,7 +1010,7 @@ class _MediaFilesHandler(FSFilesHandler):
 
     def serve(self, request):
         relative_url = request.path[len(self.base_url[2]):]
-        return serve(request, relative_url, document_root=self.get_base_dir())
+        return serve(request, relative_url, document_root=settings.MEDIA_ROOT)
 
 
 class LiveServerThread(threading.Thread):
