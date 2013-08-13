@@ -35,7 +35,7 @@ from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.db.models.loading import cache
 from django.forms.fields import CharField
-from django.http import QueryDict, Http404
+from django.http import QueryDict
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -1037,14 +1037,13 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, possible_ports, static_handler,  media_handler, connections_override=None):
+    def __init__(self, host, possible_ports, static_handler, connections_override=None):
         self.host = host
         self.port = None
         self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
         self.static_handler = static_handler
-        self.media_handler = media_handler
         self.connections_override = connections_override
         super(LiveServerThread, self).__init__()
 
@@ -1060,7 +1059,7 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = self.static_handler(self.media_handler(WSGIHandler()))
+            handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
@@ -1113,7 +1112,6 @@ class LiveServerTestCase(TransactionTestCase):
     """
 
     static_handler = _StaticFilesHandler
-    media_handler = _MediaFilesHandler
 
     @property
     def live_server_url(self):
@@ -1158,7 +1156,6 @@ class LiveServerTestCase(TransactionTestCase):
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
         cls.server_thread = LiveServerThread(host, possible_ports,
                                              cls.static_handler,
-                                             cls.media_handler,
                                              connections_override=connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
