@@ -124,24 +124,16 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
             self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
         else:
-            try:
-                hexewkb = pnt_3d.hexewkb
-            except GEOSException:
-                pass
-            else:
-                self.fail('Should have raised GEOSException.')
+            with self.assertRaises(GEOSException):
+                pnt_3d.hexewkb
 
         # Same for EWKB.
         self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
         if GEOS_PREPARE:
             self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
         else:
-            try:
-                ewkb = pnt_3d.ewkb
-            except GEOSException:
-                pass
-            else:
-                self.fail('Should have raised GEOSException')
+            with self.assertRaises(GEOSException):
+                pnt_3d.ewkb
 
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
@@ -158,7 +150,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # string-based
         for err in self.geometries.errors:
             with self.assertRaises((GEOSException, ValueError)):
-                _ = fromstr(err.wkt)
+                fromstr(err.wkt)
 
         # Bad WKB
         self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))

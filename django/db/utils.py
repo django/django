@@ -1,4 +1,5 @@
 from functools import wraps
+from importlib import import_module
 import os
 import pkgutil
 from threading import local
@@ -7,7 +8,6 @@ import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
-from django.utils.importlib import import_module
 from django.utils.module_loading import import_by_path
 from django.utils._os import upath
 from django.utils import six
@@ -104,7 +104,7 @@ class DatabaseErrorWrapper(object):
 def load_backend(backend_name):
     # Look for a fully qualified database backend name
     try:
-        return import_module('.base', backend_name)
+        return import_module('%s.base' % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.

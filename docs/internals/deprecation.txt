@@ -412,7 +412,21 @@ these changes.
 
 * ``django.utils.dictconfig`` will be removed.
 
+* ``django.utils.importlib`` will be removed.
+
 * ``django.utils.unittest`` will be removed.
+
+* If models are organized in a package, Django will no longer look for
+  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
+  custom SQL files to ``myapp/sql/``.
+
+* FastCGI support via the ``runfcgi`` management command will be
+  removed. Please deploy your project using WSGI.
+
+* ``django.utils.datastructures.SortedDict`` will be removed. Use
+  :class:`collections.OrderedDict` from the Python standard library instead.
+
+* ``ModelAdmin.declared_fieldsets`` will be removed.
 
 2.0
 ---

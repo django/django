@@ -226,7 +226,7 @@ CachedStaticFilesStorage
 
     would be replaced by calling the
     :meth:`~django.core.files.storage.Storage.url`
-    method of the ``CachedStaticFilesStorage`` storage backend, ultimatively
+    method of the ``CachedStaticFilesStorage`` storage backend, ultimately
     saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
     content:
 
@@ -349,6 +349,12 @@ This view function serves static files in development.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
+
+.. versionchanged:: 1.7
+
+    This view will now raise an :exc:`~django.http.Http404` exception instead
+    of :exc:`~django.core.exceptions.ImproperlyConfigured` when
+    :setting:`DEBUG` is ``False``.
 
 .. note::
 

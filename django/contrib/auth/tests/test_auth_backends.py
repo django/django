@@ -125,6 +125,10 @@ class BaseModelBackendTest(object):
     @override_settings(PASSWORD_HASHERS=('django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher',))
     def test_authentication_timing(self):
         """Hasher is run once regardless of whether the user exists. Refs #20760."""
+        # Re-set the password, because this tests overrides PASSWORD_HASHERS
+        self.user.set_password('test')
+        self.user.save()
+
         CountingMD5PasswordHasher.calls = 0
         username = getattr(self.user, self.UserModel.USERNAME_FIELD)
         authenticate(username=username, password='test')

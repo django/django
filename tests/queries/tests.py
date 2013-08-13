@@ -1,5 +1,6 @@
-from __future__ import absolute_import,unicode_literals
+from __future__ import unicode_literals
 
+from collections import OrderedDict
 import datetime
 from operator import attrgetter
 import pickle
@@ -14,7 +15,6 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
-from django.utils.datastructures import SortedDict
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -26,7 +26,6 @@ from .models import (
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem)
-
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -83,6 +82,19 @@ class Queries1Tests(BaseQuerysetTest):
 
         Cover.objects.create(title="first", item=i4)
         Cover.objects.create(title="second", item=self.i2)
+
+    def test_subquery_condition(self):
+        qs1 = Tag.objects.filter(pk__lte=0)
+        qs2 = Tag.objects.filter(parent__in=qs1)
+        qs3 = Tag.objects.filter(parent__in=qs2)
+        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertIn('v0', str(qs3.query).lower())
+        qs4 = qs3.filter(parent__in=qs1)
+        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        # It is possible to reuse U for the second subquery, no need to use W.
+        self.assertNotIn('w0', str(qs4.query).lower())
+        # So, 'U0."id"' is referenced twice.
+        self.assertTrue(str(qs4.query).lower().count('u0'), 2)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
@@ -499,7 +511,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket2902(self):
-        # Parameters can be given to extra_select, *if* you use a SortedDict.
+        # Parameters can be given to extra_select, *if* you use an OrderedDict.
 
         # (First we need to know which order the keys fall in "naturally" on
         # your system, so we can put things in the wrong way around from
@@ -513,7 +525,7 @@ class Queries1Tests(BaseQuerysetTest):
         # This slightly odd comparison works around the fact that PostgreSQL will
         # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
         # using constants here and not a real concern.
-        d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
+        d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
@@ -789,7 +801,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket7181(self):
-        # Ordering by related tables should accomodate nullable fields (this
+        # Ordering by related tables should accommodate nullable fields (this
         # test is a little tricky, since NULL ordering is database dependent.
         # Instead, we just count the number of results).
         self.assertEqual(len(Tag.objects.order_by('parent__name')), 5)
@@ -810,7 +822,7 @@ class Queries1Tests(BaseQuerysetTest):
         # Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
         # sufficient that this query runs without error.
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
-        qs.query.bump_prefix()
+        qs.query.bump_prefix(qs.query)
         first = qs[0]
         self.assertEqual(list(qs), list(range(first, first+5)))
 
@@ -1987,7 +1999,7 @@ class ValuesQuerysetTests(BaseQuerysetTest):
 
     def test_extra_values(self):
         # testing for ticket 14930 issues
-        qs = Number.objects.extra(select=SortedDict([('value_plus_x', 'num+%s'),
+        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
                                                      ('value_minus_x', 'num-%s')]),
                                   select_params=(1, 2))
         qs = qs.order_by('value_minus_x')
@@ -2939,3 +2951,19 @@ class Ticket20788Tests(TestCase):
             chapter__paragraph__page=page)
         self.assertQuerysetEqual(
             sentences_not_in_pub, [book2], lambda x: x)
+
+class RelatedLookupTypeTests(TestCase):
+    def test_wrong_type_lookup(self):
+        oa = ObjectA.objects.create(name="oa")
+        wrong_type = Order.objects.create(id=oa.pk)
+        ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
+        # Currently Django doesn't care if the object is of correct
+        # type, it will just use the objecta's related fields attribute
+        # (id) for model lookup. Making things more restrictive could
+        # be a good idea...
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta=wrong_type),
+            [ob], lambda x: x)
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta__in=[wrong_type]),
+            [ob], lambda x: x)

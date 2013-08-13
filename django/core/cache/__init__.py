@@ -14,6 +14,7 @@ cache class.
 
 See docs/topics/cache.txt for information on the public API.
 """
+import importlib
 try:
     from urllib.parse import parse_qsl
 except ImportError:     # Python 2
@@ -24,7 +25,6 @@ from django.core import signals
 from django.core.cache.backends.base import (
     InvalidCacheBackendError, CacheKeyWarning, BaseCache)
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import importlib
 from django.utils.module_loading import import_by_path
 
 

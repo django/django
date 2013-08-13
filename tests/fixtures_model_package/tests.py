@@ -5,6 +5,7 @@ import warnings
 from django.core import management
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase
+from django.utils.six import StringIO
 
 from .models import Article, Book
 
@@ -110,3 +111,19 @@ class FixtureTestCase(TestCase):
             ],
             lambda a: a.headline,
         )
+
+
+class InitialSQLTests(TestCase):
+
+    def test_custom_sql(self):
+        """
+        #14300 -- Verify that custom_sql_for_model searches `app/sql` and not
+        `app/models/sql` (the old location will work until Django 1.9)
+        """
+        out = StringIO()
+        management.call_command("sqlcustom", "fixtures_model_package", stdout=out)
+        output = out.getvalue()
+        self.assertTrue("INSERT INTO fixtures_model_package_book (name) "
+                        "VALUES ('My Book')" in output)
+        # value from deprecated search path models/sql (remove in Django 1.9)
+        self.assertTrue("Deprecated Book" in output)

@@ -50,6 +50,19 @@ class ParkingLot3(Place):
     primary_key = models.AutoField(primary_key=True)
     parent = models.OneToOneField(Place, parent_link=True)
 
+class ParkingLot4(models.Model):
+    # Test parent_link connector can be discovered in abstract classes.
+    parent = models.OneToOneField(Place, parent_link=True)
+
+    class Meta:
+        abstract = True
+
+class ParkingLot4A(ParkingLot4, Place):
+    pass
+
+class ParkingLot4B(Place, ParkingLot4):
+    pass
+
 class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
 

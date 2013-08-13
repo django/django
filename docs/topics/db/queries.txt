@@ -720,7 +720,7 @@ efficient code.
 In a newly created :class:`~django.db.models.query.QuerySet`, the cache is
 empty. The first time a :class:`~django.db.models.query.QuerySet` is evaluated
 -- and, hence, a database query happens -- Django saves the query results in
-the :class:`~django.db.models.query.QuerySet`\'s cache and returns the results
+the :class:`~django.db.models.query.QuerySet`’s cache and returns the results
 that have been explicitly requested (e.g., the next element, if the
 :class:`~django.db.models.query.QuerySet` is being iterated over). Subsequent
 evaluations of the :class:`~django.db.models.query.QuerySet` reuse the cached

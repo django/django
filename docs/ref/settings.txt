@@ -1108,6 +1108,19 @@ Default: ``2621440`` (i.e. 2.5 MB).
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
 
+.. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
+
+FILE_UPLOAD_DIRECTORY_PERMISSIONS
+---------------------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The numeric mode to apply to directories created in the process of
+uploading files. This value mirrors the functionality and caveats of
+the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
+
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
 FILE_UPLOAD_PERMISSIONS
@@ -1744,7 +1757,7 @@ Default::
 
 A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
-used instead of a string. The first item in the tuple should be the ``Loader``'s
+used instead of a string. The first item in the tuple should be the ``Loader``’s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
@@ -2478,7 +2491,7 @@ files</howto/static-files/index>` for more details about usage.
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
-    :doc:`staticfiles</ref/contrib/staticfiles>`'s
+    :doc:`staticfiles</ref/contrib/staticfiles>`’s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
     :setting:`STATICFILES_DIRS`).

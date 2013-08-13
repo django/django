@@ -106,7 +106,7 @@ class LiveServerAddress(LiveServerBase):
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
-        # test runner and the overriden setUpClass() method is executed.
+        # test runner and the overridden setUpClass() method is executed.
         pass
 
 class LiveServerViews(LiveServerBase):
@@ -137,6 +137,14 @@ class LiveServerViews(LiveServerBase):
         """
         f = self.urlopen('/static/example_static_file.txt')
         self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
+
+    def test_collectstatic_emulation(self):
+        """
+        Test LiveServerTestCase use of staticfiles' serve() allows it to
+        discover app's static assets without having to collectstatic first.
+        """
+        f = self.urlopen('/static/another_app/another_app_static_file.txt')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'static file from another_app')
 
     def test_media_files(self):
         """

@@ -6,24 +6,29 @@ Django Exceptions
 Django raises some Django specific exceptions as well as many standard
 Python exceptions.
 
-Django-specific Exceptions
-==========================
+Django Core Exceptions
+======================
 
 .. module:: django.core.exceptions
-    :synopsis: Django specific exceptions
+    :synopsis: Django core exceptions
+
+Django core exception classes are defined in :mod:`django.core.exceptions`.
 
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
 .. exception:: DoesNotExist
+
+    The ``DoesNotExist`` exception is raised when an object is not found for
+    the given parameters of a query. Django provides a ``DoesNotExist``
+    exception as an attribute of each model class to identify the class of
+    object that could not be found and to allow you to catch a particular model
+    class with ``try/except``.
+
 .. exception:: ObjectDoesNotExist
 
-    The :exc:`DoesNotExist` exception is raised when an object is not found
-    for the given parameters of a query.
-
-    :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
-    :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
-    exception that is provided on every model class as a way of
-    identifying the specific type of object that could not be found.
+    The base class for ``DoesNotExist`` exceptions; a ``try/except`` for
+    ``ObjectDoesNotExist`` will catch ``DoesNotExist`` exceptions for all
+    models.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
@@ -121,6 +126,11 @@ ValidationError
 
 .. currentmodule:: django.core.urlresolvers
 
+URL Resolver exceptions
+=======================
+
+URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
+
 NoReverseMatch
 --------------
 .. exception:: NoReverseMatch
@@ -134,9 +144,10 @@ NoReverseMatch
 Database Exceptions
 ===================
 
+Database exceptions are provided in :mod:`django.db`.
+
 Django wraps the standard database exceptions so that your Django code has a
-guaranteed common implementation of these classes. These database exceptions
-are provided in :mod:`django.db`.
+guaranteed common implementation of these classes.
 
 .. exception:: Error
 .. exception:: InterfaceError
@@ -160,34 +171,37 @@ to Python 3.)
 
 .. versionchanged:: 1.6
 
-    Previous version of Django only wrapped ``DatabaseError`` and
+    Previous versions of Django only wrapped ``DatabaseError`` and
     ``IntegrityError``, and did not provide ``__cause__``.
 
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.PROTECT`. Subclass of :exc:`IntegrityError`.
+:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+of :exc:`IntegrityError`.
 
 .. currentmodule:: django.http
 
 Http Exceptions
 ===============
 
+Http exceptions are provided in :mod:`django.http`.
+
 .. exception:: UnreadablePostError
 
     The :exc:`UnreadablePostError` is raised when a user cancels an upload.
-    It is available from :mod:`django.http`.
 
 .. currentmodule:: django.db.transaction
 
 Transaction Exceptions
 ======================
 
+Transaction exceptions are defined in :mod:`django.db.transaction`.
+
 .. exception:: TransactionManagementError
 
     The :exc:`TransactionManagementError` is raised for any and all problems
-    related to database transactions. It is available from
-    :mod:`django.db.transaction`.
+    related to database transactions.
 
 Python Exceptions
 =================

@@ -5,14 +5,15 @@ from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import get_language
 
+@python_2_unicode_compatible
 class Country(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=50)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-
+@python_2_unicode_compatible
 class Person(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=128)
@@ -26,9 +27,10 @@ class Person(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
+@python_2_unicode_compatible
 class Group(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=128)
@@ -38,10 +40,11 @@ class Group(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Membership(models.Model):
     # Table Column Fields
     membership_country = models.ForeignKey(Country)
@@ -51,17 +54,19 @@ class Membership(models.Model):
     group_id = models.IntegerField()
 
     # Relation Fields
-    person = models.ForeignObject(Person,
+    person = models.ForeignObject(
+        Person,
         from_fields=['membership_country', 'person_id'],
         to_fields=['person_country_id', 'id'])
-    group = models.ForeignObject(Group,
+    group = models.ForeignObject(
+        Group,
         from_fields=['membership_country', 'group_id'],
         to_fields=['group_country', 'id'])
 
     class Meta:
         ordering = ('date_joined', 'invite_reason')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s is a member of %s" % (self.person.name, self.group.name)
 
 
@@ -73,17 +78,20 @@ class Friendship(models.Model):
     to_friend_id = models.IntegerField()
 
     # Relation Fields
-    from_friend = models.ForeignObject(Person,
+    from_friend = models.ForeignObject(
+        Person,
         from_fields=['from_friend_country', 'from_friend_id'],
         to_fields=['person_country_id', 'id'],
         related_name='from_friend')
 
-    to_friend_country = models.ForeignObject(Country,
+    to_friend_country = models.ForeignObject(
+        Country,
         from_fields=['to_friend_country_id'],
         to_fields=['id'],
         related_name='to_friend_country')
 
-    to_friend = models.ForeignObject(Person,
+    to_friend = models.ForeignObject(
+        Person,
         from_fields=['to_friend_country_id', 'to_friend_id'],
         to_fields=['person_country_id', 'id'],
         related_name='to_friend')
@@ -140,6 +148,9 @@ class Article(models.Model):
         except ArticleTranslation.DoesNotExist:
             return '[No translation found]'
 
+class NewsArticle(Article):
+    pass
+
 class ArticleTranslation(models.Model):
     article = models.ForeignKey(Article)
     lang = models.CharField(max_length='2')
@@ -156,5 +167,6 @@ class ArticleTag(models.Model):
     name = models.CharField(max_length=255)
 
 class ArticleIdea(models.Model):
-    articles = models.ManyToManyField(Article, related_name="ideas", related_query_name="idea_things")
+    articles = models.ManyToManyField(Article, related_name="ideas",
+                                      related_query_name="idea_things")
     name = models.CharField(max_length=255)

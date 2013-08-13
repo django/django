@@ -25,15 +25,25 @@ Quickstart
 ~~~~~~~~~~
 
 Running the tests requires a Django settings module that defines the
-databases to use. To make it easy to get started, Django provides a
-sample settings module that uses the SQLite database. To run the tests
-with this sample ``settings`` module:
+databases to use. To make it easy to get started, Django provides and uses a
+sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
     git clone git@github.com:django/django.git django-repo
     cd django-repo/tests
+    ./runtests.py
+
+.. versionchanged:: 1.7
+
+Older versions of Django required running the tests like this::
+
     PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+
+``runtests.py`` now uses the Django package found at ``tests/../django`` (there
+isn't a need to add this on your ``PYTHONPATH``) and ``test_sqlite`` for the
+settings if settings aren't provided through either ``--settings`` or
+:envvar:`DJANGO_SETTINGS_MODULE`.
 
 .. _running-unit-tests-settings:
 

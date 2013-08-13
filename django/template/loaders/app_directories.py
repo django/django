@@ -3,6 +3,7 @@ Wrapper for loading templates from "templates" directories in INSTALLED_APPS
 packages.
 """
 
+from importlib import import_module
 import os
 import sys
 
@@ -11,7 +12,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join
-from django.utils.importlib import import_module
 from django.utils import six
 
 # At compile time, cache the directories to search.

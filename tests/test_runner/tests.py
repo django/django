@@ -1,8 +1,9 @@
 """
 Tests for django test runner
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
+from importlib import import_module
 from optparse import make_option
 import sys
 import unittest
@@ -13,7 +14,6 @@ from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
 from django.test.utils import IgnoreAllDeprecationWarningsMixin
-from django.utils.importlib import import_module
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person

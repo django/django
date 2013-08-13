@@ -1,12 +1,13 @@
 "This is the locale selecting middleware that will look at accept headers"
 
+from collections import OrderedDict
+
 from django.conf import settings
 from django.core.urlresolvers import (is_valid_path, get_resolver,
                                       LocaleRegexURLResolver)
 from django.http import HttpResponseRedirect
 from django.utils.cache import patch_vary_headers
 from django.utils import translation
-from django.utils.datastructures import SortedDict
 
 
 class LocaleMiddleware(object):
@@ -19,7 +20,7 @@ class LocaleMiddleware(object):
     """
 
     def __init__(self):
-        self._supported_languages = SortedDict(settings.LANGUAGES)
+        self._supported_languages = OrderedDict(settings.LANGUAGES)
         self._is_language_prefix_patterns_used = False
         for url_pattern in get_resolver(None).url_patterns:
             if isinstance(url_pattern, LocaleRegexURLResolver):

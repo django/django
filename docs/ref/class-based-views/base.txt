@@ -222,6 +222,8 @@ RedirectView
 
     .. attribute:: pattern_name
 
+        .. versionadded:: 1.6
+
         The name of the URL pattern to redirect to. Reversing will be done
         using the same args and kwargs as are passed in for this view.
 
