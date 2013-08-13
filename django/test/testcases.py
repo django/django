@@ -23,7 +23,6 @@ except ImportError:     # Python 2
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.handlers.fs import FSFilesHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.handlers.base import get_path_info
 from django.core.management import call_command
@@ -172,6 +171,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         testMethod = getattr(self, self._testMethodName)
         skipped = (getattr(self.__class__, "__unittest_skip__", False) or
+            getattr(testMethod, "__unittest_skip__", False))
 
         if not skipped:
             try:
@@ -1015,26 +1015,6 @@ class _MediaFilesHandler(FSFilesHandler):
     def serve(self, request):
         relative_url = request.path[len(self.base_url[2]):]
         return serve(request, relative_url, document_root=self.get_base_dir())
-
-
-class _StaticFilesHandler(FSFilesHandler):
-    """
-    Handler for serving the static files. This is an alter ego of
-    django.contrib.staticfiles.handlers.StaticFilesHandler but implemented here
-    as a private class that is meant to be used solely as a convenience by
-    LiveServerThread and to avoid such core->contrib dependency.
-    """
-
-    def get_base_dir(self):
-        return settings.STATIC_ROOT
-
-    def get_base_url(self):
-        return settings.STATIC_URL
-
-    def serve(self, request):
-        path = self.file_path(request.path)
-        path2 = posixpath.normpath(unquote(path)).lstrip('/')
-        return serve(request, path2, document_root=settings.STATIC_ROOT)
 
 
 class LiveServerThread(threading.Thread):
