@@ -88,13 +88,13 @@ class Queries1Tests(BaseQuerysetTest):
         qs2 = Tag.objects.filter(parent__in=qs1)
         qs3 = Tag.objects.filter(parent__in=qs2)
         self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
-        self.assertIn('V0', str(qs3.query))
+        self.assertIn('v0', str(qs3.query).lower())
         qs4 = qs3.filter(parent__in=qs1)
         self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
         # It is possible to reuse U for the second subquery, no need to use W.
-        self.assertNotIn('W0', str(qs4.query))
+        self.assertNotIn('w0', str(qs4.query).lower())
         # So, 'U0."id"' is referenced twice.
-        self.assertTrue(str(qs4.query).count('U0."id"'), 2)
+        self.assertTrue(str(qs4.query).lower().count('u0'), 2)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
