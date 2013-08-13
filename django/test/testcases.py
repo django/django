@@ -995,11 +995,6 @@ class _StaticFilesHandler(FSFilesHandler):
     def get_base_url(self):
         return settings.STATIC_URL
 
-    #def serve(self, request):
-    #    path = self.file_path(request.path)
-    #    norm_path = posixpath.normpath(unquote(path)).lstrip('/')
-    #    return serve(request, norm_path, document_root=settings.STATIC_ROOT)
-
 
 class _MediaFilesHandler(FSFilesHandler):
     """
@@ -1012,10 +1007,6 @@ class _MediaFilesHandler(FSFilesHandler):
 
     def get_base_url(self):
         return settings.MEDIA_URL
-
-    #def serve(self, request):
-    #    relative_url = request.path[len(self.base_url[2]):]
-    #    return serve(request, relative_url, document_root=settings.MEDIA_ROOT)
 
 
 class LiveServerThread(threading.Thread):
