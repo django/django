@@ -1,3 +1,9 @@
+"""
+A subset of the tests in tests/servers/tests exercicing
+django.contrib.staticfiles.testing.StaticLiveServerCase instead of
+django.test.LiveServerTestCase.
+""""
+
 import os
 try:
     from urllib.request import urlopen
@@ -27,7 +33,6 @@ class LiveServerBase(StaticLiveServerCase):
     @classmethod
     def setUpClass(cls):
         # Override settings
-        print(TEST_SETTINGS['STATIC_URL'])
         cls.settings_override = override_settings(**TEST_SETTINGS)
         cls.settings_override.enable()
         super(LiveServerBase, cls).setUpClass()
@@ -59,6 +64,11 @@ class StaticLiveServerChecks(LiveServerBase):
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
         else:
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
+
+    @classmethod
+    def tearDownClass(cls):
+        # skip it, as setUpClass doesn't call its parent either
+        pass
 
     @classmethod
     def raises_exception(cls, address, exception):
