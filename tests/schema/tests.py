@@ -167,7 +167,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right to begin with
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
-        self.assertEqual(columns['name'][1][6], False)
+        self.assertEqual(bool(columns['name'][1][6]), bool(connection.features.interprets_empty_strings_as_nulls))
         # Alter the name field to a TextField
         new_field = TextField(null=True)
         new_field.set_attributes_from_name("name")
@@ -195,7 +195,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(columns['name'][1][6], False)
+        self.assertEqual(columns['name'][1][6], bool(connection.features.interprets_empty_strings_as_nulls))
 
     def test_rename(self):
         """

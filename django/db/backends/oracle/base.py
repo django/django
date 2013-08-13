@@ -92,6 +92,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_sequence_reset = False
     supports_combined_alters = False
+    max_index_name_length = 30
 
 
 class DatabaseOperations(BaseDatabaseOperations):

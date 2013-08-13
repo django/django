@@ -113,6 +113,11 @@ class BaseDatabaseSchemaEditor(object):
             sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
         # Work out nullability
         null = field.null
+        # If we were told to include a default value, do so
+        default_value = self.effective_default(field)
+        if include_default and default_value is not None:
+            sql += " DEFAULT %s"
+            params += [default_value]
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
@@ -127,11 +132,6 @@ class BaseDatabaseSchemaEditor(object):
             sql += " PRIMARY KEY"
         elif field.unique:
             sql += " UNIQUE"
-        # If we were told to include a default value, do so
-        default_value = self.effective_default(field)
-        if include_default and default_value is not None:
-            sql += " DEFAULT %s"
-            params += [default_value]
         # Return the sql
         return sql, params
 
@@ -176,7 +176,7 @@ class BaseDatabaseSchemaEditor(object):
             ))
             params.extend(extra_params)
             # Indexes
-            if field.db_index:
+            if field.db_index and not field.unique:
                 self.deferred_sql.append(
                     self.sql_create_index % {
                         "name": self._create_index_name(model, [field.column], suffix=""),
@@ -198,6 +198,11 @@ class BaseDatabaseSchemaEditor(object):
                         "to_column": self.quote_name(to_column),
                     }
                 )
+            # Autoincrement SQL
+            if field.get_internal_type() == "AutoField":
+                autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
+                if autoinc_sql:
+                    self.deferred_sql.extend(autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
@@ -353,6 +358,16 @@ class BaseDatabaseSchemaEditor(object):
                 }
             }
             self.execute(sql)
+        # Add an index, if required
+        if field.db_index and not field.unique:
+            self.deferred_sql.append(
+                self.sql_create_index % {
+                    "name": self._create_index_name(model, [field.column], suffix=""),
+                    "table": self.quote_name(model._meta.db_table),
+                    "columns": self.quote_name(field.column),
+                    "extra": "",
+                }
+            )
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys:
             to_table = field.rel.to._meta.db_table
@@ -412,7 +427,7 @@ class BaseDatabaseSchemaEditor(object):
                 new_field,
             ))
         # Has unique been removed?
-        if old_field.unique and not new_field.unique:
+        if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
             # Find the unique constraint for this field
             constraint_names = self._constraint_names(model, [old_field.column], unique=True)
             if strict and len(constraint_names) != 1:
@@ -647,9 +662,15 @@ class BaseDatabaseSchemaEditor(object):
         if len(index_name) > self.connection.features.max_index_name_length:
             part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
             index_name = '%s%s' % (table_name[:(self.connection.features.max_index_name_length - len(part))], part)
+        # It shouldn't start with an underscore (Oracle hates this)
+        if index_name[0] == "_":
+            index_name = index_name[1:]
         # If it's STILL too long, just hash it down
         if len(index_name) > self.connection.features.max_index_name_length:
             index_name = hashlib.md5(index_name).hexdigest()[:self.connection.features.max_index_name_length]
+        # It can't start with a number on Oracle, so prepend D if we need to
+        if index_name[0].isdigit():
+            index_name = "D%s" % index_name[:-1]
         return index_name
 
     def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None, check=None):
