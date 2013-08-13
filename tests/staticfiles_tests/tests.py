@@ -25,19 +25,15 @@ from django.utils._os import rmtree_errorhandler, upath
 from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.testing import StaticLiveServerCase
 
 
 TEST_ROOT = os.path.dirname(upath(__file__))
-BASE_TEST_SETTINGS = {
-    'DEBUG': False,
+TEST_SETTINGS = {
+    'DEBUG': True,
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
-}
-TEST_SETTINGS = dict(BASE_TEST_SETTINGS, **{
-    'DEBUG': True,
     'STATICFILES_DIRS': (
         os.path.join(TEST_ROOT, 'project', 'documents'),
         ('prefix', os.path.join(TEST_ROOT, 'project', 'prefixed')),
@@ -47,7 +43,7 @@ TEST_SETTINGS = dict(BASE_TEST_SETTINGS, **{
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
-})
+}
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
@@ -812,32 +808,3 @@ class TestAppStaticStorage(TestCase):
             st.path('bar')
         finally:
             sys.getfilesystemencoding = old_enc_func
-
-
-class LiveServerStaticHandling(StaticLiveServerCase):
-
-    available_apps = []
-
-    @classmethod
-    def setUpClass(cls):
-        # Override settings
-        cls.settings_override = override_settings(**BASE_TEST_SETTINGS)
-        cls.settings_override.enable()
-        super(LiveServerStaticHandling, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        # Restore original settings
-        cls.settings_override.disable()
-        super(LiveServerStaticHandling, cls).tearDownClass()
-
-    def urlopen(self, url):
-        return urlopen(self.live_server_url + url)
-
-    def test_collectstatic_emulation(self):
-        """
-        Test StaticLiveServerCase use of staticfiles' serve() allows it to
-        discover app's static assets without having to collectstatic first.
-        """
-        f = self.urlopen('/static/test/file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'In app media directory.')
