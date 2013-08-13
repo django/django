@@ -967,8 +967,13 @@ class FSFilesHandler(WSGIHandler):
         return url2pathname(relative_url)
 
     def get_response(self, request):
+        from django.http import Http404
+
         if self._should_handle(request.path):
-            return self.serve(request)
+            try:
+                return self.serve(request)
+            except Http404:
+                pass
         return super(FSFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):

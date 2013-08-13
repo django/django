@@ -138,13 +138,18 @@ class LiveServerViews(LiveServerBase):
         f = self.urlopen('/static/example_static_file.txt')
         self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
-    #def test_no_collectstatic_emulation(self):
-    #    """
-    #    Test LiveServerTestCase use of staticfiles' serve() allows it to
-    #    discover app's static assets without having to collectstatic first.
-    #    """
-    #    f = self.urlopen('/static/another_app/another_app_static_file.txt')
-    #    self.assertEqual(f.read().rstrip(b'\r\n'), b'static file from another_app')
+    def test_no_collectstatic_emulation(self):
+        """
+        Test that LiveServerTestCase reports a 404 status code when HTTP client
+        tries to access a static file that isn't explictly put under
+        STATIC_ROOT.
+        """
+        try:
+            self.urlopen('/static/another_app/another_app_static_file.txt')
+        except HTTPError as err:
+            self.assertEqual(err.code, 404, 'Expected 404 response')
+        else:
+            self.fail('Expected 404 response (got %d)' % err.code)
 
     def test_media_files(self):
         """
