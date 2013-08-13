@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
-    got_request_exception)
+                                 got_request_exception)
 from django.db import close_old_connections
 from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
