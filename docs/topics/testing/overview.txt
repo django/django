@@ -1095,14 +1095,15 @@ out the `full reference`_ for more details.
 
     In Django 1.7 this dependency of core functionality on a ``contrib``
     appplication has been removed, because of which ``LiveServerTestCase``
-    ability iin this respect has been retrofitted to simply publish the actual
-    contents of the file system under :setting:`STATIC_ROOT` at the
-    :setting:`STATIC_URL` URL.
+    ability in this respect has been retrofitted to simply publish the contents
+    of the file system under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`
+    URL.
 
-    If you, as it is most likely considering that it's active by default, use
-    ``staticfiles`` and need to perform live testing then you might want to
-    consider using the :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase`
-    subclass shipped with it instead. See :ref:`the relevant documentation
+    If you use the ``staticfiles`` app in your project and need to perform live
+    testing then you might want to consider using the
+    :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase` subclass
+    shipped with it instead because it's the one that implements the old
+    behavior now. See :ref:`the relevant documentation
     <staticfiles-testing-support>` for more details.
 
 .. note::
