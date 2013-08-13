@@ -27,7 +27,6 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem)
 
-
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
         return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
@@ -83,6 +82,19 @@ class Queries1Tests(BaseQuerysetTest):
 
         Cover.objects.create(title="first", item=i4)
         Cover.objects.create(title="second", item=self.i2)
+
+    def test_subquery_condition(self):
+        qs1 = Tag.objects.filter(pk__lte=0)
+        qs2 = Tag.objects.filter(parent__in=qs1)
+        qs3 = Tag.objects.filter(parent__in=qs2)
+        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertIn('V0', str(qs3.query))
+        qs4 = qs3.filter(parent__in=qs1)
+        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        # It is possible to reuse U for the second subquery, no need to use W.
+        self.assertNotIn('W0', str(qs4.query))
+        # So, 'U0."id"' is referenced twice.
+        self.assertTrue(str(qs4.query).count('U0."id"'), 2)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
@@ -810,7 +822,7 @@ class Queries1Tests(BaseQuerysetTest):
         # Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
         # sufficient that this query runs without error.
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
-        qs.query.bump_prefix()
+        qs.query.bump_prefix(qs.query)
         first = qs[0]
         self.assertEqual(list(qs), list(range(first, first+5)))
 

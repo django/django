@@ -167,7 +167,6 @@ class SQLCompiler(object):
         if obj.low_mark == 0 and obj.high_mark is None:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
-        obj.bump_prefix()
         return obj.get_compiler(connection=self.connection).as_sql()
 
     def get_columns(self, with_aliases=False):
@@ -808,13 +807,14 @@ class SQLCompiler(object):
         return result
 
     def as_subquery_condition(self, alias, columns, qn):
+        inner_qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()
             return '%s.%s IN (%s)' % (qn(alias), qn2(columns[0]), sql), params
 
         for index, select_col in enumerate(self.query.select):
-            lhs = '%s.%s' % (qn(select_col.col[0]), qn2(select_col.col[1]))
+            lhs = '%s.%s' % (inner_qn(select_col.col[0]), qn2(select_col.col[1]))
             rhs = '%s.%s' % (qn(alias), qn2(columns[index]))
             self.query.where.add(
                 QueryWrapper('%s = %s' % (lhs, rhs), []), 'AND')
@@ -1010,7 +1010,6 @@ class SQLUpdateCompiler(SQLCompiler):
         # We need to use a sub-select in the where clause to filter on things
         # from other tables.
         query = self.query.clone(klass=Query)
-        query.bump_prefix()
         query.extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
