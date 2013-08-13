@@ -2,7 +2,7 @@
 A subset of the tests in tests/servers/tests exercicing
 django.contrib.staticfiles.testing.StaticLiveServerCase instead of
 django.test.LiveServerTestCase.
-""""
+"""
 
 import os
 try:
