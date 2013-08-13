@@ -7,10 +7,6 @@ import posixpath
 import shutil
 import sys
 import tempfile
-try:
-    from urllib.request import urlopen
-except ImportError:     # Python 2
-    from urllib2 import urlopen
 
 from django.template import loader, Context
 from django.conf import settings
@@ -25,7 +21,6 @@ from django.utils._os import rmtree_errorhandler, upath
 from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
-
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
