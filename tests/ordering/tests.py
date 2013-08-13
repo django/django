@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from datetime import datetime
 from operator import attrgetter
 
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
+from django.utils.unittest import expectedFailure
 
-from .models import Article, ArticlePKOrdering
+from .models import Article, ArticlePKOrdering, Chapter
 
 
 class OrderingTests(TestCase):
@@ -165,3 +166,45 @@ class OrderingTests(TestCase):
             ],
             attrgetter("headline")
         )
+
+    @expectedFailure
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_order_in_subquery(self):
+        c1 = Chapter.objects.create(
+            pk=1, book_id=1, topics="javascript", weight=1
+        )
+        c2 = Chapter.objects.create(
+            pk=2, book_id=1, topics="css", weight=4
+        )
+        c3 = Chapter.objects.create(
+            pk=3, book_id=2, topics="python", weight=100
+        )
+        c4 = Chapter.objects.create(
+            pk=4, book_id=2, topics="javascript", weight=5
+        )
+        c5 = Chapter.objects.create(
+            pk=5, book_id=1, topics="javascript", weight=2
+        )
+        c6 = Chapter.objects.create(
+            pk=6, book_id=2, topics="javascript", weight=11
+        )
+        top_chapters = Chapter.objects.filter(topics__in=['css', 'javascript']).distinct('book_id').order_by('book_id', '-weight', 'id')
+        chapters = Chapter.objects.filter(id__in=top_chapters).order_by('weight')
+
+        sql_statement = """
+           (u'
+               SELECT "polls_chapter"."id", "polls_chapter"."book_id", "polls_chapter"."topics", "polls_chapter"."weight"
+               FROM "polls_chapter"
+               WHERE "polls_chapter"."id"
+               IN (
+                   SELECT DISTINCT ON (U0."book_id") U0."id"
+                   FROM "polls_chapter" U0
+                   WHERE U0."topics"
+                   IN (%s, %s)
+                   ORDER BY (U0."book_id")
+                   ORDER BY "polls_chapter"."weight" ASC', ('css', 'javascript')
+               )
+           )
+        """
+         
+        self.assertEqual(chapters.query.sql_with_params(), sql_statement)
