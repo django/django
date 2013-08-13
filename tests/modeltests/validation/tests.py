@@ -85,6 +85,7 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=301') #example.com is a redirect to iana.org now
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
+    @verify_exists_urls(existing_urls=())
     def test_correct_https_url_but_nonexisting(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='https://www.example.com/')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
