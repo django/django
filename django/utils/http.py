@@ -228,11 +228,12 @@ else:
 def is_safe_url(url, host=None):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
-    a different host).
+    a different host and uses a safe scheme).
 
     Always returns ``False`` on an empty url.
     """
     if not url:
         return False
-    netloc = urlparse.urlparse(url)[1]
-    return not netloc or netloc == host
+    url_info = urlparse.urlparse(url)
+    return (not url_info[1] or url_info[1] == host) and \
+        (not url_info[0] or url_info[0] in ['http', 'https'])
