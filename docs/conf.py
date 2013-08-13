@@ -50,9 +50,9 @@ copyright = 'Django Software Foundation and contributors'
 # built documents.
 #
 # The short X.Y version.
-version = '1.4.5'
+version = '1.4.6'
 # The full version, including alpha/beta/rc tags.
-release = '1.4.5'
+release = '1.4.6'
 # The next version to be released
 django_next_version = '1.5'
 
