@@ -17,8 +17,8 @@ try:
     from urllib.parse import urlsplit, urlunsplit, urlparse, unquote
     from urllib.request import url2pathname
 except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit, urlparse, unquote
-    from urllib import url2pathname
+    from urlparse import urlsplit, urlunsplit, urlparse
+    from urllib import url2pathname, unquote
 
 from django.conf import settings
 from django.core import mail
@@ -957,7 +957,7 @@ class FSFilesHandler(WSGIHandler):
 
     def file_path(self, url):
         """
-        Returns the relative path to the media file on disk for the given URL.
+        Returns the relative path to the file on disk for the given URL.
         """
         relative_url = url[len(self.base_url[2]):]
         return url2pathname(relative_url)
@@ -972,6 +972,11 @@ class FSFilesHandler(WSGIHandler):
                 pass
         return super(FSFilesHandler, self).get_response(request)
 
+    def serve(self, request):
+        os_rel_path = self.file_path(request.path)
+        final_rel_path = posixpath.normpath(unquote(os_rel_path)).lstrip('/')
+        return serve(request, final_rel_path, document_root=self.get_base_dir())
+
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
@@ -980,8 +985,8 @@ class FSFilesHandler(WSGIHandler):
 
 class _StaticFilesHandler(FSFilesHandler):
     """
-    Handler for serving static files. This is a private class that is
-    meant to be used solely as a convenience by LiveServerThread.
+    Handler for serving static files. A private class that is meant to be used
+    solely as a convenience by LiveServerThread.
     """
 
     def get_base_dir(self):
@@ -990,16 +995,16 @@ class _StaticFilesHandler(FSFilesHandler):
     def get_base_url(self):
         return settings.STATIC_URL
 
-    def serve(self, request):
-        path = self.file_path(request.path)
-        norm_path = posixpath.normpath(unquote(path)).lstrip('/')
-        return serve(request, norm_path, document_root=settings.STATIC_ROOT)
+    #def serve(self, request):
+    #    path = self.file_path(request.path)
+    #    norm_path = posixpath.normpath(unquote(path)).lstrip('/')
+    #    return serve(request, norm_path, document_root=settings.STATIC_ROOT)
 
 
 class _MediaFilesHandler(FSFilesHandler):
     """
-    Handler for serving the media files. This is a private class that is
-    meant to be used solely as a convenience by LiveServerThread.
+    Handler for serving the media files. A private class that is meant to be
+    used solely as a convenience by LiveServerThread.
     """
 
     def get_base_dir(self):
@@ -1008,9 +1013,9 @@ class _MediaFilesHandler(FSFilesHandler):
     def get_base_url(self):
         return settings.MEDIA_URL
 
-    def serve(self, request):
-        relative_url = request.path[len(self.base_url[2]):]
-        return serve(request, relative_url, document_root=settings.MEDIA_ROOT)
+    #def serve(self, request):
+    #    relative_url = request.path[len(self.base_url[2]):]
+    #    return serve(request, relative_url, document_root=settings.MEDIA_ROOT)
 
 
 class LiveServerThread(threading.Thread):
