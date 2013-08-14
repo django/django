@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
-import warnings
 
-from django.core.checks.compatibility.base import check_compatibility
+import sys
+
 from django.core.management.base import NoArgsCommand
 
 
@@ -10,5 +10,4 @@ class Command(NoArgsCommand):
            "of Django."
 
     def handle_noargs(self, **options):
-        for message in check_compatibility():
-            warnings.warn(message)
+        sys.stdout.write("Sorry -- not implemented yet.")

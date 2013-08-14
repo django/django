@@ -117,6 +117,7 @@ class BaseSettings(object):
 
 class Settings(BaseSettings):
     def __init__(self, settings_module):
+
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
             if setting == setting.upper():
@@ -134,6 +135,8 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+
+        self.RAW_SETTINGS_MODULE = mod
 
         for setting in dir(mod):
             if setting == setting.upper():

@@ -5,7 +5,8 @@ from .messages import (CheckMessage,
         Debug, Info, Warning, Error, Critical,
         DEBUG, INFO, WARNING, ERROR, CRITICAL)
 from .registration import register, run_checks
-from .default_checks import check_all_models
+from .default_checks import check_all_models, check_1_6_compatibility
 
 
 register(check_all_models)
+register(check_1_6_compatibility)
