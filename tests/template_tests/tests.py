@@ -1575,6 +1575,13 @@ class TemplateTests(TransRealMixin, TestCase):
             # Test whitespace in filter argument
             'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
 
+            # Widthratio with variable assignment
+            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
+            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
+
+            'widthratio18': ('{% widthratio a b 100 as %}', { }, template.TemplateSyntaxError),
+            'widthratio19': ('{% widthratio a b 100 not_as variable %}', { }, template.TemplateSyntaxError),
+
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
             'legacywith01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
