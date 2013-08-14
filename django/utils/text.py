@@ -4,6 +4,8 @@ import re
 import unicodedata
 from gzip import GzipFile
 from io import BytesIO
+from random import Random
+from StringIO import StringIO
 
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, SimpleLazyObject
@@ -266,12 +268,38 @@ phone2numeric = allow_lazy(phone2numeric)
 
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
 # Used with permission.
+
+AVERAGE_SPAN_BETWEEN_FLUSHES = 512
+APPROX_MIN_FLUSHES = 3
+MIN_INTERFLUSH_INTERVAL = 16
+FLUSH_LIMIT = 5
+
 def compress_string(s):
+
+    # avg_block_size is actually the reciporical of the average
+    # intended interflush distance to satisfy expovariate's
+    # expected parameter format.
+
+    rnd = Random(s)
+    flushes_remaining = FLUSH_LIMIT
+    if len(s) < AVERAGE_SPAN_BETWEEN_FLUSHES * APPROX_MIN_FLUSHES:
+        avg_block_size = APPROX_MIN_FLUSHES / float(len(s) + 1)
+    else:
+        avg_block_size = 1.0 / AVERAGE_SPAN_BETWEEN_FLUSHES
+    s = StringIO(s)
     zbuf = BytesIO()
     zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
-    zfile.write(s)
+    chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(rnd.expovariate(avg_block_size)))
+    while chunk and flushes_remaining:
+        zfile.write(chunk)
+        zfile.flush()
+        flushes_remaining -= 1
+        chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(rnd.expovariate(avg_block_size)))
+    zfile.write(chunk)
+    zfile.write(s.read())
     zfile.close()
     return zbuf.getvalue()
+
 
 class StreamingBuffer(object):
     def __init__(self):
@@ -291,7 +319,56 @@ class StreamingBuffer(object):
     def close(self):
         return
 
+
 # Like compress_string, but for iterators of strings.
+def compress_sequence(sequence):
+    avg_block_size = 1.0 / AVERAGE_SPAN_BETWEEN_FLUSHES
+
+    buf = StreamingBuffer()
+    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)
+    # Output headers...
+    yield buf.read()
+
+    flushes_remaining = FLUSH_LIMIT
+    rnd = None
+    count = None
+    rnd = None
+    for item in sequence:
+        if rnd is None:
+            rnd = Random(hash(item))
+            count = int(rnd.expovariate(avg_block_size))
+        chunking_buf = BytesIO(item)
+        chunk = chunking_buf.read(count)
+        while chunk:
+            if count is not None:
+                count -= len(chunk)
+            zfile.write(chunk)
+            if count <= 0:
+                flushes_remaining -= 1
+                zfile.flush()
+                yield buf.read()
+                if flushes_remaining:
+                    count = int(rnd.expovariate(avg_block_size))
+                else:
+                    count = None
+            if count is None:
+                chunk = chunking_buf.read()
+            else:
+                chunk = chunking_buf.read(count)
+        zfile.flush()
+        yield buf.read()
+        if chunk is None:
+            break
+        
+    for item in sequence:
+        zfile.write(chunking_buf.read())
+        zfile.flush()
+        yield buf.read()
+        
+    zfile.close()
+    yield buf.read()
+
+
 def compress_sequence(sequence):
     buf = StreamingBuffer()
     zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)

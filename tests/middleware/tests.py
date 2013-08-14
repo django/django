@@ -762,3 +762,4 @@ class TransactionMiddlewareTest(IgnoreDeprecationWarningsMixin, TransactionTestC
             self.assertFalse(transaction.is_managed())
         finally:
             del connections[DEFAULT_DB_ALIAS].commit
+
