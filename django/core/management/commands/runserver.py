@@ -94,7 +94,7 @@ class Command(BaseCommand):
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
-        self.stdout.write("Validating models...\n\n")
+        self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
         self.stdout.write((
             "%(started_at)s\n"
