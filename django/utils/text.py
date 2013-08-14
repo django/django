@@ -4,6 +4,8 @@ import re
 import unicodedata
 from gzip import GzipFile
 from io import BytesIO
+from random import Random
+from StringIO import StringIO
 
 from django.utils.encoding import force_text
 from django.utils.functional import allow_lazy, SimpleLazyObject
