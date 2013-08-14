@@ -54,20 +54,21 @@ Storage backends
 
 The messages framework can use different backends to store temporary messages.
 
-Django provides three built-in storage classes:
+Django provides three built-in storage classes in
+:mod:`django.contrib.messages`:
 
-.. class:: django.contrib.messages.storage.session.SessionStorage
+.. class:: storage.session.SessionStorage
 
     This class stores all messages inside of the request's session. Therefore
     it requires Django's ``contrib.sessions`` application.
 
-.. class:: django.contrib.messages.storage.cookie.CookieStorage
+.. class:: storage.cookie.CookieStorage
 
     This class stores the message data in a cookie (signed with a secret hash
     to prevent manipulation) to persist notifications across requests. Old
     messages are dropped if the cookie data size would exceed 2048 bytes.
 
-.. class:: django.contrib.messages.storage.fallback.FallbackStorage
+.. class:: storage.fallback.FallbackStorage
 
     This class first uses ``CookieStorage``, and falls back to using
     ``SessionStorage`` for the messages that could not fit in a single cookie.
@@ -82,6 +83,8 @@ another storage class by setting `MESSAGE_STORAGE`_ to its full import path,
 for example::
 
     MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+.. class:: storage.base.BaseStorage
 
 To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
