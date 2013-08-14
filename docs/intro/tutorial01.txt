@@ -137,7 +137,7 @@ see the following output on the command line:
 
 .. parsed-literal::
 
-    Validating models...
+    Performing system checks...
 
     0 errors found
     |today| - 15:50:53
