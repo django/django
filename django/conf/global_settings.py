@@ -313,6 +313,11 @@ FILE_UPLOAD_TEMP_DIR = None
 # you'd pass directly to os.chmod; see http://docs.python.org/lib/os-file-dir.html.
 FILE_UPLOAD_PERMISSIONS = None
 
+# The numeric mode to assign to newly-created directories, when uploading files.
+# The value should be a mode as you'd pass to os.chmod;
+# see http://docs.python.org/lib/os-file-dir.html.
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
+
 # Python module path where user will place custom format definition.
 # The directory where this setting is pointing should contain subdirectories
 # named as the locales, containing a formats.py file

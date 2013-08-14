@@ -5,8 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
-from django.test.client import CONTENT_TYPE_RE
 from django.template import RequestContext
+from django.test import Client
+from django.test.client import CONTENT_TYPE_RE
+from django.test.utils import setup_test_environment
 
 
 class CustomTestException(Exception):
@@ -51,6 +53,15 @@ def view_with_argument(request, name):
         return HttpResponse('Hi, Arthur')
     else:
         return HttpResponse('Howdy, %s' % name)
+
+def nested_view(request):
+    """
+    A view that uses test client to call another view.
+    """
+    setup_test_environment()
+    c = Client()
+    c.get("/test_client_regress/no_template_view")
+    return render_to_response('base.html', {'nested':'yes'})
 
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"

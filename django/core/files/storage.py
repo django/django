@@ -172,7 +172,16 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
-                os.makedirs(directory)
+                if settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS is not None:
+                    # os.makedirs applies the global umask, so we reset it,
+                    # for consistency with FILE_UPLOAD_PERMISSIONS behavior.
+                    old_umask = os.umask(0)
+                    try:
+                        os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
+                    finally:
+                        os.umask(old_umask)
+                else:
+                    os.makedirs(directory)
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise

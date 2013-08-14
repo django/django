@@ -297,9 +297,12 @@ class BaseForm(object):
 
     def _clean_form(self):
         try:
-            self.cleaned_data = self.clean()
+            cleaned_data = self.clean()
         except ValidationError as e:
             self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+        else:
+            if cleaned_data is not None:
+                self.cleaned_data = cleaned_data
 
     def _post_clean(self):
         """
@@ -431,7 +434,9 @@ class BoundField(object):
         This really is only useful for RadioSelect widgets, so that you can
         iterate over individual radio buttons in a template.
         """
-        for subwidget in self.field.widget.subwidgets(self.html_name, self.value()):
+        id_ = self.field.widget.attrs.get('id') or self.auto_id
+        attrs = {'id': id_} if id_ else {}
+        for subwidget in self.field.widget.subwidgets(self.html_name, self.value(), attrs):
             yield subwidget
 
     def __len__(self):

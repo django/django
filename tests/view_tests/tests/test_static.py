@@ -6,7 +6,7 @@ import unittest
 
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
@@ -16,7 +16,7 @@ from ..urls import media_dir
 
 
 @override_settings(DEBUG=True)
-class StaticTests(TestCase):
+class StaticTests(SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
     prefix = 'site_media'
@@ -93,6 +93,10 @@ class StaticTests(TestCase):
             self.assertEqual(fp.read(), response_content)
         self.assertEqual(len(response_content),
                           int(response['Content-Length']))
+
+    def test_404(self):
+        response = self.client.get('/views/%s/non_existing_resource' % self.prefix)
+        self.assertEqual(404, response.status_code)
 
 
 class StaticHelperTest(StaticTests):

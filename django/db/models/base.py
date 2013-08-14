@@ -184,10 +184,21 @@ class ModelBase(type):
         else:
             new_class._meta.concrete_model = new_class
 
-        # Do the appropriate setup for any model parents.
-        o2o_map = dict([(f.rel.to, f) for f in new_class._meta.local_fields
-                if isinstance(f, OneToOneField)])
+        # Collect the parent links for multi-table inheritance.
+        parent_links = {}
+        for base in reversed([new_class] + parents):
+            # Conceptually equivalent to `if base is Model`.
+            if not hasattr(base, '_meta'):
+                continue
+            # Skip concrete parent classes.
+            if base != new_class and not base._meta.abstract:
+                continue
+            # Locate OneToOneField instances.
+            for field in base._meta.local_fields:
+                if isinstance(field, OneToOneField):
+                    parent_links[field.rel.to] = field
 
+        # Do the appropriate setup for any model parents.
         for base in parents:
             original_base = base
             if not hasattr(base, '_meta'):
@@ -208,8 +219,8 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                if base in o2o_map:
-                    field = o2o_map[base]
+                if base in parent_links:
+                    field = parent_links[base]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,

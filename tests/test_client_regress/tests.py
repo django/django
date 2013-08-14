@@ -925,6 +925,14 @@ class ContextTests(TestCase):
         finally:
             django.template.context._standard_context_processors = None
 
+    def test_nested_requests(self):
+        """
+        response.context is not lost when view call another view.
+        """
+        response = self.client.get("/test_client_regress/nested_view/")
+        self.assertEqual(response.context.__class__, Context)
+        self.assertEqual(response.context['nested'], 'yes')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SessionTests(TestCase):
