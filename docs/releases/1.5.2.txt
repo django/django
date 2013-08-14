@@ -50,7 +50,7 @@ Bugfixes
 * :djadmin:`makemessages` no longer crashes with ``UnicodeDecodeError``
   (#20354).
 * Fixed ``geojson`` detection with Spatialite.
-* :meth:`~django.test.SimpleTestCase.assertContains` once again works with
+* :meth:`~django.test.TestCase.assertContains` once again works with
   binary content (#20237).
 * Fixed :class:`~django.db.models.ManyToManyField` if it has a unicode ``name``
   parameter (#20207).
