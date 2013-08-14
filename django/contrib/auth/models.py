@@ -406,6 +406,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+
 class User(AbstractUser):
     """
     Users within the Django authentication system are represented by this

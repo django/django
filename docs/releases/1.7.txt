@@ -141,7 +141,6 @@ Minor features
 * Any ``**kwargs`` in :meth:`~django.contrib.auth.models.AbstractUser.email_user()`
   is passed directly to :meth:`~django.core.mail.send_mail()`.
 
-
 Backwards incompatible changes in 1.7
 =====================================
 

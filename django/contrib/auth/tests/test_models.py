@@ -95,6 +95,7 @@ class AbstractUserTestCase(TestCase):
         self.assertEqual(mail.outbox[0].body, "This is a message")
         self.assertEqual(mail.outbox[0].from_email, "from@domain.com")
 
+
 class IsActiveTestCase(TestCase):
     """
     Tests the behavior of the guaranteed is_active attribute

@@ -224,7 +224,6 @@ Methods
 
             Any``**kwargs`` is passed directly to :meth:`~django.core.mail.send_mail()`.
 
-
 Manager methods
 ---------------
 
