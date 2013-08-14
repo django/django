@@ -2262,7 +2262,9 @@ Controls where Django stores message data. Valid values are:
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
-The backends that use cookies -- ``CookieStorage`` and ``FallbackStorage`` --
+The backends that use cookies --
+:class:`~django.contrib.messages.storage.cookie.CookieStorage` and
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
 use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
