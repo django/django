@@ -156,6 +156,9 @@ Minor features
   :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
   underlying :meth:`~django.core.mail.send_mail()` call.
 
+* The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
+  the result in a variable.
+
 Backwards incompatible changes in 1.7
 =====================================
 
