@@ -54,6 +54,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 'DATABASES',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
+                'TEST_RUNNER',  # We need to include TEST_RUNNER, otherwise we get a compatibility warning.
             ]
             for s in exports:
                 if hasattr(settings, s):
