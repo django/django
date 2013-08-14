@@ -708,9 +708,20 @@ class ModelTest(TestCase):
             SelfRef.objects.get(selfref=sr)
 
     def test_eq(self):
+        self.assertEqual(Article(id=1), Article(id=1))
         self.assertNotEqual(Article(id=1), object())
         self.assertNotEqual(object(), Article(id=1))
+        a = Article()
+        self.assertEqual(a, a)
+        self.assertNotEqual(Article(), a)
 
+    def test_hash(self):
+        # Value based on PK
+        self.assertEqual(hash(Article(id=1)), hash(1))
+        with self.assertRaises(TypeError):
+            # No PK value -> unhashable (because save() would then change
+            # hash)
+            hash(Article())
 
 class ConcurrentSaveTests(TransactionTestCase):
 
