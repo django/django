@@ -8,14 +8,17 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
-    model_format_dict, NestedObjects, lookup_needs_distinct)
+from django.contrib.admin.util import (unquote, flatten_fieldsets,
+    get_deleted_objects, model_format_dict, NestedObjects,
+    lookup_needs_distinct)
 from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied, ValidationError, FieldError
+from django.core.exceptions import (PermissionDenied, ValidationError,
+    FieldError, ImproperlyConfigured)
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -25,21 +28,23 @@ from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
+    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields,
+    BaseModelForm, BaseModelFormSet, _get_foreign_key)
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.utils.decorators import method_decorator
-from django.utils.html import escape, escapejs
-from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.decorators import method_decorator
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.datastructures import SortedDict
+from django.utils.encoding import force_text
+from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-from django.utils.encoding import force_text
+from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
 
 
@@ -77,6 +82,46 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
+######################################################
+# CHECK HELPERS
+######################################################
+
+def check_type(cls, attr, type_):
+    if getattr(cls, attr, None) is not None and not isinstance(getattr(cls, attr), type_):
+        raise ImproperlyConfigured("'%s.%s' should be a %s."
+                % (cls.__name__, attr, type_.__name__ ))
+
+def check_isseq(cls, label, obj):
+    if not isinstance(obj, (list, tuple)):
+        raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
+
+def check_isdict(cls, label, obj):
+    if not isinstance(obj, dict):
+        raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
+
+def get_field(cls, model, label, field):
+    try:
+        return model._meta.get_field(field)
+    except models.FieldDoesNotExist:
+        raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
+                % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
+def fetch_attr(cls, model, label, field):
+    try:
+        return model._meta.get_field(field)
+    except models.FieldDoesNotExist:
+        pass
+    try:
+        return getattr(model, field)
+    except AttributeError:
+        raise ImproperlyConfigured("'%s.%s' refers to '%s' that is neither a field, method or property of model '%s.%s'."
+            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
+######################################################
+# END OF CHECK HELPERS
+######################################################
+
+
 class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
     renamed_methods = (
         ('queryset', 'get_queryset', DeprecationWarning),
@@ -98,14 +143,6 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
-
-    # validation
-    validator_class = validation.BaseValidator
-
-    @classmethod
-    def validate(cls, model):
-        validator = cls.validator_class()
-        validator.validate(cls, model)
 
     def __init__(self):
         self._orig_formfield_overrides = self.formfield_overrides
@@ -402,6 +439,235 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+    ############################################
+    # CHECKS
+    ############################################
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        # Before we can introspect models, they need to be fully loaded so that
+        # inter-relations are set up correctly. We force that here.
+        models.get_apps()
+
+        errors = []
+        errors.extend(cls._check_raw_id_fields(model=model))
+        errors.extend(cls._check_fields(model=model))
+        errors.extend(cls._check_fieldsets(model=model))
+        errors.extend(cls._check_exclude(model=model))
+        errors.extend(cls._check_form(model=model))
+        errors.extend(cls._check_filter_vertical(model=model))
+        errors.extend(cls._check_filter_horizontal(model=model))
+        errors.extend(cls._check_radio_fields(model=model))
+        errors.extend(cls._check_prepopulated_fields(model=model))
+        errors.extend(cls._check_ordering(model=model))
+        errors.extend(cls._check_readonly_fields(model=model))
+        return []
+
+    @classmethod
+    def _check_raw_id_fields(cls, model):
+        """ Check that raw_id_fields only contains field names that are listed
+        on the model. """
+        if hasattr(cls, 'raw_id_fields'):
+            check_isseq(cls, 'raw_id_fields', cls.raw_id_fields)
+            for idx, field in enumerate(cls.raw_id_fields):
+                f = get_field(cls, model, 'raw_id_fields', field)
+                if not isinstance(f, (models.ForeignKey, models.ManyToManyField)):
+                    raise ImproperlyConfigured("'%s.raw_id_fields[%d]', '%s' must "
+                            "be either a ForeignKey or ManyToManyField."
+                            % (cls.__name__, idx, field))
+        return []
+
+    @classmethod
+    def _check_fields(cls, model):
+        """ check that fields only refer to existing fields, doesn't contain
+        duplicates. """
+        # fields
+        if cls.fields: # default value is None
+            check_isseq(cls, 'fields', cls.fields)
+            cls._check_field_spec(model, cls.fields, 'fields')
+            if cls.fieldsets:
+                raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
+            if len(cls.fields) > len(set(cls.fields)):
+                raise ImproperlyConfigured('There are duplicate field(s) in %s.fields' % cls.__name__)
+        return []
+
+    @classmethod
+    def _check_fieldsets(cls, model):
+        """ Check that fieldsets is properly formatted and doesn't contain
+        duplicates. """
+        if cls.fieldsets: # default value is None
+            check_isseq(cls, 'fieldsets', cls.fieldsets)
+            for idx, fieldset in enumerate(cls.fieldsets):
+                check_isseq(cls, 'fieldsets[%d]' % idx, fieldset)
+                if len(fieldset) != 2:
+                    raise ImproperlyConfigured("'%s.fieldsets[%d]' does not "
+                            "have exactly two elements." % (cls.__name__, idx))
+                check_isdict(cls, 'fieldsets[%d][1]' % idx, fieldset[1])
+                if 'fields' not in fieldset[1]:
+                    raise ImproperlyConfigured("'fields' key is required in "
+                            "%s.fieldsets[%d][1] field options dict."
+                            % (cls.__name__, idx))
+                cls._check_field_spec(model, fieldset[1]['fields'], "fieldsets[%d][1]['fields']" % idx)
+            flattened_fieldsets = flatten_fieldsets(cls.fieldsets)
+            if len(flattened_fieldsets) > len(set(flattened_fieldsets)):
+                raise ImproperlyConfigured('There are duplicate field(s) in %s.fieldsets' % cls.__name__)
+        return []
+
+    @classmethod
+    def _check_field_spec(cls, model, flds, label):
+        """
+        Validate the fields specification in `flds` from a ModelAdmin subclass
+        `cls` for the `model` model. Use `label` for reporting problems to the user.
+
+        The fields specification can be a ``fields`` option or a ``fields``
+        sub-option from a ``fieldsets`` option component.
+        """
+        for fields in flds:
+            # The entry in fields might be a tuple. If it is a standalone
+            # field, make it into a tuple to make processing easier.
+            if type(fields) != tuple:
+                fields = (fields,)
+            for field in fields:
+                if field in cls.readonly_fields:
+                    # Stuff can be put in fields that isn't actually a
+                    # model field if it's in readonly_fields,
+                    # readonly_fields will handle the validation of such
+                    # things.
+                    continue
+                try:
+                    f = model._meta.get_field(field)
+                except models.FieldDoesNotExist:
+                    # If we can't find a field on the model that matches, it could be an
+                    # extra field on the form; nothing to check so move on to the next field.
+                    continue
+                if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                    raise ImproperlyConfigured("'%s.%s' "
+                        "can't include the ManyToManyField field '%s' because "
+                        "'%s' manually specifies a 'through' model." % (
+                            cls.__name__, label, field, field))
+        return []
+
+    @classmethod
+    def _check_exclude(cls, model):
+        """ Check that exclude is a sequence without duplicates. """
+        if cls.exclude: # default value is None
+            check_isseq(cls, 'exclude', cls.exclude)
+            if len(cls.exclude) > len(set(cls.exclude)):
+                raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
+        return []
+
+    @classmethod
+    def _check_form(cls, model):
+        """ Check that form subclasses BaseModelForm. """
+        if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
+            raise ImproperlyConfigured("%s.form does not inherit from "
+                    "BaseModelForm." % cls.__name__)
+        return []
+
+    @classmethod
+    def _check_filter_vertical(cls, model):
+        """ Check that filter_vertical is a sequence of field names. """
+        if hasattr(cls, 'filter_vertical'):
+            check_isseq(cls, 'filter_vertical', cls.filter_vertical)
+            for idx, field in enumerate(cls.filter_vertical):
+                f = get_field(cls, model, 'filter_vertical', field)
+                if not isinstance(f, models.ManyToManyField):
+                    raise ImproperlyConfigured("'%s.filter_vertical[%d]' must be "
+                        "a ManyToManyField." % (cls.__name__, idx))
+        return []
+
+    @classmethod
+    def _check_filter_horizontal(cls, model):
+        """ Check that filter_horizontal is a sequence of field names. """
+        if hasattr(cls, 'filter_horizontal'):
+            check_isseq(cls, 'filter_horizontal', cls.filter_horizontal)
+            for idx, field in enumerate(cls.filter_horizontal):
+                f = get_field(cls, model, 'filter_horizontal', field)
+                if not isinstance(f, models.ManyToManyField):
+                    raise ImproperlyConfigured("'%s.filter_horizontal[%d]' must be "
+                        "a ManyToManyField." % (cls.__name__, idx))
+        return []
+
+    @classmethod
+    def _check_radio_fields(cls, model):
+        """ Check that radio_fields is a dictionary of choice or foreign key
+        fields. """
+        from django.contrib.admin.options import HORIZONTAL, VERTICAL
+        if hasattr(cls, 'radio_fields'):
+            check_isdict(cls, 'radio_fields', cls.radio_fields)
+            for field, val in cls.radio_fields.items():
+                f = get_field(cls, model, 'radio_fields', field)
+                if not (isinstance(f, models.ForeignKey) or f.choices):
+                    raise ImproperlyConfigured("'%s.radio_fields['%s']' "
+                            "is neither an instance of ForeignKey nor does "
+                            "have choices set." % (cls.__name__, field))
+                if not val in (HORIZONTAL, VERTICAL):
+                    raise ImproperlyConfigured("'%s.radio_fields['%s']' "
+                            "is neither admin.HORIZONTAL nor admin.VERTICAL."
+                            % (cls.__name__, field))
+        return []
+
+    @classmethod
+    def _check_prepopulated_fields(cls, model):
+        """ Check that prepopulated_fields if a dictionary  containing allowed
+        field types. """
+        # prepopulated_fields
+        if hasattr(cls, 'prepopulated_fields'):
+            check_isdict(cls, 'prepopulated_fields', cls.prepopulated_fields)
+            for field, val in cls.prepopulated_fields.items():
+                f = get_field(cls, model, 'prepopulated_fields', field)
+                if isinstance(f, (models.DateTimeField, models.ForeignKey,
+                    models.ManyToManyField)):
+                    raise ImproperlyConfigured("'%s.prepopulated_fields['%s']' "
+                            "is either a DateTimeField, ForeignKey or "
+                            "ManyToManyField. This isn't allowed."
+                            % (cls.__name__, field))
+                check_isseq(cls, "prepopulated_fields['%s']" % field, val)
+                for idx, f in enumerate(val):
+                    get_field(cls, model, "prepopulated_fields['%s'][%d]" % (field, idx), f)
+        return []
+
+    @classmethod
+    def _check_ordering(cls, model):
+        """ Check that ordering refers to existing fields or is random. """
+        # ordering = None
+        if cls.ordering:
+            check_isseq(cls, 'ordering', cls.ordering)
+            for idx, field in enumerate(cls.ordering):
+                if field == '?' and len(cls.ordering) != 1:
+                    raise ImproperlyConfigured("'%s.ordering' has the random "
+                            "ordering marker '?', but contains other fields as "
+                            "well. Please either remove '?' or the other fields."
+                            % cls.__name__)
+                if field == '?':
+                    continue
+                if field.startswith('-'):
+                    field = field[1:]
+                # Skip ordering in the format field1__field2 (FIXME: checking
+                # this format would be nice, but it's a little fiddly).
+                if '__' in field:
+                    continue
+                get_field(cls, model, 'ordering[%d]' % idx, field)
+        return []
+
+    @classmethod
+    def _check_readonly_fields(cls, model):
+        """ Check that readonly_fields refers to proper attribute or field. """
+        if hasattr(cls, "readonly_fields"):
+            check_isseq(cls, "readonly_fields", cls.readonly_fields)
+            for idx, field in enumerate(cls.readonly_fields):
+                if not callable(field):
+                    if not hasattr(cls, field):
+                        if not hasattr(model, field):
+                            try:
+                                model._meta.get_field(field)
+                            except models.FieldDoesNotExist:
+                                raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
+                                    % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+
+        return []
+
+
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
@@ -435,9 +701,6 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
-
-    # validation
-    validator_class = validation.ModelAdminValidator
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1592,6 +1855,213 @@ class ModelAdmin(BaseModelAdmin):
             formsets.append(FormSet(**formset_params))
         return formsets
 
+    #####################################
+    # CHECKS
+    #####################################
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = super(ModelAdmin, cls).check(model=model, **kwargs)
+        errors.extend(cls._check_save_as(model=model))
+        errors.extend(cls._check_save_on_top(model=model))
+        errors.extend(cls._check_inlines(model=model))
+        errors.extend(cls._check_list_display(model=model))
+        errors.extend(cls._check_list_display_links(model=model))
+        errors.extend(cls._check_list_filter(model=model))
+        errors.extend(cls._check_list_select_related(model=model))
+        errors.extend(cls._check_list_per_page(model=model))
+        errors.extend(cls._check_list_max_show_all(model=model))
+        errors.extend(cls._check_list_editable(model=model))
+        errors.extend(cls._check_search_fields(model=model))
+        errors.extend(cls._check_date_hierarchy(model=model))
+        return errors
+
+    @classmethod
+    def _check_save_as(cls, model):
+        """ Check save_as is a boolean. """
+        check_type(cls, 'save_as', bool)
+        return []
+
+    @classmethod
+    def _check_save_on_top(cls, model):
+        """ Check save_on_top is a boolean. """
+        check_type(cls, 'save_on_top', bool)
+        return []
+
+    @classmethod
+    def _check_inlines(cls, model):
+        """ Check inline model admin classes. """
+        from django.contrib.admin.options import BaseModelAdmin
+        if hasattr(cls, 'inlines'):
+            check_isseq(cls, 'inlines', cls.inlines)
+            for idx, inline in enumerate(cls.inlines):
+                if not issubclass(inline, BaseModelAdmin):
+                    raise ImproperlyConfigured("'%s.inlines[%d]' does not inherit "
+                            "from BaseModelAdmin." % (cls.__name__, idx))
+                if not inline.model:
+                    raise ImproperlyConfigured("'model' is a required attribute "
+                            "of '%s.inlines[%d]'." % (cls.__name__, idx))
+                if not issubclass(inline.model, models.Model):
+                    raise ImproperlyConfigured("'%s.inlines[%d].model' does not "
+                            "inherit from models.Model." % (cls.__name__, idx))
+                inline.check(inline.model)
+                #cls.check_inline(inline, model)
+        return []
+
+    @classmethod
+    def _check_list_display(cls, model):
+        """ Check that list_display only contains fields or usable attributes.
+        """
+        if hasattr(cls, 'list_display'):
+            check_isseq(cls, 'list_display', cls.list_display)
+            for idx, field in enumerate(cls.list_display):
+                if not callable(field):
+                    if not hasattr(cls, field):
+                        if not hasattr(model, field):
+                            try:
+                                model._meta.get_field(field)
+                            except models.FieldDoesNotExist:
+                                raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
+                                    % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
+                        else:
+                            # getattr(model, field) could be an X_RelatedObjectsDescriptor
+                            f = fetch_attr(cls, model, "list_display[%d]" % idx, field)
+                            if isinstance(f, models.ManyToManyField):
+                                raise ImproperlyConfigured("'%s.list_display[%d]', '%s' is a ManyToManyField which is not supported."
+                                    % (cls.__name__, idx, field))
+        return []
+
+    @classmethod
+    def _check_list_display_links(cls, model):
+        """ Check that list_display_links is a unique subset of list_display.
+        """
+        if hasattr(cls, 'list_display_links'):
+            check_isseq(cls, 'list_display_links', cls.list_display_links)
+            for idx, field in enumerate(cls.list_display_links):
+                if field not in cls.list_display:
+                    raise ImproperlyConfigured("'%s.list_display_links[%d]' "
+                            "refers to '%s' which is not defined in 'list_display'."
+                            % (cls.__name__, idx, field))
+        return []
+
+    @classmethod
+    def _check_list_filter(cls, model):
+        """
+        Check that list_filter is a sequence of one of three options:
+            1: 'field' - a basic field filter, possibly w/ relationships (eg, 'field__rel')
+            2: ('field', SomeFieldListFilter) - a field-based list filter class
+            3: SomeListFilter - a non-field list filter class
+        """
+        from django.contrib.admin import ListFilter, FieldListFilter
+        if hasattr(cls, 'list_filter'):
+            check_isseq(cls, 'list_filter', cls.list_filter)
+            for idx, item in enumerate(cls.list_filter):
+                if callable(item) and not isinstance(item, models.Field):
+                    # If item is option 3, it should be a ListFilter...
+                    if not issubclass(item, ListFilter):
+                        raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
+                                " which is not a descendant of ListFilter."
+                                % (cls.__name__, idx, item.__name__))
+                    # ...  but not a FieldListFilter.
+                    if issubclass(item, FieldListFilter):
+                        raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
+                                " which is of type FieldListFilter but is not"
+                                " associated with a field name."
+                                % (cls.__name__, idx, item.__name__))
+                else:
+                    if isinstance(item, (tuple, list)):
+                        # item is option #2
+                        field, list_filter_class = item
+                        if not issubclass(list_filter_class, FieldListFilter):
+                            raise ImproperlyConfigured("'%s.list_filter[%d][1]'"
+                                " is '%s' which is not of type FieldListFilter."
+                                % (cls.__name__, idx, list_filter_class.__name__))
+                    else:
+                        # item is option #1
+                        field = item
+                    # Validate the field string
+                    try:
+                        get_fields_from_path(model, field)
+                    except (NotRelationField, FieldDoesNotExist):
+                        raise ImproperlyConfigured("'%s.list_filter[%d]' refers to '%s'"
+                                " which does not refer to a Field."
+                                % (cls.__name__, idx, field))
+        return []
+
+    @classmethod
+    def _check_list_select_related(cls, model):
+        """ Check that list_select_related is a boolean, a list or a tuple. """
+        list_select_related = getattr(cls, 'list_select_related', None)
+        if list_select_related:
+            types = (bool, tuple, list)
+            if not isinstance(list_select_related, types):
+                raise ImproperlyConfigured("'%s.list_select_related' should be "
+                                           "either a bool, a tuple or a list" %
+                                           cls.__name__)
+        return []
+
+    @classmethod
+    def _check_list_per_page(cls, model):
+        """ Check that list_per_page is an integer. """
+        check_type(cls, 'list_per_page', int)
+        return []
+
+    @classmethod
+    def _check_list_max_show_all(cls, model):
+        """ Check that list_max_show_all is an integer. """
+        check_type(cls, 'list_max_show_all', int)
+        return []
+
+    @classmethod
+    def _check_list_editable(cls, model):
+        """ Check that list_editable is a sequence of editable fields from
+        list_display without first element. """
+        if hasattr(cls, 'list_editable') and cls.list_editable:
+            check_isseq(cls, 'list_editable', cls.list_editable)
+            for idx, field_name in enumerate(cls.list_editable):
+                try:
+                    field = model._meta.get_field_by_name(field_name)[0]
+                except models.FieldDoesNotExist:
+                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
+                        "field, '%s', not defined on %s.%s."
+                        % (cls.__name__, idx, field_name, model._meta.app_label, model.__name__))
+                if field_name not in cls.list_display:
+                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "
+                        "'%s' which is not defined in 'list_display'."
+                        % (cls.__name__, idx, field_name))
+                if field_name in cls.list_display_links:
+                    raise ImproperlyConfigured("'%s' cannot be in both '%s.list_editable'"
+                        " and '%s.list_display_links'"
+                        % (field_name, cls.__name__, cls.__name__))
+                if not cls.list_display_links and cls.list_display[0] in cls.list_editable:
+                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to"
+                        " the first field in list_display, '%s', which can't be"
+                        " used unless list_display_links is set."
+                        % (cls.__name__, idx, cls.list_display[0]))
+                if not field.editable:
+                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
+                        "field, '%s', which isn't editable through the admin."
+                        % (cls.__name__, idx, field_name))
+        return []
+
+    @classmethod
+    def _check_search_fields(cls, model):
+        """ Check search_fields is a sequence. """
+        if hasattr(cls, 'search_fields'):
+            check_isseq(cls, 'search_fields', cls.search_fields)
+        return []
+
+    @classmethod
+    def _check_date_hierarchy(cls, model):
+        """ Check that date_hierarchy refers to DateField or DateTimeField. """
+        if cls.date_hierarchy:
+            f = get_field(cls, model, 'date_hierarchy', cls.date_hierarchy)
+            if not isinstance(f, (models.DateField, models.DateTimeField)):
+                raise ImproperlyConfigured("'%s.date_hierarchy is "
+                        "neither an instance of DateField nor DateTimeField."
+                        % cls.__name__)
+        return []
+
 
 class InlineModelAdmin(BaseModelAdmin):
     """
@@ -1610,9 +2080,6 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
-
-    # validation
-    validator_class = validation.InlineValidator
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1757,6 +2224,62 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
+    ######################################
+    # CHECKS
+    ######################################
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = super(InlineModelAdmin, cls).check(model=model, **kwargs)
+        errors.extend(cls._check_inline())
+        errors.extend(cls._check_fk_name(model=model))
+        errors.extend(cls._check_extra())
+        errors.extend(cls._check_max_num())
+        errors.extend(cls._check_formset())
+        return errors
+
+    @classmethod
+    def _check_inline(cls):
+        """ Check inline class's fk field is not excluded. """
+        parent_model = cls.model
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
+        if hasattr(cls, 'exclude') and cls.exclude:
+            if fk and fk.name in cls.exclude:
+                raise ImproperlyConfigured("%s cannot exclude the field "
+                        "'%s' - this is the foreign key to the parent model "
+                        "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
+        return []
+
+    @classmethod
+    def _check_fk_name(cls, model):
+        """ Check that fk_name refers to a ForeignKey. """
+        if cls.fk_name: # default value is None
+            f = get_field(cls, model, 'fk_name', cls.fk_name)
+            if not isinstance(f, models.ForeignKey):
+                raise ImproperlyConfigured("'%s.fk_name is not an instance of "
+                        "models.ForeignKey." % cls.__name__)
+        return []
+
+    @classmethod
+    def _check_extra(cls):
+        """ Check that extra is an integer. """
+        check_type(cls, 'extra', int)
+        return []
+
+    @classmethod
+    def _check_max_num(cls):
+        """ Check that max_num is an integer. """
+        check_type(cls, 'max_num', int)
+        return []
+
+    @classmethod
+    def _check_formset(cls):
+        """ Check formset is a subclass of BaseModelFormSet. """
+        if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):
+            raise ImproperlyConfigured("'%s.formset' does not inherit from "
+                    "BaseModelFormSet." % cls.__name__)
+        return []
 
 
 class StackedInline(InlineModelAdmin):
