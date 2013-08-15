@@ -1,0 +1,68 @@
+=====================
+Query-related classes
+=====================
+
+.. currentmodule:: django.db.models
+
+This document provides reference material for query-related tools not
+documented elsewhere.
+
+.. _query-expressions:
+
+F() expressions
+===============
+
+.. class:: F
+
+An ``F()`` object represents the value of a model field. It makes it possible
+to refer to model field values, and perform database operations using them,
+*without actually having to obtain them in your Python code*.
+
+Instead, Django uses the ``F()`` object to generate an SQL expression that
+describes the required operation *at the database* level.
+
+This is easiest to understand though an example. Normally, one might do
+something like this:
+
+    >>> # Tintin filed a news story!
+    >>> reporter = Reporters.objects.get(name='Tintin')
+    >>> reporter.stories_filed = reporter.stories_filed + 1
+    >>> reporter.save()
+
+Here, we have pulled the value of ``reporter.stories_filed`` from the database
+into memory and manipulated it using familiar Python operators, before saving
+the object back to the database. But instead we could also have done:
+
+    >>> reporter = Reporters.objects.get(name='Tintin')
+    >>> reporter.stories_filed = F('stories_filed') + 1
+    >>> reporter.save()
+
+to the same end. 
+
+Although ``reporter.stories_filed = F('stories_filed') + 1`` *looks* like a
+normal Python assignment of value to a class attribute, in fact it's an SQL
+construct describing an operation on the database.
+
+When Django encounters an instance of ``F()`` it overrides the standard Python
+operators to create an encapsulated SQL expression; in this case, one which
+instructs the database to increment the database field represented by
+``reporter.stories_filed``.
+
+Whatever value is or was on ``reporter.stories_filed``, Python never gets to
+know about it - it is dealt with entirely by the database. All Python does,
+through Django's ``F()`` class, is create the SQL syntax to refer to the field
+and describe the operation.
+
+``F()`` expressions have two particularly useful functions:
+
+*   :ref:`performing operations directly on fields <ref-models-field-updates-using-f-expressions>`
+*   :ref:`using F() expressions in queries <using-f-expressions-in-filters>`
+
+Q() objects
+===========
+
+.. class:: Q
+
+A ``Q()`` object, like an :class:`~django.db.models.F` object, encapsulates a SQL expression in a Python object that can be used in database-related operations.
+
+The most common use for ``Q()`` objects is to allow :ref:`complex database queries to be constructed <complex-lookups-with-q>`.

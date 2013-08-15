@@ -340,6 +340,8 @@ only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
 
+.. _ref-models-field-updates-using-f-expressions:
+
 Updating attributes based on existing fields
 --------------------------------------------
 
