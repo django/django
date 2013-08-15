@@ -500,9 +500,9 @@ using ``__str__()`` like this::
 .. method:: Model.__eq__()
 
 The equality method is defined such that instances with the same primary
-key value and the same concrete class are considered equal. The term
-concrete class means proxy model's first non-proxy parent or the class
-itself if it isn't a proxy class.
+key value and the same concrete class are considered equal. For proxy
+models, concrete class is defined as the model's first non-proxy parent;
+for all other models it is simply the model's class.
 
 For example::
 
