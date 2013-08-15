@@ -33,6 +33,7 @@ Here, we have pulled the value of ``reporter.stories_filed`` from the database
 into memory and manipulated it using familiar Python operators, before saving
 the object back to the database. But instead we could also have done:
 
+    >>> from django.db.models import F
     >>> reporter = Reporters.objects.get(name='Tintin')
     >>> reporter.stories_filed = F('stories_filed') + 1
     >>> reporter.save()
@@ -63,6 +64,9 @@ Q() objects
 
 .. class:: Q
 
-A ``Q()`` object, like an :class:`~django.db.models.F` object, encapsulates a SQL expression in a Python object that can be used in database-related operations.
+A ``Q()`` object, like an :class:`~django.db.models.F` object, encapsulates a
+SQL expression in a Python object that can be used in database-related
+operations.
 
-The most common use for ``Q()`` objects is to allow :ref:`complex database queries to be constructed <complex-lookups-with-q>`.
+The most common use for ``Q()`` objects is to allow :ref:`complex database
+queries to be constructed <complex-lookups-with-q>`.
