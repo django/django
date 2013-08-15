@@ -10,7 +10,7 @@ import warnings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import simple
+from django.test import simple, skipIfDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.test.utils import get_warnings_state, restore_warnings_state
@@ -217,6 +217,13 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
 
 
 class Ticket16885RegressionTests(unittest.TestCase):
+    
+    # Skipped if empty strings are nulls because this feature causes
+    # database setup to fail on model validation for models defined
+    # with string PKs (such models are already in the AppCache), while
+    # the test cares neither about models nor about the database backend
+    # from settings.
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_ticket_16885(self):
         """Features are also confirmed on mirrored databases."""
         old_db_connections = db.connections
