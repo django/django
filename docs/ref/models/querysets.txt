@@ -913,7 +913,7 @@ needed by ``select_related``), it is able to detect that the ``best_pizza``
 objects have already been fetched, and it will skip fetching them again.
 
 Chaining ``prefetch_related`` calls will accumulate the lookups that are
-prefetched. To clear any ``prefetch_related`` behavior, pass `None` as a
+prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
 parameter::
 
    >>> non_prefetched = qs.prefetch_related(None)

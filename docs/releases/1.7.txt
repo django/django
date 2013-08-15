@@ -75,7 +75,7 @@ Minor features
   context level.
 
 * The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
-  ``updated`` element now utilizes `updateddate` instead of ``pubdate``,
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 

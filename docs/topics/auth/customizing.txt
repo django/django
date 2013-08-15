@@ -686,13 +686,13 @@ auth views.
 * :class:`~django.contrib.auth.forms.AuthenticationForm`
 
   Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
-  and will adapt to use the field defined in `USERNAME_FIELD`.
+  and will adapt to use the field defined in ``USERNAME_FIELD``.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
   Assumes that the user model has an integer primary key, has a field named
   ``email`` that can be used to identify the user, and a boolean field
-  named `is_active` to prevent password resets for inactive users.
+  named ``is_active`` to prevent password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 
