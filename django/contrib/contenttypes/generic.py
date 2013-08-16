@@ -332,6 +332,9 @@ class GenericRelation(ForeignObject):
     def _check_generic_foreign_key_existence(self):
         target = self.rel.to
         if isinstance(target, ModelBase):
+            # Using `vars` is very ugly approach, but there is no better one,
+            # because GenericForeignKeys are not considered as fields and,
+            # therefore, are not included in `target._meta.local_fields`.
             fields = vars(target).itervalues()
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
