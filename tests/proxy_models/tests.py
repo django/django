@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 import copy
 
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.core.exceptions import FieldError
@@ -15,7 +14,7 @@ from django.test import TestCase
 from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
-    Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
+    Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement)
 
 
 class ProxyModelTests(TestCase):
@@ -361,22 +360,3 @@ class ProxyModelTests(TestCase):
         management.call_command('loaddata', 'mypeople.json', verbosity=0)
         p = MyPerson.objects.get(pk=100)
         self.assertEqual(p.name, 'Elvis Presley')
-
-
-class ProxyModelAdminTests(TestCase):
-    fixtures = ['myhorses']
-
-    def test_cascade_delete_proxy_model_admin_warning(self):
-        """
-        Test if admin gives warning about cascade deleting models referenced
-        to concrete model by deleting proxy object.
-        """
-        tracker_user = TrackerUser.objects.all()[0]
-        base_user = BaseUser.objects.all()[0]
-        issue = Issue.objects.all()[0]
-        with self.assertNumQueries(7):
-            collector = admin.util.NestedObjects('default')
-            collector.collect(ProxyTrackerUser.objects.all())
-        self.assertTrue(tracker_user in collector.edges.get(None, ()))
-        self.assertTrue(base_user in collector.edges.get(None, ()))
-        self.assertTrue(issue in collector.edges.get(tracker_user, ()))
