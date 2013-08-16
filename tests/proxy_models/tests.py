@@ -389,15 +389,18 @@ class ProxyModelAdminTests(TestCase):
         self.assertTrue(issue in collector.edges.get(tracker_user, ()))
 
     def test_delete_str_in_model_admin(self):
-        '''
+        """
         Test if the admin delete page shows the correct string representation
         for a proxy model.
-        '''
+        """
         user = TrackerUser.objects.get(name='Django Pony')
         proxy = ProxyTrackerUser.objects.get(name='Django Pony')
 
-        user_str = 'Tracker user: <a href="/admin/proxy_models/trackeruser/%s/">%s</a>' % (user.pk, user)
-        proxy_str = 'Proxy tracker user: <a href="/admin/proxy_models/proxytrackeruser/%s/">%s</a>' % (proxy.pk, proxy)
+        user_str = (
+            'Tracker user: <a href="/admin/proxy_models/trackeruser/%s/">%s</a>' % (user.pk, user))
+        proxy_str = (
+            'Proxy tracker user: <a href="/admin/proxy_models/proxytrackeruser/%s/">%s</a>' %
+            (proxy.pk, proxy))
 
         self.client.login(username='super', password='secret')
         response = self.client.get('/admin/proxy_models/trackeruser/%s/delete/' % (user.pk,))
