@@ -1076,13 +1076,13 @@ class ManageCheck(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_nonexistent_app(self):
-        """ manage.py validate reports an error on a non-existent app in
+        """ manage.py check reports an error on a non-existent app in
         INSTALLED_APPS """
 
         self.write_settings('settings.py',
             apps=['admin_scriptz.broken_app'],
             sdict={'USE_I18N': False})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'ImportError')
@@ -1090,29 +1090,29 @@ class ManageCheck(AdminScriptTestCase):
         self.assertOutput(err, 'admin_scriptz')
 
     def test_broken_app(self):
-        """ manage.py validate reports an ImportError if an app's models.py
+        """ manage.py check reports an ImportError if an app's models.py
         raises one on import """
 
         self.write_settings('settings.py', apps=['admin_scripts.broken_app'])
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'ImportError')
 
     def test_complex_app(self):
-        """ manage.py validate does not raise an ImportError validating a
+        """ manage.py check does not raise an ImportError validating a
         complex app with nested calls to load_app """
 
         self.write_settings('settings.py',
             apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
             sdict={'DEBUG': True})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertEqual(out, 'System check identified no problems.\n')
 
     def test_app_with_import(self):
-        """ manage.py validate does not raise errors when an app imports a base
+        """ manage.py check does not raise errors when an app imports a base
         class that itself has an abstract base. """
 
         self.write_settings('settings.py',
@@ -1121,7 +1121,7 @@ class ManageCheck(AdminScriptTestCase):
                   'django.contrib.contenttypes',
                   'django.contrib.sites'],
             sdict={'DEBUG': True})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertEqual(out, 'System check identified no problems.\n')
@@ -1132,7 +1132,7 @@ class ManageCheck(AdminScriptTestCase):
         self.write_settings('settings.py',
             apps=['admin_scripts.app_raising_messages'],
             sdict={'DEBUG': True})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
             "CommandError: There are some issues:\n"
@@ -1152,14 +1152,19 @@ class ManageCheck(AdminScriptTestCase):
         self.assertNoOutput(out)
 
     def test_warning_does_not_halt(self):
-        """ When there are only warnings or less serious messages, then Django
-        should not prevent user from launching their project, so `validate`
-        command should not raise `CommandError` exception. """
+        """
+        When there are only warnings or less serious messages, then Django
+        should not prevent user from launching their project, so `check`
+        command should not raise `CommandError` exception.
+
+        In this test we also test output format.
+
+        """
 
         self.write_settings('settings.py',
             apps=['admin_scripts.app_raising_warning'],
             sdict={'DEBUG': True})
-        args = ['validate']
+        args = ['check']
         out, err = self.run_manage(args)
         expected_err = (
             "There are some issues:\n"  # No "CommandError: " part

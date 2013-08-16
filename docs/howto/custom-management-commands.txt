@@ -307,11 +307,19 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     The actual logic of the command. Subclasses must implement this method.
 
+.. method:: BaseCommand.check(display_num_errors=False)
+
+    Uses the system check framework to validate entire Django project. Yes,
+    it's includes model validation and compatibility checks. For any serious
+    issue (like an error or critical error), raises :class:`CommandError`. If
+    there are only light issues (like warnings), does not raise any exception.
+    In both cases, prints to stderr. When there are no issues, prints to
+    stdout.
+
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
-    Validates the given app, raising :class:`CommandError` for any errors.
+    Deprecated. Use "check" instead. Delegates to "check". `app` argument is ignored.
 
-    If ``app`` is None, then all installed apps are validated.
 
 
 .. _ref-basecommand-subclasses:

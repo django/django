@@ -108,6 +108,9 @@ them providing hints. The framework is extensible and it's possible to
 write custom checks.
 >>>>>>> deprecated BaseCommand.{requires_model_validation, validate}
 
+To perform system checks, you need to run ``check`` command. ``validate``
+command is deprecated now.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -603,6 +606,8 @@ value is used. Defining both ``requires_system_checks`` and
 ``requires_model_validation`` results in an error.
 
 ``check`` method's replaced old ``validate`` method.
+
+``validate`` command is deprecated in favour of ``check`` command.
 
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
