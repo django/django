@@ -246,6 +246,8 @@ class Sqlite3InMemoryTestDbs(TestCase):
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
+    # `setup_databases` triggers system check framework, but we do not want to
+    # perform checks.
     @override_system_checks([])
     def test_transaction_support(self):
         """Ticket #16329: sqlite3 in-memory test databases"""
