@@ -31,12 +31,6 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         for app in settings.INSTALLED_APPS:
             load_app(app)
 
-        # We need to mock list of registered checks, because checks of `auth`
-        # app are registered, but we don't want to perform checks of not
-        # installed app.
-        #self.old_checks = check_framework.registered_checks
-        #check_framework.registered_checks = []
-
     def tearDown(self):
         sys.path = self.old_sys_path
         del cache.app_store[cache.app_labels['app1']]
@@ -45,8 +39,9 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         del cache.app_labels['app2']
         del cache.app_models['app1']
         del cache.app_models['app2']
-        #check_framework.registered_checks = self.old_checks
 
+    # `auth` app is imported, but not installed in this test, so we need to
+    # exclude checks registered by this app.
     @override_system_checks([])
     def test_table_exists(self):
         try:

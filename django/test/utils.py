@@ -243,7 +243,10 @@ class override_settings(object):
 
 
 def override_system_checks(new_checks):
-    """ Acts as a decorator. """
+    """ Acts as a decorator. Overrides list of registered system checks.
+    Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
+    you also need to exclude its system checks. """
+
     from django.core.checks.registration import framework
 
     def outer(test_func):
