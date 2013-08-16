@@ -476,8 +476,8 @@ Note the following:
 
 If you're interested, also run the following commands:
 
-* :djadmin:`python manage.py validate <validate>` -- Checks for any errors
-  in the construction of your models.
+* :djadmin:`python manage.py check <check>` -- Checks for any errors
+  in your project.
 
 * :djadmin:`python manage.py sqlcustom polls <sqlcustom>` -- Outputs any
   :ref:`custom SQL statements <initial-sql>` (such as table modifications or

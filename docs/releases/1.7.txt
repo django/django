@@ -100,6 +100,9 @@ validating mainly apps and models. It detects common problems and report
 them providing hints. The framework is extensible and it's possible to
 write custom checks.
 
+To perform system checks, you need to run ``check`` command. ``validate``
+command is deprecated now.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -477,6 +480,8 @@ value is used. Defining both ``requires_system_checks`` and
 ``requires_model_validation`` results in an error.
 
 ``check`` method's replaced old ``validate`` method.
+
+``validate`` command is deprecated in favour of ``check`` command.
 
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

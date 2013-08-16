@@ -765,9 +765,9 @@ The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
 
 When you start the server, and each time you change Python code while the
-server is running, the server will validate all of your installed models. (See
-the ``validate`` command below.) If the validator finds errors, it will print
-them to standard output, but it won't stop the server.
+server is running, the server will validate entire Django project (e.g.
+installed models). (See the ``check`` command below.) If the validator finds
+errors, it will print them to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
@@ -1259,13 +1259,14 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-validate
---------
+check
+-----
 
-.. django-admin:: validate
+.. django-admin:: check
 
-Validates all installed models (according to the :setting:`INSTALLED_APPS`
-setting) and prints validation errors to standard output.
+Uses the system check framework to validate entire Django project, i.e.
+validates all installed models (according to the :setting:`INSTALLED_APPS`
+setting) and prints errors to standard error output.
 
 Commands provided by applications
 =================================
