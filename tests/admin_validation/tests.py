@@ -74,7 +74,7 @@ class ValidationTestCase(TestCase):
         """
 
         class ExcludedFields1(admin.ModelAdmin):
-            exclude = ('foo')
+            exclude = 'foo'
 
         errors = ExcludedFields1.check(model=Book)
         expected = [
@@ -111,7 +111,7 @@ class ValidationTestCase(TestCase):
     def test_exclude_in_inline(self):
         class ExcludedFieldsInline(admin.TabularInline):
             model = Song
-            exclude = ('foo')
+            exclude = 'foo'
 
         class ExcludedFieldsAlbumAdmin(admin.ModelAdmin):
             model = Album
@@ -171,7 +171,7 @@ class ValidationTestCase(TestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                '"raw_id_fields" refers to field "nonexisting that is missing '
+                '"raw_id_fields" refers to field "nonexisting" that is missing '
                     'from model admin_validation.Album.',
                 hint=None,
                 obj=RawIdNonexistingAdmin,
@@ -203,7 +203,6 @@ class ValidationTestCase(TestCase):
         self.assertEqual(errors, [])
 
     def test_inline_self_validation(self):
-
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
             model = TwoAlbumFKAndAnE
 
