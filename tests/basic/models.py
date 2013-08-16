@@ -19,6 +19,11 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+class ArticleSelectOnSave(Article):
+    class Meta:
+        proxy = True
+        select_on_save = True
+
 @python_2_unicode_compatible
 class SelfRef(models.Model):
     selfref = models.ForeignKey('self', null=True, blank=True,
