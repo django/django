@@ -524,31 +524,28 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
-        with self.settings(LANGUAGE_CODE='fr'):
-            with translation.override('en-us'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertNotContains(response, 'Choisir une heure')
+        with self.settings(LANGUAGE_CODE='fr'), translation.override('en-us'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, 'Choisir une heure')
 
     def testI18NLanguageNonEnglishFallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
         """
-        with self.settings(LANGUAGE_CODE='fr'):
-            with translation.override('none'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertContains(response, 'Choisir une heure')
+        with self.settings(LANGUAGE_CODE='fr'), translation.override('none'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertContains(response, 'Choisir une heure')
 
     def testL10NDeactivated(self):
         """
         Check if L10N is deactivated, the JavaScript i18n view doesn't
         return localized date/time formats. Refs #14824.
         """
-        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False):
-            with translation.override('none'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
-                self.assertContains(response, '%Y-%m-%d %H:%M:%S')
+        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False), translation.override('none'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
+            self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
         with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
