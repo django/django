@@ -1321,6 +1321,49 @@ class ForeignObject(RelatedField):
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
+    def check(self, **kwargs):
+        errors = super(ForeignObject, self).check(**kwargs)
+        errors.extend(self._check_unique_target())
+        return errors
+
+    def _check_unique_target(self):
+        rel_is_string = isinstance(self.rel.to, six.string_types)
+        perform_check = self.requires_unique_target and not rel_is_string
+        if not perform_check:
+            return []
+
+        has_unique_field = any(rel_field.unique
+            for rel_field in self.foreign_related_fields)
+        if not has_unique_field and len(self.foreign_related_fields) > 1:
+            field_combination = ','.join(rel_field.name
+                for rel_field in self.foreign_related_fields)
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    'No unique=True constraint '
+                        'on field combination "%s" under model %s.'
+                        % (field_combination, model_name),
+                    hint='Set unique=True argument on any of the fields '
+                        '"%s" under model %s.'
+                        % (field_combination, model_name),
+                    obj=self,
+                )
+            ]
+        elif not has_unique_field:
+            field_name = self.foreign_related_fields[0].name
+            model_name = self.rel.to.__name__
+            return [
+                checks.Error(
+                    '%s.%s must have unique=True '
+                        'because it is referenced by a foreign key.'
+                        % (model_name, field_name),
+                    hint=None,
+                    obj=self,
+                )
+            ]
+        else:
+            return []
+
 
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
@@ -1484,48 +1527,9 @@ class ForeignKey(ForeignObject):
         return {"type": self.db_type(connection), "check": []}
 
     def check(self, **kwargs):
-        errors = super(ForeignObject, self).check(**kwargs)
-        errors.extend(self._check_unique_target())
+        errors = super(ForeignKey, self).check(**kwargs)
         errors.extend(self._check_on_delete())
         return errors
-
-    def _check_unique_target(self):
-        rel_is_string = isinstance(self.rel.to, six.string_types)
-        perform_check = self.requires_unique_target and not rel_is_string
-        if not perform_check:
-            return []
-
-        has_unique_field = any(rel_field.unique
-            for rel_field in self.foreign_related_fields)
-        if not has_unique_field and len(self.foreign_related_fields) > 1:
-            field_combination = ','.join(rel_field.name
-                for rel_field in self.foreign_related_fields)
-            model_name = self.rel.to.__name__
-            return [
-                checks.Error(
-                    'No unique=True constraint '
-                        'on field combination "%s" under model %s.'
-                        % (field_combination, model_name),
-                    hint='Set unique=True argument on any of the fields '
-                        '"%s" under model %s.'
-                        % (field_combination, model_name),
-                    obj=self,
-                )
-            ]
-        elif not has_unique_field:
-            field_name = self.foreign_related_fields[0].name
-            model_name = self.rel.to.__name__
-            return [
-                checks.Error(
-                    '%s.%s must have unique=True '
-                        'because it is referenced by a foreign key.'
-                        % (model_name, field_name),
-                    hint=None,
-                    obj=self,
-                )
-            ]
-        else:
-            return []
 
     def _check_on_delete(self):
         on_delete = getattr(self.rel, 'on_delete', None)
