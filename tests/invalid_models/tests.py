@@ -542,6 +542,34 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_foreign_object_to_non_unique_fields(self):
+        class Person(models.Model):
+            # Note that both fields are not unique.
+            country_id = models.IntegerField()
+            city_id = models.IntegerField()
+
+        class MMembership(models.Model):
+            person_country_id = models.IntegerField()
+            person_city_id = models.IntegerField()
+
+            person = models.ForeignObject(Person,
+                from_fields=['person_country_id', 'person_city_id'],
+                to_fields=['country_id', 'city_id'])
+
+        field = MMembership._meta.get_field('person')
+        errors = field.check()
+        expected = [
+            Error(
+                'No unique=True constraint on field combination '
+                    '"country_id,city_id" under model Person.',
+                hint='Set unique=True argument on any of the fields '
+                    '"country_id,city_id" under model Person.',
+                obj=field,
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+
     def test_on_delete_set_null_on_non_nullable_field(self):
         class Person(models.Model):
             pass
