@@ -30,7 +30,7 @@ class CommentSecurityForm(forms.Form):
 
     def security_errors(self):
         """Return just those errors associated with security"""
-        errors = ErrorDict()
+        errors = ErrorDict(self.error_class)
         for f in ["honeypot", "timestamp", "security_hash"]:
             if f in self.errors:
                 errors[f] = self.errors[f]

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.util import flatatt, ErrorDict, ErrorList
 from django.test import TestCase
@@ -61,7 +62,25 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>Example of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
         self.assertHTMLEqual(str(ErrorList([mark_safe(example)])),
                          '<ul class="errorlist"><li>Example of link: <a href="http://www.example.com/">example</a></li></ul>')
-        self.assertHTMLEqual(str(ErrorDict({'name': example})),
+        self.assertHTMLEqual(str(ErrorDict(None, {'name': example})),
                          '<ul class="errorlist"><li>nameExample of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
-        self.assertHTMLEqual(str(ErrorDict({'name': mark_safe(example)})),
+        self.assertHTMLEqual(str(ErrorDict(None, {'name': mark_safe(example)})),
                          '<ul class="errorlist"><li>nameExample of link: <a href="http://www.example.com/">example</a></li></ul>')
+
+    def test_errordict(self):
+        class MyForm(forms.Form):
+            pass
+
+        # Test that form
+        form = MyForm({})
+        self.assertEqual(str(form.errors), '')
+
+        # Test that a default `ErrorList` is created automatically.
+        form.errors['field'].append('error')
+        self.assertHTMLEqual(str(form.errors),
+            '<ul class="errorlist">'
+            '  <li>field'
+            '    <ul class="errorlist"><li>error</li></ul>'
+            '  </li>'
+            '</ul>'
+        )

@@ -327,13 +327,13 @@ class BaseModelForm(BaseForm):
         message_dict = errors.message_dict
         for k, v in message_dict.items():
             if k != NON_FIELD_ERRORS:
-                self._errors.setdefault(k, self.error_class()).extend(v)
+                self._errors[k].extend(v)
                 # Remove the data from the cleaned_data dict since it was invalid
                 if k in self.cleaned_data:
                     del self.cleaned_data[k]
         if NON_FIELD_ERRORS in message_dict:
             messages = message_dict[NON_FIELD_ERRORS]
-            self._errors.setdefault(NON_FIELD_ERRORS, self.error_class()).extend(messages)
+            self._errors[NON_FIELD_ERRORS].extend(messages)
 
     def _get_validation_exclusions(self):
         """
@@ -638,7 +638,7 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_unique_error_message(unique_check))
-                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
+                        form._errors[NON_FIELD_ERRORS].append(self.get_form_error())
                         # remove the data from the cleaned_data dict since it was invalid
                         for field in unique_check:
                             if field in form.cleaned_data:
@@ -667,7 +667,7 @@ class BaseModelFormSet(BaseFormSet):
                         # poke error messages into the right places and mark
                         # the form as invalid
                         errors.append(self.get_date_error_message(date_check))
-                        form._errors[NON_FIELD_ERRORS] = self.error_class([self.get_form_error()])
+                        form._errors[NON_FIELD_ERRORS].append(self.get_form_error())
                         # remove the data from the cleaned_data dict since it was invalid
                         del form.cleaned_data[field]
                     # mark the data as seen
