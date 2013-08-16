@@ -362,6 +362,28 @@ class ProxyModelTests(TestCase):
         p = MyPerson.objects.get(pk=100)
         self.assertEqual(p.name, 'Elvis Presley')
 
+    def test_proxy_eq(self):
+        bug = Bug(pk=3)
+        proxy_bug = ProxyBug(pk=3)
+        proxy_proxy_bug = ProxyProxyBug(pk=3)
+
+        self.assertEqual(bug, proxy_bug)
+        self.assertEqual(proxy_bug, bug)
+        self.assertEqual(bug, proxy_proxy_bug)
+        self.assertEqual(proxy_proxy_bug, bug)
+        self.assertEqual(proxy_bug, proxy_proxy_bug)
+        self.assertEqual(proxy_proxy_bug, proxy_bug)
+
+        proxy_bug.pk = 4
+        proxy_proxy_bug.pk = 5
+
+        self.assertNotEqual(bug, proxy_bug)
+        self.assertNotEqual(proxy_bug, bug)
+        self.assertNotEqual(bug, proxy_proxy_bug)
+        self.assertNotEqual(proxy_proxy_bug, bug)
+        self.assertNotEqual(proxy_bug, proxy_proxy_bug)
+        self.assertNotEqual(proxy_proxy_bug, proxy_bug)
+
 
 class ProxyModelAdminTests(TestCase):
     fixtures = ['myhorses']
