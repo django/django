@@ -674,6 +674,12 @@ class UndeletableObject(models.Model):
     """
     name = models.CharField(max_length=255)
 
+class UnchangeableObject(models.Model):
+    """
+    Model whose change_view is disabled in admin
+    Refs #20640.
+    """
+
 class UserMessenger(models.Model):
     """
     Dummy class for testing message_user functions on ModelAdmin
