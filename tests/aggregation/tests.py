@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import datetime
+import operator
+import itertools
 from decimal import Decimal
 import re
 
@@ -652,3 +654,106 @@ class BaseAggregateTestCase(TestCase):
             else:
                 self.assertNotIn('order by', qstr)
             self.assertEqual(qstr.count(' join '), 0)
+
+    def test_alias_required_for_aggreate_with_operations(self):
+        self.assertRaises(ValueError, lambda: Book.objects.aggregate(Sum('price') / Sum('count')))
+        self.assertRaises(ValueError, lambda: Book.objects.annotate(Sum('price') / Sum('count')))
+
+    def _assert_float_equal(self, val1, val2, precision=None):
+        try:
+            if precision is not None:
+                self.assertEqual(round(val1, precision), round(val2, precision))
+            else:
+                self.assertEqual(val1, val2)
+        except AssertionError:
+            precision = 6 if precision is None else precision - 1
+            if precision == -1:
+                raise
+            self._assert_float_equal(val1, val2, precision=precision)
+
+    def _test_op_aggregate(self, op_method, class_1, class_2, number, always_float=False, int_if_int=False):
+        aggregate_result = Book.objects.aggregate(res_1=class_1('pages'), res_2=class_2('price'))
+        self._assert_float_equal(
+            Book.objects.aggregate(result=op_method(op_method(class_1('pages'), class_2('price')), number))['result']
+            ,
+            op_method(op_method(
+                aggregate_result['res_1'],
+                int(aggregate_result['res_2']) if int_if_int and int(aggregate_result['res_2']) == float(aggregate_result['res_2']) else (
+                    float(aggregate_result['res_2']) if always_float or class_2 is not Count else aggregate_result['res_2']
+                )
+            ), number)
+        )
+
+    def _test_op_annotate(self, op_method, class_1, class_2, number, always_float=False, int_if_int=False):
+        for query_result, generated_result in itertools.izip(
+            (
+                {'publisher': book['publisher'], 'result': book['result']}
+                for book in Book.objects.values('publisher').annotate(
+                    result=op_method(op_method(class_1('pages'), class_2('price')), number)
+                )
+            ),
+            (
+                {
+                    'publisher': book['publisher'],
+                    'result': op_method(op_method(
+                        book['res_1'], int(book['res_2']) if int_if_int and int(book['res_2']) == float(book['res_2']) else (
+                            float(book['res_2']) if always_float or class_2 is not Count else book['res_2']
+                        )
+                    ), number)
+                }
+                for book in Book.objects.values('publisher').annotate(res_1=class_1('pages'), res_2=class_2('price'))
+            )
+        ):
+            self.assertEqual(query_result['publisher'], generated_result['publisher'])
+            self._assert_float_equal(query_result['result'], generated_result['result'])
+
+    def _test_op_aggregate_on_annotation(self, op_method, class_1, class_2, class_3, number, always_float=False, int_if_int=False):
+        self._assert_float_equal(
+            Book.objects.values('publisher').annotate(
+                result=op_method(op_method(class_1('pages'), class_2('price')), number)
+            ).aggregate(f_res=class_3('result'))['f_res']
+            ,
+            {Max: max, Min: min, Count: len, Sum: sum, Avg: lambda val: sum(val) / len(val)}[class_3]([
+                op_method(op_method(book['res_1'], int(book['res_2']) if int_if_int and int(book['res_2']) == float(book['res_2']) else (
+                    float(book['res_2']) if always_float or class_2 is not Count else book['res_2'])), number
+                )
+                for book in Book.objects.values('publisher').annotate(res_1=class_1('pages'), res_2=class_2('price'))
+            ])
+        )
+
+    def test_all_operations_on_all_aggregates(self):
+        """
+        Test diffrent arithmatic opertion on aggregate objects.
+        """
+        aggragate_class_list = [Avg, Sum, Count, Max, Min]
+        for op_method in [operator.add, operator.sub, operator.mul, operator.div]:
+            for class_1 in aggragate_class_list:
+                for class_2 in aggragate_class_list:
+                    for class_3 in aggragate_class_list:
+                        for number in [2, 2.1]:
+                            # Test aggregate
+                            try:
+                                self._test_op_aggregate(op_method, class_1, class_2, number)
+                            except AssertionError:
+                                try:
+                                    self._test_op_aggregate(op_method, class_1, class_2, number, always_float=True)
+                                except AssertionError:
+                                    self._test_op_aggregate(op_method, class_1, class_2, number, int_if_int=True)
+
+                            # Test annotate
+                            try:
+                                self._test_op_annotate(op_method, class_1, class_2, number)
+                            except AssertionError:
+                                try:
+                                    self._test_op_annotate(op_method, class_1, class_2, number, always_float=True)
+                                except AssertionError:
+                                    self._test_op_annotate(op_method, class_1, class_2, number, int_if_int=True)
+
+                            # Test aggregate with annotate
+                            try:
+                                self._test_op_aggregate_on_annotation(op_method, class_1, class_2, class_3, number)
+                            except AssertionError:
+                                try:
+                                    self._test_op_aggregate_on_annotation(op_method, class_1, class_2, class_3, number, always_float=True)
+                                except AssertionError:
+                                    self._test_op_aggregate_on_annotation(op_method, class_1, class_2, class_3, number, int_if_int=True)
