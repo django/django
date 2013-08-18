@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib import admin
 from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import str_prefix
 
@@ -44,7 +43,6 @@ class ValidationTestCase(TestCase):
                 }),
             ]
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -53,7 +51,6 @@ class ValidationTestCase(TestCase):
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
 
-        # ValidFields.validate(Song)
         errors = ValidFields.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -64,7 +61,6 @@ class ValidationTestCase(TestCase):
         Refs #19445.
         """
 
-        # ValidFormFieldsets.validate(Song)
         errors = ValidFormFieldsets.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -85,10 +81,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        #self.assertRaisesMessage(ImproperlyConfigured,
-        #    "'ExcludedFields1.exclude' must be a list or tuple.",
-        #    ExcludedFields1.validate,
-        #    Book)
 
     def test_exclude_duplicate_values(self):
         class ExcludedFields2(admin.ModelAdmin):
@@ -103,10 +95,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        #self.assertRaisesMessage(ImproperlyConfigured,
-        #    "There are duplicate field(s) in ExcludedFields2.exclude",
-        #    ExcludedFields2.validate,
-        #    Book)
 
     def test_exclude_in_inline(self):
         class ExcludedFieldsInline(admin.TabularInline):
@@ -126,10 +114,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "'ExcludedFieldsInline.exclude' must be a list or tuple.",
-        #     ExcludedFieldsAlbumAdmin.validate,
-        #     Album)
 
     def test_exclude_inline_model_admin(self):
         """
@@ -150,17 +134,11 @@ class ValidationTestCase(TestCase):
             checks.Error(
                 'Cannot exclude the field "album", because it is the foreign key '
                     'to the parent model admin_validation.Album.',
-                #'SongInline cannot exclude the field "album", because it is '
-                #    'the foreign key to the parent model admin_validation.Album.',
                 hint=None,
                 obj=SongInline,
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "SongInline cannot exclude the field 'album' - this is the foreign key to the parent model admin_validation.Album.",
-        #     AlbumAdmin.validate,
-        #     Album)
 
     def test_app_label_in_admin_validation(self):
         """
@@ -180,10 +158,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
-        #     RawIdNonexistingAdmin.validate,
-        #     Album)
 
     def test_fk_exclusion(self):
         """
@@ -200,7 +174,6 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        # MyAdmin.validate(Album)
         errors = MyAdmin.check(model=Album)
         self.assertEqual(errors, [])
 
@@ -221,10 +194,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(Exception,
-        #     "<class 'admin_validation.models.TwoAlbumFKAndAnE'> has more than 1 "
-        #     "ForeignKey to <class 'admin_validation.models.Album'>",
-        #     MyAdmin.validate, Album)
 
     def test_inline_with_specified(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -234,7 +203,6 @@ class ValidationTestCase(TestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        # MyAdmin.validate(Album)
         errors = MyAdmin.check(model=Album)
         self.assertEqual(errors, [])
 
@@ -242,7 +210,6 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title",)
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -253,7 +220,6 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (my_function,)
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -264,7 +230,6 @@ class ValidationTestCase(TestCase):
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -272,7 +237,6 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_model",)
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -290,11 +254,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "SongAdmin.readonly_fields[1], 'nonexistant' is not a callable "
-        #     "or an attribute of 'SongAdmin' or found in the model 'Song'.",
-        #     SongAdmin.validate,
-        #     Song)
 
     def test_nonexistant_field_on_inline(self):
         class CityInline(admin.TabularInline):
@@ -311,11 +270,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "CityInline.readonly_fields[0], 'i_dont_exist' is not a callable "
-        #     "or an attribute of 'CityInline' or found in the model 'City'.",
-        #     CityInline.validate,
-        #     City)
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
@@ -324,7 +278,6 @@ class ValidationTestCase(TestCase):
                     return "Best Ever!"
                 return "Status unknown."
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -332,7 +285,6 @@ class ValidationTestCase(TestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (lambda obj: "test",)
 
-        # SongAdmin.validate(Song)
         errors = SongAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
@@ -356,11 +308,6 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "'BookAdmin.fields' can't include the ManyToManyField field 'authors' "
-        #     "because 'authors' manually specifies a 'through' model.",
-        #     BookAdmin.validate,
-        #     Book)
 
     def test_cannot_include_through(self):
         class FieldsetBookAdmin(admin.ModelAdmin):
@@ -379,17 +326,11 @@ class ValidationTestCase(TestCase):
             )
         ]
         self.assertEqual(errors, expected)
-        # self.assertRaisesMessage(ImproperlyConfigured,
-        #     "'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include "
-        #     "the ManyToManyField field 'authors' because 'authors' "
-        #     "manually specifies a 'through' model.",
-        #     FieldsetBookAdmin.validate,
-        #     Book)
 
     def test_nested_fields(self):
         class NestedFieldsAdmin(admin.ModelAdmin):
             fields = ('price', ('name', 'subtitle'))
-        # NestedFieldsAdmin.validate(Book)
+
         errors = NestedFieldsAdmin.check(model=Book)
         self.assertEqual(errors, [])
 
@@ -399,8 +340,7 @@ class ValidationTestCase(TestCase):
                 ('Main', {'fields': ('price', ('name', 'subtitle'))}),
             )
 
-        # NestedFieldsAdmin.validate(Book)
-        errors = NestedFieldsAdmin.check(model=Book)
+        errors = NestedFieldsetAdmin.check(model=Book)
         self.assertEqual(errors, [])
 
     def test_explicit_through_override(self):
@@ -416,9 +356,6 @@ class ValidationTestCase(TestCase):
         class BookAdmin(admin.ModelAdmin):
             inlines = [AuthorsInline]
 
-        # If the through model is still a string (and hasn't been resolved to a model)
-        # the validation will fail.
-        # BookAdmin.validate(Book)
         errors = BookAdmin.check(model=Book)
         self.assertEqual(errors, [])
 
@@ -435,7 +372,6 @@ class ValidationTestCase(TestCase):
             form = SongForm
             fields = ['title', 'extra_data']
 
-        # FieldsOnFormOnlyAdmin.validate(Song)
         errors = FieldsOnFormOnlyAdmin.check(model=Song)
         self.assertEqual(errors, [])
 
