@@ -15,12 +15,9 @@ from django.contrib.admin.utils import (unquote, flatten_fieldsets,
     lookup_needs_distinct)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.core.exceptions import (PermissionDenied, ValidationError,
-    FieldError, ImproperlyConfigured)
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -30,8 +27,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields,
-    BaseModelForm, BaseModelFormSet, _get_foreign_key)
+    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
@@ -1801,6 +1797,7 @@ class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
 
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'

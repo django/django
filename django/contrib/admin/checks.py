@@ -480,27 +480,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif not issubclass(inline.model, models.Model):
             return cls._error('"%s.model" must be a Model."' % label)
         else:
-            #return cls._check_inline(inline, model) + inline.check(model, cls)
-            return inline.check(model, cls)
-
-    '''
-    @classmethod
-    def _check_inline(class_, cls, parent_model):
-        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
-        if cls.exclude is None:
-            return []
-        elif fk and fk.name in cls.exclude:
-            return cls._error(
-                'Cannot exclude the field "%s", because it is the foreign key to the parent model %s.%s.'
-                % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name))
-        else:
-            return []
-        # if hasattr(cls, 'exclude') and cls.exclude:
-        #     if fk and fk.name in cls.exclude:
-        #         raise ImproperlyConfigured("%s cannot exclude the field "
-        #                 "'%s' - this is the foreign key to the parent model "
-        #                 "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
-    '''
+            return inline.check(model)
 
     @classmethod
     def _check_list_display(cls, model):
@@ -713,21 +693,18 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     @classmethod
-    def check(cls, model, parent_model, **kwargs):
+    def check(cls, model, **kwargs):
         errors = super(InlineModelAdminChecks, cls).check(model=model, **kwargs)
-        #errors.extend(cls._check_inline(model, parent_model))
-        errors.extend(cls._check_fk_name(model))
+        errors.extend(cls._check_inline(model))
+        errors.extend(cls._check_fk_name())
         errors.extend(cls._check_extra())
         errors.extend(cls._check_max_num())
         errors.extend(cls._check_formset())
         return errors
 
     @classmethod
-    def _check_inline(cls, model, parent_model):
-        """ Check inline class's fk field is not excluded. """
-
-        fk = _get_foreign_key(cls.model, cls.model, fk_name=cls.fk_name, can_fail=True)
-        import ipdb; ipdb.set_trace()
+    def _check_inline(cls, parent_model):
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
         if cls.exclude is None:
             return []
         elif fk and fk.name in cls.exclude:
@@ -748,33 +725,24 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         """
 
     @classmethod
-    def _check_fk_name(cls, model):
+    def _check_fk_name(cls):
         """ Check that fk_name refers to a ForeignKey. """
 
         if cls.fk_name is None:  # the default value is None
             return []
         else:
             try:
-                field = model._meta.get_field(cls.fk_name)
+                field = cls.model._meta.get_field(cls.fk_name)
                 if not isinstance(field, models.ForeignKey):
                     raise ValueError
             except models.FieldDoesNotExist:
                 return cls._error(
                     '"fk_name" refers to field "%s", which is missing from model %s.%s.'
-                    % (cls.fk_name, model._meta.app_label, model._meta.object_name))
+                    % (cls.fk_name, cls.model._meta.app_label, cls.model._meta.object_name))
             except ValueError:
                 return cls._error('"fk_name" must be a ForeignKey.')
             else:
                 return []
-
-    """
-    try:
-        return model._meta.get_field(field)
-    except models.FieldDoesNotExist:
-        raise ImproperlyConfigured("'%s.%s' refers to field '%s' "
-            "that is missing from model '%s.%s'."
-            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-    """
 
     @classmethod
     def _check_extra(cls):
@@ -804,45 +772,3 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return cls._error('"formset" must inherit from BaseModelFormSet.')
         else:
             return []
-
-
-######################################################
-# CHECK HELPERS
-######################################################
-
-def check_type(cls, attr, type_):
-    if getattr(cls, attr, None) is not None and not isinstance(getattr(cls, attr), type_):
-        raise ImproperlyConfigured("'%s.%s' should be a %s."
-                % (cls.__name__, attr, type_.__name__ ))
-
-def check_isseq(cls, label, obj):
-    if not isinstance(obj, (list, tuple)):
-        raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
-
-def check_isdict(cls, label, obj):
-    if not isinstance(obj, dict):
-        raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
-
-def get_field(cls, model, label, field):
-    try:
-        return model._meta.get_field(field)
-    except models.FieldDoesNotExist:
-        raise ImproperlyConfigured("'%s.%s' refers to field '%s' "
-            "that is missing from model '%s.%s'."
-            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-
-def fetch_attr(cls, model, label, field):
-    try:
-        return model._meta.get_field(field)
-    except models.FieldDoesNotExist:
-        pass
-    try:
-        return getattr(model, field)
-    except AttributeError:
-        raise ImproperlyConfigured("'%s.%s' refers to '%s' "
-            "that is neither a field, method or property of model '%s.%s'."
-            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-
-######################################################
-# END OF CHECK HELPERS
-######################################################
