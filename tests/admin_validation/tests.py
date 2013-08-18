@@ -97,7 +97,7 @@ class ValidationTestCase(TestCase):
         errors = ExcludedFields2.check(model=Book)
         expected = [
             checks.Error(
-                'There are duplicate field(s) in "exclude".',
+                '"exclude" contains duplicate field(s).',
                 hint=None,
                 obj=ExcludedFields2,
             )
@@ -122,7 +122,7 @@ class ValidationTestCase(TestCase):
             checks.Error(
                 '"exclude" must be a list or tuple.',
                 hint=None,
-                obj=ExcludedFieldsAlbumAdmin,
+                obj=ExcludedFieldsInline,
             )
         ]
         self.assertEqual(errors, expected)
@@ -148,8 +148,10 @@ class ValidationTestCase(TestCase):
         errors = AlbumAdmin.check(model=Album)
         expected = [
             checks.Error(
-                'SongInline cannot exclude the field "album", because it is '
-                    'the foreign key to the parent model admin_validation.Album.',
+                'Cannot exclude the field "album", because it is the foreign key '
+                    'to the parent model admin_validation.Album.',
+                #'SongInline cannot exclude the field "album", because it is '
+                #    'the foreign key to the parent model admin_validation.Album.',
                 hint=None,
                 obj=SongInline,
             )
@@ -171,8 +173,8 @@ class ValidationTestCase(TestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                '"raw_id_fields" refers to field "nonexisting" that is missing '
-                    'from model admin_validation.Album.',
+                '"raw_id_fields[0]" refers to field "nonexisting", which is '
+                    'missing from model admin_validation.Album.',
                 hint=None,
                 obj=RawIdNonexistingAdmin,
             )
@@ -281,8 +283,8 @@ class ValidationTestCase(TestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                '"readonly_fields" includes "nonexistant" which is not a callable '
-                    'or an attribute of SongAdmin or found in the model Song.',
+                '"readonly_fields[1]" is neither a callable nor an attribute '
+                    'of "SongAdmin" nor found in the model admin_validation.Song.',
                 hint=None,
                 obj=SongAdmin,
             )
@@ -299,11 +301,11 @@ class ValidationTestCase(TestCase):
             model = City
             readonly_fields=['i_dont_exist'] # Missing attribute
 
-        errors = CityInline.check(model=City)
+        errors = CityInline.check(model=City, parent_model=None)
         expected = [
             checks.Error(
-                'readonly_fields[0] is "i_dont_exist", which is not a callable '
-                    'or an attribute of "CityInline" or found in the model "City".',
+                '"readonly_fields[0]" is neither a callable nor an attribute '
+                    'of "CityInline" nor found in the model admin_validation.City.',
                 hint=None,
                 obj=CityInline,
             )
@@ -347,8 +349,8 @@ class ValidationTestCase(TestCase):
         errors = BookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                'fields cannot include many-to-many fields like "authors", '
-                    'because this field manually specifies a relationship model.',
+                '"fields" cannot include the ManyToManyField "authors", '
+                    'because "authors" manually specifies relationship model.',
                 hint=None,
                 obj=BookAdmin,
             )
@@ -370,9 +372,8 @@ class ValidationTestCase(TestCase):
         errors = FieldsetBookAdmin.check(model=Book)
         expected = [
             checks.Error(
-                'fieldsets[1][1]["fields"] cannot include many-to-many fields '
-                    'like "authors", because this field manually specifies '
-                    'a relationship model.',
+                '"fieldsets[1][1][\'fields\']" cannot include the ManyToManyField '
+                    '"authors", because "authors" manually specifies relationship model.',
                 hint=None,
                 obj=FieldsetBookAdmin,
             )

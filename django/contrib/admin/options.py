@@ -8,7 +8,8 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.checks import BaseModelAdminChecks
+from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
+    InlineModelAdminChecks)
 from django.contrib.admin.utils import (unquote, flatten_fieldsets,
     get_deleted_objects, model_format_dict, NestedObjects,
     lookup_needs_distinct)
@@ -80,46 +81,6 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 }
 
 csrf_protect_m = method_decorator(csrf_protect)
-
-
-######################################################
-# CHECK HELPERS
-######################################################
-
-def check_type(cls, attr, type_):
-    if getattr(cls, attr, None) is not None and not isinstance(getattr(cls, attr), type_):
-        raise ImproperlyConfigured("'%s.%s' should be a %s."
-                % (cls.__name__, attr, type_.__name__ ))
-
-def check_isseq(cls, label, obj):
-    if not isinstance(obj, (list, tuple)):
-        raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
-
-def check_isdict(cls, label, obj):
-    if not isinstance(obj, dict):
-        raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
-
-def get_field(cls, model, label, field):
-    try:
-        return model._meta.get_field(field)
-    except models.FieldDoesNotExist:
-        raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
-                % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-
-def fetch_attr(cls, model, label, field):
-    try:
-        return model._meta.get_field(field)
-    except models.FieldDoesNotExist:
-        pass
-    try:
-        return getattr(model, field)
-    except AttributeError:
-        raise ImproperlyConfigured("'%s.%s' refers to '%s' that is neither a field, method or property of model '%s.%s'."
-            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
-
-######################################################
-# END OF CHECK HELPERS
-######################################################
 
 
 class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
@@ -455,7 +416,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
 
-class ModelAdmin(BaseModelAdmin):
+class ModelAdmin(BaseModelAdmin, ModelAdminChecks):
     "Encapsulates all admin options and functionality for a given model."
 
     list_display = ('__str__',)
@@ -1678,215 +1639,8 @@ class ModelAdmin(BaseModelAdmin):
             inline_instances.append(inline)
         return formsets, inline_instances
 
-    #####################################
-    # CHECKS
-    #####################################
 
-    @classmethod
-    def check(cls, model, **kwargs):
-        errors = super(ModelAdmin, cls).check(model=model, **kwargs)
-        errors.extend(cls._check_save_as(model=model))
-        errors.extend(cls._check_save_on_top(model=model))
-        errors.extend(cls._check_inlines(model=model))
-        errors.extend(cls._check_list_display(model=model))
-        errors.extend(cls._check_list_display_links(model=model))
-        errors.extend(cls._check_list_filter(model=model))
-        errors.extend(cls._check_list_select_related(model=model))
-        errors.extend(cls._check_list_per_page(model=model))
-        errors.extend(cls._check_list_max_show_all(model=model))
-        errors.extend(cls._check_list_editable(model=model))
-        errors.extend(cls._check_search_fields(model=model))
-        errors.extend(cls._check_date_hierarchy(model=model))
-        return errors
-
-    @classmethod
-    def _check_save_as(cls, model):
-        """ Check save_as is a boolean. """
-        check_type(cls, 'save_as', bool)
-        return []
-
-    @classmethod
-    def _check_save_on_top(cls, model):
-        """ Check save_on_top is a boolean. """
-        check_type(cls, 'save_on_top', bool)
-        return []
-
-    @classmethod
-    def _check_inlines(cls, model):
-        """ Check inline model admin classes. """
-        from django.contrib.admin.options import BaseModelAdmin
-        if hasattr(cls, 'inlines'):
-            check_isseq(cls, 'inlines', cls.inlines)
-            for idx, inline in enumerate(cls.inlines):
-                if not issubclass(inline, BaseModelAdmin):
-                    raise ImproperlyConfigured("'%s.inlines[%d]' does not inherit "
-                            "from BaseModelAdmin." % (cls.__name__, idx))
-                if not inline.model:
-                    raise ImproperlyConfigured("'model' is a required attribute "
-                            "of '%s.inlines[%d]'." % (cls.__name__, idx))
-                if not issubclass(inline.model, models.Model):
-                    raise ImproperlyConfigured("'%s.inlines[%d].model' does not "
-                            "inherit from models.Model." % (cls.__name__, idx))
-                inline.check(inline.model)
-                #cls.check_inline(inline, model)
-        return []
-
-    @classmethod
-    def _check_list_display(cls, model):
-        """ Check that list_display only contains fields or usable attributes.
-        """
-        if hasattr(cls, 'list_display'):
-            check_isseq(cls, 'list_display', cls.list_display)
-            for idx, field in enumerate(cls.list_display):
-                if not callable(field):
-                    if not hasattr(cls, field):
-                        if not hasattr(model, field):
-                            try:
-                                model._meta.get_field(field)
-                            except models.FieldDoesNotExist:
-                                raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
-                                    % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
-                        else:
-                            # getattr(model, field) could be an X_RelatedObjectsDescriptor
-                            f = fetch_attr(cls, model, "list_display[%d]" % idx, field)
-                            if isinstance(f, models.ManyToManyField):
-                                raise ImproperlyConfigured("'%s.list_display[%d]', '%s' is a ManyToManyField which is not supported."
-                                    % (cls.__name__, idx, field))
-        return []
-
-    @classmethod
-    def _check_list_display_links(cls, model):
-        """ Check that list_display_links is a unique subset of list_display.
-        """
-        if hasattr(cls, 'list_display_links'):
-            check_isseq(cls, 'list_display_links', cls.list_display_links)
-            for idx, field in enumerate(cls.list_display_links):
-                if field not in cls.list_display:
-                    raise ImproperlyConfigured("'%s.list_display_links[%d]' "
-                            "refers to '%s' which is not defined in 'list_display'."
-                            % (cls.__name__, idx, field))
-        return []
-
-    @classmethod
-    def _check_list_filter(cls, model):
-        """
-        Check that list_filter is a sequence of one of three options:
-            1: 'field' - a basic field filter, possibly w/ relationships (eg, 'field__rel')
-            2: ('field', SomeFieldListFilter) - a field-based list filter class
-            3: SomeListFilter - a non-field list filter class
-        """
-        from django.contrib.admin import ListFilter, FieldListFilter
-        if hasattr(cls, 'list_filter'):
-            check_isseq(cls, 'list_filter', cls.list_filter)
-            for idx, item in enumerate(cls.list_filter):
-                if callable(item) and not isinstance(item, models.Field):
-                    # If item is option 3, it should be a ListFilter...
-                    if not issubclass(item, ListFilter):
-                        raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
-                                " which is not a descendant of ListFilter."
-                                % (cls.__name__, idx, item.__name__))
-                    # ...  but not a FieldListFilter.
-                    if issubclass(item, FieldListFilter):
-                        raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
-                                " which is of type FieldListFilter but is not"
-                                " associated with a field name."
-                                % (cls.__name__, idx, item.__name__))
-                else:
-                    if isinstance(item, (tuple, list)):
-                        # item is option #2
-                        field, list_filter_class = item
-                        if not issubclass(list_filter_class, FieldListFilter):
-                            raise ImproperlyConfigured("'%s.list_filter[%d][1]'"
-                                " is '%s' which is not of type FieldListFilter."
-                                % (cls.__name__, idx, list_filter_class.__name__))
-                    else:
-                        # item is option #1
-                        field = item
-                    # Validate the field string
-                    try:
-                        get_fields_from_path(model, field)
-                    except (NotRelationField, FieldDoesNotExist):
-                        raise ImproperlyConfigured("'%s.list_filter[%d]' refers to '%s'"
-                                " which does not refer to a Field."
-                                % (cls.__name__, idx, field))
-        return []
-
-    @classmethod
-    def _check_list_select_related(cls, model):
-        """ Check that list_select_related is a boolean, a list or a tuple. """
-        list_select_related = getattr(cls, 'list_select_related', None)
-        if list_select_related:
-            types = (bool, tuple, list)
-            if not isinstance(list_select_related, types):
-                raise ImproperlyConfigured("'%s.list_select_related' should be "
-                                           "either a bool, a tuple or a list" %
-                                           cls.__name__)
-        return []
-
-    @classmethod
-    def _check_list_per_page(cls, model):
-        """ Check that list_per_page is an integer. """
-        check_type(cls, 'list_per_page', int)
-        return []
-
-    @classmethod
-    def _check_list_max_show_all(cls, model):
-        """ Check that list_max_show_all is an integer. """
-        check_type(cls, 'list_max_show_all', int)
-        return []
-
-    @classmethod
-    def _check_list_editable(cls, model):
-        """ Check that list_editable is a sequence of editable fields from
-        list_display without first element. """
-        if hasattr(cls, 'list_editable') and cls.list_editable:
-            check_isseq(cls, 'list_editable', cls.list_editable)
-            for idx, field_name in enumerate(cls.list_editable):
-                try:
-                    field = model._meta.get_field_by_name(field_name)[0]
-                except models.FieldDoesNotExist:
-                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
-                        "field, '%s', not defined on %s.%s."
-                        % (cls.__name__, idx, field_name, model._meta.app_label, model.__name__))
-                if field_name not in cls.list_display:
-                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "
-                        "'%s' which is not defined in 'list_display'."
-                        % (cls.__name__, idx, field_name))
-                if field_name in cls.list_display_links:
-                    raise ImproperlyConfigured("'%s' cannot be in both '%s.list_editable'"
-                        " and '%s.list_display_links'"
-                        % (field_name, cls.__name__, cls.__name__))
-                if not cls.list_display_links and cls.list_display[0] in cls.list_editable:
-                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to"
-                        " the first field in list_display, '%s', which can't be"
-                        " used unless list_display_links is set."
-                        % (cls.__name__, idx, cls.list_display[0]))
-                if not field.editable:
-                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
-                        "field, '%s', which isn't editable through the admin."
-                        % (cls.__name__, idx, field_name))
-        return []
-
-    @classmethod
-    def _check_search_fields(cls, model):
-        """ Check search_fields is a sequence. """
-        if hasattr(cls, 'search_fields'):
-            check_isseq(cls, 'search_fields', cls.search_fields)
-        return []
-
-    @classmethod
-    def _check_date_hierarchy(cls, model):
-        """ Check that date_hierarchy refers to DateField or DateTimeField. """
-        if cls.date_hierarchy:
-            f = get_field(cls, model, 'date_hierarchy', cls.date_hierarchy)
-            if not isinstance(f, (models.DateField, models.DateTimeField)):
-                raise ImproperlyConfigured("'%s.date_hierarchy is "
-                        "neither an instance of DateField nor DateTimeField."
-                        % cls.__name__)
-        return []
-
-
-class InlineModelAdmin(BaseModelAdmin):
+class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
     """
     Options for inline editing of ``model`` instances.
 
@@ -2047,63 +1801,6 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
-
-    ######################################
-    # CHECKS
-    ######################################
-
-    @classmethod
-    def check(cls, model, **kwargs):
-        errors = super(InlineModelAdmin, cls).check(model=model, **kwargs)
-        errors.extend(cls._check_inline())
-        errors.extend(cls._check_fk_name(model=model))
-        errors.extend(cls._check_extra())
-        errors.extend(cls._check_max_num())
-        errors.extend(cls._check_formset())
-        return errors
-
-    @classmethod
-    def _check_inline(cls):
-        """ Check inline class's fk field is not excluded. """
-        parent_model = cls.model
-        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
-        if hasattr(cls, 'exclude') and cls.exclude:
-            if fk and fk.name in cls.exclude:
-                raise ImproperlyConfigured("%s cannot exclude the field "
-                        "'%s' - this is the foreign key to the parent model "
-                        "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
-        return []
-
-    @classmethod
-    def _check_fk_name(cls, model):
-        """ Check that fk_name refers to a ForeignKey. """
-        if cls.fk_name: # default value is None
-            f = get_field(cls, model, 'fk_name', cls.fk_name)
-            if not isinstance(f, models.ForeignKey):
-                raise ImproperlyConfigured("'%s.fk_name is not an instance of "
-                        "models.ForeignKey." % cls.__name__)
-        return []
-
-    @classmethod
-    def _check_extra(cls):
-        """ Check that extra is an integer. """
-        check_type(cls, 'extra', int)
-        return []
-
-    @classmethod
-    def _check_max_num(cls):
-        """ Check that max_num is an integer. """
-        check_type(cls, 'max_num', int)
-        return []
-
-    @classmethod
-    def _check_formset(cls):
-        """ Check formset is a subclass of BaseModelFormSet. """
-        if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):
-            raise ImproperlyConfigured("'%s.formset' does not inherit from "
-                    "BaseModelFormSet." % cls.__name__)
-        return []
-
 
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline/stacked.html'

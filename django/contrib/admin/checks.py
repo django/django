@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.core import checks
 from django.db import models
-from django.forms.models import BaseModelForm
+from django.db.models.fields import FieldDoesNotExist
+from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
 
 
 # This check is registered in __init__.py file.
@@ -74,7 +76,7 @@ class BaseModelAdminChecks(object):
                 raise ValueError
         except models.FieldDoesNotExist:
             return cls._error(
-                '"%s" refers to field "%s" that is missing from model %s.%s.'
+                '"%s" refers to field "%s", which is missing from model %s.%s.'
                 % (label, field_name, model._meta.app_label, model.__name__))
         except ValueError:
             return cls._error('"%s" must be a ForeignKey or a ManyToManyField.' % label)
@@ -119,7 +121,7 @@ class BaseModelAdminChecks(object):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
         set name and a dictionary containing "fields" key. """
 
-        if isinstance(fieldset, (list, tuple)):
+        if not isinstance(fieldset, (list, tuple)):
             return cls._error('"%s must be a list or tuple' % label)
         elif len(fieldset) != 2:
             return cls._error('"%s" must be a sequence of pairs.' % label)
@@ -129,7 +131,7 @@ class BaseModelAdminChecks(object):
             return cls._error('"%s[1]" must contain "fields" key.' % label)
         else:
             return flatten(
-                cls._check_field_spec(model, fields, '"%s[1][\'fields\']"' % label)
+                cls._check_field_spec(model, fields, '%s[1][\'fields\']' % label)
                 for fields in fieldset[1]['fields'])
 
     @classmethod
@@ -228,7 +230,7 @@ class BaseModelAdminChecks(object):
                 raise ValueError
         except models.FieldDoesNotExist:
             return cls._error(
-                '"%s" refers to field "%s" that is missing from model %s.%s.'
+                '"%s" refers to field "%s", which is missing from model %s.%s.'
                 % (label, field_name, model._meta.app_label, model._meta.object_name))
         except ValueError:
             return cls._error('"%s" must be a ManyToManyField.' % label)
@@ -260,7 +262,7 @@ class BaseModelAdminChecks(object):
                 raise ValueError
         except models.FieldDoesNotExist:
             return cls._error(
-                '"%s" refers to "%s" field that is missing from model %s.%s.'
+                '"%s" refers to "%s" field, which is missing from model %s.%s.'
                 % (label, field_name, model._meta.app_label, model._meta.object_name))
         except ValueError:
             return cls._error('"%s" is neither an instance of ForeignKey '
@@ -312,7 +314,7 @@ class BaseModelAdminChecks(object):
                 raise ValueError
         except models.FieldDoesNotExist:
             return cls._error(
-                '"%s" refers to "%s" field that is missing from model %s.%s.'
+                '"%s" refers to "%s" field, which is missing from model %s.%s.'
                 % (label, field_name, model._meta.app_label, model._meta.object_name))
         except ValueError:
             return cls._error('"%s" is either a DateTimeField, ForeignKey '
@@ -341,7 +343,7 @@ class BaseModelAdminChecks(object):
             model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
             return cls._error(
-                '"%s" refers to field "%s" that is missing from model %s.%s.'
+                '"%s" refers to field "%s", which is missing from model %s.%s.'
                 % (label, field_name, model._meta.app_label, model._meta.object_name))
         else:
             return []
@@ -381,7 +383,7 @@ class BaseModelAdminChecks(object):
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
                 return cls._error(
-                    '"%s" refers to field "%s" that is missing from model %s.%s.'
+                    '"%s" refers to field "%s", which is missing from model %s.%s.'
                     % (label, field_name, model._meta.app_label, model._meta.object_name))
             else:
                 return []
@@ -412,8 +414,435 @@ class BaseModelAdminChecks(object):
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
                 return cls._error(
-                    '"%s" is neither a callable nor an attribute of %r nor found in the model %s.%s.'
+                    '"%s" is neither a callable nor an attribute of "%s" nor found in the model %s.%s.'
                     % (label, cls.__name__, model._meta.app_label, model._meta.object_name))
             else:
                 return []
 
+
+# Mixin for ModelBase.
+class ModelAdminChecks(BaseModelAdminChecks):
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = super(ModelAdminChecks, cls).check(model=model, **kwargs)
+        errors.extend(cls._check_save_as(model=model))
+        errors.extend(cls._check_save_on_top(model=model))
+        errors.extend(cls._check_inlines(model=model))
+        errors.extend(cls._check_list_display(model=model))
+        errors.extend(cls._check_list_display_links(model=model))
+        errors.extend(cls._check_list_filter(model=model))
+        errors.extend(cls._check_list_select_related(model=model))
+        errors.extend(cls._check_list_per_page(model=model))
+        errors.extend(cls._check_list_max_show_all(model=model))
+        errors.extend(cls._check_list_editable(model=model))
+        errors.extend(cls._check_search_fields(model=model))
+        errors.extend(cls._check_date_hierarchy(model=model))
+        return errors
+
+    @classmethod
+    def _check_save_as(cls, model):
+        """ Check save_as is a boolean. """
+
+        if not isinstance(cls.save_as, bool):
+            return cls._error('"save_as" must be a boolean.')
+        else:
+            return []
+
+    @classmethod
+    def _check_save_on_top(cls, model):
+        """ Check save_on_top is a boolean. """
+
+        if not isinstance(cls.save_on_top, bool):
+            return cls._error('"save_on_top" must be a boolean.')
+        else:
+            return []
+
+    @classmethod
+    def _check_inlines(cls, model):
+        """ Check inline model admin classes. """
+
+        if not isinstance(cls.inlines, (list, tuple)):
+            return cls._error('"inlines" must be a list or tuple.')
+        else:
+            return flatten(
+                cls._check_inlines_item(model, item, "inlines[%d]" % index)
+                for index, item in enumerate(cls.inlines))
+
+    @classmethod
+    def _check_inlines_item(cls, model, inline, label):
+        from django.contrib.admin.options import BaseModelAdmin
+
+        if not issubclass(inline, BaseModelAdmin):
+            return cls._error('"%s" must inherit from BaseModelAdmin.' % label)
+        elif not inline.model:
+            return cls._error('"model" is a required attribute of "%s".' % label)
+        elif not issubclass(inline.model, models.Model):
+            return cls._error('"%s.model" must be a Model."' % label)
+        else:
+            #return cls._check_inline(inline, model) + inline.check(model, cls)
+            return inline.check(model, cls)
+
+    '''
+    @classmethod
+    def _check_inline(class_, cls, parent_model):
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
+        if cls.exclude is None:
+            return []
+        elif fk and fk.name in cls.exclude:
+            return cls._error(
+                'Cannot exclude the field "%s", because it is the foreign key to the parent model %s.%s.'
+                % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name))
+        else:
+            return []
+        # if hasattr(cls, 'exclude') and cls.exclude:
+        #     if fk and fk.name in cls.exclude:
+        #         raise ImproperlyConfigured("%s cannot exclude the field "
+        #                 "'%s' - this is the foreign key to the parent model "
+        #                 "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
+    '''
+
+    @classmethod
+    def _check_list_display(cls, model):
+        """ Check that list_display only contains fields or usable attributes.
+        """
+
+        if not isinstance(cls.list_display, (list, tuple)):
+            return cls._error('"list_display" must be a list or tuple.')
+        else:
+            return flatten(
+                cls._check_list_display_item(model, item, "list_diplay[%d]" % index)
+                for index, item in enumerate(cls.list_display))
+
+    @classmethod
+    def _check_list_display_item(cls, model, item, label):
+        if callable(item):
+            return []
+        elif hasattr(cls, item):
+            return []
+        elif hasattr(model, item):
+            # getattr(model, item) could be an X_RelatedObjectsDescriptor
+            try:
+                field = model._meta.get_field(item)
+            except models.FieldDoesNotExist:
+                try:
+                    field = getattr(model, item)
+                except AttributeError:
+                    field = None
+
+            if field is None:
+                return cls._error(
+                    '"%s" refers to "%s" that is neither a field, method nor a property of model %s.%s.'
+                    % label, item, model._meta.app_label, model._meta.object_name)
+            elif isinstance(item, models.ManyToManyField):
+                return cls._error('"%s" must not be a ManyToManyField.' % label)
+            else:
+                return []
+        else:
+            try:
+                model._meta.get_field(item)
+            except models.FieldDoesNotExist:
+                return cls._error(
+                    '"%s" is neither a callable nor an attribute of %r nor found in model %s.%s.'
+                    % (label, cls.__name__, model._meta.app_label, model._meta.object_name))
+            else:
+                return []
+
+    @classmethod
+    def _check_list_display_links(cls, model):
+        """ Check that list_display_links is a unique subset of list_display.
+        """
+
+        if not isinstance(cls.list_display_links, (list, tuple)):
+            import ipdb; ipdb.set_trace()
+            return cls._error('"list_display_links" must be a list or tuple')
+
+        else:
+            return flatten(
+                cls._check_list_display_links_item(model, field_name, "list_display_links[%d]" % index)
+                for index, field_name in enumerate(cls.list_display_links))
+
+    @classmethod
+    def _check_list_display_links_item(cls, model, field_name, label):
+        if field_name not in cls.list_display:
+            return cls._error(
+                '"%s" refers to "%s", which is not defined in "list_display".'
+                % (label, field_name))
+        else:
+            return []
+
+    @classmethod
+    def _check_list_filter(cls, model):
+        """
+        Check that list_filter is a sequence of one of three options:
+            1: 'field' - a basic field filter, possibly w/ relationships (eg, 'field__rel')
+            2: ('field', SomeFieldListFilter) - a field-based list filter class
+            3: SomeListFilter - a non-field list filter class
+        """
+
+        if not isinstance(cls.list_filter, (list, tuple)):
+            return cls._error('"list_filter" must be a list or tuple.')
+        else:
+            return flatten(
+                cls._check_list_filter_item(model, item, "list_filter[%d]" % index)
+                for index, item in enumerate(cls.list_filter))
+
+    @classmethod
+    def _check_list_filter_item(cls, model, item, label):
+        from django.contrib.admin import ListFilter, FieldListFilter
+
+        if callable(item) and not isinstance(item, models.Field):
+            # If item is option 3, it should be a ListFilter...
+            if not issubclass(item, ListFilter):
+                return cls._error('"%s" must inherit from ListFilter.' % label)
+            # ...  but not a FieldListFilter.
+            elif issubclass(item, FieldListFilter):
+                return cls._error('"%s" must not inherit from FieldListFilter.' % label)
+            else:
+                return []
+        else:
+            if isinstance(item, (tuple, list)):
+                # item is option #2
+                field, list_filter_class = item
+                if not issubclass(list_filter_class, FieldListFilter):
+                    return cls._error('"%s" must inherit from FieldListFilter.' % label)
+                else:
+                    return []
+            else:
+                # item is option #1
+                field = item
+
+                # Validate the field string
+                try:
+                    get_fields_from_path(model, field)
+                except (NotRelationField, FieldDoesNotExist):
+                    return cls._error('"%s" refers to "%s", which does not refer to a Field.' % (label, field))
+
+    @classmethod
+    def _check_list_select_related(cls, model):
+        """ Check that list_select_related is a boolean, a list or a tuple. """
+
+        if not isinstance(cls.list_select_related, (bool, list, tuple)):
+            return cls._error('"list_select_related" must be a bool, tuple or list.')
+        else:
+            return []
+
+    @classmethod
+    def _check_list_per_page(cls, model):
+        """ Check that list_per_page is an integer. """
+
+        if not isinstance(cls.list_per_page, int):
+            return cls._error('"list_per_page" must be an integer.')
+        else:
+            return []
+
+    @classmethod
+    def _check_list_max_show_all(cls, model):
+        """ Check that list_max_show_all is an integer. """
+
+        if not isinstance(cls.list_max_show_all, int):
+            return cls._error('"list_max_show_all" must be an integer.')
+        else:
+            return []
+
+    @classmethod
+    def _check_list_editable(cls, model):
+        """ Check that list_editable is a sequence of editable fields from
+        list_display without first element. """
+
+        if not isinstance(cls.list_editable, (list, tuple)):
+            return cls._error('"list_editable" must be a list or tuple.')
+        else:
+            return flatten(
+                cls._check_list_editable_item(model, item, "list_editable[%d]" % index)
+                for index, item in enumerate(cls.list_editable))
+
+    @classmethod
+    def _check_list_editable_item(cls, model, field_name, label):
+        try:
+            field = model._meta.get_field_by_name(field_name)[0]
+        except models.FieldDoesNotExist:
+            return cls._error(
+                '"%s" refers to field "%s", which is missing from model %s.%s.'
+                % (label, field_name, model._meta.app_label, model._meta.object_name))
+        else:
+            if field_name not in cls.list_display:
+                return cls._error('"%s" refers to field "%s", which is not defined in "list_display".' % (label, field_name))
+            elif field_name in cls.list_display_links:
+                return cls._error('"%s" cannot be in both "list_editable" and "list_display_links".' % field_name)
+            elif not cls.list_display_links and cls.list_display[0] in cls.list_editable:
+                return cls._error(
+                    '"%s" refers to the first field in list_display ("%s"), which cannot be used unless list_display_links is set.'
+                    % (label, cls.list_display[0]))
+            elif not field.editable:
+                return cls._error(
+                    '"%s" refers to field "%s", whih is not editable through the admin.'
+                    % (label, field_name))
+
+    @classmethod
+    def _check_search_fields(cls, model):
+        """ Check search_fields is a sequence. """
+
+        if not isinstance(cls.search_fields, (list, tuple)):
+            return cls._error('"search_fields" must be a list or tuple.')
+        else:
+            return []
+
+    @classmethod
+    def _check_date_hierarchy(cls, model):
+        """ Check that date_hierarchy refers to DateField or DateTimeField. """
+
+        if cls.date_hierarchy is None:
+            return []
+        else:
+            try:
+                field = model._meta.get_field(cls.date_hierarchy)
+                if not isinstance(field, (models.DateField, models.DateTimeField)):
+                    raise ValueError
+            except models.FieldDoesNotExist:
+                return cls._error(
+                    '"date_hierarchy" refers to field "%s", which is missing from model %s.%s.'
+                    % (cls.date_hierarchy, model._meta.app_label, model._meta.object_name))
+            except ValueError:
+                return cls._error('"date_hierarchy" must be a DateField or DateTimeField.')
+            else:
+                return []
+
+
+# Mixin for InlineModelAdmin
+class InlineModelAdminChecks(BaseModelAdminChecks):
+
+    @classmethod
+    def check(cls, model, parent_model, **kwargs):
+        errors = super(InlineModelAdminChecks, cls).check(model=model, **kwargs)
+        #errors.extend(cls._check_inline(model, parent_model))
+        errors.extend(cls._check_fk_name(model))
+        errors.extend(cls._check_extra())
+        errors.extend(cls._check_max_num())
+        errors.extend(cls._check_formset())
+        return errors
+
+    @classmethod
+    def _check_inline(cls, model, parent_model):
+        """ Check inline class's fk field is not excluded. """
+
+        fk = _get_foreign_key(cls.model, cls.model, fk_name=cls.fk_name, can_fail=True)
+        import ipdb; ipdb.set_trace()
+        if cls.exclude is None:
+            return []
+        elif fk and fk.name in cls.exclude:
+            return cls._error(
+                'Cannot exclude the field "%s", because it is the foreign key to the parent model %s.%s.'
+                % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name))
+        else:
+            return []
+
+        """
+        parent_model = cls.model
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
+        if hasattr(cls, 'exclude') and cls.exclude:
+            if fk and fk.name in cls.exclude:
+                raise ImproperlyConfigured("%s cannot exclude the field "
+                        "'%s' - this is the foreign key to the parent model "
+                        "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
+        """
+
+    @classmethod
+    def _check_fk_name(cls, model):
+        """ Check that fk_name refers to a ForeignKey. """
+
+        if cls.fk_name is None:  # the default value is None
+            return []
+        else:
+            try:
+                field = model._meta.get_field(cls.fk_name)
+                if not isinstance(field, models.ForeignKey):
+                    raise ValueError
+            except models.FieldDoesNotExist:
+                return cls._error(
+                    '"fk_name" refers to field "%s", which is missing from model %s.%s.'
+                    % (cls.fk_name, model._meta.app_label, model._meta.object_name))
+            except ValueError:
+                return cls._error('"fk_name" must be a ForeignKey.')
+            else:
+                return []
+
+    """
+    try:
+        return model._meta.get_field(field)
+    except models.FieldDoesNotExist:
+        raise ImproperlyConfigured("'%s.%s' refers to field '%s' "
+            "that is missing from model '%s.%s'."
+            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+    """
+
+    @classmethod
+    def _check_extra(cls):
+        """ Check that extra is an integer. """
+
+        if not isinstance(cls.extra, int):
+            return cls._error('"extra" must be an integer.')
+        else:
+            return []
+
+    @classmethod
+    def _check_max_num(cls):
+        """ Check that max_num is an integer. """
+
+        if cls.max_num is None:
+            return []
+        elif not isinstance(cls.max_num, int):
+            return cls._error('"max_num" must be an integer.')
+        else:
+            return []
+
+    @classmethod
+    def _check_formset(cls):
+        """ Check formset is a subclass of BaseModelFormSet. """
+
+        if not issubclass(cls.formset, BaseModelFormSet):
+            return cls._error('"formset" must inherit from BaseModelFormSet.')
+        else:
+            return []
+
+
+######################################################
+# CHECK HELPERS
+######################################################
+
+def check_type(cls, attr, type_):
+    if getattr(cls, attr, None) is not None and not isinstance(getattr(cls, attr), type_):
+        raise ImproperlyConfigured("'%s.%s' should be a %s."
+                % (cls.__name__, attr, type_.__name__ ))
+
+def check_isseq(cls, label, obj):
+    if not isinstance(obj, (list, tuple)):
+        raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
+
+def check_isdict(cls, label, obj):
+    if not isinstance(obj, dict):
+        raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
+
+def get_field(cls, model, label, field):
+    try:
+        return model._meta.get_field(field)
+    except models.FieldDoesNotExist:
+        raise ImproperlyConfigured("'%s.%s' refers to field '%s' "
+            "that is missing from model '%s.%s'."
+            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
+def fetch_attr(cls, model, label, field):
+    try:
+        return model._meta.get_field(field)
+    except models.FieldDoesNotExist:
+        pass
+    try:
+        return getattr(model, field)
+    except AttributeError:
+        raise ImproperlyConfigured("'%s.%s' refers to '%s' "
+            "that is neither a field, method or property of model '%s.%s'."
+            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
+######################################################
+# END OF CHECK HELPERS
+######################################################
