@@ -270,13 +270,8 @@ class LazyObject(object):
     def __delitem__(self, key):
         del self[key]
 
-    @new_method_proxy
-    def __len__(self):
-        return len(self)
-
-    @new_method_proxy
-    def __contains__(self, key):
-        return key in self
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
 
 
 # Workaround for http://bugs.python.org/issue12370
