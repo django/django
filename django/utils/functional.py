@@ -270,6 +270,9 @@ class LazyObject(object):
     def __delitem__(self, key):
         del self[key]
 
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
+
 
 # Workaround for http://bugs.python.org/issue12370
 _super = super
