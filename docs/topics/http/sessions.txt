@@ -231,11 +231,16 @@ You can edit it multiple times.
 
     .. method:: flush()
 
-      Delete the current session data from the session and regenerate the
-      session key value that is sent back to the user in the cookie. This is
-      used if you want to ensure that the previous session data can't be
-      accessed again from the user's browser (for example, the
+      Delete the current session data from the session and delete the session
+      cookie. This is used if you want to ensure that the previous session data
+      can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
+
+      .. versionchanged:: 1.8
+
+          Deletion of the session cookie is a behavior new in Django 1.8.
+          Previously, the behavior was to regenerate the session key value that
+          was sent back to the user in the cookie.
 
     .. method:: set_test_cookie()
 

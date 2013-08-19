@@ -61,7 +61,8 @@ Minor features
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Session cookie is now deleted after
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.flush()` is called.
 
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
