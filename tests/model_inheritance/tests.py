@@ -323,3 +323,27 @@ class ModelInheritanceTests(TestCase):
         # Equality doesn't transfer in multitable inheritance.
         self.assertNotEqual(Place(id=1), Restaurant(id=1))
         self.assertNotEqual(Restaurant(id=1), Place(id=1))
+
+    def test_ticket_12567(self):
+        r = Restaurant.objects.create(name='n1', address='a1')
+        s = Supplier.objects.create(name='s1', address='a2')
+        self.assertQuerysetEqual(
+            Place.objects.filter(supplier__isnull=False),
+            [Place.objects.get(pk=s.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.filter(supplier__isnull=True),
+            [Place.objects.get(pk=r.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.exclude(supplier__isnull=False),
+            [Place.objects.get(pk=r.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.exclude(supplier__isnull=True),
+            [Place.objects.get(pk=s.pk)],
+            lambda x: x
+        )
