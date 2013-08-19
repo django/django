@@ -466,24 +466,6 @@ class SQLCompiler(object):
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
 
-    def as_nested_sql(self):
-        """
-        Perform the same functionality as the as_sql() method, returning an
-        SQL string and parameters. However, the alias prefixes are bumped
-        beforehand (in a copy -- the current query isn't changed), and any
-        ordering is removed if the query is unsliced.
-
-        Used when nesting this query inside another.
-        """
-        obj = self.query.clone()
-        # It's safe to drop ordering if the queryset isn't using slicing,
-        # distinct(*fields) or select_for_update().
-        if (obj.low_mark == 0 and obj.high_mark is None and
-                not self.query.distinct_fields and
-                not self.query.select_for_update):
-            obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
-
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
         Computes the default columns for selecting every field in the base

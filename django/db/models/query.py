@@ -1128,22 +1128,27 @@ class QuerySet(object):
                 return self.values(foreign_fields[0].name)
         return self
 
-    def _as_sql(self, connection):
-        """
-        Returns the internal query's SQL and parameters (as a tuple).
-        """
+    def _prepare_as_filter_value(self):
+        forced_pk = False
         if self._fields is not None:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
-            if len(self._fields or self.model._meta.concrete_fields) > 1:
+            if len(self._fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
-            clone = self._clone()
+            obj = self._clone()
         else:
-            clone = self.values('pk')
-
-        if clone._db is None or connection == connections[clone._db]:
-            return clone.query.get_compiler(connection=connection).as_nested_sql()
-        raise ValueError("Can't do subqueries with queries on different DBs.")
+            obj = self.values('pk')
+            forced_pk = True
+        query = obj.query
+        if forced_pk:
+            query._forced_pk = True
+        # It's safe to drop ordering if the queryset isn't using slicing,
+        # distinct(*fields) or select_for_update().
+        if (query.low_mark == 0 and query.high_mark is None and
+                not query.distinct_fields and
+                not query.select_for_update):
+            query.clear_ordering(True)
+        return query
 
     def _add_hints(self, **hints):
         """

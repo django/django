@@ -974,8 +974,7 @@ class Query(object):
         if value is None:
             if lookups[-1] not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
-            lookups[-1] = 'isnull'
-            value = True
+            return True, ['isnull'], used_joins
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
@@ -997,10 +996,10 @@ class Query(object):
         # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
         # query (the value).
-        if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
-            value = value._clone()
-            value.query.bump_prefix(self)
-        if hasattr(value, 'bump_prefix'):
+        if hasattr(value, '_prepare_as_filter_value'):
+            value = value._prepare_as_filter_value()
+            value.bump_prefix(self)
+        elif hasattr(value, 'bump_prefix'):
             value = value.clone()
             value.bump_prefix(self)
         # For Oracle '' is equivalent to null. The check needs to be done
