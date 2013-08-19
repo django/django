@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 class SessionManager(models.Manager):
     def encode(self, session_dict):
         """
-        Returns the given session dictionary pickled and encoded as a string.
+        Returns the given session dictionary serialized and encoded as a string.
         """
         return SessionStore().encode(session_dict)
 
