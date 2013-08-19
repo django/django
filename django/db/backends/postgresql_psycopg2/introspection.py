@@ -26,6 +26,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1700: 'DecimalField',
     }
 
+    ignored_tables = []
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("""
@@ -35,7 +37,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('r', 'v', '')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [row[0] for row in cursor.fetchall()]
+        return [row[0] for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."

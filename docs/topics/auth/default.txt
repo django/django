@@ -434,12 +434,10 @@ The login_required decorator
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-    .. versionchanged:: 1.5
-
-        The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts
-        view function names and :ref:`named URL patterns <naming-url-patterns>`.
-        This allows you to freely remap your login view within your URLconf
-        without having to update the setting.
+    The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
+    names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
+    to freely remap your login view within your URLconf without having to
+    update the setting.
 
 .. note::
 
@@ -527,6 +525,11 @@ The permission_required decorator
     :exc:`~django.core.exceptions.PermissionDenied`, prompting :ref:`the 403
     (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
     login page.
+
+    .. versionchanged:: 1.7
+
+        The :func:`~django.contrib.auth.decorators.permission_required`
+        decorator can take a list of permissions as well as a single permission.
 
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1181,10 +1184,6 @@ Thus, you can check permissions in template ``{% if %}`` statements:
     {% else %}
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
-
-.. versionadded:: 1.5
-
-    Permission lookup by "if in".
 
 It is possible to also look permissions up by ``{% if in %}`` statements.
 For example:

@@ -92,7 +92,7 @@ class GeckoManager(models.Manager):
         return super(GeckoManager, self).get_queryset().filter(has_tail=True)
 
 class Gecko(models.Model):
-    has_tail = models.BooleanField()
+    has_tail = models.BooleanField(default=False)
     objects = GeckoManager()
 
 # To test fix for #11263

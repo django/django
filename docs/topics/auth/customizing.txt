@@ -359,8 +359,6 @@ the extra database load.
 Substituting a custom User model
 ================================
 
-.. versionadded:: 1.5
-
 Some kinds of projects may have authentication requirements for which Django's
 built-in :class:`~django.contrib.auth.models.User` model is not always
 appropriate. For instance, on some sites it makes more sense to use an email
@@ -684,13 +682,13 @@ auth views.
 * :class:`~django.contrib.auth.forms.AuthenticationForm`
 
   Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
-  and will adapt to use the field defined in `USERNAME_FIELD`.
+  and will adapt to use the field defined in ``USERNAME_FIELD``.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
   Assumes that the user model has an integer primary key, has a field named
   ``email`` that can be used to identify the user, and a boolean field
-  named `is_active` to prevent password resets for inactive users.
+  named ``is_active`` to prevent password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 

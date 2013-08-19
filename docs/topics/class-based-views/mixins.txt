@@ -55,8 +55,6 @@ interface to working with templates in class-based views.
     override this to provide more flexible defaults when dealing with actual
     objects.
 
-.. versionadded:: 1.5
-
 :class:`~django.views.generic.base.ContextMixin`
     Every built in view which needs context data, such as for rendering a
     template (including ``TemplateResponseMixin`` above), should call

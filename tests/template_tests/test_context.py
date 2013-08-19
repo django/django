@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from django.template import Context
+from django.template import Context, Variable, VariableDoesNotExist
 
 
 class ContextTests(TestCase):
@@ -25,3 +25,12 @@ class ContextTests(TestCase):
         with c.push(a=3):
             self.assertEqual(c['a'], 3)
         self.assertEqual(c['a'], 1)
+
+    def test_resolve_on_context_method(self):
+        # Regression test for #17778
+        empty_context = Context()
+        self.assertRaises(VariableDoesNotExist,
+                Variable('no_such_variable').resolve, empty_context)
+        self.assertRaises(VariableDoesNotExist,
+                Variable('new').resolve, empty_context)
+        self.assertEqual(Variable('new').resolve(Context({'new': 'foo'})), 'foo')

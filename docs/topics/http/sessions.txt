@@ -70,10 +70,6 @@ If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
-.. versionchanged:: 1.5
-
-    The :setting:`SESSION_CACHE_ALIAS` setting was added.
-
 Once your cache is configured, you've got two choices for how to store data in
 the cache:
 
@@ -302,8 +298,6 @@ You can edit it multiple times.
 
     .. method:: SessionBase.clear_expired
 
-      .. versionadded:: 1.5
-
       Removes expired sessions from the session store. This class method is
       called by :djadmin:`clearsessions`.
 
@@ -469,9 +463,7 @@ cookie will be sent on every request.
 Similarly, the ``expires`` part of a session cookie is updated each time the
 session cookie is sent.
 
-.. versionchanged:: 1.5
-
-  The session is not saved if the response's status code is 500.
+The session is not saved if the response's status code is 500.
 
 .. _browser-length-vs-persistent-sessions:
 

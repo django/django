@@ -458,10 +458,11 @@ class VerbatimNode(Node):
         return self.content
 
 class WidthRatioNode(Node):
-    def __init__(self, val_expr, max_expr, max_width):
+    def __init__(self, val_expr, max_expr, max_width, asvar=None):
         self.val_expr = val_expr
         self.max_expr = max_expr
         self.max_width = max_width
+        self.asvar = asvar
 
     def render(self, context):
         try:
@@ -480,7 +481,13 @@ class WidthRatioNode(Node):
             return '0'
         except (ValueError, TypeError):
             return ''
-        return str(int(round(ratio)))
+        result = str(int(round(ratio)))
+
+        if self.asvar:
+            context[self.asvar] = result
+            return ''
+        else:
+            return result
 
 class WithNode(Node):
     def __init__(self, var, name, nodelist, extra_context=None):
@@ -1353,20 +1360,34 @@ def widthratio(parser, token):
 
     For example::
 
-        <img src='bar.gif' height='10' width='{% widthratio this_value max_value max_width %}' />
+        <img src="bar.png" alt="Bar"
+             height="10" width="{% widthratio this_value max_value max_width %}" />
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
+
+    In some cases you might want to capture the result of widthratio in a
+    variable. It can be useful for instance in a blocktrans like this::
+
+        {% widthratio this_value max_value max_width as width %}
+        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
     """
     bits = token.split_contents()
-    if len(bits) != 4:
-        raise TemplateSyntaxError("widthratio takes three arguments")
-    tag, this_value_expr, max_value_expr, max_width = bits
+    if len(bits) == 4:
+        tag, this_value_expr, max_value_expr, max_width = bits
+        asvar = None
+    elif len(bits) == 6:
+        tag, this_value_expr, max_value_expr, max_width, as_, asvar = bits
+        if as_ != 'as':
+            raise TemplateSyntaxError("Invalid syntax in widthratio tag. Expecting 'as' keyword")
+    else:
+        raise TemplateSyntaxError("widthratio takes at least three arguments")
 
     return WidthRatioNode(parser.compile_filter(this_value_expr),
                           parser.compile_filter(max_value_expr),
-                          parser.compile_filter(max_width))
+                          parser.compile_filter(max_width),
+                          asvar=asvar)
 
 @register.tag('with')
 def do_with(parser, token):

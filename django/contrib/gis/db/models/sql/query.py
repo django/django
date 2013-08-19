@@ -76,7 +76,7 @@ class GeoQuery(sql.Query):
             return super(GeoQuery, self).convert_values(value, field, connection)
         return value
 
-    def get_aggregation(self, using):
+    def get_aggregation(self, using, force_subq=False):
         # Remove any aggregates marked for reduction from the subquery
         # and move them to the outer AggregateQuery.
         connection = connections[using]
@@ -84,7 +84,7 @@ class GeoQuery(sql.Query):
             if isinstance(aggregate, gis_aggregates.GeoAggregate):
                 if not getattr(aggregate, 'is_extent', False) or connection.ops.oracle:
                     self.extra_select_fields[alias] = GeomField()
-        return super(GeoQuery, self).get_aggregation(using)
+        return super(GeoQuery, self).get_aggregation(using, force_subq)
 
     def resolve_aggregate(self, value, aggregate, connection):
         """

@@ -1031,8 +1031,6 @@ in django-statici18n_.
 Internationalization: in URL patterns
 =====================================
 
-..  versionadded:: 1.4
-
 .. module:: django.conf.urls.i18n
 
 Django provides two mechanisms to internationalize URL patterns:

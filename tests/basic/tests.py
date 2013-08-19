@@ -707,6 +707,10 @@ class ModelTest(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             SelfRef.objects.get(selfref=sr)
 
+    def test_eq(self):
+        self.assertNotEqual(Article(id=1), object())
+        self.assertNotEqual(object(), Article(id=1))
+
 
 class ConcurrentSaveTests(TransactionTestCase):
 

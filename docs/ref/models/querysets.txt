@@ -913,7 +913,7 @@ needed by ``select_related``), it is able to detect that the ``best_pizza``
 objects have already been fetched, and it will skip fetching them again.
 
 Chaining ``prefetch_related`` calls will accumulate the lookups that are
-prefetched. To clear any ``prefetch_related`` behavior, pass `None` as a
+prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
 parameter::
 
    >>> non_prefetched = qs.prefetch_related(None)
@@ -1149,13 +1149,11 @@ to ``defer()``::
     # Load all fields immediately.
     my_queryset.defer(None)
 
-.. versionchanged:: 1.5
-
-    Some fields in a model won't be deferred, even if you ask for them. You can
-    never defer the loading of the primary key. If you are using
-    :meth:`select_related()` to retrieve related models, you shouldn't defer the
-    loading of the field that connects from the primary model to the related
-    one, doing so will result in an error.
+Some fields in a model won't be deferred, even if you ask for them. You can
+never defer the loading of the primary key. If you are using
+:meth:`select_related()` to retrieve related models, you shouldn't defer the
+loading of the field that connects from the primary model to the related
+one, doing so will result in an error.
 
 .. note::
 
@@ -1177,8 +1175,6 @@ to ``defer()``::
     might otherwise call ``defer()``. This makes your code more explicit to the
     reader, is slightly faster and consumes a little less memory in the Python
     process.
-
-.. versionchanged:: 1.5
 
 .. note::
 
@@ -1227,16 +1223,14 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
-.. versionchanged:: 1.5
+Using :meth:`only` and omitting a field requested using :meth:`select_related`
+is an error as well.
 
-    Using :meth:`only` and omitting a field requested using
-    :meth:`select_related` is an error as well.
+.. note::
 
-    .. note::
-
-        When calling :meth:`~django.db.models.Model.save()` for instances with
-        deferred fields, only the loaded fields will be saved. See
-        :meth:`~django.db.models.Model.save()` for more details.
+    When calling :meth:`~django.db.models.Model.save()` for instances with
+    deferred fields, only the loaded fields will be saved. See
+    :meth:`~django.db.models.Model.save()` for more details.
 
 using
 ~~~~~
@@ -1567,10 +1561,6 @@ The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at maximum 999 variables per query is used.
 
-.. versionadded:: 1.5
-
-    The ``batch_size`` parameter was added in version 1.5.
-
 count
 ~~~~~
 
@@ -1900,10 +1890,6 @@ methods on your models. It does, however, emit the
 :data:`~django.db.models.signals.post_delete` signals for all deleted objects
 (including cascaded deletions).
 
-.. versionadded:: 1.5
-
-    Allow fast-path deletion of objects.
-
 Django needs to fetch objects into memory to send signals and handle cascades.
 However, if there are no cascades and no signals, then Django may take a
 fast-path and delete objects without fetching into memory. For large
@@ -1911,7 +1897,7 @@ deletes this can result in significantly reduced memory usage. The amount of
 executed queries can be reduced, too.
 
 ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
-DO_NOTHING do not prevent taking the fast-path in deletion.
+``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.

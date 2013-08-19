@@ -118,8 +118,6 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-.. versionadded:: 1.5
-
 ``update_fields``
     The set of fields to update explicitly specified in the ``save()`` method.
     ``None`` if this argument was not used in the ``save()`` call.
@@ -152,8 +150,6 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
-
-.. versionadded:: 1.5
 
 ``update_fields``
     The set of fields to update explicitly specified in the ``save()`` method.
@@ -522,14 +518,7 @@ request_finished
 .. data:: django.core.signals.request_finished
    :module:
 
-Sent when Django finishes processing an HTTP request.
-
-.. versionchanged:: 1.5
-
-    Before Django 1.5, this signal was sent before delivering content to the
-    client. In order to accommodate :ref:`streaming responses
-    <httpresponse-streaming>`, it is now sent after the response has been fully
-    delivered to the client.
+Sent when Django finishes delvering an HTTP response to the client.
 
 .. note::
 

@@ -27,7 +27,6 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem)
 
-
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
         return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
@@ -83,6 +82,19 @@ class Queries1Tests(BaseQuerysetTest):
 
         Cover.objects.create(title="first", item=i4)
         Cover.objects.create(title="second", item=self.i2)
+
+    def test_subquery_condition(self):
+        qs1 = Tag.objects.filter(pk__lte=0)
+        qs2 = Tag.objects.filter(parent__in=qs1)
+        qs3 = Tag.objects.filter(parent__in=qs2)
+        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertIn('v0', str(qs3.query).lower())
+        qs4 = qs3.filter(parent__in=qs1)
+        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        # It is possible to reuse U for the second subquery, no need to use W.
+        self.assertNotIn('w0', str(qs4.query).lower())
+        # So, 'U0."id"' is referenced twice.
+        self.assertTrue(str(qs4.query).lower().count('u0'), 2)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
@@ -810,7 +822,7 @@ class Queries1Tests(BaseQuerysetTest):
         # Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
         # sufficient that this query runs without error.
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
-        qs.query.bump_prefix()
+        qs.query.bump_prefix(qs.query)
         first = qs[0]
         self.assertEqual(list(qs), list(range(first, first+5)))
 
@@ -2939,6 +2951,16 @@ class Ticket20788Tests(TestCase):
             chapter__paragraph__page=page)
         self.assertQuerysetEqual(
             sentences_not_in_pub, [book2], lambda x: x)
+
+class Ticket12807Tests(TestCase):
+    def test_ticket_12807(self):
+        p1 = Paragraph.objects.create()
+        p2 = Paragraph.objects.create()
+        # The ORed condition below should have no effect on the query - the
+        # ~Q(pk__in=[]) will always be True.
+        qs = Paragraph.objects.filter((Q(pk=p2.pk) | ~Q(pk__in=[])) & Q(pk=p1.pk))
+        self.assertQuerysetEqual(qs, [p1], lambda x: x)
+
 
 class RelatedLookupTypeTests(TestCase):
     def test_wrong_type_lookup(self):

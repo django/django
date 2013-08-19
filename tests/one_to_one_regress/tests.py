@@ -141,12 +141,10 @@ class OneToOneRegressionTests(TestCase):
         """
         p = Place(name='Zombie Cats', address='Not sure')
         p.save()
-        with self.assertNumQueries(1):
-            with self.assertRaises(Restaurant.DoesNotExist):
-                p.restaurant
-        with self.assertNumQueries(0):
-            with self.assertRaises(Restaurant.DoesNotExist):
-                p.restaurant
+        with self.assertNumQueries(1), self.assertRaises(Restaurant.DoesNotExist):
+            p.restaurant
+        with self.assertNumQueries(0), self.assertRaises(Restaurant.DoesNotExist):
+            p.restaurant
 
     def test_reverse_object_cached_when_related_is_accessed(self):
         """
@@ -199,9 +197,8 @@ class OneToOneRegressionTests(TestCase):
             self.assertEqual(self.p1.undergroundbar, b)
         b.place = None
         b.save()
-        with self.assertNumQueries(0):
-            with self.assertRaises(UndergroundBar.DoesNotExist):
-                self.p1.undergroundbar
+        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
+            self.p1.undergroundbar
 
     def test_get_reverse_on_unsaved_object(self):
         """
@@ -213,24 +210,21 @@ class OneToOneRegressionTests(TestCase):
         p = Place()
 
         # When there's no instance of the origin of the one-to-one
-        with self.assertNumQueries(0):
-            with self.assertRaises(UndergroundBar.DoesNotExist):
-                p.undergroundbar
+        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
+            p.undergroundbar
 
         UndergroundBar.objects.create()
 
         # When there's one instance of the origin
         # (p.undergroundbar used to return that instance)
-        with self.assertNumQueries(0):
-            with self.assertRaises(UndergroundBar.DoesNotExist):
-                p.undergroundbar
+        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
+            p.undergroundbar
 
         UndergroundBar.objects.create()
 
         # When there are several instances of the origin
-        with self.assertNumQueries(0):
-            with self.assertRaises(UndergroundBar.DoesNotExist):
-                p.undergroundbar
+        with self.assertNumQueries(0), self.assertRaises(UndergroundBar.DoesNotExist):
+            p.undergroundbar
 
     def test_set_reverse_on_unsaved_object(self):
         """
@@ -239,6 +233,5 @@ class OneToOneRegressionTests(TestCase):
         """
         p = Place()
         b = UndergroundBar.objects.create()
-        with self.assertNumQueries(0):
-            with self.assertRaises(ValueError):
-                p.undergroundbar = b
+        with self.assertNumQueries(0), self.assertRaises(ValueError):
+            p.undergroundbar = b

@@ -248,19 +248,13 @@ Methods
 
 .. method:: Page.next_page_number()
 
-    Returns the next page number.
-
-    .. versionchanged:: 1.5
-
-        Raises :exc:`InvalidPage` if next page doesn't exist.
+    Returns the next page number. Raises :exc:`InvalidPage` if next page
+    doesn't exist.
 
 .. method:: Page.previous_page_number()
 
-    Returns the previous page number.
-
-    .. versionchanged:: 1.5
-
-        Raises :exc:`InvalidPage` if previous page doesn't exist.
+    Returns the previous page number. Raises :exc:`InvalidPage` if previous
+    page doesn't exist.
 
 .. method:: Page.start_index()
 

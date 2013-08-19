@@ -22,8 +22,8 @@ class Place(models.Model):
 @python_2_unicode_compatible
 class Restaurant(models.Model):
     place = models.OneToOneField(Place, primary_key=True)
-    serves_hot_dogs = models.BooleanField()
-    serves_pizza = models.BooleanField()
+    serves_hot_dogs = models.BooleanField(default=False)
+    serves_pizza = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the restaurant" % self.place.name

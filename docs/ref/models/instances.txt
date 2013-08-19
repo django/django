@@ -388,8 +388,6 @@ For more details, see the documentation on :ref:`F() expressions
 Specifying which fields to save
 -------------------------------
 
-.. versionadded:: 1.5
-
 If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
 This may be desirable if you want to update just one or a few fields on
@@ -493,6 +491,40 @@ using ``__str__()`` like this::
             # Note use of django.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
             return force_bytes('%s %s' % (self.first_name, self.last_name))
+
+``__eq__``
+----------
+
+.. method:: Model.__eq__()
+
+The equality method is defined such that instances with the same primary
+key value and the same concrete class are considered equal. For proxy
+models, concrete class is defined as the model's first non-proxy parent;
+for all other models it is simply the model's class.
+
+For example::
+
+    form django.db import models
+
+    class MyModel(models.Model):
+        id = models.AutoField(primary_key=True)
+
+    class MyProxyModel(MyModel):
+        class Meta:
+            proxy = True
+
+    class MultitableInherited(MyModel):
+        pass
+
+    MyModel(id=1) == MyModel(id=1)
+    MyModel(id=1) == MyProxyModel(id=1)
+    MyModel(id=1) != MultitableInherited(id=1)
+    MyModel(id=1) != MyModel(id=2)
+
+.. versionchanged:: 1.7
+
+  In previous versions only instances of the exact same class and same
+  primary key value were considered equal.
 
 ``get_absolute_url``
 --------------------

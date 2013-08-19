@@ -121,17 +121,16 @@ class AuthenticationFormTest(TestCase):
                          [force_text(form.error_messages['inactive'])])
 
     def test_inactive_user_i18n(self):
-        with self.settings(USE_I18N=True):
-            with translation.override('pt-br', deactivate=True):
-                # The user is inactive.
-                data = {
-                    'username': 'inactive',
-                    'password': 'password',
-                    }
-                form = AuthenticationForm(None, data)
-                self.assertFalse(form.is_valid())
-                self.assertEqual(form.non_field_errors(),
-                                 [force_text(form.error_messages['inactive'])])
+        with self.settings(USE_I18N=True), translation.override('pt-br', deactivate=True):
+            # The user is inactive.
+            data = {
+                'username': 'inactive',
+                'password': 'password',
+                }
+            form = AuthenticationForm(None, data)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form.non_field_errors(),
+                             [force_text(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows him to log in.

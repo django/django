@@ -16,7 +16,6 @@ from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import translation
-from django.utils.html import conditional_escape
 
 from . import models
 from .widgetadmin import site as widget_admin_site
@@ -238,14 +237,14 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'test')),
+            w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
     def test_stacked_render(self):
         w = widgets.FilteredSelectMultiple('test', True)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'test')),
+            w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
@@ -257,13 +256,13 @@ class AdminDateWidgetTest(DjangoTestCase):
         """
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10" />',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={'size': 20, 'class': 'myDateField'})
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
         )
 
@@ -275,13 +274,13 @@ class AdminTimeWidgetTest(DjangoTestCase):
         """
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8" />',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={'size': 20, 'class': 'myTimeField'})
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
         )
 
@@ -289,50 +288,55 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">Date: <input value="2007-12-01" type="text" class="vDateField" name="test_0" size="10" /><br />Time: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
         )
 
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True):
-            with translation.override('de-at'):
-                w.is_localized = True
-                self.assertHTMLEqual(
-                    conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
-                    '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
-                )
+        with self.settings(USE_L10N=True), translation.override('de-at'):
+            w.is_localized = True
+            self.assertHTMLEqual(
+                w.render('test', datetime(2007, 12, 1, 9, 30)),
+                '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+            )
 
 
 class AdminURLWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', '')),
+            w.render('test', ''),
             '<input class="vURLField" name="test" type="url" />'
         )
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example.com')),
+            w.render('test', 'http://example.com'),
             '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com" /></p>'
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example-äüö.com')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
+            w.render('test', 'http://example-äüö.com'),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
         )
 
     def test_render_quoting(self):
+        # WARNING: Don't use assertHTMLEqual in that testcase!
+        # assertHTMLEqual will get rid of some escapes which are tested here!
         w = widgets.AdminURLFieldWidget()
-        self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com/<sometag>some text</sometag>" /></p>'
+        self.assertEqual(
+            w.render('test', 'http://example.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
         )
-        self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
+        self.assertEqual(
+            w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+        )
+        self.assertEqual(
+            w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"'),
+            '<p class="url">Currently: <a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
         )
 
 
@@ -345,12 +349,12 @@ class AdminFileWidgetTest(DjangoTestCase):
 
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', album.cover_art)),
+            w.render('test', album.cover_art),
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % { 'STORAGE_URL': default_storage.url('') },
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', SimpleUploadedFile('test', b'content'))),
+            w.render('test', SimpleUploadedFile('test', b'content')),
             '<input type="file" name="test" />',
         )
 
@@ -365,7 +369,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', band.pk, attrs={})),
+            w.render('test', band.pk, attrs={}),
             '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
@@ -393,7 +397,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('honeycomb_widget', big_honeycomb.pk, attrs={})),
+            w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
             '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />&nbsp;<strong>Honeycomb object</strong>' % {'hcombpk': big_honeycomb.pk}
         )
 
@@ -406,7 +410,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('individual_widget', subject1.pk, attrs={})),
+            w.render('individual_widget', subject1.pk, attrs={}),
             '<input type="text" name="individual_widget" value="%(subj1pk)s" />&nbsp;<strong>Individual object</strong>' % {'subj1pk': subject1.pk}
         )
 
@@ -438,12 +442,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={})),
+            w.render('test', [m1.pk, m2.pk], attrs={}),
             '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', [m1.pk])),
+            w.render('test', [m1.pk]),
             '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
@@ -459,12 +463,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('company_widget1', [c1.pk, c2.pk], attrs={})),
+            w.render('company_widget1', [c1.pk, c2.pk], attrs={}),
             '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s" />' % {'c1pk': c1.pk, 'c2pk': c2.pk}
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('company_widget2', [c1.pk])),
+            w.render('company_widget2', [c1.pk]),
             '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
         )
 

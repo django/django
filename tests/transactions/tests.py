@@ -65,10 +65,9 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
-            with transaction.atomic():
-                Reporter.objects.create(first_name="Haddock")
-                raise Exception("Oops, that's his last name")
+        with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+            Reporter.objects.create(first_name="Haddock")
+            raise Exception("Oops, that's his last name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_nested_commit_commit(self):
@@ -82,30 +81,27 @@ class AtomicTests(TransactionTestCase):
     def test_nested_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
-                with transaction.atomic():
-                    Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
+            with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_nested_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+            Reporter.objects.create(last_name="Tintin")
             with transaction.atomic():
-                Reporter.objects.create(last_name="Tintin")
-                with transaction.atomic():
-                    Reporter.objects.create(last_name="Haddock")
-                raise Exception("Oops, that's his first name")
+                Reporter.objects.create(last_name="Haddock")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_nested_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
-            with transaction.atomic():
-                Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
-                    with transaction.atomic():
-                        Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
-                raise Exception("Oops, that's his first name")
+        with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+            Reporter.objects.create(last_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with transaction.atomic():
+                    Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_commit_commit(self):
@@ -119,31 +115,29 @@ class AtomicTests(TransactionTestCase):
     def test_merged_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
-                with transaction.atomic(savepoint=False):
-                    Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
+            with six.assertRaisesRegex(self, Exception, "Oops"), \
+                    transaction.atomic(savepoint=False):
+                Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
         # Writes in the outer block are rolled back too.
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
-            with transaction.atomic():
-                Reporter.objects.create(last_name="Tintin")
-                with transaction.atomic(savepoint=False):
-                    Reporter.objects.create(last_name="Haddock")
-                raise Exception("Oops, that's his first name")
+        with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+            Reporter.objects.create(last_name="Tintin")
+            with transaction.atomic(savepoint=False):
+                Reporter.objects.create(last_name="Haddock")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
-            with transaction.atomic():
-                Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
-                    with transaction.atomic(savepoint=False):
-                        Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
-                raise Exception("Oops, that's his first name")
+        with six.assertRaisesRegex(self, Exception, "Oops"), transaction.atomic():
+            Reporter.objects.create(last_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with transaction.atomic(savepoint=False):
+                    Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_reuse_commit_commit(self):
@@ -159,32 +153,29 @@ class AtomicTests(TransactionTestCase):
         atomic = transaction.atomic()
         with atomic:
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
-                with atomic:
-                    Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
+            with six.assertRaisesRegex(self, Exception, "Oops"), atomic:
+                Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_reuse_rollback_commit(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with six.assertRaisesRegex(self, Exception, "Oops"), atomic:
+            Reporter.objects.create(last_name="Tintin")
             with atomic:
-                Reporter.objects.create(last_name="Tintin")
-                with atomic:
-                    Reporter.objects.create(last_name="Haddock")
-                raise Exception("Oops, that's his first name")
+                Reporter.objects.create(last_name="Haddock")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_reuse_rollback_rollback(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
-            with atomic:
-                Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
-                    with atomic:
-                        Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
-                raise Exception("Oops, that's his first name")
+        with six.assertRaisesRegex(self, Exception, "Oops"), atomic:
+            Reporter.objects.create(last_name="Tintin")
+            with six.assertRaisesRegex(self, Exception, "Oops"):
+                with atomic:
+                    Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
+            raise Exception("Oops, that's his first name")
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_force_rollback(self):
@@ -200,10 +191,9 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             sid = transaction.savepoint()
             # trigger a database error inside an inner atomic without savepoint
-            with self.assertRaises(DatabaseError):
-                with transaction.atomic(savepoint=False):
-                    connection.cursor().execute(
-                            "SELECT no_such_col FROM transactions_reporter")
+            with self.assertRaises(DatabaseError), transaction.atomic(savepoint=False):
+                connection.cursor().execute(
+                        "SELECT no_such_col FROM transactions_reporter")
             transaction.savepoint_rollback(sid)
             # atomic block should rollback, but prevent it, as we just did it.
             self.assertTrue(transaction.get_rollback())
@@ -263,10 +253,10 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
-                    with transaction.atomic(savepoint=False):
-                        Reporter.objects.create(first_name="Tournesol")
-                        raise Exception("Oops, that's his last name")
+                with six.assertRaisesRegex(self, Exception, "Oops"), \
+                        transaction.atomic(savepoint=False):
+                    Reporter.objects.create(first_name="Tournesol")
+                    raise Exception("Oops, that's his last name")
                 # It wasn't possible to roll back
                 self.assertEqual(Reporter.objects.count(), 3)
             # It wasn't possible to roll back
@@ -279,10 +269,10 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
-                    with transaction.atomic(savepoint=False):
-                        Reporter.objects.create(first_name="Tournesol")
-                        raise Exception("Oops, that's his last name")
+                with six.assertRaisesRegex(self, Exception, "Oops"), \
+                        transaction.atomic(savepoint=False):
+                    Reporter.objects.create(first_name="Tournesol")
+                    raise Exception("Oops, that's his last name")
                 # It wasn't possible to roll back
                 self.assertEqual(Reporter.objects.count(), 3)
             # The first block with a savepoint must roll back
@@ -293,10 +283,10 @@ class AtomicMergeTests(TransactionTestCase):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
             # Inner block without a savepoint fails
-            with six.assertRaisesRegex(self, Exception, "Oops"):
-                with transaction.atomic(savepoint=False):
-                    Reporter.objects.create(first_name="Haddock")
-                    raise Exception("Oops, that's his last name")
+            with six.assertRaisesRegex(self, Exception, "Oops"), \
+                    transaction.atomic(savepoint=False):
+                Reporter.objects.create(first_name="Haddock")
+                raise Exception("Oops, that's his last name")
             # It wasn't possible to roll back
             self.assertEqual(Reporter.objects.count(), 2)
             # Inner block with a savepoint succeeds
@@ -316,9 +306,9 @@ class AtomicErrorsTests(TransactionTestCase):
 
     def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
-        with transaction.atomic():
-            with self.assertRaises(transaction.TransactionManagementError):
-                transaction.set_autocommit(not autocommit)
+        with transaction.atomic(), \
+                self.assertRaises(transaction.TransactionManagementError):
+            transaction.set_autocommit(not autocommit)
         # Make sure autocommit wasn't changed.
         self.assertEqual(connection.autocommit, autocommit)
 
@@ -552,9 +542,8 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         The autocommit context manager works exactly the same as the default
         behavior.
         """
-        with self.assertRaises(Exception):
-            with transaction.autocommit():
-                self.create_reporter_and_fail()
+        with self.assertRaises(Exception), transaction.autocommit():
+            self.create_reporter_and_fail()
 
         self.assertEqual(Reporter.objects.count(), 1)
 
@@ -563,9 +552,8 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         """
         The autocommit context manager also works with a using argument.
         """
-        with self.assertRaises(Exception):
-            with transaction.autocommit(using="default"):
-                self.create_reporter_and_fail()
+        with self.assertRaises(Exception), transaction.autocommit(using="default"):
+            self.create_reporter_and_fail()
 
         self.assertEqual(Reporter.objects.count(), 1)
 
@@ -575,9 +563,8 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         With the commit_on_success context manager, the transaction is only
         committed if the block doesn't throw an exception.
         """
-        with self.assertRaises(Exception):
-            with transaction.commit_on_success():
-                self.create_reporter_and_fail()
+        with self.assertRaises(Exception), transaction.commit_on_success():
+            self.create_reporter_and_fail()
 
         self.assertEqual(Reporter.objects.count(), 0)
 
@@ -586,9 +573,8 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         """
         The commit_on_success context manager also works with a using argument.
         """
-        with self.assertRaises(Exception):
-            with transaction.commit_on_success(using="default"):
-                self.create_reporter_and_fail()
+        with self.assertRaises(Exception), transaction.commit_on_success(using="default"):
+            self.create_reporter_and_fail()
 
         self.assertEqual(Reporter.objects.count(), 0)
 
@@ -633,18 +619,18 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         """
         If you forget, you'll get bad errors.
         """
-        with self.assertRaises(transaction.TransactionManagementError):
-            with transaction.commit_manually():
-                Reporter.objects.create(first_name="Scott", last_name="Browning")
+        with self.assertRaises(transaction.TransactionManagementError), \
+                transaction.commit_manually():
+            Reporter.objects.create(first_name="Scott", last_name="Browning")
 
     @skipUnlessDBFeature('supports_transactions')
     def test_manually_managed_with_using(self):
         """
         The commit_manually function also works with a using argument.
         """
-        with self.assertRaises(transaction.TransactionManagementError):
-            with transaction.commit_manually(using="default"):
-                Reporter.objects.create(first_name="Walter", last_name="Cronkite")
+        with self.assertRaises(transaction.TransactionManagementError), \
+                transaction.commit_manually(using="default"):
+            Reporter.objects.create(first_name="Walter", last_name="Cronkite")
 
     @skipUnlessDBFeature('requires_rollback_on_dirty_transaction')
     def test_bad_sql(self):
@@ -654,8 +640,7 @@ class TransactionContextManagerTests(IgnoreDeprecationWarningsMixin, Transaction
         be rolled back. The bug is only visible using the psycopg2 backend,
         though the fix is generally a good idea.
         """
-        with self.assertRaises(IntegrityError):
-            with transaction.commit_on_success():
-                cursor = connection.cursor()
-                cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
+        with self.assertRaises(IntegrityError), transaction.commit_on_success():
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO transactions_reporter (first_name, last_name) VALUES ('Douglas', 'Adams');")
         transaction.rollback()

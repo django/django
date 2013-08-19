@@ -199,14 +199,18 @@ The ``ContentTypeManager``
 
         Takes either a model class or an instance of a model, and returns the
         :class:`~django.contrib.contenttypes.models.ContentType` instance
-        representing that model.
+        representing that model. ``for_concrete_model=False`` allows fetching
+        the :class:`~django.contrib.contenttypes.models.ContentType` of a proxy
+        model.
 
     .. method:: get_for_models(*models[, for_concrete_models=True])
 
         Takes a variadic number of model classes, and returns a dictionary
         mapping the model classes to the
         :class:`~django.contrib.contenttypes.models.ContentType` instances
-        representing them.
+        representing them. ``for_concrete_models=False`` allows fetching the
+        :class:`~django.contrib.contenttypes.models.ContentType` of proxy
+        models.
 
     .. method:: get_by_natural_key(app_label, model)
 
@@ -231,21 +235,6 @@ lookup::
 .. module:: django.contrib.contenttypes.generic
 
 .. _generic-relations:
-
-.. versionadded:: 1.5
-
-    Prior to Django 1.5,
-    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model` and
-    :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_models`
-    always returned the :class:`~django.contrib.contenttypes.models.ContentType`
-    associated with the concrete model of the specified one(s). That means there
-    was no way to retrieve the
-    :class:`~django.contrib.contenttypes.models.ContentType` of a proxy model
-    using those methods. As of Django 1.5 you can now pass a boolean flag –
-    ``for_concrete_model`` and ``for_concrete_models`` respectively – to specify
-    wether or not you want to retrieve the
-    :class:`~django.contrib.contenttypes.models.ContentType` for the concrete or
-    direct model.
 
 Generic relations
 =================

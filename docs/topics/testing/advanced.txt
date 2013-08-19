@@ -217,8 +217,6 @@ Advanced features of ``TransactionTestCase``
 
 .. attribute:: TransactionTestCase.reset_sequences
 
-    .. versionadded:: 1.5
-
     Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
     sure sequences are always reset before the test run::
 

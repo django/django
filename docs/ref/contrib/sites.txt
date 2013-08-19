@@ -417,9 +417,10 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
-* The shortcut view (``django.views.defaults.shortcut``) uses the domain
-  of the current :class:`~django.contrib.sites.models.Site` object when
-  calculating an object's URL.
+* The shortcut view (``django.contrib.contenttypes.views.shortcut``)
+  uses the domain of the current
+  :class:`~django.contrib.sites.models.Site` object when calculating
+  an object's URL.
 
 * In the admin framework, the "view on site" link uses the current
   :class:`~django.contrib.sites.models.Site` to work out the domain for the

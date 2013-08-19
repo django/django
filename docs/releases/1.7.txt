@@ -130,7 +130,7 @@ Minor features
   context level.
 
 * The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
-  ``updated`` element now utilizes `updateddate` instead of ``pubdate``,
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
@@ -190,6 +190,30 @@ Minor features
   ``Meta`` option allows you to customize (or disable) creation of the default
   add, change, and delete permissions.
 
+* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
+  take a list of permissions as well as a single permission.
+
+* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
+  the file system permissions of directories created during file upload, like
+  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+
+* Explicit :class:`~django.db.models.OneToOneField` for
+  :ref:`multi-table-inheritance` are now discovered in abstract classes.
+
+* The ``<label>`` and ``<input>`` tags rendered by
+  :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
+  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
+  Each radio button or checkbox includes an ``id_for_label`` attribute to
+  output the element's ID.
+
+* Any ``**kwargs`` passed to
+  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
+  underlying :meth:`~django.core.mail.send_mail()` call.
+
+* The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
+  the result in a variable.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -236,6 +260,11 @@ Miscellaneous
   your root URLconf, which in turn makes it safe to reverse by name. It also
   removes the ability for visitors to generate spurious HTTP 500 errors by
   requesting static files that don't exist or haven't been collected yet.
+
+* The :meth:`django.db.models.Model.__eq__` method is now defined in a
+  way where instances of a proxy model and its base model are considered
+  equal when primary keys match. Previously only instances of exact same
+  class were considered equal on primary key match.
 
 Features deprecated in 1.7
 ==========================

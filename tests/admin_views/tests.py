@@ -15,7 +15,6 @@ from django.core import mail
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
-from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
@@ -51,7 +50,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject, Choice, ShortMessage, Telegram)
+    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage, Telegram)
 from .admin import site, site2
 
 
@@ -524,31 +523,28 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
-        with self.settings(LANGUAGE_CODE='fr'):
-            with translation.override('en-us'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertNotContains(response, 'Choisir une heure')
+        with self.settings(LANGUAGE_CODE='fr'), translation.override('en-us'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, 'Choisir une heure')
 
     def testI18NLanguageNonEnglishFallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
         """
-        with self.settings(LANGUAGE_CODE='fr'):
-            with translation.override('none'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertContains(response, 'Choisir une heure')
+        with self.settings(LANGUAGE_CODE='fr'), translation.override('none'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertContains(response, 'Choisir une heure')
 
     def testL10NDeactivated(self):
         """
         Check if L10N is deactivated, the JavaScript i18n view doesn't
         return localized date/time formats. Refs #14824.
         """
-        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False):
-            with translation.override('none'):
-                response = self.client.get('/test_admin/admin/jsi18n/')
-                self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
-                self.assertContains(response, '%Y-%m-%d %H:%M:%S')
+        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False), translation.override('none'):
+            response = self.client.get('/test_admin/admin/jsi18n/')
+            self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
+            self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
         with patch_logger('django.security.DisallowedModelAdminLookup', 'error') as calls:
@@ -2424,6 +2420,24 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, "would require deleting the following protected related objects")
         self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Because.</a></li>' % a1.pk, html=True)
         self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Yes.</a></li>' % a2.pk, html=True)
+
+    def test_model_admin_default_delete_action_no_change_url(self):
+        """
+        Default delete action shouldn't break if a user's ModelAdmin removes the url for change_view.
+
+        Regression test for #20640
+        """
+        obj = UnchangeableObject.objects.create()
+        action_data = {
+            ACTION_CHECKBOX_NAME: obj.pk,
+            "action": "delete_selected",
+            "index": "0",
+        }
+        response = self.client.post('/test_admin/admin/admin_views/unchangeableobject/', action_data)
+        # No 500 caused by NoReverseMatch
+        self.assertEqual(response.status_code, 200)
+        # The page shouldn't display a link to the nonexistent change page
+        self.assertContains(response, "<li>Unchangeable object: UnchangeableObject object</li>", 1, html=True)
 
     def test_custom_function_mail_action(self):
         "Tests a custom action defined in a function"

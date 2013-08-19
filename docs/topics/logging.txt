@@ -581,8 +581,6 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-   .. versionadded:: 1.5
-
    This filter is similar to :class:`RequireDebugFalse`, except that records are
    passed only when :setting:`DEBUG` is ``True``.
 
@@ -598,11 +596,6 @@ long as the :setting:`DEBUG` setting is set to ``False``.
 All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
 ``True`` are sent to the console. They are simply discarded (sent to
 ``NullHandler``) when :setting:`DEBUG` is ``False``.
-
-.. versionchanged:: 1.5
-
-    Before Django 1.5, all messages reaching the ``django`` logger were
-    discarded, regardless of :setting:`DEBUG`.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

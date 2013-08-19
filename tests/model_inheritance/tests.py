@@ -8,8 +8,9 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
-from .models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
-    Post, Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
+from .models import (
+    Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
+    Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
 
 
 class ModelInheritanceTests(TestCase):
@@ -20,7 +21,7 @@ class ModelInheritanceTests(TestCase):
         # information for programming purposes, but still completely
         # independent separate models at the database level.
         w1 = Worker.objects.create(name="Fred", age=35, job="Quarry worker")
-        w2 = Worker.objects.create(name="Barney", age=34, job="Quarry worker")
+        Worker.objects.create(name="Barney", age=34, job="Quarry worker")
 
         s = Student.objects.create(name="Pebbles", age=5, school_class="1B")
 
@@ -48,10 +49,12 @@ class ModelInheritanceTests(TestCase):
 
         # A StudentWorker which does not exist is both a Student and Worker
         # which does not exist.
-        self.assertRaises(Student.DoesNotExist,
+        self.assertRaises(
+            Student.DoesNotExist,
             StudentWorker.objects.get, pk=12321321
         )
-        self.assertRaises(Worker.DoesNotExist,
+        self.assertRaises(
+            Worker.DoesNotExist,
             StudentWorker.objects.get, pk=12321321
         )
 
@@ -67,10 +70,12 @@ class ModelInheritanceTests(TestCase):
         sw2.age = 24
         sw2.save()
 
-        self.assertRaises(Student.MultipleObjectsReturned,
+        self.assertRaises(
+            Student.MultipleObjectsReturned,
             StudentWorker.objects.get, pk__lt=sw2.pk + 100
         )
-        self.assertRaises(Worker.MultipleObjectsReturned,
+        self.assertRaises(
+            Worker.MultipleObjectsReturned,
             StudentWorker.objects.get, pk__lt=sw2.pk + 100
         )
 
@@ -85,16 +90,16 @@ class ModelInheritanceTests(TestCase):
 
         # The Post model doesn't have an attribute called
         # 'attached_%(class)s_set'.
-        self.assertRaises(AttributeError,
-            getattr, post, "attached_%(class)s_set"
+        self.assertRaises(
+            AttributeError, getattr, post, "attached_%(class)s_set"
         )
 
         # The Place/Restaurant/ItalianRestaurant models all exist as
         # independent models. However, the subclasses also have transparent
         # access to the fields of their ancestors.
         # Create a couple of Places.
-        p1 = Place.objects.create(name="Master Shakes", address="666 W. Jersey")
-        p2 = Place.objects.create(name="Ace Harware", address="1013 N. Ashland")
+        Place.objects.create(name="Master Shakes", address="666 W. Jersey")
+        Place.objects.create(name="Ace Harware", address="1013 N. Ashland")
 
         # Test constructor for Restaurant.
         r = Restaurant.objects.create(
@@ -134,11 +139,13 @@ class ModelInheritanceTests(TestCase):
         # the right order.
         self.assertEqual(
             [f.name for f in Restaurant._meta.fields],
-            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs", "serves_pizza", "chef"]
+            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs",
+             "serves_pizza", "chef"]
         )
         self.assertEqual(
             [f.name for f in ItalianRestaurant._meta.fields],
-            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs", "serves_pizza", "chef", "restaurant_ptr", "serves_gnocchi"],
+            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs",
+             "serves_pizza", "chef", "restaurant_ptr", "serves_gnocchi"],
         )
         self.assertEqual(Restaurant._meta.ordering, ["-rating"])
 
@@ -146,8 +153,8 @@ class ModelInheritanceTests(TestCase):
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
         self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
-        self.assertRaises(FieldError,
-            Restaurant.objects.filter, supplier__name="foo"
+        self.assertRaises(
+            FieldError, Restaurant.objects.filter, supplier__name="foo"
         )
 
         # Parent fields can be used directly in filters on the child model.
@@ -185,16 +192,19 @@ class ModelInheritanceTests(TestCase):
 
         # This won't work because the Demon Dogs restaurant is not an Italian
         # restaurant.
-        self.assertRaises(ItalianRestaurant.DoesNotExist,
+        self.assertRaises(
+            ItalianRestaurant.DoesNotExist,
             lambda: p.restaurant.italianrestaurant
         )
         # An ItalianRestaurant which does not exist is also a Place which does
         # not exist.
-        self.assertRaises(Place.DoesNotExist,
+        self.assertRaises(
+            Place.DoesNotExist,
             ItalianRestaurant.objects.get, name="The Noodle Void"
         )
         # MultipleObjectsReturned is also inherited.
-        self.assertRaises(Place.MultipleObjectsReturned,
+        self.assertRaises(
+            Place.MultipleObjectsReturned,
             Restaurant.objects.get, id__lt=12321
         )
 
@@ -207,8 +217,8 @@ class ModelInheritanceTests(TestCase):
         # This won't work because the Place we select is not a Restaurant (it's
         # a Supplier).
         p = Place.objects.get(name="Joe's Chickens")
-        self.assertRaises(Restaurant.DoesNotExist,
-            lambda: p.restaurant
+        self.assertRaises(
+            Restaurant.DoesNotExist, lambda: p.restaurant
         )
 
         self.assertEqual(p.supplier, s1)
@@ -233,10 +243,10 @@ class ModelInheritanceTests(TestCase):
             attrgetter("name"),
         )
 
-        park1 = ParkingLot.objects.create(
+        ParkingLot.objects.create(
             name="Main St", address="111 Main St", main_site=s1
         )
-        park2 = ParkingLot.objects.create(
+        ParkingLot.objects.create(
             name="Well Lit", address="124 Sesame St", main_site=ir
         )
 
@@ -268,11 +278,11 @@ class ModelInheritanceTests(TestCase):
 
         # select_related works with fields from the parent object as if they
         # were a normal part of the model.
-        self.assertNumQueries(2,
-            lambda: ItalianRestaurant.objects.all()[0].chef
+        self.assertNumQueries(
+            2, lambda: ItalianRestaurant.objects.all()[0].chef
         )
-        self.assertNumQueries(1,
-            lambda: ItalianRestaurant.objects.select_related("chef")[0].chef
+        self.assertNumQueries(
+            1, lambda: ItalianRestaurant.objects.select_related("chef")[0].chef
         )
 
     def test_mixin_init(self):
@@ -318,3 +328,32 @@ class ModelInheritanceTests(TestCase):
             sql = query['sql']
             if 'UPDATE' in sql:
                 self.assertEqual(expected_sql, sql)
+
+    def test_eq(self):
+        # Equality doesn't transfer in multitable inheritance.
+        self.assertNotEqual(Place(id=1), Restaurant(id=1))
+        self.assertNotEqual(Restaurant(id=1), Place(id=1))
+
+    def test_ticket_12567(self):
+        r = Restaurant.objects.create(name='n1', address='a1')
+        s = Supplier.objects.create(name='s1', address='a2')
+        self.assertQuerysetEqual(
+            Place.objects.filter(supplier__isnull=False),
+            [Place.objects.get(pk=s.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.filter(supplier__isnull=True),
+            [Place.objects.get(pk=r.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.exclude(supplier__isnull=False),
+            [Place.objects.get(pk=r.pk)],
+            lambda x: x
+        )
+        self.assertQuerysetEqual(
+            Place.objects.exclude(supplier__isnull=True),
+            [Place.objects.get(pk=s.pk)],
+            lambda x: x
+        )

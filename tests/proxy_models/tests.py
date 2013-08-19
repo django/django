@@ -10,12 +10,14 @@ from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.loading import cache
 from django.test import TestCase
+from django.test.utils import override_settings
 
 
 from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
     MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
     Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
     Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
+from .admin import admin as force_admin_model_registration
 
 
 class ProxyModelTests(TestCase):
@@ -362,9 +364,14 @@ class ProxyModelTests(TestCase):
         p = MyPerson.objects.get(pk=100)
         self.assertEqual(p.name, 'Elvis Presley')
 
+    def test_eq(self):
+        self.assertEqual(MyPerson(id=100), Person(id=100))
 
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ProxyModelAdminTests(TestCase):
     fixtures = ['myhorses']
+    urls = 'proxy_models.urls'
 
     def test_cascade_delete_proxy_model_admin_warning(self):
         """
@@ -380,3 +387,26 @@ class ProxyModelAdminTests(TestCase):
         self.assertTrue(tracker_user in collector.edges.get(None, ()))
         self.assertTrue(base_user in collector.edges.get(None, ()))
         self.assertTrue(issue in collector.edges.get(tracker_user, ()))
+
+    def test_delete_str_in_model_admin(self):
+        """
+        Test if the admin delete page shows the correct string representation
+        for a proxy model.
+        """
+        user = TrackerUser.objects.get(name='Django Pony')
+        proxy = ProxyTrackerUser.objects.get(name='Django Pony')
+
+        user_str = (
+            'Tracker user: <a href="/admin/proxy_models/trackeruser/%s/">%s</a>' % (user.pk, user))
+        proxy_str = (
+            'Proxy tracker user: <a href="/admin/proxy_models/proxytrackeruser/%s/">%s</a>' %
+            (proxy.pk, proxy))
+
+        self.client.login(username='super', password='secret')
+        response = self.client.get('/admin/proxy_models/trackeruser/%s/delete/' % (user.pk,))
+        delete_str = response.context['deleted_objects'][0]
+        self.assertEqual(delete_str, user_str)
+        response = self.client.get('/admin/proxy_models/proxytrackeruser/%s/delete/' % (proxy.pk,))
+        delete_str = response.context['deleted_objects'][0]
+        self.assertEqual(delete_str, proxy_str)
+        self.client.logout()

@@ -1108,6 +1108,19 @@ Default: ``2621440`` (i.e. 2.5 MB).
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
 
+.. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
+
+FILE_UPLOAD_DIRECTORY_PERMISSIONS
+---------------------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The numeric mode to apply to directories created in the process of
+uploading files. This value mirrors the functionality and caveats of
+the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
+
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
 FILE_UPLOAD_PERMISSIONS
@@ -1529,6 +1542,8 @@ unpredictable value.
 :djadmin:`django-admin.py startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
+Django will refuse to start if :setting:`SECRET_KEY` is not set.
+
 .. warning::
 
     **Keep this value secret.**
@@ -1536,10 +1551,6 @@ randomly-generated ``SECRET_KEY`` to each new project.
     Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
-
-.. versionchanged:: 1.5
-
-    Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
@@ -2095,13 +2106,9 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
@@ -2113,13 +2120,9 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGOUT_URL
 
@@ -2249,7 +2252,9 @@ Controls where Django stores message data. Valid values are:
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
-The backends that use cookies -- ``CookieStorage`` and ``FallbackStorage`` --
+The backends that use cookies --
+:class:`~django.contrib.messages.storage.cookie.CookieStorage` and
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
 use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS

@@ -601,16 +601,15 @@ class ChoiceInput(SubWidget):
         self.choice_value = force_text(choice[0])
         self.choice_label = force_text(choice[1])
         self.index = index
+        if 'id' in self.attrs:
+            self.attrs['id'] += "_%d" % self.index
 
     def __str__(self):
         return self.render()
 
     def render(self, name=None, value=None, attrs=None, choices=()):
-        name = name or self.name
-        value = value or self.value
-        attrs = attrs or self.attrs
-        if 'id' in self.attrs:
-            label_for = format_html(' for="{0}_{1}"', self.attrs['id'], self.index)
+        if self.id_for_label:
+            label_for = format_html(' for="{0}"', self.id_for_label)
         else:
             label_for = ''
         return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
@@ -619,12 +618,14 @@ class ChoiceInput(SubWidget):
         return self.value == self.choice_value
 
     def tag(self):
-        if 'id' in self.attrs:
-            self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))
+
+    @property
+    def id_for_label(self):
+        return self.attrs.get('id', '')
 
 
 class RadioChoiceInput(ChoiceInput):
