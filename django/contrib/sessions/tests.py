@@ -568,6 +568,27 @@ class SessionMiddlewareTests(unittest.TestCase):
         # Check that the value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
 
+    def test_session_delete_on_end(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Before deleting, there has to be an existing cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the cookie was deleted, not recreated.
+        # A deleted cookie header looks like:
+        #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        self.assertEqual('Set-Cookie: {0}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'.format(settings.SESSION_COOKIE_NAME),
+            str(response.cookies[settings.SESSION_COOKIE_NAME]))
+
 
 class CookieSessionTests(SessionTestsMixin, TestCase):
 
