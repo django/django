@@ -102,7 +102,7 @@ def _detect_image_library():
         except ImportError as err:
             # Neither worked, so it's likely not installed.
             raise ImproperlyConfigured(
-                _("Neither Pillow nor PIL could be imported: %s" % err)
+                _("Neither Pillow nor PIL could be imported: %s") % err
             )
 
     # ``Image.alpha_composite`` was added to Pillow in SHA: e414c6 & is not
@@ -125,7 +125,7 @@ def _detect_image_library():
             except ImportError as err:
                 raise ImproperlyConfigured(
                     _("The '_imaging' module for the PIL could not be "
-                      "imported: %s" % err)
+                      "imported: %s") % err
                 )
 
     # Try to import ImageFile as well.
