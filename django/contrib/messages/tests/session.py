@@ -10,13 +10,13 @@ def set_session_data(storage, messages):
     Sets the messages into the backend request's session and remove the
     backend's loaded data cache.
     """
-    storage.request.session[storage.session_key] = messages
+    storage.request.session[storage.session_key] = storage.serialize_messages(messages)
     if hasattr(storage, '_loaded_data'):
         del storage._loaded_data
 
 
 def stored_session_messages_count(storage):
-    data = storage.request.session.get(storage.session_key, [])
+    data = storage.deserialize_messages(storage.request.session.get(storage.session_key, []))
     return len(data)
 
 

@@ -7,6 +7,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
 from django.db.models.loading import cache
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import (ResolveThis, Item, RelatedItem, Child, Leaf, Proxy,
     SimpleItem, Feature, ItemAndSimpleItem, OneToOneItem, SpecialFeature)
@@ -80,24 +81,6 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
-        # Test for #12163 - Pickling error saving session with unsaved model
-        # instances.
-        SESSION_KEY = '2b1189a188b44ad18c35e1baac6ceead'
-
-        item = Item()
-        item._deferred = False
-        s = SessionStore(SESSION_KEY)
-        s.clear()
-        s["item"] = item
-        s.save()
-
-        s = SessionStore(SESSION_KEY)
-        s.modified = True
-        s.save()
-
-        i2 = s["item"]
-        self.assertFalse(i2._deferred)
-
         # Regression for #11936 - loading.get_models should not return deferred
         # models by default.
         klasses = sorted(
@@ -159,6 +142,27 @@ class DeferRegressionTest(TestCase):
             ]
         )
 
+    @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')
+    def test_ticket_12163(self):
+        # Test for #12163 - Pickling error saving session with unsaved model
+        # instances.
+        SESSION_KEY = '2b1189a188b44ad18c35e1baac6ceead'
+
+        item = Item()
+        item._deferred = False
+        s = SessionStore(SESSION_KEY)
+        s.clear()
+        s["item"] = item
+        s.save()
+
+        s = SessionStore(SESSION_KEY)
+        s.modified = True
+        s.save()
+
+        i2 = s["item"]
+        self.assertFalse(i2._deferred)
+
+    def test_ticket_16409(self):
         # Regression for #16409 - make sure defer() and only() work with annotate()
         self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).defer('name')), list)
         self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).only('name')), list)

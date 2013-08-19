@@ -1444,6 +1444,8 @@ Sets the minimum message level that will be recorded by the messages
 framework. See the :doc:`messages documentation </ref/contrib/messages>` for
 more details.
 
+.. setting:: MESSAGE_STORAGE
+
 MESSAGE_STORAGE
 ---------------
 
@@ -1817,7 +1819,7 @@ SESSION_ENGINE
 
 Default: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Controls where Django stores session data. Included engines are:
 
 * ``'django.contrib.sessions.backends.db'``
 * ``'django.contrib.sessions.backends.file'``
@@ -1858,6 +1860,30 @@ Default: ``False``
 
 Whether to save the session data on every request. See
 :doc:`/topics/http/sessions`.
+
+.. setting:: SESSION_SERIALIZER
+
+SESSION_SERIALIZER
+------------------
+
+.. versionadded:: 1.5.3
+
+Default: ``'django.contrib.sessions.serializers.PickleSerializer'``
+
+Full import path of a serializer class to use for serializing session data.
+Included serializers are:
+
+* ``'django.contrib.sessions.serializers.PickleSerializer'``
+* ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+See :ref:`session_serialization` for details, including a warning regarding
+possible remote code execution when using
+:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+
+In Django 1.5.3, the default in newly created projects using
+:djadmin:`django-admin.py startproject <startproject>` is
+:class:`django.contrib.sessions.serializers.JSONSerializer`, and the global
+default will switch to this class in Django 1.6.
 
 .. setting:: SHORT_DATE_FORMAT
 
