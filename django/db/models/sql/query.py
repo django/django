@@ -315,7 +315,7 @@ class Query(object):
             # Return value depends on the type of the field being processed.
             return self.convert_values(value, aggregate.field, connection)
 
-    def get_aggregation(self, using):
+    def get_aggregation(self, using, force_subq=False):
         """
         Returns the dictionary with the values of the existing aggregations.
         """
@@ -325,18 +325,18 @@ class Query(object):
         # If there is a group by clause, aggregating does not add useful
         # information but retrieves only the first row. Aggregate
         # over the subquery instead.
-        if self.group_by is not None:
+        if self.group_by is not None or force_subq:
 
             from django.db.models.sql.subqueries import AggregateQuery
             query = AggregateQuery(self.model)
-
             obj = self.clone()
+            relabels = dict((t, 'subquery') for t in self.tables)
 
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
             for alias, aggregate in self.aggregate_select.items():
                 if aggregate.is_summary:
-                    query.aggregate_select[alias] = aggregate
+                    query.aggregate_select[alias] = aggregate.relabeled_clone(relabels)
                     del obj.aggregate_select[alias]
 
             try:

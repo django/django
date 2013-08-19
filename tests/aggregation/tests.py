@@ -617,3 +617,11 @@ class BaseAggregateTestCase(TestCase):
         # Check internal state
         self.assertIsNone(annotated_books.query.alias_map["aggregation_book"].join_type)
         self.assertIsNone(excluded_books.query.alias_map["aggregation_book"].join_type)
+
+    def test_ticket12886(self):
+        """
+        Check that aggregation over sliced queryset works correctly.
+        """
+        qs = Book.objects.all().order_by('-rating')[0:3]
+        vals = qs.aggregate(average_top3_rating=Avg('rating'))['average_top3_rating']
+        self.assertAlmostEqual(vals, 4.5, places=2)
