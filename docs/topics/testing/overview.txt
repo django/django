@@ -219,12 +219,6 @@ the Django test runner reorders tests in the following way:
 * Then any other tests (e.g. doctests) that may alter the database without
   restoring it to its original state are run.
 
-.. versionchanged:: 1.5
-
-    Before Django 1.5, the only guarantee was that
-    :class:`~django.test.TestCase` tests were always ran first, before any other
-    tests.
-
 .. note::
 
     The new ordering of tests may reveal unexpected dependencies on test case
@@ -587,11 +581,6 @@ Use the ``django.test.client.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        .. versionchanged:: 1.5
-
-            :meth:`Client.options` used to process ``data`` like
-            :meth:`Client.get`.
-
         The ``follow`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
@@ -602,11 +591,6 @@ Use the ``django.test.client.Client`` class to make requests.
 
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
-
-        .. versionchanged:: 1.5
-
-            :meth:`Client.put` used to process ``data`` like
-            :meth:`Client.post`.
 
         The ``follow`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
@@ -627,14 +611,8 @@ Use the ``django.test.client.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        .. versionchanged:: 1.5
-
-            :meth:`Client.delete` used to process ``data`` like
-            :meth:`Client.get`.
-
         The ``follow`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
-
 
     .. method:: Client.login(**credentials)
 
@@ -931,25 +909,6 @@ to test the effects of commit and rollback:
     database. This can cause your tests to pass or fail unexpectedly. Always
     use ``TransactionTestCase`` when testing transactional behavior.
 
-.. versionchanged:: 1.5
-
-    Prior to 1.5, :class:`~django.test.TransactionTestCase` flushed the
-    database tables *before* each test. In Django 1.5, this is instead done
-    *after* the test has been run.
-
-    When the flush took place before the test, it was guaranteed that primary
-    key values started at one in :class:`~django.test.TransactionTestCase`
-    tests.
-
-    Tests should not depend on this behavior, but for legacy tests that do,
-    the :attr:`~TransactionTestCase.reset_sequences` attribute can be used
-    until the test has been properly updated.
-
-.. versionchanged:: 1.5
-
-    The order in which tests are run has changed. See `Order in which tests are
-    executed`_.
-
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
 TestCase
@@ -974,11 +933,6 @@ additions, including:
 
 * Django-specific assertions for testing for things like redirection and form
   errors.
-
-.. versionchanged:: 1.5
-
-    The order in which tests are run has changed. See `Order in which tests are
-    executed`_.
 
 ``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
 
@@ -1636,8 +1590,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
 
-    .. versionadded:: 1.5
-
     Asserts that the strings ``xml1`` and ``xml2`` are equal. The
     comparison is based on XML semantics. Similarly to
     :meth:`~SimpleTestCase.assertHTMLEqual`, the comparison is
@@ -1649,8 +1601,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
 
-    .. versionadded:: 1.5
-
     Asserts that the strings ``xml1`` and ``xml2`` are *not* equal. The
     comparison is based on XML semantics. See
     :meth:`~SimpleTestCase.assertXMLEqual` for details.
@@ -1658,8 +1608,6 @@ your test suite.
     Output in case of error can be customized with the ``msg`` argument.
 
 .. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
-
-    .. versionadded:: 1.5
 
     Asserts that the HTML fragment ``needle`` is contained in the ``haystack`` one.
 
@@ -1670,8 +1618,6 @@ your test suite.
     significant. The passed-in arguments must be valid HTML.
 
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
-
-    .. versionadded:: 1.5
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are equal.
     Usual JSON non-significant whitespace rules apply as the heavyweight is

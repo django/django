@@ -680,11 +680,6 @@ In addition, some objects are automatically created just after
 - three ``Permission`` for each model (including those not stored in that
   database).
 
-.. versionchanged:: 1.5
-
-    Previously, ``ContentType`` and ``Permission`` instances were created only
-    in the default database.
-
 For common setups with multiple databases, it isn't useful to have these
 objects in more than one database. Common setups include master / slave and
 connecting to external databases. Therefore, it's recommended:

@@ -104,12 +104,6 @@ TemplateView
     Renders a given template, with the context containing parameters captured
     in the URL.
 
-    .. versionchanged:: 1.5
-
-        The context used to be populated with a ``{{ params }}`` dictionary of
-        the parameters captured in the URL. Now those parameters are first-level
-        context variables.
-
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:

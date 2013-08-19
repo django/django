@@ -389,8 +389,6 @@ can be used for notification when a user logs in or out.
 
 .. function:: user_login_failed
 
-    .. versionadded:: 1.5
-
     Sent when the user failed to login successfully
 
     ``sender``

@@ -573,15 +573,11 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: allow_files
 
-        .. versionadded:: 1.5
-
         Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
         whether files in the specified location should be included.  Either this or
         :attr:`allow_folders` must be ``True``.
 
     .. attribute:: allow_folders
-
-        .. versionadded:: 1.5
 
         Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
         whether folders in the specified location should be included.  Either this or
@@ -1064,11 +1060,6 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
       queryset.
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
-
-    .. versionchanged:: 1.5
-
-        The empty and normalized values were changed to be consistently
-        ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
 
     .. versionchanged:: 1.6
 

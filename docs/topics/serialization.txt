@@ -141,14 +141,11 @@ sure that they are "appropriate" for saving before doing so.  Of course, if you
 trust your data source you could just save the object and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
+If fields in the serialized data do not exist on a model, a
+``DeserializationError`` will be raised unless the ``ignorenonexistent``
+argument is passed in as ``True``::
 
-.. versionadded:: 1.5
-
-    If fields in the serialized data do not exist on a model,
-    a ``DeserializationError`` will be raised unless the ``ignorenonexistent``
-    argument is passed in as True::
-
-        serializers.deserialize("xml", data, ignorenonexistent=True)
+    serializers.deserialize("xml", data, ignorenonexistent=True)
 
 .. _serialization-formats:
 

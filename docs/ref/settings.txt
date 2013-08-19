@@ -1542,6 +1542,8 @@ unpredictable value.
 :djadmin:`django-admin.py startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
+Django will refuse to start if :setting:`SECRET_KEY` is not set.
+
 .. warning::
 
     **Keep this value secret.**
@@ -1549,10 +1551,6 @@ randomly-generated ``SECRET_KEY`` to each new project.
     Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
-
-.. versionchanged:: 1.5
-
-    Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
@@ -2108,13 +2106,9 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
@@ -2126,13 +2120,9 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGOUT_URL
 

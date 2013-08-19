@@ -45,28 +45,26 @@ rendering or anywhere else -- you have two choices for encoding those strings.
 You can use Unicode strings, or you can use normal strings (sometimes called
 "bytestrings") that are encoded using UTF-8.
 
-.. versionchanged:: 1.5
+In Python 3, the logic is reversed, that is normal strings are Unicode, and
+when you want to specifically create a bytestring, you have to prefix the
+string with a 'b'. As we are doing in Django code from version 1.5,
+we recommend that you import ``unicode_literals`` from the __future__ library
+in your code. Then, when you specifically want to create a bytestring literal,
+prefix the string with 'b'.
 
-    In Python 3, the logic is reversed, that is normal strings are Unicode, and
-    when you want to specifically create a bytestring, you have to prefix the
-    string with a 'b'. As we are doing in Django code from version 1.5,
-    we recommend that you import ``unicode_literals`` from the __future__ library
-    in your code. Then, when you specifically want to create a bytestring literal,
-    prefix the string with 'b'.
+Python 2 legacy::
 
-    Python 2 legacy::
+    my_string = "This is a bytestring"
+    my_unicode = u"This is an Unicode string"
 
-        my_string = "This is a bytestring"
-        my_unicode = u"This is an Unicode string"
+Python 2 with unicode literals or Python 3::
 
-    Python 2 with unicode literals or Python 3::
+    from __future__ import unicode_literals
 
-        from __future__ import unicode_literals
+    my_string = b"This is a bytestring"
+    my_unicode = "This is an Unicode string"
 
-        my_string = b"This is a bytestring"
-        my_unicode = "This is an Unicode string"
-
-    See also :doc:`Python 3 compatibility </topics/python3>`.
+See also :doc:`Python 3 compatibility </topics/python3>`.
 
 .. warning::
 

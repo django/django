@@ -256,8 +256,6 @@ to flush.
 ``--no-initial-data``
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.5
-
 Use ``--no-initial-data`` to avoid loading the initial_data fixture.
 
 
@@ -333,8 +331,6 @@ The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
 
 .. django-admin-option:: --ignorenonexistent
-
-.. versionadded:: 1.5
 
 The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
 may have been removed from models since the fixture was originally generated.
@@ -859,10 +855,6 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
-.. versionadded:: 1.5
-
-    The ``--interface`` option was added in Django 1.5.
-
 .. versionadded:: 1.6
 
     The ``--no-startup`` option was added in Django 1.6.
@@ -1148,8 +1140,6 @@ synchronize.
 ``--no-initial-data``
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.5
-
 Use ``--no-initial-data`` to avoid loading the initial_data fixture.
 
 test <app or test identifier>
@@ -1326,8 +1316,6 @@ clearsessions
 ~~~~~~~~~~~~~~~
 
 .. django-admin:: clearsessions
-
-.. versionadded:: 1.5
 
 Can be run as a cron job or directly to clean out expired sessions.
 

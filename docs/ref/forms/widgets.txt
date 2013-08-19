@@ -525,11 +525,6 @@ Selector and checkbox widgets
         A callable that takes the value of the CheckBoxInput and returns
         ``True`` if the checkbox should be checked for that value.
 
-        .. versionchanged:: 1.5
-
-            Exceptions from ``check_test`` used to be silenced by its caller,
-            this is no longer the case, they will propagate upwards.
-
 ``Select``
 ~~~~~~~~~~
 

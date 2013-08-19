@@ -388,8 +388,6 @@ For more details, see the documentation on :ref:`F() expressions
 Specifying which fields to save
 -------------------------------
 
-.. versionadded:: 1.5
-
 If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
 This may be desirable if you want to update just one or a few fields on

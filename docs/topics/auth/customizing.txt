@@ -359,8 +359,6 @@ the extra database load.
 Substituting a custom User model
 ================================
 
-.. versionadded:: 1.5
-
 Some kinds of projects may have authentication requirements for which Django's
 built-in :class:`~django.contrib.auth.models.User` model is not always
 appropriate. For instance, on some sites it makes more sense to use an email

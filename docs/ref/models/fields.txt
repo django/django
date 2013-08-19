@@ -757,20 +757,15 @@ directory on the filesystem. Has three special arguments, of which the first is
 
 .. attribute:: FilePathField.allow_files
 
-    .. versionadded:: 1.5
-
     Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
     whether files in the specified location should be included.  Either this or
     :attr:`~FilePathField.allow_folders` must be ``True``.
 
 .. attribute:: FilePathField.allow_folders
 
-    .. versionadded:: 1.5
-
     Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
-
 
 Of course, these arguments can be used together.
 
@@ -979,12 +974,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
-
-.. versionadded:: 1.5
-
-    The current value of the field will be displayed as a clickable link above the
-    input widget.
-
 
 Relationship fields
 ===================

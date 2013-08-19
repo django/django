@@ -639,19 +639,10 @@ that were modified more than 3 days after they were published::
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
-.. versionadded:: 1.5
-
-    ``.bitand()`` and ``.bitor()``
-
-The ``F()`` objects now support bitwise operations by ``.bitand()`` and
+The ``F()`` objects support bitwise operations by ``.bitand()`` and
 ``.bitor()``, for example::
 
     >>> F('somefield').bitand(16)
-
-.. versionchanged:: 1.5
-
-    The previously undocumented operators ``&`` and ``|`` no longer produce
-    bitwise operations, use ``.bitand()`` and ``.bitor()`` instead.
 
 The pk lookup shortcut
 ----------------------

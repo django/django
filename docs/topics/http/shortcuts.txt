@@ -50,10 +50,6 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
-    .. versionchanged:: 1.5
-
-        This parameter used to be called ``mimetype``.
-
 ``status``
     The status code for the response. Defaults to ``200``.
 
@@ -128,11 +124,6 @@ Optional arguments
 ``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
-
-    .. versionchanged:: 1.5
-
-        This parameter used to be called ``mimetype``.
-
 
 Example
 -------
