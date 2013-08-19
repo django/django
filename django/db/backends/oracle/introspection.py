@@ -180,7 +180,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "unique": unique,
                     "foreign_key": None,
                     "check": check,
-                    "index": True,
+                    "index": True,  # All P and U come with index, see inner join above
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)
@@ -258,6 +258,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     FROM user_constraints cons
                     WHERE cols.index_name = cons.index_name
                 )
+            ORDER BY cols.column_position
         """, [table_name])
         for constraint, column in cursor.fetchall():
             # If we're the first column, make the record
