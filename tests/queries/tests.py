@@ -2952,6 +2952,16 @@ class Ticket20788Tests(TestCase):
         self.assertQuerysetEqual(
             sentences_not_in_pub, [book2], lambda x: x)
 
+class Ticket12807Tests(TestCase):
+    def test_ticket_12807(self):
+        p1 = Paragraph.objects.create()
+        p2 = Paragraph.objects.create()
+        # The ORed condition below should have no effect on the query - the
+        # ~Q(pk__in=[]) will always be True.
+        qs = Paragraph.objects.filter((Q(pk=p2.pk) | ~Q(pk__in=[])) & Q(pk=p1.pk))
+        self.assertQuerysetEqual(qs, [p1], lambda x: x)
+
+
 class RelatedLookupTypeTests(TestCase):
     def test_wrong_type_lookup(self):
         oa = ObjectA.objects.create(name="oa")
