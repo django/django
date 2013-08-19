@@ -140,6 +140,13 @@ class SessionBase(object):
         self.accessed = True
         self.modified = True
 
+    def is_empty(self):
+        "Returns True when there is no session_key and the session is empty"
+        try:
+            return not bool(self._session_key) and not self._session_cache
+        except AttributeError:
+            return True
+
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
         while True:
@@ -266,7 +273,7 @@ class SessionBase(object):
         """
         self.clear()
         self.delete()
-        self.create()
+        self._session_key = None
 
     def cycle_key(self):
         """
