@@ -6,7 +6,7 @@ from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
-from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagUniqueRename, UniqueTest
+from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest
 
 
 class SchemaTests(TransactionTestCase):
@@ -20,7 +20,7 @@ class SchemaTests(TransactionTestCase):
     
     available_apps = []
 
-    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagUniqueRename, UniqueTest]
+    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest]
     no_table_strings = ["no such table", "unknown table", "does not exist"]
 
     # Utility functions
@@ -234,7 +234,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithM2M)
         # Ensure there is now an m2m table there
         columns = self.column_classes(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)
-        self.assertEqual(columns['tag_id'][0], "IntegerField")
+        self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
 
     def test_m2m(self):
         """
@@ -243,9 +243,9 @@ class SchemaTests(TransactionTestCase):
         # Create the tables
         with connection.schema_editor() as editor:
             editor.create_model(AuthorWithM2M)
-            editor.create_model(Tag)
+            editor.create_model(TagM2MTest)
         # Create an M2M field
-        new_field = ManyToManyField("schema.Tag", related_name="authors")
+        new_field = ManyToManyField("schema.TagM2MTest", related_name="authors")
         new_field.contribute_to_class(AuthorWithM2M, "tags")
         try:
             # Ensure there's no m2m table there
@@ -258,7 +258,7 @@ class SchemaTests(TransactionTestCase):
                 )
             # Ensure there is now an m2m table there
             columns = self.column_classes(new_field.rel.through)
-            self.assertEqual(columns['tag_id'][0], "IntegerField")
+            self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
             # Remove the M2M table again
             with connection.schema_editor() as editor:
                 editor.remove_field(
@@ -279,17 +279,17 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(BookWithM2M)
-            editor.create_model(Tag)
+            editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
-        # Ensure the M2M exists and points to Tag
+        # Ensure the M2M exists and points to TagM2MTest
         constraints = connection.introspection.get_constraints(connection.cursor(), BookWithM2M._meta.get_field_by_name("tags")[0].rel.through._meta.db_table)
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
-                if details['columns'] == ["tag_id"] and details['foreign_key']:
-                    self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
+                    self.assertEqual(details['foreign_key'], ('schema_tagm2mtest', 'id'))
                     break
             else:
-                self.fail("No FK constraint for tag_id found")
+                self.fail("No FK constraint for tagm2mtest_id found")
         # Repoint the M2M
         new_field = ManyToManyField(UniqueTest)
         new_field.contribute_to_class(BookWithM2M, "uniques")
@@ -310,7 +310,7 @@ class SchemaTests(TransactionTestCase):
                         self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
                         break
                 else:
-                    self.fail("No FK constraint for tag_id found")
+                    self.fail("No FK constraint for uniquetest_id found")
         finally:
             # Cleanup model states
             BookWithM2M._meta.local_many_to_many.remove(new_field)

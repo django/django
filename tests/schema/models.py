@@ -37,7 +37,7 @@ class BookWithM2M(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
     pub_date = models.DateTimeField()
-    tags = models.ManyToManyField("Tag", related_name="books")
+    tags = models.ManyToManyField("TagM2MTest", related_name="books")
 
     class Meta:
         app_cache = new_app_cache
@@ -55,6 +55,14 @@ class BookWithSlug(models.Model):
 
 
 class Tag(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        app_cache = new_app_cache
+
+
+class TagM2MTest(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
 

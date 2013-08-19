@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.loading import get_models, app_cache_ready, cache
+from django.db.models.loading import app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
@@ -495,7 +495,7 @@ class Options(object):
                     cache[obj] = model
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
-        for klass in get_models(include_auto_created=True, only_installed=False):
+        for klass in self.app_cache.get_models(include_auto_created=True, only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_fields:
                     if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
@@ -538,7 +538,7 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
-        for klass in get_models(only_installed=False):
+        for klass in self.app_cache.get_models(only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_many_to_many:
                     if (f.rel

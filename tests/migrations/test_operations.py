@@ -116,7 +116,7 @@ class OperationTests(MigrationTestBase):
         """
         project_state = self.set_up_test_model("test_adflmm", second_model=True)
         # Test the state alteration
-        operation = migrations.AddField("Pony", "stables", models.ManyToManyField("Stable"))
+        operation = migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies"))
         new_state = project_state.clone()
         operation.state_forwards("test_adflmm", new_state)
         self.assertEqual(len(new_state.models["test_adflmm", "pony"].fields), 4)
@@ -126,6 +126,13 @@ class OperationTests(MigrationTestBase):
             operation.database_forwards("test_adflmm", editor, project_state, new_state)
         self.assertTableExists("test_adflmm_pony_stables")
         self.assertColumnNotExists("test_adflmm_pony", "stables")
+        # Make sure the M2M field actually works
+        app_cache = new_state.render()
+        Pony = app_cache.get_model("test_adflmm", "Pony")
+        p = Pony.objects.create(pink=False, weight=4.55)
+        p.stables.create()
+        self.assertEqual(p.stables.count(), 1)
+        p.stables.all().delete()
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adflmm", editor, new_state, project_state)
