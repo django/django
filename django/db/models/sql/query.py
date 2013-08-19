@@ -330,8 +330,16 @@ class Query(object):
             from django.db.models.sql.subqueries import AggregateQuery
             query = AggregateQuery(self.model)
             obj = self.clone()
-            relabels = dict((t, 'subquery') for t in self.tables)
+            if not force_subq:
+                # In forced subq case the ordering and limits will likely
+                # affect the results.
+                obj.clear_ordering(True)
+                obj.clear_limits()
+            obj.select_for_update = False
+            obj.select_related = False
+            obj.related_select_cols = []
 
+            relabels = dict((t, 'subquery') for t in self.tables)
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
             for alias, aggregate in self.aggregate_select.items():

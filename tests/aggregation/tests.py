@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal
 
+from django.db import connection
 from django.db.models import Avg, Sum, Count, Max, Min
 from django.test import TestCase, Approximate
+from django.test.utils import CaptureQueriesContext
 
 from .models import Author, Publisher, Book, Store
 
@@ -625,3 +627,18 @@ class BaseAggregateTestCase(TestCase):
         qs = Book.objects.all().order_by('-rating')[0:3]
         vals = qs.aggregate(average_top3_rating=Avg('rating'))['average_top3_rating']
         self.assertAlmostEqual(vals, 4.5, places=2)
+
+    def test_ticket11881(self):
+        """
+        Check that subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE
+        or select_related() stuff.
+        """
+        qs = Book.objects.all().select_for_update().order_by(
+            'pk').select_related('publisher').annotate(max_pk=Max('pk'))
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.aggregate(avg_pk=Avg('max_pk'))
+            self.assertEqual(len(captured_queries), 1)
+            qstr = captured_queries[0]['sql'].lower()
+            self.assertNotIn('for update', qstr)
+            self.assertNotIn('order by', qstr)
+            self.assertEqual(qstr.count(' join '), 0)
