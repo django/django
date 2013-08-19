@@ -1,3 +1,5 @@
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+
 import decimal
 import datetime
 from importlib import import_module
