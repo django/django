@@ -20,11 +20,32 @@ from django.core.mail.message import BadHeaderError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str, force_text
-from django.utils.six import PY3, StringIO
+from django.utils.six import PY3, StringIO, string_types
 from django.utils.translation import ugettext_lazy
 
 
-class MailTests(TestCase):
+class HeadersCheckMixin(object):
+
+    def assertMessageHasHeaders(self, message, headers):
+        """
+        Check that :param message: has all :param headers: headers.
+
+        :param message: can be an instance of an email.Message subclass or a
+        string with the contens of an email message.
+        :param headers: should be a set of (header-name, header-value) tuples.
+        """
+        if isinstance(message, string_types):
+            just_headers = message.split('\n\n', 1)[0]
+            hlist = just_headers.split('\n')
+            pairs = [hl.split(':', 1) for hl in hlist]
+            msg_headers = {(n, v.lstrip()) for (n, v) in pairs}
+        else:
+            msg_headers = set(message.items())
+        self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '
+                        'the following headers: %s' % (headers - msg_headers),)
+
+
+class MailTests(HeadersCheckMixin, TestCase):
     """
     Non-backend specific tests.
     """
@@ -93,7 +114,7 @@ class MailTests(TestCase):
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
 
-        self.assertEqual(sorted(email.message().items()), [
+        self.assertMessageHasHeaders(email.message(), {
             ('Content-Transfer-Encoding', '7bit'),
             ('Content-Type', 'text/plain; charset="utf-8"'),
             ('From', 'from@example.com'),
@@ -102,7 +123,7 @@ class MailTests(TestCase):
             ('Subject', 'subject'),
             ('To', 'to@example.com'),
             ('date', 'Fri, 09 Nov 2001 01:08:47 -0000'),
-        ])
+        })
 
     def test_from_header(self):
         """
@@ -184,7 +205,13 @@ class MailTests(TestCase):
         email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])
         email.encoding = 'iso-8859-1'
         message = email.message()
-        self.assertTrue(message.as_string().startswith('Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com'))
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="iso-8859-1"'),
+            ('Content-Transfer-Encoding', 'quoted-printable'),
+            ('Subject', 'Subject'),
+            ('From', 'from@example.com'),
+            ('To', 'other@example.com')})
         self.assertEqual(message.get_payload(), 'Firstname S=FCrname is a great guy.')
 
         # Make sure MIME attachments also works correctly with other encodings than utf-8
@@ -193,8 +220,18 @@ class MailTests(TestCase):
         msg = EmailMultiAlternatives('Subject', text_content, 'from@example.com', ['to@example.com'])
         msg.encoding = 'iso-8859-1'
         msg.attach_alternative(html_content, "text/html")
-        self.assertEqual(msg.message().get_payload(0).as_string(), 'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.')
-        self.assertEqual(msg.message().get_payload(1).as_string(), 'Content-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
+        payload0 = msg.message().get_payload(0)
+        self.assertMessageHasHeaders(payload0, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="iso-8859-1"'),
+            ('Content-Transfer-Encoding', 'quoted-printable')})
+        self.assertTrue(payload0.as_string().endswith('\n\nFirstname S=FCrname is a great guy.'))
+        payload1 = msg.message().get_payload(1)
+        self.assertMessageHasHeaders(payload1, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/html; charset="iso-8859-1"'),
+            ('Content-Transfer-Encoding', 'quoted-printable')})
+        self.assertTrue(payload1.as_string().endswith('\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>'))
 
     def test_attachments(self):
         """Regression test for #9367"""
@@ -332,7 +369,7 @@ class MailTests(TestCase):
         self.assertTrue(str('Content-Transfer-Encoding: 8bit') in s)
 
 
-class BaseEmailBackendTests(object):
+class BaseEmailBackendTests(HeadersCheckMixin, object):
     email_backend = None
 
     def setUp(self):
@@ -490,7 +527,15 @@ class BaseEmailBackendTests(object):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         mail.get_connection().send_messages([email])
         message = self.get_the_message()
-        self.assertStartsWith(message.as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
+        self.assertMessageHasHeaders(message, {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', '7bit'),
+            ('Subject', 'Subject'),
+            ('From', 'from@example.com'),
+            ('To', 'to@example.com'),
+            ('Cc', 'cc@example.com')})
+        self.assertIn('\nDate: ', message.as_string())
 
     def test_idn_send(self):
         """
@@ -648,7 +693,14 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
+        self.assertMessageHasHeaders(s.getvalue(), {
+            ('MIME-Version', '1.0'),
+            ('Content-Type', 'text/plain; charset="utf-8"'),
+            ('Content-Transfer-Encoding', '7bit'),
+            ('Subject', 'Subject'),
+            ('From', 'from@example.com'),
+            ('To', 'to@example.com')})
+        self.assertIn('\nDate: ', s.getvalue())
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
