@@ -58,6 +58,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
+    nulls_order_largest = True
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

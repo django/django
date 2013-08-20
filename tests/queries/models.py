@@ -262,8 +262,12 @@ class ReservedName(models.Model):
         return self.name
 
 # A simpler shared-foreign-key setup that can expose some problems.
+@python_2_unicode_compatible
 class SharedConnection(models.Model):
     data = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.data
 
 class PointerA(models.Model):
     connection = models.ForeignKey(SharedConnection)

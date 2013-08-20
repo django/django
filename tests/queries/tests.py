@@ -2984,7 +2984,11 @@ class Ticket14056Tests(TestCase):
         s2 = SharedConnection.objects.create(data='s2')
         s3 = SharedConnection.objects.create(data='s3')
         PointerA.objects.create(connection=s2)
+        expected_ordering = (
+            [s1, s3, s2] if connection.features.nulls_order_largest
+            else [s2, s1, s3]
+        )
         self.assertQuerysetEqual(
-            SharedConnection.objects.order_by('pointera__connection', 'pk'),
-            [s1, s3, s2], lambda x: x
+            SharedConnection.objects.order_by('-pointera__connection', 'pk'),
+            expected_ordering, lambda x: x
         )

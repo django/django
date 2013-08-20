@@ -599,6 +599,9 @@ class BaseDatabaseFeatures(object):
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
 
+    # Does the backend order NULL values as largest or smallest?
+    nulls_order_largest = False
+
     # Is there a 1000 item limit on query parameters?
     supports_1000_query_parameters = True
 
