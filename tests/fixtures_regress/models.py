@@ -39,12 +39,6 @@ class Stuff(models.Model):
 class Absolute(models.Model):
     name = models.CharField(max_length=40)
 
-    load_count = 0
-
-    def __init__(self, *args, **kwargs):
-        super(Absolute, self).__init__(*args, **kwargs)
-        Absolute.load_count += 1
-
 
 class Parent(models.Model):
     name = models.CharField(max_length=10)
