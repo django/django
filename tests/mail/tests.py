@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import asyncore
 import email
+from email.mime.text import MIMEText
 import os
 import shutil
 import smtpd
@@ -367,6 +368,29 @@ class MailTests(HeadersCheckMixin, TestCase):
         s = msg.message().as_string()
         self.assertFalse(str('Content-Transfer-Encoding: quoted-printable') in s)
         self.assertTrue(str('Content-Transfer-Encoding: 8bit') in s)
+
+
+class PythonGlobalState(TestCase):
+    """
+    Tests for #12422. -- Django smarts (#2472/#11212) shouldn't pollute global
+    Python charset registry when django.mail.message is imported.
+    """
+
+    def test_utf8(self):
+        txt = MIMEText('UTF-8 encoded body', 'plain', 'utf-8')
+        self.assertTrue('Content-Transfer-Encoding: base64' in txt.as_string())
+
+    def test_7bit(self):
+        txt = MIMEText('Body with only ASCII characters.', 'plain', 'utf-8')
+        self.assertTrue('Content-Transfer-Encoding: base64' in txt.as_string())
+
+    def test_8bit_latin(self):
+        txt = MIMEText('Body with latin characters: àáä.', 'plain', 'utf-8')
+        self.assertTrue(str('Content-Transfer-Encoding: base64') in txt.as_string())
+
+    def test_8bit_non_latin(self):
+        txt = MIMEText('Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'plain', 'utf-8')
+        self.assertTrue(str('Content-Transfer-Encoding: base64') in txt.as_string())
 
 
 class BaseEmailBackendTests(HeadersCheckMixin, object):
