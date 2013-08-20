@@ -2,6 +2,7 @@ import gc
 import sys
 import time
 import unittest
+import weakref
 
 from django.dispatch import Signal, receiver
 
@@ -35,6 +36,8 @@ class Callable(object):
 a_signal = Signal(providing_args=["val"])
 b_signal = Signal(providing_args=["val"])
 c_signal = Signal(providing_args=["val"])
+d_signal = Signal(providing_args=["val"], use_caching=True)
+
 
 class DispatcherTests(unittest.TestCase):
     """Test suite for dispatcher (barely started)"""
@@ -71,6 +74,24 @@ class DispatcherTests(unittest.TestCase):
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, expected)
         self._testIsClean(a_signal)
+
+    def testCachedGarbagedCollected(self):
+        """
+        Make sure signal caching sender receivers don't prevent garbage
+        collection of senders.
+        """
+        class sender:
+            pass
+        wref = weakref.ref(sender)
+        d_signal.connect(receiver_1_arg)
+        d_signal.send(sender, val='garbage')
+        del sender
+        garbage_collect()
+        try:
+            self.assertIsNone(wref())
+        finally:
+            # Disconnect after reference check since it flushes the tested cache.
+            d_signal.disconnect(receiver_1_arg)
 
     def testMultipleRegistration(self):
         a = Callable()
