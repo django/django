@@ -80,7 +80,7 @@ class DispatcherTests(unittest.TestCase):
         Make sure signal caching sender receivers don't prevent garbage
         collection of senders.
         """
-        class sender:
+        class sender(object):
             pass
         wref = weakref.ref(sender)
         d_signal.connect(receiver_1_arg)
