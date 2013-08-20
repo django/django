@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import re
 
 from django.db import connection
 from django.db.models import Avg, Sum, Count, Max, Min
@@ -640,5 +641,14 @@ class BaseAggregateTestCase(TestCase):
             self.assertEqual(len(captured_queries), 1)
             qstr = captured_queries[0]['sql'].lower()
             self.assertNotIn('for update', qstr)
-            self.assertNotIn('order by', qstr)
+            forced_ordering = connection.ops.force_no_ordering()
+            if forced_ordering:
+                # If the backend needs to force an ordering we make sure it's
+                # the only "ORDER BY" clause present in the query.
+                self.assertEqual(
+                    re.findall(r'order by (\w+)', qstr),
+                    [', '.join(forced_ordering).lower()]
+                )
+            else:
+                self.assertNotIn('order by', qstr)
             self.assertEqual(qstr.count(' join '), 0)
