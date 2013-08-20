@@ -13,6 +13,8 @@ from django.core.management.utils import (handle_extensions, find_command,
 from django.utils.functional import total_ordering
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
+from django.template.loader import get_template_source
+from django.template import TemplateDoesNotExist
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
@@ -88,8 +90,11 @@ class TranslatableFile(object):
             orig_file = os.path.join(self.dirpath, self.file)
             is_templatized = file_ext in command.extensions
             if is_templatized:
-                with open(orig_file, "rU") as fp:
-                    src_data = fp.read()
+                try:
+                    src_data = get_template_source(orig_file)
+                except TemplateDoesNotExist:
+                    with open(orig_file, "rU") as fp:
+                        src_data = fp.read()
                 thefile = '%s.py' % self.file
                 content = templatize(src_data, orig_file[2:])
                 with open(os.path.join(self.dirpath, thefile), "w") as fp:
