@@ -16,7 +16,7 @@ class Aggregate(object):
     """
     is_ordinal = False
     is_computed = False
-    sql_template = '%(function)s(%(field)s)'
+    sql_template = '%(function_{0})s(%(field_{0})s)'
 
     def __init__(self, col, source=None, is_summary=False, **extra):
         """Instantiate an SQL aggregate
@@ -47,6 +47,8 @@ class Aggregate(object):
         self.source = source
         self.is_summary = is_summary
         self.extra = extra
+        self.additional_aggregate_list = []
+        self.sql_template = self.sql_template.format(id(self))
 
         # Follow the chain of aggregate sources back until you find an
         # actual field, or an aggregate that forces a particular output
@@ -70,10 +72,8 @@ class Aggregate(object):
             clone.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
         return clone
 
-    def as_sql(self, qn, connection):
-        "Return the aggregate, rendered as SQL with parameters."
+    def _get_template_params(self, qn, connection):
         params = []
-
         if hasattr(self.col, 'as_sql'):
             field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
@@ -82,11 +82,22 @@ class Aggregate(object):
             field_name = self.col
 
         substitutions = {
-            'function': self.sql_function,
-            'field': field_name
+            'function_{}'.format(id(self)): self.sql_function,
+            'field_{}'.format(id(self)): field_name
         }
-        substitutions.update(self.extra)
+        substitutions.update({'{}_{}'.format(key, id(self)): value for key, value in self.extra.iteritems()})
 
+        return substitutions, params
+
+    def as_sql(self, qn, connection):
+        "Return the aggregate, rendered as SQL with parameters."
+        substitutions, params = self._get_template_params(qn, connection)
+        for aggregate in self.additional_aggregate_list:
+            subs, pars = aggregate._get_template_params(qn, connection)
+            substitutions.update(subs)
+            params.extend(pars)
+
+        print self.sql_template, substitutions, params
         return self.sql_template % substitutions, params
 
 
@@ -98,7 +109,7 @@ class Avg(Aggregate):
 class Count(Aggregate):
     is_ordinal = True
     sql_function = 'COUNT'
-    sql_template = '%(function)s(%(distinct)s%(field)s)'
+    sql_template = '%(function_{0})s(%(distinct_{0})s%(field_{0})s)'
 
     def __init__(self, col, distinct=False, **extra):
         super(Count, self).__init__(col, distinct='DISTINCT ' if distinct else '', **extra)

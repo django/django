@@ -21,7 +21,12 @@ class Aggregate(object):
     """
     Default Aggregate definition.
     """
-    def __init__(self, lookup, **extra):
+    ADDITION = '+'
+    SUBSTRACTION = '-'
+    MULTIPLICATION = '*'
+    DIVISION = '/'
+
+    def __init__(self, lookup, operations=None, **extra):
         """Instantiate a new aggregate.
 
          * lookup is the field on which the aggregate operates.
@@ -33,6 +38,7 @@ class Aggregate(object):
         """
         self.lookup = lookup
         self.extra = extra
+        self.operations = operations[:] if operations else []
 
     def _default_alias(self):
         return '%s__%s' % (self.lookup, self.name.lower())
@@ -56,9 +62,64 @@ class Aggregate(object):
          * is_summary is a boolean that is set True if the aggregate is a
            summary value rather than an annotation.
         """
+        query.aggregates[alias] = self._get_aggregate(query, col, source, is_summary)
+
+    def _get_aggregate(self, query, col, source, is_summary):
         klass = getattr(query.aggregates_module, self.name)
         aggregate = klass(col, source=source, is_summary=is_summary, **self.extra)
-        query.aggregates[alias] = aggregate
+
+        is_computed = False
+        for operation in self.operations:
+            operator = operation[0]
+            operand = operation[1]
+            if operator == self.DIVISION and not is_computed:
+                is_computed = True
+
+            if isinstance(operand, Aggregate):
+                operands_aggregate = operand._get_aggregate(query, col, source, is_summary)
+                aggregate.sql_template = '({} {} {})'.format(aggregate.sql_template, operator, operands_aggregate.sql_template)
+                aggregate.additional_aggregate_list.append(operands_aggregate)
+
+                if operands_aggregate.field == query.aggregates_module.computed_aggregate_field and not is_computed:
+                    is_computed = True
+            else:
+                aggregate.sql_template = '({} {} {})'.format(aggregate.sql_template, operator, operand)
+
+                if isinstance(operand, float) and not is_computed:
+                    is_computed = True
+
+        if is_computed:
+            aggregate.is_computed = True
+            aggregate.is_ordinal = False
+            aggregate.field = query.aggregates_module.computed_aggregate_field
+
+        return aggregate
+
+    def _update_operations(self, operator, obj):
+        if not isinstance(obj, (int, long, float, Aggregate)):
+            raise TypeError("unsupported operand type(s) for {}: '{}' and '{}'".format(operator, type(self).__name__, type(obj).__name__))
+
+        copy = self.copy()
+
+        if isinstance(obj, Aggregate):
+            obj = obj.copy()
+        copy.operations.append((operator, obj))
+        return copy
+
+    def __add__(self, obj):
+        return self._update_operations(self.ADDITION, obj)
+
+    def __mul__(self, obj):
+        return self._update_operations(self.MULTIPLICATION, obj)
+
+    def __sub__(self, obj):
+        return self._update_operations(self.SUBSTRACTION, obj)
+
+    def __div__(self, obj):
+        return self._update_operations(self.DIVISION, obj)
+
+    def copy(self):
+        return type(self)(self.lookup, self.operations, **self.extra)
 
 
 class Avg(Aggregate):
