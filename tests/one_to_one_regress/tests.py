@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Place, Restaurant, Bar, Favorites, Target, UndergroundBar
+from .models import (Bar, Favorites, HiddenPointer, Place, Restaurant, Target,
+    UndergroundBar)
 
 
 class OneToOneRegressionTests(TestCase):
@@ -125,11 +126,11 @@ class OneToOneRegressionTests(TestCase):
             []
         )
         self.assertQuerysetEqual(
-            Target.objects.filter(pointer2=None),
+            Target.objects.filter(second_pointer=None),
             ['<Target: Target object>']
         )
         self.assertQuerysetEqual(
-            Target.objects.exclude(pointer2=None),
+            Target.objects.exclude(second_pointer=None),
             []
         )
 
@@ -250,3 +251,12 @@ class OneToOneRegressionTests(TestCase):
         self.p1.delete()
         self.assertTrue(UndergroundBar.objects.filter(pk=u.pk).exists())
         self.assertIsNone(UndergroundBar.objects.get(pk=u.pk).place)
+
+    def test_hidden_accessor(self):
+        """
+        When a '+' ending related name is specified no reverse accessor should
+        be added to the related model.
+        """
+        self.assertFalse(
+            hasattr(Target, HiddenPointer._meta.get_field('target').related.get_accessor_name())
+        )
