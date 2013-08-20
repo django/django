@@ -70,6 +70,11 @@ class Article(models.Model):
         ordering = ('id',)
 
 
+# Subclass of a model with a ManyToManyField for test_ticket_20820
+class SpecialArticle(Article):
+    pass
+
+
 # Models to regression test #11428
 @python_2_unicode_compatible
 class Widget(models.Model):
