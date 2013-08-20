@@ -25,7 +25,7 @@ from .models import (
     OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem)
+    MyObject, Order, OrderItem, SharedConnection)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -2977,3 +2977,14 @@ class RelatedLookupTypeTests(TestCase):
         self.assertQuerysetEqual(
             ObjectB.objects.filter(objecta__in=[wrong_type]),
             [ob], lambda x: x)
+
+class Ticket14056Tests(TestCase):
+    def test_ticket_14056(self):
+        s1 = SharedConnection.objects.create(data='s1')
+        s2 = SharedConnection.objects.create(data='s2')
+        s3 = SharedConnection.objects.create(data='s3')
+        PointerA.objects.create(connection=s2)
+        self.assertQuerysetEqual(
+            SharedConnection.objects.order_by('pointera__connection', 'pk'),
+            [s1, s3, s2], lambda x: x
+        )
