@@ -183,7 +183,7 @@ class Command(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
 
-        if os.path.isabs(fixture_name):
+        if os.path.sep in fixture_name:
             fixture_dirs = [os.path.dirname(fixture_name)]
             fixture_name = os.path.basename(fixture_name)
         else:

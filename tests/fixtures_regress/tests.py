@@ -148,7 +148,22 @@ class TestFixtures(TestCase):
             load_absolute_path,
             verbosity=0,
         )
-        self.assertEqual(Absolute.load_count, 1)
+        self.assertEqual(Absolute.objects.count(), 1)
+
+    def test_relative_path(self):
+        directory = os.path.dirname(upath(__file__))
+        relative_path = os.path.join('fixtures', 'absolute.json')
+        cwd = os.getcwd()
+        try:
+            os.chdir(directory)
+            management.call_command(
+                'loaddata',
+                relative_path,
+                verbosity=0,
+            )
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(Absolute.objects.count(), 1)
 
     def test_unknown_format(self):
         """
