@@ -989,7 +989,16 @@ class ForeignObject(RelatedField):
 
     @staticmethod
     def get_instance_value_for_fields(instance, fields):
-        return tuple([getattr(instance, field.attname) for field in fields])
+        ret = []
+        for field in fields:
+            # Gotcha: in some cases (like fixture loading) a model can have
+            # different values in parent_ptr_id and parent's id. So, use
+            # instance.pk (that is, parent_ptr_id) when asked for instance.id.
+            if field.primary_key:
+                ret.append(instance.pk)
+            else:
+                ret.append(getattr(instance, field.attname))
+        return tuple(ret)
 
     def get_attname_column(self):
         attname, column = super(ForeignObject, self).get_attname_column()
