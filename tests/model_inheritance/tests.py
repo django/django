@@ -10,7 +10,8 @@ from django.utils import six
 
 from .models import (
     Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
+    Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel,
+    Title, Base, SubBase)
 
 
 class ModelInheritanceTests(TestCase):
@@ -357,3 +358,16 @@ class ModelInheritanceTests(TestCase):
             [Place.objects.get(pk=s.pk)],
             lambda x: x
         )
+
+    def test_custompk_m2m(self):
+        b = Base.objects.create()
+        b.titles.add(Title.objects.create(title="foof"))
+        s = SubBase.objects.create(sub_id=b.id)
+        b = Base.objects.get(pk=s.id)
+        self.assertNotEqual(b.pk, s.pk)
+        # Low-level test for related_val
+        self.assertEqual(s.titles.related_val, (s.id,))
+        # Higher level test for correct query values (title foof not
+        # accidentally found).
+        self.assertQuerysetEqual(
+            s.titles.all(), [])

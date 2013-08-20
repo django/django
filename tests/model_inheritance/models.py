@@ -162,3 +162,9 @@ class Mixin(object):
 
 class MixinModel(models.Model, Mixin):
     pass
+
+class Base(models.Model):
+    titles = models.ManyToManyField(Title)
+
+class SubBase(Base):
+    sub_id = models.IntegerField(primary_key=True)
