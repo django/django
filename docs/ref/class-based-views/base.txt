@@ -79,10 +79,6 @@ View
         you can override the ``head()`` method. See
         :ref:`supporting-other-http-methods` for an example.
 
-        The default implementation also sets ``request``, ``args`` and
-        ``kwargs`` as instance variables, so any method on the view can know
-        the full details of the request that was made to invoke the view.
-
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 
         If the view was called with a HTTP method it doesn't support, this
