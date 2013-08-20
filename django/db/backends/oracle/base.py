@@ -93,6 +93,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_sequence_reset = False
     supports_combined_alters = False
     max_index_name_length = 30
+    nulls_order_largest = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):
