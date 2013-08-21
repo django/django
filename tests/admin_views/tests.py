@@ -630,6 +630,19 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         with self.assertRaises(AttributeError):
             self.client.get('/test_admin/%s/admin_views/simple/' % self.urlbit)
 
+    def test_changelist_with_no_change_url(self):
+        """
+        ModelAdmin.changelist_view shouldn't result in a NoReverseMatch if url
+        for change_view is removed from get_urls
+
+        Regression test for #20934
+        """
+        UnchangeableObject.objects.create()
+        response = self.client.get('/test_admin/admin/admin_views/unchangeableobject/')
+        self.assertEqual(response.status_code, 200)
+        # Check the format of the shown object -- shouldn't contain a change link
+        self.assertContains(response, '<th class="field-__str__">UnchangeableObject object</th>', html=True)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
