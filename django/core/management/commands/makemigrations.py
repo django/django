@@ -49,10 +49,7 @@ class Command(BaseCommand):
             ProjectState.from_app_cache(cache),
             InteractiveMigrationQuestioner(specified_apps=app_labels),
         )
-        changes = autodetector.changes()
-        changes = autodetector.arrange_for_graph(changes, loader.graph)
-        if app_labels:
-            changes = autodetector.trim_to_apps(changes, app_labels)
+        changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)
 
         # No changes? Tell them.
         if not changes:

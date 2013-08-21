@@ -25,7 +25,19 @@ class MigrationAutodetector(object):
         self.to_state = to_state
         self.questioner = questioner or MigrationQuestioner()
 
-    def changes(self):
+    def changes(self, graph, trim_to_apps=None):
+        """
+        Main entry point to produce a list of appliable changes.
+        Takes a graph to base names on and an optional set of apps
+        to try and restrict to (restriction is not guaranteed)
+        """
+        changes = self._detect_changes()
+        changes = self._arrange_for_graph(changes, graph)
+        if trim_to_apps:
+            changes = self._trim_to_apps(changes, trim_to_apps)
+        return changes
+
+    def _detect_changes(self):
         """
         Returns a dict of migration plans which will achieve the
         change from from_state to to_state. The dict has app labels
@@ -229,7 +241,7 @@ class MigrationAutodetector(object):
             dependency = (other_app_label, "__first__")
         self.migrations[app_label][-1].dependencies.append(dependency)
 
-    def arrange_for_graph(self, changes, graph):
+    def _arrange_for_graph(self, changes, graph):
         """
         Takes in a result from changes() and a MigrationGraph,
         and fixes the names and dependencies of the changes so they
@@ -273,7 +285,7 @@ class MigrationAutodetector(object):
                 migration.dependencies = [name_map.get(d, d) for d in migration.dependencies]
         return changes
 
-    def trim_to_apps(self, changes, app_labels):
+    def _trim_to_apps(self, changes, app_labels):
         """
         Takes changes from arrange_for_graph and set of app labels and
         returns a modified set of changes which trims out as many migrations

@@ -44,9 +44,9 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Run through arrange_for_graph
-        changes = autodetector.arrange_for_graph(changes, graph)
+        changes = autodetector._arrange_for_graph(changes, graph)
         # Make sure there's a new name, deps match, etc.
         self.assertEqual(changes["testapp"][0].name, "0003_author")
         self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
@@ -59,12 +59,12 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable, self.third_thing])
         autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_initial": True}))
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Run through arrange_for_graph
         graph = MigrationGraph()
-        changes = autodetector.arrange_for_graph(changes, graph)
+        changes = autodetector._arrange_for_graph(changes, graph)
         changes["testapp"][0].dependencies.append(("otherapp", "0001_initial"))
-        changes = autodetector.trim_to_apps(changes, set(["testapp"]))
+        changes = autodetector._trim_to_apps(changes, set(["testapp"]))
         # Make sure there's the right set of migrations
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(changes["otherapp"][0].name, "0001_initial")
@@ -76,7 +76,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -93,7 +93,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -110,7 +110,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_name])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -127,7 +127,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_name])
         after = self.make_project_state([self.author_empty])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -144,7 +144,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_name])
         after = self.make_project_state([self.author_name_longer])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -161,7 +161,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_name])
         after = self.make_project_state([self.author_name_renamed])
         autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
@@ -179,7 +179,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([])
         after = self.make_project_state([self.author_name, self.book, self.edition])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         self.assertEqual(len(changes['otherapp']), 1)
@@ -212,7 +212,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([])
         after = self.make_project_state([self.author_with_book, self.book])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         self.assertEqual(len(changes['otherapp']), 2)
@@ -243,7 +243,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_empty, self.book])
         after = self.make_project_state([self.author_empty, self.book_unique])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['otherapp']), 1)
         # Right number of actions?
@@ -261,7 +261,7 @@ class AutodetectorTests(TestCase):
         before = self.make_project_state([self.author_empty, self.book_unique])
         after = self.make_project_state([self.author_empty, self.book_unique_2])
         autodetector = MigrationAutodetector(before, after)
-        changes = autodetector.changes()
+        changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['otherapp']), 1)
         # Right number of actions?
