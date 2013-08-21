@@ -331,6 +331,39 @@ class MailTests(TestCase):
         self.assertFalse(str('Content-Transfer-Encoding: quoted-printable') in s)
         self.assertTrue(str('Content-Transfer-Encoding: 8bit') in s)
 
+    def test_dont_base64_encode_message_rfc822(self):
+        # Ticket #18967
+        # Shouldn't use base64 encoding for a child EmailMessage attachment.
+        # Create a child message first
+        child_msg = EmailMessage('Child Subject', 'Some body of child message', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        child_s = child_msg.message().as_string()
+
+        # Now create a parent
+        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+
+        # Attach to parent as a string
+        parent_msg.attach(content=child_s, mimetype='message/rfc822')
+        parent_s = parent_msg.message().as_string()
+
+        # Verify that the child message header is not base64 encoded
+        self.assertTrue(str('Child Subject') in parent_s)
+
+        # Feature test: try attaching email.Message object directly to the mail.
+        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        parent_msg.attach(content=child_msg.message(), mimetype='message/rfc822')
+        parent_s = parent_msg.message().as_string()
+
+        # Verify that the child message header is not base64 encoded
+        self.assertTrue(str('Child Subject') in parent_s)
+
+        # Feature test: try attaching Django's EmailMessage object directly to the mail.
+        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        parent_msg.attach(content=child_msg, mimetype='message/rfc822')
+        parent_s = parent_msg.message().as_string()
+
+        # Verify that the child message header is not base64 encoded
+        self.assertTrue(str('Child Subject') in parent_s)
+
 
 class BaseEmailBackendTests(object):
     email_backend = None
