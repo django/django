@@ -21,9 +21,15 @@ from django.utils import six
 from django.utils.six import PY3, StringIO
 import json
 
-from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
+from .models import (
+    Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
-    ExternalDependency, Thingy)
+    ExternalDependency, Thingy, M2MSimpleA, M2MSimpleB, M2MSimpleCircularA,
+    M2MSimpleCircularB, M2MComplexA, M2MComplexB, M2MThroughAB,
+    M2MComplexCircular1A, M2MComplexCircular1B, M2MComplexCircular1C,
+    M2MCircular1ThroughAB, M2MCircular1ThroughBC, M2MCircular1ThroughCA,
+    M2MComplexCircular2A, M2MComplexCircular2B, M2MCircular2ThroughAB
+)
 
 
 class TestFixtures(TestCase):
@@ -689,6 +695,228 @@ class NaturalKeyFixtureTests(TestCase):
             books.__repr__(),
             """[<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>, <Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>, <Book: Permutation City by Greg Egan (available at Angus and Robertson)>]"""
         )
+
+    def test_dependency_sorting_m2m_simple(self):
+        """
+        M2M relations without explicit through models SHOULD count as dependencies
+
+        Regression test for bugs that could be caused by flawed fixes to
+        #14226, namely if M2M checks are removed from sort_dependencies
+        altogether.
+        """
+        sorted_deps = sort_dependencies(
+            [('fixtures_regress', [M2MSimpleA, M2MSimpleB])],
+        )
+        self.assertEqual(sorted_deps, [M2MSimpleB, M2MSimpleA])
+
+    def test_dependency_sorting_m2m_simple_circular(self):
+        """
+        Resolving circular M2M relations without explicit through models should
+        fail loudly
+        """
+        self.assertRaisesMessage(
+            CommandError,
+            "Can't resolve dependencies for fixtures_regress.M2MSimpleCircularA, "
+            "fixtures_regress.M2MSimpleCircularB in serialized app list.",
+            sort_dependencies,
+            [('fixtures_regress', [M2MSimpleCircularA, M2MSimpleCircularB])],
+        )
+
+    def test_dependency_sorting_m2m_complex(self):
+        """
+        M2M relations with explicit through models should NOT count as
+        dependencies.  The through model itself will have dependencies, though.
+
+        Regression test for #14226
+        """
+        sorted_deps = sort_dependencies(
+            [('fixtures_regress', [M2MComplexA, M2MComplexB, M2MThroughAB])],
+        )
+        # Order between M2MComplexA and M2MComplexB doesn't matter. The through
+        # model has dependencies to them though, so it should come last.
+        self.assertEqual(sorted_deps[-1], M2MThroughAB)
+
+    def test_dependency_sorting_m2m_complex_circular_1(self):
+        """
+        Circular M2M relations with explicit through models should be serializable
+
+        Regression test for #14226
+        """
+        A, B, C, AtoB, BtoC, CtoA = (M2MComplexCircular1A, M2MComplexCircular1B,
+                                     M2MComplexCircular1C, M2MCircular1ThroughAB,
+                                     M2MCircular1ThroughBC, M2MCircular1ThroughCA)
+        sorted_deps = sort_dependencies(
+            [('fixtures_regress', [A, B, C, AtoB, BtoC, CtoA])],
+        )
+        # The dependency sorting should not result in and error, and the
+        # through model should have dependencies to the other models and as
+        # such come last in the list.
+        self.assertEqual(sorted(sorted_deps[:3]), sorted([A, B, C]))
+        self.assertEqual(sorted(sorted_deps[3:]), sorted([AtoB, BtoC, CtoA]))
+
+    def test_dependency_sorting_m2m_complex_circular_2(self):
+        """
+        Circular M2M relations with explicit through models should be serializable
+        This test tests the circularity with explicit natural_key.dependencies
+
+        Regression test for #14226
+        """
+        A, B, AtoB = (M2MComplexCircular2A, M2MComplexCircular2B, M2MCircular2ThroughAB)
+        sorted_deps = sort_dependencies(
+            [('fixtures_regress', [A, B, AtoB])],
+        )
+        self.assertEqual(sorted(sorted_deps[:2]), sorted([A, B]))
+        self.assertEqual(sorted_deps[2:], [AtoB])
+
+    def test_dump_and_load_m2m_simple(self):
+        """
+        Test serializing and deserializing back models with simple M2M relations
+        """
+        from django.core import serializers
+        a = M2MSimpleA.objects.create(data="a")
+        b1 = M2MSimpleB.objects.create(data="b1")
+        b2 = M2MSimpleB.objects.create(data="b2")
+        a.b_set.add(b1)
+        a.b_set.add(b2)
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.M2MSimpleA',
+            'fixtures_regress.M2MSimpleB',
+            use_natural_keys=True,
+            stdout=stdout
+        )
+
+        for model in [M2MSimpleA, M2MSimpleB]:
+            model.objects.all().delete()
+
+        objects = serializers.deserialize("json", stdout.getvalue())
+        for obj in objects:
+            obj.save()
+
+        new_a = M2MSimpleA.objects.get_by_natural_key("a")
+        self.assertQuerysetEqual(new_a.b_set.all(), [
+            "<M2MSimpleB: b1>",
+            "<M2MSimpleB: b2>",
+        ], ordered=False)
+
+    def test_dump_and_load_m2m_complex(self):
+        """
+        Test serializing and deserializing back models with complex M2M relations
+        """
+        from django.core import serializers
+        a = M2MComplexA.objects.create(data="a")
+        b1 = M2MComplexB.objects.create(data="b1")
+        b2 = M2MComplexB.objects.create(data="b2")
+        M2MThroughAB.objects.create(data="ab1", a=a, b=b1)
+        M2MThroughAB.objects.create(data="ab2", a=a, b=b2)
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.M2MComplexA',
+            'fixtures_regress.M2MComplexB',
+            'fixtures_regress.M2MThroughAB',
+            use_natural_keys=True,
+            stdout=stdout
+        )
+
+        for model in [M2MComplexA, M2MComplexB, M2MThroughAB]:
+            model.objects.all().delete()
+
+        objects = serializers.deserialize("json", stdout.getvalue())
+        for obj in objects:
+            obj.save()
+
+        new_a = M2MComplexA.objects.get_by_natural_key("a")
+        self.assertQuerysetEqual(new_a.b_set.all(), [
+            "<M2MComplexB: b1>",
+            "<M2MComplexB: b2>",
+        ], ordered=False)
+
+        M2MComplexB.objects.get_by_natural_key("b1")
+        M2MComplexB.objects.get_by_natural_key("b2")
+        M2MThroughAB.objects.get_by_natural_key("ab1")
+        M2MThroughAB.objects.get_by_natural_key("ab2")
+
+    def test_dump_and_load_m2m_complex_circular_1(self):
+        """
+        Test serializing and deserializing back models with complex, circular M2M relations
+        """
+        A, B, C, AtoB, BtoC, CtoA = (M2MComplexCircular1A, M2MComplexCircular1B,
+                                     M2MComplexCircular1C, M2MCircular1ThroughAB,
+                                     M2MCircular1ThroughBC, M2MCircular1ThroughCA)
+        from django.core import serializers
+        a = A.objects.create(data="a")
+        b = B.objects.create(data="b")
+        c = C.objects.create(data="c")
+        AtoB.objects.create(data="ab", a=a, b=b)
+        BtoC.objects.create(data="bc", b=b, c=c)
+        CtoA.objects.create(data="ca", c=c, a=a)
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.M2MComplexCircular1A',
+            'fixtures_regress.M2MComplexCircular1B',
+            'fixtures_regress.M2MComplexCircular1C',
+            'fixtures_regress.M2MCircular1ThroughAB',
+            'fixtures_regress.M2MCircular1ThroughBC',
+            'fixtures_regress.M2MCircular1ThroughCA',
+            use_natural_keys=True,
+            stdout=stdout
+        )
+
+        for model in [A, B, C, AtoB, BtoC, CtoA]:
+            model.objects.all().delete()
+
+        objects = serializers.deserialize("json", stdout.getvalue())
+        for obj in objects:
+            obj.save()
+
+        new_a = A.objects.get_by_natural_key("a")
+        new_b = B.objects.get_by_natural_key("b")
+        new_c = C.objects.get_by_natural_key("c")
+        self.assertQuerysetEqual(new_a.b_set.all(), ["<M2MComplexCircular1B: b>"])
+        self.assertQuerysetEqual(new_b.c_set.all(), ["<M2MComplexCircular1C: c>"])
+        self.assertQuerysetEqual(new_c.a_set.all(), ["<M2MComplexCircular1A: a>"])
+        AtoB.objects.get_by_natural_key("ab")
+        BtoC.objects.get_by_natural_key("bc")
+        CtoA.objects.get_by_natural_key("ca")
+
+    def test_dump_and_load_m2m_complex_circular_2(self):
+        """
+        Test serializing and deserializing back models with complex, circular
+        M2M relations with explicit natural_key.dependencies
+        """
+        from django.core import serializers
+        A, B, AtoB = (M2MComplexCircular2A, M2MComplexCircular2B, M2MCircular2ThroughAB)
+        a = A.objects.create(data="a")
+        b = B.objects.create(data="b")
+        AtoB.objects.create(data="ab", a=a, b=b)
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.M2MComplexCircular2A',
+            'fixtures_regress.M2MComplexCircular2B',
+            'fixtures_regress.M2MCircular2ThroughAB',
+            use_natural_keys=True,
+            stdout=stdout
+        )
+
+        for model in [A, B, AtoB]:
+            model.objects.all().delete()
+
+        objects = serializers.deserialize("json", stdout.getvalue())
+        for obj in objects:
+            obj.save()
+
+        new_a = A.objects.get_by_natural_key("a")
+        self.assertQuerysetEqual(new_a.b_set.all(), ["<M2MComplexCircular2B: b>"])
+        B.objects.get_by_natural_key("b")
+        AtoB.objects.get_by_natural_key("ab")
 
 
 class TestTicket11101(TransactionTestCase):
