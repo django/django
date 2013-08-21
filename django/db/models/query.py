@@ -411,7 +411,7 @@ class QuerySet(object):
         Returns a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        lookup, params, _ = self._extract_model_params(defaults, **kwargs)
+        lookup, params = self._extract_model_params(defaults, **kwargs)
         self._for_write = True
         try:
             return self.get(**lookup), False
@@ -425,7 +425,8 @@ class QuerySet(object):
         Returns a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        lookup, params, filtered_defaults = self._extract_model_params(defaults, **kwargs)
+        defaults = defaults or {}
+        lookup, params = self._extract_model_params(defaults, **kwargs)
         self._for_write = True
         try:
             obj = self.get(**lookup)
@@ -433,12 +434,12 @@ class QuerySet(object):
             obj, created = self._create_object_from_params(lookup, params)
             if created:
                 return obj, created
-        for k, v in six.iteritems(filtered_defaults):
+        for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
 
         sid = transaction.savepoint(using=self.db)
         try:
-            obj.save(update_fields=filtered_defaults.keys(), using=self.db)
+            obj.save(using=self.db)
             transaction.savepoint_commit(sid, using=self.db)
             return obj, False
         except DatabaseError:
@@ -469,22 +470,17 @@ class QuerySet(object):
     def _extract_model_params(self, defaults, **kwargs):
         """
         Prepares `lookup` (kwargs that are valid model attributes), `params`
-        (for creating a model instance) and `filtered_defaults` (defaults
-        that are valid model attributes) based on given kwargs; for use by
+        (for creating a model instance) based on given kwargs; for use by
         get_or_create and update_or_create.
         """
         defaults = defaults or {}
-        filtered_defaults = {}
         lookup = kwargs.copy()
         for f in self.model._meta.fields:
-            # Filter out fields that don't belongs to the model.
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
-            if f.attname in defaults:
-                filtered_defaults[f.name] = defaults.pop(f.attname)
         params = dict((k, v) for k, v in kwargs.items() if LOOKUP_SEP not in k)
-        params.update(filtered_defaults)
-        return lookup, params, filtered_defaults
+        params.update(defaults)
+        return lookup, params
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
         """
