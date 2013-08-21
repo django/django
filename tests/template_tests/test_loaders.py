@@ -105,6 +105,7 @@ class EggLoaderTest(unittest.TestCase):
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 
+
 class CachedLoader(unittest.TestCase):
     def setUp(self):
         self.old_TEMPLATE_LOADERS = settings.TEMPLATE_LOADERS
@@ -126,6 +127,16 @@ class CachedLoader(unittest.TestCase):
 
         # The two templates should not have the same content
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
+
+    def test_missing_template_is_cached(self):
+        "Check that the missing template is cached."
+        template_loader = loader.find_template_loader(settings.TEMPLATE_LOADERS[0])
+        # Empty cache, which may be filled from previous tests.
+        template_loader.reset()
+        # Check that 'missing.html' isn't already in cache before 'missing.html' is loaed
+        self.assertRaises(KeyError, lambda: template_loader.template_cache["missing.html"])
+        self.assertRaises(TemplateDoesNotExist, template_loader.load_template, "missing.html")
+
 
 class RenderToStringTest(unittest.TestCase):
 
