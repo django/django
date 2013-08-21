@@ -104,14 +104,9 @@ aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
-your model's :meth:`~Model.save()` method, nor as a result of
-:class:`~django.forms.ModelForm` validation. In the case of
-:class:`~django.forms.ModelForm` validation, :meth:`Model.clean_fields()`,
-:meth:`Model.clean()`, and :meth:`Model.validate_unique()` are all called
-individually.
-
-You'll need to call ``full_clean`` manually when you want to run one-step model
-validation for your own manually created models. For example::
+your model's :meth:`~Model.save()` method. You'll need to call it manually
+when you want to run one-step model validation for your own manually created
+models. For example::
 
     from django.core.exceptions import ValidationError
     try:
