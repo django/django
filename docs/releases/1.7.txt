@@ -159,6 +159,12 @@ Minor features
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
 
+* ``django.forms.util.ErrorDict`` is now a subclass of
+  :class:`~collections.defaultdict` and the default factory for
+  :attr:`django.forms.Form.errors` is set to the ``error_class`` attribute of
+  the form instance. As a result it's no longer necessary to check if an
+  ``error_class`` already exist for a given field before adding errors.
+
 Backwards incompatible changes in 1.7
 =====================================
 

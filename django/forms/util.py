@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from collections import defaultdict
+import sys
 import warnings
 
 from django.conf import settings
@@ -8,7 +10,6 @@ from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
-import sys
 
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
@@ -31,7 +32,7 @@ def flatatt(attrs):
     return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
 @python_2_unicode_compatible
-class ErrorDict(dict):
+class ErrorDict(defaultdict):
     """
     A collection of errors that knows how to display itself in various formats.
 

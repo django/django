@@ -262,7 +262,7 @@ class BaseForm(object):
         Cleans all of self.data and populates self._errors and
         self.cleaned_data.
         """
-        self._errors = ErrorDict()
+        self._errors = ErrorDict(self.error_class)
         if not self.is_bound: # Stop further processing.
             return
         self.cleaned_data = {}
@@ -291,7 +291,7 @@ class BaseForm(object):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError as e:
-                self._errors[name] = self.error_class(e.messages)
+                self._errors[name].extend(e.messages)
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
 
@@ -299,7 +299,7 @@ class BaseForm(object):
         try:
             cleaned_data = self.clean()
         except ValidationError as e:
-            self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+            self._errors[NON_FIELD_ERRORS].extend(e.messages)
         else:
             if cleaned_data is not None:
                 self.cleaned_data = cleaned_data

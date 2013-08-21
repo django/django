@@ -226,12 +226,6 @@ that has an error. Each value in the dictionary is a
 display itself in different ways. So you can treat ``_errors`` as a dictionary
 mapping field names to lists.
 
-If you want to add a new error to a particular field, you should check whether
-the key already exists in ``self._errors`` or not. If not, create a new entry
-for the given key, holding an empty ``ErrorList`` instance. In either case,
-you can then append your error message to the list for the field name in
-question and it will be displayed when the form is displayed.
-
 There is an example of modifying ``self._errors`` in the following section.
 
 .. admonition:: What's in a name?
@@ -432,8 +426,8 @@ sample) looks like this::
                 # We know these are not in self._errors now (see discussion
                 # below).
                 msg = u"Must put 'help' in subject when cc'ing yourself."
-                self._errors["cc_myself"] = self.error_class([msg])
-                self._errors["subject"] = self.error_class([msg])
+                self._errors["cc_myself"].append(msg)
+                self._errors["subject"].append(msg)
 
                 # These fields are no longer valid. Remove them from the
                 # cleaned data.
@@ -441,14 +435,12 @@ sample) looks like this::
                 del cleaned_data["subject"]
 
 As you can see, this approach requires a bit more effort, not withstanding the
-extra design effort to create a sensible form display. The details are worth
-noting, however. Firstly, earlier we mentioned that you might need to check if
-the field name keys already exist in the ``_errors`` dictionary. In this case,
-since we know the fields exist in ``self.cleaned_data``, they must have been
-valid when cleaned as individual fields, so there will be no corresponding
-entries in ``_errors``.
+extra design effort to create a sensible form display. Once we have decided
+that the combined data in the two fields we are considering aren't valid, we
+must remember to remove them from the ``cleaned_data``.
 
-Secondly, once we have decided that the combined data in the two fields we are
-considering aren't valid, we must remember to remove them from the
-``cleaned_data``. `cleaned_data`` is present even if the form doesn't
-validate, but it contains only field values that did validate.
+.. versionchanged:: 1.7
+
+    Before adding new errors, it used to be necessary to check if a key already
+    existed in ``self._errors``, and if not, to create a new entry key holding an
+    empty ``ErrorList`` instance.
