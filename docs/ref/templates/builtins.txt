@@ -60,6 +60,8 @@ Sample usage::
         <p>Commented out text with {{ create_date|date:"c" }}</p>
     {% endcomment %}
 
+``comment`` tags cannot be nested.
+
 .. templatetag:: csrf_token
 
 csrf_token
@@ -73,10 +75,12 @@ This tag is used for CSRF protection, as described in the documentation for
 cycle
 ^^^^^
 
-Cycles among the given strings or variables each time this tag is encountered.
+Produces one of its arguments each time this tag is encountered. The first
+argument is produced on the first encounter, the second argument on the second
+encounter, and so forth. Once all arguments are exhausted, the tag cycles to
+the first argument and produces it again.
 
-Within a loop, cycles among the given strings each time through the
-loop::
+This tag is particularly useful in a loop::
 
     {% for o in some_list %}
         <tr class="{% cycle 'row1' 'row2' %}">
@@ -84,8 +88,13 @@ loop::
         </tr>
     {% endfor %}
 
+The first iteration produces HTML that refers to class ``row1``, the second to
+``row2``, the third to ``row1`` again, and so on for each iteration of the
+loop.
+
 You can use variables, too. For example, if you have two template variables,
-``rowvalue1`` and ``rowvalue2``, you can cycle between their values like this::
+``rowvalue1`` and ``rowvalue2``, you can alternate between their values like
+this::
 
     {% for o in some_list %}
         <tr class="{% cycle rowvalue1 rowvalue2 %}">
@@ -93,9 +102,10 @@ You can use variables, too. For example, if you have two template variables,
         </tr>
     {% endfor %}
 
-Note that variable arguments (``rowvalue1`` and ``rowvalue2`` above) are NOT
-auto-escaped! So either make sure that you trust their values, or use explicit
-escaping, like this::
+Note that the variables included in the cycle will not be escaped. Any HTML or
+Javascript code contained in the printed variable will be rendered as-is, which
+could potentially lead to security issues. So either make sure that you trust
+their values or use explicit escaping like this::
 
     {% for o in some_list %}
         <tr class="{% filter force_escape %}{% cycle rowvalue1 rowvalue2 %}{% endfilter %}">
@@ -111,17 +121,17 @@ You can mix variables and strings::
         </tr>
     {% endfor %}
 
-In some cases you might want to refer to the next value of a cycle from
-outside of a loop. To do this, just give the ``{% cycle %}`` tag a name, using
-"as", like this::
+In some cases you might want to refer to the current value of a cycle
+without advancing to the next value. To do this,
+just give the ``{% cycle %}`` tag a name, using "as", like this::
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
-From then on, you can insert the current value of the cycle wherever
-you'd like in your template by referencing the cycle name as a context
-variable. If you want to move the cycle onto the next value, you use
-the cycle tag again, using the name of the variable. So, the following
-template::
+From then on, you can insert the current value of the cycle wherever you'd like
+in your template by referencing the cycle name as a context variable. If you
+want to move the cycle to the next value independently of the original
+``cycle`` tag, you can use another ``cycle`` tag and specify the name of the
+variable. So, the following template::
 
     <tr>
         <td class="{% cycle 'row1' 'row2' as rowcolors %}">...</td>
@@ -143,15 +153,39 @@ would output::
         <td class="row2">...</td>
     </tr>
 
-You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
-Values enclosed in single (``'``) or double quotes (``"``) are treated as
-string literals, while values without quotes are treated as template variables.
+You can use any number of values in a ``cycle`` tag, separated by spaces.
+Values enclosed in single quotes (``'``) or double quotes (``"``) are treated
+as string literals, while values without quotes are treated as template
+variables.
 
-Note that currently the variables included in the cycle will not be escaped.
-Any HTML or Javascript code contained in the printed variable will be rendered
-as-is, which could potentially lead to security issues.
+By default, when you use the ``as`` keyword with the cycle tag, the
+usage of ``{% cycle %}`` that initiates the cycle will itself produce
+the first value in the cycle. This could be a problem if you want to
+use the value in a nested loop or an included template. If you only want
+to declare the cycle but not produce the first value, you can add a
+``silent`` keyword as the last keyword in the tag. For example::
 
-For backwards compatibility, the ``{% cycle %}`` tag supports the much inferior
+    {% for obj in some_list %}
+        {% cycle 'row1' 'row2' as rowcolors silent %}
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
+    {% endfor %}
+
+This will output a list of ``<tr>`` elements with ``class``
+alternating between ``row1`` and ``row2``. The subtemplate will have
+access to ``rowcolors`` in its context and the value will match the class
+of the ``<tr>`` that encloses it. If the ``silent`` keyword were to be
+omitted, ``row1`` and ``row2`` would be emitted as normal text, outside the
+``<tr>`` element.
+
+When the silent keyword is used on a cycle definition, the silence
+automatically applies to all subsequent uses of that specific cycle tag.
+The following template would output *nothing*, even though the second
+call to ``{% cycle %}`` doesn't specify ``silent``::
+
+    {% cycle 'row1' 'row2' as rowcolors silent %}
+    {% cycle rowcolors %}
+
+For backward compatibility, the ``{% cycle %}`` tag supports the much inferior
 old syntax from previous Django versions. You shouldn't use this in any new
 projects, but for the sake of the people who are still using it, here's what it
 looks like::
@@ -162,48 +196,21 @@ In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
 
-By default, when you use the ``as`` keyword with the cycle tag, the
-usage of ``{% cycle %}`` that declares the cycle will itself output
-the first value in the cycle. This could be a problem if you want to
-use the value in a nested loop or an included template. If you want to
-just declare the cycle, but not output the first value, you can add a
-``silent`` keyword as the last keyword in the tag. For example::
-
-    {% for obj in some_list %}
-        {% cycle 'row1' 'row2' as rowcolors silent %}
-        <tr class="{{ rowcolors }}">{% include "subtemplate.html" %}</tr>
-    {% endfor %}
-
-This will output a list of ``<tr>`` elements with ``class``
-alternating between ``row1`` and ``row2``; the subtemplate will have
-access to ``rowcolors`` in its context that matches the class of the
-``<tr>`` that encloses it. If the ``silent`` keyword were to be
-omitted, ``row1`` would be emitted as normal text, outside the
-``<tr>`` element.
-
-When the silent keyword is used on a cycle definition, the silence
-automatically applies to all subsequent uses of the cycle tag. In,
-the following template would output *nothing*, even though the second
-call to ``{% cycle %}`` doesn't specify silent::
-
-    {% cycle 'row1' 'row2' as rowcolors silent %}
-    {% cycle rowcolors %}
-
 .. versionchanged:: 1.6
 
-    To improve safety, future versions of ``cycle`` will automatically escape
-    their output. You're encouraged to activate this behavior by loading
-    ``cycle`` from the ``future`` template library::
+To improve safety, future versions of ``cycle`` will automatically escape
+their output. You're encouraged to activate this behavior by loading
+``cycle`` from the ``future`` template library::
 
-        {% load cycle from future %}
+    {% load cycle from future %}
 
-    When using the ``future`` version, you can disable auto-escaping with::
+When using the ``future`` version, you can disable auto-escaping with::
 
-        {% for o in some_list %}
-            <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
-                ...
-            </tr>
-        {% endfor %}
+    {% for o in some_list %}
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
+            ...
+        </tr>
+    {% endfor %}
 
 .. templatetag:: debug
 
@@ -237,10 +244,12 @@ See :ref:`template-inheritance` for more information.
 filter
 ^^^^^^
 
-Filters the contents of the variable through variable filters.
+Filters the contents of the block through one or more filters. Multiple
+filters can be specified with pipes and filters can have arguments, just as
+in variable syntax.
 
-Filters can also be piped through each other, and they can have arguments --
-just like in variable syntax.
+Note that the block includes *all* the text between the ``filter`` and
+``endfilter`` tags.
 
 Sample usage::
 
@@ -259,8 +268,8 @@ Sample usage::
 firstof
 ^^^^^^^
 
-Outputs the first variable passed that is not False. Does NOT auto-escape
-variable values.
+Outputs the first argument variable that is not False. This tag does *not*
+auto-escape variable values.
 
 Outputs nothing if all the passed variables are False.
 
@@ -315,8 +324,9 @@ to escape the variables in the firstof tag, you must do so explicitly::
 for
 ^^^
 
-Loop over each item in an array.  For example, to display a list of athletes
-provided in ``athlete_list``::
+Loops over each item in an array, making the item available in a context
+variable. For example, to display a list of athletes provided in
+``athlete_list``::
 
     <ul>
     {% for athlete in athlete_list %}
@@ -328,7 +338,7 @@ You can loop over a list in reverse by using
 ``{% for obj in list reversed %}``.
 
 If you need to loop over a list of lists, you can unpack the values
-in each sub-list into individual variables. For example, if your context
+in each sublist into individual variables. For example, if your context
 contains a list of (x,y) coordinates called ``points``, you could use the
 following to output the list of points::
 
@@ -357,14 +367,14 @@ Variable                    Description
                             loop (0-indexed)
 ``forloop.first``           True if this is the first time through the loop
 ``forloop.last``            True if this is the last time through the loop
-``forloop.parentloop``      For nested loops, this is the loop "above" the
-                            current one
+``forloop.parentloop``      For nested loops, this is the loop surrounding
+                            the current one
 ==========================  ===============================================
 
 for ... empty
 ^^^^^^^^^^^^^
 
-The ``for`` tag can take an optional ``{% empty %}`` clause that will be
+The ``for`` tag can take an optional ``{% empty %}`` clause whose text is
 displayed if the given array is empty or could not be found::
 
     <ul>
@@ -451,7 +461,7 @@ will be interpreted like:
 
     if (athlete_list and coach_list) or cheerleader_list
 
-Use of actual parentheses in the :ttag:`if` tag is invalid syntax.  If you need
+Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
@@ -517,7 +527,7 @@ Greater than or equal to. Example::
 ^^^^^^^^^^^^^^^
 
 Contained within. This operator is supported by many Python containers to test
-whether the given value is in the container.  The following are some examples
+whether the given value is in the container. The following are some examples
 of how ``x in y`` will be interpreted::
 
     {% if "bc" in "abcdef" %}
@@ -537,7 +547,7 @@ of how ``x in y`` will be interpreted::
 ``not in`` operator
 ^^^^^^^^^^^^^^^^^^^
 
-Not contained within.  This is the negation of the ``in`` operator.
+Not contained within. This is the negation of the ``in`` operator.
 
 
 The comparison operators cannot be 'chained' like in Python or in mathematical
@@ -564,7 +574,7 @@ Complex expressions
 
 All of the above can be combined to form complex expressions. For such
 expressions, it can be important to know how the operators are grouped when the
-expression is evaluated - that is, the precedence rules.  The precedence of the
+expression is evaluated - that is, the precedence rules. The precedence of the
 operators, from lowest to highest, is as follows:
 
 * ``or``
@@ -691,8 +701,8 @@ the variable ``template_name``::
 
     {% include template_name %}
 
-An included template is rendered with the context of the template that's
-including it. This example produces the output ``"Hello, John"``:
+An included template is rendered within the context of the template that
+includes it. This example produces the output ``"Hello, John"``:
 
 * Context: variable ``person`` is set to ``"john"``.
 * Template::
@@ -707,8 +717,9 @@ You can pass additional context to the template using keyword arguments::
 
     {% include "name_snippet.html" with person="Jane" greeting="Hello" %}
 
-If you want to only render the context with the variables provided (or even
-no variables at all), use the ``only`` option::
+If you want to render the context only with the variables provided (or even
+no variables at all), use the ``only`` option. No other variables are
+available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
@@ -1188,7 +1199,8 @@ If ``value`` is ``"I'm using Django"``, the output will be
 capfirst
 ^^^^^^^^
 
-Capitalizes the first character of the value.
+Capitalizes the first character of the value. If the first character is not
+a letter, this filter has no effect.
 
 For example::
 
@@ -1916,9 +1928,9 @@ autoescaping is off, this filter has no effect.
 safeseq
 ^^^^^^^
 
-Applies the :tfilter:`safe` filter to each element of a sequence.  Useful in
+Applies the :tfilter:`safe` filter to each element of a sequence. Useful in
 conjunction with other filters that operate on sequences, such as
-:tfilter:`join`.  For example::
+:tfilter:`join`. For example::
 
     {{ some_list|safeseq|join:", " }}
 
@@ -2075,7 +2087,8 @@ date that is in the past relative to the comparison point.
 title
 ^^^^^
 
-Converts a string into titlecase.
+Converts a string into titlecase by capitalizing each word in the string.
+This tag makes no effort to keep "trivial words" in lowercase.
 
 For example::
 
