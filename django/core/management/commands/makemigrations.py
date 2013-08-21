@@ -61,6 +61,7 @@ class Command(BaseCommand):
                 self.stdout.write("No changes detected")
             return
 
+        directory_created = {}
         for app_label, migrations in changes.items():
             self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
             for migration in migrations:
@@ -71,10 +72,13 @@ class Command(BaseCommand):
                     self.stdout.write("    - %s\n" % operation.describe())
                 # Write it
                 migrations_directory = os.path.dirname(writer.path)
-                if not os.path.isdir(migrations_directory):
-                    os.mkdir(migrations_directory)
-                init_path = os.path.join(migrations_directory, "__init__.py")
-                if not os.path.isfile(init_path):
-                    open(init_path, "w").close()
+                if not directory_created.get(app_label, False):
+                    if not os.path.isdir(migrations_directory):
+                        os.mkdir(migrations_directory)
+                    init_path = os.path.join(migrations_directory, "__init__.py")
+                    if not os.path.isfile(init_path):
+                        open(init_path, "w").close()
+                    # We just do this once per app
+                    directory_created[app_label] = True
                 with open(writer.path, "w") as fh:
                     fh.write(writer.as_string())
