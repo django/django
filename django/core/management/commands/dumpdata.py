@@ -189,17 +189,21 @@ def sort_dependencies(app_list):
             else:
                 deps = []
 
-            # Now add a dependency for any FK or M2M relation with
-            # a model that defines a natural key
+            # Now add a dependency for any FK relation with a model that
+            # defines a natural key
             for field in model._meta.fields:
                 if hasattr(field.rel, 'to'):
                     rel_model = field.rel.to
                     if hasattr(rel_model, 'natural_key') and rel_model != model:
                         deps.append(rel_model)
+            # Also add a dependency for any simple M2M relation with a model
+            # that defines a natural key.  M2M relations with explicit through
+            # models don't count as dependencies.
             for field in model._meta.many_to_many:
-                rel_model = field.rel.to
-                if hasattr(rel_model, 'natural_key') and rel_model != model:
-                    deps.append(rel_model)
+                if field.rel.through._meta.auto_created:
+                    rel_model = field.rel.to
+                    if hasattr(rel_model, 'natural_key') and rel_model != model:
+                        deps.append(rel_model)
             model_dependencies.append((model, deps))
 
     model_dependencies.reverse()
