@@ -18,7 +18,7 @@ from django.core.mail import (EmailMessage, mail_admins, mail_managers,
         EmailMultiAlternatives, send_mail, send_mass_mail)
 from django.core.mail.backends import console, dummy, locmem, filebased, smtp
 from django.core.mail.message import BadHeaderError
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str, force_text
 from django.utils.six import PY3, StringIO, string_types
@@ -46,7 +46,7 @@ class HeadersCheckMixin(object):
                         'the following headers: %s' % (headers - msg_headers),)
 
 
-class MailTests(HeadersCheckMixin, TestCase):
+class MailTests(HeadersCheckMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
@@ -403,7 +403,7 @@ class MailTests(HeadersCheckMixin, TestCase):
         self.assertTrue(str('Child Subject') in parent_s)
 
 
-class PythonGlobalState(TestCase):
+class PythonGlobalState(SimpleTestCase):
     """
     Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
     parts shouldn't pollute global email Python package charset registry when
@@ -636,7 +636,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
             self.fail("close() unexpectedly raised an exception: %s" % e)
 
 
-class LocmemBackendTests(BaseEmailBackendTests, TestCase):
+class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.locmem.EmailBackend'
 
     def get_mailbox_content(self):
@@ -666,7 +666,7 @@ class LocmemBackendTests(BaseEmailBackendTests, TestCase):
             send_mail('Subject\nMultiline', 'Content', 'from@example.com', ['to@example.com'])
 
 
-class FileBackendTests(BaseEmailBackendTests, TestCase):
+class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
@@ -723,7 +723,7 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         connection.close()
 
 
-class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
+class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
@@ -826,7 +826,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
             self.join()
 
 
-class SMTPBackendTests(BaseEmailBackendTests, TestCase):
+class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.smtp.EmailBackend'
 
     @classmethod
