@@ -1550,14 +1550,17 @@ should be used -- installation-wide, for a particular user, or both.
 
 To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
 Django uses this language as the default translation -- the final attempt if no
-other translator finds a translation.
+better matching translation is found by one of the methods employed by the
+locale middleware (see below).
 
-If all you want to do is run Django with your native language, and a language
-file is available for it, all you need to do is set :setting:`LANGUAGE_CODE`.
+If all you want to do is run Django with your native language all you need to do
+is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
+files <message file>` and their compiled versions (``.mo``) exist.
 
 If you want to let each individual user specify which language he or she
-prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
-selection based on data from the request. It customizes content for each user.
+prefers, the you also need to use use the ``LocaleMiddleware``.
+``LocaleMiddleware`` enables language selection based on data from the request.
+It customizes content for each user.
 
 To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order

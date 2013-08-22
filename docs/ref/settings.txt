@@ -1290,10 +1290,21 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be
-in standard :term:`language format<language code>`. For example, U.S. English
+A string representing the language code for this installation. This should be in
+standard :term:`language ID format <language code>`. For example, U.S.  English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
+
+:setting:`USE_I18N` must be active to this setting to have any effect.
+
+it serves two purposes:
+
+* If the locale middleware isn't in use, it decides which translation is served
+  to all users.
+* If the locale middleware is active, it provides the fallback translation when
+  no translation exist for a given literal to the user preferred language.
+
+See :ref:`how-django-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
