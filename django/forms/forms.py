@@ -526,9 +526,9 @@ class BoundField(object):
         """
         contents = contents or self.label
         # Only add the suffix if the label does not end in punctuation.
+        label_suffix = label_suffix if label_suffix is not None else self.form.label_suffix
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
-        label_suffix = label_suffix if label_suffix is not None else self.form.label_suffix
         if label_suffix and contents and contents[-1] not in _(':?.!'):
             contents = format_html('{0}{1}', contents, label_suffix)
         widget = self.field.widget
