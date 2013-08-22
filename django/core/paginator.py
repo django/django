@@ -2,6 +2,7 @@ import collections
 from math import ceil
 
 from django.utils import six
+from django.db import DatabaseError
 
 
 class InvalidPage(Exception):
@@ -70,10 +71,11 @@ class Paginator(object):
         if self._count is None:
             try:
                 self._count = self.object_list.count()
-            except (AttributeError, TypeError):
+            except (AttributeError, TypeError, DatabaseError):
                 # AttributeError if object_list has no count() method.
                 # TypeError if object_list.count() requires arguments
                 # (i.e. is of type list).
+                # DatabaseError if the set was generated with objects.extra()
                 self._count = len(self.object_list)
         return self._count
     count = property(_get_count)
