@@ -10,7 +10,7 @@ from django.core.validators import ValidationError
 from django.db import connection
 from django.forms.models import model_to_dict
 from django.utils.unittest import skipUnless
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
@@ -422,6 +422,7 @@ class UniqueTest(TestCase):
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], [u'Price with this Price and Quantity already exists.'])
 
+    @skipUnlessDBFeature('ignores_nulls_in_unique_constraints')
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
         form = BookForm({'title': title, 'author': self.writer.pk})
