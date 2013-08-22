@@ -3,11 +3,6 @@ from __future__ import unicode_literals
 import base64
 from datetime import datetime, timedelta
 import logging
-
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 import string
 
 from django.conf import settings
@@ -17,6 +12,7 @@ from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
+from django.utils.module_loading import import_by_path
 
 from django.contrib.sessions.exceptions import SuspiciousSession
 
@@ -42,6 +38,7 @@ class SessionBase(object):
         self._session_key = session_key
         self.accessed = False
         self.modified = False
+        self.serializer = import_by_path(settings.SESSION_SERIALIZER)
 
     def __contains__(self, key):
         return key in self._session
@@ -86,21 +83,21 @@ class SessionBase(object):
         return salted_hmac(key_salt, value).hexdigest()
 
     def encode(self, session_dict):
-        "Returns the given session dictionary pickled and encoded as a string."
-        pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
-        hash = self._hash(pickled)
-        return base64.b64encode(hash.encode() + b":" + pickled).decode('ascii')
+        "Returns the given session dictionary serialized and encoded as a string."
+        serialized = self.serializer().dumps(session_dict)
+        hash = self._hash(serialized)
+        return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
 
     def decode(self, session_data):
         encoded_data = base64.b64decode(force_bytes(session_data))
         try:
             # could produce ValueError if there is no ':'
-            hash, pickled = encoded_data.split(b':', 1)
-            expected_hash = self._hash(pickled)
+            hash, serialized = encoded_data.split(b':', 1)
+            expected_hash = self._hash(serialized)
             if not constant_time_compare(hash.decode(), expected_hash):
                 raise SuspiciousSession("Session data corrupted")
             else:
-                return pickle.loads(pickled)
+                return self.serializer().loads(serialized)
         except Exception as e:
             # ValueError, SuspiciousOperation, unpickling exceptions. If any of
             # these happen, just return an empty dictionary (an empty session).

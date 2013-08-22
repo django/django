@@ -1,24 +1,7 @@
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
-
 from django.conf import settings
 from django.core import signing
 
 from django.contrib.sessions.backends.base import SessionBase
-
-
-class PickleSerializer(object):
-    """
-    Simple wrapper around pickle to be used in signing.dumps and
-    signing.loads.
-    """
-    def dumps(self, obj):
-        return pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
-
-    def loads(self, data):
-        return pickle.loads(data)
 
 
 class SessionStore(SessionBase):
@@ -31,7 +14,7 @@ class SessionStore(SessionBase):
         """
         try:
             return signing.loads(self.session_key,
-                serializer=PickleSerializer,
+                serializer=self.serializer,
                 # This doesn't handle non-default expiry dates, see #19201
                 max_age=settings.SESSION_COOKIE_AGE,
                 salt='django.contrib.sessions.backends.signed_cookies')
@@ -91,7 +74,7 @@ class SessionStore(SessionBase):
         session_cache = getattr(self, '_session_cache', {})
         return signing.dumps(session_cache, compress=True,
             salt='django.contrib.sessions.backends.signed_cookies',
-            serializer=PickleSerializer)
+            serializer=self.serializer)
 
     @classmethod
     def clear_expired(cls):
