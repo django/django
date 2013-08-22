@@ -328,7 +328,8 @@ Some of the things you can do with the test client are:
   everything from low-level HTTP (result headers and status codes) to
   page content.
 
-* Test that the correct view is executed for a given URL.
+* See the chain of redirects (if any) and check the URL and status code at
+  each step.
 
 * Test that a given request is rendered by a given Django template, with
   a template context that contains certain values.
@@ -337,8 +338,8 @@ Note that the test client is not intended to be a replacement for Selenium_ or
 other "in-browser" frameworks. Django's test client has a different focus. In
 short:
 
-* Use Django's test client to establish that the correct view is being
-  called and that the view is collecting the correct context data.
+* Use Django's test client to establish that the correct template is being
+  rendered and that the template is passed the correct context data.
 
 * Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
   *behavior* of Web pages, namely JavaScript functionality. Django also
