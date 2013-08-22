@@ -288,16 +288,7 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Response redirected to '%s', expected '%s'" %
                 (url, expected_url))
 
-    def assertContains(self, response, text, count=None, status_code=200,
-                       msg_prefix='', html=False):
-        """
-        Asserts that a response indicates that some content was retrieved
-        successfully, (i.e., the HTTP status code was as expected), and that
-        ``text`` occurs ``count`` times in the content of the response.
-        If ``count`` is None, the count doesn't matter - the assertion is true
-        if the text occurs at least once in the response.
-        """
-
+    def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered
         # yet, then ensure that it does get rendered before proceeding further.
         if (hasattr(response, 'render') and callable(response.render)
@@ -327,6 +318,20 @@ class SimpleTestCase(unittest.TestCase):
             text = assert_and_parse_html(self, text, None,
                 "Second argument is not valid HTML:")
         real_count = content.count(text)
+        return (text_repr, real_count, msg_prefix)
+
+    def assertContains(self, response, text, count=None, status_code=200,
+                       msg_prefix='', html=False):
+        """
+        Asserts that a response indicates that some content was retrieved
+        successfully, (i.e., the HTTP status code was as expected), and that
+        ``text`` occurs ``count`` times in the content of the response.
+        If ``count`` is None, the count doesn't matter - the assertion is true
+        if the text occurs at least once in the response.
+        """
+        text_repr, real_count, msg_prefix = self._assert_contains(
+            response, text, status_code, msg_prefix, html)
+
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of %s in response"
@@ -342,34 +347,11 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected), and that
         ``text`` doesn't occurs in the content of the response.
         """
+        text_repr, real_count, msg_prefix = self._assert_contains(
+            response, text, status_code, msg_prefix, html)
 
-        # If the response supports deferred rendering and hasn't been rendered
-        # yet, then ensure that it does get rendered before proceeding further.
-        if (hasattr(response, 'render') and callable(response.render)
-            and not response.is_rendered):
-            response.render()
-
-        if msg_prefix:
-            msg_prefix += ": "
-
-        self.assertEqual(response.status_code, status_code,
-            msg_prefix + "Couldn't retrieve content: Response code was %d"
-            " (expected %d)" % (response.status_code, status_code))
-
-        content = response.content
-        if not isinstance(text, bytes) or html:
-            text = force_text(text, encoding=response._charset)
-            content = content.decode(response._charset)
-            text_repr = "'%s'" % text
-        else:
-            text_repr = repr(text)
-        if html:
-            content = assert_and_parse_html(self, content, None,
-                'Response\'s content is not valid HTML:')
-            text = assert_and_parse_html(self, text, None,
-                'Second argument is not valid HTML:')
-        self.assertEqual(content.count(text), 0,
-            msg_prefix + "Response should not contain %s" % text_repr)
+        self.assertEqual(real_count, 0,
+                msg_prefix + "Response should not contain %s" % text_repr)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
@@ -499,26 +481,36 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(msg_prefix + "The formset '%s' was not used to render "
                       "the response" % formset)
 
-    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
-        """
-        Asserts that the template with the provided name was used in rendering
-        the response. Also usable as context manager.
-        """
+    def _assert_template_used(self, response, template_name, msg_prefix):
+
         if response is None and template_name is None:
             raise TypeError('response and/or template_name argument must be provided')
 
         if msg_prefix:
             msg_prefix += ": "
 
-        # Use assertTemplateUsed as context manager.
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response
                 response = None
-            context = _AssertTemplateUsedContext(self, template_name)
-            return context
+            # use this template with context manager
+            return template_name, None, msg_prefix
 
         template_names = [t.name for t in response.templates]
+        return None, template_names, msg_prefix
+
+    def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
+        """
+        Asserts that the template with the provided name was used in rendering
+        the response. Also usable as context manager.
+        """
+        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+            response, template_name, msg_prefix)
+
+        if context_mgr_template:
+            # Use assertTemplateUsed as context manager.
+            return _AssertTemplateUsedContext(self, context_mgr_template)
+
         if not template_names:
             self.fail(msg_prefix + "No templates used to render the response")
         self.assertTrue(template_name in template_names,
@@ -531,21 +523,14 @@ class SimpleTestCase(unittest.TestCase):
         Asserts that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
-        if response is None and template_name is None:
-            raise TypeError('response and/or template_name argument must be provided')
 
-        if msg_prefix:
-            msg_prefix += ": "
+        context_mgr_template, template_names, msg_prefix = self._assert_template_used(
+            response, template_name, msg_prefix)
 
-        # Use assertTemplateUsed as context manager.
-        if not hasattr(response, 'templates') or (response is None and template_name):
-            if response:
-                template_name = response
-                response = None
-            context = _AssertTemplateNotUsedContext(self, template_name)
-            return context
+        if context_mgr_template:
+            # Use assertTemplateNotUsed as context manager.
+            return _AssertTemplateNotUsedContext(self, context_mgr_template)
 
-        template_names = [t.name for t in response.templates]
         self.assertFalse(template_name in template_names,
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
