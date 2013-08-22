@@ -57,3 +57,13 @@ def csrf_exempt(view_func):
         return view_func(*args, **kwargs)
     wrapped_view.csrf_exempt = True
     return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+
+def csrf_time_limited(view_func):
+    """
+    Marks a view function as requiring a time-limited CSRF token
+    """
+    # See csrf_exempt for why this is not just view_func.csrf_time_limited = True
+    def wrapped_view(*args, **kwargs):
+        return view_func(*args, **kwargs)
+    wrapped_view.csrf_time_limited = True
+    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
