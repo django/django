@@ -128,8 +128,9 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the SECRET_KEY is not kept secret, this can lead to arbitrary remote
-    code execution.**
+    **If the SECRET_KEY is not kept secret and you are using the**
+    :class:`~django.contrib.sessions.serializers.PickleSerializer`, **this can
+    lead to arbitrary remote code execution.**
 
     An attacker in possession of the :setting:`SECRET_KEY` can not only
     generate falsified session data, which your site will trust, but also
@@ -256,7 +257,9 @@ You can edit it multiple times.
         in 5 minutes.
 
       * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-        session will expire at that specific date/time.
+        session will expire at that specific date/time. Note that ``datetime``
+        and ``timedelta`` values are only serializable if you are using the
+        :class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
       * If ``value`` is ``0``, the user's session cookie will expire
         when the user's Web browser is closed.
@@ -300,6 +303,72 @@ You can edit it multiple times.
 
       Removes expired sessions from the session store. This class method is
       called by :djadmin:`clearsessions`.
+
+.. _session_serialization:
+
+Session serialization
+---------------------
+
+.. versionchanged:: 1.6
+
+Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
+session data before storing it in the backend. If you're using the :ref:`signed
+cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
+known by an attacker, the attacker could insert a string into his session
+which, when unpickled, executes arbitrary code on the server. The technique for
+doing so is simple and easily available on the internet. Although the cookie
+session storage signs the cookie-stored data to prevent tampering, a
+:setting:`SECRET_KEY` leak immediately escalates to a remote code execution
+vulnerability.
+
+This attack can be mitigated by serializing session data using JSON rather
+than :mod:`pickle`. To facilitate this, Django 1.5.3 introduced a new setting,
+:setting:`SESSION_SERIALIZER`, to customize the session serialization format.
+For backwards compatibility, this setting defaults to
+using :class:`django.contrib.sessions.serializers.PickleSerializer` in
+Django 1.5.x, but, for security hardening, defaults to
+:class:`django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
+Even with the caveats described in :ref:`custom-serializers`, we highly
+recommend sticking with JSON serialization *especially if you are using the
+cookie backend*.
+
+Bundled Serializers
+^^^^^^^^^^^^^^^^^^^
+
+.. class:: serializers.JSONSerializer
+
+    A wrapper around the JSON serializer from :mod:`django.core.signing`. Can
+    only serialize basic data types. See the :ref:`custom-serializers` section
+    for more details.
+
+.. class:: serializers.PickleSerializer
+
+    Supports arbitrary Python objects, but, as described above, can lead to a
+    remote code execution vulnerability if :setting:`SECRET_KEY` becomes known
+    by an attacker.
+
+.. _custom-serializers:
+
+Write Your Own Serializer
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
+the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
+arbitrary Python data types. As is often the case, there is a trade-off between
+convenience and security. If you wish to store more advanced data types
+including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
+to write a custom serializer (or convert such values to a JSON serializable
+object before storing them in ``request.session``). While serializing these
+values is fairly straightforward
+(``django.core.serializers.json.DateTimeAwareJSONEncoder`` may be helpful),
+writing a decoder that can reliably get back the same thing that you put in is
+more fragile. For example, you run the risk of returning a ``datetime`` that
+was actually a string that just happened to be in the same format chosen for
+``datetime``\s).
+
+Your serializer class must implement two methods,
+``dumps(self, obj)`` and ``loads(self, data)``, to serialize and deserialize
+the dictionary of session data, respectively.
 
 Session object guidelines
 -------------------------
@@ -390,14 +459,15 @@ An API is available to manipulate session data outside of a view::
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> import datetime
     >>> s = SessionStore()
-    >>> s['last_login'] = datetime.datetime(2005, 8, 20, 13, 35, 10)
+    >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
+    >>> s['last_login'] = 1376587691
     >>> s.save()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
 
     >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
     >>> s['last_login']
-    datetime.datetime(2005, 8, 20, 13, 35, 0)
+    1376587691
 
 In order to prevent session fixation attacks, sessions keys that don't exist
 are regenerated::
@@ -543,8 +613,11 @@ behavior:
 Technical details
 =================
 
-* The session dictionary should accept any pickleable Python object. See
-  the :mod:`pickle` module for more information.
+* The session dictionary accepts any :mod:`json` serializable value when using
+  :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
+  pickleable Python object when using
+  :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
+  :mod:`pickle` module for more information.
 
 * Session data is stored in a database table named ``django_session`` .
 

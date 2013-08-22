@@ -2403,7 +2403,7 @@ SESSION_ENGINE
 
 Default: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Controls where Django stores session data. Included engines are:
 
 * ``'django.contrib.sessions.backends.db'``
 * ``'django.contrib.sessions.backends.file'``
@@ -2446,6 +2446,28 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
+.. setting:: SESSION_SERIALIZER
+
+SESSION_SERIALIZER
+------------------
+
+Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+.. versionchanged:: 1.6
+
+    The default switched from
+    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
+    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
+
+Full import path of a serializer class to use for serializing session data.
+Included serializers are:
+
+* ``'django.contrib.sessions.serializers.PickleSerializer'``
+* ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+See :ref:`session_serialization` for details, including a warning regarding
+possible remote code execution when using
+:class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
 Sites
 =====
