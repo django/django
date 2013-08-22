@@ -61,6 +61,7 @@ class BaseTest(TestCase):
             MESSAGE_TAGS    = '',
             MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                          self.storage_class.__name__),
+            SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
 
