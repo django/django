@@ -501,3 +501,29 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return '%s' % self.pk
+
+class BaseUser(models.Model):
+    pass
+
+@python_2_unicode_compatible
+class Task(models.Model):
+    title = models.CharField(max_length=10)
+    owner = models.ForeignKey(BaseUser, related_name='owner')
+    creator = models.ForeignKey(BaseUser, related_name='creator')
+
+    def __str__(self):
+        return self.title
+
+@python_2_unicode_compatible
+class Staff(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+@python_2_unicode_compatible
+class StaffUser(BaseUser):
+    staff = models.OneToOneField(Staff, related_name='user')
+
+    def __str__(self):
+        return self.staff

@@ -664,9 +664,8 @@ class SQLCompiler(object):
                 # Use True here because we are looking at the _reverse_ side of
                 # the relation, which is always nullable.
                 new_nullable = True
-                table = model._meta.db_table
-                self.fill_related_selections(model._meta, table, cur_depth + 1,
-                    next, restricted, new_nullable)
+                self.fill_related_selections(model._meta, alias, cur_depth + 1,
+                                             next, restricted, new_nullable)
 
     def deferred_to_columns(self):
         """
