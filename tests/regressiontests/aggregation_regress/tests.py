@@ -524,6 +524,19 @@ class AggregationTests(TestCase):
             query,
         )
 
+    @skipUnlessDBFeature('allows_group_by_ordinal')
+    def test_annotation_with_datequeryset(self):
+        # MSSQL doesn't support group by column's ordinal number
+        # Regression for #10248 - Annotations work with DateQuerySets
+        qs = Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
+        self.assertQuerysetEqual(
+            qs, [
+                datetime.datetime(1995, 1, 15, 0, 0),
+                datetime.datetime(2007, 12, 6, 0, 0)
+            ],
+            lambda b: b
+        )
+
     def test_more_more_more(self):
         # Regression for #10199 - Aggregate calls clone the original query so
         # the original query can still be used
@@ -539,16 +552,6 @@ class AggregationTests(TestCase):
                 u'The Definitive Guide to Django: Web Development Done Right'
             ],
             lambda b: b.name
-        )
-
-        # Regression for #10248 - Annotations work with DateQuerySets
-        qs = Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
-        self.assertQuerysetEqual(
-            qs, [
-                datetime.datetime(1995, 1, 15, 0, 0),
-                datetime.datetime(2007, 12, 6, 0, 0)
-            ],
-            lambda b: b
         )
 
         # Regression for #10290 - extra selects with parameters can be used for
