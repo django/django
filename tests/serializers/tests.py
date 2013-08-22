@@ -257,6 +257,18 @@ class SerializersTestBase(object):
             obj.save()
         self.assertEqual(Category.objects.all().count(), 5)
 
+    def test_serialize_extra_non_field_attributes(self):
+        """
+        Tests that non-field attributes can be serialized if passed in
+        explicitly to fields.
+        """
+        a = Author(name='Some Random Person')
+        serial_str = serializers.serialize(self.serializer_name, [a],
+            extra=['age'])
+        age_values = self._get_field_values(serial_str, 'age')
+        self.assertEqual(len(age_values), 1)
+        self.assertEqual(int(age_values[0]), 42)
+
 
 class SerializersTransactionTestBase(object):
 

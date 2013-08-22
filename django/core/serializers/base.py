@@ -35,6 +35,10 @@ class Serializer(object):
         self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
+        self.extra_fields = options.pop("extra", None)
+
+        def field_is_selected(field):
+            return (self.selected_fields is None or field in self.selected_fields)
 
         self.start_serialization()
         self.first = True
@@ -46,15 +50,20 @@ class Serializer(object):
             for field in concrete_model._meta.local_fields:
                 if field.serialize:
                     if field.rel is None:
-                        if self.selected_fields is None or field.attname in self.selected_fields:
+                        if field_is_selected(field.attname):
                             self.handle_field(obj, field)
                     else:
-                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
+                        if field_is_selected(field.attname[:-3]):
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.many_to_many:
                 if field.serialize:
-                    if self.selected_fields is None or field.attname in self.selected_fields:
+                    if field_is_selected(field.attname):
                         self.handle_m2m_field(obj, field)
+
+            if self.extra_fields:
+                for field in self.extra_fields:
+                    self.handle_extra_attr(obj, field)
+
             self.end_object(obj)
             if self.first:
                 self.first = False
@@ -88,6 +97,12 @@ class Serializer(object):
     def handle_field(self, obj, field):
         """
         Called to handle each individual (non-relational) field on an object.
+        """
+        raise NotImplementedError
+
+    def handle_attr(self, obj, attr):
+        """
+        Called to handle a non-field attribute on an object.
         """
         raise NotImplementedError
 

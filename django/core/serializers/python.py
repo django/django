@@ -50,6 +50,9 @@ class Serializer(base.Serializer):
         else:
             self._current[field.name] = field.value_to_string(obj)
 
+    def handle_extra_attr(self, obj, field):
+        self._current[field] = getattr(obj, field)
+
     def handle_fk_field(self, obj, field):
         if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
             related = getattr(obj, field.name)
