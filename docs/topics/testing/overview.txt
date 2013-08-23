@@ -1170,9 +1170,9 @@ documentation<dumpdata>` for more details.
 
 .. note::
 
-    If you've ever run :djadmin:`manage.py syncdb<syncdb>`, you've
+    If you've ever run :djadmin:`manage.py migrate<migrate>`, you've
     already used a fixture without even knowing it! When you call
-    :djadmin:`syncdb` in the database for the first time, Django
+    :djadmin:`migrate` in the database for the first time, Django
     installs a fixture called ``initial_data``. This gives you a way
     of populating a new database with any initial data, such as a
     default set of categories.

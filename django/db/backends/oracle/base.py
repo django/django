@@ -55,6 +55,7 @@ from django.db.backends import *
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
+from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -90,6 +91,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    supports_combined_alters = False
+    max_index_name_length = 30
+    nulls_order_largest = True
+    requires_literal_defaults = True
+    connection_persists_old_columns = True
     nulls_order_largest = True
 
 
@@ -621,6 +627,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
+    
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
 
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):

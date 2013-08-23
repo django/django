@@ -1,0 +1,297 @@
+==========
+Migrations
+==========
+
+.. module:: django.db.migrations
+   :synopsis: Schema migration support for Django models
+
+.. versionadded:: 1.7
+
+Migrations are Django's way of propagating changes you make to your models
+(adding a field, deleting a model, etc.) into your database schema. They're
+designed to be mostly automatic, but you'll need to know when to make
+migrations, when to run them, and the common problems you might run into.
+
+A Brief History
+---------------
+
+Prior to version 1.7, Django only supported adding new models to the
+database; it was not possible to alter or remove existing models via the
+``syncdb`` command (the predecessor to ``migrate``).
+
+Third-party tools, most notably `South <http://south.aeracode.org>`_,
+provided support for these additional types of change, but it was considered
+important enough that support was brought into core Django.
+
+Two Commands
+------------
+
+There are two commands which you will use to interact with migrations
+and Django's handling of database schema:
+
+* :djadmin:`migrate`, which is responsible for applying migrations, as well as
+  unapplying and listing their status.
+
+* :djadmin:`makemigrations`, which is responsible for creating new migrations
+  based on the changes you have made to your models.
+
+It's worth noting that migrations are created and run on a per-app basis.
+In particular, it's possible to have apps that *do not use migrations* (these
+are referred to as "unmigrated" apps) - these apps will instead mimic the
+legacy behaviour of just adding new models.
+
+You should think of migrations as a version control system for your database
+schema. ``makemigrations`` is responsible for packaging up your model changes
+into individual migration files - analagous to commits - and ``migrate`` is
+responsible for applying those to your database.
+
+The migration files for each app live in a "migrations" directory inside
+of that app, and are designed to be committed to, and distributed as part
+of, its codebase. You should be making them once on your development machine
+and then running the same migrations on your colleagues' machines, your
+staging machines, and eventually your production machines.
+
+Migrations will run the same way every time and produce consistent results,
+meaning that what you see in development and staging is exactly what will
+happen in production - no unexpected surprises.
+
+Backend Support
+---------------
+
+Migrations are supported on all backends that Django ships with, as well
+as any third-party backends if they have programmed in support for schema
+alteration (done via the ``SchemaEditor`` class).
+
+However, some databases are more capable than others when it comes to
+schema migrations; some of the caveats are covered below.
+
+PostgreSQL
+~~~~~~~~~~
+
+PostgreSQL is the most capable of all the databases here in terms of schema
+support; the only caveat is that adding columns with default values will
+lock a table for a time proportional to the number of rows in it.
+
+For this reason, it's recommended you always create new columns with
+``null=True``, as this way they will be added immediately.
+
+MySQL
+~~~~~
+
+MySQL lacks support for transactions around schema alteration operations,
+meaning that if a migration fails to apply you will have to manually unpick
+the changes in order to try again (it's impossible to roll back to an
+earlier point).
+
+In addition, MySQL will lock tables for almost every schema operation and
+generally takes a time proportional to the number of rows in the table to
+add or remove columns. On slower hardware this can be worse than a minute
+per million rows - adding a few columns to a table with just a few million
+rows could lock your site up for over ten minutes.
+
+Finally, MySQL has reasonably small limits on name lengths for columns, tables
+and indexes, as well as a limit on the combined size of all columns an index
+covers. This means that indexes that are possible on other backends will
+fail to be created under MySQL.
+
+SQLite
+~~~~~~
+
+SQLite has very little built-in schema alteration support, and so Django
+attempts to emulate it by:
+
+* Creating a new table with the new schema
+* Copying the data across
+* Dropping the old table
+* Renaming the new table to match the original name
+
+This process generally works well, but it can be slow and occasionally
+buggy. It is not recommended that you run and migrate SQLite in a
+production environment unless you are very aware of the risks and
+its limitations; the support Django ships with is designed to allow
+developers to use SQLite on their local machines to develop less complex
+Django projects without the need for a full database.
+
+Workflow
+--------
+
+Working with migrations is simple. Make changes to your models - say, add
+a field and remove a model - and then run :djadmin:`makemigrations`::
+
+    $ python manage.py makemigrations
+    Migrations for 'books':
+      0003_auto.py:
+        - Alter field author on book
+
+Your models will be scanned and compared to the versions currently
+contained in your migration files, and then a new set of migrations
+will be written out. Make sure to read the output to see what
+``makemigrations`` thinks you have changed - it's not perfect, and for
+complex changes it might not be detecting what you expect.
+
+Once you have your new migration files, you should apply them to your
+database to make sure they work as expected::
+
+    $ python manage.py migrate
+    Operations to perform:
+      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
+      Apply all migrations: books
+    Synchronizing apps without migrations:
+      Creating tables...
+      Installing custom SQL...
+      Installing indexes...
+    Installed 0 object(s) from 0 fixture(s)
+    Running migrations:
+      Applying books.0003_auto... OK
+
+The command runs in two stages; first, it synchronizes unmigrated apps
+(performing the same functionality that ``syncdb`` used to provide), and
+then it runs any migrations that have not yet been applied.
+
+Once the migration is applied, commit the migration and the models change
+to your version control system as a single commit - that way, when other
+developers (or your production servers) check out the code, they'll
+get both the changes to your models and the accompanying migration at the
+same time.
+
+Version control
+~~~~~~~~~~~~~~~
+
+Because migrations are stored in version control, you'll occasionally
+come across situations where you and another developer have both committed
+a migration to the same app at the same time, resulting in two migrations
+with the same number.
+
+Don't worry - the numbers are just there for developers' reference, Django
+just cares that each migration has a different name. Migrations specify which
+other migrations they depend on - including earlier migrations in the same
+app - in the file, so it's possible to detect when there's two new migrations
+for the same app that aren't ordered.
+
+When this happens, Django will prompt you and give you some options. If it
+thinks it's safe enough, it will offer to automatically linearize the two
+migrations for you. If not, you'll have to go in and modify the migrations
+yourself - don't worry, this isn't difficult, and is explained more in
+:ref:`migration-files` below.
+
+Dependencies
+------------
+
+While migrations are per-app, the tables and relationships implied by
+your models are too complex to be created for just one app at a time. When
+you make a migration that requires something else to run - for example,
+you add a ForeignKey in your ``books`` app to your ``authors`` app - the
+resulting migration will contain a dependency on a migration in ``authors``.
+
+This means that when you run the migrations, the ``authors`` migration runs
+first and creates the table the ``ForeignKey`` references, and then the migration
+that makes the ``ForeignKey`` column runs afterwards and creates the constraint.
+If this didn't happen, the migration would try to create the ForeignKey column
+without the table it's referencing existing and your database would
+throw an error.
+
+This dependency behaviour affects most migration operations where you
+restrict to a single app. Restricting to a single app (either in
+``makemigrations`` or ``migrate``) is a best-efforts promise, and not
+a guarantee; any other apps that need to be used to get dependencies correct
+will be.
+
+.. migration-files:
+
+Migration files
+---------------
+
+Migrations are stored as an on-disk format, referred to here as
+"migration files". These files are actually just normal Python files with
+an agreed-upon object layout, written in a declarative style.
+
+A basic migration file looks like this::
+
+    from django.db import migrations, models
+
+    class Migration(migrations.Migration):
+
+        dependencies = [("migrations", "0001_initial")]
+
+        operations = [
+            migrations.DeleteModel("Tribble"),
+            migrations.AddField("Author", "rating", models.IntegerField(default=0)),
+        ]
+
+What Django looks for when it loads a migration file (as a Python module) is
+a subclass of ``django.db.migrations.Migration`` called ``Migration``. It then
+inspects this object for four attributes, only two of which are used
+most of the time:
+
+* ``dependencies``, a list of migrations this one depends on.
+* ``operations``, a list of Operation classes that define what this migration
+  does.
+
+The operations are the key; they are a set of declarative instructions which
+tell Django what schema changes need to be made. Django scans them and
+builds an in-memory representation of all of the schema changes to all apps,
+and uses this to generate the SQL which makes the schema changes.
+
+That in-memory structure is also used to work out what the differences are
+between your models and the current state of your migrations; Django runs
+through all the changes, in order, on an in-memory set of models to come
+up with the state of your models last time you ran ``makemigrations``. It
+then uses these models to compare against the ones in your ``models.py`` files
+to work out what you have changed.
+
+You should rarely, if ever, need to edit migration files by hand, but
+it's entirely possible to write them manually if you need to. Some of the
+more complex operations are not autodetectable and are only available via
+a hand-written migration, so don't be scared about editing them if you have to.
+
+Adding migrations to apps
+-------------------------
+
+Adding migrations to new apps is straightforward - they come preconfigured to
+accept migrations, and so just run :djadmin:`makemigrations` once you've made
+some changes.
+
+If your app already has models and database tables, and doesn't have migrations
+yet (for example, you created it against a previous Django version), you'll
+need to convert it to use migrations; this is a simple process::
+
+    python manage.py makemigrations --force yourappname
+
+This will make a new initial migration for your app (the ``--force`` argument
+is to override Django's default behaviour, as it thinks your app does not want
+migrations). Now, when you run :djadmin:`migrate`, Django will detect that
+you have an initial migration *and* that the tables it wants to create already
+exist, and will mark the migration as already applied.
+
+Note that this only works given two things:
+
+* You have not changed your models since you made their tables. For migrations
+  to work, you must make the initial migration *first* and then make changes,
+  as Django compares changes against migration files, not the database.
+
+* You have not manually edited your database - Django won't be able to detect
+  that your database doesn't match your models, you'll just get errors when
+  migrations try to modify those tables.
+
+
+.. historical-models:
+
+Historical models
+-----------------
+
+When you run migrations, Django is working from historical versions of
+your models stored in the migration files. If you write Python code
+using the ``django.db.migrations.RunPython`` operation, or if you have
+``allow_migrate`` methods on your database routers, you will be exposed
+to these versions of your models.
+
+Because it's impossible to serialize arbitrary Python code, these historical
+models will not have any custom methods or managers that you have defined.
+They will, however, have the same fields, relationships and ``Meta`` options
+(also versioned, so they may be different from your current ones).
+
+In addition, the base classes of the model are just stored as pointers,
+so you must always keep base classes around for as long as there is a migration
+that contains a reference to them. On the plus side, methods and managers
+from these base classes inherit normally, so if you absolutely need access
+to these you can opt to move them into a superclass.

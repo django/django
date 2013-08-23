@@ -220,7 +220,7 @@ If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
 tables, ensure that your tables are using the same storage engine (i.e. MyISAM
 vs. InnoDB). Specifically, if tables that have a ``ForeignKey`` between them
 use different storage engines, you may see an error like the following when
-running ``syncdb``::
+running ``migrate``::
 
     _mysql_exceptions.OperationalError: (
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
@@ -659,7 +659,7 @@ required.
 .. _`Oracle Database Server`: http://www.oracle.com/
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
 
-In order for the ``python manage.py syncdb`` command to work, your Oracle
+In order for the ``python manage.py migrate`` command to work, your Oracle
 database user must have privileges to run the following commands:
 
 * CREATE TABLE
@@ -748,7 +748,7 @@ Oracle imposes a name length limit of 30 characters. To accommodate this, the
 backend truncates database identifiers to fit, replacing the final four
 characters of the truncated name with a repeatable MD5 hash value.
 
-When running syncdb, an ``ORA-06552`` error may be encountered if
+When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the
 value of a ``db_column`` option.  Django quotes all identifiers used
 in queries to prevent most such problems, but this error can still

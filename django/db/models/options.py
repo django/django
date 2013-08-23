@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.loading import get_models, app_cache_ready
+from django.db.models.loading import app_cache_ready, cache
 from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
@@ -22,8 +22,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together', 'default_permissions')
-
+                 'index_together', 'app_cache', 'default_permissions')
 
 @python_2_unicode_compatible
 class Options(object):
@@ -71,6 +70,9 @@ class Options(object):
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
 
+        # A custom AppCache to use, if you're making a separate model set.
+        self.app_cache = cache
+
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.util import truncate_name
@@ -82,6 +84,10 @@ class Options(object):
         self.object_name = cls.__name__
         self.model_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
+
+        # Store the original user-defined values for each option,
+        # for use when serializing the model definition
+        self.original_attrs = {}
 
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
@@ -95,8 +101,10 @@ class Options(object):
             for attr_name in DEFAULT_NAMES:
                 if attr_name in meta_attrs:
                     setattr(self, attr_name, meta_attrs.pop(attr_name))
+                    self.original_attrs[attr_name] = getattr(self, attr_name)
                 elif hasattr(self.meta, attr_name):
                     setattr(self, attr_name, getattr(self.meta, attr_name))
+                    self.original_attrs[attr_name] = getattr(self, attr_name)
 
             # unique_together can be either a tuple of tuples, or a single
             # tuple of two strings. Normalize it to a tuple of tuples, so that
@@ -487,7 +495,7 @@ class Options(object):
                     cache[obj] = model
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
-        for klass in get_models(include_auto_created=True, only_installed=False):
+        for klass in self.app_cache.get_models(include_auto_created=True, only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_fields:
                     if f.rel and not isinstance(f.rel.to, six.string_types) and f.generate_reverse_relation:
@@ -530,7 +538,7 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
-        for klass in get_models(only_installed=False):
+        for klass in self.app_cache.get_models(only_installed=False):
             if not klass._meta.swapped:
                 for f in klass._meta.local_many_to_many:
                     if (f.rel

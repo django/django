@@ -65,7 +65,7 @@ interactively <auth-admin>`.
 Creating superusers
 -------------------
 
-:djadmin:`manage.py syncdb <syncdb>` prompts you to create a superuser the
+:djadmin:`manage.py migrate <migrate>` prompts you to create a superuser the
 first time you run it with ``'django.contrib.auth'`` in your
 :setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
 you can use a command line utility::
@@ -190,13 +190,13 @@ setting, it will ensure that three default permissions -- add, change and
 delete -- are created for each Django model defined in one of your installed
 applications.
 
-These permissions will be created when you run :djadmin:`manage.py syncdb
-<syncdb>`; the first time you run ``syncdb`` after adding
+These permissions will be created when you run :djadmin:`manage.py migrate
+<migrate>`; the first time you run ``migrate`` after adding
 ``django.contrib.auth`` to :setting:`INSTALLED_APPS`, the default permissions
 will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
-permissions for new models each time you run :djadmin:`manage.py syncdb
-<syncdb>`.
+permissions for new models each time you run :djadmin:`manage.py migrate
+<migrate>`.
 
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,

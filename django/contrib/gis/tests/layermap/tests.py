@@ -311,7 +311,7 @@ class OtherRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return True
 
 

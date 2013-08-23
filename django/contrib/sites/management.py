@@ -11,7 +11,7 @@ from django.core.management.color import no_style
 
 def create_default_site(app, created_models, verbosity, db, **kwargs):
     # Only create the default sites in databases where Django created the table
-    if Site in created_models and router.allow_syncdb(db, Site) :
+    if Site in created_models and router.allow_migrate(db, Site) :
         # The default settings set SITE_ID = 1, and some tests in Django's test
         # suite rely on this value. However, if database sequences are reused
         # (e.g. in the test suite after flush/syncdb), it isn't guaranteed that
@@ -33,4 +33,4 @@ def create_default_site(app, created_models, verbosity, db, **kwargs):
 
     Site.objects.clear_cache()
 
-signals.post_syncdb.connect(create_default_site, sender=site_app)
+signals.post_migrate.connect(create_default_site, sender=site_app)

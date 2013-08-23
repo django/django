@@ -293,7 +293,7 @@ serialize an object that refers to a content type, then you need to have a way
 to refer to that content type to begin with. Since ``ContentType`` objects are
 automatically created by Django during the database synchronization process,
 the primary key of a given content type isn't easy to predict; it will
-depend on how and when :djadmin:`syncdb` was executed. This is true for all
+depend on how and when :djadmin:`migrate` was executed. This is true for all
 models which automatically generate objects, notably including
 :class:`~django.contrib.auth.models.Permission`,
 :class:`~django.contrib.auth.models.Group`, and
