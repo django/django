@@ -155,13 +155,22 @@ A database Router is a class that provides up to four methods:
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_syncdb(db, model)
+.. method:: allow_migrate(db, model)
 
-    Determine if the ``model`` should be synchronized onto the
+    Determine if the ``model`` should have tables/indexes created in the
     database with alias ``db``. Return True if the model should be
-    synchronized, False if it should not be synchronized, or None if
+    migrated, False if it should not be migrated, or None if
     the router has no opinion. This method can be used to determine
     the availability of a model on a given database.
+
+    Note that migrations will just silently not perform any operations
+    on a model for which this returns ``False``. This may result in broken
+    ForeignKeys, extra tables or missing tables if you change it once you
+    have applied some migrations.
+
+    The value passed for ``model`` may be a
+    :ref:`historical model <historical-models>`, and thus not have any
+    custom attributes, methods or managers. You should only rely on ``_meta``.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
@@ -288,7 +297,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -328,7 +337,7 @@ from::
                 return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             All non-auth models end up in this pool.
             """
@@ -347,7 +356,7 @@ be queried in the order the are listed in the
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
-``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
+``MasterSlaveRouter.allow_migrate()`` would be processed first. The
 catch-all nature of the MasterSlaveRouter implementation would mean
 that all models would be available on all databases.
 

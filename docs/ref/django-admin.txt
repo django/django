@@ -242,10 +242,8 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after :djadmin:`syncdb`
-was executed. This means that all data will be removed from the database, any
-post-synchronization handlers will be re-executed, and the ``initial_data``
-fixture will be re-installed.
+Removes all data from the database, re-executes any post-synchronization
+handlers, and reinstalls any initial data fixtures.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
@@ -567,6 +565,52 @@ for technically skilled translators to understand each message's context.
 Use the ``--keep-pot`` option to prevent django from deleting the temporary
 .pot file it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
+
+makemigrations [<appname>]
+--------------------------
+
+.. django-admin:: makemigrations
+
+.. versionadded:: 1.7
+
+Creates new migrations based on the changes detected to your models.
+Migrations, their relationship with apps and more are covered in depth in
+:doc:`the migrations documentation</topics/migrations>`.
+
+Providing one or more app names as arguments will limit the migrations created
+to the app(s) specified and any dependencies needed (the table at the other end
+of a ``ForeignKey``, for example).
+
+.. django-admin-option:: --empty
+
+The ``--empty`` option will cause ``makemigrations`` to output an empty
+migration for the specified apps, for manual editing. This option is only
+for advanced users and should not be used unless you are familiar with
+the migration format, migration operations, and the dependencies between
+your migrations.
+
+migrate [<appname> [<migrationname>]]
+-------------------------------------
+
+.. django-admin:: migrate
+
+.. versionadded:: 1.7
+
+Synchronizes the database state with the current set of models and migrations.
+Migrations, their relationship with apps and more are covered in depth in
+:doc:`the migrations documentation</topics/migrations>`.
+
+The behavior of this command changes depending on the arguments provided:
+
+* No arguments: All migrated apps have all of their migrations run,
+  and all unmigrated apps are synchronized with the database,
+* ``<appname>``: The specified app has its migrations run, up to the most
+  recent migration. This may involve running other apps' migrations too, due
+  to dependencies.
+* ``<appname> <migrationname>``: Brings the database schema to a state where it
+  would have just run the given migration, but no further - this may involve
+  unapplying migrations if you have previously migrated past the named
+  migration. Use the name `zero` to unapply all migrations for an app.
 
 runfcgi [options]
 -----------------
@@ -1102,45 +1146,13 @@ syncdb
 
 .. django-admin:: syncdb
 
-Creates the database tables for all apps in :setting:`INSTALLED_APPS` whose
-tables have not already been created.
+.. deprecated:: 1.7
 
-Use this command when you've added new applications to your project and want to
-install them in the database. This includes any apps shipped with Django that
-might be in :setting:`INSTALLED_APPS` by default. When you start a new project,
-run this command to install the default apps.
+    This command has been deprecated in favour of the :djadmin:`migrate`
+    command, which performs both the old behaviour as well as executing
+    migrations. It is now just an alias to that command.
 
-.. admonition:: Syncdb will not alter existing tables
-
-   ``syncdb`` will only create tables for models which have not yet been
-   installed. It will *never* issue ``ALTER TABLE`` statements to match
-   changes made to a model class after installation. Changes to model classes
-   and database schemas often involve some form of ambiguity and, in those
-   cases, Django would have to guess at the correct changes to make. There is
-   a risk that critical data would be lost in the process.
-
-   If you have made changes to a model and wish to alter the database tables
-   to match, use the ``sql`` command to display the new SQL structure and
-   compare that to your existing table schema to work out the changes.
-
-If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
-give you the option of creating a superuser immediately.
-
-``syncdb`` will also search for and install any fixture named ``initial_data``
-with an appropriate extension (e.g. ``json`` or ``xml``). See the
-documentation for ``loaddata`` for details on the specification of fixture
-data files.
-
-The :djadminopt:`--noinput` option may be provided to suppress all user
-prompts.
-
-The :djadminopt:`--database` option can be used to specify the database to
-synchronize.
-
-``--no-initial-data``
-~~~~~~~~~~~~~~~~~~~~~
-
-Use ``--no-initial-data`` to avoid loading the initial_data fixture.
+Alias for :djadmin:`migrate`.
 
 test <app or test identifier>
 -----------------------------
@@ -1278,7 +1290,7 @@ This command is only available if Django's :doc:`authentication system
 
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account but did not
-do so during ``syncdb``, or if you need to programmatically generate
+do so during the first ``migrate``, or if you need to programmatically generate
 superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
@@ -1362,7 +1374,7 @@ allows for the following options:
 
 Example usage::
 
-    django-admin.py syncdb --pythonpath='/home/djangoprojects/myproject'
+    django-admin.py migrate --pythonpath='/home/djangoprojects/myproject'
 
 Adds the given filesystem path to the Python `import search path`_. If this
 isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
@@ -1377,7 +1389,7 @@ setting the Python path for you.
 
 Example usage::
 
-    django-admin.py syncdb --settings=mysite.settings
+    django-admin.py migrate --settings=mysite.settings
 
 Explicitly specifies the settings module to use. The settings module should be
 in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
@@ -1391,7 +1403,7 @@ Note that this option is unnecessary in ``manage.py``, because it uses
 
 Example usage::
 
-    django-admin.py syncdb --traceback
+    django-admin.py migrate --traceback
 
 By default, ``django-admin.py`` will show a simple error message whenever an
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
@@ -1407,7 +1419,7 @@ will also output a full stack trace when a ``CommandError`` is raised.
 
 Example usage::
 
-    django-admin.py syncdb --verbosity 2
+    django-admin.py migrate --verbosity 2
 
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.

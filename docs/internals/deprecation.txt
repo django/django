@@ -419,6 +419,17 @@ these changes.
 
 * ``django.utils.unittest`` will be removed.
 
+* The ``syncdb`` command will be removed.
+
+* ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` will be removed, and
+  ``django.db.models.signals.pre_migrate`` and
+  ``django.db.models.signals.post_migrate`` will lose their
+  ``create_models`` and ``created_models`` arguments.
+
+* ``allow_syncdb`` on database routers will no longer automatically become
+  ``allow_migrate``.
+
 * If models are organized in a package, Django will no longer look for
   :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
   custom SQL files to ``myapp/sql/``.

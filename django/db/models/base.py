@@ -146,7 +146,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name,
+        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                       seed_cache=False, only_installed=False)
         if m is not None:
             return m
@@ -264,13 +264,13 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        register_models(new_class._meta.app_label, new_class)
-
+        
+        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name,
+        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                          seed_cache=False, only_installed=False)
 
     def copy_managers(cls, base_managers):

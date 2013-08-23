@@ -368,12 +368,32 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
+        params = self.db_parameters(connection)
+        if params['type']:
+            if params['check']:
+                return "%s CHECK (%s)" % (params['type'], params['check'])
+            else:
+                return params['type']
+        return None
+
+    def db_parameters(self, connection):
+        """
+        Replacement for db_type, providing a range of different return
+        values (type, checks)
+        """
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return (connection.creation.data_types[self.get_internal_type()]
-                    % data)
+            type_string = connection.creation.data_types[self.get_internal_type()] % data
         except KeyError:
-            return None
+            type_string = None
+        try:
+            check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
+        except KeyError:
+            check_string = None
+        return {
+            "type": type_string,
+            "check": check_string,
+        }
 
     @property
     def unique(self):

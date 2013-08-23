@@ -182,7 +182,7 @@ Advanced features of ``TransactionTestCase``
 
     By default, ``available_apps`` is set to ``None``. After each test, Django
     calls :djadmin:`flush` to reset the database state. This empties all tables
-    and emits the :data:`~django.db.models.signals.post_syncdb` signal, which
+    and emits the :data:`~django.db.models.signals.post_migrate` signal, which
     re-creates one content type and three permissions for each model. This
     operation gets expensive proportionally to the number of models.
 
@@ -190,13 +190,13 @@ Advanced features of ``TransactionTestCase``
     behave as if only the models from these applications were available. The
     behavior of ``TransactionTestCase`` changes as follows:
 
-    - :data:`~django.db.models.signals.post_syncdb` is fired before each
+    - :data:`~django.db.models.signals.post_migrate` is fired before each
       test to create the content types and permissions for each model in
       available apps, in case they're missing.
     - After each test, Django empties only tables corresponding to models in
       available apps. However, at the database level, truncation may cascade to
       related models in unavailable apps. Furthermore
-      :data:`~django.db.models.signals.post_syncdb` isn't fired; it will be
+      :data:`~django.db.models.signals.post_migrate` isn't fired; it will be
       fired by the next ``TransactionTestCase``, after the correct set of
       applications is selected.
 
@@ -205,10 +205,10 @@ Advanced features of ``TransactionTestCase``
     cause unrelated tests to fail. Be careful with tests that use sessions;
     the default session engine stores them in the database.
 
-    Since :data:`~django.db.models.signals.post_syncdb` isn't emitted after
+    Since :data:`~django.db.models.signals.post_migrate` isn't emitted after
     flushing the database, its state after a ``TransactionTestCase`` isn't the
     same as after a ``TestCase``: it's missing the rows created by listeners
-    to :data:`~django.db.models.signals.post_syncdb`. Considering the
+    to :data:`~django.db.models.signals.post_migrate`. Considering the
     :ref:`order in which tests are executed <order-of-tests>`, this isn't an
     issue, provided either all ``TransactionTestCase`` in a given test suite
     declare ``available_apps``, or none of them.
@@ -276,7 +276,7 @@ testing behavior. This behavior involves:
 
 #. Creating the test databases.
 
-#. Running ``syncdb`` to install models and initial data into the test
+#. Running ``migrate`` to install models and initial data into the test
    databases.
 
 #. Running the tests that were found.
@@ -467,7 +467,7 @@ can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 
-    Creates a new test database and runs ``syncdb`` against it.
+    Creates a new test database and runs ``migrate`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 

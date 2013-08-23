@@ -53,10 +53,11 @@ automatically:
 
 .. code-block:: bash
 
-    manage.py syncdb
+    manage.py migrate
 
-The :djadmin:`syncdb` command looks at all your available models and creates
-tables in your database for whichever tables don't already exist.
+The :djadmin:`migrate` command looks at all your available models and creates
+tables in your database for whichever tables don't already exist, as well as
+optionally providing :doc:`much richer schema control </topics/migrations>`.
 
 Enjoy the free API
 ==================
