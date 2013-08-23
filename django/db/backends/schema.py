@@ -107,10 +107,6 @@ class BaseDatabaseSchemaEditor(object):
         # Check for fields that aren't actually columns (e.g. M2M)
         if sql is None:
             return None
-        # Optionally add the tablespace if it's an implicitly indexed column
-        tablespace = field.db_tablespace or model._meta.db_tablespace
-        if tablespace and self.connection.features.supports_tablespaces and field.unique:
-            sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
         # Work out nullability
         null = field.null
         # If we were told to include a default value, do so
@@ -138,6 +134,10 @@ class BaseDatabaseSchemaEditor(object):
             sql += " PRIMARY KEY"
         elif field.unique:
             sql += " UNIQUE"
+        # Optionally add the tablespace if it's an implicitly indexed column
+        tablespace = field.db_tablespace or model._meta.db_tablespace
+        if tablespace and self.connection.features.supports_tablespaces and field.unique:
+            sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
         # Return the sql
         return sql, params
 
