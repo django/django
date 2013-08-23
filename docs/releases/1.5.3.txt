@@ -1,0 +1,50 @@
+==========================
+Django 1.5.3 release notes
+==========================
+
+*September 10, 2013*
+
+This is Django 1.5.3, the third release in the Django 1.5 series. It addresses
+one security issue and also contains an opt-in feature to enhance the security
+of :mod:`django.contrib.sessions`.
+
+Directory traversal vulnerability in :ttag:`ssi` template tag
+-------------------------------------------------------------
+
+In previous versions of Django it was possible to bypass the
+:setting:`ALLOWED_INCLUDE_ROOTS` setting used for security with the :ttag:`ssi`
+template tag by specifying a relative path that starts with one of the allowed
+roots. For example, if ``ALLOWED_INCLUDE_ROOTS = ("/var/www",)`` the following
+would be possible:
+
+.. code-block:: html+django
+
+    {% ssi "/var/www/../../etc/passwd" %}
+
+In practice this is not a very common problem, as it would require the template
+author to put the :ttag:`ssi` file in a user-controlled variable, but it's
+possible in principle.
+
+Mitigating a remote-code execution vulnerability in :mod:`django.contrib.sessions`
+----------------------------------------------------------------------------------
+
+:mod:`django.contrib.sessions` currently uses :mod:`pickle` to serialize
+session data before storing it in the backend. If you're using the :ref:`signed
+cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
+known by an attacker (there isn't an inherent vulnerability in Django that
+would cause it to leak), the attacker could insert a string into his session
+which, when unpickled, executes arbitrary code on the server. The technique for
+doing so is simple and easily available on the internet. Although the cookie
+session storage signs the cookie-stored data to prevent tampering, a
+:setting:`SECRET_KEY` leak immediately escalates to a remote code execution
+vulnerability.
+
+This attack can be mitigated by serializing session data using JSON rather
+than :mod:`pickle`. To facilitate this, Django 1.5.3 introduces a new setting,
+:setting:`SESSION_SERIALIZER`, to customize the session serialization format.
+For backwards compatibility, this setting defaults to using :mod:`pickle`.
+While JSON serialization does not support all Python objects like :mod:`pickle`
+does, we highly recommend switching to JSON-serialized values. Also,
+as JSON requires string keys, you will likely run into problems if you are
+using non-string keys in ``request.session``. See the
+:ref:`session_serialization` documentation for more details.
