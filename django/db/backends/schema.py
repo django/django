@@ -8,6 +8,7 @@ from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
 from django.utils.log import getLogger
 from django.utils.six.moves import reduce
+from django.utils.six import callable
 
 logger = getLogger('django.db.backends.schema')
 
