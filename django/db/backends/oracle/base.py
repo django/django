@@ -96,6 +96,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     nulls_order_largest = True
     requires_literal_defaults = True
     connection_persists_old_columns = True
+    nulls_order_largest = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):

@@ -1290,10 +1290,21 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be
-in standard :term:`language format<language code>`. For example, U.S. English
+A string representing the language code for this installation. This should be in
+standard :term:`language ID format <language code>`. For example, U.S. English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
+
+:setting:`USE_I18N` must be active for this setting to have any effect.
+
+It serves two purposes:
+
+* If the locale middleware isn't in use, it decides which translation is served
+  to all users.
+* If the locale middleware is active, it provides the fallback translation when
+  no translation exist for a given literal to the user's preferred language.
+
+See :ref:`how-django-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
@@ -2392,7 +2403,7 @@ SESSION_ENGINE
 
 Default: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Controls where Django stores session data. Included engines are:
 
 * ``'django.contrib.sessions.backends.db'``
 * ``'django.contrib.sessions.backends.file'``
@@ -2435,6 +2446,28 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
+.. setting:: SESSION_SERIALIZER
+
+SESSION_SERIALIZER
+------------------
+
+Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+.. versionchanged:: 1.6
+
+    The default switched from
+    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
+    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
+
+Full import path of a serializer class to use for serializing session data.
+Included serializers are:
+
+* ``'django.contrib.sessions.serializers.PickleSerializer'``
+* ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+See :ref:`session_serialization` for details, including a warning regarding
+possible remote code execution when using
+:class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
 Sites
 =====

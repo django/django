@@ -459,14 +459,21 @@ class Model(six.with_metaclass(ModelBase)):
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
-        return (isinstance(other, Model) and
-                self._meta.concrete_model == other._meta.concrete_model and
-                self._get_pk_val() == other._get_pk_val())
+        if not isinstance(other, Model):
+            return False
+        if self._meta.concrete_model != other._meta.concrete_model:
+            return False
+        my_pk = self._get_pk_val()
+        if my_pk is None:
+            return self is other
+        return my_pk == other._get_pk_val()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
+        if self._get_pk_val() is None:
+            raise TypeError("Model instances without primary key value are unhashable")
         return hash(self._get_pk_val())
 
     def __reduce__(self):

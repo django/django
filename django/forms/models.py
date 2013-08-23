@@ -631,7 +631,11 @@ class BaseModelFormSet(BaseFormSet):
             seen_data = set()
             for form in valid_forms:
                 # get data for each field of each of unique_check
-                row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
+                row_data = (form.cleaned_data[field]
+                            for field in unique_check if field in form.cleaned_data)
+                # Reduce Model instances to their primary key values
+                row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else d
+                                 for d in row_data)
                 if row_data and not None in row_data:
                     # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:
