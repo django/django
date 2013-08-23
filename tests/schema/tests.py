@@ -195,7 +195,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(columns['name'][1][6], bool(connection.features.interprets_empty_strings_as_nulls))
+        self.assertEqual(bool(columns['name'][1][6]), False)
 
     def test_rename(self):
         """
@@ -230,7 +230,7 @@ class SchemaTests(TransactionTestCase):
         # Create the tables
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-            editor.create_model(Tag)
+            editor.create_model(TagM2MTest)
             editor.create_model(BookWithM2M)
         # Ensure there is now an m2m table there
         columns = self.column_classes(BookWithM2M._meta.get_field_by_name("tags")[0].rel.through)

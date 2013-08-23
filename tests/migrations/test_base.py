@@ -1,11 +1,13 @@
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.db import connection
 
 
-class MigrationTestBase(TestCase):
+class MigrationTestBase(TransactionTestCase):
     """
     Contains an extended set of asserts for testing migrations and schema operations.
     """
+
+    available_apps = ["migrations"]
 
     def assertTableExists(self, table):
         self.assertIn(table, connection.introspection.get_table_list(connection.cursor()))

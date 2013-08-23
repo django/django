@@ -38,6 +38,11 @@ class ExecutorTests(TransactionTestCase):
         # Are the tables there now?
         self.assertIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
         self.assertIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
+        # Alright, let's undo what we did
+        executor.migrate([("migrations", None)])
+        # Are the tables gone?
+        self.assertNotIn("migrations_author", connection.introspection.get_table_list(connection.cursor()))
+        self.assertNotIn("migrations_book", connection.introspection.get_table_list(connection.cursor()))
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations", "sessions": "migrations.test_migrations_2"})
     def test_empty_plan(self):
