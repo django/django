@@ -1,4 +1,6 @@
 import copy
+import datetime
+from django.utils import six
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
@@ -89,3 +91,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         suffix = hex(hash(for_name)).upper()[1:]
         return self.normalize_name(for_name + "_" + suffix)
+
+    def prepare_default(self, value):
+        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
+            return "'%s'" % value
+        elif isinstance(value, six.string_types):
+            return repr(value)
+        elif isinstance(value, bool):
+            return "1" if value else "0"
+        else:
+            return str(value)

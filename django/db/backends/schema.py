@@ -116,8 +116,14 @@ class BaseDatabaseSchemaEditor(object):
         # If we were told to include a default value, do so
         default_value = self.effective_default(field)
         if include_default and default_value is not None:
-            sql += " DEFAULT %s"
-            params += [default_value]
+            if self.connection.features.requires_literal_defaults:
+                # Some databases can't take defaults as a parameter (oracle)
+                # If this is the case, the individual schema backend should
+                # implement prepare_default
+                sql += " DEFAULT %s" % self.prepare_default(default_value)
+            else:
+                sql += " DEFAULT %s"
+                params += [default_value]
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
         if (field.empty_strings_allowed and not field.primary_key and
@@ -134,6 +140,12 @@ class BaseDatabaseSchemaEditor(object):
             sql += " UNIQUE"
         # Return the sql
         return sql, params
+
+    def prepare_default(self, value):
+        """
+        Only used for backends which have requires_literal_defaults feature
+        """
+        raise NotImplementedError()
 
     def effective_default(self, field):
         """
@@ -385,6 +397,9 @@ class BaseDatabaseSchemaEditor(object):
                     "to_column": self.quote_name(to_column),
                 }
             )
+        # Reset connection if required
+        if self.connection.features.connection_persists_old_columns:
+            self.connection.close()
 
     def remove_field(self, model, field):
         """
@@ -405,6 +420,9 @@ class BaseDatabaseSchemaEditor(object):
             "column": self.quote_name(field.column),
         }
         self.execute(sql)
+        # Reset connection if required
+        if self.connection.features.connection_persists_old_columns:
+            self.connection.close()
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """
@@ -523,13 +541,25 @@ class BaseDatabaseSchemaEditor(object):
                     [],
                 ))
             else:
-                actions.append((
-                    self.sql_alter_column_default % {
-                        "column": self.quote_name(new_field.column),
-                        "default": "%s",
-                    },
-                    [new_default],
-                ))
+                if self.connection.features.requires_literal_defaults:
+                    # Some databases can't take defaults as a parameter (oracle)
+                    # If this is the case, the individual schema backend should
+                    # implement prepare_default
+                    actions.append((
+                        self.sql_alter_column_default % {
+                            "column": self.quote_name(new_field.column),
+                            "default": self.prepare_default(new_default),
+                        },
+                        [],
+                    ))
+                else:
+                    actions.append((
+                        self.sql_alter_column_default % {
+                            "column": self.quote_name(new_field.column),
+                            "default": "%s",
+                        },
+                        [new_default],
+                    ))
         # Nullability change?
         if old_field.null != new_field.null:
             if new_field.null:
@@ -628,6 +658,9 @@ class BaseDatabaseSchemaEditor(object):
                     "check": new_db_params['check'],
                 }
             )
+        # Reset connection if required
+        if self.connection.features.connection_persists_old_columns:
+            self.connection.close()
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """
