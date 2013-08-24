@@ -164,7 +164,7 @@ class CsrfViewMiddleware(object):
             # Check non-cookie token for match.
             request_csrf_token = ""
             if request.method == "POST":
-                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+                request_csrf_token = request.REQUEST.get('csrfmiddlewaretoken', '')
 
             if request_csrf_token == "":
                 # Fall back to X-CSRFToken, to make things easier for AJAX,
