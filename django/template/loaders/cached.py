@@ -37,6 +37,9 @@ class Loader(BaseLoader):
             return template_name
 
     def find_template(self, name, dirs=None):
+        """
+        Helper method. Lookup the template :param name: in all the configured loaders
+        """
         key = self.cache_key(name, dirs)
         try:
             result = self.find_template_cache[key]
@@ -58,7 +61,7 @@ class Loader(BaseLoader):
     def load_template(self, template_name, template_dirs=None):
         key = self.cache_key(template_name, template_dirs)
         template_tuple = self.template_cache.get(key)
-        # cached a previous failure:
+        # A cached previous failure:
         if template_tuple is TemplateDoesNotExist:
             raise TemplateDoesNotExist
         elif template_tuple is None:
@@ -79,3 +82,17 @@ class Loader(BaseLoader):
         "Empty the template cache."
         self.template_cache.clear()
         self.find_template_cache.clear()
+
+    def inspect_cache(self, template_name, template_dirs=None):
+        """
+        Return the value stored in the cache for template_name.
+        Test instrumentation method.
+        """
+        key = self.cache_key(template_name, template_dirs)
+        return self.template_cache.get(key)
+
+    def is_cached_notfoud(self, template_name, template_dirs=None):
+        """
+        Test instrumentation method.
+        """
+        return self.inspect_cache(template_name, template_dirs) == TemplateDoesNotExist
