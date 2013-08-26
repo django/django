@@ -90,8 +90,8 @@ fixtures. You can set the :setting:`FIXTURE_DIRS` setting to a list of
 additional directories where Django should look.
 
 When running :djadmin:`manage.py loaddata <loaddata>`, you can also
-specify an absolute path to a fixture file, which overrides searching
-the usual directories.
+specify a path to a fixture file, which overrides searching the usual
+directories.
 
 .. seealso::
 

@@ -67,7 +67,7 @@ CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
 class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    fun = models.BooleanField()
+    fun = models.BooleanField(default=False)
     objects = PersonManager()
 
     custom_queryset_default_manager = CustomQuerySet.as_manager()
@@ -80,7 +80,7 @@ class Person(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
-    is_published = models.BooleanField()
+    is_published = models.BooleanField(default=False)
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
 

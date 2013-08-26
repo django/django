@@ -255,8 +255,6 @@ CachedStaticFilesStorage
 
     .. method:: file_hash(name, content=None)
 
-    .. versionadded:: 1.5
-
     The method that is used when creating the hashed name of a file.
     Needs to return a hash for the given file name and content.
     By default it calculates a MD5 hash from the content's chunks as
@@ -289,8 +287,6 @@ The previous example is equal to calling the ``url`` method of an instance of
 :setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
 useful when using a non-local storage backend to deploy files as documented
 in :ref:`staticfiles-from-cdn`.
-
-.. versionadded:: 1.5
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:

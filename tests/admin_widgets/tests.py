@@ -132,6 +132,23 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(f2.widget.attrs['maxlength'], '20')
         self.assertEqual(f2.widget.attrs['size'], '10')
 
+    def testFormfieldOverridesWidgetInstancesForFieldsWithChoices(self):
+        """
+        Test that widget is actually overridden for fields with choices.
+        (#194303)
+        """
+        class MemberAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {'widget': forms.TextInput}
+            }
+        ma = MemberAdmin(models.Member, admin.site)
+        name_field = models.Member._meta.get_field('name')
+        gender_field = models.Member._meta.get_field('gender')
+        name = ma.formfield_for_dbfield(name_field, request=None)
+        gender = ma.formfield_for_dbfield(gender_field, request=None)
+        self.assertIsInstance(name.widget, forms.TextInput)
+        self.assertIsInstance(gender.widget, forms.TextInput)
+
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
 
@@ -295,13 +312,12 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True):
-            with translation.override('de-at'):
-                w.is_localized = True
-                self.assertHTMLEqual(
-                    w.render('test', datetime(2007, 12, 1, 9, 30)),
-                    '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
-                )
+        with self.settings(USE_L10N=True), translation.override('de-at'):
+            w.is_localized = True
+            self.assertHTMLEqual(
+                w.render('test', datetime(2007, 12, 1, 9, 30)),
+                '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+            )
 
 
 class AdminURLWidgetTest(DjangoTestCase):

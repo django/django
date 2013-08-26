@@ -37,7 +37,7 @@ class SpecialColumnName(models.Model):
 class ColumnTypes(models.Model):
     id = models.AutoField(primary_key=True)
     big_int_field = models.BigIntegerField()
-    bool_field = models.BooleanField()
+    bool_field = models.BooleanField(default=False)
     null_bool_field = models.NullBooleanField()
     char_field = models.CharField(max_length=10)
     comma_separated_int_field = models.CommaSeparatedIntegerField(max_length=99)

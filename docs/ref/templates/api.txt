@@ -274,11 +274,6 @@ Builtin variables
 Every context contains ``True``, ``False`` and ``None``. As you would expect,
 these variables resolve to the corresponding Python objects.
 
-.. versionadded:: 1.5
-
-    Before Django 1.5, these variables weren't a special case, and they
-    resolved to ``None`` unless you defined them in the context.
-
 Playing with Context objects
 ----------------------------
 

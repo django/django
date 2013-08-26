@@ -75,7 +75,7 @@ Minor features
   context level.
 
 * The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
-  ``updated`` element now utilizes `updateddate` instead of ``pubdate``,
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
   allowing the ``published`` element to be included in the feed (which
   relies on ``pubdate``).
 
@@ -193,6 +193,19 @@ Miscellaneous
   your root URLconf, which in turn makes it safe to reverse by name. It also
   removes the ability for visitors to generate spurious HTTP 500 errors by
   requesting static files that don't exist or haven't been collected yet.
+
+* The :meth:`django.db.models.Model.__eq__` method is now defined in a
+  way where instances of a proxy model and its base model are considered
+  equal when primary keys match. Previously only instances of exact same
+  class were considered equal on primary key match.
+
+* The :meth:`django.db.models.Model.__eq__` method has changed such that
+  two ``Model`` instances without primary key values won't be considered
+  equal (unless they are the same instance).
+  
+* The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
+  when called on an instance without a primary key value. This is done to
+  avoid mutable ``__hash__`` values in containers.
 
 Features deprecated in 1.7
 ==========================

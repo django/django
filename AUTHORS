@@ -46,6 +46,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Daniel Lindsley
     * Marc Tamlyn
     * Baptiste Mispelon
+    * Daniele Procida
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -442,6 +443,7 @@ answer newbie questions, and generally made Django that much better:
     Gopal Narayanan <gopastro@gmail.com>
     Fraser Nevett <mail@nevett.org>
     Sam Newman <http://www.magpiebrain.com/>
+    Alasdair Nicol <http://al.sdair.co.uk/>
     Ryan Niemeyer <https://profiles.google.com/ryan.niemeyer/about>
     Filip Noetzel <http://filip.noetzel.co.uk/>
     Afonso Fernández Nogueira <fonzzo.django@gmail.com>
@@ -477,7 +479,6 @@ answer newbie questions, and generally made Django that much better:
     polpak@yahoo.com
     Ross Poulton <ross@rossp.org>
     Mihai Preda <mihai_preda@yahoo.com>
-    Daniele Procida <daniele@vurt.org>
     Matthias Pronk <django@masida.nl>
     Jyrki Pulliainen <jyrki.pulliainen@gmail.com>
     Thejaswi Puthraya <thejaswi.puthraya@gmail.com>

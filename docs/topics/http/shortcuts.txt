@@ -21,7 +21,7 @@ introduce controlled coupling for convenience's sake.
    :class:`~django.http.HttpResponse` object with that rendered text.
 
    :func:`render()` is the same as a call to
-   :func:`render_to_response()` with a `context_instance` argument that
+   :func:`render_to_response()` with a ``context_instance`` argument that
    forces the use of a :class:`~django.template.RequestContext`.
 
 Required arguments
@@ -49,10 +49,6 @@ Optional arguments
 ``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
-
-    .. versionchanged:: 1.5
-
-        This parameter used to be called ``mimetype``.
 
 ``status``
     The status code for the response. Defaults to ``200``.
@@ -129,11 +125,6 @@ Optional arguments
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
 
-    .. versionchanged:: 1.5
-
-        This parameter used to be called ``mimetype``.
-
-
 Example
 -------
 
@@ -169,7 +160,8 @@ This example is equivalent to::
 
    The arguments could be:
 
-   * A model: the model's `get_absolute_url()` function will be called.
+   * A model: the model's `:meth:`~django.db.models.Model.get_absolute_url()`
+     function will be called.
 
    * A view name, possibly with arguments: :func:`urlresolvers.reverse
      <django.core.urlresolvers.reverse>` will be used to reverse-resolve the

@@ -204,11 +204,6 @@ reverse order, from the bottom up. This means classes defined at the end of
 Dealing with streaming responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionchanged:: 1.5
-
-    ``response`` may also be an :class:`~django.http.StreamingHttpResponse`
-    object.
-
 Unlike :class:`~django.http.HttpResponse`,
 :class:`~django.http.StreamingHttpResponse` does not have a ``content``
 attribute. As a result, middleware can no longer assume that all responses

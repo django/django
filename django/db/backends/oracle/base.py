@@ -90,6 +90,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    nulls_order_largest = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):

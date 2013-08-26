@@ -148,7 +148,22 @@ class TestFixtures(TestCase):
             load_absolute_path,
             verbosity=0,
         )
-        self.assertEqual(Absolute.load_count, 1)
+        self.assertEqual(Absolute.objects.count(), 1)
+
+    def test_relative_path(self):
+        directory = os.path.dirname(upath(__file__))
+        relative_path = os.path.join('fixtures', 'absolute.json')
+        cwd = os.getcwd()
+        try:
+            os.chdir(directory)
+            management.call_command(
+                'loaddata',
+                relative_path,
+                verbosity=0,
+            )
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(Absolute.objects.count(), 1)
 
     def test_unknown_format(self):
         """
@@ -443,6 +458,17 @@ class TestFixtures(TestCase):
             )
         self.assertTrue("No fixture 'this_fixture_doesnt_exist' in" in
             force_text(stdout_output.getvalue()))
+
+    def test_ticket_20820(self):
+        """
+        Regression for ticket #20820 -- loaddata on a model that inherits
+        from a model with a M2M shouldn't blow up.
+        """
+        management.call_command(
+            'loaddata',
+            'special-article.json',
+            verbosity=0,
+        )
 
 
 class NaturalKeyFixtureTests(TestCase):

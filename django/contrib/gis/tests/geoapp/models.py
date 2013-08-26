@@ -40,7 +40,7 @@ class Track(models.Model):
     def __str__(self): return self.name
 
 class Truth(models.Model):
-    val = models.BooleanField()
+    val = models.BooleanField(default=False)
     objects = models.GeoManager()
 
 if not spatialite:

@@ -55,6 +55,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_transactions = True
     can_distinct_on_fields = True
+    nulls_order_largest = True
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
