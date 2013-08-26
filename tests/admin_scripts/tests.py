@@ -1103,9 +1103,19 @@ class ManageCheck(AdminScriptTestCase):
         """ manage.py check does not raise an ImportError validating a
         complex app with nested calls to load_app """
 
-        self.write_settings('settings.py',
-            apps=['admin_scripts.complex_app', 'admin_scripts.simple_app'],
-            sdict={'DEBUG': True})
+        self.write_settings(
+            'settings.py',
+            apps=[
+                'admin_scripts.complex_app',
+                'admin_scripts.simple_app',
+                'django.contrib.admin',
+                'django.contrib.auth',
+                'django.contrib.contenttypes',
+            ],
+            sdict={
+                'DEBUG': True
+            }
+        )
         args = ['check']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
