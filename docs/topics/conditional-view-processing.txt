@@ -147,7 +147,7 @@ Using the decorators with other HTTP methods
 
 The ``condition`` decorator is useful for more than only ``GET`` and
 ``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
-situation). It can be used also to be used to provide checking for ``POST``,
+situation). It can also be used to provide checking for ``POST``,
 ``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
 a "not modified" response, but to tell the client that the resource they are
 trying to change has been altered in the meantime.
