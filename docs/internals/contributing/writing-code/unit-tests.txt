@@ -220,4 +220,4 @@ If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 To run tests for just one contrib app (e.g. ``auth``), use the same
 method as above::
 
-    ./runtests.py --settings=settings auth
+    ./runtests.py --settings=settings django.contrib.auth
