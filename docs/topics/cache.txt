@@ -253,10 +253,11 @@ model.
 Filesystem caching
 ------------------
 
-To store cached items on a filesystem, use
-``"django.core.cache.backends.filebased.FileBasedCache"`` for
-:setting:`BACKEND <CACHES-BACKEND>`. For example, to store cached data in
-``/var/tmp/django_cache``, use this setting::
+The file-based backend serializes and stores each cache value as a separate
+file. To use this backend set :setting:`BACKEND <CACHES-BACKEND>` to
+``"django.core.cache.backends.filebased.FileBasedCache"`` and
+:setting:`LOCATION <CACHES-LOCATION>` to a suitable directory. For example,
+to store cached data in ``/var/tmp/django_cache``, use this setting::
 
     CACHES = {
         'default': {
@@ -264,7 +265,6 @@ To store cached items on a filesystem, use
             'LOCATION': '/var/tmp/django_cache',
         }
     }
-
 
 If you're on Windows, put the drive letter at the beginning of the path,
 like this::
@@ -285,10 +285,6 @@ writable by the system user under which your Web server runs. Continuing the
 above example, if your server runs as the user ``apache``, make sure the
 directory ``/var/tmp/django_cache`` exists and is readable and writable by the
 user ``apache``.
-
-Each cache value will be stored as a separate file whose contents are the
-cache data saved in a serialized ("pickled") format, using Python's ``pickle``
-module. Each file's name is the cache key, escaped for safe filesystem use.
 
 Local-memory caching
 --------------------
