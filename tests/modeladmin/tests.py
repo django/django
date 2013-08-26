@@ -1272,7 +1272,7 @@ class FkNameCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            '"fk_name" refers to field "non_existent_field", which '
+            '"fk_name" refers to "non_existent_field" field, which '
                 'is missing from model modeladmin.ValidationTestInlineModel.',
             invalid_obj=ValidationTestInline)
 

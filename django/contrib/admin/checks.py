@@ -659,50 +659,45 @@ def check_model_admin(cls, model, **kwargs):
 
 def check_inline_model_admin(cls, model, **kwargs):
 
-    def check(cls, model, **kwargs):
-        errors = check_base_model_admin(cls, model, **kwargs)
-        errors.extend(_check_exclude(cls, model))
-        errors.extend(_check_fk_name(cls))
+    def check(cls, parent_model, **kwargs):
+        errors = check_base_model_admin(cls, cls.model, **kwargs)
+        errors.extend(_check_fk_name(cls, parent_model))
+        errors.extend(_check_exclude(cls, parent_model))
         errors.extend(_check_extra(cls))
         errors.extend(_check_max_num(cls))
         errors.extend(_check_formset(cls))
         return errors
 
     def _check_exclude(cls, parent_model):
-        # If there are any errors, skip. These errors are collected in `check`
-        # method thanks to `check_base_model_admin` invocation.
+        # Do not perform more specific checks if the base checks result in an
+        # error. These errors are collected in `check` method thanks to
+        # `check_base_model_admin` invocation.
         errors = _check_exclude_of_base_model_admin(cls, parent_model)
         if errors:
             return []
 
-        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
+        # Skip if `fk_name` is invalid.
+        if _check_fk_name(cls, parent_model):
+            return []
+
         if cls.exclude is None:
             return []
-        elif fk and fk.name in cls.exclude:
+
+        fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
+        if fk.name in cls.exclude:
             return _error(cls,
                 'Cannot exclude the field "%s", because it is the foreign key to the parent model %s.%s.'
                 % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name))
         else:
             return []
 
-    def _check_fk_name(cls):
-        """ Check that `fk_name` refers to a ForeignKey. """
-
-        if cls.fk_name is None:  # the default value is None
-            return []
+    def _check_fk_name(cls, parent_model):
+        try:
+            _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
+        except ValueError as e:
+            return _error(cls, e.args[0])
         else:
-            try:
-                field = cls.model._meta.get_field(cls.fk_name)
-                if not isinstance(field, models.ForeignKey):
-                    raise ValueError
-            except models.FieldDoesNotExist:
-                return _error(cls,
-                    '"fk_name" refers to field "%s", which is missing from model %s.%s.'
-                    % (cls.fk_name, cls.model._meta.app_label, cls.model._meta.object_name))
-            except ValueError:
-                return _error(cls, '"fk_name" must be a ForeignKey.')
-            else:
-                return []
+            return []
 
     def _check_extra(cls):
         """ Check that extra is an integer. """
