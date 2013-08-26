@@ -1281,8 +1281,13 @@ class ForeignObject(RelatedField):
 
     def _check_unique_target(self):
         rel_is_string = isinstance(self.rel.to, six.string_types)
-        perform_check = self.requires_unique_target and not rel_is_string
-        if not perform_check:
+        if rel_is_string or not self.requires_unique_target:
+            return []
+
+        # Skip if the
+        try:
+            self.foreign_related_fields
+        except FieldDoesNotExist:
             return []
 
         has_unique_field = any(rel_field.unique
