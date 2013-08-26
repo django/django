@@ -10,7 +10,11 @@ from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSe
 
 # This check is registered in __init__.py file.
 def check_admin_app(**kwargs):
-    return []
+    from django.contrib.admin.sites import site
+
+    return flatten(
+        model_admin.check(model, **kwargs)
+        for model, model_admin in site._registry.items())
 
 
 def flatten(outer_list):

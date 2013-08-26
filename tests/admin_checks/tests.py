@@ -33,6 +33,21 @@ class ValidFormFieldsets(admin.ModelAdmin):
 
 class SystemChecksTestCase(TestCase):
 
+    def test_checks_are_performed(self):
+        class MyAdmin(admin.ModelAdmin):
+            @classmethod
+            def check(self, model, **kwargs):
+                return ['error!']
+
+        admin.site.register(Song, MyAdmin)
+
+        try:
+            errors = checks.run_checks()
+            expected = ['error!']
+            self.assertEqual(errors, expected)
+        finally:
+            admin.site.unregister(Song)
+
     def test_readonly_and_editable(self):
 
         class SongAdmin(admin.ModelAdmin):
