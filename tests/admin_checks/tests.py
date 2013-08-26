@@ -31,7 +31,7 @@ class ValidFormFieldsets(admin.ModelAdmin):
     )
 
 
-class ValidationTestCase(TestCase):
+class SystemChecksTestCase(TestCase):
 
     def test_readonly_and_editable(self):
 
@@ -56,7 +56,7 @@ class ValidationTestCase(TestCase):
 
     def test_custom_get_form_with_fieldsets(self):
         """
-        Ensure that the fieldsets validation is skipped when the ModelAdmin.get_form() method
+        Ensure that the fieldsets checks are skipped when the ModelAdmin.get_form() method
         is overridden.
         Refs #19445.
         """
@@ -66,7 +66,7 @@ class ValidationTestCase(TestCase):
 
     def test_exclude_values(self):
         """
-        Tests for basic validation of 'exclude' option values (#12689)
+        Tests for basic system checks of 'exclude' option values (#12689)
         """
 
         class ExcludedFields1(admin.ModelAdmin):
@@ -133,16 +133,16 @@ class ValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 'Cannot exclude the field "album", because it is the foreign key '
-                    'to the parent model admin_validation.Album.',
+                    'to the parent model admin_checks.Album.',
                 hint=None,
                 obj=SongInline,
             )
         ]
         self.assertEqual(errors, expected)
 
-    def test_app_label_in_admin_validation(self):
+    def test_app_label_in_admin_checks(self):
         """
-        Regression test for #15669 - Include app label in admin validation messages
+        Regression test for #15669 - Include app label in admin system check messages
         """
 
         class RawIdNonexistingAdmin(admin.ModelAdmin):
@@ -152,7 +152,7 @@ class ValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 '"raw_id_fields[0]" refers to field "nonexisting", which is '
-                    'missing from model admin_validation.Album.',
+                    'missing from model admin_checks.Album.',
                 hint=None,
                 obj=RawIdNonexistingAdmin,
             )
@@ -177,7 +177,7 @@ class ValidationTestCase(TestCase):
         errors = MyAdmin.check(model=Album)
         self.assertEqual(errors, [])
 
-    def test_inline_self_validation(self):
+    def test_inline_self_check(self):
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
             model = TwoAlbumFKAndAnE
 
@@ -188,8 +188,8 @@ class ValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 '"fk_name" must be explicitly defined, because '
-                    'admin_validation.TwoAlbumFKAndAnE has more than one '
-                    'ForeignKey to admin_validation.Album.',
+                    'admin_checks.TwoAlbumFKAndAnE has more than one '
+                    'ForeignKey to admin_checks.Album.',
                 hint=None,
                 obj=TwoAlbumFKAndAnEInline,
             )
@@ -249,7 +249,7 @@ class ValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 '"readonly_fields[1]" is neither a callable nor an attribute '
-                    'of "SongAdmin" nor found in the model admin_validation.Song.',
+                    'of "SongAdmin" nor found in the model admin_checks.Song.',
                 hint=None,
                 obj=SongAdmin,
             )
@@ -265,7 +265,7 @@ class ValidationTestCase(TestCase):
         expected = [
             checks.Error(
                 '"readonly_fields[0]" is neither a callable nor an attribute '
-                    'of "CityInline" nor found in the model admin_validation.City.',
+                    'of "CityInline" nor found in the model admin_checks.City.',
                 hint=None,
                 obj=CityInline,
             )
