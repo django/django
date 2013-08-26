@@ -16,10 +16,10 @@ F() expressions
 
 An ``F()`` object represents the value of a model field. It makes it possible
 to refer to model field values, and perform database operations using them,
-*without actually having to obtain them in your Python code*.
+without actually having to obtain them in your Python code.
 
 Instead, Django uses the ``F()`` object to generate an SQL expression that
-describes the required operation *at the database* level.
+describes the required operation at the database level.
 
 This is easiest to understand though an example. Normally, one might do
 something like this:
@@ -38,9 +38,9 @@ the object back to the database. But instead we could also have done:
     >>> reporter.stories_filed = F('stories_filed') + 1
     >>> reporter.save()
 
-to the same end. 
+to the same end.
 
-Although ``reporter.stories_filed = F('stories_filed') + 1`` *looks* like a
+Although ``reporter.stories_filed = F('stories_filed') + 1`` looks like a
 normal Python assignment of value to a class attribute, in fact it's an SQL
 construct describing an operation on the database.
 
@@ -54,10 +54,68 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-``F()`` expressions have two particularly useful functions:
+.. note::
 
-*   :ref:`performing operations directly on fields <ref-models-field-updates-using-f-expressions>`
-*   :ref:`using F() expressions in queries <using-f-expressions-in-filters>`
+   in order to access the new value that has been saved in this way, the object
+   will need to be reloaded::
+
+       reporter = Reporters.objects.get(pk=reporter.pk)
+
+In fact, now that we are using ``F()`` we can refine this further, by
+employing it in an ``update()``::
+
+    reporter.stories_filed.update(stories_filed=F('stories_filed) + 1)
+
+which reduces the two queries - of the ``get()`` and the :meth:`~Model.save()` - to just one.
+
+We can now even do::
+
+    Reporter.objects.all().update(stories_filed=F('stories_filed) + 1)
+
+to do the same for multiple objects - which could be very much faster than
+pulling them all into Python from the database, looping over them, incrementing
+the field value of each one, and saving each one back to the database.
+
+Performance benefits of using ``F()``
+-------------------------------------
+
+``F()`` therefore can offer performance advantages, by:
+
+* getting the database, rather than Python to do work
+* reducing the number of queries some operations require
+
+Avoiding race conditions using ``F()``
+--------------------------------------
+
+Another useful benefit of ``F()`` is that having the database - rather than
+Python - update a field's value avoids a *race condition*.
+
+If two Python threads execute the code in the first example above, one thread
+could retrieve, increment and save a field's value after the other has
+retrieved it from the database. The value that the second thread saves will be
+based on the original value; the work of the first thread will simply be lost.
+
+If the database is responsible for updating the field, the process is more
+robust: it will only ever update the field based on the field's current value
+when the :meth:`~Model.save()` is executed, rather than based on the value
+retrieved a short time ago.
+
+Using ``F()`` in filters
+------------------------
+
+``F()`` is also very useful in ``queryset`` filters, where they make it
+possible to filter a set of objects against criteria based on their field
+values, rather than on Python values.
+
+This is documented in :ref:`using F() expressions in queries
+<using-f-expressions-in-filters>`
+
+Supported operations with ``F()``
+---------------------------------
+
+As well as addition, Django supports subtraction, multiplication, division
+and modulo arithmetic with ``F()`` objects, using Python constants,
+variables and even other ``F()`` objects.
 
 Q() objects
 ===========
@@ -68,5 +126,7 @@ A ``Q()`` object, like an :class:`~django.db.models.F` object, encapsulates a
 SQL expression in a Python object that can be used in database-related
 operations.
 
-The most common use for ``Q()`` objects is to allow :ref:`complex database
-queries to be constructed <complex-lookups-with-q>`.
+In general, ``Q() objects`` make it possible to define and reuse conditions.
+This permits the :ref:`construction of complex database queries
+<complex-lookups-with-q>` using ``|`` (``OR``) and ``&`` (``AND``) operators;
+in particular, it is not otherwise possible to use ``OR`` in ``querysets``.
