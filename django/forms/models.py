@@ -901,13 +901,12 @@ class BaseInlineFormSet(BaseModelFormSet):
         return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
 
 
-def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
+def _get_foreign_key(parent_model, model, fk_name=None):
     """
     Finds and returns the ForeignKey from model to parent if there is one
     (returns None if can_fail is True and no such field exists). If fk_name is
-    provided, assume it is the name of the ForeignKey field. Unless can_fail is
-    True, an exception is raised if there is no ForeignKey from model to
-    parent_model.
+    provided, assume it is the name of the ForeignKey field. An exception is
+    raised if there is no ForeignKey from model to parent_model.
     """
     # avoid circular import
     from django.db.models import ForeignKey
@@ -937,12 +936,9 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
         elif len(fks_to_parent) == 0:
-            if can_fail:
-                return
-            else:
-                raise ValueError(
-                    '"fk_name" must be explicitly defined, because there are no ForeignKey from %s.%s to %s.%s.'
-                    % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
+            raise ValueError(
+                '"fk_name" must be explicitly defined, because there are no ForeignKey from %s.%s to %s.%s.'
+                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
         else:
             raise ValueError(
                 '"fk_name" must be explicitly defined, because %s.%s has more than one ForeignKey to %s.%s.'
