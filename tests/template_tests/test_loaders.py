@@ -129,13 +129,19 @@ class CachedLoader(unittest.TestCase):
         self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
 
     def test_missing_template_is_cached(self):
-        "Check that the missing template is cached."
+        "#19949 -- Check that the missing template is cached."
         template_loader = loader.find_template_loader(settings.TEMPLATE_LOADERS[0])
         # Empty cache, which may be filled from previous tests.
         template_loader.reset()
-        # Check that 'missing.html' isn't already in cache before 'missing.html' is loaed
+        # Check that 'missing.html' isn't already in cache before 'missing.html' is loaded
         self.assertRaises(KeyError, lambda: template_loader.template_cache["missing.html"])
+        # Try to load it, it should fail
         self.assertRaises(TemplateDoesNotExist, template_loader.load_template, "missing.html")
+        # Verify that the fact that the missing template, which hasn't been found, has actually
+        # been cached:
+        self.assertEqual(template_loader.template_cache.get("missing.html"),
+                         TemplateDoesNotExist,
+                         "Cached template loader doesn't cache file lookup misses. It should.")
 
 
 class RenderToStringTest(unittest.TestCase):
