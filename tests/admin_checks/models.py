@@ -1,5 +1,5 @@
 """
-Tests of ModelAdmin validation logic.
+Tests of ModelAdmin system checks logic.
 """
 
 from django.db import models
