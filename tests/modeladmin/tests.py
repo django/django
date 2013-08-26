@@ -1,10 +1,8 @@
 from __future__ import unicode_literals
 
 from datetime import date
-import unittest
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
      HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite
@@ -12,12 +10,10 @@ from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.contrib.admin import (SimpleListFilter,
      BooleanFieldListFilter)
 from django.core.checks import Error
-from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
-from django.test.utils import str_prefix
-from django.utils import six
+from django.utils.encoding import force_text
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
@@ -43,6 +39,19 @@ class ModelAdminTests(TestCase):
             sign_date=date(1965, 1, 1),
         )
         self.site = AdminSite()
+
+    def test_str_on_model_admin(self):
+        got = force_text(ModelAdmin(Band, self.site))
+        expected = "modeladmin.ModelAdmin"
+        self.assertEqual(got, expected)
+
+    def test_str_on_inline_model_admin(self):
+        class MyInline(TabularInline):
+            model = ValidationTestInlineModel
+
+        got = force_text(MyInline(ValidationTestModel, self.site))
+        expected = "modeladmin.MyInline"
+        self.assertEqual(got, expected)
 
     # form/fields/fieldsets interaction ##############################
 

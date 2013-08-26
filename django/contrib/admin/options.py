@@ -36,7 +36,7 @@ from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
@@ -402,6 +402,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         return check_base_model_admin(cls, model, **kwargs)
 
 
+@python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -1592,8 +1593,11 @@ class ModelAdmin(BaseModelAdmin):
     def check(cls, model, **kwargs):
         return check_model_admin(cls, model, **kwargs)
 
+    def __str__(self):
+        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
 
+@python_2_unicode_compatible
 class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
@@ -1759,6 +1763,9 @@ class InlineModelAdmin(BaseModelAdmin):
     @classmethod
     def check(cls, model, **kwargs):
         return check_inline_model_admin(cls, model, **kwargs)
+
+    def __str__(self):
+        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
 
 class StackedInline(InlineModelAdmin):
