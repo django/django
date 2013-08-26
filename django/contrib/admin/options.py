@@ -1590,9 +1590,8 @@ class ModelAdmin(BaseModelAdmin):
 
     @classmethod
     def check(cls, model, **kwargs):
-        errors = super(ModelAdmin, cls).check(model, **kwargs)
-        errors.extend(check_model_admin(cls, model, **kwargs))
-        return errors
+        return check_model_admin(cls, model, **kwargs)
+
 
 
 class InlineModelAdmin(BaseModelAdmin):
@@ -1759,9 +1758,7 @@ class InlineModelAdmin(BaseModelAdmin):
 
     @classmethod
     def check(cls, model, **kwargs):
-        errors = super(InlineModelAdmin, cls).check(model, **kwargs)
-        errors.extend(check_inline_model_admin(cls, model, **kwargs))
-        return errors
+        return check_inline_model_admin(cls, model, **kwargs)
 
 
 class StackedInline(InlineModelAdmin):
