@@ -117,8 +117,8 @@ class SystemChecksTestCase(TestCase):
 
     def test_exclude_inline_model_admin(self):
         """
-        # Regression test for #9932 - exclude in InlineModelAdmin
-        # should not contain the ForeignKey field used in ModelAdmin.model
+        Regression test for #9932 - exclude in InlineModelAdmin should not
+        contain the ForeignKey field used in ModelAdmin.model
         """
 
         class SongInline(admin.StackedInline):
@@ -393,6 +393,5 @@ class SystemChecksTestCase(TestCase):
             form = SongForm
             fields = ['extra_data', 'title']
 
-        # FieldsOnFormOnlyAdmin.validate(Song)
         errors = FieldsOnFormOnlyAdmin.check(model=Song)
         self.assertEqual(errors, [])
