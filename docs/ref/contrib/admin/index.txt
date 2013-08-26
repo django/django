@@ -1235,8 +1235,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_list_filter(self, request)
 
-    .. versionadded:: 1.5
-
     The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
@@ -1250,8 +1248,6 @@ templates used by the :class:`ModelAdmin` views:
     :attr:`~ModelAdmin.search_fields` attribute.
 
 .. method:: ModelAdmin.get_inline_instances(self, request, obj=None)
-
-    .. versionadded:: 1.5
 
     The ``get_inline_instances`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
@@ -1505,10 +1501,6 @@ templates used by the :class:`ModelAdmin` views:
 
     Sends a message to the user using the :mod:`django.contrib.messages`
     backend.  See the :ref:`custom ModelAdmin example <custom-admin-action>`.
-
-    .. versionchanged:: 1.5
-
-        Keyword arguments were added in Django 1.5.
 
     Keyword arguments allow you to change the message level, add extra CSS
     tags, or fail silently if the ``contrib.messages`` framework is not

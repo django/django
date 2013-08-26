@@ -204,8 +204,6 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
     ``str`` on Python 3. Treats bytestrings using the ``encoding`` codec.
 
@@ -225,8 +223,6 @@ The functions defined in this module share the following properties:
 
 .. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Similar to ``smart_text``, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
@@ -239,8 +235,6 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Returns a bytestring version of ``s``, encoded as specified in
     ``encoding``.
 
@@ -248,8 +242,6 @@ The functions defined in this module share the following properties:
     objects.
 
 .. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. versionadded:: 1.5
 
     Similar to ``smart_bytes``, except that lazy instances are resolved to
     bytestrings, rather than kept as lazy objects.
@@ -745,8 +737,6 @@ appropriate entities.
 
 .. class:: SafeBytes
 
-    .. versionadded:: 1.5
-
     A ``bytes`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes.
 
@@ -757,8 +747,6 @@ appropriate entities.
     :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
 
 .. class:: SafeText
-
-    .. versionadded:: 1.5
 
     A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
     that has been specifically marked as "safe" for HTML output purposes.
@@ -976,8 +964,6 @@ For a complete discussion on the usage of the following see the
     the previously active time zone on exit. If the ``timezone`` argument is
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
-
-.. versionadded:: 1.5
 
 .. function:: localtime(value, timezone=None)
 

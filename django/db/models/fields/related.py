@@ -2,7 +2,7 @@ from operator import attrgetter
 
 from django.db import connection, connections, router
 from django.db.backends import util
-from django.db.models import signals, get_model
+from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
 from django.db.models.related import RelatedObject, PathInfo
@@ -17,8 +17,6 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
-
-pending_lookups = {}
 
 
 def add_lazy_relation(cls, field, relation, operation):
@@ -70,14 +68,14 @@ def add_lazy_relation(cls, field, relation, operation):
     # string right away. If get_model returns None, it means that the related
     # model isn't loaded yet, so we need to pend the relation until the class
     # is prepared.
-    model = get_model(app_label, model_name,
+    model = cls._meta.app_cache.get_model(app_label, model_name,
                       seed_cache=False, only_installed=False)
     if model:
         operation(field, model, cls)
     else:
         key = (app_label, model_name)
         value = (cls, field, operation)
-        pending_lookups.setdefault(key, []).append(value)
+        cls._meta.app_cache.pending_lookups.setdefault(key, []).append(value)
 
 
 def do_pending_lookups(sender, **kwargs):
@@ -85,7 +83,7 @@ def do_pending_lookups(sender, **kwargs):
     Handle any pending relations to the sending model. Sent from class_prepared.
     """
     key = (sender._meta.app_label, sender.__name__)
-    for cls, field, operation in pending_lookups.pop(key, []):
+    for cls, field, operation in sender._meta.app_cache.pending_lookups.pop(key, []):
         operation(field, sender, cls)
 
 signals.class_prepared.connect(do_pending_lookups)
@@ -503,8 +501,6 @@ def create_many_related_manager(superclass, rel):
             self.through = through
             self.prefetch_cache_name = prefetch_cache_name
             self.related_val = source_field.get_foreign_related_value(instance)
-            # Used for single column related auto created models
-            self._fk_val = self.related_val[0]
             if None in self.related_val:
                 raise ValueError('"%r" needs to have a value for field "%s" before '
                                  'this many-to-many relationship can be used.' %
@@ -516,18 +512,6 @@ def create_many_related_manager(superclass, rel):
                 raise ValueError("%r instance needs to have a primary key value before "
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
-
-        def _get_fk_val(self, obj, field_name):
-            """
-            Returns the correct value for this relationship's foreign key. This
-            might be something else than pk value when to_field is used.
-            """
-            fk = self.through._meta.get_field(field_name)
-            if fk.rel.field_name and fk.rel.field_name != fk.rel.to._meta.pk.attname:
-                attname = fk.rel.get_related_field().get_attname()
-                return fk.get_prep_lookup('exact', getattr(obj, attname))
-            else:
-                return obj.pk
 
         def get_queryset(self):
             try:
@@ -626,11 +610,12 @@ def create_many_related_manager(superclass, rel):
                         if not router.allow_relation(obj, self.instance):
                             raise ValueError('Cannot add "%r": instance is on database "%s", value is on database "%s"' %
                                                (obj, self.instance._state.db, obj._state.db))
-                        fk_val = self._get_fk_val(obj, target_field_name)
+                        fk_val = self.through._meta.get_field(
+                            target_field_name).get_foreign_related_value(obj)[0]
                         if fk_val is None:
                             raise ValueError('Cannot add "%r": the value for field "%s" is None' %
                                              (obj, target_field_name))
-                        new_ids.add(self._get_fk_val(obj, target_field_name))
+                        new_ids.add(fk_val)
                     elif isinstance(obj, Model):
                         raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
                     else:
@@ -638,7 +623,7 @@ def create_many_related_manager(superclass, rel):
                 db = router.db_for_write(self.through, instance=self.instance)
                 vals = self.through._default_manager.using(db).values_list(target_field_name, flat=True)
                 vals = vals.filter(**{
-                    source_field_name: self._fk_val,
+                    source_field_name: self.related_val[0],
                     '%s__in' % target_field_name: new_ids,
                 })
                 new_ids = new_ids - set(vals)
@@ -652,7 +637,7 @@ def create_many_related_manager(superclass, rel):
                 # Add the ones that aren't there already
                 self.through._default_manager.using(db).bulk_create([
                     self.through(**{
-                        '%s_id' % source_field_name: self._fk_val,
+                        '%s_id' % source_field_name: self.related_val[0],
                         '%s_id' % target_field_name: obj_id,
                     })
                     for obj_id in new_ids
@@ -676,7 +661,9 @@ def create_many_related_manager(superclass, rel):
                 old_ids = set()
                 for obj in objs:
                     if isinstance(obj, self.model):
-                        old_ids.add(self._get_fk_val(obj, target_field_name))
+                        fk_val = self.through._meta.get_field(
+                            target_field_name).get_foreign_related_value(obj)[0]
+                        old_ids.add(fk_val)
                     else:
                         old_ids.add(obj)
                 # Work out what DB we're operating on
@@ -690,7 +677,7 @@ def create_many_related_manager(superclass, rel):
                         model=self.model, pk_set=old_ids, using=db)
                 # Remove the specified objects from the join table
                 self.through._default_manager.using(db).filter(**{
-                    source_field_name: self._fk_val,
+                    source_field_name: self.related_val[0],
                     '%s__in' % target_field_name: old_ids
                 }).delete()
                 if self.reverse or source_field_name == self.source_field_name:
@@ -952,6 +939,8 @@ class ForeignObject(RelatedField):
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
+        if isinstance(self.rel.to, six.string_types):
+            raise ValueError('Related model %r cannot been resolved' % self.rel.to)
         related_fields = []
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
@@ -989,7 +978,19 @@ class ForeignObject(RelatedField):
 
     @staticmethod
     def get_instance_value_for_fields(instance, fields):
-        return tuple([getattr(instance, field.attname) for field in fields])
+        ret = []
+        for field in fields:
+            # Gotcha: in some cases (like fixture loading) a model can have
+            # different values in parent_ptr_id and parent's id. So, use
+            # instance.pk (that is, parent_ptr_id) when asked for instance.id.
+            opts = instance._meta
+            if field.primary_key:
+                possible_parent_link = opts.get_ancestor_link(field.model)
+                if not possible_parent_link or possible_parent_link.primary_key:
+                    ret.append(instance.pk)
+                    continue
+            ret.append(getattr(instance, field.attname))
+        return tuple(ret)
 
     def get_attname_column(self):
         attname, column = super(ForeignObject, self).get_attname_column()
@@ -1280,6 +1281,9 @@ class ForeignKey(ForeignObject):
             return IntegerField().db_type(connection=connection)
         return rel_field.db_type(connection=connection)
 
+    def db_parameters(self, connection):
+        return {"type": self.db_type(connection), "check": []}
+
 
 class OneToOneField(ForeignKey):
     """
@@ -1350,6 +1354,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'unique_together': (from_, to),
         'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
+        'app_cache': field.model._meta.app_cache,
     })
     # Construct and return the new class.
     return type(str(name), (models.Model,), {
@@ -1560,3 +1565,11 @@ class ManyToManyField(RelatedField):
                 initial = initial()
             defaults['initial'] = [i._get_pk_val() for i in initial]
         return super(ManyToManyField, self).formfield(**defaults)
+
+    def db_type(self, connection):
+        # A ManyToManyField is not represented by a single column,
+        # so return None.
+        return None
+
+    def db_parameters(self, connection):
+        return {"type": None, "check": None}

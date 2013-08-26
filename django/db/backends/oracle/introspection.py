@@ -134,3 +134,143 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             indexes[row[0]] = {'primary_key': bool(row[1]),
                                'unique': bool(row[2])}
         return indexes
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        """
+        constraints = {}
+        # Loop over the constraints, getting PKs and uniques
+        cursor.execute("""
+            SELECT
+                user_constraints.constraint_name,
+                LOWER(cols.column_name) AS column_name,
+                CASE user_constraints.constraint_type
+                    WHEN 'P' THEN 1
+                    ELSE 0
+                END AS is_primary_key,
+                CASE user_indexes.uniqueness
+                    WHEN 'UNIQUE' THEN 1
+                    ELSE 0
+                END AS is_unique,
+                CASE user_constraints.constraint_type
+                    WHEN 'C' THEN 1
+                    ELSE 0
+                END AS is_check_constraint
+            FROM
+                user_constraints
+            INNER JOIN
+                user_indexes ON user_indexes.index_name = user_constraints.index_name
+            LEFT OUTER JOIN
+                user_cons_columns cols ON user_constraints.constraint_name = cols.constraint_name
+            WHERE
+                (
+                    user_constraints.constraint_type = 'P' OR
+                    user_constraints.constraint_type = 'U'
+                )
+                AND user_constraints.table_name = UPPER(%s)
+            ORDER BY cols.position
+        """, [table_name])
+        for constraint, column, pk, unique, check in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": [],
+                    "primary_key": pk,
+                    "unique": unique,
+                    "foreign_key": None,
+                    "check": check,
+                    "index": True,  # All P and U come with index, see inner join above
+                }
+            # Record the details
+            constraints[constraint]['columns'].append(column)
+        # Check constraints
+        cursor.execute("""
+            SELECT
+                cons.constraint_name,
+                LOWER(cols.column_name) AS column_name
+            FROM
+                user_constraints cons
+            LEFT OUTER JOIN
+                user_cons_columns cols ON cons.constraint_name = cols.constraint_name
+            WHERE
+                cons.constraint_type = 'C' AND
+                cons.table_name = UPPER(%s)
+            ORDER BY cols.position
+        """, [table_name])
+        for constraint, column in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": [],
+                    "primary_key": False,
+                    "unique": False,
+                    "foreign_key": None,
+                    "check": True,
+                    "index": False,
+                }
+            # Record the details
+            constraints[constraint]['columns'].append(column)
+        # Foreign key constraints
+        cursor.execute("""
+            SELECT
+                cons.constraint_name,
+                LOWER(cols.column_name) AS column_name,
+                LOWER(rcons.table_name),
+                LOWER(rcols.column_name)
+            FROM
+                user_constraints cons
+            INNER JOIN
+                user_constraints rcons ON cons.r_constraint_name = rcons.constraint_name
+            INNER JOIN
+                user_cons_columns rcols ON rcols.constraint_name = rcons.constraint_name
+            LEFT OUTER JOIN
+                user_cons_columns cols ON cons.constraint_name = cols.constraint_name
+            WHERE
+                cons.constraint_type = 'R' AND
+                cons.table_name = UPPER(%s)
+            ORDER BY cols.position
+        """, [table_name])
+        for constraint, column, other_table, other_column in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": [],
+                    "primary_key": False,
+                    "unique": False,
+                    "foreign_key": (other_table, other_column),
+                    "check": False,
+                    "index": False,
+                }
+            # Record the details
+            constraints[constraint]['columns'].append(column)
+        # Now get indexes
+        cursor.execute("""
+            SELECT
+                index_name,
+                LOWER(column_name)
+            FROM
+                user_ind_columns cols
+            WHERE
+                table_name = UPPER(%s) AND
+                NOT EXISTS (
+                    SELECT 1
+                    FROM user_constraints cons
+                    WHERE cols.index_name = cons.index_name
+                )
+            ORDER BY cols.column_position
+        """, [table_name])
+        for constraint, column in cursor.fetchall():
+            # If we're the first column, make the record
+            if constraint not in constraints:
+                constraints[constraint] = {
+                    "columns": [],
+                    "primary_key": False,
+                    "unique": False,
+                    "foreign_key": None,
+                    "check": False,
+                    "index": True,
+                }
+            # Record the details
+            constraints[constraint]['columns'].append(column)
+        return constraints

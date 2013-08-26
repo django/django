@@ -35,6 +35,7 @@ TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
+    'coverage_html',
     'data',
     'requirements',
     'templates',
@@ -97,7 +98,7 @@ def get_installed():
 def setup(verbosity, test_labels):
     from django.conf import settings
     from django.db.models.loading import get_apps, load_app
-    from django.test.testcases import TransactionTestCase, TestCase
+    from django.test import TransactionTestCase, TestCase
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):

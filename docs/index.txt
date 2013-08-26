@@ -72,6 +72,9 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Accessing related objects <ref/models/relations>` |
   :doc:`Query-related classes <ref/models/queries>`
 
+* **Migrations:**
+  :doc:`Introduction to Migrations<topics/migrations>`
+
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
   :doc:`Raw SQL <topics/db/sql>` |

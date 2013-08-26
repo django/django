@@ -138,23 +138,15 @@ YearArchiveView
     * ``year``: A :class:`~datetime.date` object
       representing the given year.
 
-      .. versionchanged:: 1.5
-
-         Previously, this returned a string.
-
     * ``next_year``: A :class:`~datetime.date` object
       representing the first day of the next year, according to
       :attr:`~BaseDateListView.allow_empty` and
       :attr:`~DateMixin.allow_future`.
 
-      .. versionadded:: 1.5
-
     * ``previous_year``: A :class:`~datetime.date` object
       representing the first day of the previous year, according to
       :attr:`~BaseDateListView.allow_empty` and
       :attr:`~DateMixin.allow_future`.
-
-      .. versionadded:: 1.5
 
     **Notes**
 

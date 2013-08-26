@@ -475,6 +475,7 @@ SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the se
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
 SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'  # class to serialize session data
 
 #########
 # CACHE #
@@ -608,3 +609,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+##############
+# MIGRATIONS #
+##############
+
+# Migration module overrides for apps, by app label.
+MIGRATION_MODULES = {}

@@ -93,10 +93,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     non-form data posted in the request, access this through the
     :attr:`HttpRequest.body` attribute instead.
 
-    .. versionchanged:: 1.5
-
-        Before Django 1.5, HttpRequest.POST contained non-form data.
-
     It's possible that a request can come in via POST with an empty ``POST``
     dictionary -- if, say, a form is requested via the POST HTTP method but
     does not include form data. Therefore, you shouldn't use ``if request.POST``
@@ -195,8 +191,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     setting. See :ref:`how-django-processes-a-request` for details.
 
 .. attribute:: HttpRequest.resolver_match
-
-    .. versionadded:: 1.5
 
     An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
     the resolved url. This attribute is only set after url resolving took place,
@@ -823,8 +817,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 StreamingHttpResponse objects
 =============================
-
-.. versionadded:: 1.5
 
 .. class:: StreamingHttpResponse
 

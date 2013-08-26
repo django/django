@@ -276,10 +276,6 @@ that the SRID value is not included in this representation
 because it is not a part of the OGC specification (use the
 :attr:`GEOSGeometry.hexewkb` property instead).
 
-.. versionchanged:: 1.5
-
-    Prior to Django 1.5, the Z value of the geometry was dropped.
-
 .. attribute:: GEOSGeometry.hexewkb
 
 Returns the EWKB of this Geometry in hexadecimal form.  This is an
@@ -324,10 +320,6 @@ correspondg to the GEOS geometry.
 Returns the WKB (Well-Known Binary) representation of this Geometry
 as a Python buffer.  SRID value is not included, use the
 :attr:`GEOSGeometry.ewkb` property instead.
-
-.. versionchanged:: 1.5
-
-    Prior to Django 1.5, the Z value of the geometry was dropped.
 
 .. _ewkb:
 
@@ -426,8 +418,6 @@ geometry that do not make up other.
 .. method:: GEOSGeometry.interpolate(distance)
 .. method:: GEOSGeometry.interpolate_normalized(distance)
 
-.. versionadded:: 1.5
-
 Given a distance (float), returns the point (or closest point) within the
 geometry (:class:`LineString` or :class:`MultiLineString`) at that distance.
 The normalized version takes the distance as a float between 0 (origin) and 1
@@ -442,8 +432,6 @@ geometry and other.
 
 .. method:: GEOSGeometry.project(point)
 .. method:: GEOSGeometry.project_normalized(point)
-
-.. versionadded:: 1.5
 
 Returns the distance (float) from the origin of the geometry
 (:class:`LineString` or :class:`MultiLineString`) to the point projected on the

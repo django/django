@@ -100,10 +100,6 @@ The ``ContentFile`` Class
         f1 = ContentFile("esta sentencia está en español")
         f2 = ContentFile(b"these are bytes")
 
-    .. versionchanged:: 1.5
-
-        ContentFile also accepts Unicode strings.
-
 .. currentmodule:: django.core.files.images
 
 The ``ImageFile`` Class

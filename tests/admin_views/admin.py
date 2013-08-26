@@ -29,7 +29,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
+    RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram)
 
 
@@ -656,6 +656,13 @@ class UndeletableObjectAdmin(admin.ModelAdmin):
         return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
 
 
+class UnchangeableObjectAdmin(admin.ModelAdmin):
+    def get_urls(self):
+        # Disable change_view, but leave other urls untouched
+        urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
+        return [p for p in urlpatterns if not p.name.endswith("_change")]
+
+
 def callable_on_unknown(obj):
     return obj.unknown
 
@@ -741,6 +748,7 @@ site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
+site.register(UnchangeableObject, UnchangeableObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

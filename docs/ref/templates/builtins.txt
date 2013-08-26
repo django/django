@@ -1059,21 +1059,13 @@ by the context as to the current application.
 
 .. warning::
 
-    Don't forget to put quotes around the function path or pattern name!
-
-    .. versionchanged:: 1.5
-
-        The first parameter used not to be quoted, which was inconsistent with
-        other template tags. Since Django 1.5, it is evaluated according to
-        the usual rules: it can be a quoted string or a variable that will be
-        looked up in the context.
+    Don't forget to put quotes around the function path or pattern name,
+    otherwise the value will be interpreted as a context variable!
 
 .. templatetag:: verbatim
 
 verbatim
 ^^^^^^^^
-
-.. versionadded:: 1.5
 
 Stops the template engine from rendering the contents of this block tag.
 
@@ -2410,8 +2402,6 @@ It is also able to consume standard context variables, e.g. assuming a
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
-
-.. versionadded:: 1.5
 
 .. code-block:: html+django
 

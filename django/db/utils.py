@@ -262,10 +262,13 @@ class ConnectionRouter(object):
                     return allow
         return obj1._state.db == obj2._state.db
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         for router in self.routers:
             try:
-                method = router.allow_syncdb
+                try:
+                    method = router.allow_migrate
+                except AttributeError:
+                    method = router.allow_syncdb
             except AttributeError:
                 # If the router doesn't have a method, skip to the next one.
                 pass

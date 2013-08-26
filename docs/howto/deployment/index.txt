@@ -28,6 +28,7 @@ the easiest, fastest, and most stable deployment choice.
     * `Chapter 12 of the Django Book (second edition)`_ discusses deployment
       and especially scaling in more detail. However, note that this edition
       was written against Django version 1.1 and has not been updated since
-      `mod_python` was first deprecated, then completely removed in Django 1.5.
+      ``mod_python`` was first deprecated, then completely removed in
+      Django 1.5.
 
 .. _chapter 12 of the django book (second edition): http://djangobook.com/en/2.0/chapter12/

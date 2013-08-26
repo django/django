@@ -1,5 +1,6 @@
 import copy
 import warnings
+from collections import OrderedDict
 from django.utils import six
 
 class MergeDict(object):
@@ -235,6 +236,36 @@ class SortedDict(dict):
     def clear(self):
         super(SortedDict, self).clear()
         self.keyOrder = []
+
+class OrderedSet(object):
+    """
+    A set which keeps the ordering of the inserted items.
+    Currently backs onto OrderedDict.
+    """
+
+    def __init__(self, iterable=None):
+        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+
+    def add(self, item):
+        self.dict[item] = None
+
+    def remove(self, item):
+        del self.dict[item]
+
+    def discard(self, item):
+        try:
+            self.remove(item)
+        except KeyError:
+            pass
+
+    def __iter__(self):
+        return iter(self.dict.keys())
+
+    def __contains__(self, item):
+        return item in self.dict
+
+    def __nonzero__(self):
+        return bool(self.dict)
 
 class MultiValueDictKeyError(KeyError):
     pass

@@ -2,8 +2,10 @@ from django.core.checks.compatibility import base
 from django.core.checks.compatibility import django_1_6_0
 from django.core.management.commands import check
 from django.core.management import call_command
+from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
 
+from .models import Book
 
 class StubCheckModule(object):
     # Has no ``run_checks`` attribute & will trigger a warning.
@@ -52,6 +54,24 @@ class CompatChecksTestCase(TestCase):
     def test_run_checks_overridden(self):
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
             self.assertEqual(len(django_1_6_0.run_checks()), 0)
+
+    def test_boolean_field_default_value(self):
+        with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
+            # We patch the field's default value to trigger the warning
+            boolean_field = Book._meta.get_field('is_published')
+            old_default = boolean_field.default
+            try:
+                boolean_field.default = NOT_PROVIDED
+                result = django_1_6_0.run_checks()
+                self.assertEqual(len(result), 1)
+                self.assertTrue("You have not set a default value for one or more BooleanFields" in result[0])
+                self.assertTrue('check.Book: "is_published"' in result[0])
+                # We did not patch the BlogPost.is_published field so
+                # there should not be a warning about it
+                self.assertFalse('check.BlogPost' in result[0])
+            finally:
+                # Restore the ``default``
+                boolean_field.default = old_default
 
     def test_check_compatibility(self):
         with self.settings(TEST_RUNNER='django.test.runner.DiscoverRunner'):

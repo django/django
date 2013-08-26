@@ -32,7 +32,7 @@ class ValidationTestModel(models.Model):
     slug = models.SlugField()
     users = models.ManyToManyField(User)
     state = models.CharField(max_length=2, choices=(("CO", "Colorado"), ("WA", "Washington")))
-    is_active = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     pub_date = models.DateTimeField()
     band = models.ForeignKey(Band)
     no = models.IntegerField(verbose_name="Number", blank=True, null=True) # This field is intentionally 2 characters long. See #16080.

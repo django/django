@@ -22,7 +22,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     data_types = {
         'AutoField': 'NUMBER(11)',
         'BinaryField': 'BLOB',
-        'BooleanField': 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))',
+        'BooleanField': 'NUMBER(1)',
         'CharField': 'NVARCHAR2(%(max_length)s)',
         'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
         'DateField': 'DATE',
@@ -35,15 +35,22 @@ class DatabaseCreation(BaseDatabaseCreation):
         'BigIntegerField': 'NUMBER(19)',
         'IPAddressField': 'VARCHAR2(15)',
         'GenericIPAddressField': 'VARCHAR2(39)',
-        'NullBooleanField': 'NUMBER(1) CHECK ((%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL))',
+        'NullBooleanField': 'NUMBER(1)',
         'OneToOneField': 'NUMBER(11)',
-        'PositiveIntegerField': 'NUMBER(11) CHECK (%(qn_column)s >= 0)',
-        'PositiveSmallIntegerField': 'NUMBER(11) CHECK (%(qn_column)s >= 0)',
+        'PositiveIntegerField': 'NUMBER(11)',
+        'PositiveSmallIntegerField': 'NUMBER(11)',
         'SlugField': 'NVARCHAR2(%(max_length)s)',
         'SmallIntegerField': 'NUMBER(11)',
         'TextField': 'NCLOB',
         'TimeField': 'TIMESTAMP',
         'URLField': 'VARCHAR2(%(max_length)s)',
+    }
+
+    data_type_check_constraints = {
+        'BooleanField': '%(qn_column)s IN (0,1)',
+        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
+        'PositiveIntegerField': '%(qn_column)s >= 0',
+        'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
 
     def __init__(self, connection):
