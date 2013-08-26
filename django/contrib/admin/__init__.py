@@ -1,6 +1,6 @@
 # ACTION_CHECKBOX_NAME is unused, but should stay since its import from here
 # has been referenced in documentation.
-from django.contrib.admin.checks import check_model_admin
+from django.contrib.admin.checks import check_admin_app
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 from django.contrib.admin.options import StackedInline, TabularInline
@@ -42,4 +42,4 @@ def autodiscover():
             if module_has_submodule(mod, 'admin'):
                 raise
 
-register(check_model_admin)
+register(check_admin_app)

@@ -8,8 +8,8 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
-    InlineModelAdminChecks)
+from django.contrib.admin.checks import (check_base_model_admin,
+    check_model_admin, check_inline_model_admin)
 from django.contrib.admin.util import (unquote, flatten_fieldsets,
     get_deleted_objects, model_format_dict, NestedObjects,
     lookup_needs_distinct)
@@ -86,8 +86,7 @@ class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
     )
 
 
-class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
-                     BaseModelAdminChecks):
+class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
@@ -398,8 +397,12 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+    @classmethod
+    def check(cls, model, **kwargs):
+        return check_base_model_admin(cls, model, **kwargs)
 
-class ModelAdmin(BaseModelAdmin, ModelAdminChecks):
+
+class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
     list_display = ('__str__',)
@@ -1585,8 +1588,14 @@ class ModelAdmin(BaseModelAdmin, ModelAdminChecks):
             formsets.append(FormSet(**formset_params))
         return formsets
 
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = super(ModelAdmin, cls).check(model, **kwargs)
+        errors.extend(check_model_admin(cls, model, **kwargs))
+        return errors
 
-class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
+
+class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
 
@@ -1747,6 +1756,12 @@ class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = super(InlineModelAdmin, cls).check(model, **kwargs)
+        errors.extend(check_inline_model_admin(cls, model, **kwargs))
+        return errors
 
 
 class StackedInline(InlineModelAdmin):
