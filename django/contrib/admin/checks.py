@@ -40,7 +40,7 @@ def check_base_model_admin(cls, model, **kwargs):
         errors.extend(_check_raw_id_fields(cls, model))
         errors.extend(_check_fields(cls, model))
         errors.extend(_check_fieldsets(cls, model))
-        errors.extend(_check_exclude(cls, model))
+        errors.extend(_check_exclude_of_base_model_admin(cls, model))
         errors.extend(_check_form(cls, model))
         errors.extend(_check_filter_vertical(cls, model))
         errors.extend(_check_filter_horizontal(cls, model))
@@ -164,18 +164,6 @@ def check_base_model_admin(cls, model, **kwargs):
                     % (label, field_name, field_name))
             else:
                 return []
-
-    def _check_exclude(cls, model):
-        """ Check that exclude is a sequence without duplicates. """
-
-        if cls.exclude is None:  # default value is None
-            return []
-        elif not isinstance(cls.exclude, (list, tuple)):
-            return _error(cls, '"exclude" must be a list or tuple.')
-        elif len(cls.exclude) > len(set(cls.exclude)):
-            return _error(cls, '"exclude" contains duplicate field(s).')
-        else:
-            return []
 
     def _check_form(cls, model):
         """ Check that form subclasses BaseModelForm. """
@@ -402,22 +390,35 @@ def check_base_model_admin(cls, model, **kwargs):
     return check(cls, model, **kwargs)
 
 
+def _check_exclude_of_base_model_admin(cls, model):
+    """ Check that exclude is a sequence without duplicates. """
+
+    if cls.exclude is None:  # default value is None
+        return []
+    elif not isinstance(cls.exclude, (list, tuple)):
+        return _error(cls, '"exclude" must be a list or tuple.')
+    elif len(cls.exclude) > len(set(cls.exclude)):
+        return _error(cls, '"exclude" contains duplicate field(s).')
+    else:
+        return []
+
+
 def check_model_admin(cls, model, **kwargs):
 
     def check(cls, model, **kwargs):
-        errors = []
-        errors.extend(_check_save_as(cls, model=model))
-        errors.extend(_check_save_on_top(cls, model=model))
-        errors.extend(_check_inlines(cls, model=model))
-        errors.extend(_check_list_display(cls, model=model))
-        errors.extend(_check_list_display_links(cls, model=model))
-        errors.extend(_check_list_filter(cls, model=model))
-        errors.extend(_check_list_select_related(cls, model=model))
-        errors.extend(_check_list_per_page(cls, model=model))
-        errors.extend(_check_list_max_show_all(cls, model=model))
-        errors.extend(_check_list_editable(cls, model=model))
-        errors.extend(_check_search_fields(cls, model=model))
-        errors.extend(_check_date_hierarchy(cls, model=model))
+        errors = check_base_model_admin(cls, model)
+        errors.extend(_check_save_as(cls, model))
+        errors.extend(_check_save_on_top(cls, model))
+        errors.extend(_check_inlines(cls, model))
+        errors.extend(_check_list_display(cls, model))
+        errors.extend(_check_list_display_links(cls, model))
+        errors.extend(_check_list_filter(cls, model))
+        errors.extend(_check_list_select_related(cls, model))
+        errors.extend(_check_list_per_page(cls, model))
+        errors.extend(_check_list_max_show_all(cls, model))
+        errors.extend(_check_list_editable(cls, model))
+        errors.extend(_check_search_fields(cls, model))
+        errors.extend(_check_date_hierarchy(cls, model))
         return errors
 
     def _check_save_as(cls, model):
@@ -659,8 +660,8 @@ def check_model_admin(cls, model, **kwargs):
 def check_inline_model_admin(cls, model, **kwargs):
 
     def check(cls, model, **kwargs):
-        errors = []
-        #errors.extend(_check_exclude(cls, model))
+        errors = check_base_model_admin(cls, model, **kwargs)
+        errors.extend(_check_exclude(cls, model))
         errors.extend(_check_fk_name(cls))
         errors.extend(_check_extra(cls))
         errors.extend(_check_max_num(cls))
@@ -668,9 +669,11 @@ def check_inline_model_admin(cls, model, **kwargs):
         return errors
 
     def _check_exclude(cls, parent_model):
-        #errors = super(InlineModelAdminChecks, cls)._check_exclude(parent_model)
-        #if errors:
-        #    return errors
+        # If there are any errors, skip. These errors are collected in `check`
+        # method thanks to `check_base_model_admin` invocation.
+        errors = _check_exclude_of_base_model_admin(cls, parent_model)
+        if errors:
+            return []
 
         fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name, can_fail=True)
         if cls.exclude is None:

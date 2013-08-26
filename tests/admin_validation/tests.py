@@ -113,6 +113,7 @@ class ValidationTestCase(TestCase):
                 obj=ExcludedFieldsInline,
             )
         ]
+        print errors
         self.assertEqual(errors, expected)
 
     def test_exclude_inline_model_admin(self):

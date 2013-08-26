@@ -1635,6 +1635,10 @@ class ModelAdmin(BaseModelAdmin, ModelAdminChecks):
             inline_instances.append(inline)
         return formsets, inline_instances
 
+    @classmethod
+    def check(cls, model, **kwargs):
+        return check_model_admin(cls, model, **kwargs)
+
 
 class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
     """
@@ -1797,6 +1801,10 @@ class InlineModelAdmin(BaseModelAdmin, InlineModelAdminChecks):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
+    @classmethod
+    def check(cls, model, **kwargs):
+        return check_inline_model_admin(cls, model, **kwargs)
 
 
 class StackedInline(InlineModelAdmin):
