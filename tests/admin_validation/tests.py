@@ -6,7 +6,7 @@ from django.core import checks
 from django.test import TestCase
 from django.test.utils import str_prefix
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State
 
 
 class SongForm(forms.ModelForm):
@@ -113,7 +113,6 @@ class ValidationTestCase(TestCase):
                 obj=ExcludedFieldsInline,
             )
         ]
-        print errors
         self.assertEqual(errors, expected)
 
     def test_exclude_inline_model_admin(self):
@@ -188,8 +187,9 @@ class ValidationTestCase(TestCase):
         errors = MyAdmin.check(model=Album)
         expected = [
             checks.Error(
-                'admin_validation.TwoAlbumFKAndAnE has more than one ForeignKey '
-                    'to admin_validation.Album.',
+                '"fk_name" must be explicitly defined, because '
+                    'admin_validation.TwoAlbumFKAndAnE has more than one '
+                    'ForeignKey to admin_validation.Album.',
                 hint=None,
                 obj=TwoAlbumFKAndAnEInline,
             )
@@ -259,9 +259,9 @@ class ValidationTestCase(TestCase):
     def test_nonexistant_field_on_inline(self):
         class CityInline(admin.TabularInline):
             model = City
-            readonly_fields=['i_dont_exist'] # Missing attribute
+            readonly_fields=['i_dont_exist']  # Missing attribute
 
-        errors = CityInline.check(model=City, parent_model=None)
+        errors = CityInline.check(State)
         expected = [
             checks.Error(
                 '"readonly_fields[0]" is neither a callable nor an attribute '
