@@ -13,12 +13,10 @@ def check_admin_app(**kwargs):
     return []
 
 
-# Helper. Flatten a list.
 def flatten(outer_list):
     return [item for inner_list in outer_list for item in inner_list]
 
 
-# A helper.
 def _error(cls, msg):
     return [
         checks.Error(
