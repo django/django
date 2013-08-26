@@ -1160,15 +1160,6 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         self.assertIsInvalid(ValidationTestModelAdmin, ValidationTestModel,
             '"list_select_related" must be a boolean, tuple or list.')
 
-        # six.assertRaisesRegex(
-        #     self,
-        #     ImproperlyConfigured,
-        #     '"list_select_related" must be either a '
-        #     'bool, a tuple or a list',
-        #     ValidationTestModelAdmin.validate,
-        #     ValidationTestModel,
-        # )
-
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
             list_select_related = False
