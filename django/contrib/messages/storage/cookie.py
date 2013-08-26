@@ -79,7 +79,9 @@ class CookieStorage(BaseStorage):
         """
         if encoded_data:
             response.set_cookie(self.cookie_name, encoded_data,
-                domain=settings.SESSION_COOKIE_DOMAIN)
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                secure=settings.SESSION_COOKIE_SECURE or None,
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
         else:
             response.delete_cookie(self.cookie_name,
                 domain=settings.SESSION_COOKIE_DOMAIN)

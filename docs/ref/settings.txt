@@ -2266,7 +2266,8 @@ See :ref:`message storage backends <message-storage-backends>` for more details.
 The backends that use cookies --
 :class:`~django.contrib.messages.storage.cookie.CookieStorage` and
 :class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
-use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
+use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
+and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
@@ -2342,6 +2343,8 @@ standard domain cookies, existing user cookies will be set to the old
 domain. This may result in them being unable to log in as long as these cookies
 persist.
 
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
 .. setting:: SESSION_COOKIE_HTTPONLY
 
 SESSION_COOKIE_HTTPONLY
@@ -2358,6 +2361,10 @@ is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
+
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
@@ -2395,6 +2402,10 @@ Default: ``False``
 Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
+
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_ENGINE
 

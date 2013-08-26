@@ -214,6 +214,10 @@ Minor features
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
 
+* The backends for :mod:`django.contrib.messages` that use cookies, will now
+  follow the :setting:`SESSION_COOKIE_SECURE` and
+  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+
 Backwards incompatible changes in 1.7
 =====================================
 
