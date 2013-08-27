@@ -41,7 +41,7 @@ database.
 Migrations are covered in :doc:`their own documentation</topics/migrations>`,
 but a few of the key features are:
 
-* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry - 
+* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry -
   calls to ``syncdb`` will still work as before.
 
 * A new ``makemigrations`` command provides an easy way to autodetect changes
@@ -108,31 +108,8 @@ will be interpreted.
 Minor features
 ~~~~~~~~~~~~~~
 
-* The new :attr:`UploadedFile.content_type_extra
-  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
-  contains extra parameters passed to the ``content-type`` header on a file
-  upload.
-
-* The ``enter`` argument was added to the
-  :data:`~django.test.signals.setting_changed` signal.
-
-* The :meth:`QuerySet.update_or_create()
-  <django.db.models.query.QuerySet.update_or_create>` method was added.
-
-* :attr:`~django.db.models.Options.app_label` is no longer required for models
-  that are defined in a ``models`` package within an app.
-
-* The :meth:`Context.push() <django.template.Context.push>` method now returns
-  a context manager which automatically calls :meth:`pop()
-  <django.template.Context.pop>` upon exiting the ``with`` statement.
-  Additionally, :meth:`push() <django.template.Context.push>` now accepts
-  parameters that are passed to the ``dict`` constructor used to build the new
-  context level.
-
-* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
-  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
-  allowing the ``published`` element to be included in the feed (which
-  relies on ``pubdate``).
+:mod:`django.contrib.admin`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
   property for rounded corners rather than GIF background images.
@@ -144,27 +121,6 @@ Minor features
 * The admin changelist cells now have a ``field-<field_name>`` class in the
   HTML to enable style customizations.
 
-* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
-  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
-
-* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
-  disable the colorization of management command output.
-
-* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
-  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
-  header in the response. This makes it possible for the
-  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
-  conditional ``GET`` requests for sitemaps which set ``lastmod``.
-
-* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
-  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
-  to more easily customize the login policy.
-
-* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
-  customize the "empty choice" label by including a tuple with an empty string
-  or ``None`` for the key and the custom label as the value. The default blank
-  option ``"----------"`` will be omitted in this case.
-
 * The admin's search fields can now be customized per-request thanks to the new
   :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
 
@@ -173,9 +129,80 @@ Minor features
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
 
+:mod:`django.contrib.auth`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Any ``**kwargs`` passed to
+  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
+  underlying :meth:`~django.core.mail.send_mail()` call.
+
+* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
+  take a list of permissions as well as a single permission.
+
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
 * :func:`django.contrib.auth.views.password_reset` takes an optional
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
+
+:mod:`django.contrib.messages`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The backends for :mod:`django.contrib.messages` that use cookies, will now
+  follow the :setting:`SESSION_COOKIE_SECURE` and
+  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+
+:mod:`django.contrib.sitemaps`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
+  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
+  header in the response. This makes it possible for the
+  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
+  conditional ``GET`` requests for sitemaps which set ``lastmod``.
+
+:mod:`django.contrib.syndication`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
+  allowing the ``published`` element to be included in the feed (which
+  relies on ``pubdate``).
+
+Email
+^^^^^
+
+* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
+  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+
+File Uploads
+^^^^^^^^^^^^
+
+* The new :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
+* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
+  the file system permissions of directories created during file upload, like
+  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+
+Forms
+^^^^^
+
+* The ``<label>`` and ``<input>`` tags rendered by
+  :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
+  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
+  Each radio button or checkbox includes an ``id_for_label`` attribute to
+  output the element's ID.
+
+* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
+  customize the "empty choice" label by including a tuple with an empty string
+  or ``None`` for the key and the custom label as the value. The default blank
+  option ``"----------"`` will be omitted in this case.
 
 * :class:`~django.forms.MultiValueField` allows optional subfields by setting
   the ``require_all_fields`` argument to ``False``. The ``required`` attribute
@@ -186,37 +213,46 @@ Minor features
   return ``self.cleaned_data``. If it does return a changed dictionary then
   that will still be used.
 
+Management Commands
+^^^^^^^^^^^^^^^^^^^
+
+* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+  disable the colorization of management command output.
+
+Models
+^^^^^^
+
 * The new :attr:`~django.db.models.Options.default_permissions` model
   ``Meta`` option allows you to customize (or disable) creation of the default
   add, change, and delete permissions.
 
-* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
-  take a list of permissions as well as a single permission.
-
-* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
-  the file system permissions of directories created during file upload, like
-  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
-
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
 
-* The ``<label>`` and ``<input>`` tags rendered by
-  :class:`~django.forms.RadioSelect` and
-  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
-  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
-  Each radio button or checkbox includes an ``id_for_label`` attribute to
-  output the element's ID.
+Signals
+^^^^^^^
 
-* Any ``**kwargs`` passed to
-  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
-  underlying :meth:`~django.core.mail.send_mail()` call.
+* The ``enter`` argument was added to the
+  :data:`~django.test.signals.setting_changed` signal.
+
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
+
+Templates
+^^^^^^^^^
+
+* The :meth:`Context.push() <django.template.Context.push>` method now returns
+  a context manager which automatically calls :meth:`pop()
+  <django.template.Context.pop>` upon exiting the ``with`` statement.
+  Additionally, :meth:`push() <django.template.Context.push>` now accepts
+  parameters that are passed to the ``dict`` constructor used to build the new
+  context level.
 
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
-
-* The backends for :mod:`django.contrib.messages` that use cookies, will now
-  follow the :setting:`SESSION_COOKIE_SECURE` and
-  :setting:`SESSION_COOKIE_HTTPONLY` settings.
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -273,7 +309,7 @@ Miscellaneous
 * The :meth:`django.db.models.Model.__eq__` method has changed such that
   two ``Model`` instances without primary key values won't be considered
   equal (unless they are the same instance).
-  
+
 * The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
