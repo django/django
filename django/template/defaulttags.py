@@ -1,6 +1,7 @@
 """Default tags used by the template system, available to all templates."""
 from __future__ import unicode_literals
 
+import os
 import sys
 import re
 from datetime import datetime
@@ -312,6 +313,7 @@ class RegroupNode(Node):
         return ''
 
 def include_is_allowed(filepath):
+    filepath = os.path.abspath(filepath)
     for root in settings.ALLOWED_INCLUDE_ROOTS:
         if filepath.startswith(root):
             return True
