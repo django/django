@@ -7,8 +7,6 @@ Query-related classes
 This document provides reference material for query-related tools not
 documented elsewhere.
 
-.. _query-expressions:
-
 F() expressions
 ===============
 
@@ -81,7 +79,7 @@ Performance benefits of using ``F()``
 
 ``F()`` therefore can offer performance advantages, by:
 
-* getting the database, rather than Python to do work
+* getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
 
 Avoiding race conditions using ``F()``

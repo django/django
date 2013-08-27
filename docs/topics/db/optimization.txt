@@ -111,7 +111,7 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :ref:`F() object query expressions <query-expressions>` to do filtering
+* Use :class:`F expressions <django.db.models.F>` to do filtering
   against other fields within the same model.
 
 * Use :doc:`annotate to do aggregation in the database </topics/db/aggregation>`.

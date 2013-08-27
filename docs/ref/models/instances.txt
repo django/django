@@ -353,17 +353,17 @@ the value of 11 will be written back to the database.
 
 The process can be made robust and slightly faster by expressing the update
 relative to the original field value, rather than as an explicit assignment of
-a new value. Django provides :ref:`F() expressions <query-expressions>` for
-performing this kind of relative update. Using ``F()`` expressions, the
-previous example is expressed as::
+a new value. Django provides :class:`F expressions <django.db.models.F>` for
+performing this kind of relative update. Using :class:`F expressions
+<django.db.models.F>`, the previous example is expressed as::
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold = F('number_sold') + 1
     >>> product.save()
 
-For more details, see the documentation on :ref:`F() expressions
-<query-expressions>` and their :ref:`use in update queries
+For more details, see the documentation on :class:`F expressions
+<django.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
 Specifying which fields to save
