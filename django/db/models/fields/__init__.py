@@ -283,6 +283,12 @@ class Field(object):
         except KeyError:
             return None
 
+    def db_type_suffix(self, connection):
+        try:
+            return connection.creation.data_types_suffix[self.get_internal_type()]
+        except KeyError:
+            return False
+
     @property
     def unique(self):
         return self._unique or self.primary_key

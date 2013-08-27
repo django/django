@@ -33,6 +33,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TimeField':                    'time',
     }
 
+    data_types_suffix = {
+        'AutoField':                    'AUTOINCREMENT',
+    }
+
     def sql_for_pending_references(self, model, style, pending_references):
         "SQLite3 doesn't support constraints"
         return []

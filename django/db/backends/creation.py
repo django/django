@@ -23,6 +23,7 @@ class BaseDatabaseCreation(object):
     destruction of test databases.
     """
     data_types = {}
+    data_types_suffix = {}
 
     def __init__(self, connection):
         self.connection = connection
@@ -51,6 +52,7 @@ class BaseDatabaseCreation(object):
         qn = self.connection.ops.quote_name
         for f in opts.local_fields:
             col_type = f.db_type(connection=self.connection)
+            col_type_suffix = f.db_type_suffix(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
                 # Skip ManyToManyFields, because they're not represented as
@@ -86,6 +88,8 @@ class BaseDatabaseCreation(object):
                         (model, f))
                 else:
                     field_output.extend(ref_output)
+            if col_type_suffix:
+                field_output.append(style.SQL_KEYWORD(col_type_suffix))
             table_output.append(' '.join(field_output))
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' %
