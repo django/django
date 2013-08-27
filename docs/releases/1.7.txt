@@ -278,6 +278,14 @@ Miscellaneous
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
+* The :meth:`django.db.backends.sqlite3.DatabaseCreation.sql_create_model`
+  will now create AutoField columns in SQLite databases using the
+  AUTOINCREMENT option, which guarantees monotonic increments. This will
+  cause primary key numbering behaviour to change on SQLite, becoming
+  consistent with most other SQL databases. You may need to migrate your
+  existing databases somehow to take advantage of this feature. See ticket
+  #10164 for details.
+
 Features deprecated in 1.7
 ==========================
 
