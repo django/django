@@ -3,13 +3,26 @@ from __future__ import unicode_literals
 
 from . import Warning
 
+
+def _get_models(apps, **kwargs):
+    from django.db import models
+
+    if apps is None:
+        return models.get_models(**kwargs)
+    else:
+        return [model
+            for model in models.get_models(**kwargs)
+            if model._meta.app_label in apps
+        ]
+
+
 # All these checks are registered in __init__.py file.
 
-def check_all_models(**kwargs):
+def check_all_models(apps=None, **kwargs):
     from django.db import models
 
     errors = []
-    for cls in models.get_models(include_swapped=True):
+    for cls in models.get_models_from_apps(apps, include_swapped=True):
         errors.extend(cls.check())
     return errors
 
@@ -18,9 +31,12 @@ def check_1_6_compatibility(**kwargs):
     return _check_test_runner(**kwargs) + _check_boolean_field_default_value(**kwargs)
 
 
-def _check_test_runner(**kwargs):
+def _check_test_runner(apps=None, **kwargs):
     """ Warn an user if the user has *not* set explicitly the ``TEST_RUNNER``
     setting. """
+
+    if apps is not None:
+        return []
 
     from django.conf import settings
 
@@ -41,7 +57,7 @@ def _check_test_runner(**kwargs):
         return []
 
 
-def _check_boolean_field_default_value():
+def _check_boolean_field_default_value(apps=None, **kwargs):
     """
     Checks if there are any BooleanFields without a default value, &
     warns the user that the default has changed from False to Null.
@@ -50,7 +66,7 @@ def _check_boolean_field_default_value():
     from django.db import models
 
     invalid_fields = [field
-        for cls in models.get_models()
+        for cls in models.get_models_from_apps(apps)
         for field in cls._meta.local_fields
         if isinstance(field, models.BooleanField) and not field.has_default()]
 

@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import sys
+
 from django.conf import settings
 from django.core import checks
-from django.core.checks import Error
+from django.core.checks import Error, tag
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registration import CheckFramework
 from django.core.checks.default_checks import check_1_6_compatibility
+from django.core.management import call_command
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_str
 
 from .models import SimpleModel, Book
+
+
+class DummyObj(object):
+    def __repr__(self):
+        return "obj"
 
 
 class SystemCheckFrameworkTests(TestCase):
@@ -25,14 +33,9 @@ class SystemCheckFrameworkTests(TestCase):
             return [1, 2, 3]
         framework = CheckFramework()
         framework.register(f)
-        errors = framework.run_checks()
+        errors = framework.run_checks(apps=None)
         self.assertEqual(errors, [1, 2, 3])
         self.assertEqual(calls[0], 1)
-
-
-class DummyObj(object):
-    def __repr__(self):
-        return "obj"
 
 
 class MessageTests(TestCase):
@@ -133,3 +136,43 @@ class Compatibility_1_6_Checks(TestCase):
             finally:
                 # Restore the ``default``
                 boolean_field.default = old_default
+
+
+def simple_system_check(**kwargs):
+    simple_system_check.kwargs = kwargs
+    return []
+
+
+@tag('simpletag')
+def tagged_system_check(**kwargs):
+    tagged_system_check.kwargs = kwargs
+    return []
+
+
+class CheckCommandTests(TestCase):
+
+    def setUp(self):
+        simple_system_check.kwargs = None
+        tagged_system_check.kwargs = None
+        self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
+
+    def tearDown(self):
+        sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
+
+    @override_system_checks([simple_system_check, tagged_system_check])
+    def test_simple_call(self):
+        call_command('check')
+        self.assertEqual(simple_system_check.kwargs, {'apps': None})
+        self.assertEqual(tagged_system_check.kwargs, {'apps': None})
+
+    @override_system_checks([simple_system_check, tagged_system_check])
+    def test_given_app(self):
+        call_command('check', 'auth', 'admin')
+        self.assertEqual(simple_system_check.kwargs, {'apps': ('auth', 'admin')})
+        self.assertEqual(tagged_system_check.kwargs, {'apps': ('auth', 'admin')})
+
+    @override_system_checks([simple_system_check, tagged_system_check])
+    def test_given_tag(self):
+        call_command('check', tags=['simpletag'])
+        self.assertEqual(simple_system_check.kwargs, None)
+        self.assertEqual(tagged_system_check.kwargs, {})
