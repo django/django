@@ -1,11 +1,12 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.util import ErrorList
-from django.forms.widgets import Media, HiddenInput
+from django.forms.widgets import HiddenInput
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils import six
 from django.utils.six.moves import xrange
@@ -55,8 +56,6 @@ class BaseFormSet(object):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
-        # construct the forms in the formset
-        self._construct_forms()
 
     def __str__(self):
         return self.as_table()
@@ -85,7 +84,10 @@ class BaseFormSet(object):
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
-                raise ValidationError('ManagementForm data is missing or has been tampered with')
+                raise ValidationError(
+                    _('ManagementForm data is missing or has been tampered with'),
+                    code='missing_management_form',
+                )
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -122,12 +124,14 @@ class BaseFormSet(object):
             initial_forms = len(self.initial) if self.initial else 0
         return initial_forms
 
-    def _construct_forms(self):
-        # instantiate all the forms and put them in self.forms
-        self.forms = []
+    @cached_property
+    def forms(self):
+        """
+        Instantiate forms at first property access.
+        """
         # DoS protection is included in total_form_count()
-        for i in xrange(self.total_form_count()):
-            self.forms.append(self._construct_form(i))
+        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        return forms
 
     def _construct_form(self, i, **kwargs):
         """
@@ -315,7 +319,9 @@ class BaseFormSet(object):
                 self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
-                    "Please submit %d or fewer forms.", self.max_num) % self.max_num)
+                    "Please submit %d or fewer forms.", self.max_num) % self.max_num,
+                    code='too_many_forms',
+                )
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:

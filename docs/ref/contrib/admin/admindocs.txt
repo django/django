@@ -156,6 +156,6 @@ Edit this object
 Using these bookmarklets requires that you are either logged into the
 :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to `True`, or that the
+:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``, or that the
 ``XViewMiddleware`` is installed and you are accessing the site from an IP
 address listed in :setting:`INTERNAL_IPS`.

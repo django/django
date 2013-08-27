@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # This coding header is significant for tests, as the debug view is parsing
 # files to search for such a header to decode the source file content
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import inspect
 import os
+import re
 import shutil
 import sys
 from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
+from unittest import skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -22,7 +24,6 @@ from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller)
-from django.utils.unittest import skipIf
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
@@ -68,6 +69,21 @@ class DebugViewTests(TestCase):
         for n in range(len(except_args)):
             self.assertRaises(BrokenException, self.client.get,
                 reverse('view_exception', args=(n,)))
+
+    def test_non_l10ned_numeric_ids(self):
+        """
+        Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
+        """
+        with self.settings(DEBUG=True, USE_L10N=True):
+            response = self.client.get('/views/raises500/')
+            # We look for a HTML fragment of the form
+            # '<div class="context" id="c38123208">', not '<div class="context" id="c38,123,208"'
+            self.assertContains(response, '<div class="context" id="', status_code=500)
+            match = re.search(b'<div class="context" id="(?P<id>[^"]+)">', response.content)
+            self.assertFalse(match is None)
+            id_repr = match.group('id')
+            self.assertFalse(re.search(b'[^c\d]', id_repr),
+                             "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr)
 
     def test_template_exceptions(self):
         for n in range(len(except_args)):

@@ -14,7 +14,7 @@ class TransactionMiddleware(object):
     def __init__(self):
         warnings.warn(
             "TransactionMiddleware is deprecated in favor of ATOMIC_REQUESTS.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
         if connection.settings_dict['ATOMIC_REQUESTS']:
             raise MiddlewareNotUsed
 

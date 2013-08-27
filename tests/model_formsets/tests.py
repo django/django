@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -8,7 +8,7 @@ from decimal import Decimal
 from django import forms
 from django.db import models
 from django.forms.models import (_get_foreign_key, inlineformset_factory,
-    modelformset_factory)
+    modelformset_factory, BaseModelFormSet)
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -32,6 +32,9 @@ class DeletionTests(TestCase):
             'form-0-DELETE': 'on',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
+        formset.save(commit=False)
+        self.assertEqual(Poet.objects.count(), 1)
+
         formset.save()
         self.assertTrue(formset.is_valid())
         self.assertEqual(Poet.objects.count(), 0)
@@ -386,6 +389,23 @@ class ModelFormsetTest(TestCase):
         formset = PostFormSet()
         self.assertFalse("subtitle" in formset.forms[0].fields)
 
+    def test_custom_queryset_init(self):
+        """
+        Test that a queryset can be overridden in the __init__ method.
+        https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
+        """
+        author1 = Author.objects.create(name='Charles Baudelaire')
+        author2 = Author.objects.create(name='Paul Verlaine')
+
+        class BaseAuthorFormSet(BaseModelFormSet):
+            def __init__(self, *args, **kwargs):
+                super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+                self.queryset = Author.objects.filter(name__startswith='Charles')
+
+        AuthorFormSet = modelformset_factory(Author, fields='__all__', formset=BaseAuthorFormSet)
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset.get_queryset()), 1)
+
     def test_model_inheritance(self):
         BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields="__all__")
         formset = BetterAuthorFormSet()
@@ -559,7 +579,7 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet2(instance=author)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(formset.forms[0].as_p(),
-            '<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label> <input id="id_bookwithcustompk_set-0-my_pk" type="number" name="bookwithcustompk_set-0-my_pk" maxlength="6" /></p>\n'
+            '<p><label for="id_bookwithcustompk_set-0-my_pk">My pk:</label> <input id="id_bookwithcustompk_set-0-my_pk" type="number" name="bookwithcustompk_set-0-my_pk" step="1" /></p>\n'
             '<p><label for="id_bookwithcustompk_set-0-title">Title:</label> <input id="id_bookwithcustompk_set-0-title" type="text" name="bookwithcustompk_set-0-title" maxlength="100" /><input type="hidden" name="bookwithcustompk_set-0-author" value="1" id="id_bookwithcustompk_set-0-author" /></p>')
 
         data = {

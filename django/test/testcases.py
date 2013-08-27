@@ -8,14 +8,15 @@ import json
 import os
 import re
 import sys
+import socket
+import threading
+import unittest
+from unittest import skipIf         # Imported here for backward compatibility
+from unittest.util import safe_repr
 try:
     from urllib.parse import urlsplit, urlunsplit
 except ImportError:     # Python 2
     from urlparse import urlsplit, urlunsplit
-import select
-import socket
-import threading
-import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
@@ -37,10 +38,8 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml)
-from django.utils import six, unittest as ut2
+from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.unittest import skipIf # Imported here for backward compatibility
-from django.utils.unittest.util import safe_repr
 from django.views.static import serve
 
 
@@ -156,15 +155,11 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
-class SimpleTestCase(ut2.TestCase):
+class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
-
-    _warn_txt = ("save_warnings_state/restore_warnings_state "
-        "django.test.*TestCase methods are deprecated. Use Python's "
-        "warnings.catch_warnings context manager instead.")
 
     def __call__(self, result=None):
         """
@@ -224,21 +219,6 @@ class SimpleTestCase(ut2.TestCase):
         if hasattr(self, '_old_root_urlconf'):
             settings.ROOT_URLCONF = self._old_root_urlconf
             clear_url_caches()
-
-    def save_warnings_state(self):
-        """
-        Saves the state of the warnings module
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        self._warnings_state = warnings.filters[:]
-
-    def restore_warnings_state(self):
-        """
-        Restores the state of the warnings module to the state
-        saved by save_warnings_state()
-        """
-        warnings.warn(self._warn_txt, DeprecationWarning, stacklevel=2)
-        warnings.filters = self._warnings_state[:]
 
     def settings(self, **kwargs):
         """
@@ -738,7 +718,7 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any pre-test setup. This includes:
 
         * If the class has an 'available_apps' attribute, restricting the app
-          cache to these applications, then firing post_syncdb -- it must run
+          cache to these applications, then firing post_migrate -- it must run
           with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
@@ -746,8 +726,7 @@ class TransactionTestCase(SimpleTestCase):
         if self.available_apps is not None:
             cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
-                flush.Command.emit_post_syncdb(
-                        verbosity=0, interactive=False, database=db_name)
+                flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
@@ -792,7 +771,7 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any post-test things. This includes:
 
         * Flushing the contents of the database, to leave a clean slate. If
-          the class has an 'available_apps' attribute, post_syncdb isn't fired.
+          the class has an 'available_apps' attribute, post_migrate isn't fired.
         * Force-closing the connection, so the next test gets a clean cursor.
         """
         try:
@@ -810,14 +789,14 @@ class TransactionTestCase(SimpleTestCase):
             cache.unset_available_apps()
 
     def _fixture_teardown(self):
-        # Allow TRUNCATE ... CASCADE and don't emit the post_syncdb signal
+        # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, skip_validation=True,
                          reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_syncdb=self.available_apps is not None)
+                         inhibit_post_migrate=self.available_apps is not None)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
@@ -899,18 +878,29 @@ class TestCase(TransactionTestCase):
             self.atomics[db_name].__exit__(None, None, None)
 
 
+class CheckCondition(object):
+    """Descriptor class for deferred condition checking"""
+    def __init__(self, cond_func):
+        self.cond_func = cond_func
+
+    def __get__(self, obj, objtype):
+        return self.cond_func()
+
+
 def _deferredSkip(condition, reason):
     def decorator(test_func):
         if not (isinstance(test_func, type) and
-                issubclass(test_func, TestCase)):
+                issubclass(test_func, unittest.TestCase)):
             @wraps(test_func)
             def skip_wrapper(*args, **kwargs):
                 if condition():
-                    raise ut2.SkipTest(reason)
+                    raise unittest.SkipTest(reason)
                 return test_func(*args, **kwargs)
             test_item = skip_wrapper
         else:
+            # Assume a class is decorated
             test_item = test_func
+            test_item.__unittest_skip__ = CheckCondition(condition)
         test_item.__unittest_skip_why__ = reason
         return test_item
     return decorator
@@ -941,104 +931,6 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
 
     def log_message(*args):
         pass
-
-
-if sys.version_info >= (3, 3, 0):
-    _ImprovedEvent = threading.Event
-elif sys.version_info >= (2, 7, 0):
-    _ImprovedEvent = threading._Event
-else:
-    class _ImprovedEvent(threading._Event):
-        """
-        Does the same as `threading.Event` except it overrides the wait() method
-        with some code borrowed from Python 2.7 to return the set state of the
-        event (see: http://hg.python.org/cpython/rev/b5aa8aa78c0f/). This allows
-        to know whether the wait() method exited normally or because of the
-        timeout. This class can be removed when Django supports only Python >= 2.7.
-        """
-
-        def wait(self, timeout=None):
-            self._Event__cond.acquire()
-            try:
-                if not self._Event__flag:
-                    self._Event__cond.wait(timeout)
-                return self._Event__flag
-            finally:
-                self._Event__cond.release()
-
-
-class StoppableWSGIServer(WSGIServer):
-    """
-    The code in this class is borrowed from the `SocketServer.BaseServer` class
-    in Python 2.6. The important functionality here is that the server is non-
-    blocking and that it can be shut down at any moment. This is made possible
-    by the server regularly polling the socket and checking if it has been
-    asked to stop.
-    Note for the future: Once Django stops supporting Python 2.6, this class
-    can be removed as `WSGIServer` will have this ability to shutdown on
-    demand and will not require the use of the _ImprovedEvent class whose code
-    is borrowed from Python 2.7.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(StoppableWSGIServer, self).__init__(*args, **kwargs)
-        self.__is_shut_down = _ImprovedEvent()
-        self.__serving = False
-
-    def serve_forever(self, poll_interval=0.5):
-        """
-        Handle one request at a time until shutdown.
-
-        Polls for shutdown every poll_interval seconds.
-        """
-        self.__serving = True
-        self.__is_shut_down.clear()
-        while self.__serving:
-            r, w, e = select.select([self], [], [], poll_interval)
-            if r:
-                self._handle_request_noblock()
-        self.__is_shut_down.set()
-
-    def shutdown(self):
-        """
-        Stops the serve_forever loop.
-
-        Blocks until the loop has finished. This must be called while
-        serve_forever() is running in another thread, or it will
-        deadlock.
-        """
-        self.__serving = False
-        if not self.__is_shut_down.wait(2):
-            raise RuntimeError(
-                "Failed to shutdown the live test server in 2 seconds. The "
-                "server might be stuck or generating a slow response.")
-
-    def handle_request(self):
-        """Handle one request, possibly blocking.
-        """
-        fd_sets = select.select([self], [], [], None)
-        if not fd_sets[0]:
-            return
-        self._handle_request_noblock()
-
-    def _handle_request_noblock(self):
-        """
-        Handle one request, without blocking.
-
-        I assume that select.select has returned that the socket is
-        readable before this function was called, so there should be
-        no risk of blocking in get_request().
-        """
-        try:
-            request, client_address = self.get_request()
-        except socket.error:
-            return
-        if self.verify_request(request, client_address):
-            try:
-                self.process_request(request, client_address)
-            except Exception:
-                self.handle_error(request, client_address)
-                self.close_request(request)
 
 
 class _MediaFilesHandler(StaticFilesHandler):
@@ -1090,7 +982,7 @@ class LiveServerThread(threading.Thread):
             # one that is free to use for the WSGI server.
             for index, port in enumerate(self.possible_ports):
                 try:
-                    self.httpd = StoppableWSGIServer(
+                    self.httpd = WSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
                 except WSGIServerException as e:
                     if (index + 1 < len(self.possible_ports) and
@@ -1147,7 +1039,7 @@ class LiveServerTestCase(TransactionTestCase):
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
-            if (conn.settings_dict['ENGINE'].rsplit('.', 1)[-1] in ('sqlite3', 'spatialite')
+            if (conn.vendor == 'sqlite'
                 and conn.settings_dict['NAME'] == ':memory:'):
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
@@ -1199,7 +1091,7 @@ class LiveServerTestCase(TransactionTestCase):
 
         # Restore sqlite connections' non-sharability
         for conn in connections.all():
-            if (conn.settings_dict['ENGINE'].rsplit('.', 1)[-1] in ('sqlite3', 'spatialite')
+            if (conn.vendor == 'sqlite'
                 and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 

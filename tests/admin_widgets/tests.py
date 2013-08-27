@@ -1,7 +1,8 @@
 # encoding: utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from unittest import TestCase
 
 from django import forms
 from django.conf import settings
@@ -15,8 +16,6 @@ from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import translation
-from django.utils.html import conditional_escape
-from django.utils.unittest import TestCase
 
 from . import models
 from .widgetadmin import site as widget_admin_site
@@ -83,19 +82,22 @@ class AdminFormfieldForDBFieldTests(TestCase):
     def testCharField(self):
         self.assertFormfield(models.Member, 'name', widgets.AdminTextInputWidget)
 
+    def testEmailField(self):
+        self.assertFormfield(models.Member, 'email', widgets.AdminEmailInputWidget)
+
     def testFileField(self):
         self.assertFormfield(models.Album, 'cover_art', widgets.AdminFileWidget)
 
     def testForeignKey(self):
-        self.assertFormfield(models.Event, 'band', forms.Select)
+        self.assertFormfield(models.Event, 'main_band', forms.Select)
 
     def testRawIDForeignKey(self):
-        self.assertFormfield(models.Event, 'band', widgets.ForeignKeyRawIdWidget,
-                             raw_id_fields=['band'])
+        self.assertFormfield(models.Event, 'main_band', widgets.ForeignKeyRawIdWidget,
+                             raw_id_fields=['main_band'])
 
     def testRadioFieldsForeignKey(self):
-        ff = self.assertFormfield(models.Event, 'band', widgets.AdminRadioSelect,
-                                  radio_fields={'band':admin.VERTICAL})
+        ff = self.assertFormfield(models.Event, 'main_band', widgets.AdminRadioSelect,
+                                  radio_fields={'main_band':admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
     def testManyToMany(self):
@@ -129,6 +131,23 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(f1.widget.attrs['maxlength'], '100')
         self.assertEqual(f2.widget.attrs['maxlength'], '20')
         self.assertEqual(f2.widget.attrs['size'], '10')
+
+    def testFormfieldOverridesWidgetInstancesForFieldsWithChoices(self):
+        """
+        Test that widget is actually overridden for fields with choices.
+        (#194303)
+        """
+        class MemberAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {'widget': forms.TextInput}
+            }
+        ma = MemberAdmin(models.Member, admin.site)
+        name_field = models.Member._meta.get_field('name')
+        gender_field = models.Member._meta.get_field('gender')
+        name = ma.formfield_for_dbfield(name_field, request=None)
+        gender = ma.formfield_for_dbfield(gender_field, request=None)
+        self.assertIsInstance(name.widget, forms.TextInput)
+        self.assertIsInstance(gender.widget, forms.TextInput)
 
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
@@ -198,7 +217,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "band": '%s' % pk,
+            "main_band": '%s' % pk,
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
@@ -212,7 +231,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         for test_str in ('Iñtërnâtiônàlizætiøn', "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
-                {"band": test_str})
+                {"main_band": test_str})
 
             self.assertContains(response,
                 'Select a valid choice. That choice is not one of the available choices.')
@@ -223,19 +242,26 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         self.assertEqual(lookup1, {'color__in': 'red,blue'})
         self.assertEqual(lookup1, lookup2)
 
+    def test_url_params_from_lookup_dict_callable(self):
+        def my_callable():
+            return 'works'
+        lookup1 = widgets.url_params_from_lookup_dict({'myfield': my_callable})
+        lookup2 = widgets.url_params_from_lookup_dict({'myfield': my_callable()})
+        self.assertEqual(lookup1, lookup2)
+
 
 class FilteredSelectMultipleWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'test')),
+            w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
     def test_stacked_render(self):
         w = widgets.FilteredSelectMultiple('test', True)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'test')),
+            w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
@@ -247,13 +273,13 @@ class AdminDateWidgetTest(DjangoTestCase):
         """
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10" />',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={'size': 20, 'class': 'myDateField'})
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
         )
 
@@ -265,13 +291,13 @@ class AdminTimeWidgetTest(DjangoTestCase):
         """
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8" />',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={'size': 20, 'class': 'myTimeField'})
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
         )
 
@@ -279,50 +305,55 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            w.render('test', datetime(2007, 12, 1, 9, 30)),
             '<p class="datetime">Date: <input value="2007-12-01" type="text" class="vDateField" name="test_0" size="10" /><br />Time: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
         )
 
     def test_localization(self):
         w = widgets.AdminSplitDateTime()
 
-        with self.settings(USE_L10N=True):
-            with translation.override('de-at'):
-                w.is_localized = True
-                self.assertHTMLEqual(
-                    conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
-                    '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
-                )
+        with self.settings(USE_L10N=True), translation.override('de-at'):
+            w.is_localized = True
+            self.assertHTMLEqual(
+                w.render('test', datetime(2007, 12, 1, 9, 30)),
+                '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+            )
 
 
 class AdminURLWidgetTest(DjangoTestCase):
     def test_render(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', '')),
-            '<input class="vURLField" name="test" type="text" />'
+            w.render('test', ''),
+            '<input class="vURLField" name="test" type="url" />'
         )
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example.com')),
-            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com" /></p>'
+            w.render('test', 'http://example.com'),
+            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com" /></p>'
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example-äüö.com')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com" /></p>'
+            w.render('test', 'http://example-äüö.com'),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
         )
 
     def test_render_quoting(self):
+        # WARNING: Don't use assertHTMLEqual in that testcase!
+        # assertHTMLEqual will get rid of some escapes which are tested here!
         w = widgets.AdminURLFieldWidget()
-        self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example.com/<sometag>some text</sometag>" /></p>'
+        self.assertEqual(
+            w.render('test', 'http://example.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
         )
-        self.assertHTMLEqual(
-            conditional_escape(w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')),
-            '<p class="url">Currently:<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change:<input class="vURLField" name="test" type="text" value="http://example-äüö.com/<sometag>some text</sometag>" /></p>'
+        self.assertEqual(
+            w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>'),
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+        )
+        self.assertEqual(
+            w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"'),
+            '<p class="url">Currently: <a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
         )
 
 
@@ -335,12 +366,12 @@ class AdminFileWidgetTest(DjangoTestCase):
 
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', album.cover_art)),
+            w.render('test', album.cover_art),
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % { 'STORAGE_URL': default_storage.url('') },
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', SimpleUploadedFile('test', b'content'))),
+            w.render('test', SimpleUploadedFile('test', b'content')),
             '<input type="file" name="test" />',
         )
 
@@ -355,7 +386,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', band.pk, attrs={})),
+            w.render('test', band.pk, attrs={}),
             '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
@@ -383,7 +414,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('honeycomb_widget', big_honeycomb.pk, attrs={})),
+            w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
             '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />&nbsp;<strong>Honeycomb object</strong>' % {'hcombpk': big_honeycomb.pk}
         )
 
@@ -396,7 +427,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('individual_widget', subject1.pk, attrs={})),
+            w.render('individual_widget', subject1.pk, attrs={}),
             '<input type="text" name="individual_widget" value="%(subj1pk)s" />&nbsp;<strong>Individual object</strong>' % {'subj1pk': subject1.pk}
         )
 
@@ -428,12 +459,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={})),
+            w.render('test', [m1.pk, m2.pk], attrs={}),
             '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', [m1.pk])),
+            w.render('test', [m1.pk]),
             '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
@@ -449,12 +480,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            conditional_escape(w.render('company_widget1', [c1.pk, c2.pk], attrs={})),
+            w.render('company_widget1', [c1.pk, c2.pk], attrs={}),
             '<input type="text" name="company_widget1" value="%(c1pk)s,%(c2pk)s" />' % {'c1pk': c1.pk, 'c2pk': c2.pk}
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('company_widget2', [c1.pk])),
+            w.render('company_widget2', [c1.pk]),
             '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
         )
 
@@ -523,6 +554,64 @@ class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(TIME_ZONE='Asia/Singapore')
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_date_time_picker_shortcuts(self):
+        """
+        Ensure that date/time/datetime picker shortcuts work in the current time zone.
+        Refs #20663.
+
+        This test case is fairly tricky, it relies on selenium still running the browser
+        in the default time zone "America/Chicago" despite `override_settings` changing
+        the time zone to "Asia/Singapore".
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        now = datetime.now()
+        error_margin = timedelta(seconds=10)
+
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        self.selenium.find_element_by_id('id_name').send_keys('test')
+
+        # Click on the "today" and "now" shortcuts.
+        shortcuts = self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .datetimeshortcuts')
+
+        for shortcut in shortcuts:
+            shortcut.find_element_by_tag_name('a').click()
+
+        # Check that there is a time zone mismatch warning.
+        # Warning: This would effectively fail if the TIME_ZONE defined in the
+        # settings has the same UTC offset as "Asia/Singapore" because the
+        # mismatch warning would be rightfully missing from the page.
+        self.selenium.find_elements_by_css_selector(
+            '.field-birthdate .timezonewarning')
+
+        # Submit the form.
+        self.selenium.find_element_by_tag_name('form').submit()
+        self.wait_page_loaded()
+
+        # Make sure that "now" in javascript is within 10 seconds
+        # from "now" on the server side.
+        member = models.Member.objects.get(name='test')
+        self.assertGreater(member.birthdate, now - error_margin)
+        self.assertLess(member.birthdate, now + error_margin)
+
+class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
@@ -757,4 +846,101 @@ class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleni
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def setUp(self):
+        models.Band.objects.create(id=42, name='Bogey Blues')
+        models.Band.objects.create(id=98, name='Green Potatoes')
+        super(AdminRawIdWidgetSeleniumFirefoxTests, self).setUp()
+
+    def test_foreignkey(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/event/add/'))
+        main_window = self.selenium.current_window_handle
+
+        # No value has been selected yet
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '')
+
+        # Open the popup window and click on a band
+        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.switch_to_window('id_main_band')
+        self.wait_page_loaded()
+        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '42')
+
+        # Reopen the popup window and click on another band
+        self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.selenium.switch_to_window('id_main_band')
+        self.wait_page_loaded()
+        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the other selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
+            '98')
+
+    def test_many_to_many(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/event/add/'))
+        main_window = self.selenium.current_window_handle
+
+        # No value has been selected yet
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '')
+
+        # Open the popup window and click on a band
+        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.switch_to_window('id_supporting_bands')
+        self.wait_page_loaded()
+        link = self.selenium.find_element_by_link_text('Bogey Blues')
+        self.assertTrue('/band/42/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the selected band's id
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '42')
+
+        # Reopen the popup window and click on another band
+        self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.selenium.switch_to_window('id_supporting_bands')
+        self.wait_page_loaded()
+        link = self.selenium.find_element_by_link_text('Green Potatoes')
+        self.assertTrue('/band/98/' in link.get_attribute('href'))
+        link.click()
+
+        # The field now contains the two selected bands' ids
+        self.selenium.switch_to_window(main_window)
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
+            '42,98')
+
+class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

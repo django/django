@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404, get_list_or_404
@@ -87,7 +87,7 @@ class GetObjectOr404Tests(TestCase):
         self.assertRaisesMessage(ValueError,
             "Object is of type 'str', but must be a Django Model, Manager, "
             "or QuerySet",
-            get_object_or_404, "Article", title__icontains="Run"
+            get_object_or_404, str("Article"), title__icontains="Run"
         )
 
         class CustomClass(object):

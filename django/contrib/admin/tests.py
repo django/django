@@ -1,8 +1,8 @@
 import os
+from unittest import SkipTest
 
 from django.test import LiveServerTestCase
 from django.utils.module_loading import import_by_path
-from django.utils.unittest import SkipTest
 from django.utils.translation import ugettext as _
 
 

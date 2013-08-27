@@ -225,7 +225,7 @@ DateMixin
     .. attribute:: date_field
 
         The name of the ``DateField`` or ``DateTimeField`` in the
-        ``QuerySet``'s model that the date-based archive should use to
+        ``QuerySet``’s model that the date-based archive should use to
         determine the list of objects to display on the page.
 
         When :doc:`time zone support </topics/i18n/timezones>` is enabled and
@@ -328,8 +328,3 @@ BaseDateListView
         :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
         and ``ordering`` are simply passed to
         :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.
-
-        .. versionchanged:: 1.5
-
-            The ``ordering`` parameter was added, and the default order was
-            changed to ascending.

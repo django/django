@@ -9,6 +9,7 @@ except ImportError:
     from django.utils.six.moves import _dummy_thread as thread
 from collections import namedtuple
 from contextlib import contextmanager
+from importlib import import_module
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
@@ -17,7 +18,6 @@ from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
-from django.utils.importlib import import_module
 from django.utils import six
 from django.utils import timezone
 
@@ -70,7 +70,9 @@ class BaseDatabaseWrapper(object):
         self._thread_ident = thread.get_ident()
 
     def __eq__(self, other):
-        return self.alias == other.alias
+        if isinstance(other, BaseDatabaseWrapper):
+            return self.alias == other.alias
+        return NotImplemented
 
     def __ne__(self, other):
         return not self == other
@@ -204,7 +206,7 @@ class BaseDatabaseWrapper(object):
 
     def _savepoint_allowed(self):
         # Savepoints cannot be created outside a transaction
-        return self.features.uses_savepoints and not self.autocommit
+        return self.features.uses_savepoints and not self.get_autocommit()
 
     ##### Generic savepoint management methods #####
 
@@ -279,15 +281,13 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_no_atomic_block()
 
-        self.ensure_connection()
-
         self.transaction_state.append(managed)
 
         if not managed and self.is_dirty() and not forced:
             self.commit()
             self.set_clean()
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
 
     def leave_transaction_management(self):
@@ -297,8 +297,6 @@ class BaseDatabaseWrapper(object):
         those from outside. (Commits are on connection level.)
         """
         self.validate_no_atomic_block()
-
-        self.ensure_connection()
 
         if self.transaction_state:
             del self.transaction_state[-1]
@@ -313,13 +311,20 @@ class BaseDatabaseWrapper(object):
 
         if self._dirty:
             self.rollback()
-            if managed == self.autocommit:
+            if managed == self.get_autocommit():
                 self.set_autocommit(not managed)
             raise TransactionManagementError(
                 "Transaction managed block ended with pending COMMIT/ROLLBACK")
 
-        if managed == self.autocommit:
+        if managed == self.get_autocommit():
             self.set_autocommit(not managed)
+
+    def get_autocommit(self):
+        """
+        Check the autocommit state.
+        """
+        self.ensure_connection()
+        return self.autocommit
 
     def set_autocommit(self, autocommit):
         """
@@ -329,6 +334,24 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
         self._set_autocommit(autocommit)
         self.autocommit = autocommit
+
+    def get_rollback(self):
+        """
+        Get the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        return self.needs_rollback
+
+    def set_rollback(self, rollback):
+        """
+        Set or unset the "needs rollback" flag -- for *advanced use* only.
+        """
+        if not self.in_atomic_block:
+            raise TransactionManagementError(
+                "The rollback flag doesn't work outside of an 'atomic' block.")
+        self.needs_rollback = rollback
 
     def validate_no_atomic_block(self):
         """
@@ -361,7 +384,7 @@ class BaseDatabaseWrapper(object):
         to decide in a managed block of code to decide whether there are open
         changes waiting for commit.
         """
-        if not self.autocommit:
+        if not self.get_autocommit():
             self._dirty = True
 
     def set_clean(self):
@@ -427,7 +450,7 @@ class BaseDatabaseWrapper(object):
         if self.connection is not None:
             # If the application didn't restore the original autocommit setting,
             # don't take chances, drop the connection.
-            if self.autocommit != self.settings_dict['AUTOCOMMIT']:
+            if self.get_autocommit() != self.settings_dict['AUTOCOMMIT']:
                 self.close()
                 return
 
@@ -497,6 +520,10 @@ class BaseDatabaseWrapper(object):
         Only required when autocommits_when_autocommit_is_off = True.
         """
         raise NotImplementedError
+
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        raise NotImplementedError()
 
 
 class BaseDatabaseFeatures(object):
@@ -572,6 +599,9 @@ class BaseDatabaseFeatures(object):
     # to remove any ordering?
     requires_explicit_null_ordering_when_grouping = False
 
+    # Does the backend order NULL values as largest or smallest?
+    nulls_order_largest = False
+
     # Is there a 1000 item limit on query parameters?
     supports_1000_query_parameters = True
 
@@ -603,6 +633,32 @@ class BaseDatabaseFeatures(object):
     # Does the backend decide to commit before SAVEPOINT statements
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
+
+    # Can we roll back DDL in a transaction?
+    can_rollback_ddl = False
+
+    # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
+    supports_combined_alters = False
+
+    # What's the maximum length for index names?
+    max_index_name_length = 63
+
+    # Does it support foreign keys?
+    supports_foreign_keys = True
+
+    # Does it support CHECK constraints?
+    supports_check_constraints = True
+
+    # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
+    # parameter passing? Note this can be provided by the backend even if not
+    # supported by the Python driver
+    supports_paramstyle_pyformat = True
+
+    # Does the backend require literal defaults, rather than parameterised ones?
+    requires_literal_defaults = False
+
+    # Does the backend require a connection reset after each material schema change?
+    connection_persists_old_columns = False
 
     def __init__(self, connection):
         self.connection = connection
@@ -1139,6 +1195,7 @@ FieldInfo = namedtuple('FieldInfo',
     'name type_code display_size internal_size precision scale null_ok'
 )
 
+
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities
@@ -1195,7 +1252,7 @@ class BaseDatabaseIntrospection(object):
             for model in models.get_models(app):
                 if not model._meta.managed:
                     continue
-                if not router.allow_syncdb(self.connection.alias, model):
+                if not router.allow_migrate(self.connection.alias, model):
                     continue
                 tables.add(model._meta.db_table)
                 tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
@@ -1215,7 +1272,7 @@ class BaseDatabaseIntrospection(object):
         all_models = []
         for app in models.get_apps():
             for model in models.get_models(app):
-                if router.allow_syncdb(self.connection.alias, model):
+                if router.allow_migrate(self.connection.alias, model):
                     all_models.append(model)
         tables = list(map(self.table_name_converter, tables))
         return set([
@@ -1236,7 +1293,7 @@ class BaseDatabaseIntrospection(object):
                     continue
                 if model._meta.swapped:
                     continue
-                if not router.allow_syncdb(self.connection.alias, model):
+                if not router.allow_migrate(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
                     if isinstance(f, models.AutoField):
@@ -1275,6 +1332,25 @@ class BaseDatabaseIntrospection(object):
              'unique': boolean representing whether it's a unique index}
 
         Only single-column indexes are introspected.
+        """
+        raise NotImplementedError
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index)
+        across one or more columns.
+
+        Returns a dict mapping constraint names to their attributes,
+        where attributes is a dict with keys:
+         * columns: List of columns this covers
+         * primary_key: True if primary key, False otherwise
+         * unique: True if this is a unique constraint, False otherwise
+         * foreign_key: (table, column) of target, or None
+         * check: True if check constraint, False otherwise
+         * index: True if index, False otherwise.
+
+        Some backends may return special constraint names that don't exist
+        if they don't name constraints of a certain type (e.g. SQLite)
         """
         raise NotImplementedError
 

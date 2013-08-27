@@ -64,8 +64,12 @@ def permission_required(perm, login_url=None, raise_exception=False):
     is raised.
     """
     def check_perms(user):
+        if not isinstance(perm, (list, tuple)):
+            perms = (perm, )
+        else:
+            perms = perm
         # First check if the user has the permission (even anon users)
-        if user.has_perm(perm):
+        if user.has_perms(perms):
             return True
         # In case the 403 handler should be called raise the exception
         if raise_exception:

@@ -1,0 +1,329 @@
+============================================
+Django 1.7 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 1.7!
+
+These release notes cover the `new features`_, as well as some `backwards
+incompatible changes`_ you'll want to be aware of when upgrading from Django
+1.6 or older versions. We've also dropped some features, which are detailed in
+:doc:`our deprecation plan </internals/deprecation>`, and we've `begun the
+deprecation process for some features`_.
+
+.. _`new features`: `What's new in Django 1.7`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
+
+Python compatibility
+====================
+
+Django 1.7 requires Python 2.7 or above, though we **highly recommend**
+the latest minor release. Support for Python 2.6 has been dropped.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.7 or newer as their default
+version. If you're still using Python 2.6, however, you'll need to stick to
+Django 1.6 until you can upgrade your Python version. Per :doc:`our support
+policy </internals/release-process>`, Django 1.6 will continue to receive
+security support until the release of Django 1.8.
+
+What's new in Django 1.7
+========================
+
+Schema migrations
+~~~~~~~~~~~~~~~~~
+
+Django now has built-in support for schema migrations. It allows models
+to be updated, changed, and deleted by creating migration files that represent
+the model changes and which can be run on any development, staging or production
+database.
+
+Migrations are covered in :doc:`their own documentation</topics/migrations>`,
+but a few of the key features are:
+
+* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry - 
+  calls to ``syncdb`` will still work as before.
+
+* A new ``makemigrations`` command provides an easy way to autodetect changes
+  to your models and make migrations for them.
+
+* :data:`~django.db.models.signals.post_syncdb` and
+  :data:`~django.db.models.signals.post_syncdb` have been renamed to
+  :data:`~django.db.models.signals.pre_migrate` and
+  :data:`~django.db.models.signals.post_migrate` respectively. The
+  ``create_models``/``created_models`` argument has also been deprecated.
+
+* The ``allow_syncdb`` method on database routers is now called ``allow_migrate``,
+  but still performs the same function. Routers with ``allow_syncdb`` methods
+  will still work, but that method name is deprecated and you should change
+  it as soon as possible (nothing more than renaming is required).
+
+New method on Field subclasses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To help power both schema migrations and composite keys, the :class:`~django.db.models.Field` API now
+has a new required method: ``deconstruct()``.
+
+This method takes no arguments, and returns a tuple of four items:
+
+* ``name``: The field's attribute name on its parent model, or None if it is not part of a model
+* ``path``: A dotted, Python path to the class of this field, including the class name.
+* ``args``: Positional arguments, as a list
+* ``kwargs``: Keyword arguments, as a dict
+
+These four values allow any field to be serialized into a file, as well as
+allowing the field to be copied safely, both essential parts of these new features.
+
+This change should not affect you unless you write custom Field subclasses;
+if you do, you may need to reimplement the ``deconstruct()`` method if your
+subclass changes the method signature of ``__init__`` in any way. If your
+field just inherits from a built-in Django field and doesn't override ``__init__``,
+no changes are necessary.
+
+If you do need to override ``deconstruct()``, a good place to start is the
+built-in Django fields (``django/db/models/fields/__init__.py``) as several
+fields, including ``DecimalField`` and ``DateField``, override it and show how
+to call the method on the superclass and simply add or remove extra arguments.
+
+Calling custom ``QuerySet`` methods from the ``Manager``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
+class method has been added to :ref:`create Manager with QuerySet methods
+<create-manager-with-queryset-methods>`.
+
+Admin shortcuts support time zones
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "today" and "now" shortcuts next to date and time input widgets in the
+admin are now operating in the :ref:`current time zone
+<default-current-time-zone>`. Previously, they used the browser time zone,
+which could result in saving the wrong value when it didn't match the current
+time zone on the server.
+
+In addition, the widgets now display a help message when the browser and
+server time zone are different, to clarify how the value inserted in the field
+will be interpreted.
+
+Minor features
+~~~~~~~~~~~~~~
+
+* The new :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
+* The ``enter`` argument was added to the
+  :data:`~django.test.signals.setting_changed` signal.
+
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
+
+* The :meth:`Context.push() <django.template.Context.push>` method now returns
+  a context manager which automatically calls :meth:`pop()
+  <django.template.Context.pop>` upon exiting the ``with`` statement.
+  Additionally, :meth:`push() <django.template.Context.push>` now accepts
+  parameters that are passed to the ``dict`` constructor used to build the new
+  context level.
+
+* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
+  allowing the ``published`` element to be included in the feed (which
+  relies on ``pubdate``).
+
+* Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
+  property for rounded corners rather than GIF background images.
+
+* Some admin templates now have ``app-<app_name>`` and ``model-<model_name>``
+  classes in their ``<body>`` tag to allow customizing the CSS per app or per
+  model.
+
+* The admin changelist cells now have a ``field-<field_name>`` class in the
+  HTML to enable style customizations.
+
+* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
+  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+
+* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+  disable the colorization of management command output.
+
+* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
+  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
+  header in the response. This makes it possible for the
+  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
+  conditional ``GET`` requests for sitemaps which set ``lastmod``.
+
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
+* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
+  customize the "empty choice" label by including a tuple with an empty string
+  or ``None`` for the key and the custom label as the value. The default blank
+  option ``"----------"`` will be omitted in this case.
+
+* The admin's search fields can now be customized per-request thanks to the new
+  :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
+
+* The :meth:`ModelAdmin.get_fields()
+  <django.contrib.admin.ModelAdmin.get_fields>` method may be overridden to
+  customize the value of :attr:`ModelAdmin.fields
+  <django.contrib.admin.ModelAdmin.fields>`.
+
+* :func:`django.contrib.auth.views.password_reset` takes an optional
+  ``html_email_template_name`` parameter used to send a multipart HTML email
+  for password resets.
+
+* :class:`~django.forms.MultiValueField` allows optional subfields by setting
+  the ``require_all_fields`` argument to ``False``. The ``required`` attribute
+  for each individual field will be respected, and a new ``incomplete``
+  validation error will be raised when any required fields are empty.
+
+* The :meth:`~django.forms.Form.clean` method on a form no longer needs to
+  return ``self.cleaned_data``. If it does return a changed dictionary then
+  that will still be used.
+
+* The new :attr:`~django.db.models.Options.default_permissions` model
+  ``Meta`` option allows you to customize (or disable) creation of the default
+  add, change, and delete permissions.
+
+* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
+  take a list of permissions as well as a single permission.
+
+* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
+  the file system permissions of directories created during file upload, like
+  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+
+* Explicit :class:`~django.db.models.OneToOneField` for
+  :ref:`multi-table-inheritance` are now discovered in abstract classes.
+
+* The ``<label>`` and ``<input>`` tags rendered by
+  :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
+  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
+  Each radio button or checkbox includes an ``id_for_label`` attribute to
+  output the element's ID.
+
+* Any ``**kwargs`` passed to
+  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
+  underlying :meth:`~django.core.mail.send_mail()` call.
+
+* The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
+  the result in a variable.
+
+* The backends for :mod:`django.contrib.messages` that use cookies, will now
+  follow the :setting:`SESSION_COOKIE_SECURE` and
+  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+
+Backwards incompatible changes in 1.7
+=====================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation plan </internals/deprecation>` for any features that
+    have been removed. If you haven't updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
+allow_syncdb/allow_migrate
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While Django will still look at ``allow_syncdb`` methods even though they
+should be renamed to ``allow_migrate``, there is a subtle difference in which
+models get passed to these methods.
+
+For apps with migrations, ``allow_migrate`` will now get passed
+:ref:`historical models <historical-models>`, which are special versioned models
+without custom attributes, methods or managers. Make sure your ``allow_migrate``
+methods are only referring to fields or other items in ``model._meta``.
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The :meth:`django.core.files.uploadhandler.FileUploadHandler.new_file()`
+  method is now passed an additional ``content_type_extra`` parameter. If you
+  have a custom :class:`~django.core.files.uploadhandler.FileUploadHandler`
+  that implements ``new_file()``, be sure it accepts this new parameter.
+
+* :class:`ModelFormSet<django.forms.models.BaseModelFormSet>`’s no longer
+  delete instances when ``save(commit=False)`` is called. See
+  :attr:`~django.forms.formsets.BaseFormSet.can_delete` for instructions on how
+  to manually delete objects from deleted forms.
+
+* Loading empty fixtures emits a ``RuntimeWarning`` rather than raising
+  :class:`~django.core.management.CommandError`.
+
+* :func:`django.contrib.staticfiles.views.serve` will now raise an
+  :exc:`~django.http.Http404` exception instead of
+  :exc:`~django.core.exceptions.ImproperlyConfigured` when :setting:`DEBUG`
+  is ``False``. This change removes the need to conditionally add the view to
+  your root URLconf, which in turn makes it safe to reverse by name. It also
+  removes the ability for visitors to generate spurious HTTP 500 errors by
+  requesting static files that don't exist or haven't been collected yet.
+
+* The :meth:`django.db.models.Model.__eq__` method is now defined in a
+  way where instances of a proxy model and its base model are considered
+  equal when primary keys match. Previously only instances of exact same
+  class were considered equal on primary key match.
+
+* The :meth:`django.db.models.Model.__eq__` method has changed such that
+  two ``Model`` instances without primary key values won't be considered
+  equal (unless they are the same instance).
+  
+* The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
+  when called on an instance without a primary key value. This is done to
+  avoid mutable ``__hash__`` values in containers.
+
+Features deprecated in 1.7
+==========================
+
+``django.utils.dictconfig``/``django.utils.importlib``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
+respectively :mod:`logging.config` and :mod:`importlib` provided for Python
+versions prior to 2.7. They have been deprecated.
+
+``django.utils.unittest``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.unittest`` provided uniform access to the ``unittest2`` library
+on all Python versions. Since ``unittest2`` became the standard library's
+:mod:`unittest` module in Python 2.7, and Django 1.7 drops support for older
+Python versions, this module isn't useful anymore. It has been deprecated. Use
+:mod:`unittest` instead.
+
+``django.utils.datastructures.SortedDict``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As :class:`~collections.OrderedDict` was added to the standard library in
+Python 2.7, :class:`~django.utils.datastructures.SortedDict` is no longer
+needed and has been deprecated.
+
+Custom SQL location for models package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, if models were organized in a package (``myapp/models/``) rather
+than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
+<initial-sql>` in ``myapp/models/sql/``. This bug has been fixed so that Django
+will search ``myapp/sql/`` as documented. The old location will continue to
+work until Django 1.9.
+
+``declared_fieldsets`` attribute on ``ModelAdmin.``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.declared_fieldsets`` was deprecated. Despite being a private API,
+it will go through a regular deprecation path. This attribute was mostly used
+by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
+a bug and has been addressed.
+
+``syncdb``
+~~~~~~~~~~
+
+The ``syncdb`` command has been deprecated in favour of the new ``migrate``
+command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
+more, so it's safe to just change the name you're calling and nothing else.

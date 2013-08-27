@@ -661,45 +661,34 @@ a.deletelink:hover {
 .object-tools li {
     display: block;
     float: left;
-    background: url(../img/tool-left.gif) 0 0 no-repeat;
-    padding: 0 0 0 8px;
-    margin-left: 2px;
+    margin-left: 5px;
     height: 16px;
 }
 
-.object-tools li:hover {
-    background: url(../img/tool-left_over.gif) 0 0 no-repeat;
+.object-tools a {
+    border-radius: 15px;
 }
 
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
     color: white;
-    padding: .1em 14px .1em 8px;
-    height: 14px;
-    background: #999 url(../img/tool-right.gif) 100% 0 no-repeat;
+    padding: .2em 10px;
+    background: #999;
 }
 
 .object-tools a:hover, .object-tools li:hover a {
-    background: #5b80b2 url(../img/tool-right_over.gif) 100% 0 no-repeat;
+    background-color: #5b80b2;
 }
 
 .object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/tooltag-arrowright.gif) top right no-repeat;
-    padding-right: 28px;
-}
-
-.object-tools a.viewsitelink:hover, .object-tools a.golink:hover {
-    background: #5b80b2 url(../img/tooltag-arrowright_over.gif) top right no-repeat;
+    background: #999 url(../img/tooltag-arrowright.png) 95% center no-repeat;
+    padding-right: 26px;
 }
 
 .object-tools a.addlink {
-    background: #999 url(../img/tooltag-add.gif) top right no-repeat;
-    padding-right: 28px;
-}
-
-.object-tools a.addlink:hover {
-    background: #5b80b2 url(../img/tooltag-add_over.gif) top right no-repeat;
+    background: #999 url(../img/tooltag-add.png) 95% center no-repeat;
+    padding-right: 26px;
 }
 
 /* OBJECT HISTORY */
@@ -837,4 +826,3 @@ table#change-history tbody th {
     background: #eee url(../img/nav-bg.gif) bottom left repeat-x;
     color: #666;
 }
-

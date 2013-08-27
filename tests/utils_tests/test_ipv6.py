@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
-from django.utils import unittest
+import unittest
+
 from django.utils.ipv6 import is_valid_ipv6_address, clean_ipv6_address
 
 class TestUtilsIPv6(unittest.TestCase):

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import base64
 import calendar
 import datetime
 import re
@@ -11,7 +12,7 @@ except ImportError:     # Python 2
     import urlparse
     urllib_parse.urlparse = urlparse.urlparse
 
-
+from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
@@ -108,8 +109,7 @@ def http_date(epoch_seconds=None):
 
     Outputs a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
     """
-    rfcdate = formatdate(epoch_seconds)
-    return '%s GMT' % rfcdate[:25]
+    return formatdate(epoch_seconds, usegmt=True)
 
 def parse_http_date(date):
     """
@@ -202,6 +202,24 @@ def int_to_base36(i):
         factor -= 1
     return ''.join(base36)
 
+def urlsafe_base64_encode(s):
+    """
+    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    equal signs.
+    """
+    return base64.urlsafe_b64encode(s).rstrip(b'\n=')
+
+def urlsafe_base64_decode(s):
+    """
+    Decodes a base64 encoded string, adding back any trailing equal signs that
+    might have been stripped.
+    """
+    s = s.encode('utf-8') # base64encode should only return ASCII.
+    try:
+        return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
+    except (LookupError, BinasciiError) as e:
+        raise ValueError(e)
+
 def parse_etags(etag_str):
     """
     Parses a string with one or several etags passed in If-None-Match and
@@ -234,11 +252,12 @@ def same_origin(url1, url2):
 def is_safe_url(url, host=None):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
-    a different host).
+    a different host and uses a safe scheme).
 
     Always returns ``False`` on an empty url.
     """
     if not url:
         return False
-    netloc = urllib_parse.urlparse(url)[1]
-    return not netloc or netloc == host
+    url_info = urllib_parse.urlparse(url)
+    return (not url_info.netloc or url_info.netloc == host) and \
+        (not url_info.scheme or url_info.scheme in ['http', 'https'])

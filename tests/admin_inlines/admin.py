@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib import admin
 from django import forms
 
@@ -12,8 +10,26 @@ class BookInline(admin.TabularInline):
     model = Author.books.through
 
 
+class NonAutoPKBookTabularInline(admin.TabularInline):
+    model = NonAutoPKBook
+
+
+class NonAutoPKBookStackedInline(admin.StackedInline):
+    model = NonAutoPKBook
+
+
+class EditablePKBookTabularInline(admin.TabularInline):
+    model = EditablePKBook
+
+
+class EditablePKBookStackedInline(admin.StackedInline):
+    model = EditablePKBook
+
+
 class AuthorAdmin(admin.ModelAdmin):
-    inlines = [BookInline]
+    inlines = [BookInline,
+        NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
+        EditablePKBookTabularInline, EditablePKBookStackedInline]
 
 
 class InnerInline(admin.StackedInline):

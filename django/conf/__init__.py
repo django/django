@@ -6,6 +6,7 @@ variable, and then from django.conf.global_settings; see the global settings fil
 a list of all possible variables.
 """
 
+import importlib
 import logging
 import os
 import sys
@@ -15,7 +16,6 @@ import warnings
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils import importlib
 from django.utils.module_loading import import_by_path
 from django.utils import six
 
@@ -59,14 +59,10 @@ class LazySettings(LazyObject):
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
         if not sys.warnoptions:
-            try:
-                # Route warnings through python logging
-                logging.captureWarnings(True)
-                # Allow DeprecationWarnings through the warnings filters
-                warnings.simplefilter("default", DeprecationWarning)
-            except AttributeError:
-                # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
-                pass
+            # Route warnings through python logging
+            logging.captureWarnings(True)
+            # Allow DeprecationWarnings through the warnings filters
+            warnings.simplefilter("default", DeprecationWarning)
 
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING
@@ -111,6 +107,11 @@ class BaseSettings(object):
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
+        elif name == "INSTALLED_APPS":
+            value = list(value)  # force evaluation of generators on Python 3
+            if len(value) != len(set(value)):
+                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
+
         object.__setattr__(self, name, value)
 
 
@@ -132,19 +133,17 @@ class Settings(BaseSettings):
                 % (self.SETTINGS_MODULE, e)
             )
 
-        # Settings that should be converted into tuples if they're mistakenly entered
-        # as strings.
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
 
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
+
                 if setting in tuple_settings and \
                         isinstance(setting_value, six.string_types):
-                    warnings.warn("The %s setting must be a tuple. Please fix your "
-                                  "settings, as auto-correction is now deprecated." % setting,
-                                  DeprecationWarning, stacklevel=2)
-                    setting_value = (setting_value,) # In case the user forgot the comma.
+                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                            "Please fix your settings." % setting)
+
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:

@@ -78,7 +78,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     name = 'oracle'
     oracle = True
-    valid_aggregates = dict([(a, None) for a in ('Union', 'Extent')])
+    valid_aggregates = {'Union', 'Extent'}
 
     Adapter = OracleSpatialAdapter
     Adaptor = Adapter # Backwards-compatibility alias.

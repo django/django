@@ -1055,6 +1055,26 @@ EMAIL_USE_TLS
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL_USE_SSL`.
+
+.. setting:: EMAIL_USE_SSL
+
+EMAIL_USE_SSL
+-------------
+
+.. versionadded:: 1.7
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
+
+Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
+exclusive, so only set one of those settings to ``True``.
 
 .. setting:: FILE_CHARSET
 
@@ -1087,6 +1107,19 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
+
+.. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
+
+FILE_UPLOAD_DIRECTORY_PERMISSIONS
+---------------------------------
+
+.. versionadded:: 1.7
+
+Default: ``None``
+
+The numeric mode to apply to directories created in the process of
+uploading files. This value mirrors the functionality and caveats of
+the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
@@ -1257,10 +1290,21 @@ LANGUAGE_CODE
 
 Default: ``'en-us'``
 
-A string representing the language code for this installation. This should be
-in standard :term:`language format<language code>`. For example, U.S. English
+A string representing the language code for this installation. This should be in
+standard :term:`language ID format <language code>`. For example, U.S. English
 is ``"en-us"``. See also the `list of language identifiers`_ and
 :doc:`/topics/i18n/index`.
+
+:setting:`USE_I18N` must be active for this setting to have any effect.
+
+It serves two purposes:
+
+* If the locale middleware isn't in use, it decides which translation is served
+  to all users.
+* If the locale middleware is active, it provides the fallback translation when
+  no translation exist for a given literal to the user's preferred language.
+
+See :ref:`how-django-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
@@ -1350,15 +1394,21 @@ A data structure containing configuration information. The contents of
 this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
-The default logging configuration passes HTTP 500 server errors to an
-email log handler; all other log messages are given to a NullHandler.
+Among other things, the default logging configuration passes HTTP 500 server
+errors to an email log handler when :setting:`DEBUG` is ``False``. See also
+:ref:`configuring-logging`.
+
+You can see the default logging configuration by looking in
+``django/utils/log.py`` (or view the `online source`__).
+
+__ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
 LOGGING_CONFIG
 --------------
 
-Default: ``'django.utils.log.dictConfig'``
+Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
 Django project. Points at a instance of Python's `dictConfig`_
@@ -1366,6 +1416,10 @@ configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. versionchanged:: 1.7
+
+    Previously, the default value was ``'django.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -1499,6 +1553,8 @@ unpredictable value.
 :djadmin:`django-admin.py startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
+Django will refuse to start if :setting:`SECRET_KEY` is not set.
+
 .. warning::
 
     **Keep this value secret.**
@@ -1506,10 +1562,6 @@ randomly-generated ``SECRET_KEY`` to each new project.
     Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
-
-.. versionchanged:: 1.5
-
-    Django will now refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
@@ -1714,7 +1766,7 @@ Default::
 
 A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
-used instead of a string. The first item in the tuple should be the ``Loader``'s
+used instead of a string. The first item in the tuple should be the ``Loader``’s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
@@ -2043,22 +2095,6 @@ A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
-.. setting:: AUTH_PROFILE_MODULE
-
-AUTH_PROFILE_MODULE
--------------------
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Default: Not defined
-
-The site-specific user profile model used by this site. See
-:ref:`User profiles <auth-profiles>`.
-
 .. setting:: AUTH_USER_MODEL
 
 AUTH_USER_MODEL
@@ -2081,13 +2117,9 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
@@ -2099,13 +2131,9 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-.. versionchanged:: 1.5
-
-    This setting now also accepts view function names and
-    :ref:`named URL patterns <naming-url-patterns>` which can be used to reduce
-    configuration duplication since you no longer have to define the URL in two
-    places (``settings`` and URLconf).
-    For backward compatibility reasons the default remains unchanged.
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGOUT_URL
 
@@ -2235,8 +2263,11 @@ Controls where Django stores message data. Valid values are:
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
-The backends that use cookies -- ``CookieStorage`` and ``FallbackStorage`` --
-use the value of :setting:`SESSION_COOKIE_DOMAIN` when setting their cookies.
+The backends that use cookies --
+:class:`~django.contrib.messages.storage.cookie.CookieStorage` and
+:class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
+use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
+and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
@@ -2312,6 +2343,8 @@ standard domain cookies, existing user cookies will be set to the old
 domain. This may result in them being unable to log in as long as these cookies
 persist.
 
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
 .. setting:: SESSION_COOKIE_HTTPONLY
 
 SESSION_COOKIE_HTTPONLY
@@ -2328,6 +2361,10 @@ is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
+
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
@@ -2366,6 +2403,10 @@ Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
 
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
 .. setting:: SESSION_ENGINE
 
 SESSION_ENGINE
@@ -2373,7 +2414,7 @@ SESSION_ENGINE
 
 Default: ``django.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Valid values are:
+Controls where Django stores session data. Included engines are:
 
 * ``'django.contrib.sessions.backends.db'``
 * ``'django.contrib.sessions.backends.file'``
@@ -2416,6 +2457,28 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
+.. setting:: SESSION_SERIALIZER
+
+SESSION_SERIALIZER
+------------------
+
+Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+.. versionchanged:: 1.6
+
+    The default switched from
+    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
+    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
+
+Full import path of a serializer class to use for serializing session data.
+Included serializers are:
+
+* ``'django.contrib.sessions.serializers.PickleSerializer'``
+* ``'django.contrib.sessions.serializers.JSONSerializer'``
+
+See :ref:`session_serialization` for details, including a warning regarding
+possible remote code execution when using
+:class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
 Sites
 =====
@@ -2464,7 +2527,7 @@ files</howto/static-files/index>` for more details about usage.
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
-    :doc:`staticfiles</ref/contrib/staticfiles>`'s
+    :doc:`staticfiles</ref/contrib/staticfiles>`’s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
     :setting:`STATICFILES_DIRS`).
@@ -2481,7 +2544,7 @@ URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
-:ref:`media definitions<form-media-paths>` and the
+:ref:`asset definitions<form-asset-paths>` (the ``Media`` class) and the
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.
@@ -2564,7 +2627,9 @@ various locations.
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
 (using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``)
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+files with the same name are present, the first file that is found will be
+used.
 
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to

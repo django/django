@@ -105,7 +105,7 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
-        if django.VERSION[-1] == 0:
+        if django.VERSION[-2] != 'final':
             docs_version = 'dev'
         else:
             docs_version = '%d.%d' % django.VERSION[:2]

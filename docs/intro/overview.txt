@@ -31,6 +31,7 @@ the file ``mysite/news/models.py``::
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.full_name
 
@@ -40,6 +41,7 @@ the file ``mysite/news/models.py``::
         content = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.headline
 
@@ -51,10 +53,11 @@ automatically:
 
 .. code-block:: bash
 
-    manage.py syncdb
+    manage.py migrate
 
-The :djadmin:`syncdb` command looks at all your available models and creates
-tables in your database for whichever tables don't already exist.
+The :djadmin:`migrate` command looks at all your available models and creates
+tables in your database for whichever tables don't already exist, as well as
+optionally providing :doc:`much richer schema control </topics/migrations>`.
 
 Enjoy the free API
 ==================

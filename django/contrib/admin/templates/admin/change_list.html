@@ -1,6 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_static admin_list %}
-{% load admin_urls %}
+{% load i18n admin_urls admin_static admin_list %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -33,7 +32,7 @@
 {% endif %}{% endif %}
 {% endblock %}
 
-{% block bodyclass %}change-list{% endblock %}
+{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} change-list{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
@@ -54,7 +53,8 @@
         <ul class="object-tools">
           {% block object-tools-items %}
             <li>
-              <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+              {% url cl.opts|admin_urlname:'add' as add_url %}
+              <a href="{% add_preserved_filters add_url is_popup %}" class="addlink">
                 {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
               </a>
             </li>

@@ -4,7 +4,9 @@ import threading
 from django.dispatch import saferef
 from django.utils.six.moves import xrange
 
+
 WEAKREF_TYPES = (weakref.ReferenceType, saferef.BoundMethodWeakref)
+
 
 def _make_id(target):
     if hasattr(target, '__func__'):
@@ -14,6 +16,7 @@ NONE_ID = _make_id(None)
 
 # A marker for caching
 NO_RECEIVERS = object()
+
 
 class Signal(object):
     """
@@ -42,7 +45,7 @@ class Signal(object):
         # distinct sender we cache the receivers that sender has in
         # 'sender_receivers_cache'. The cache is cleaned when .connect() or
         # .disconnect() is called and populated on send().
-        self.sender_receivers_cache = {}
+        self.sender_receivers_cache = weakref.WeakKeyDictionary() if use_caching else {}
 
     def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
         """
@@ -116,7 +119,7 @@ class Signal(object):
                     break
             else:
                 self.receivers.append((lookup_key, receiver))
-            self.sender_receivers_cache = {}
+            self.sender_receivers_cache.clear()
 
     def disconnect(self, receiver=None, sender=None, weak=True, dispatch_uid=None):
         """
@@ -151,7 +154,7 @@ class Signal(object):
                 if r_key == lookup_key:
                     del self.receivers[index]
                     break
-            self.sender_receivers_cache = {}
+            self.sender_receivers_cache.clear()
 
     def has_listeners(self, sender=None):
         return bool(self._live_receivers(sender))
@@ -276,7 +279,8 @@ class Signal(object):
                 for idx, (r_key, _) in enumerate(reversed(self.receivers)):
                     if r_key == key:
                         del self.receivers[last_idx - idx]
-            self.sender_receivers_cache = {}
+            self.sender_receivers_cache.clear()
+
 
 def receiver(signal, **kwargs):
     """

@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-import warnings
+from __future__ import unicode_literals
+
+import unittest
 
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, IgnorePendingDeprecationWarningsMixin
+from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
-from django.utils import unittest
-from django.utils.unittest import skip
 
 from .models import Person
 
@@ -25,6 +24,29 @@ class SkippingTestCase(TestCase):
             raise ValueError
 
         self.assertRaises(ValueError, test_func)
+
+
+class SkippingClassTestCase(TestCase):
+    def test_skip_class_unless_db_feature(self):
+        @skipUnlessDBFeature("__class__")
+        class NotSkippedTests(unittest.TestCase):
+            def test_dummy(self):
+                return
+
+        @skipIfDBFeature("__class__")
+        class SkippedTests(unittest.TestCase):
+            def test_will_be_skipped(self):
+                self.fail("We should never arrive here.")
+
+        test_suite = unittest.TestSuite()
+        test_suite.addTest(NotSkippedTests('test_dummy'))
+        try:
+            test_suite.addTest(SkippedTests('test_will_be_skipped'))
+        except unittest.SkipTest:
+            self.fail("SkipTest should not be raised at this stage")
+        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
+        self.assertEqual(result.testsRun, 2)
+        self.assertEqual(len(result.skipped), 1)
 
 
 class AssertNumQueriesTests(TestCase):
@@ -130,9 +152,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertEqual(2, len(captured_queries))
 
     def test_failure(self):
-        with self.assertRaises(TypeError):
-            with CaptureQueriesContext(connection):
-                raise TypeError
+        with self.assertRaises(TypeError), CaptureQueriesContext(connection):
+            raise TypeError
 
     def test_with_client(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -168,14 +189,12 @@ class AssertNumQueriesContextManagerTests(TestCase):
             Person.objects.count()
 
     def test_failure(self):
-        with self.assertRaises(AssertionError) as exc_info:
-            with self.assertNumQueries(2):
-                Person.objects.count()
+        with self.assertRaises(AssertionError) as exc_info, self.assertNumQueries(2):
+            Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
 
-        with self.assertRaises(TypeError):
-            with self.assertNumQueries(4000):
-                raise TypeError
+        with self.assertRaises(TypeError), self.assertNumQueries(4000):
+            raise TypeError
 
     def test_with_client(self):
         person = Person.objects.create(name="test")
@@ -210,13 +229,13 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             render_to_string('template_used/base.html')
 
     def test_nested_usage(self):
-        with self.assertTemplateUsed('template_used/base.html'):
-            with self.assertTemplateUsed('template_used/include.html'):
-                render_to_string('template_used/include.html')
+        with self.assertTemplateUsed('template_used/base.html'), \
+                self.assertTemplateUsed('template_used/include.html'):
+            render_to_string('template_used/include.html')
 
-        with self.assertTemplateUsed('template_used/extends.html'):
-            with self.assertTemplateUsed('template_used/base.html'):
-                render_to_string('template_used/extends.html')
+        with self.assertTemplateUsed('template_used/extends.html'), \
+                self.assertTemplateUsed('template_used/base.html'):
+            render_to_string('template_used/extends.html')
 
         with self.assertTemplateUsed('template_used/base.html'):
             with self.assertTemplateUsed('template_used/alternative.html'):
@@ -236,69 +255,34 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
-            with self.assertTemplateUsed('template_used/base.html'):
-                pass
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'), \
+                self.assertTemplateUsed('template_used/base.html'):
+            pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
-            with self.assertTemplateUsed(template_name='template_used/base.html'):
-                pass
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'), \
+                self.assertTemplateUsed(template_name='template_used/base.html'):
+            pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
-            with self.assertTemplateUsed('template_used/base.html'):
-                render_to_string('template_used/alternative.html')
+        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'), \
+                self.assertTemplateUsed('template_used/base.html'):
+            render_to_string('template_used/alternative.html')
 
     def test_failure(self):
-        with self.assertRaises(TypeError):
-            with self.assertTemplateUsed():
-                pass
+        with self.assertRaises(TypeError), self.assertTemplateUsed():
+            pass
 
-        with self.assertRaises(AssertionError):
-            with self.assertTemplateUsed(''):
-                pass
+        with self.assertRaises(AssertionError), self.assertTemplateUsed(''):
+            pass
 
-        with self.assertRaises(AssertionError):
-            with self.assertTemplateUsed(''):
-                render_to_string('template_used/base.html')
+        with self.assertRaises(AssertionError), self.assertTemplateUsed(''):
+            render_to_string('template_used/base.html')
 
-        with self.assertRaises(AssertionError):
-            with self.assertTemplateUsed(template_name=''):
-                pass
+        with self.assertRaises(AssertionError), self.assertTemplateUsed(template_name=''):
+            pass
 
-        with self.assertRaises(AssertionError):
-            with self.assertTemplateUsed('template_used/base.html'):
-                render_to_string('template_used/alternative.html')
-
-
-class SaveRestoreWarningState(TestCase):
-    def test_save_restore_warnings_state(self):
-        """
-        Ensure save_warnings_state/restore_warnings_state work correctly.
-        """
-        # In reality this test could be satisfied by many broken implementations
-        # of save_warnings_state/restore_warnings_state (e.g. just
-        # warnings.resetwarnings()) , but it is difficult to test more.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-
-            self.save_warnings_state()
-
-            class MyWarning(Warning):
-                pass
-
-            # Add a filter that causes an exception to be thrown, so we can catch it
-            warnings.simplefilter("error", MyWarning)
-            self.assertRaises(Warning, lambda: warnings.warn("warn", MyWarning))
-
-            # Now restore.
-            self.restore_warnings_state()
-            # After restoring, we shouldn't get an exception. But we don't want a
-            # warning printed either, so we have to silence the warning.
-            warnings.simplefilter("ignore", MyWarning)
-            warnings.warn("warn", MyWarning)
-
-            # Remove the filter we just added.
-            self.restore_warnings_state()
+        with self.assertRaises(AssertionError), \
+                self.assertTemplateUsed('template_used/base.html'):
+            render_to_string('template_used/alternative.html')
 
 
 class HTMLEqualTests(TestCase):
@@ -592,7 +576,7 @@ class SkippingExtraTests(TestCase):
         with self.assertNumQueries(0):
             super(SkippingExtraTests, self).__call__(result)
 
-    @skip("Fixture loading should not be performed for skipped tests.")
+    @unittest.skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
         pass
 
@@ -623,7 +607,7 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
+class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
 
     def test_normalizer(self):
         from django.test.simple import make_doctest

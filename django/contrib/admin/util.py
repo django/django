@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 
+from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -15,7 +16,7 @@ from django.utils import timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils import six
 from django.utils.translation import ungettext
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 
 def lookup_needs_distinct(opts, lookup_path):
     """
@@ -112,14 +113,22 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
 
+        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
+                                   force_text(obj))
+
         if has_admin:
-            admin_url = reverse('%s:%s_%s_change'
-                                % (admin_site.name,
-                                   opts.app_label,
-                                   opts.model_name),
-                                None, (quote(obj._get_pk_val()),))
+            try:
+                admin_url = reverse('%s:%s_%s_change'
+                                    % (admin_site.name,
+                                       opts.app_label,
+                                       opts.model_name),
+                                    None, (quote(obj._get_pk_val()),))
+            except NoReverseMatch:
+                # Change url doesn't exist -- don't display link to edit
+                return no_edit_link
+
             p = '%s.%s' % (opts.app_label,
-                           opts.get_delete_permission())
+                           get_permission_codename('delete', opts))
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
@@ -130,8 +139,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         else:
             # Don't display link to edit, because it either has no
             # admin or is edited inline.
-            return '%s: %s' % (capfirst(opts.verbose_name),
-                                force_text(obj))
+            return no_edit_link
 
     to_delete = collector.nested(format_callback)
 
@@ -154,9 +162,6 @@ class NestedObjects(Collector):
             if source_attr:
                 self.add_edge(getattr(obj, source_attr), obj)
             else:
-                if obj._meta.proxy:
-                    # Take concrete model's instance to avoid mismatch in edges
-                    obj = obj._meta.concrete_model(pk=obj.pk)
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)

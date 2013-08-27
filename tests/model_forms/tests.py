@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import os
 from decimal import Decimal
+from unittest import skipUnless
 import warnings
 
 from django import forms
@@ -13,7 +14,6 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils._os import upath
-from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
 
@@ -22,7 +22,7 @@ from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
     Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
-    ArticleStatusNote, DateTimePost, test_images)
+    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -253,6 +253,14 @@ class StatusNoteCBM2mForm(forms.ModelForm):
         widgets = {'status': forms.CheckboxSelectMultiple}
 
 
+class CustomErrorMessageForm(forms.ModelForm):
+    name1 = forms.CharField(error_messages={'invalid': 'Form custom error message.'})
+
+    class Meta:
+        fields = '__all__'
+        model = CustomErrorMessage
+
+
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
         self.assertEqual(list(BaseCategoryForm.base_fields),
@@ -260,7 +268,7 @@ class ModelFormBaseTest(TestCase):
 
     def test_missing_fields_attribute(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
                 class Meta:
@@ -270,7 +278,7 @@ class ModelFormBaseTest(TestCase):
         # if a warning has been seen already, the catch_warnings won't
         # have recorded it. The following line therefore will not work reliably:
 
-        # self.assertEqual(w[0].category, PendingDeprecationWarning)
+        # self.assertEqual(w[0].category, DeprecationWarning)
 
         # Until end of the deprecation cycle, should still create the
         # form as before:
@@ -1761,6 +1769,26 @@ class OldFormForXTests(TestCase):
         <option value="%(blue_pk)s">Blue</option>
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
+
+    def test_custom_error_messages(self) :
+        data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(
+            str(errors['name1']),
+            '<ul class="errorlist"><li>Form custom error message.</li></ul>'
+        )
+        self.assertHTMLEqual(
+            str(errors['name2']),
+            '<ul class="errorlist"><li>Model custom error message.</li></ul>'
+        )
+
+    def test_model_clean_error_messages(self) :
+        data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(
+            str(errors['name1']),
+            '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>'
+        )
 
 
 class M2mHelpTextTest(TestCase):

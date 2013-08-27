@@ -77,7 +77,8 @@ application by the :djadmin:`manage.py startapp <startapp>` script),
     )
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
-:djadmin:`manage.py syncdb <syncdb>`.
+:djadmin:`manage.py migrate <migrate>`, optionally making migrations
+for them first with :djadmin:`manage.py makemigrations <makemigrations>`.
 
 Fields
 ======
@@ -416,6 +417,7 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -423,6 +425,7 @@ something like this::
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -709,7 +712,10 @@ of :ref:`methods automatically given to each model <model-instance-methods>`.
 You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
-:meth:`~Model.__unicode__`
+:meth:`~Model.__str__` (Python 3)
+    Python 3 equivalent of ``__unicode__()``.
+
+:meth:`~Model.__unicode__` (Python 2)
     A Python "magic method" that returns a unicode "representation" of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
@@ -951,7 +957,7 @@ The reverse name of the ``common.ChildA.m2m`` field will be
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
 to construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`syncdb`).
+errors when you validate your models (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1044,7 +1050,7 @@ are putting those types of relations on a subclass of another model,
 you **must** specify the
 :attr:`~django.db.models.ForeignKey.related_name` attribute on each
 such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`syncdb`.
+:djadmin:`validate` or :djadmin:`migrate`.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::

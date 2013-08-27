@@ -37,17 +37,24 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.utils import unittest
+    from django.contrib.auth.models import User
+    from django.test import TestCase
     from django.test.client import RequestFactory
 
-    class SimpleTest(unittest.TestCase):
+    class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
+            self.user = User.objects.create_user(
+                first_name='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
+
+            # Recall that middleware are not suported. You can simulate a
+            # logged-in user by setting request.user manually.
+            request.user = self.user
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
@@ -167,7 +174,7 @@ Advanced features of ``TransactionTestCase``
     .. warning::
 
         This attribute is a private API. It may be changed or removed without
-        a deprecation period in the future, for instance to accomodate changes
+        a deprecation period in the future, for instance to accommodate changes
         in application loading.
 
         It's used to optimize Django's own test suite, which contains hundreds
@@ -175,7 +182,7 @@ Advanced features of ``TransactionTestCase``
 
     By default, ``available_apps`` is set to ``None``. After each test, Django
     calls :djadmin:`flush` to reset the database state. This empties all tables
-    and emits the :data:`~django.db.models.signals.post_syncdb` signal, which
+    and emits the :data:`~django.db.models.signals.post_migrate` signal, which
     re-creates one content type and three permissions for each model. This
     operation gets expensive proportionally to the number of models.
 
@@ -183,13 +190,13 @@ Advanced features of ``TransactionTestCase``
     behave as if only the models from these applications were available. The
     behavior of ``TransactionTestCase`` changes as follows:
 
-    - :data:`~django.db.models.signals.post_syncdb` is fired before each
+    - :data:`~django.db.models.signals.post_migrate` is fired before each
       test to create the content types and permissions for each model in
       available apps, in case they're missing.
     - After each test, Django empties only tables corresponding to models in
       available apps. However, at the database level, truncation may cascade to
       related models in unavailable apps. Furthermore
-      :data:`~django.db.models.signals.post_syncdb` isn't fired; it will be
+      :data:`~django.db.models.signals.post_migrate` isn't fired; it will be
       fired by the next ``TransactionTestCase``, after the correct set of
       applications is selected.
 
@@ -198,10 +205,10 @@ Advanced features of ``TransactionTestCase``
     cause unrelated tests to fail. Be careful with tests that use sessions;
     the default session engine stores them in the database.
 
-    Since :data:`~django.db.models.signals.post_syncdb` isn't emitted after
+    Since :data:`~django.db.models.signals.post_migrate` isn't emitted after
     flushing the database, its state after a ``TransactionTestCase`` isn't the
     same as after a ``TestCase``: it's missing the rows created by listeners
-    to :data:`~django.db.models.signals.post_syncdb`. Considering the
+    to :data:`~django.db.models.signals.post_migrate`. Considering the
     :ref:`order in which tests are executed <order-of-tests>`, this isn't an
     issue, provided either all ``TransactionTestCase`` in a given test suite
     declare ``available_apps``, or none of them.
@@ -209,8 +216,6 @@ Advanced features of ``TransactionTestCase``
     ``available_apps`` is mandatory in Django's own test suite.
 
 .. attribute:: TransactionTestCase.reset_sequences
-
-    .. versionadded:: 1.5
 
     Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
     sure sequences are always reset before the test run::
@@ -271,7 +276,7 @@ testing behavior. This behavior involves:
 
 #. Creating the test databases.
 
-#. Running ``syncdb`` to install models and initial data into the test
+#. Running ``migrate`` to install models and initial data into the test
    databases.
 
 #. Running the tests that were found.
@@ -462,7 +467,7 @@ can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 
-    Creates a new test database and runs ``syncdb`` against it.
+    Creates a new test database and runs ``migrate`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 

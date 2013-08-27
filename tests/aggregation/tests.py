@@ -1,10 +1,13 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import re
 
+from django.db import connection
 from django.db.models import Avg, Sum, Count, Max, Min
 from django.test import TestCase, Approximate
+from django.test.utils import CaptureQueriesContext
 
 from .models import Author, Publisher, Book, Store
 
@@ -585,3 +588,67 @@ class BaseAggregateTestCase(TestCase):
                 "datetime.date(2008, 1, 1)"
             ]
         )
+
+    def test_values_aggregation(self):
+        # Refs #20782
+        max_rating = Book.objects.values('rating').aggregate(max_rating=Max('rating'))
+        self.assertEqual(max_rating['max_rating'], 5)
+        max_books_per_rating = Book.objects.values('rating').annotate(
+            books_per_rating=Count('id')
+        ).aggregate(Max('books_per_rating'))
+        self.assertEqual(
+            max_books_per_rating,
+            {'books_per_rating__max': 3})
+
+    def test_ticket17424(self):
+        """
+        Check that doing exclude() on a foreign model after annotate()
+        doesn't crash.
+        """
+        all_books = list(Book.objects.values_list('pk', flat=True).order_by('pk'))
+        annotated_books = Book.objects.order_by('pk').annotate(one=Count("id"))
+
+        # The value doesn't matter, we just need any negative
+        # constraint on a related model that's a noop.
+        excluded_books = annotated_books.exclude(publisher__name="__UNLIKELY_VALUE__")
+
+        # Try to generate query tree
+        str(excluded_books.query)
+
+        self.assertQuerysetEqual(excluded_books, all_books, lambda x: x.pk)
+
+        # Check internal state
+        self.assertIsNone(annotated_books.query.alias_map["aggregation_book"].join_type)
+        self.assertIsNone(excluded_books.query.alias_map["aggregation_book"].join_type)
+
+    def test_ticket12886(self):
+        """
+        Check that aggregation over sliced queryset works correctly.
+        """
+        qs = Book.objects.all().order_by('-rating')[0:3]
+        vals = qs.aggregate(average_top3_rating=Avg('rating'))['average_top3_rating']
+        self.assertAlmostEqual(vals, 4.5, places=2)
+
+    def test_ticket11881(self):
+        """
+        Check that subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE
+        or select_related() stuff.
+        """
+        qs = Book.objects.all().select_for_update().order_by(
+            'pk').select_related('publisher').annotate(max_pk=Max('pk'))
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.aggregate(avg_pk=Avg('max_pk'))
+            self.assertEqual(len(captured_queries), 1)
+            qstr = captured_queries[0]['sql'].lower()
+            self.assertNotIn('for update', qstr)
+            forced_ordering = connection.ops.force_no_ordering()
+            if forced_ordering:
+                # If the backend needs to force an ordering we make sure it's
+                # the only "ORDER BY" clause present in the query.
+                self.assertEqual(
+                    re.findall(r'order by (\w+)', qstr),
+                    [', '.join(forced_ordering).lower()]
+                )
+            else:
+                self.assertNotIn('order by', qstr)
+            self.assertEqual(qstr.count(' join '), 0)

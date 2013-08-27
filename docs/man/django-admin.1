@@ -45,8 +45,7 @@ Outputs to standard output all data in the database associated with the named
 application(s).
 .TP
 .BI flush
-Returns the database to the state it was in immediately after syncdb was
-executed.
+Removes all data from the database and then re-installs any initial data.
 .TP
 .B inspectdb
 Introspects the database tables in the database specified in settings.py and outputs a Django
@@ -114,9 +113,9 @@ the current directory or the optional destination.
 Creates a Django project directory structure for the given project name
 in the current directory or the optional destination.
 .TP
-.BI syncdb
-Creates the database tables for all apps in INSTALLED_APPS whose tables
-haven't already been created.
+.BI migrate
+Runs migrations for apps containing migrations, and just creates missing tables
+for apps without migrations.
 .TP
 .BI "test [" "\-\-verbosity" "] [" "\-\-failfast" "] [" "appname ..." "]"
 Runs the test suite for the specified applications, or the entire project if

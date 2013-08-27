@@ -3,7 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.test import TestCase
 from django.utils import timezone

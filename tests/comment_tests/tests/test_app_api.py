@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments.models import Comment

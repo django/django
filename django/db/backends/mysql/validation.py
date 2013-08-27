@@ -1,5 +1,6 @@
 from django.db.backends import BaseDatabaseValidation
 
+
 class DatabaseValidation(BaseDatabaseValidation):
     def validate_field(self, errors, opts, f):
         """

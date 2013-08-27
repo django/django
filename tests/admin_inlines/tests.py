@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
@@ -210,6 +210,24 @@ class TestInline(TestCase):
         response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
         self.assertContains(response, max_forms_input % 2)
         self.assertContains(response, total_forms_hidden)
+
+    def test_inline_nonauto_noneditable_pk(self):
+        response = self.client.get('/admin/admin_inlines/author/add/')
+        self.assertContains(response,
+            '<input id="id_nonautopkbook_set-0-rand_pk" name="nonautopkbook_set-0-rand_pk" type="hidden" />',
+             html=True)
+        self.assertContains(response,
+            '<input id="id_nonautopkbook_set-2-0-rand_pk" name="nonautopkbook_set-2-0-rand_pk" type="hidden" />',
+             html=True)
+
+    def test_inline_editable_pk(self):
+        response = self.client.get('/admin/admin_inlines/author/add/')
+        self.assertContains(response,
+            '<input class="vIntegerField" id="id_editablepkbook_set-0-manual_pk" name="editablepkbook_set-0-manual_pk" type="text" />',
+             html=True, count=1)
+        self.assertContains(response,
+            '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" name="editablepkbook_set-2-0-manual_pk" type="text" />',
+             html=True, count=1)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

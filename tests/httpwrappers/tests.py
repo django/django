@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import copy
 import os
 import pickle
+import unittest
 import warnings
 
 from django.core.exceptions import SuspiciousOperation
@@ -15,10 +16,12 @@ from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          SimpleCookie, BadHeaderError,
                          parse_cookie)
 from django.test import TestCase
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, force_text
+from django.utils.functional import lazy
 from django.utils._os import upath
 from django.utils import six
-from django.utils import unittest
+
+lazystr = lazy(force_text, six.text_type)
 
 
 class QueryDictTests(unittest.TestCase):
@@ -324,19 +327,10 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [1, 2, 3]
         self.assertEqual(r.content, b'123')
 
-        #test retrieval explicitly using iter (deprecated) and odd inputs
+        #test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
-            my_iter = iter(r)
-            self.assertEqual(w[0].category, DeprecationWarning)
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
-            result = list(my_iter)
-            self.assertEqual(w[0].category, DeprecationWarning)
         #'\xde\x9e' == unichr(1950).encode('utf-8')
-        self.assertEqual(result, [b'1', b'2', b'3', b'\xde\x9e'])
         self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header
@@ -344,9 +338,8 @@ class HttpResponseTests(unittest.TestCase):
         r['Content-Encoding'] = 'winning'
         r.content = [b'abc', b'def']
         self.assertEqual(r.content, b'abcdef')
-        r.content = ['\u079e']
         self.assertRaises(TypeError if six.PY3 else UnicodeEncodeError,
-                          getattr, r, 'content')
+                          setattr, r, 'content', ['\u079e'])
 
         # .content can safely be accessed multiple times.
         r = HttpResponse(iter(['hello', 'world']))
@@ -358,15 +351,12 @@ class HttpResponseTests(unittest.TestCase):
         # accessing .content still works
         self.assertEqual(r.content, b'helloworld')
 
-        # XXX accessing .content doesn't work if the response was iterated first
-        # XXX change this when the deprecation completes in HttpResponse
+        # Accessing .content also works if the response was iterated first.
         r = HttpResponse(iter(['hello', 'world']))
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.assertEqual(b''.join(r), b'helloworld')
-        self.assertEqual(r.content, b'')                # not the expected result!
+        self.assertEqual(b''.join(r), b'helloworld')
+        self.assertEqual(r.content, b'helloworld')
 
-        # additional content can be written to the response.
+        # Additional content can be written to the response.
         r = HttpResponse(iter(['hello', 'world']))
         self.assertEqual(r.content, b'helloworld')
         r.write('!')
@@ -379,6 +369,10 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(list(i), [b'abc'])
         self.assertEqual(list(i), [])
 
+    def test_lazy_content(self):
+        r = HttpResponse(lazystr('helloworld'))
+        self.assertEqual(r.content, b'helloworld')
+
     def test_file_interface(self):
         r = HttpResponse()
         r.write(b"hello")
@@ -389,6 +383,13 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse(['abc'])
         r.write('def')
         self.assertEqual(r.tell(), 6)
+        self.assertEqual(r.content, b'abcdef')
+
+        # with Content-Encoding header
+        r = HttpResponse()
+        r['Content-Encoding'] = 'winning'
+        r.write(b'abc')
+        r.write(b'def')
         self.assertEqual(r.content, b'abcdef')
 
     def test_unsafe_redirect(self):
@@ -414,6 +415,11 @@ class HttpResponseSubclassesTests(TestCase):
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
         # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
+
+    def test_redirect_lazy(self):
+        """Make sure HttpResponseRedirect works with lazy strings."""
+        r = HttpResponseRedirect(lazystr('/redirected/'))
+        self.assertEqual(r.url, '/redirected/')
 
     def test_not_modified(self):
         response = HttpResponseNotModified()

@@ -9,7 +9,7 @@ def prepopulated_fields_js(context):
     the prepopulated fields for both the admin form and inlines.
     """
     prepopulated_fields = []
-    if context['add'] and 'adminform' in context:
+    if 'adminform' in context:
         prepopulated_fields.extend(context['adminform'].prepopulated_fields)
     if 'inline_admin_formsets' in context:
         for inline_admin_formset in context['inline_admin_formsets']:
@@ -37,7 +37,8 @@ def submit_row(context):
                             not is_popup and (not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'is_popup': is_popup,
-        'show_save': True
+        'show_save': True,
+        'preserved_filters': context.get('preserved_filters'),
     }
     if context.get('original') is not None:
         ctx['original'] = context['original']

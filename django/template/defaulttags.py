@@ -95,10 +95,9 @@ class FilterNode(Node):
     def render(self, context):
         output = self.nodelist.render(context)
         # Apply filters.
-        context.update({'var': output})
-        filtered = self.filter_expr.resolve(context)
-        context.pop()
-        return filtered
+        with context.push(var=output):
+            return self.filter_expr.resolve(context)
+
 
 class FirstOfNode(Node):
     def __init__(self, variables, escape=False):
@@ -143,71 +142,69 @@ class ForNode(Node):
             parentloop = context['forloop']
         else:
             parentloop = {}
-        context.push()
-        try:
-            values = self.sequence.resolve(context, True)
-        except VariableDoesNotExist:
-            values = []
-        if values is None:
-            values = []
-        if not hasattr(values, '__len__'):
-            values = list(values)
-        len_values = len(values)
-        if len_values < 1:
-            context.pop()
-            return self.nodelist_empty.render(context)
-        nodelist = NodeList()
-        if self.is_reversed:
-            values = reversed(values)
-        unpack = len(self.loopvars) > 1
-        # Create a forloop value in the context.  We'll update counters on each
-        # iteration just below.
-        loop_dict = context['forloop'] = {'parentloop': parentloop}
-        for i, item in enumerate(values):
-            # Shortcuts for current loop iteration number.
-            loop_dict['counter0'] = i
-            loop_dict['counter'] = i+1
-            # Reverse counter iteration numbers.
-            loop_dict['revcounter'] = len_values - i
-            loop_dict['revcounter0'] = len_values - i - 1
-            # Boolean values designating first and last times through loop.
-            loop_dict['first'] = (i == 0)
-            loop_dict['last'] = (i == len_values - 1)
+        with context.push():
+            try:
+                values = self.sequence.resolve(context, True)
+            except VariableDoesNotExist:
+                values = []
+            if values is None:
+                values = []
+            if not hasattr(values, '__len__'):
+                values = list(values)
+            len_values = len(values)
+            if len_values < 1:
+                return self.nodelist_empty.render(context)
+            nodelist = NodeList()
+            if self.is_reversed:
+                values = reversed(values)
+            unpack = len(self.loopvars) > 1
+            # Create a forloop value in the context.  We'll update counters on each
+            # iteration just below.
+            loop_dict = context['forloop'] = {'parentloop': parentloop}
+            for i, item in enumerate(values):
+                # Shortcuts for current loop iteration number.
+                loop_dict['counter0'] = i
+                loop_dict['counter'] = i+1
+                # Reverse counter iteration numbers.
+                loop_dict['revcounter'] = len_values - i
+                loop_dict['revcounter0'] = len_values - i - 1
+                # Boolean values designating first and last times through loop.
+                loop_dict['first'] = (i == 0)
+                loop_dict['last'] = (i == len_values - 1)
 
-            pop_context = False
-            if unpack:
-                # If there are multiple loop variables, unpack the item into
-                # them.
-                try:
-                    unpacked_vars = dict(zip(self.loopvars, item))
-                except TypeError:
-                    pass
-                else:
-                    pop_context = True
-                    context.update(unpacked_vars)
-            else:
-                context[self.loopvars[0]] = item
-            # In TEMPLATE_DEBUG mode provide source of the node which
-            # actually raised the exception
-            if settings.TEMPLATE_DEBUG:
-                for node in self.nodelist_loop:
+                pop_context = False
+                if unpack:
+                    # If there are multiple loop variables, unpack the item into
+                    # them.
                     try:
+                        unpacked_vars = dict(zip(self.loopvars, item))
+                    except TypeError:
+                        pass
+                    else:
+                        pop_context = True
+                        context.update(unpacked_vars)
+                else:
+                    context[self.loopvars[0]] = item
+                # In TEMPLATE_DEBUG mode provide source of the node which
+                # actually raised the exception
+                if settings.TEMPLATE_DEBUG:
+                    for node in self.nodelist_loop:
+                        try:
+                            nodelist.append(node.render(context))
+                        except Exception as e:
+                            if not hasattr(e, 'django_template_source'):
+                                e.django_template_source = node.source
+                            raise
+                else:
+                    for node in self.nodelist_loop:
                         nodelist.append(node.render(context))
-                    except Exception as e:
-                        if not hasattr(e, 'django_template_source'):
-                            e.django_template_source = node.source
-                        raise
-            else:
-                for node in self.nodelist_loop:
-                    nodelist.append(node.render(context))
-            if pop_context:
-                # The loop variables were pushed on to the context so pop them
-                # off again. This is necessary because the tag lets the length
-                # of loopvars differ to the length of each set of items and we
-                # don't want to leave any vars from the previous loop on the
-                # context.
-                context.pop()
-        context.pop()
+                if pop_context:
+                    # The loop variables were pushed on to the context so pop them
+                    # off again. This is necessary because the tag lets the length
+                    # of loopvars differ to the length of each set of items and we
+                    # don't want to leave any vars from the previous loop on the
+                    # context.
+                    context.pop()
         return nodelist.render(context)
 
 class IfChangedNode(Node):
@@ -461,10 +458,11 @@ class VerbatimNode(Node):
         return self.content
 
 class WidthRatioNode(Node):
-    def __init__(self, val_expr, max_expr, max_width):
+    def __init__(self, val_expr, max_expr, max_width, asvar=None):
         self.val_expr = val_expr
         self.max_expr = max_expr
         self.max_width = max_width
+        self.asvar = asvar
 
     def render(self, context):
         try:
@@ -483,7 +481,13 @@ class WidthRatioNode(Node):
             return '0'
         except (ValueError, TypeError):
             return ''
-        return str(int(round(ratio)))
+        result = str(int(round(ratio)))
+
+        if self.asvar:
+            context[self.asvar] = result
+            return ''
+        else:
+            return result
 
 class WithNode(Node):
     def __init__(self, var, name, nodelist, extra_context=None):
@@ -500,10 +504,9 @@ class WithNode(Node):
     def render(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
                        six.iteritems(self.extra_context)])
-        context.update(values)
-        output = self.nodelist.render(context)
-        context.pop()
-        return output
+        with context.push(**values):
+            return self.nodelist.render(context)
+
 
 @register.tag
 def autoescape(parser, token):
@@ -568,7 +571,7 @@ def cycle(parser, token, escape=False):
             "'The `cycle` template tag is changing to escape its arguments; "
             "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -665,8 +668,9 @@ def do_filter(parser, token):
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
     for func, unused in filter_expr.filters:
-        if getattr(func, '_decorated_function', func).__name__ in ('escape', 'safe'):
-            raise TemplateSyntaxError('"filter %s" is not permitted.  Use the "autoescape" tag instead.' % func.__name__)
+        filter_name = getattr(func, '_filter_name', None)
+        if filter_name in ('escape', 'safe'):
+            raise TemplateSyntaxError('"filter %s" is not permitted.  Use the "autoescape" tag instead.' % filter_name)
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)
@@ -711,7 +715,7 @@ def firstof(parser, token, escape=False):
             "'The `firstof` template tag is changing to escape its arguments; "
             "the non-autoescaping version is deprecated. Load it "
             "from the `future` tag library to start using the new behavior.",
-            PendingDeprecationWarning, stacklevel=2)
+            DeprecationWarning, stacklevel=2)
 
     bits = token.split_contents()[1:]
     if len(bits) < 1:
@@ -1356,20 +1360,34 @@ def widthratio(parser, token):
 
     For example::
 
-        <img src='bar.gif' height='10' width='{% widthratio this_value max_value max_width %}' />
+        <img src="bar.png" alt="Bar"
+             height="10" width="{% widthratio this_value max_value max_width %}" />
 
     If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100,
     the image in the above example will be 88 pixels wide
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
+
+    In some cases you might want to capture the result of widthratio in a
+    variable. It can be useful for instance in a blocktrans like this::
+
+        {% widthratio this_value max_value max_width as width %}
+        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
     """
     bits = token.split_contents()
-    if len(bits) != 4:
-        raise TemplateSyntaxError("widthratio takes three arguments")
-    tag, this_value_expr, max_value_expr, max_width = bits
+    if len(bits) == 4:
+        tag, this_value_expr, max_value_expr, max_width = bits
+        asvar = None
+    elif len(bits) == 6:
+        tag, this_value_expr, max_value_expr, max_width, as_, asvar = bits
+        if as_ != 'as':
+            raise TemplateSyntaxError("Invalid syntax in widthratio tag. Expecting 'as' keyword")
+    else:
+        raise TemplateSyntaxError("widthratio takes at least three arguments")
 
     return WidthRatioNode(parser.compile_filter(this_value_expr),
                           parser.compile_filter(max_value_expr),
-                          parser.compile_filter(max_width))
+                          parser.compile_filter(max_width),
+                          asvar=asvar)
 
 @register.tag('with')
 def do_with(parser, token):

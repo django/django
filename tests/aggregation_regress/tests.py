@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import pickle
@@ -10,7 +10,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
 from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
-from django.utils.unittest import expectedFailure
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
         ItemTag, WithManualPK)
@@ -250,6 +249,13 @@ class AggregationTests(TestCase):
             'pages__max': 1132,
             'price__max': Decimal("82.80")
         })
+
+        # Regression for #15624 - Missing SELECT columns when using values, annotate
+        # and aggregate in a single query
+        self.assertEqual(
+            Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
+            {'c__max': 3}
+            )
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported

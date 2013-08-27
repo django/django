@@ -262,8 +262,12 @@ class ReservedName(models.Model):
         return self.name
 
 # A simpler shared-foreign-key setup that can expose some problems.
+@python_2_unicode_compatible
 class SharedConnection(models.Model):
     data = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.data
 
 class PointerA(models.Model):
     connection = models.ForeignKey(SharedConnection)
@@ -497,3 +501,29 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return '%s' % self.pk
+
+class BaseUser(models.Model):
+    pass
+
+@python_2_unicode_compatible
+class Task(models.Model):
+    title = models.CharField(max_length=10)
+    owner = models.ForeignKey(BaseUser, related_name='owner')
+    creator = models.ForeignKey(BaseUser, related_name='creator')
+
+    def __str__(self):
+        return self.title
+
+@python_2_unicode_compatible
+class Staff(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+@python_2_unicode_compatible
+class StaffUser(BaseUser):
+    staff = models.OneToOneField(Staff, related_name='user')
+
+    def __str__(self):
+        return self.staff

@@ -116,6 +116,8 @@ def url_params_from_lookup_dict(lookups):
     if lookups and hasattr(lookups, 'items'):
         items = []
         for k, v in lookups.items():
+            if callable(v):
+                v = v()
             if isinstance(v, (tuple, list)):
                 v = ','.join([str(x) for x in v])
             elif isinstance(v, bool):
@@ -285,7 +287,14 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
-class AdminURLFieldWidget(forms.TextInput):
+class AdminEmailInputWidget(forms.EmailInput):
+    def __init__(self, attrs=None):
+        final_attrs = {'class': 'vTextField'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminEmailInputWidget, self).__init__(attrs=final_attrs)
+
+class AdminURLFieldWidget(forms.URLInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:
@@ -296,9 +305,9 @@ class AdminURLFieldWidget(forms.TextInput):
         html = super(AdminURLFieldWidget, self).render(name, value, attrs)
         if value:
             value = force_text(self._format_value(value))
-            final_attrs = {'href': mark_safe(smart_urlquote(value))}
+            final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
-                '<p class="url">{0} <a {1}>{2}</a><br />{3} {4}</p>',
+                '<p class="url">{0} <a{1}>{2}</a><br />{3} {4}</p>',
                 _('Currently:'), flatatt(final_attrs), value,
                 _('Change:'), html
             )

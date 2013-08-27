@@ -239,13 +239,14 @@ Python
 ^^^^^^
 
 Although OS X comes with Python installed, users can use framework
-installers (`2.6`__ and `2.7`__ are available) provided by
+installers (`2.7`__, `3.2`__ and `3.3`__ are available) provided by
 the Python Software Foundation.  An advantage to using the installer is
 that OS X's Python will remain "pristine" for internal operating system
 use.
 
-__ http://python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
-__ http://python.org/ftp/python/2.7.3/
+__ http://python.org/ftp/python/2.7.5/
+__ http://python.org/ftp/python/3.2.5/
+__ http://python.org/ftp/python/3.3.2/
 
 .. note::
 
@@ -284,7 +285,7 @@ William Kyngesburye provides a number of `geospatial library binary packages`__
 that make it simple to get GeoDjango installed on OS X without compiling
 them from source.  However, the `Apple Developer Tools`_ are still necessary
 for compiling the Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS)
-and :ref:`pysqlite2` (for SpatiaLite).
+and ``pysqlite2`` (for SpatiaLite).
 
 .. note::
 

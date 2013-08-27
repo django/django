@@ -226,7 +226,7 @@ CachedStaticFilesStorage
 
     would be replaced by calling the
     :meth:`~django.core.files.storage.Storage.url`
-    method of the ``CachedStaticFilesStorage`` storage backend, ultimatively
+    method of the ``CachedStaticFilesStorage`` storage backend, ultimately
     saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
     content:
 
@@ -254,8 +254,6 @@ CachedStaticFilesStorage
     the ``'default'`` cache backend.
 
     .. method:: file_hash(name, content=None)
-
-    .. versionadded:: 1.5
 
     The method that is used when creating the hashed name of a file.
     Needs to return a hash for the given file name and content.
@@ -289,8 +287,6 @@ The previous example is equal to calling the ``url`` method of an instance of
 :setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
 useful when using a non-local storage backend to deploy files as documented
 in :ref:`staticfiles-from-cdn`.
-
-.. versionadded:: 1.5
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
@@ -349,6 +345,12 @@ This view function serves static files in development.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
+
+.. versionchanged:: 1.7
+
+    This view will now raise an :exc:`~django.http.Http404` exception instead
+    of :exc:`~django.core.exceptions.ImproperlyConfigured` when
+    :setting:`DEBUG` is ``False``.
 
 .. note::
 

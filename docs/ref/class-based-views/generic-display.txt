@@ -70,7 +70,7 @@ DetailView
         <p>{{ object.content }}</p>
         <p>Reporter: {{ object.reporter }}</p>
         <p>Published: {{ object.pub_date|date }}</p>
-        <p>Date: {{ object.now|date }}</p>
+        <p>Date: {{ now|date }}</p>
 
 ListView
 --------

@@ -1,6 +1,7 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import date
+import unittest
 
 from django import forms
 from django.conf import settings
@@ -15,7 +16,7 @@ from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 from django.test.utils import str_prefix
-from django.utils import unittest, six
+from django.utils import six
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
@@ -48,6 +49,12 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
 
         self.assertEqual(list(ma.get_form(request).base_fields),
+            ['name', 'bio', 'sign_date'])
+
+        self.assertEqual(list(ma.get_fields(request)),
+            ['name', 'bio', 'sign_date'])
+
+        self.assertEqual(list(ma.get_fields(request, self.band)),
             ['name', 'bio', 'sign_date'])
 
     def test_default_fieldsets(self):
@@ -95,6 +102,10 @@ class ModelAdminTests(TestCase):
             fields = ['name']
 
         ma = BandAdmin(Band, self.site)
+
+        self.assertEqual(list(ma.get_fields(request)), ['name'])
+
+        self.assertEqual(list(ma.get_fields(request, self.band)), ['name'])
 
         self.assertEqual(ma.get_fieldsets(request),
             [(None, {'fields': ['name']})])

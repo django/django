@@ -115,7 +115,7 @@ class ModelWithStringPrimaryKey(models.Model):
 @python_2_unicode_compatible
 class Color(models.Model):
     value = models.CharField(max_length=10)
-    warm = models.BooleanField()
+    warm = models.BooleanField(default=False)
     def __str__(self):
         return self.value
 
@@ -137,14 +137,14 @@ class Thing(models.Model):
 class Actor(models.Model):
     name = models.CharField(max_length=50)
     age = models.IntegerField()
-    title = models.CharField(max_length=50, null=True)
+    title = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return self.name
 
 
 @python_2_unicode_compatible
 class Inquisition(models.Model):
-    expected = models.BooleanField()
+    expected = models.BooleanField(default=False)
     leader = models.ForeignKey(Actor)
     country = models.CharField(max_length=20)
 
@@ -376,7 +376,7 @@ class Link(models.Model):
 
 class PrePopulatedPost(models.Model):
     title = models.CharField(max_length=100)
-    published = models.BooleanField()
+    published = models.BooleanField(default=False)
     slug = models.SlugField()
 
 
@@ -607,7 +607,7 @@ class PrePopulatedPostLargeSlug(models.Model):
     the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000)
     """
     title = models.CharField(max_length=100)
-    published = models.BooleanField()
+    published = models.BooleanField(default=False)
     slug = models.SlugField(max_length=1000)
 
 class AdminOrderedField(models.Model):
@@ -644,8 +644,8 @@ class MainPrepopulated(models.Model):
         max_length=20,
         choices=(('option one', 'Option One'),
                  ('option two', 'Option Two')))
-    slug1 = models.SlugField()
-    slug2 = models.SlugField()
+    slug1 = models.SlugField(blank=True)
+    slug2 = models.SlugField(blank=True)
 
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated)
@@ -673,6 +673,12 @@ class UndeletableObject(models.Model):
     Refs #10057.
     """
     name = models.CharField(max_length=255)
+
+class UnchangeableObject(models.Model):
+    """
+    Model whose change_view is disabled in admin
+    Refs #20640.
+    """
 
 class UserMessenger(models.Model):
     """

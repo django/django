@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import glob
 import gzip
 import os
+import warnings
 import zipfile
 from optparse import make_option
 import warnings
@@ -133,7 +134,7 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
-                    if router.allow_syncdb(self.using, obj.object.__class__):
+                    if router.allow_migrate(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
                         try:
@@ -156,12 +157,13 @@ class Command(BaseCommand):
             finally:
                 fixture.close()
 
-            # If the fixture we loaded contains 0 objects, assume that an
-            # error was encountered during fixture loading.
+            # Warn if the fixture we loaded contains 0 objects.
             if objects_in_fixture == 0:
-                raise CommandError(
-                        "No fixture data found for '%s'. "
-                        "(File format may be invalid.)" % fixture_name)
+                warnings.warn(
+                    "No fixture data found for '%s'. (File format may be "
+                    "invalid.)" % fixture_name,
+                    RuntimeWarning
+                )
 
     def _find_fixtures(self, fixture_label):
         """
@@ -181,7 +183,7 @@ class Command(BaseCommand):
         if self.verbosity >= 2:
             self.stdout.write("Loading '%s' fixtures..." % fixture_name)
 
-        if os.path.isabs(fixture_name):
+        if os.path.sep in fixture_name:
             fixture_dirs = [os.path.dirname(fixture_name)]
             fixture_name = os.path.basename(fixture_name)
         else:
@@ -233,7 +235,7 @@ class Command(BaseCommand):
         """
         dirs = []
         for path in get_app_paths():
-            d = os.path.join(os.path.dirname(path), 'fixtures')
+            d = os.path.join(path, 'fixtures')
             if os.path.isdir(d):
                 dirs.append(d)
         dirs.extend(list(settings.FIXTURE_DIRS))

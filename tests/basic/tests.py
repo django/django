@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
 import threading
@@ -6,7 +6,8 @@ import threading
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.fields import Field, FieldDoesNotExist
-from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
 from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -153,6 +154,28 @@ class ModelTest(TestCase):
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=7,
+        )
+
+    def test_multiple_objects_max_num_fetched(self):
+        """
+        #6785 - get() should fetch a limited number of results.
+        """
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(MAX_GET_RESULTS)
+        )
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area %s' % MAX_GET_RESULTS, pub_date=datetime(2005, 7, 28))
+        six.assertRaisesRegex(self,
+            MultipleObjectsReturned,
+            "get\(\) returned more than one Article -- it returned more than %d!" % MAX_GET_RESULTS,
+            Article.objects.get,
+            headline__startswith='Area',
         )
 
     def test_object_creation(self):
@@ -684,6 +707,21 @@ class ModelTest(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             SelfRef.objects.get(selfref=sr)
 
+    def test_eq(self):
+        self.assertEqual(Article(id=1), Article(id=1))
+        self.assertNotEqual(Article(id=1), object())
+        self.assertNotEqual(object(), Article(id=1))
+        a = Article()
+        self.assertEqual(a, a)
+        self.assertNotEqual(Article(), a)
+
+    def test_hash(self):
+        # Value based on PK
+        self.assertEqual(hash(Article(id=1)), hash(1))
+        with self.assertRaises(TypeError):
+            # No PK value -> unhashable (because save() would then change
+            # hash)
+            hash(Article())
 
 class ConcurrentSaveTests(TransactionTestCase):
 
@@ -712,3 +750,59 @@ class ConcurrentSaveTests(TransactionTestCase):
         t.join()
         a.save()
         self.assertEqual(Article.objects.get(pk=a.pk).headline, 'foo')
+
+
+class ManagerTest(TestCase):
+    QUERYSET_PROXY_METHODS = [
+        'none',
+        'count',
+        'dates',
+        'datetimes',
+        'distinct',
+        'extra',
+        'get',
+        'get_or_create',
+        'update_or_create',
+        'create',
+        'bulk_create',
+        'filter',
+        'aggregate',
+        'annotate',
+        'complex_filter',
+        'exclude',
+        'in_bulk',
+        'iterator',
+        'earliest',
+        'latest',
+        'first',
+        'last',
+        'order_by',
+        'select_for_update',
+        'select_related',
+        'prefetch_related',
+        'values',
+        'values_list',
+        'update',
+        'reverse',
+        'defer',
+        'only',
+        'using',
+        'exists',
+        '_insert',
+        '_update',
+        'raw',
+    ]
+
+    def test_manager_methods(self):
+        """
+        This test ensures that the correct set of methods from `QuerySet`
+        are copied onto `Manager`.
+
+        It's particularly useful to prevent accidentally leaking new methods
+        into `Manager`. New `QuerySet` methods that should also be copied onto
+        `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
+        """
+        self.assertEqual(
+            sorted(BaseManager._get_queryset_methods(QuerySet).keys()),
+            sorted(self.QUERYSET_PROXY_METHODS),
+        )

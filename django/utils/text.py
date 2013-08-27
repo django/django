@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import re
 import unicodedata
-import warnings
 from gzip import GzipFile
 from io import BytesIO
 

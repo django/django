@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import unittest
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.signals import request_started
@@ -8,7 +10,7 @@ from django.db import close_old_connections
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils import six, unittest
+from django.utils import six
 
 
 class WSGITest(TestCase):

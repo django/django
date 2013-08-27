@@ -172,7 +172,16 @@ class FileSystemStorage(Storage):
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
-                os.makedirs(directory)
+                if settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS is not None:
+                    # os.makedirs applies the global umask, so we reset it,
+                    # for consistency with FILE_UPLOAD_PERMISSIONS behavior.
+                    old_umask = os.umask(0)
+                    try:
+                        os.makedirs(directory, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS)
+                    finally:
+                        os.umask(old_umask)
+                else:
+                    os.makedirs(directory)
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise
@@ -231,6 +240,7 @@ class FileSystemStorage(Storage):
         return name
 
     def delete(self, name):
+        assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
         # Note that there is a race between os.path.exists and os.remove:

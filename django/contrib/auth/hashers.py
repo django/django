@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import base64
 import binascii
+from collections import OrderedDict
 import hashlib
+import importlib
 
 from django.dispatch import receiver
 from django.conf import settings
 from django.test.signals import setting_changed
-from django.utils import importlib
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
@@ -17,9 +17,11 @@ from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_noop as _
 
 
-UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
+
 
 @receiver(setting_changed)
 def reset_hashers(**kwargs):
@@ -30,10 +32,10 @@ def reset_hashers(**kwargs):
 
 
 def is_password_usable(encoded):
-    if encoded is None or encoded == UNUSABLE_PASSWORD:
+    if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
         return False
     try:
-        hasher = identify_hasher(encoded)
+        identify_hasher(encoded)
     except ValueError:
         return False
     return True
@@ -47,7 +49,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     If setter is specified, it'll be called when you need to
     regenerate the password.
     """
-    if not password or not is_password_usable(encoded):
+    if password is None or not is_password_usable(encoded):
         return False
 
     preferred = get_hasher(preferred)
@@ -64,13 +66,15 @@ def make_password(password, salt=None, hasher='default'):
     """
     Turn a plain-text password into a hash for database storage
 
-    Same as encode() but generates a new random salt.  If
-    password is None or blank then UNUSABLE_PASSWORD will be
-    returned which disallows logins.
+    Same as encode() but generates a new random salt.
+    If password is None then a concatenation of
+    UNUSABLE_PASSWORD_PREFIX and a random string will be returned
+    which disallows logins. Additional random string reduces chances
+    of gaining access to staff or superuser accounts.
+    See ticket #20079 for more info.
     """
-    if not password:
-        return UNUSABLE_PASSWORD
-
+    if password is None:
+        return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
     hasher = get_hasher(hasher)
 
     if not salt:
@@ -168,7 +172,7 @@ class BasePasswordHasher(object):
             if isinstance(self.library, (tuple, list)):
                 name, mod_path = self.library
             else:
-                name = mod_path = self.library
+                mod_path = self.library
             try:
                 module = importlib.import_module(mod_path)
             except ImportError as e:
@@ -222,7 +226,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         if not iterations:
             iterations = self.iterations
@@ -239,7 +243,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('iterations'), iterations),
             (_('salt'), mask_hash(salt)),
@@ -316,7 +320,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
         assert algorithm == self.algorithm
         salt, checksum = data[:22], data[22:]
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('work factor'), work_factor),
             (_('salt'), mask_hash(salt)),
@@ -350,7 +354,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     algorithm = "sha1"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
@@ -364,7 +368,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
@@ -378,7 +382,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     algorithm = "md5"
 
     def encode(self, password, salt):
-        assert password
+        assert password is not None
         assert salt and '$' not in salt
         hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
@@ -392,7 +396,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), mask_hash(salt, show=2)),
             (_('hash'), mask_hash(hash)),
@@ -425,7 +429,7 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         assert encoded.startswith('sha1$$')
         hash = encoded[6:]
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), self.algorithm),
             (_('hash'), mask_hash(hash)),
         ])
@@ -458,7 +462,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), self.algorithm),
             (_('hash'), mask_hash(encoded, show=3)),
         ])
@@ -492,7 +496,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     def safe_summary(self, encoded):
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return SortedDict([
+        return OrderedDict([
             (_('algorithm'), algorithm),
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),

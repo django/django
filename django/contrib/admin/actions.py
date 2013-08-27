@@ -19,7 +19,7 @@ def delete_selected(modeladmin, request, queryset):
     deleteable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 
-    Next, it delets all selected objects and redirects back to the change list.
+    Next, it deletes all selected objects and redirects back to the change list.
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label

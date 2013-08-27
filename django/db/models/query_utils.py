@@ -30,6 +30,7 @@ class QueryWrapper(object):
     def as_sql(self, qn=None, connection=None):
         return self.data
 
+
 class Q(tree.Node):
     """
     Encapsulates filters as objects that can then be combined logically (using
@@ -74,6 +75,7 @@ class Q(tree.Node):
                 clone.children.append(child)
         return clone
 
+
 class DeferredAttribute(object):
     """
     A wrapper for a deferred-loading field. When the value is read from this
@@ -99,8 +101,7 @@ class DeferredAttribute(object):
             try:
                 f = opts.get_field_by_name(self.field_name)[0]
             except FieldDoesNotExist:
-                f = [f for f in opts.fields
-                     if f.attname == self.field_name][0]
+                f = [f for f in opts.fields if f.attname == self.field_name][0]
             name = f.name
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
@@ -173,6 +174,7 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
                                    (field.model._meta.object_name, field.name))
             return False
     return True
+
 
 # This function is needed because data descriptors must be defined on a class
 # object, not an instance, to have any effect.

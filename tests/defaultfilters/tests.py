@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import unittest
 
 from django.template.defaultfilters import *
 from django.test import TestCase
 from django.utils import six
-from django.utils import unittest, translation
+from django.utils import translation
 from django.utils.safestring import SafeData
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -248,9 +249,10 @@ class DefaultFiltersTests(TestCase):
             '<a href="https://google.com" rel="nofollow">https://google.com</a>')
 
         # Check urlize doesn't overquote already quoted urls - see #9655
-        self.assertEqual(urlize('http://hi.baidu.com/%D6%D8%D0%C2%BF'),
-            '<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
-            'http://hi.baidu.com/%D6%D8%D0%C2%BF</a>')
+        # The teststring is the urlquoted version of 'http://hi.baidu.com/重新开始'
+        self.assertEqual(urlize('http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B'),
+            '<a href="http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B" rel="nofollow">'
+            'http://hi.baidu.com/%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B</a>')
         self.assertEqual(urlize('www.mystore.com/30%OffCoupons!'),
             '<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
             'www.mystore.com/30%OffCoupons!</a>')
@@ -645,22 +647,21 @@ class DefaultFiltersI18NTests(TransRealMixin, TestCase):
 
     def test_localized_filesizeformat(self):
         # NOTE: \xa0 avoids wrapping between value and unit
-        with self.settings(USE_L10N=True):
-            with translation.override('de', deactivate=True):
-                self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
-                self.assertEqual(filesizeformat(1024), '1,0\xa0KB')
-                self.assertEqual(filesizeformat(10*1024), '10,0\xa0KB')
-                self.assertEqual(filesizeformat(1024*1024-1), '1024,0\xa0KB')
-                self.assertEqual(filesizeformat(1024*1024), '1,0\xa0MB')
-                self.assertEqual(filesizeformat(1024*1024*50), '50,0\xa0MB')
-                self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0\xa0MB')
-                self.assertEqual(filesizeformat(1024*1024*1024), '1,0\xa0GB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0\xa0TB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
-                                  '1,0\xa0PB')
-                self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
-                                  '2000,0\xa0PB')
-                self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0Bytes')
-                self.assertEqual(filesizeformat(""), '0\xa0Bytes')
-                self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
-                                  '0\xa0Bytes')
+        with self.settings(USE_L10N=True), translation.override('de', deactivate=True):
+            self.assertEqual(filesizeformat(1023), '1023\xa0Bytes')
+            self.assertEqual(filesizeformat(1024), '1,0\xa0KB')
+            self.assertEqual(filesizeformat(10*1024), '10,0\xa0KB')
+            self.assertEqual(filesizeformat(1024*1024-1), '1024,0\xa0KB')
+            self.assertEqual(filesizeformat(1024*1024), '1,0\xa0MB')
+            self.assertEqual(filesizeformat(1024*1024*50), '50,0\xa0MB')
+            self.assertEqual(filesizeformat(1024*1024*1024-1), '1024,0\xa0MB')
+            self.assertEqual(filesizeformat(1024*1024*1024), '1,0\xa0GB')
+            self.assertEqual(filesizeformat(1024*1024*1024*1024), '1,0\xa0TB')
+            self.assertEqual(filesizeformat(1024*1024*1024*1024*1024),
+                              '1,0\xa0PB')
+            self.assertEqual(filesizeformat(1024*1024*1024*1024*1024*2000),
+                              '2000,0\xa0PB')
+            self.assertEqual(filesizeformat(complex(1,-1)), '0\xa0Bytes')
+            self.assertEqual(filesizeformat(""), '0\xa0Bytes')
+            self.assertEqual(filesizeformat("\N{GREEK SMALL LETTER ALPHA}"),
+                              '0\xa0Bytes')

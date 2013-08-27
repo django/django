@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import tempfile
 import os
@@ -29,7 +29,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
+    RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
     ShortMessage, Telegram)
 
 
@@ -656,6 +656,13 @@ class UndeletableObjectAdmin(admin.ModelAdmin):
         return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
 
 
+class UnchangeableObjectAdmin(admin.ModelAdmin):
+    def get_urls(self):
+        # Disable change_view, but leave other urls untouched
+        urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
+        return [p for p in urlpatterns if not p.name.endswith("_change")]
+
+
 def callable_on_unknown(obj):
     return obj.unknown
 
@@ -741,6 +748,7 @@ site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
+site.register(UnchangeableObject, UnchangeableObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -777,3 +785,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
+
+# Used to test URL namespaces
+site2 = admin.AdminSite(name="namespaced_admin")
+site2.register(User, UserAdmin)
+site2.register(Group, GroupAdmin)

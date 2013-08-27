@@ -24,11 +24,16 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of the standard :file:`models.py` (for instance,
-    if the app's models are in submodules of ``myapp.models``), the model must
-    define which app it is part of::
+    If a model exists outside of the standard locations (:file:`models.py` or
+    a ``models`` package in an app), the model must define which app it is part
+    of::
 
         app_label = 'myapp'
+
+    .. versionadded:: 1.7
+
+        ``app_label`` is no longer required for models that are defined
+        in a ``models`` package within an app.
 
 ``db_table``
 ------------
@@ -85,7 +90,7 @@ Django quotes column and table names behind the scenes.
 
     The name of an orderable field in the model, typically a :class:`DateField`,
     :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`'s
+    field to use in your model :class:`Manager`’s
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
@@ -101,9 +106,9 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.managed
 
     Defaults to ``True``, meaning Django will create the appropriate database
-    tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`flush`
-    management command. That is, Django *manages* the database tables'
-    lifecycles.
+    tables in :djadmin:`migrate` or as part of migrations and remove them as
+    part of a :djadmin:`flush` management command. That is, Django
+    *manages* the database tables' lifecycles.
 
     If ``False``, no database table creation or deletion operations will be
     performed for this model. This is useful if the model represents an existing
@@ -187,9 +192,9 @@ Django quotes column and table names behind the scenes.
 .. admonition:: Changing order_with_respect_to
 
         ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to handle that as you would any other
-        change to your models if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`syncdb`.
+        named ``_order``, so be sure to make and apply the appropriate 
+        migrations if you add or change ``order_with_respect_to``
+        after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------
@@ -222,14 +227,26 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.permissions
 
     Extra permissions to enter into the permissions table when creating this object.
-    Add, delete and change permissions are automatically created for each object
-    that has ``admin`` set. This example specifies an extra permission,
-    ``can_deliver_pizzas``::
+    Add, delete and change permissions are automatically created for each
+    model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
         permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
+
+``default_permissions``
+------------------------------
+
+.. attribute:: Options.default_permissions
+
+    .. versionadded:: 1.7
+
+    Defaults to ``('add', 'change', 'delete')``. You may customize this list,
+    for example, by setting this to an empty list if your app doesn't require
+    any of the default permissions. It must be specified on the model before
+    the model is created by :djadmin:`syncdb` in order to prevent any omitted
+    permissions from being created.
 
 ``proxy``
 ---------
@@ -268,8 +285,6 @@ Django quotes column and table names behind the scenes.
 ------------------
 
 .. attribute:: Options.index_together
-
-    .. versionadded:: 1.5
 
     Sets of field names that, taken together, are indexed::
 

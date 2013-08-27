@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import errno
 import os
@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
 try:
     from urllib.request import urlopen
 except ImportError:     # Python 2
@@ -28,7 +29,6 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.utils import six
-from django.utils import unittest
 from django.utils._os import upath
 from django.test.utils import override_settings
 
@@ -364,6 +364,14 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
 
+    def test_delete_no_name(self):
+        """
+        Calling delete with an empty name should not try to remove the base
+        storage directory, but fail loudly (#20660).
+        """
+        with self.assertRaises(AssertionError):
+            self.storage.delete('')
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
@@ -453,6 +461,18 @@ class FileStoragePermissions(unittest.TestCase):
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
         self.assertEqual(mode, 0o666 & ~self.umask)
+
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
+    def test_file_upload_directory_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o765)
+
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
+    def test_file_upload_directory_default_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o777 & ~self.umask)
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):

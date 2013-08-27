@@ -22,20 +22,26 @@ class SQLCompiler(compiler.SQLCompiler):
         sql, params = self.as_sql()
         return '(%s) IN (%s)' % (', '.join(['%s.%s' % (qn(alias), qn2(column)) for column in columns]), sql), params
 
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
+
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
     pass
 
+
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
     pass
+
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
 
+
 class SQLDateCompiler(compiler.SQLDateCompiler, SQLCompiler):
     pass
+
 
 class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, SQLCompiler):
     pass

@@ -165,9 +165,9 @@ __ http://sphinx.pocoo.org/markup/desc.html
 
 * ``django-admin`` commands::
 
-        .. django-admin:: syncdb
+        .. django-admin:: migrate
 
-  To link, use ``:djadmin:`syncdb```.
+  To link, use ``:djadmin:`migrate```.
 
 * ``django-admin`` command-line options::
 

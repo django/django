@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 To provide a shim layer over Pillow/PIL situation until the PIL support is
-removed.
+removed. See #19934.
 
 
 Combinations To Account For
@@ -102,7 +102,7 @@ def _detect_image_library():
         except ImportError as err:
             # Neither worked, so it's likely not installed.
             raise ImproperlyConfigured(
-                _("Neither Pillow nor PIL could be imported: %s" % err)
+                _("Neither Pillow nor PIL could be imported: %s") % err
             )
 
     # ``Image.alpha_composite`` was added to Pillow in SHA: e414c6 & is not
@@ -125,13 +125,15 @@ def _detect_image_library():
             except ImportError as err:
                 raise ImproperlyConfigured(
                     _("The '_imaging' module for the PIL could not be "
-                      "imported: %s" % err)
+                      "imported: %s") % err
                 )
 
     # Try to import ImageFile as well.
     try:
         from PIL import ImageFile as PILImageFile
     except ImportError:
+        # This import cannot fail unless Pillow/PIL install is completely
+        # broken (e.g. missing Python modules).
         import ImageFile as PILImageFile
 
     # Finally, warn about deprecation...
@@ -139,7 +141,7 @@ def _detect_image_library():
         warnings.warn(
             "Support for the PIL will be removed in Django 1.8. Please " +
             "uninstall it & install Pillow instead.",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
 
     return PILImage, PIL_imaging, PILImageFile

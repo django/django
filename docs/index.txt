@@ -71,6 +71,9 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Instance methods <ref/models/instances>` |
   :doc:`Accessing related objects <ref/models/relations>`
 
+* **Migrations:**
+  :doc:`Introduction to Migrations<topics/migrations>`
+
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
   :doc:`Raw SQL <topics/db/sql>` |
@@ -190,7 +193,7 @@ testing of Django applications:
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
-  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` (deprecated) |
   :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 

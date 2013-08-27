@@ -205,13 +205,6 @@ Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
 By default, Django uses the `dictConfig format`_.
 
-.. note::
-    ``logging.dictConfig`` is a builtin library in Python 2.7. In
-    order to make this library available for users of earlier Python
-    versions, Django includes a copy as part of ``django.utils.log``.
-    If you have Python 2.7 or later, the system native library will be used; if
-    you have Python 2.6, Django's copy will be used.
-
 In order to configure logging, you use :setting:`LOGGING` to define a
 dictionary of logging settings. These settings describes the loggers,
 handlers, filters and formatters that you want in your logging setup,
@@ -233,8 +226,6 @@ things that Django does, you can be certain that loggers are always ready for
 use in your project code.
 
 .. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
-
-.. _a third-party library: http://bitbucket.org/vinay.sajip/dictconfig
 
 An example
 ----------
@@ -264,7 +255,7 @@ complex logging setup, configured using :func:`logging.config.dictConfig`::
         'handlers': {
             'null': {
                 'level': 'DEBUG',
-                'class': 'django.utils.log.NullHandler',
+                'class': 'logging.NullHandler',
             },
             'console':{
                 'level': 'DEBUG',
@@ -590,8 +581,6 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-   .. versionadded:: 1.5
-
    This filter is similar to :class:`RequireDebugFalse`, except that records are
    passed only when :setting:`DEBUG` is ``True``.
 
@@ -607,11 +596,6 @@ long as the :setting:`DEBUG` setting is set to ``False``.
 All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
 ``True`` are sent to the console. They are simply discarded (sent to
 ``NullHandler``) when :setting:`DEBUG` is ``False``.
-
-.. versionchanged:: 1.5
-
-    Before Django 1.5, all messages reaching the ``django`` logger were
-    discarded, regardless of :setting:`DEBUG`.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

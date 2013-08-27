@@ -1,9 +1,11 @@
-from __future__ import absolute_import,unicode_literals
+from __future__ import unicode_literals
 
+from collections import OrderedDict
 import datetime
 from operator import attrgetter
 import pickle
 import sys
+import unittest
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -13,8 +15,6 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
-from django.utils import unittest
-from django.utils.datastructures import SortedDict
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -25,8 +25,7 @@ from .models import (
     OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem)
-
+    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -83,6 +82,19 @@ class Queries1Tests(BaseQuerysetTest):
 
         Cover.objects.create(title="first", item=i4)
         Cover.objects.create(title="second", item=self.i2)
+
+    def test_subquery_condition(self):
+        qs1 = Tag.objects.filter(pk__lte=0)
+        qs2 = Tag.objects.filter(parent__in=qs1)
+        qs3 = Tag.objects.filter(parent__in=qs2)
+        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertIn('v0', str(qs3.query).lower())
+        qs4 = qs3.filter(parent__in=qs1)
+        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        # It is possible to reuse U for the second subquery, no need to use W.
+        self.assertNotIn('w0', str(qs4.query).lower())
+        # So, 'U0."id"' is referenced twice.
+        self.assertTrue(str(qs4.query).lower().count('u0'), 2)
 
     def test_ticket1050(self):
         self.assertQuerysetEqual(
@@ -499,7 +511,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket2902(self):
-        # Parameters can be given to extra_select, *if* you use a SortedDict.
+        # Parameters can be given to extra_select, *if* you use an OrderedDict.
 
         # (First we need to know which order the keys fall in "naturally" on
         # your system, so we can put things in the wrong way around from
@@ -513,7 +525,7 @@ class Queries1Tests(BaseQuerysetTest):
         # This slightly odd comparison works around the fact that PostgreSQL will
         # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
         # using constants here and not a real concern.
-        d = Item.objects.extra(select=SortedDict(s), select_params=params).values('a', 'b')[0]
+        d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
@@ -789,7 +801,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket7181(self):
-        # Ordering by related tables should accomodate nullable fields (this
+        # Ordering by related tables should accommodate nullable fields (this
         # test is a little tricky, since NULL ordering is database dependent.
         # Instead, we just count the number of results).
         self.assertEqual(len(Tag.objects.order_by('parent__name')), 5)
@@ -810,7 +822,7 @@ class Queries1Tests(BaseQuerysetTest):
         # Make sure bump_prefix() (an internal Query method) doesn't (re-)break. It's
         # sufficient that this query runs without error.
         qs = Tag.objects.values_list('id', flat=True).order_by('id')
-        qs.query.bump_prefix()
+        qs.query.bump_prefix(qs.query)
         first = qs[0]
         self.assertEqual(list(qs), list(range(first, first+5)))
 
@@ -1976,13 +1988,62 @@ class EmptyQuerySetTests(TestCase):
 
 
 class ValuesQuerysetTests(BaseQuerysetTest):
-    def test_flat_values_lits(self):
+    def setUp(self):
         Number.objects.create(num=72)
+        self.identity = lambda x: x
+
+    def test_flat_values_list(self):
         qs = Number.objects.values_list("num")
         qs = qs.values_list("num", flat=True)
-        self.assertValueQuerysetEqual(
-            qs, [72]
-        )
+        self.assertValueQuerysetEqual(qs, [72])
+
+    def test_extra_values(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
+                                                     ('value_minus_x', 'num-%s')]),
+                                  select_params=(1, 2))
+        qs = qs.order_by('value_minus_x')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_twice(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'})
+        qs = qs.order_by('value_minus_one').order_by('value_plus_one')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_multiple(self):
+        # Postgres doesn't allow constants in order by, so check for that.
+        qs = Number.objects.extra(select={
+            'value_plus_one': 'num+1',
+            'value_minus_one': 'num-1',
+            'constant_value': '1'
+        })
+        qs = qs.order_by('value_plus_one', 'value_minus_one', 'constant_value')
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_values_order_in_extra(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(
+            select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'},
+            order_by=['value_minus_one'])
+        qs = qs.values('num')
+
+    def test_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num')
+        self.assertQuerysetEqual(qs, [(72,)], self.identity)
+
+    def test_flat_extra_values_list(self):
+        # testing for ticket 14930 issues
+        qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
+        qs = qs.order_by('value_plus_one')
+        qs = qs.values_list('num', flat=True)
+        self.assertQuerysetEqual(qs, [72], self.identity)
 
 
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):
@@ -2099,13 +2160,6 @@ class ConditionalTests(BaseQuerysetTest):
         t4 = Tag.objects.create(name='t4', parent=t3)
         t5 = Tag.objects.create(name='t5', parent=t3)
 
-
-    # In Python 2.6 beta releases, exceptions raised in __len__ are swallowed
-    # (Python issue 1242657), so these cases return an empty list, rather than
-    # raising an exception. Not a lot we can do about that, unfortunately, due to
-    # the way Python handles list() calls internally. Thus, we skip the tests for
-    # Python 2.6.
-    @unittest.skipIf(sys.version_info[:2] == (2, 6), "Python version is 2.6")
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
         # default ordering on foreign keys in a cycle. We detect that.
@@ -2868,7 +2922,7 @@ class DoubleInSubqueryTests(TestCase):
         self.assertQuerysetEqual(
             qs, [lfb1], lambda x: x)
 
-class Ticket18785Tests(unittest.TestCase):
+class Ticket18785Tests(TestCase):
     def test_ticket_18785(self):
         # Test join trimming from ticket18785
         qs = Item.objects.exclude(
@@ -2878,3 +2932,83 @@ class Ticket18785Tests(unittest.TestCase):
         ).order_by()
         self.assertEqual(1, str(qs.query).count('INNER JOIN'))
         self.assertEqual(0, str(qs.query).count('OUTER JOIN'))
+
+
+class Ticket20788Tests(TestCase):
+    def test_ticket_20788(self):
+        Paragraph.objects.create()
+        paragraph = Paragraph.objects.create()
+        page = paragraph.page.create()
+        chapter = Chapter.objects.create(paragraph=paragraph)
+        Book.objects.create(chapter=chapter)
+
+        paragraph2 = Paragraph.objects.create()
+        Page.objects.create()
+        chapter2 = Chapter.objects.create(paragraph=paragraph2)
+        book2 = Book.objects.create(chapter=chapter2)
+
+        sentences_not_in_pub = Book.objects.exclude(
+            chapter__paragraph__page=page)
+        self.assertQuerysetEqual(
+            sentences_not_in_pub, [book2], lambda x: x)
+
+class Ticket12807Tests(TestCase):
+    def test_ticket_12807(self):
+        p1 = Paragraph.objects.create()
+        p2 = Paragraph.objects.create()
+        # The ORed condition below should have no effect on the query - the
+        # ~Q(pk__in=[]) will always be True.
+        qs = Paragraph.objects.filter((Q(pk=p2.pk) | ~Q(pk__in=[])) & Q(pk=p1.pk))
+        self.assertQuerysetEqual(qs, [p1], lambda x: x)
+
+
+class RelatedLookupTypeTests(TestCase):
+    def test_wrong_type_lookup(self):
+        oa = ObjectA.objects.create(name="oa")
+        wrong_type = Order.objects.create(id=oa.pk)
+        ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
+        # Currently Django doesn't care if the object is of correct
+        # type, it will just use the objecta's related fields attribute
+        # (id) for model lookup. Making things more restrictive could
+        # be a good idea...
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta=wrong_type),
+            [ob], lambda x: x)
+        self.assertQuerysetEqual(
+            ObjectB.objects.filter(objecta__in=[wrong_type]),
+            [ob], lambda x: x)
+
+class Ticket14056Tests(TestCase):
+    def test_ticket_14056(self):
+        s1 = SharedConnection.objects.create(data='s1')
+        s2 = SharedConnection.objects.create(data='s2')
+        s3 = SharedConnection.objects.create(data='s3')
+        PointerA.objects.create(connection=s2)
+        expected_ordering = (
+            [s1, s3, s2] if connection.features.nulls_order_largest
+            else [s2, s1, s3]
+        )
+        self.assertQuerysetEqual(
+            SharedConnection.objects.order_by('-pointera__connection', 'pk'),
+            expected_ordering, lambda x: x
+        )
+
+class Ticket20955Tests(TestCase):
+    def test_ticket_20955(self):
+        jack = Staff.objects.create(name='jackstaff')
+        jackstaff = StaffUser.objects.create(staff=jack)
+        jill = Staff.objects.create(name='jillstaff')
+        jillstaff = StaffUser.objects.create(staff=jill)
+        task = Task.objects.create(creator=jackstaff, owner=jillstaff, title="task")
+        task_get = Task.objects.get(pk=task.pk)
+        # Load data so that assertNumQueries doesn't complain about the get
+        # version's queries.
+        task_get.creator.staffuser.staff
+        task_get.owner.staffuser.staff
+        task_select_related = Task.objects.select_related(
+            'creator__staffuser__staff', 'owner__staffuser__staff').get(pk=task.pk)
+        with self.assertNumQueries(0):
+            self.assertEqual(task_select_related.creator.staffuser.staff,
+                             task_get.creator.staffuser.staff)
+            self.assertEqual(task_select_related.owner.staffuser.staff,
+                             task_get.owner.staffuser.staff)

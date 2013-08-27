@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import codecs
 import os
 import re
+import warnings
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -168,7 +169,18 @@ def _split_statements(content):
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(upath(models.get_app(model._meta.app_label).__file__)), 'sql'))
+    app_dirs = []
+    app_dir = models.get_app_path(model._meta.app_label)
+    app_dirs.append(os.path.normpath(os.path.join(app_dir, 'sql')))
+
+    # Deprecated location -- remove in Django 1.9
+    old_app_dir = os.path.normpath(os.path.join(app_dir, 'models/sql'))
+    if os.path.exists(old_app_dir):
+        warnings.warn("Custom SQL location '<app_label>/models/sql' is "
+                      "deprecated, use '<app_label>/sql' instead.",
+                      PendingDeprecationWarning)
+        app_dirs.append(old_app_dir)
+
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
@@ -181,8 +193,10 @@ def custom_sql_for_model(model, style, connection):
 
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)),
-                 os.path.join(app_dir, "%s.sql" % opts.model_name)]
+    sql_files = []
+    for app_dir in app_dirs:
+        sql_files.append(os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)))
+        sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
@@ -192,25 +206,25 @@ def custom_sql_for_model(model, style, connection):
     return output
 
 
-def emit_pre_sync_signal(create_models, verbosity, interactive, db):
-    # Emit the pre_sync signal for every application.
+def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
+    # Emit the pre_migrate signal for every application.
     for app in models.get_apps():
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
-            print("Running pre-sync handlers for application %s" % app_name)
-        models.signals.pre_syncdb.send(sender=app, app=app,
+            print("Running pre-migrate handlers for application %s" % app_name)
+        models.signals.pre_migrate.send(sender=app, app=app,
                                        create_models=create_models,
                                        verbosity=verbosity,
                                        interactive=interactive,
                                        db=db)
 
 
-def emit_post_sync_signal(created_models, verbosity, interactive, db):
-    # Emit the post_sync signal for every application.
+def emit_post_migrate_signal(created_models, verbosity, interactive, db):
+    # Emit the post_migrate signal for every application.
     for app in models.get_apps():
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
-            print("Running post-sync handlers for application %s" % app_name)
-        models.signals.post_syncdb.send(sender=app, app=app,
+            print("Running post-migrate handlers for application %s" % app_name)
+        models.signals.post_migrate.send(sender=app, app=app,
             created_models=created_models, verbosity=verbosity,
             interactive=interactive, db=db)

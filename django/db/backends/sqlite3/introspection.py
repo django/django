@@ -1,7 +1,10 @@
 import re
+
 from django.db.backends import BaseDatabaseIntrospection, FieldInfo
 
+
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+
 
 def get_field_size(name):
     """ Extract the size number from a "varchar(11)" type name """
@@ -46,6 +49,7 @@ class FlexibleFieldLookupDict(object):
                 return ('CharField', {'max_length': size})
             raise KeyError
 
+
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
@@ -76,7 +80,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Schema for this table
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
         results = cursor.fetchone()[0].strip()
-        results = results[results.index('(')+1:results.rindex(')')]
+        results = results[results.index('(') + 1:results.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
@@ -96,8 +100,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             result = cursor.fetchall()[0]
             other_table_results = result[0].strip()
             li, ri = other_table_results.index('('), other_table_results.rindex(')')
-            other_table_results = other_table_results[li+1:ri]
-
+            other_table_results = other_table_results[li + 1:ri]
 
             for other_index, other_desc in enumerate(other_table_results.split(',')):
                 other_desc = other_desc.strip()
@@ -121,7 +124,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Schema for this table
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
         results = cursor.fetchone()[0].strip()
-        results = results[results.index('(')+1:results.rindex(')')]
+        results = results[results.index('(') + 1:results.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
@@ -155,7 +158,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if len(info) != 1:
                 continue
             name = info[0][2] # seqno, cid, name
-            indexes[name] = {'primary_key': False,
+            indexes[name] = {'primary_key': indexes.get(name, {}).get("primary_key", False),
                              'unique': unique}
         return indexes
 
@@ -165,8 +168,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         # Don't use PRAGMA because that causes issues with some transactions
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        results = cursor.fetchone()[0].strip()
-        results = results[results.index('(')+1:results.rindex(')')]
+        row = cursor.fetchone()
+        if row is None:
+            raise ValueError("Table %s does not exist" % table_name)
+        results = row[0].strip()
+        results = results[results.index('(') + 1:results.rindex(')')]
         for field_desc in results.split(','):
             field_desc = field_desc.strip()
             m = re.search('"(.*)".*PRIMARY KEY$', field_desc)
@@ -183,3 +189,41 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                  'null_ok': not field[3],
                  'pk': field[5]     # undocumented
                  } for field in cursor.fetchall()]
+
+    def get_constraints(self, cursor, table_name):
+        """
+        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        """
+        constraints = {}
+        # Get the index info
+        cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
+        for number, index, unique in cursor.fetchall():
+            # Get the index info for that index
+            cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
+            for index_rank, column_rank, column in cursor.fetchall():
+                if index not in constraints:
+                    constraints[index] = {
+                        "columns": [],
+                        "primary_key": False,
+                        "unique": bool(unique),
+                        "foreign_key": False,
+                        "check": False,
+                        "index": True,
+                    }
+                constraints[index]['columns'].append(column)
+        # Get the PK
+        pk_column = self.get_primary_key_column(cursor, table_name)
+        if pk_column:
+            # SQLite doesn't actually give a name to the PK constraint,
+            # so we invent one. This is fine, as the SQLite backend never
+            # deletes PK constraints by name, as you can't delete constraints
+            # in SQLite; we remake the table with a new PK instead.
+            constraints["__primary__"] = {
+                "columns": [pk_column],
+                "primary_key": True,
+                "unique": False,  # It's not actually a unique constraint.
+                "foreign_key": False,
+                "check": False,
+                "index": False,
+            }
+        return constraints

@@ -329,6 +329,15 @@ class SymlinkExtractorTests(ExtractorTests):
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
+    PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
+
+    def tearDown(self):
+        os.chdir(self.test_dir)
+        try:
+            self._rmrf('locale/es')
+        except OSError:
+            pass
+        os.chdir(self._cwd)
 
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
@@ -337,6 +346,16 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+
+    def test_override_plural_forms(self):
+        """Ticket #20311."""
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale='es', extensions=['djtpl'], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE_ES))
+        with open(self.PO_FILE_ES, 'r') as fp:
+            po_contents = force_text(fp.read())
+            found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
+            self.assertEqual(1, len(found))
 
 
 class NoWrapExtractorTests(ExtractorTests):
