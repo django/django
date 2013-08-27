@@ -1902,3 +1902,34 @@ class RequestContextTests(unittest.TestCase):
         # The stack should now contain 3 items:
         # [builtins, supplied context, context processor]
         self.assertEqual(len(ctx.dicts), 3)
+
+
+class SSITests(TestCase):
+    def setUp(self):
+        self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
+
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return template.Template('{%% ssi "%s" %%}' % path).render(Context())
+
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    def test_relative_include_exploit(self):
+        """
+        May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
+
+        e.g. if ALLOWED_INCLUDE_ROOTS = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            for path in disallowed_paths:
+                self.assertEqual(self.render_ssi(path), '')
