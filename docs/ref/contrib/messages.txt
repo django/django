@@ -376,3 +376,12 @@ behavior:
 * :setting:`MESSAGE_LEVEL`
 * :setting:`MESSAGE_STORAGE`
 * :setting:`MESSAGE_TAGS`
+
+.. versionadded:: 1.7
+
+For backends that use cookies, the settings for the cookie are taken from
+the session cookie settings:
+
+* :setting:`SESSION_COOKIE_DOMAIN`
+* :setting:`SESSION_COOKIE_SECURE`
+* :setting:`SESSION_COOKIE_HTTPONLY`

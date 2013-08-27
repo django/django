@@ -127,10 +127,16 @@ class DateFormatTests(unittest.TestCase):
         wintertime = datetime(2005, 10, 30, 4, 00)
         timestamp = datetime(2008, 5, 19, 11, 45, 23, 123456)
 
+        # 3h30m to the west of UTC
+        tz = FixedOffset(-3*60 - 30)
+        aware_dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
+
         if self.tz_tests:
             self.assertEqual(dateformat.format(my_birthday, 'O'), '+0100')
             self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 8 Jul 1979 22:00:00 +0100')
             self.assertEqual(dateformat.format(my_birthday, 'T'), 'CET')
+            self.assertEqual(dateformat.format(my_birthday, 'e'), '')
+            self.assertEqual(dateformat.format(aware_dt, 'e'), '-0330')
             self.assertEqual(dateformat.format(my_birthday, 'U'), '300315600')
             self.assertEqual(dateformat.format(timestamp, 'u'), '123456')
             self.assertEqual(dateformat.format(my_birthday, 'Z'), '3600')
@@ -140,7 +146,4 @@ class DateFormatTests(unittest.TestCase):
             self.assertEqual(dateformat.format(wintertime, 'O'), '+0100')
 
         # Ticket #16924 -- We don't need timezone support to test this
-        # 3h30m to the west of UTC
-        tz = FixedOffset(-3*60 - 30)
-        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
-        self.assertEqual(dateformat.format(dt, 'O'), '-0330')
+        self.assertEqual(dateformat.format(aware_dt, 'O'), '-0330')
