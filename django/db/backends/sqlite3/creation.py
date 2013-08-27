@@ -36,7 +36,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
 
     data_types_suffix = {
-        'AutoField':                    'AUTOINCREMENT',
+        'AutoField': 'AUTOINCREMENT',
     }
 
     def sql_for_pending_references(self, model, style, pending_references):
