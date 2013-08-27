@@ -659,17 +659,17 @@ class BaseAggregateTestCase(TestCase):
         self.assertRaises(ValueError, lambda: Book.objects.aggregate(Sum('price') / Sum('count')))
         self.assertRaises(ValueError, lambda: Book.objects.annotate(Sum('price') / Sum('count')))
 
-    def _assert_float_equal(self, val1, val2, precision=None):
+    def _assert_float_equal(self, val1, val2, precision=None, error=None):
         try:
             if precision is not None:
                 self.assertEqual(round(val1, precision), round(val2, precision))
             else:
                 self.assertEqual(val1, val2)
-        except AssertionError:
+        except AssertionError as err:
             precision = 6 if precision is None else precision - 1
             if precision == -1:
-                raise
-            self._assert_float_equal(val1, val2, precision=precision)
+                raise error or err
+            self._assert_float_equal(val1, val2, precision=precision, error=error or err)
 
     def _test_op_aggregate(self, op_method, class_1, class_2, number, always_float=False, int_if_int=False):
         aggregate_result = Book.objects.aggregate(res_1=class_1('pages'), res_2=class_2('price'))
