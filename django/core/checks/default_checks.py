@@ -15,6 +15,10 @@ def check_all_models(**kwargs):
 
 
 def check_1_6_compatibility(**kwargs):
+    return _check_test_runner(**kwargs) + _check_boolean_field_default_value(**kwargs)
+
+
+def _check_test_runner(**kwargs):
     """ Warn an user if the user has *not* set explicitly the ``TEST_RUNNER``
     setting. """
 
@@ -35,3 +39,29 @@ def check_1_6_compatibility(**kwargs):
         ]
     else:
         return []
+
+
+def _check_boolean_field_default_value():
+    """
+    Checks if there are any BooleanFields without a default value, &
+    warns the user that the default has changed from False to Null.
+    """
+
+    from django.db import models
+
+    invalid_fields = [field
+        for cls in models.get_models()
+        for field in cls._meta.local_fields
+        if isinstance(field, models.BooleanField) and not field.has_default()]
+
+    return [
+        Warning(
+            'The field has not set a default value. In Django 1.6 '
+                'the default value of BooleanField was changed from '
+                'False to Null when Field.default is not defined. '
+                'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
+                'for more information.',
+            hint=None,
+            obj=field,
+        )
+        for field in invalid_fields]
