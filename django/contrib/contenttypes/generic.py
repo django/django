@@ -335,7 +335,7 @@ class GenericRelation(ForeignObject):
             # Using `vars` is very ugly approach, but there is no better one,
             # because GenericForeignKeys are not considered as fields and,
             # therefore, are not included in `target._meta.local_fields`.
-            fields = vars(target).itervalues()
+            fields = target._meta.virtual_fields
             if any(isinstance(field, GenericForeignKey) and
                     field.ct_field == self.content_type_field_name and
                     field.fk_field == self.object_id_field_name
