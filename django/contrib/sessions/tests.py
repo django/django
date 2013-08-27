@@ -20,7 +20,7 @@ from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, patch_logger
+from django.test.utils import override_settings, patch_logger, dict_setting
 from django.utils import six
 from django.utils import timezone
 
@@ -501,7 +501,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 class SessionMiddlewareTests(unittest.TestCase):
 
-    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, SECURE=True))
+    @dict_setting('SESSION_COOKIE', {'SECURE': True})
     def test_secure_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -516,7 +516,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE['NAME']]['secure'])
 
-    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=True))
+    @dict_setting('SESSION_COOKIE', {'HTTPONLY': True})
     def test_httponly_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
@@ -533,7 +533,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         self.assertIn('httponly',
             str(response.cookies[settings.SESSION_COOKIE['NAME']]))
 
-    @override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, HTTPONLY=False))
+    @dict_setting('SESSION_COOKIE', {'HTTPONLY': False})
     def test_no_httponly_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')

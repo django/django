@@ -7,7 +7,7 @@ from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, dict_setting
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -42,9 +42,7 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-#@override_settings(SESSION_COOKIE['DOMAIN']='.example.com')
-#@override_settings(SESSION_COOKIE=settings.SESSION_COOKIE.update({'DOMAIN': '.example.com'}))
-@override_settings(SESSION_COOKIE=dict(settings.SESSION_COOKIE, DOMAIN='.example.com'))
+@dict_setting('SESSION_COOKIE', {'DOMAIN': '.example.com'})
 class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
