@@ -338,6 +338,17 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_include_template_argument(self):
+        """
+        Support any render() supporting object
+        """
+        ctx = Context({
+            'tmpl': Template('This worked!'),
+        })
+        tmpl = loader.get_template('test_include_template_argument.html')
+        output = tmpl.render(ctx)
+        self.assertEqual(output, 'This worked!\n')
+
 
 class TemplateRegressionTests(TestCase):
 

@@ -258,6 +258,11 @@ Templates
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
 
+* The :ttag:`include` template tag will now also accept anything with a
+  ``render()`` method (such as a ``Template``) as an argument. String
+  arguments will be looked up using
+  :func:`~django.template.loader.get_template` as always.
+
 Backwards incompatible changes in 1.7
 =====================================
 
