@@ -59,7 +59,7 @@ class CookieTest(BaseTests, TestCase):
 
     def test_cookie_setings(self):
         """
-        Ensure that CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE and SESSION_COOKIE_HTTPONLY
+        Ensure that CookieStorage honors SESSION_COOKIE['DOMAIN'], SESSION_COOKIE['SECURE'] and SESSION_COOKIE['HTTPONLY']
         Refs #15618 and #20972.
         """
         # Test before the messages have been consumed
