@@ -1,3 +1,4 @@
+import inspect
 import re
 
 from django.conf import settings
@@ -46,10 +47,13 @@ def authenticate(**credentials):
     """
     for backend in get_backends():
         try:
-            user = backend.authenticate(**credentials)
+            inspect.getcallargs(backend.authenticate, **credentials)
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
+
+        try:
+            user = backend.authenticate(**credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             return None

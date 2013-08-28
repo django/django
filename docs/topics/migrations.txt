@@ -196,7 +196,7 @@ restrict to a single app. Restricting to a single app (either in
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
 
-.. migration-files:
+.. _migration-files:
 
 Migration files
 ---------------
@@ -273,8 +273,7 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-
-.. historical-models:
+.. _historical-models:
 
 Historical models
 -----------------
