@@ -97,6 +97,27 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
+"""Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9."""
+_deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
+
+    'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
+    'SESSION_COOKIE_DOMAIN', 'SESSION_COOKIE_SECURE', 'SESSION_COOKIE_PATH',
+    'SESSION_COOKIE_HTTPONLY',
+
+    'CSRF_COOKIE_NAME', 'CSRF_COOKIE_DOMAIN', 'CSRF_COOKIE_SECURE',
+    'CSRF_COOKIE_PATH', 'CSRF_COOKIE_HTTPONLY')
+
+def _handle_cookie_settings_deprecation(setting):
+    """Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9."""
+    if setting in _deprecated_cookie_settings:
+        prefix, _, attrib = setting.split('_', 2)
+        new = '%s_COOKIE' % prefix
+        warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead."
+                      % {'old': setting, 'new': new},
+            PendingDeprecationWarning, stacklevel=2)
+        return (new, attrib)
+    return False
+
 class BaseSettings(object):
     """
     Common logic for settings whether set by a module or by the user.
@@ -113,6 +134,10 @@ class BaseSettings(object):
                 raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
 
         object.__setattr__(self, name, value)
+
+    def __getattr__(self, name):
+        _handle_cookie_settings_deprecation(name)
+        return super(BaseSettings, self).__getattr__(name)
 
 
 class Settings(BaseSettings):
@@ -134,14 +159,6 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-        deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
-
-            'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
-            'SESSION_COOKIE_DOMAIN', 'SESSION_COOKIE_SECURE', 'SESSION_COOKIE_PATH',
-            'SESSION_COOKIE_HTTPONLY',
-
-            'CSRF_COOKIE_NAME', 'CSRF_COOKIE_DOMAIN', 'CSRF_COOKIE_SECURE',
-            'CSRF_COOKIE_PATH', 'CSRF_COOKIE_HTTPONLY')
 
         for setting in dir(mod):
             if setting == setting.upper():
@@ -153,12 +170,9 @@ class Settings(BaseSettings):
                             "Please fix your settings." % setting)
 
                 # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
-                if setting in deprecated_cookie_settings:
-                    prefix, _, attrib = setting.split('_', 2)
-                    new = '%s_COOKIE' % prefix
-                    warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead."
-                                  % {'old': setting, 'new': new},
-                        PendingDeprecationWarning, stacklevel=2)
+                vals = _handle_cookie_settings_deprecation(setting)
+                if vals:
+                    new, attrib = vals
                     temp = getattr(self, new)
                     temp[attrib] = setting_value
                     setattr(self, new, temp)
