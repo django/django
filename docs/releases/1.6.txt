@@ -140,16 +140,17 @@ current version of Django.
 
 :meth:`Model.save() <django.db.models.Model.save()>` algorithm changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The :meth:`Model.save() <django.db.models.Model.save()>` method now
-tries to directly ``UPDATE`` the database if the object has a primary
+tries to directly ``UPDATE`` the database if the instance has a primary
 key value. Previously ``SELECT`` was performed to determine if ``UPDATE``
-or ``INSERT`` was needed. The new algorithm needs only one query for
+or ``INSERT`` were needed. The new algorithm needs only one query for
 updating an existing row while the old algorithm needed two. See
 :meth:`Model.save() <django.db.models.Model.save()>` for more details.
 
 In some rare cases the database doesn't report that a matching row was
-found when doing an ``UPDATE``. An example is PostgreSQL ON UPDATE
-trigger which returns NULL. In such cases it is possible to set
+found when doing an ``UPDATE``. An example is PostgreSQL ``ON UPDATE``
+trigger which returns ``NULL``. In such cases it is possible to set
 :attr:`django.db.models.Options.select_on_save` flag to force saving to
 use the old algorithm.
 
