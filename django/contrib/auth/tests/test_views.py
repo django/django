@@ -504,12 +504,12 @@ class LoginTest(AuthViewsTestCase):
         req.META["CSRF_COOKIE_USED"] = True
         resp = login_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE['NAME'], None)
         token1 = csrf_cookie.coded_value
 
         # Prepare the POST request
         req = HttpRequest()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
+        req.COOKIES[settings.CSRF_COOKIE['NAME']] = token1
         req.method = "POST"
         req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
         req.REQUEST = req.POST
@@ -522,7 +522,7 @@ class LoginTest(AuthViewsTestCase):
         req.META["CSRF_COOKIE_USED"] = True
         resp = login_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE['NAME'], None)
         token2 = csrf_cookie.coded_value
 
         # Check the CSRF token switched
