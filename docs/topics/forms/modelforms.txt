@@ -17,7 +17,7 @@ model, and you want to create a form that lets people submit comments. In this
 case, it would be redundant to define the field types in your form, because
 you've already defined the fields in your model.
 
-For this reason, Django provides a helper class that let you create a ``Form``
+For this reason, Django provides a helper class that lets you create a ``Form``
 class from a Django model.
 
 For example::
