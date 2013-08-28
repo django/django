@@ -42,8 +42,7 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-@dict_setting('SESSION_COOKIE', {'DOMAIN': '.example.com'})
-@override_settings(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True)
+@dict_setting('SESSION_COOKIE', {'DOMAIN': '.example.com', 'SECURE': True, 'HTTPONLY': True})
 class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
