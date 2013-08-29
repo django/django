@@ -35,6 +35,7 @@ TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
+    'coverage_html',
     'data',
     'requirements',
     'templates',

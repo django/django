@@ -317,7 +317,7 @@ class HttpResponse(HttpResponseBase):
 
     streaming = False
 
-    def __init__(self, content='', *args, **kwargs):
+    def __init__(self, content=b'', *args, **kwargs):
         super(HttpResponse, self).__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content

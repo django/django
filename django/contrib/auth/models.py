@@ -386,9 +386,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
-    def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.username)
-
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.

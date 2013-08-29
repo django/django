@@ -201,7 +201,8 @@ Create a file ``django-polls/setup.py`` with the following contents::
             'License :: OSI Approved :: BSD License', # example license
             'Operating System :: OS Independent',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.6',
+            # replace these appropriately if you are using Python 3
+            'Programming Language :: Python :: 2',
             'Programming Language :: Python :: 2.7',
             'Topic :: Internet :: WWW/HTTP',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content',

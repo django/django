@@ -16,7 +16,7 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.utils import six
@@ -154,7 +154,7 @@ class ForNode(Node):
             len_values = len(values)
             if len_values < 1:
                 return self.nodelist_empty.render(context)
-            nodelist = NodeList()
+            nodelist = []
             if self.is_reversed:
                 values = reversed(values)
             unpack = len(self.loopvars) > 1
@@ -205,7 +205,7 @@ class ForNode(Node):
                     # don't want to leave any vars from the previous loop on the
                     # context.
                     context.pop()
-        return nodelist.render(context)
+        return mark_safe(''.join([force_text(n) for n in nodelist]))
 
 class IfChangedNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
