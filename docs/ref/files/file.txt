@@ -28,8 +28,7 @@ The ``File`` Class
 
     .. attribute:: file
 
-        Python's :py:ref:`built-in file object<bltin-file-objects>` passed to :class:`~django.core.files.File`
-        that this class wraps.
+        The Python's :py:ref:`built-in file object<bltin-file-objects>` that this class wraps.
 
     .. attribute:: mode
 
