@@ -345,9 +345,9 @@ class TemplateLoaderTests(TestCase):
         ctx = Context({
             'tmpl': Template('This worked!'),
         })
-        tmpl = loader.get_template('test_include_template_argument.html')
+        tmpl = Template('{% include tmpl %}')
         output = tmpl.render(ctx)
-        self.assertEqual(output, 'This worked!\n')
+        self.assertEqual(output, 'This worked!')
 
 
 class TemplateRegressionTests(TestCase):
