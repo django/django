@@ -11,11 +11,9 @@ The ``File`` Class
 
 .. class:: File(file_object)
 
-    The :class:`File` is a thin wrapper around Python's `built-in file object`_
+    The :class:`File` is a thin wrapper around Python's :py:ref:`built-in file object<bltin-file-objects>`
     with some Django-specific additions. Internally, Django uses this class
     when it needs to represent a file.
-
-    .. _built-in file object: http://docs.python.org/library/stdtypes.html#bltin-file-objects
 
     :class:`File` objects have the following attributes and methods:
 
@@ -30,7 +28,7 @@ The ``File`` Class
 
     .. attribute:: file
 
-        The Python `built-in file object`_ passed to :class:`~django.core.files.File`
+        Python's :py:ref:`built-in file object<bltin-file-objects>` passed to :class:`~django.core.files.File`
         that this class wraps.
 
     .. attribute:: mode
