@@ -159,8 +159,11 @@ class IncludeNode(BaseIncludeNode):
 
     def render(self, context):
         try:
-            template_name = self.template_name.resolve(context)
-            template = get_template(template_name)
+            template = self.template_name.resolve(context)
+            # Does this quack like a Template?
+            if not callable(getattr(template, 'render', None)):
+                # If not, we'll try get_template
+                template = get_template(template)
             return self.render_template(template, context)
         except:
             if settings.TEMPLATE_DEBUG:
