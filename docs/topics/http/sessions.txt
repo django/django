@@ -454,6 +454,17 @@ Here's a typical usage example::
 Using sessions out of views
 ===========================
 
+.. note::
+
+    The examples in this section import the ``SessionStore`` object directly
+    from the ``django.contrib.sessions.backends.db`` backend. In your own code,
+    you should consider importing ``SessionStore`` from the session engine
+    designated by :setting:`SESSION_ENGINE`, as below:
+
+      >>> from importlib import import_module
+      >>> from django.conf import settings
+      >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+
 An API is available to manipulate session data outside of a view::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
