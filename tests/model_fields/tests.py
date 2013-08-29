@@ -494,3 +494,21 @@ class GenericIPAddressFieldTests(test.TestCase):
         model_field = models.GenericIPAddressField(protocol='IPv6')
         form_field = model_field.formfield()
         self.assertRaises(ValidationError, form_field.clean, '127.0.0.1')
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        prepare_count = [0]
+        class NoopField(models.TextField):
+            def get_prep_value(self, value):
+                prepare_count[0] += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup('exact', 'TEST', connection=connection, prepared=False)
+        self.assertEqual(prepare_count[0], 1)
