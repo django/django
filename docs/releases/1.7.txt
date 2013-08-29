@@ -323,6 +323,13 @@ Miscellaneous
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
+* ``django.contrib.auth.models.AbstractUser`` no longer defines a
+  :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
+  returned  ``"/users/%s/" % urlquote(self.username)`` which was arbitrary
+  since applications may or may not define such a url in ``urlpatterns``.
+  Define a ``get_absolute_url()`` method on your own custom user object or use
+  :setting:`ABSOLUTE_URL_OVERRIDES` if you want a URL for your user.
+
 Features deprecated in 1.7
 ==========================
 
