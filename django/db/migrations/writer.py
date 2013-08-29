@@ -104,7 +104,7 @@ class MigrationWriter(object):
                 imports.update(k_imports)
                 imports.update(v_imports)
                 strings.append((k_string, v_string))
-            return "{%s}" % (", ".join(["%s: %s" % (k, v) for k, v in strings])), imports
+            return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
         # Datetimes
         elif isinstance(value, (datetime.datetime, datetime.date)):
             return repr(value), set(["import datetime"])

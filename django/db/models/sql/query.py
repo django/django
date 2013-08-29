@@ -371,11 +371,11 @@ class Query(object):
         if result is None:
             result = [None for q in query.aggregate_select.items()]
 
-        return dict([
+        return dict(
             (alias, self.resolve_aggregate(val, aggregate, connection=connections[using]))
             for (alias, aggregate), val
             in zip(query.aggregate_select.items(), result)
-        ])
+        )
 
     def get_count(self, using):
         """
@@ -1755,7 +1755,7 @@ class Query(object):
         """
         Callback used by get_deferred_field_names().
         """
-        target[model] = set([f.name for f in fields])
+        target[model] = set(f.name for f in fields)
 
     def set_aggregate_mask(self, names):
         "Set the mask of aggregates that will actually be returned by the SELECT"
@@ -1790,10 +1790,10 @@ class Query(object):
         if self._aggregate_select_cache is not None:
             return self._aggregate_select_cache
         elif self.aggregate_select_mask is not None:
-            self._aggregate_select_cache = OrderedDict([
+            self._aggregate_select_cache = OrderedDict(
                 (k, v) for k, v in self.aggregates.items()
                 if k in self.aggregate_select_mask
-            ])
+            )
             return self._aggregate_select_cache
         else:
             return self.aggregates
@@ -1803,10 +1803,10 @@ class Query(object):
         if self._extra_select_cache is not None:
             return self._extra_select_cache
         elif self.extra_select_mask is not None:
-            self._extra_select_cache = OrderedDict([
+            self._extra_select_cache = OrderedDict(
                 (k, v) for k, v in self.extra.items()
                 if k in self.extra_select_mask
-            ])
+            )
             return self._extra_select_cache
         else:
             return self.extra

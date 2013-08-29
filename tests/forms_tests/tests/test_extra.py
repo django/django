@@ -723,7 +723,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
             def as_divs(self):
                 if not self: return ''
-                return '<div class="errorlist">%s</div>' % ''.join(['<div class="error">%s</div>' % force_text(e) for e in self])
+                return '<div class="errorlist">%s</div>' % ''.join('<div class="error">%s</div>' % force_text(e) for e in self)
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)

@@ -15,7 +15,7 @@ class FeedTestCase(TestCase):
     fixtures = ['feeddata.json']
 
     def assertChildNodes(self, elem, expected):
-        actual = set([n.nodeName for n in elem.childNodes])
+        actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 

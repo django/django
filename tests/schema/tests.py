@@ -42,7 +42,7 @@ class SchemaTests(TransactionTestCase):
                             "table": connection.ops.quote_name(field.rel.through._meta.db_table),
                         })
                     except DatabaseError as e:
-                        if any([s in str(e).lower() for s in self.no_table_strings]):
+                        if any(s in str(e).lower() for s in self.no_table_strings):
                             pass
                         else:
                             raise
@@ -53,7 +53,7 @@ class SchemaTests(TransactionTestCase):
                         "table": connection.ops.quote_name(model._meta.db_table),
                     })
                 except DatabaseError as e:
-                    if any([s in str(e).lower() for s in self.no_table_strings]):
+                    if any(s in str(e).lower() for s in self.no_table_strings):
                         pass
                     else:
                         raise

@@ -698,16 +698,16 @@ class ModelAdmin(BaseModelAdmin):
             # Avoid trying to iterate over None
             if not class_actions:
                 continue
-            actions.extend([self.get_action(action) for action in class_actions])
+            actions.extend(self.get_action(action) for action in class_actions)
 
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
         # Convert the actions into an OrderedDict keyed by name.
-        actions = OrderedDict([
+        actions = OrderedDict(
             (name, (func, name, desc))
             for func, name, desc in actions
-        ])
+        )
 
         return actions
 

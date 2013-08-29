@@ -61,7 +61,7 @@ class GOverlayBase(object):
 
     def latlng_from_coords(self, coords):
         "Generates a JavaScript array of GLatLng objects for the given coordinates."
-        return '[%s]' % ','.join(['new GLatLng(%s,%s)' % (y, x) for x, y in coords])
+        return '[%s]' % ','.join('new GLatLng(%s,%s)' % (y, x) for x, y in coords)
 
     def add_event(self, event):
         "Attaches a GEvent to the overlay object."

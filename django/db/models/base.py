@@ -159,7 +159,7 @@ class ModelBase(type):
         new_fields = new_class._meta.local_fields + \
                      new_class._meta.local_many_to_many + \
                      new_class._meta.virtual_fields
-        field_names = set([f.name for f in new_fields])
+        field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -321,7 +321,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
 
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),

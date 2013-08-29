@@ -231,7 +231,7 @@ class SortedDict(dict):
         Replaces the normal dict.__repr__ with a version that returns the keys
         in their sorted order.
         """
-        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in six.iteritems(self)])
+        return '{%s}' % ', '.join('%r: %r' % (k, v) for k, v in six.iteritems(self))
 
     def clear(self):
         super(SortedDict, self).clear()

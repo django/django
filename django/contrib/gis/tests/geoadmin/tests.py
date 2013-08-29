@@ -23,7 +23,7 @@ class GeoAdminTest(TestCase):
     def test_ensure_geographic_media(self):
         geoadmin = admin.site._registry[City]
         admin_js = geoadmin.media.render_js()
-        self.assertTrue(any([geoadmin.openlayers_url in js for js in admin_js]))
+        self.assertTrue(any(geoadmin.openlayers_url in js for js in admin_js))
 
     def test_olmap_OSM_rendering(self):
         geoadmin = admin.site._registry[City]

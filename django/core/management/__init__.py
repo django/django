@@ -114,8 +114,8 @@ def get_commands():
         for app_name in apps:
             try:
                 path = find_management_module(app_name)
-                _commands.update(dict([(name, app_name)
-                                       for name in find_commands(path)]))
+                _commands.update(dict((name, app_name)
+                                       for name in find_commands(path)))
             except ImportError:
                 pass # No management module - ignore this app
 
@@ -336,7 +336,7 @@ class ManagementUtility(object):
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input
-            options = sorted([(k, v) for k, v in options if k.startswith(curr)])
+            options = sorted((k, v) for k, v in options if k.startswith(curr))
             for option in options:
                 opt_label = option[0]
                 # append '=' to options which require args

@@ -161,7 +161,7 @@ def get_validation_errors(outfile, app=None):
                         for rel_field in f.foreign_related_fields:
                             has_unique_field = has_unique_field or rel_field.unique
                         if not has_unique_field:
-                            e.add(opts, "Field combination '%s' under model '%s' must have a unique=True constraint" % (','.join([rel_field.name for rel_field in f.foreign_related_fields]), f.rel.to.__name__))
+                            e.add(opts, "Field combination '%s' under model '%s' must have a unique=True constraint" % (','.join(rel_field.name for rel_field in f.foreign_related_fields), f.rel.to.__name__))
                     else:
                         if not f.foreign_related_fields[0].unique:
                             e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.foreign_related_fields[0].name, f.rel.to.__name__))

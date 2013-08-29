@@ -1206,7 +1206,7 @@ class ValuesListQuerySet(ValuesQuerySet):
 
             for row in self.query.get_compiler(self.db).results_iter():
                 data = dict(zip(names, row))
-                yield tuple([data[f] for f in fields])
+                yield tuple(data[f] for f in fields)
 
     def _clone(self, *args, **kwargs):
         clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)

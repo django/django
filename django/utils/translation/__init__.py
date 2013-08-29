@@ -179,7 +179,7 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
-    return ''.join([force_text(s) for s in strings])
+    return ''.join(force_text(s) for s in strings)
 string_concat = lazy(_string_concat, six.text_type)
 
 def get_language_info(lang_code):

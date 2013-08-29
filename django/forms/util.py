@@ -49,7 +49,7 @@ class ErrorDict(dict):
                            ))
 
     def as_text(self):
-        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_text(i) for i in v])) for k, v in self.items()])
+        return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
 
 @python_2_unicode_compatible
 class ErrorList(list):
@@ -69,7 +69,7 @@ class ErrorList(list):
 
     def as_text(self):
         if not self: return ''
-        return '\n'.join(['* %s' % force_text(e) for e in self])
+        return '\n'.join('* %s' % force_text(e) for e in self)
 
     def __repr__(self):
         return repr([force_text(e) for e in self])

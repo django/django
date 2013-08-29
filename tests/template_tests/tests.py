@@ -507,7 +507,7 @@ class TemplateTests(TransRealMixin, TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
+            dict((name, t[0]) for name, t in six.iteritems(template_tests)),
             use_cached_loader=True,
         )
 

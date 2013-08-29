@@ -79,7 +79,7 @@ class ProxyModelTests(TestCase):
         Person.objects.create(name="Foo McBar")
         MyPerson.objects.create(name="Bazza del Frob")
         LowerStatusPerson.objects.create(status="low", name="homer")
-        pp = sorted([mpp.name for mpp in MyPersonProxy.objects.all()])
+        pp = sorted(mpp.name for mpp in MyPersonProxy.objects.all())
         self.assertEqual(pp, ['Bazza del Frob', 'Foo McBar', 'homer'])
 
     def test_proxy_included_in_ancestors(self):

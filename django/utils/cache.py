@@ -76,7 +76,7 @@ def patch_cache_control(response, **kwargs):
 
     for (k, v) in kwargs.items():
         cc[k.replace('_', '-')] = v
-    cc = ', '.join([dictvalue(el) for el in cc.items()])
+    cc = ', '.join(dictvalue(el) for el in cc.items())
     response['Cache-Control'] = cc
 
 def get_max_age(response):
@@ -86,8 +86,8 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict([_to_tuple(el) for el in
-        cc_delim_re.split(response['Cache-Control'])])
+    cc = dict(_to_tuple(el) for el in
+        cc_delim_re.split(response['Cache-Control']))
     if 'max-age' in cc:
         try:
             return int(cc['max-age'])
@@ -144,7 +144,7 @@ def patch_vary_headers(response, newheaders):
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
@@ -156,7 +156,7 @@ def has_vary_header(response, header_query):
     if not response.has_header('Vary'):
         return False
     vary_headers = cc_delim_re.split(response['Vary'])
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     return header_query.lower() in existing_headers
 
 def _i18n_cache_key_suffix(request, cache_key):

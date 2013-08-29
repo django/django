@@ -320,7 +320,7 @@ class Options(object):
                     cache.append((field, model))
                 else:
                     cache.append((field, parent))
-        cache.extend([(f, None) for f in self.local_fields])
+        cache.extend((f, None) for f in self.local_fields)
         self._field_cache = tuple(cache)
         self._field_name_cache = [x for x, _ in cache]
 

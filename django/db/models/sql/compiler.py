@@ -718,11 +718,11 @@ class SQLCompiler(object):
                     loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
                     aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
-                    row = tuple(row[:aggregate_start]) + tuple([
+                    row = tuple(row[:aggregate_start]) + tuple(
                         self.query.resolve_aggregate(value, aggregate, self.connection)
                         for (alias, aggregate), value
                         in zip(self.query.aggregate_select.items(), row[aggregate_start:aggregate_end])
-                    ]) + tuple(row[aggregate_end:])
+                    ) + tuple(row[aggregate_end:])
 
                 yield row
 
@@ -827,7 +827,7 @@ class SQLInsertCompiler(SQLCompiler):
 
         has_fields = bool(self.query.fields)
         fields = self.query.fields if has_fields else [opts.pk]
-        result.append('(%s)' % ', '.join([qn(f.column) for f in fields]))
+        result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
             params = values = [
@@ -1007,7 +1007,7 @@ class SQLUpdateCompiler(SQLCompiler):
             # selecting from the updating table (e.g. MySQL).
             idents = []
             for rows in query.get_compiler(self.using).execute_sql(MULTI):
-                idents.extend([r[0] for r in rows])
+                idents.extend(r[0] for r in rows)
             self.query.add_filter(('pk__in', idents))
             self.query.related_ids = idents
         else:

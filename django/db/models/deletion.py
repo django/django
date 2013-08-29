@@ -234,8 +234,8 @@ class Collector(object):
                     found = True
             if not found:
                 return
-        self.data = OrderedDict([(model, self.data[model])
-                                for model in sorted_models])
+        self.data = OrderedDict((model, self.data[model])
+                                for model in sorted_models)
 
     def delete(self):
         # sort instance collections

@@ -1181,7 +1181,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={'pk': pk},
                 )
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = set([force_text(getattr(o, key)) for o in qs])
+        pks = set(force_text(getattr(o, key)) for o in qs)
         for val in value:
             if force_text(val) not in pks:
                 raise ValidationError(
@@ -1208,8 +1208,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set([force_text(value) for value in self.prepare_value(initial)])
-        data_set = set([force_text(value) for value in data])
+        initial_set = set(force_text(value) for value in self.prepare_value(initial))
+        data_set = set(force_text(value) for value in data)
         return data_set != initial_set
 
 
