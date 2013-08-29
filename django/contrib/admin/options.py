@@ -8,8 +8,8 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.checks import (check_base_model_admin,
-    check_model_admin, check_inline_model_admin)
+from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
+    InlineModelAdminChecks)
 from django.contrib.admin.utils import (unquote, flatten_fieldsets,
     get_deleted_objects, model_format_dict, NestedObjects,
     lookup_needs_distinct)
@@ -36,8 +36,7 @@ from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_text
-from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
@@ -103,6 +102,8 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+
+    checks = BaseModelAdminChecks
 
     def __init__(self):
         self._orig_formfield_overrides = self.formfield_overrides
@@ -413,6 +414,10 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+    @classmethod
+    def check(cls, model, **kwargs):
+        return cls.checks().check(cls, model, **kwargs)
+
 
 @python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
@@ -447,6 +452,8 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
+
+    checks = ModelAdminChecks
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1638,10 +1645,6 @@ class ModelAdmin(BaseModelAdmin):
             inline_instances.append(inline)
         return formsets, inline_instances
 
-    @classmethod
-    def check(cls, model, **kwargs):
-        return check_model_admin(cls, model, **kwargs)
-
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
@@ -1663,6 +1666,8 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+
+    checks = InlineModelAdminChecks
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1807,10 +1812,6 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
-
-    @classmethod
-    def check(cls, model, **kwargs):
-        return check_inline_model_admin(cls, model, **kwargs)
 
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
