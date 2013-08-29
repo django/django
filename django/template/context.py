@@ -180,7 +180,7 @@ class RequestContext(Context):
             processors = ()
         else:
             processors = tuple(processors)
-        updates = dict()
+        context = {}
         for processor in get_standard_processors() + processors:
-            updates.update(processor(request))
-        self.update(updates)
+            context.update(processor(request))
+        self.update(context)
