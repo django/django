@@ -263,6 +263,8 @@ Templates
   arguments will be looked up using
   :func:`~django.template.loader.get_template` as always.
 
+* It is now possible to :ttag:`include` templates recursively.
+
 Backwards incompatible changes in 1.7
 =====================================
 

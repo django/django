@@ -349,6 +349,40 @@ class TemplateLoaderTests(TestCase):
         output = outer_tmpl.render(ctx)
         self.assertEqual(output, 'This worked!')
 
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_immediate_missing(self):
+        """
+        Regression test for #16417 -- {% include %} tag raises TemplateDoesNotExist at compile time if TEMPLATE_DEBUG is True
+
+        Test that an {% include %} tag with a literal string referencing a
+        template that does not exist does not raise an exception at parse
+        time.
+        """
+        ctx = Context()
+        tmpl = Template('{% include "this_does_not_exist.html" %}')
+        self.assertIsInstance(tmpl, Template)
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_recursive(self):
+        comments = [
+            {
+                'comment': 'A1',
+                'children': [
+                    {'comment': 'B1', 'children': []},
+                    {'comment': 'B2', 'children': []},
+                    {'comment': 'B3', 'children': [
+                        {'comment': 'C1', 'children': []}
+                    ]},
+                ]
+            }
+        ]
+
+        t = loader.get_template('recursive_include.html')
+        self.assertEqual(
+            "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
+            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+        )
+
 
 class TemplateRegressionTests(TestCase):
 
