@@ -87,7 +87,7 @@ class GeometryCollection(GEOSGeometry):
     @property
     def tuple(self):
         "Returns a tuple of all the coordinates in this Geometry Collection"
-        return tuple([g.tuple for g in self])
+        return tuple(g.tuple for g in self)
     coords = tuple
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.

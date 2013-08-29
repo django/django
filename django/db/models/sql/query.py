@@ -762,7 +762,7 @@ class Query(object):
         # 2. Rename the alias in the internal table/alias datastructures.
         for ident, aliases in self.join_map.items():
             del self.join_map[ident]
-            aliases = tuple([change_map.get(a, a) for a in aliases])
+            aliases = tuple(change_map.get(a, a) for a in aliases)
             ident = (change_map.get(ident[0], ident[0]),) + ident[1:]
             self.join_map[ident] = aliases
         for old_alias, new_alias in six.iteritems(change_map):

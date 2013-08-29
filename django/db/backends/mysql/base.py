@@ -537,4 +537,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
+        return tuple(int(x) for x in match.groups())

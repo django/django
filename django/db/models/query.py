@@ -534,7 +534,7 @@ class QuerySet(object):
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
-        return dict([(obj._get_pk_val(), obj) for obj in qs])
+        return dict((obj._get_pk_val(), obj) for obj in qs)
 
     def delete(self):
         """

@@ -773,7 +773,7 @@ class FormatStylePlaceholderCursor(object):
         try:
             return dict((k, OracleParam(v, self, True)) for k, v in params.items())
         except AttributeError:
-            return tuple([OracleParam(p, self, True) for p in params])
+            return tuple(OracleParam(p, self, True) for p in params)
 
     def _guess_input_sizes(self, params_list):
         # Try dict handling; if that fails, treat as sequence

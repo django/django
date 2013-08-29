@@ -99,7 +99,7 @@ def get_commands():
     """
     global _commands
     if _commands is None:
-        _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
+        _commands = dict((name, 'django.core') for name in find_commands(__path__[0]))
 
         # Find the installed apps
         from django.conf import settings

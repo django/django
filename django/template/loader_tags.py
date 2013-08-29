@@ -78,7 +78,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name = parent_name
         self.template_dirs = template_dirs
-        self.blocks = dict([(n.name, n) for n in nodelist.get_nodes_by_type(BlockNode)])
+        self.blocks = dict((n.name, n) for n in nodelist.get_nodes_by_type(BlockNode))
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token

@@ -334,7 +334,7 @@ class MultiValueDict(dict):
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = dict([(k, self.getlist(k)) for k in self])
+        obj_dict['_data'] = dict((k, self.getlist(k)) for k in self)
         return obj_dict
 
     def __setstate__(self, obj_dict):
