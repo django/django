@@ -42,7 +42,7 @@ class SystemChecksTestCase(TestCase):
         admin.site.register(Song, MyAdmin)
 
         try:
-            errors = checks.run_checks()
+            errors = checks.run_checks(apps=None)
             expected = ['error!']
             self.assertEqual(errors, expected)
         finally:
@@ -128,6 +128,8 @@ class SystemChecksTestCase(TestCase):
                 obj=ExcludedFieldsInline,
             )
         ]
+        print 'errors', errors
+        print 'expected', expected
         self.assertEqual(errors, expected)
 
     def test_exclude_inline_model_admin(self):

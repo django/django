@@ -31,28 +31,29 @@ def _error(cls, msg):
     ]
 
 
-def check_base_model_admin(cls, model, **kwargs):
+class BaseModelAdminChecks(object):
 
-    def check(cls, model, **kwargs):
+    def __init__(self):
         # Before we can introspect models, they need to be fully loaded so that
         # inter-relations are set up correctly. We force that here.
         models.get_apps()
 
+    def check(self, cls, model, **kwargs):
         errors = []
-        errors.extend(_check_raw_id_fields(cls, model))
-        errors.extend(_check_fields(cls, model))
-        errors.extend(_check_fieldsets(cls, model))
-        errors.extend(_check_exclude_of_base_model_admin(cls, model))
-        errors.extend(_check_form(cls, model))
-        errors.extend(_check_filter_vertical(cls, model))
-        errors.extend(_check_filter_horizontal(cls, model))
-        errors.extend(_check_radio_fields(cls, model))
-        errors.extend(_check_prepopulated_fields(cls, model))
-        errors.extend(_check_ordering(cls, model))
-        errors.extend(_check_readonly_fields(cls, model))
+        errors.extend(self._check_raw_id_fields(cls, model))
+        errors.extend(self._check_fields(cls, model))
+        errors.extend(self._check_fieldsets(cls, model))
+        errors.extend(self._check_exclude(cls, model))
+        errors.extend(self._check_form(cls, model))
+        errors.extend(self._check_filter_vertical(cls, model))
+        errors.extend(self._check_filter_horizontal(cls, model))
+        errors.extend(self._check_radio_fields(cls, model))
+        errors.extend(self._check_prepopulated_fields(cls, model))
+        errors.extend(self._check_ordering(cls, model))
+        errors.extend(self._check_readonly_fields(cls, model))
         return errors
 
-    def _check_raw_id_fields(cls, model):
+    def _check_raw_id_fields(self, cls, model):
         """ Check that `raw_id_fields` only contains field names that are listed
         on the model. """
 
@@ -60,10 +61,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"raw_id_fields" must be a list or tuple.')
         else:
             return flatten(
-                _check_raw_id_fields_item(cls, model, field_name, 'raw_id_fields[%d]' % index)
+                self._check_raw_id_fields_item(cls, model, field_name, 'raw_id_fields[%d]' % index)
                 for index, field_name in enumerate(cls.raw_id_fields))
 
-    def _check_raw_id_fields_item(cls, model, field_name, label):
+    def _check_raw_id_fields_item(self, cls, model, field_name, label):
         """ Check an item of `raw_id_fields`, i.e. check that field named
         `field_name` exists in model `model` and is a ForeignKey or a
         ManyToManyField. """
@@ -81,7 +82,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_fields(cls, model):
+    def _check_fields(self, cls, model):
         """ Check that `fields` only refer to existing fields, doesn't contain
         duplicates. Check if at most one of `fields` and `fieldsets` is defined.
         """
@@ -96,10 +97,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, 'There are duplicate field(s) in "fields".')
         else:
             return flatten(
-                _check_field_spec(cls, model, field_name, 'fields')
+                self._check_field_spec(cls, model, field_name, 'fields')
                 for field_name in cls.fields)
 
-    def _check_fieldsets(cls, model):
+    def _check_fieldsets(self, cls, model):
         """ Check that fieldsets is properly formatted and doesn't contain
         duplicates. """
 
@@ -109,10 +110,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"fieldsets" must be a list or tuple.')
         else:
             return flatten(
-                _check_fieldsets_item(cls, model, fieldset, 'fieldsets[%d]' % index)
+                self._check_fieldsets_item(cls, model, fieldset, 'fieldsets[%d]' % index)
                 for index, fieldset in enumerate(cls.fieldsets))
 
-    def _check_fieldsets_item(cls, model, fieldset, label):
+    def _check_fieldsets_item(self, cls, model, fieldset, label):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
         set name and a dictionary containing "fields" key. """
 
@@ -128,22 +129,22 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, 'There are duplicate field(s) in "%s[1]".'% label)
         else:
             return flatten(
-                _check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
+                self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
                 for fields in fieldset[1]['fields'])
 
-    def _check_field_spec(cls, model, fields, label):
+    def _check_field_spec(self, cls, model, fields, label):
         """ `fields` should be an item of `fields` or an item of
         fieldset[1]['fields'] for any `fieldset` in `fieldsets`. It should be a
         field name or a tuple of field names. """
 
         if isinstance(fields, tuple):
             return flatten(
-                _check_field_spec_item(cls, model, field_name, "%s[%d]" % (label, index))
+                self._check_field_spec_item(cls, model, field_name, "%s[%d]" % (label, index))
                 for index, field_name in enumerate(fields))
         else:
-            return _check_field_spec_item(cls, model, fields, label)
+            return self._check_field_spec_item(cls, model, fields, label)
 
-    def _check_field_spec_item(cls, model, field_name, label):
+    def _check_field_spec_item(self, cls, model, field_name, label):
         if field_name in cls.readonly_fields:
             # Stuff can be put in fields that isn't actually a model field if
             # it's in readonly_fields, readonly_fields will handle the
@@ -167,7 +168,19 @@ def check_base_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    def _check_form(cls, model):
+    def _check_exclude(self, cls, model):
+        """ Check that exclude is a sequence without duplicates. """
+
+        if cls.exclude is None:  # default value is None
+            return []
+        elif not isinstance(cls.exclude, (list, tuple)):
+            return _error(cls, '"exclude" must be a list or tuple.')
+        elif len(cls.exclude) > len(set(cls.exclude)):
+            return _error(cls, '"exclude" contains duplicate field(s).')
+        else:
+            return []
+
+    def _check_form(self, cls, model):
         """ Check that form subclasses BaseModelForm. """
 
         if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
@@ -175,7 +188,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_filter_vertical(cls, model):
+    def _check_filter_vertical(self, cls, model):
         """ Check that filter_vertical is a sequence of field names. """
 
         if not hasattr(cls, 'filter_vertical'):
@@ -184,10 +197,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"filter_vertical" must be a list or tuple.')
         else:
             return flatten(
-                _check_filter_item(cls, model, field_name, "filter_vertical[%d]" % index)
+                self._check_filter_item(cls, model, field_name, "filter_vertical[%d]" % index)
                 for index, field_name in enumerate(cls.filter_vertical))
 
-    def _check_filter_horizontal(cls, model):
+    def _check_filter_horizontal(self, cls, model):
         """ Check that filter_horizontal is a sequence of field names. """
 
         if not hasattr(cls, 'filter_horizontal'):
@@ -196,10 +209,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"filter_horizontal" must be a list or tuple.')
         else:
             return flatten(
-                _check_filter_item(cls, model, field_name, "filter_horizontal[%d]" % index)
+                self._check_filter_item(cls, model, field_name, "filter_horizontal[%d]" % index)
                 for index, field_name in enumerate(cls.filter_horizontal))
 
-    def _check_filter_item(cls, model, field_name, label):
+    def _check_filter_item(self, cls, model, field_name, label):
         """ Check one item of `filter_vertical` or `filter_horizontal`, i.e.
         check that given field exists and is a ManyToManyField. """
 
@@ -216,7 +229,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_radio_fields(cls, model):
+    def _check_radio_fields(self, cls, model):
         """ Check that `radio_fields` is a dictionary. """
 
         if not hasattr(cls, 'radio_fields'):
@@ -225,11 +238,11 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"radio_fields" must be a dictionary.')
         else:
             return flatten(
-                _check_radio_fields_key(cls, model, field_name, 'radio_fields') +
-                _check_radio_fields_value(cls, model, val, 'radio_fields[\'%s\']' % field_name)
+                self._check_radio_fields_key(cls, model, field_name, 'radio_fields') +
+                self._check_radio_fields_value(cls, model, val, 'radio_fields[\'%s\']' % field_name)
                 for field_name, val in cls.radio_fields.items())
 
-    def _check_radio_fields_key(cls, model, field_name, label):
+    def _check_radio_fields_key(self, cls, model, field_name, label):
         """ Check that a key of `radio_fields` dictionary is name of existing
         field and that the field is a ForeignKey or has `choices` defined. """
 
@@ -248,7 +261,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_radio_fields_value(cls, model, val, label):
+    def _check_radio_fields_value(self, cls, model, val, label):
         """ Check type of a value of `radio_fields` dictionary. """
 
         from django.contrib.admin.options import HORIZONTAL, VERTICAL
@@ -258,7 +271,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_prepopulated_fields(cls, model):
+    def _check_prepopulated_fields(self, cls, model):
         """ Check that `prepopulated_fields` is a dictionary containing allowed
         field types. """
 
@@ -268,11 +281,11 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"prepopulated_fields" must be a dictionary.')
         else:
             return flatten(
-                _check_prepopulated_fields_key(cls, model, field_name, 'prepopulated_fields') +
-                _check_prepopulated_fields_value(cls, model, val, 'prepopulated_fields[\'%s\']' % field_name)
+                self._check_prepopulated_fields_key(cls, model, field_name, 'prepopulated_fields') +
+                self._check_prepopulated_fields_value(cls, model, val, 'prepopulated_fields[\'%s\']' % field_name)
                 for field_name, val in cls.prepopulated_fields.items())
 
-    def _check_prepopulated_fields_key(cls, model, field_name, label):
+    def _check_prepopulated_fields_key(self, cls, model, field_name, label):
         """ Check a key of `prepopulated_fields` dictionary, i.e. check that it
         is a name of existing field and the field is one of the allowed types.
         """
@@ -298,7 +311,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_prepopulated_fields_value(cls, model, val, label):
+    def _check_prepopulated_fields_value(self, cls, model, val, label):
         """ Check a value of `prepopulated_fields` dictionary, i.e. it's an
         iterable of existing fields. """
 
@@ -306,10 +319,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"%s" must be a list or tuple.' % label)
         else:
             return flatten(
-                _check_prepopulated_fields_value_item(cls, model, subfield_name, "%s[%r]" % (label, index))
+                self._check_prepopulated_fields_value_item(cls, model, subfield_name, "%s[%r]" % (label, index))
                 for index, subfield_name in enumerate(val))
 
-    def _check_prepopulated_fields_value_item(cls, model, field_name, label):
+    def _check_prepopulated_fields_value_item(self, cls, model, field_name, label):
         """ For `prepopulated_fields` equal to {"slug": ("title",)},
         `field_name` is "title". """
 
@@ -322,7 +335,7 @@ def check_base_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_ordering(cls, model):
+    def _check_ordering(self, cls, model):
         """ Check that ordering refers to existing fields or is random. """
 
         # ordering = None
@@ -332,10 +345,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"ordering" must be a list or tuple.')
         else:
             return flatten(
-                _check_ordering_item(cls, model, field_name, 'ordering[%d]' % index)
+                self._check_ordering_item(cls, model, field_name, 'ordering[%d]' % index)
                 for index, field_name in enumerate(cls.ordering))
 
-    def _check_ordering_item(cls, model, field_name, label):
+    def _check_ordering_item(self, cls, model, field_name, label):
         """ Check that `ordering` refers to existing fields. """
 
         if field_name == '?' and len(cls.ordering) != 1:
@@ -360,7 +373,7 @@ def check_base_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    def _check_readonly_fields(cls, model):
+    def _check_readonly_fields(self, cls, model):
         """ Check that readonly_fields refers to proper attribute or field. """
 
         if cls.readonly_fields == ():
@@ -369,10 +382,10 @@ def check_base_model_admin(cls, model, **kwargs):
             return _error(cls, '"readonly_fields" must be a list or tuple.')
         else:
             return flatten(
-                _check_readonly_fields_item(cls, model, field_name, "readonly_fields[%d]" % index)
+                self._check_readonly_fields_item(cls, model, field_name, "readonly_fields[%d]" % index)
                 for index, field_name in enumerate(cls.readonly_fields))
 
-    def _check_readonly_fields_item(cls, model, field_name, label):
+    def _check_readonly_fields_item(self, cls, model, field_name, label):
         if callable(field_name):
             return []
         elif hasattr(cls, field_name):
@@ -389,41 +402,26 @@ def check_base_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    return check(cls, model, **kwargs)
 
+class ModelAdminChecks(BaseModelAdminChecks):
 
-def _check_exclude_of_base_model_admin(cls, model):
-    """ Check that exclude is a sequence without duplicates. """
-
-    if cls.exclude is None:  # default value is None
-        return []
-    elif not isinstance(cls.exclude, (list, tuple)):
-        return _error(cls, '"exclude" must be a list or tuple.')
-    elif len(cls.exclude) > len(set(cls.exclude)):
-        return _error(cls, '"exclude" contains duplicate field(s).')
-    else:
-        return []
-
-
-def check_model_admin(cls, model, **kwargs):
-
-    def check(cls, model, **kwargs):
-        errors = check_base_model_admin(cls, model)
-        errors.extend(_check_save_as(cls, model))
-        errors.extend(_check_save_on_top(cls, model))
-        errors.extend(_check_inlines(cls, model))
-        errors.extend(_check_list_display(cls, model))
-        errors.extend(_check_list_display_links(cls, model))
-        errors.extend(_check_list_filter(cls, model))
-        errors.extend(_check_list_select_related(cls, model))
-        errors.extend(_check_list_per_page(cls, model))
-        errors.extend(_check_list_max_show_all(cls, model))
-        errors.extend(_check_list_editable(cls, model))
-        errors.extend(_check_search_fields(cls, model))
-        errors.extend(_check_date_hierarchy(cls, model))
+    def check(self, cls, model, **kwargs):
+        errors = super(ModelAdminChecks, self).check(cls, model=model, **kwargs)
+        errors.extend(self._check_save_as(cls, model))
+        errors.extend(self._check_save_on_top(cls, model))
+        errors.extend(self._check_inlines(cls, model))
+        errors.extend(self._check_list_display(cls, model))
+        errors.extend(self._check_list_display_links(cls, model))
+        errors.extend(self._check_list_filter(cls, model))
+        errors.extend(self._check_list_select_related(cls, model))
+        errors.extend(self._check_list_per_page(cls, model))
+        errors.extend(self._check_list_max_show_all(cls, model))
+        errors.extend(self._check_list_editable(cls, model))
+        errors.extend(self._check_search_fields(cls, model))
+        errors.extend(self._check_date_hierarchy(cls, model))
         return errors
 
-    def _check_save_as(cls, model):
+    def _check_save_as(self, cls, model):
         """ Check save_as is a boolean. """
 
         if not isinstance(cls.save_as, bool):
@@ -431,7 +429,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_save_on_top(cls, model):
+    def _check_save_on_top(self, cls, model):
         """ Check save_on_top is a boolean. """
 
         if not isinstance(cls.save_on_top, bool):
@@ -439,17 +437,17 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_inlines(cls, model):
+    def _check_inlines(self, cls, model):
         """ Check all inline model admin classes. """
 
         if not isinstance(cls.inlines, (list, tuple)):
             return _error(cls, '"inlines" must be a list or tuple.')
         else:
             return flatten(
-                _check_inlines_item(cls, model, item, "inlines[%d]" % index)
+                self._check_inlines_item(cls, model, item, "inlines[%d]" % index)
                 for index, item in enumerate(cls.inlines))
 
-    def _check_inlines_item(cls, model, inline, label):
+    def _check_inlines_item(self, cls, model, inline, label):
         """ Check one inline model admin. """
 
         from django.contrib.admin.options import BaseModelAdmin
@@ -463,7 +461,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return inline.check(model)
 
-    def _check_list_display(cls, model):
+    def _check_list_display(self, cls, model):
         """ Check that list_display only contains fields or usable attributes.
         """
 
@@ -471,10 +469,10 @@ def check_model_admin(cls, model, **kwargs):
             return _error(cls, '"list_display" must be a list or tuple.')
         else:
             return flatten(
-                _check_list_display_item(cls, model, item, "list_display[%d]" % index)
+                self._check_list_display_item(cls, model, item, "list_display[%d]" % index)
                 for index, item in enumerate(cls.list_display))
 
-    def _check_list_display_item(cls, model, item, label):
+    def _check_list_display_item(self, cls, model, item, label):
         if callable(item):
             return []
         elif hasattr(cls, item):
@@ -507,7 +505,7 @@ def check_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    def _check_list_display_links(cls, model):
+    def _check_list_display_links(self, cls, model):
         """ Check that list_display_links is a unique subset of list_display.
         """
 
@@ -515,10 +513,10 @@ def check_model_admin(cls, model, **kwargs):
             return _error(cls, '"list_display_links" must be a list or tuple.')
         else:
             return flatten(
-                _check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)
+                self._check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)
                 for index, field_name in enumerate(cls.list_display_links))
 
-    def _check_list_display_links_item(cls, model, field_name, label):
+    def _check_list_display_links_item(self, cls, model, field_name, label):
         if field_name not in cls.list_display:
             return _error(cls,
                 '"%s" refers to "%s", which is not defined in "list_display".'
@@ -526,15 +524,15 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_list_filter(cls, model):
+    def _check_list_filter(self, cls, model):
         if not isinstance(cls.list_filter, (list, tuple)):
             return _error(cls, '"list_filter" must be a list or tuple.')
         else:
             return flatten(
-                _check_list_filter_item(cls, model, item, "list_filter[%d]" % index)
+                self._check_list_filter_item(cls, model, item, "list_filter[%d]" % index)
                 for index, item in enumerate(cls.list_filter))
 
-    def _check_list_filter_item(cls, model, item, label):
+    def _check_list_filter_item(self, cls, model, item, label):
         """
         Check one item of `list_filter`, i.e. check if it is one of three options:
         1. 'field' -- a basic field filter, possibly w/ relationships (e.g.
@@ -573,7 +571,7 @@ def check_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    def _check_list_select_related(cls, model):
+    def _check_list_select_related(self, cls, model):
         """ Check that list_select_related is a boolean, a list or a tuple. """
 
         if not isinstance(cls.list_select_related, (bool, list, tuple)):
@@ -581,7 +579,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_list_per_page(cls, model):
+    def _check_list_per_page(self, cls, model):
         """ Check that list_per_page is an integer. """
 
         if not isinstance(cls.list_per_page, int):
@@ -589,7 +587,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_list_max_show_all(cls, model):
+    def _check_list_max_show_all(self, cls, model):
         """ Check that list_max_show_all is an integer. """
 
         if not isinstance(cls.list_max_show_all, int):
@@ -597,7 +595,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_list_editable(cls, model):
+    def _check_list_editable(self, cls, model):
         """ Check that list_editable is a sequence of editable fields from
         list_display without first element. """
 
@@ -605,10 +603,10 @@ def check_model_admin(cls, model, **kwargs):
             return _error(cls, '"list_editable" must be a list or tuple.')
         else:
             return flatten(
-                _check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
+                self._check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
                 for index, item in enumerate(cls.list_editable))
 
-    def _check_list_editable_item(cls, model, field_name, label):
+    def _check_list_editable_item(self, cls, model, field_name, label):
         try:
             field = model._meta.get_field_by_name(field_name)[0]
         except models.FieldDoesNotExist:
@@ -629,7 +627,7 @@ def check_model_admin(cls, model, **kwargs):
                     '"%s" refers to field "%s", whih is not editable through the admin.'
                     % (label, field_name))
 
-    def _check_search_fields(cls, model):
+    def _check_search_fields(self, cls, model):
         """ Check search_fields is a sequence. """
 
         if not isinstance(cls.search_fields, (list, tuple)):
@@ -637,7 +635,7 @@ def check_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_date_hierarchy(cls, model):
+    def _check_date_hierarchy(self, cls, model):
         """ Check that date_hierarchy refers to DateField or DateTimeField. """
 
         if cls.date_hierarchy is None:
@@ -656,30 +654,28 @@ def check_model_admin(cls, model, **kwargs):
             else:
                 return []
 
-    return check(cls, model, **kwargs)
 
+class InlineModelAdminChecks(BaseModelAdminChecks):
 
-def check_inline_model_admin(cls, model, **kwargs):
-
-    def check(cls, parent_model, **kwargs):
-        errors = check_base_model_admin(cls, cls.model, **kwargs)
-        errors.extend(_check_fk_name(cls, parent_model))
-        errors.extend(_check_exclude(cls, parent_model))
-        errors.extend(_check_extra(cls))
-        errors.extend(_check_max_num(cls))
-        errors.extend(_check_formset(cls))
+    def check(self, cls, parent_model, **kwargs):
+        errors = super(InlineModelAdminChecks, self).check(cls, model=cls.model, **kwargs)
+        errors.extend(self._check_fk_name(cls, parent_model))
+        errors.extend(self._check_exclude(cls, parent_model))
+        errors.extend(self._check_extra(cls))
+        errors.extend(self._check_max_num(cls))
+        errors.extend(self._check_formset(cls))
         return errors
 
-    def _check_exclude(cls, parent_model):
+    # overridden
+    def _check_exclude(self, cls, parent_model):
         # Do not perform more specific checks if the base checks result in an
-        # error. These errors are collected in `check` method thanks to
-        # `check_base_model_admin` invocation.
-        errors = _check_exclude_of_base_model_admin(cls, parent_model)
+        # error.
+        errors = super(InlineModelAdminChecks, self)._check_exclude(cls, parent_model)
         if errors:
-            return []
+            return errors
 
         # Skip if `fk_name` is invalid.
-        if _check_fk_name(cls, parent_model):
+        if self._check_fk_name(cls, parent_model):
             return []
 
         if cls.exclude is None:
@@ -693,7 +689,7 @@ def check_inline_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_fk_name(cls, parent_model):
+    def _check_fk_name(self, cls, parent_model):
         try:
             _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
@@ -701,7 +697,7 @@ def check_inline_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_extra(cls):
+    def _check_extra(self, cls):
         """ Check that extra is an integer. """
 
         if not isinstance(cls.extra, int):
@@ -709,7 +705,7 @@ def check_inline_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_max_num(cls):
+    def _check_max_num(self, cls):
         """ Check that max_num is an integer. """
 
         if cls.max_num is None:
@@ -719,12 +715,10 @@ def check_inline_model_admin(cls, model, **kwargs):
         else:
             return []
 
-    def _check_formset(cls):
+    def _check_formset(self, cls):
         """ Check formset is a subclass of BaseModelFormSet. """
 
         if not issubclass(cls.formset, BaseModelFormSet):
             return _error(cls, '"formset" must inherit from BaseModelFormSet.')
         else:
             return []
-
-    return check(cls, model, **kwargs)
