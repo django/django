@@ -11,10 +11,11 @@ from django.conf import settings
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
+from django.db.backends.mysql.base import django_conversions
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.util import format_number
+from django.db.backends.util import format_number, escape_sequence
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
@@ -943,3 +944,12 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+    def test_escape_sequence(self):
+        """
+        Test the escape_sequence converter utility
+        """
+        self.assertEqual(escape_sequence((1,), django_conversions), '(1)')
+        self.assertEqual(escape_sequence([1,], django_conversions), '(1)')
+        self.assertEqual(escape_sequence((1, 2, 3), django_conversions), ('1','2','3'))
+        self.assertEqual(escape_sequence([1, 2, 3], django_conversions), ('1','2','3'))

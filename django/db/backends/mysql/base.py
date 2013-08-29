@@ -96,6 +96,8 @@ django_conversions.update({
     FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
     FIELD_TYPE.DATETIME: parse_datetime_with_timezone_support,
     datetime.datetime: adapt_datetime_with_timezone_support,
+    list: util.escape_sequence,
+    tuple: util.escape_sequence,
 })
 
 # This should match the numerical portion of the version numbers (we can treat

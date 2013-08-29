@@ -165,3 +165,18 @@ def format_number(value, max_digits, decimal_places):
         return "{0:f}".format(value.quantize(decimal.Decimal(".1") ** decimal_places, context=context))
     else:
         return "%.*f" % (decimal_places, value)
+
+
+def escape_sequence(sequence, converters):
+    """
+    MySQLdb driver fails to produce valid SQL with one item sequences. For
+    example tuple `(1,)` produces `'(1,)'`. This is reported under MySQLdb1
+    Github issue #10 and closed as wontfix.
+
+    If the sequence has one item, we escape the item itself, not the sequence
+    """
+    import MySQLdb
+    if len(sequence) == 1:
+        return '(%s)' % MySQLdb.converters.escape(sequence[0], converters)
+    else:
+        return MySQLdb.converters.escape_sequence(sequence, converters)
