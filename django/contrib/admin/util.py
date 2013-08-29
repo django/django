@@ -327,10 +327,15 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 
 
 def help_text_for_field(name, model):
+    help_text = ""
     try:
-        help_text = model._meta.get_field_by_name(name)[0].help_text
+        field_data = model._meta.get_field_by_name(name)
     except models.FieldDoesNotExist:
-        help_text = ""
+        pass
+    else:
+        field = field_data[0]
+        if not isinstance(field, RelatedObject):
+            help_text = field.help_text
     return smart_text(help_text)
 
 

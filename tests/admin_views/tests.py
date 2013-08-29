@@ -50,7 +50,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage, Telegram)
+    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
+    Telegram, Pizza, Topping)
 from .admin import site, site2
 
 
@@ -3637,6 +3638,17 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/choice/%s/' % choice.pk)
         self.assertContains(response, '<p>No opinion</p>', html=True)
         self.assertNotContains(response, '<p>(None)</p>')
+
+    def test_readonly_backwards_ref(self):
+        """
+        Regression test for #16433 - backwards references for related objects
+        broke if the related field is read-only due to the help_text attribute
+        """
+        topping = Topping.objects.create(name='Salami')
+        pizza = Pizza.objects.create(name='Americano')
+        pizza.toppings.add(topping)
+        response = self.client.get('/test_admin/admin/admin_views/topping/add/')
+        self.assertEqual(response.status_code, 200)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
