@@ -499,6 +499,7 @@ class Field(object):
         """
         if not prepared:
             value = self.get_prep_lookup(lookup_type, value)
+            prepared = True
         if hasattr(value, 'get_compiler'):
             value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):

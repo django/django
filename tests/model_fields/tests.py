@@ -663,3 +663,21 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             URLField().get_prep_value(lazy_func()),
             six.text_type)
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        prepare_count = [0]
+        class NoopField(models.TextField):
+            def get_prep_value(self, value):
+                prepare_count[0] += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup('exact', 'TEST', connection=connection, prepared=False)
+        self.assertEqual(prepare_count[0], 1)
