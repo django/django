@@ -1843,3 +1843,12 @@ class RequestContextTests(unittest.TestCase):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
+
+    def test_stack_size(self):
+        """
+        Regression test for #7116, Optimize RequetsContext construction
+        """
+        ctx = RequestContext(self.fake_request, {})
+        # The stack should now contain 3 items:
+        # [builtins, supplied context, context processor]
+        self.assertEqual(len(ctx.dicts), 3)
