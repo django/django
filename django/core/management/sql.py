@@ -152,21 +152,6 @@ def sql_all(app, style, connection):
     return sql_create(app, style, connection) + sql_custom(app, style, connection) + sql_indexes(app, style, connection)
 
 
-def _split_statements(content):
-    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
-    statements = []
-    statement = []
-    for line in content.split("\n"):
-        cleaned_line = comment_re.sub(r"\1", line).strip()
-        if not cleaned_line:
-            continue
-        statement.append(cleaned_line)
-        if cleaned_line.endswith(";"):
-            statements.append(" ".join(statement))
-            statement = []
-    return statements
-
-
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
     app_dirs = []
@@ -200,9 +185,7 @@ def custom_sql_for_model(model, style, connection):
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
-                # Some backends can't execute more than one SQL statement at a time,
-                # so split into separate statements.
-                output.extend(_split_statements(fp.read()))
+                output.extend(connection.ops.prepare_bulk_sql(fp.read()))
     return output
 
 

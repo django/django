@@ -856,6 +856,13 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
 
+    def prepare_bulk_sql(self, sql):
+        """
+        Hook to let backends split some possibly multiline sql content if
+        they don't support multiple sql statements in one execute() call.
+        """
+        return [sql]
+
     def last_executed_query(self, cursor, sql, params):
         """
         Returns a string of the query last executed by the given cursor, with

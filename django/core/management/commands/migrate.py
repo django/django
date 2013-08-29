@@ -212,6 +212,9 @@ class Command(BaseCommand):
                             with transaction.commit_on_success_unless_managed(using=connection.alias):
                                 for sql in custom_sql:
                                     cursor.execute(sql)
+                                    if connection.vendor == 'mysql':
+                                        while cursor.nextset():
+                                            pass
                         except Exception as e:
                             self.stderr.write("    Failed to install custom SQL for %s.%s model: %s\n" % (app_name, model._meta.object_name, e))
                             if self.show_traceback:
