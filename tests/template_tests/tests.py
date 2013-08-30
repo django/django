@@ -236,6 +236,19 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_loader_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = loader.get_template('login.html')
+            self.assertEqual(template.origin.loadname, 'login.html')
+
+    def test_string_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = Template('string template')
+            self.assertEqual(template.origin.source, 'string template')
+
+    def test_debug_false_origin(self):
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin, None)
 
     def test_include_missing_template(self):
         """
