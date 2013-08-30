@@ -1207,8 +1207,6 @@ class Query(object):
                current_negated=False):
         """
         Adds a Q-object to the current filter.
-
-        Can also be used to add anything that has an 'add_to_query()' method.
         """
         connector = q_object.connector
         current_negated = current_negated ^ q_object.negated
