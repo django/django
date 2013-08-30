@@ -691,3 +691,35 @@ not fall back to putting session IDs in URLs as a last resort, as PHP does.
 This is an intentional design decision. Not only does that behavior make URLs
 ugly, it makes your site vulnerable to session-ID theft via the "Referer"
 header.
+
+.. _session-invalidation-on-password-change:
+
+Session invalidation on password change
+=======================================
+
+.. versionadded:: 1.7
+
+If your :setting:`AUTH_USER_MODEL` inherits from
+:class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own
+:meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+method, the session will include the token returned by this function. In the
+:class:`~django.contrib.auth.models.AbstractBaseUser` case, this is an HMAC of
+the password field. Django verifies that the token sent along with each request
+matches the one that's computed server-side. This allows a user to log all
+other sessions out of his account by changing their password.
+
+Since :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+is based on :setting:`SECRET_KEY`, updating your site to use a new secret will
+invalidate all existing sessions.
+
+The default password change views included with Django,
+:func:`django.contrib.auth.views.password_change` and and the
+``user_change_password`` view in the ``auth`` admin, update the session with
+the new password hash so that a user changing their own password won't log
+themselves out. If you have a custom view and wish to implement similar logic,
+do something like this::
+
+    from django.contrib.auth import SESSION_HASH_KEY
+
+    if hasattr(form.user, 'get_session_auth_hash') and request.user == form.user:
+        request.session[SESSION_HASH_KEY] = form.user.get_session_auth_hash()

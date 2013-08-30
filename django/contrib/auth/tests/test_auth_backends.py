@@ -445,6 +445,7 @@ class ChangedBackendSettingsTest(TestCase):
     TEST_USERNAME = 'test_user'
     TEST_PASSWORD = 'test_password'
     TEST_EMAIL = 'test@example.com'
+    NEW_TEST_PASSWORD = 'new_test_password'
 
     def setUp(self):
         User.objects.create_user(self.TEST_USERNAME,
@@ -478,6 +479,27 @@ class ChangedBackendSettingsTest(TestCase):
             # anonymous as the backend is not longer available.
             self.assertIsNotNone(user)
             self.assertTrue(user.is_anonymous())
+
+    def test_changed_password_invalidates_session(self):
+        """
+        Tests that changing a user's password invalidates the session.
+        """
+        self.assertTrue(self.client.login(
+            username=self.TEST_USERNAME,
+            password=self.TEST_PASSWORD)
+        )
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsNotNone(user)
+        self.assertFalse(user.is_anonymous())
+
+        # After password change, user should be anonymous
+        user.set_password(self.NEW_TEST_PASSWORD)
+        user.save()
+        user = get_user(request)
+        self.assertIsNotNone(user)
+        self.assertTrue(user.is_anonymous())
 
 
 class TypeErrorBackend(object):
