@@ -21,7 +21,6 @@ class SchemaTests(TransactionTestCase):
     available_apps = []
 
     models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest]
-    no_table_strings = ["no such table", "unknown table", "does not exist"]
 
     # Utility functions
 
@@ -33,30 +32,25 @@ class SchemaTests(TransactionTestCase):
         "Deletes all model tables for our models for a clean test environment"
         cursor = connection.cursor()
         connection.disable_constraint_checking()
+        table_names = connection.introspection.table_names(cursor)
         for model in self.models:
             # Remove any M2M tables first
             for field in model._meta.local_many_to_many:
                 with atomic():
-                    try:
+                    tbl = field.rel.through._meta.db_table
+                    if tbl in table_names:
                         cursor.execute(connection.schema_editor().sql_delete_table % {
-                            "table": connection.ops.quote_name(field.rel.through._meta.db_table),
+                            "table": connection.ops.quote_name(tbl),
                         })
-                    except DatabaseError as e:
-                        if any(s in str(e).lower() for s in self.no_table_strings):
-                            pass
-                        else:
-                            raise
+                        table_names.remove(tbl)
             # Then remove the main tables
             with atomic():
-                try:
+                tbl = model._meta.db_table
+                if tbl in table_names:
                     cursor.execute(connection.schema_editor().sql_delete_table % {
-                        "table": connection.ops.quote_name(model._meta.db_table),
+                        "table": connection.ops.quote_name(tbl),
                     })
-                except DatabaseError as e:
-                    if any(s in str(e).lower() for s in self.no_table_strings):
-                        pass
-                    else:
-                        raise
+                    table_names.remove(tbl)
         connection.enable_constraint_checking()
 
     def column_classes(self, model):
