@@ -515,7 +515,7 @@ class Field(object):
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 
-    def formfield(self, form_class=None, **kwargs):
+    def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """
         Returns a django.forms.Field instance for this database Field.
         """
@@ -536,7 +536,9 @@ class Field(object):
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            if form_class is None or not issubclass(form_class, forms.TypedChoiceField):
+            if choices_form_class is not None:
+                form_class = choices_form_class
+            else:
                 form_class = forms.TypedChoiceField
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
