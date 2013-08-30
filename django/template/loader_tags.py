@@ -135,10 +135,10 @@ class IncludeNode(Node):
             if not callable(getattr(template, 'render', None)):
                 # If not, we'll try get_template
                 template = get_template(template)
-            values = dict([
-                (name, var.resolve(context))
+            values = {
+                name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)
-            ])
+            }
             if self.isolated_context:
                 return template.render(context.new(values))
             with context.push(**values):
