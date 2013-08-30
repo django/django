@@ -114,11 +114,11 @@ from other Django widget attributes.
 
     SRID code used by the map (default is 4326).
 
-.. attribute:: BaseGeometryWidget.display_wkt
+.. attribute:: BaseGeometryWidget.display_raw
 
-    Boolean value specifying if a textarea input showing the WKT representation
-    of the current geometry is visible, mainly for debugging purposes (default
-    is ``False``).
+    Boolean value specifying if a textarea input showing the serialized
+    representation of the current geometry is visible, mainly for debugging
+    purposes (default is ``False``).
 
 .. attribute:: BaseGeometryWidget.supports_3d
 
