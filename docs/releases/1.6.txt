@@ -138,6 +138,22 @@ A :djadmin:`check` management command was added, enabling you to verify if your
 current configuration (currently oriented at settings) is compatible with the
 current version of Django.
 
+:meth:`Model.save() <django.db.models.Model.save()>` algorithm changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :meth:`Model.save() <django.db.models.Model.save()>` method now
+tries to directly ``UPDATE`` the database if the instance has a primary
+key value. Previously ``SELECT`` was performed to determine if ``UPDATE``
+or ``INSERT`` were needed. The new algorithm needs only one query for
+updating an existing row while the old algorithm needed two. See
+:meth:`Model.save() <django.db.models.Model.save()>` for more details.
+
+In some rare cases the database doesn't report that a matching row was
+found when doing an ``UPDATE``. An example is the PostgreSQL ``ON UPDATE``
+trigger which returns ``NULL``. In such cases it is possible to set
+:attr:`django.db.models.Options.select_on_save` flag to force saving to
+use the old algorithm.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -221,10 +237,6 @@ Minor features
 
 * Generic :class:`~django.contrib.gis.db.models.GeometryField` is now editable
   with the OpenLayers widget in the admin.
-
-* The :meth:`Model.save() <django.db.models.Model.save()>` will do
-  ``UPDATE`` - if not updated - ``INSERT`` instead of ``SELECT`` - if not
-  found ``INSERT`` else ``UPDATE`` in case the model's primary key is set.
 
 * The documentation contains a :doc:`deployment checklist
   </howto/deployment/checklist>`.
