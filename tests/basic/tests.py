@@ -5,6 +5,7 @@ import threading
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DatabaseError
 from django.db.models.fields import Field, FieldDoesNotExist
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
@@ -12,7 +13,7 @@ from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnle
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article, SelfRef
+from .models import Article, SelfRef, ArticleSelectOnSave
 
 
 class ModelTest(TestCase):
@@ -806,3 +807,60 @@ class ManagerTest(TestCase):
             sorted(BaseManager._get_queryset_methods(QuerySet).keys()),
             sorted(self.QUERYSET_PROXY_METHODS),
         )
+
+class SelectOnSaveTests(TestCase):
+    def test_select_on_save(self):
+        a1 = Article.objects.create(pub_date=datetime.now())
+        with self.assertNumQueries(1):
+            a1.save()
+        asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
+        with self.assertNumQueries(2):
+            asos.save()
+        with self.assertNumQueries(1):
+            asos.save(force_update=True)
+        Article.objects.all().delete()
+        with self.assertRaises(DatabaseError):
+            with self.assertNumQueries(1):
+                asos.save(force_update=True)
+
+    def test_select_on_save_lying_update(self):
+        """
+        Test that select_on_save works correctly if the database
+        doesn't return correct information about matched rows from
+        UPDATE.
+        """
+        # Change the manager to not return "row matched" for update().
+        # We are going to change the Article's _base_manager class
+        # dynamically. This is a bit of a hack, but it seems hard to
+        # test this properly otherwise. Article's manager, because
+        # proxy models use their parent model's _base_manager.
+
+        orig_class = Article._base_manager.__class__
+
+        class FakeQuerySet(QuerySet):
+            # Make sure the _update method below is in fact called.
+            called = False
+
+            def _update(self, *args, **kwargs):
+                FakeQuerySet.called = True
+                super(FakeQuerySet, self)._update(*args, **kwargs)
+                return 0
+
+        class FakeManager(orig_class):
+            def get_queryset(self):
+                return FakeQuerySet(self.model)
+        try:
+            Article._base_manager.__class__ = FakeManager
+            asos = ArticleSelectOnSave.objects.create(pub_date=datetime.now())
+            with self.assertNumQueries(2):
+                asos.save()
+                self.assertTrue(FakeQuerySet.called)
+            # This is not wanted behaviour, but this is how Django has always
+            # behaved for databases that do not return correct information
+            # about matched rows for UPDATE.
+            with self.assertRaises(DatabaseError):
+                asos.save(force_update=True)
+            with self.assertRaises(DatabaseError):
+                asos.save(update_fields=['pub_date'])
+        finally:
+            Article._base_manager.__class__ = orig_class

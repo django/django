@@ -305,15 +305,22 @@ follows this algorithm:
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
   didn't update anything, Django executes an ``INSERT``.
 
-.. versionchanged:: 1.6
-
-    Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
-    algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
-
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
+
+.. versionchanged:: 1.6
+
+    Previously Django did a ``SELECT`` when the primary key attribute was set.
+    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
+    did an ``INSERT``. The old algorithm results in one more query in the
+    ``UPDATE`` case. There are some rare cases where the database doesn't
+    report that a row was updated even if the database contains a row for the
+    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
+    trigger which returns ``NULL``. In such cases it is possible to revert to the
+    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+    option to ``True``.
 
 .. _ref-models-force-insert:
 
