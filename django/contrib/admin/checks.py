@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from itertools import chain
+
 from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.core import checks
 from django.db import models
@@ -12,13 +14,10 @@ from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSe
 def check_admin_app(**kwargs):
     from django.contrib.admin.sites import site
 
-    return flatten(
+    return list(chain(*[
         model_admin.check(model, **kwargs)
-        for model, model_admin in site._registry.items())
-
-
-def flatten(outer_list):
-    return [item for inner_list in outer_list for item in inner_list]
+        for model, model_admin in site._registry.items()
+    ]))
 
 
 def _error(cls, msg):
@@ -60,9 +59,10 @@ class BaseModelAdminChecks(object):
         if not isinstance(cls.raw_id_fields, (list, tuple)):
             return _error(cls, '"raw_id_fields" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_raw_id_fields_item(cls, model, field_name, 'raw_id_fields[%d]' % index)
-                for index, field_name in enumerate(cls.raw_id_fields))
+                for index, field_name in enumerate(cls.raw_id_fields)
+            ]))
 
     def _check_raw_id_fields_item(self, cls, model, field_name, label):
         """ Check an item of `raw_id_fields`, i.e. check that field named
@@ -96,9 +96,10 @@ class BaseModelAdminChecks(object):
         elif len(cls.fields) != len(set(cls.fields)):
             return _error(cls, 'There are duplicate field(s) in "fields".')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_field_spec(cls, model, field_name, 'fields')
-                for field_name in cls.fields)
+                for field_name in cls.fields
+            ]))
 
     def _check_fieldsets(self, cls, model):
         """ Check that fieldsets is properly formatted and doesn't contain
@@ -109,9 +110,10 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.fieldsets, (list, tuple)):
             return _error(cls, '"fieldsets" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_fieldsets_item(cls, model, fieldset, 'fieldsets[%d]' % index)
-                for index, fieldset in enumerate(cls.fieldsets))
+                for index, fieldset in enumerate(cls.fieldsets)
+            ]))
 
     def _check_fieldsets_item(self, cls, model, fieldset, label):
         """ Check an item of `fieldsets`, i.e. check that this is a pair of a
@@ -128,9 +130,10 @@ class BaseModelAdminChecks(object):
         elif len(fieldset[1]['fields']) != len(set(fieldset[1]['fields'])):
             return _error(cls, 'There are duplicate field(s) in "%s[1]".'% label)
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
-                for fields in fieldset[1]['fields'])
+                for fields in fieldset[1]['fields']
+            ]))
 
     def _check_field_spec(self, cls, model, fields, label):
         """ `fields` should be an item of `fields` or an item of
@@ -138,9 +141,10 @@ class BaseModelAdminChecks(object):
         field name or a tuple of field names. """
 
         if isinstance(fields, tuple):
-            return flatten(
+            return list(chain(*[
                 self._check_field_spec_item(cls, model, field_name, "%s[%d]" % (label, index))
-                for index, field_name in enumerate(fields))
+                for index, field_name in enumerate(fields)
+            ]))
         else:
             return self._check_field_spec_item(cls, model, fields, label)
 
@@ -196,9 +200,10 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.filter_vertical, (list, tuple)):
             return _error(cls, '"filter_vertical" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_vertical[%d]" % index)
-                for index, field_name in enumerate(cls.filter_vertical))
+                for index, field_name in enumerate(cls.filter_vertical)
+            ]))
 
     def _check_filter_horizontal(self, cls, model):
         """ Check that filter_horizontal is a sequence of field names. """
@@ -208,9 +213,10 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.filter_horizontal, (list, tuple)):
             return _error(cls, '"filter_horizontal" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_horizontal[%d]" % index)
-                for index, field_name in enumerate(cls.filter_horizontal))
+                for index, field_name in enumerate(cls.filter_horizontal)
+            ]))
 
     def _check_filter_item(self, cls, model, field_name, label):
         """ Check one item of `filter_vertical` or `filter_horizontal`, i.e.
@@ -237,10 +243,11 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.radio_fields, dict):
             return _error(cls, '"radio_fields" must be a dictionary.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_radio_fields_key(cls, model, field_name, 'radio_fields') +
                 self._check_radio_fields_value(cls, model, val, 'radio_fields[\'%s\']' % field_name)
-                for field_name, val in cls.radio_fields.items())
+                for field_name, val in cls.radio_fields.items()
+            ]))
 
     def _check_radio_fields_key(self, cls, model, field_name, label):
         """ Check that a key of `radio_fields` dictionary is name of existing
@@ -280,10 +287,11 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.prepopulated_fields, dict):
             return _error(cls, '"prepopulated_fields" must be a dictionary.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_prepopulated_fields_key(cls, model, field_name, 'prepopulated_fields') +
                 self._check_prepopulated_fields_value(cls, model, val, 'prepopulated_fields[\'%s\']' % field_name)
-                for field_name, val in cls.prepopulated_fields.items())
+                for field_name, val in cls.prepopulated_fields.items()
+            ]))
 
     def _check_prepopulated_fields_key(self, cls, model, field_name, label):
         """ Check a key of `prepopulated_fields` dictionary, i.e. check that it
@@ -318,9 +326,10 @@ class BaseModelAdminChecks(object):
         if not isinstance(val, (list, tuple)):
             return _error(cls, '"%s" must be a list or tuple.' % label)
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_prepopulated_fields_value_item(cls, model, subfield_name, "%s[%r]" % (label, index))
-                for index, subfield_name in enumerate(val))
+                for index, subfield_name in enumerate(val)
+            ]))
 
     def _check_prepopulated_fields_value_item(self, cls, model, field_name, label):
         """ For `prepopulated_fields` equal to {"slug": ("title",)},
@@ -344,9 +353,10 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.ordering, (list, tuple)):
             return _error(cls, '"ordering" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_ordering_item(cls, model, field_name, 'ordering[%d]' % index)
-                for index, field_name in enumerate(cls.ordering))
+                for index, field_name in enumerate(cls.ordering)
+            ]))
 
     def _check_ordering_item(self, cls, model, field_name, label):
         """ Check that `ordering` refers to existing fields. """
@@ -381,9 +391,10 @@ class BaseModelAdminChecks(object):
         elif not isinstance(cls.readonly_fields, (list, tuple)):
             return _error(cls, '"readonly_fields" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_readonly_fields_item(cls, model, field_name, "readonly_fields[%d]" % index)
-                for index, field_name in enumerate(cls.readonly_fields))
+                for index, field_name in enumerate(cls.readonly_fields)
+            ]))
 
     def _check_readonly_fields_item(self, cls, model, field_name, label):
         if callable(field_name):
@@ -443,9 +454,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.inlines, (list, tuple)):
             return _error(cls, '"inlines" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_inlines_item(cls, model, item, "inlines[%d]" % index)
-                for index, item in enumerate(cls.inlines))
+                for index, item in enumerate(cls.inlines)
+            ]))
 
     def _check_inlines_item(self, cls, model, inline, label):
         """ Check one inline model admin. """
@@ -468,9 +480,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.list_display, (list, tuple)):
             return _error(cls, '"list_display" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_list_display_item(cls, model, item, "list_display[%d]" % index)
-                for index, item in enumerate(cls.list_display))
+                for index, item in enumerate(cls.list_display)
+            ]))
 
     def _check_list_display_item(self, cls, model, item, label):
         if callable(item):
@@ -512,9 +525,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.list_display_links, (list, tuple)):
             return _error(cls, '"list_display_links" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)
-                for index, field_name in enumerate(cls.list_display_links))
+                for index, field_name in enumerate(cls.list_display_links)
+            ]))
 
     def _check_list_display_links_item(self, cls, model, field_name, label):
         if field_name not in cls.list_display:
@@ -528,9 +542,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.list_filter, (list, tuple)):
             return _error(cls, '"list_filter" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_list_filter_item(cls, model, item, "list_filter[%d]" % index)
-                for index, item in enumerate(cls.list_filter))
+                for index, item in enumerate(cls.list_filter)
+            ]))
 
     def _check_list_filter_item(self, cls, model, item, label):
         """
@@ -602,9 +617,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if not isinstance(cls.list_editable, (list, tuple)):
             return _error(cls, '"list_editable" must be a list or tuple.')
         else:
-            return flatten(
+            return list(chain(*[
                 self._check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
-                for index, item in enumerate(cls.list_editable))
+                for index, item in enumerate(cls.list_editable)
+            ]))
 
     def _check_list_editable_item(self, cls, model, field_name, label):
         try:
