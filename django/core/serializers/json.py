@@ -31,6 +31,9 @@ class Serializer(PythonSerializer):
         self.json_kwargs = self.options.copy()
         self.json_kwargs.pop('stream', None)
         self.json_kwargs.pop('fields', None)
+        if self.options.get('indent'):
+            # Prevent trailing spaces
+            self.json_kwargs['separators'] = (',', ': ')
         self.stream.write("[")
 
     def end_serialization(self):

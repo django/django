@@ -392,6 +392,31 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
                 ret_list.append(obj_dict["fields"][field_name])
         return ret_list
 
+    def test_indentation_whitespace(self):
+        Score.objects.create(score=5.0)
+        Score.objects.create(score=6.0)
+        qset = Score.objects.all()
+
+        s = serializers.json.Serializer()
+        self.assertEqual(s.serialize(qset, indent=2), """[
+{
+  "pk": 1,
+  "model": "serializers.score",
+  "fields": {
+    "score": 5.0
+  }
+},
+{
+  "pk": 2,
+  "model": "serializers.score",
+  "fields": {
+    "score": 6.0
+  }
+}
+]
+""")
+
+
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "json"
     fwd_ref_str = """[
