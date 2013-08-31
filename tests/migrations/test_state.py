@@ -75,3 +75,22 @@ class StateTests(TestCase):
         new_app_cache = project_state.render()
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("name")[0].max_length, 100)
         self.assertEqual(new_app_cache.get_model("migrations", "Tag")._meta.get_field_by_name("hidden")[0].null, False)
+
+    def test_render_multiple_inheritance(self):
+        # Use a custom app cache to avoid polluting the global one.
+        new_app_cache = BaseAppCache()
+
+        class Book(models.Model):
+            title = models.CharField(max_length=1000)
+
+            class Meta:
+                app_label = "migrations"
+                app_cache = new_app_cache
+
+        class Novel(Book):
+            class Meta:
+                app_label = "migrations"
+                app_cache = new_app_cache
+
+        yet_another_app_cache = BaseAppCache()
+        ModelState.from_model(Novel).render(yet_another_app_cache)
