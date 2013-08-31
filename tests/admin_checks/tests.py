@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib import admin
 from django.core import checks
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import str_prefix
 
@@ -410,3 +411,21 @@ class SystemChecksTestCase(TestCase):
 
         errors = FieldsOnFormOnlyAdmin.check(model=Song)
         self.assertEqual(errors, [])
+
+    def test_validator_compatibility(self):
+        class MyValidator(object):
+            def validate(self, cls, model):
+                raise ImproperlyConfigured("error!")
+
+        class MyModelAdmin(admin.ModelAdmin):
+            validator = MyValidator
+
+        errors = MyModelAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                'error!',
+                hint=None,
+                obj=MyModelAdmin,
+            )
+        ]
+        self.assertEqual(errors, expected)
