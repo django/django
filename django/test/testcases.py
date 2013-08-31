@@ -6,23 +6,25 @@ import errno
 from functools import wraps
 import json
 import os
+import posixpath
 import re
 import sys
-import socket
 import threading
 import unittest
 from unittest import skipIf         # Imported here for backward compatibility
 from unittest.util import safe_repr
 try:
-    from urllib.parse import urlsplit, urlunsplit
+    from urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+    from urllib.request import url2pathname
 except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
+    from urlparse import urlsplit, urlunsplit, urlparse
+    from urllib import url2pathname, unquote
 
 from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.base import get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
@@ -933,10 +935,70 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
         pass
 
 
-class _MediaFilesHandler(StaticFilesHandler):
+class FSFilesHandler(WSGIHandler):
     """
-    Handler for serving the media files. This is a private class that is
-    meant to be used solely as a convenience by LiveServerThread.
+    WSGI middleware that intercepts calls to a directory, as defined by one of
+    the *_ROOT settings, and serves those files, publishing them under *_URL.
+    """
+    def __init__(self, application):
+        self.application = application
+        self.base_url = urlparse(self.get_base_url())
+        super(FSFilesHandler, self).__init__()
+
+    def _should_handle(self, path):
+        """
+        Checks if the path should be handled. Ignores the path if:
+
+        * the host is provided as part of the base_url
+        * the request's path isn't under the media path (or equal)
+        """
+        return path.startswith(self.base_url[2]) and not self.base_url[1]
+
+    def file_path(self, url):
+        """
+        Returns the relative path to the file on disk for the given URL.
+        """
+        relative_url = url[len(self.base_url[2]):]
+        return url2pathname(relative_url)
+
+    def get_response(self, request):
+        from django.http import Http404
+
+        if self._should_handle(request.path):
+            try:
+                return self.serve(request)
+            except Http404:
+                pass
+        return super(FSFilesHandler, self).get_response(request)
+
+    def serve(self, request):
+        os_rel_path = self.file_path(request.path)
+        final_rel_path = posixpath.normpath(unquote(os_rel_path)).lstrip('/')
+        return serve(request, final_rel_path, document_root=self.get_base_dir())
+
+    def __call__(self, environ, start_response):
+        if not self._should_handle(get_path_info(environ)):
+            return self.application(environ, start_response)
+        return super(FSFilesHandler, self).__call__(environ, start_response)
+
+
+class _StaticFilesHandler(FSFilesHandler):
+    """
+    Handler for serving static files. A private class that is meant to be used
+    solely as a convenience by LiveServerThread.
+    """
+
+    def get_base_dir(self):
+        return settings.STATIC_ROOT
+
+    def get_base_url(self):
+        return settings.STATIC_URL
+
+
+class _MediaFilesHandler(FSFilesHandler):
+    """
+    Handler for serving the media files. A private class that is meant to be
+    used solely as a convenience by LiveServerThread.
     """
 
     def get_base_dir(self):
@@ -945,22 +1007,19 @@ class _MediaFilesHandler(StaticFilesHandler):
     def get_base_url(self):
         return settings.MEDIA_URL
 
-    def serve(self, request):
-        relative_url = request.path[len(self.base_url[2]):]
-        return serve(request, relative_url, document_root=self.get_base_dir())
-
 
 class LiveServerThread(threading.Thread):
     """
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, possible_ports, connections_override=None):
+    def __init__(self, host, possible_ports, static_handler, connections_override=None):
         self.host = host
         self.port = None
         self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
+        self.static_handler = static_handler
         self.connections_override = connections_override
         super(LiveServerThread, self).__init__()
 
@@ -976,7 +1035,7 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.
@@ -1028,6 +1087,8 @@ class LiveServerTestCase(TransactionTestCase):
     other thread can see the changes.
     """
 
+    static_handler = _StaticFilesHandler
+
     @property
     def live_server_url(self):
         return 'http://%s:%s' % (
@@ -1069,8 +1130,9 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(
-            host, possible_ports, connections_override)
+        cls.server_thread = LiveServerThread(host, possible_ports,
+                                             cls.static_handler,
+                                             connections_override=connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 

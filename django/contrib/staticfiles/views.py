@@ -27,7 +27,7 @@ def serve(request, path, insecure=False, **kwargs):
 
     in your URLconf.
 
-    It uses the django.views.static view to serve the found files.
+    It uses the django.views.static.serve() view to serve the found files.
     """
     if not settings.DEBUG and not insecure:
         raise Http404
