@@ -20,16 +20,6 @@ def check_admin_app(**kwargs):
     ]))
 
 
-def _error(cls, msg):
-    return [
-        checks.Error(
-            msg,
-            hint=None,
-            obj=cls,
-        )
-    ]
-
-
 class BaseModelAdminChecks(object):
 
     def __init__(self):
@@ -57,7 +47,13 @@ class BaseModelAdminChecks(object):
         on the model. """
 
         if not isinstance(cls.raw_id_fields, (list, tuple)):
-            return _error(cls, '"raw_id_fields" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"raw_id_fields" must be a list or tuple.',
+                    hint=None,
+                    obj=cls
+                ),
+            ]
         else:
             return list(chain(*[
                 self._check_raw_id_fields_item(cls, model, field_name, 'raw_id_fields[%d]' % index)
@@ -74,11 +70,22 @@ class BaseModelAdminChecks(object):
             if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
                 raise ValueError
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to field "%s", which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model.__name__))
+            return [
+                checks.Error(
+                    '"%s" refers to field "%s", which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model.__name__),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         except ValueError:
-            return _error(cls, '"%s" must be a ForeignKey or ManyToManyField.' % label)
+            return [
+                checks.Error(
+                    '"%s" must be a ForeignKey or ManyToManyField.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -90,11 +97,29 @@ class BaseModelAdminChecks(object):
         if cls.fields is None:
             return []
         elif not isinstance(cls.fields, (list, tuple)):
-            return _error(cls, '"fields" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"fields" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif cls.fieldsets:
-            return _error(cls, 'Both "fieldsets" and "fields" are specified.')
+            return [
+                checks.Error(
+                    'Both "fieldsets" and "fields" are specified.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif len(cls.fields) != len(set(cls.fields)):
-            return _error(cls, 'There are duplicate field(s) in "fields".')
+            return [
+                checks.Error(
+                    'There are duplicate field(s) in "fields".',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_field_spec(cls, model, field_name, 'fields')
@@ -108,7 +133,13 @@ class BaseModelAdminChecks(object):
         if cls.fieldsets is None:
             return []
         elif not isinstance(cls.fieldsets, (list, tuple)):
-            return _error(cls, '"fieldsets" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"fieldsets" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_fieldsets_item(cls, model, fieldset, 'fieldsets[%d]' % index)
@@ -120,15 +151,45 @@ class BaseModelAdminChecks(object):
         set name and a dictionary containing "fields" key. """
 
         if not isinstance(fieldset, (list, tuple)):
-            return _error(cls, '"%s" must be a list or tuple.' % label)
+            return [
+                checks.Error(
+                    '"%s" must be a list or tuple.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif len(fieldset) != 2:
-            return _error(cls, '"%s" must be a pair.' % label)
+            return [
+                checks.Error(
+                    '"%s" must be a pair.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif not isinstance(fieldset[1], dict):
-            return _error(cls, '"%s[1]" must be a dictionary.' % label)
+            return [
+                checks.Error(
+                    '"%s[1]" must be a dictionary.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif 'fields' not in fieldset[1]:
-            return _error(cls, '"%s[1]" must contain "fields" key.' % label)
+            return [
+                checks.Error(
+                    '"%s[1]" must contain "fields" key.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif len(fieldset[1]['fields']) != len(set(fieldset[1]['fields'])):
-            return _error(cls, 'There are duplicate field(s) in "%s[1]".'% label)
+            return [
+                checks.Error(
+                    'There are duplicate field(s) in "%s[1]".' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_field_spec(cls, model, fields, '%s[1][\'fields\']' % label)
@@ -165,10 +226,15 @@ class BaseModelAdminChecks(object):
                 # be an extra field on the form.
                 return []
             except ValueError:
-                return _error(cls,
-                    '"%s" cannot include the ManyToManyField "%s", '
-                    'because "%s" manually specifies relationship model.'
-                    % (label, field_name, field_name))
+                return [
+                    checks.Error(
+                        '"%s" cannot include the ManyToManyField "%s", '
+                            'because "%s" manually specifies relationship model.'
+                            % (label, field_name, field_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -178,9 +244,21 @@ class BaseModelAdminChecks(object):
         if cls.exclude is None:  # default value is None
             return []
         elif not isinstance(cls.exclude, (list, tuple)):
-            return _error(cls, '"exclude" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"exclude" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif len(cls.exclude) > len(set(cls.exclude)):
-            return _error(cls, '"exclude" contains duplicate field(s).')
+            return [
+                checks.Error(
+                    '"exclude" contains duplicate field(s).',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -188,7 +266,13 @@ class BaseModelAdminChecks(object):
         """ Check that form subclasses BaseModelForm. """
 
         if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
-            return _error(cls, '"form" must inherit from BaseModelForm.')
+            return [
+                checks.Error(
+                    '"form" must inherit from BaseModelForm.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -198,7 +282,13 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'filter_vertical'):
             return []
         elif not isinstance(cls.filter_vertical, (list, tuple)):
-            return _error(cls, '"filter_vertical" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"filter_vertical" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_vertical[%d]" % index)
@@ -211,7 +301,13 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'filter_horizontal'):
             return []
         elif not isinstance(cls.filter_horizontal, (list, tuple)):
-            return _error(cls, '"filter_horizontal" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"filter_horizontal" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_horizontal[%d]" % index)
@@ -227,11 +323,22 @@ class BaseModelAdminChecks(object):
             if not isinstance(field, models.ManyToManyField):
                 raise ValueError
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to field "%s", which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model._meta.object_name))
+            return [
+                checks.Error(
+                    '"%s" refers to field "%s", which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         except ValueError:
-            return _error(cls, '"%s" must be a ManyToManyField.' % label)
+            return [
+                checks.Error(
+                    '"%s" must be a ManyToManyField.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -241,7 +348,13 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'radio_fields'):
             return []
         elif not isinstance(cls.radio_fields, dict):
-            return _error(cls, '"radio_fields" must be a dictionary.')
+            return [
+                checks.Error(
+                    '"radio_fields" must be a dictionary.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_radio_fields_key(cls, model, field_name, 'radio_fields') +
@@ -258,13 +371,23 @@ class BaseModelAdminChecks(object):
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 raise ValueError
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to "%s" field, which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model._meta.object_name))
+            return [
+                checks.Error(
+                    '"%s" refers to "%s" field, which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         except ValueError:
-            return _error(cls,
-                '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.'
-                % (label, field_name))
+            return [
+                checks.Error(
+                    '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.'
+                        % (label, field_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -274,7 +397,13 @@ class BaseModelAdminChecks(object):
         from django.contrib.admin.options import HORIZONTAL, VERTICAL
 
         if val not in (HORIZONTAL, VERTICAL):
-            return _error(cls, '"%s" is neither admin.HORIZONTAL nor admin.VERTICAL.' % label)
+            return [
+                checks.Error(
+                    '"%s" is neither admin.HORIZONTAL nor admin.VERTICAL.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -285,7 +414,13 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'prepopulated_fields'):
             return []
         elif not isinstance(cls.prepopulated_fields, dict):
-            return _error(cls, '"prepopulated_fields" must be a dictionary.')
+            return [
+                checks.Error(
+                    '"prepopulated_fields" must be a dictionary.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_prepopulated_fields_key(cls, model, field_name, 'prepopulated_fields') +
@@ -309,13 +444,24 @@ class BaseModelAdminChecks(object):
             if isinstance(field, forbidden_field_types):
                 raise ValueError
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to "%s" field, which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model._meta.object_name))
+            return [
+                checks.Error(
+                    '"%s" refers to "%s" field, which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         except ValueError:
-            return _error(cls,
-                '"%s" refers to "%s", which must be neither a DateTimeField, ForeignKey nor ManyToManyField.'
-                % (label, field_name))
+            return [
+                checks.Error(
+                    '"%s" refers to "%s", which must be neither a DateTimeField, '
+                        'ForeignKey nor ManyToManyField.'
+                        % (label, field_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -324,7 +470,13 @@ class BaseModelAdminChecks(object):
         iterable of existing fields. """
 
         if not isinstance(val, (list, tuple)):
-            return _error(cls, '"%s" must be a list or tuple.' % label)
+            return [
+                checks.Error(
+                    '"%s" must be a list or tuple.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_prepopulated_fields_value_item(cls, model, subfield_name, "%s[%r]" % (label, index))
@@ -338,9 +490,14 @@ class BaseModelAdminChecks(object):
         try:
             model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to field "%s", which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model._meta.object_name))
+            return [
+                checks.Error(
+                    '"%s" refers to field "%s", which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -351,7 +508,13 @@ class BaseModelAdminChecks(object):
         if cls.ordering is None:  # The default value is None
             return []
         elif not isinstance(cls.ordering, (list, tuple)):
-            return _error(cls, '"ordering" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"ordering" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_ordering_item(cls, model, field_name, 'ordering[%d]' % index)
@@ -362,8 +525,14 @@ class BaseModelAdminChecks(object):
         """ Check that `ordering` refers to existing fields. """
 
         if field_name == '?' and len(cls.ordering) != 1:
-            return _error(cls, '"ordering" has the random ordering marker "?", '
-                'but contains other fields as well.')
+            return [
+                checks.Error(
+                    '"ordering" has the random ordering marker "?", '
+                        'but contains other fields as well.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif field_name == '?':
             return []
         elif '__' in field_name:
@@ -377,9 +546,14 @@ class BaseModelAdminChecks(object):
             try:
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
-                return _error(cls,
-                    '"%s" refers to field "%s", which is missing from model %s.%s.'
-                    % (label, field_name, model._meta.app_label, model._meta.object_name))
+                return [
+                    checks.Error(
+                        '"%s" refers to field "%s", which is missing from model %s.%s.'
+                            % (label, field_name, model._meta.app_label, model._meta.object_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -389,7 +563,13 @@ class BaseModelAdminChecks(object):
         if cls.readonly_fields == ():
             return []
         elif not isinstance(cls.readonly_fields, (list, tuple)):
-            return _error(cls, '"readonly_fields" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"readonly_fields" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_readonly_fields_item(cls, model, field_name, "readonly_fields[%d]" % index)
@@ -407,9 +587,14 @@ class BaseModelAdminChecks(object):
             try:
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
-                return _error(cls,
-                    '"%s" is neither a callable nor an attribute of "%s" nor found in the model %s.%s.'
-                    % (label, cls.__name__, model._meta.app_label, model._meta.object_name))
+                return [
+                    checks.Error(
+                        '"%s" is neither a callable nor an attribute of "%s" nor found in the model %s.%s.'
+                            % (label, cls.__name__, model._meta.app_label, model._meta.object_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -436,7 +621,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check save_as is a boolean. """
 
         if not isinstance(cls.save_as, bool):
-            return _error(cls, '"save_as" must be a boolean.')
+            return [
+                checks.Error(
+                    '"save_as" must be a boolean.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -444,7 +635,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check save_on_top is a boolean. """
 
         if not isinstance(cls.save_on_top, bool):
-            return _error(cls, '"save_on_top" must be a boolean.')
+            return [
+                checks.Error(
+                    '"save_on_top" must be a boolean.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -452,7 +649,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check all inline model admin classes. """
 
         if not isinstance(cls.inlines, (list, tuple)):
-            return _error(cls, '"inlines" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"inlines" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_inlines_item(cls, model, item, "inlines[%d]" % index)
@@ -465,11 +668,29 @@ class ModelAdminChecks(BaseModelAdminChecks):
         from django.contrib.admin.options import BaseModelAdmin
 
         if not issubclass(inline, BaseModelAdmin):
-            return _error(cls, '"%s" must inherit from BaseModelAdmin.' % label)
+            return [
+                checks.Error(
+                    '"%s" must inherit from BaseModelAdmin.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif not inline.model:
-            return _error(cls, '"model" is a required attribute of "%s".' % label)
+            return [
+                checks.Error(
+                    '"model" is a required attribute of "%s".' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         elif not issubclass(inline.model, models.Model):
-            return _error(cls, '"%s.model" must be a Model.' % label)
+            return [
+                checks.Error(
+                    '"%s.model" must be a Model.' % label,
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return inline.check(model)
 
@@ -478,7 +699,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """
 
         if not isinstance(cls.list_display, (list, tuple)):
-            return _error(cls, '"list_display" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"list_display" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_list_display_item(cls, model, item, "list_display[%d]" % index)
@@ -501,20 +728,36 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     field = None
 
             if field is None:
-                return _error(cls,
-                    '"%s" refers to "%s" that is neither a field, method nor a property of model %s.%s.'
-                    % label, item, model._meta.app_label, model._meta.object_name)
+                return [
+                    checks.Error(
+                        '"%s" refers to "%s" that is neither a field, method nor a property of model %s.%s.'
+                            % label, item, model._meta.app_label, model._meta.object_name,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             elif isinstance(field, models.ManyToManyField):
-                return _error(cls, '"%s" must not be a ManyToManyField.' % label)
+                return [
+                    checks.Error(
+                        '"%s" must not be a ManyToManyField.' % label,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
         else:
             try:
                 model._meta.get_field(item)
             except models.FieldDoesNotExist:
-                return _error(cls,
-                    '"%s" is neither a callable nor an attribute of "%s" nor found in model %s.%s.'
-                    % (label, cls.__name__, model._meta.app_label, model._meta.object_name))
+                return [
+                    checks.Error(
+                        '"%s" is neither a callable nor an attribute of "%s" nor found in model %s.%s.'
+                            % (label, cls.__name__, model._meta.app_label, model._meta.object_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -523,7 +766,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """
 
         if not isinstance(cls.list_display_links, (list, tuple)):
-            return _error(cls, '"list_display_links" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"list_display_links" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)
@@ -532,15 +781,26 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_display_links_item(self, cls, model, field_name, label):
         if field_name not in cls.list_display:
-            return _error(cls,
-                '"%s" refers to "%s", which is not defined in "list_display".'
-                % (label, field_name))
+            return [
+                checks.Error(
+                    '"%s" refers to "%s", which is not defined in "list_display".'
+                        % (label, field_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
     def _check_list_filter(self, cls, model):
         if not isinstance(cls.list_filter, (list, tuple)):
-            return _error(cls, '"list_filter" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"list_filter" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_list_filter_item(cls, model, item, "list_filter[%d]" % index)
@@ -561,17 +821,35 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...
             if not issubclass(item, ListFilter):
-                return _error(cls, '"%s" must inherit from ListFilter.' % label)
+                return [
+                    checks.Error(
+                        '"%s" must inherit from ListFilter.' % label,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             # ...  but not a FieldListFilter.
             elif issubclass(item, FieldListFilter):
-                return _error(cls, '"%s" must not inherit from FieldListFilter.' % label)
+                return [
+                    checks.Error(
+                        '"%s" must not inherit from FieldListFilter.' % label,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
         elif isinstance(item, (tuple, list)):
             # item is option #2
             field, list_filter_class = item
             if not issubclass(list_filter_class, FieldListFilter):
-                return _error(cls, '"%s[1]" must inherit from FieldListFilter.' % label)
+                return [
+                    checks.Error(
+                        '"%s[1]" must inherit from FieldListFilter.' % label,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
         else:
@@ -582,7 +860,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
             try:
                 get_fields_from_path(model, field)
             except (NotRelationField, FieldDoesNotExist):
-                return _error(cls, '"%s" refers to "%s", which does not refer to a Field.' % (label, field))
+                return [
+                    checks.Error(
+                        '"%s" refers to "%s", which does not refer to a Field.' % (label, field),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -590,7 +874,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_select_related is a boolean, a list or a tuple. """
 
         if not isinstance(cls.list_select_related, (bool, list, tuple)):
-            return _error(cls, '"list_select_related" must be a boolean, tuple or list.')
+            return [
+                checks.Error(
+                    '"list_select_related" must be a boolean, tuple or list.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -598,7 +888,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_per_page is an integer. """
 
         if not isinstance(cls.list_per_page, int):
-            return _error(cls, '"list_per_page" must be an integer.')
+            return [
+                checks.Error(
+                    '"list_per_page" must be an integer.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -606,7 +902,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_max_show_all is an integer. """
 
         if not isinstance(cls.list_max_show_all, int):
-            return _error(cls, '"list_max_show_all" must be an integer.')
+            return [
+                checks.Error(
+                    '"list_max_show_all" must be an integer.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -615,7 +917,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         list_display without first element. """
 
         if not isinstance(cls.list_editable, (list, tuple)):
-            return _error(cls, '"list_editable" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"list_editable" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return list(chain(*[
                 self._check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
@@ -626,28 +934,64 @@ class ModelAdminChecks(BaseModelAdminChecks):
         try:
             field = model._meta.get_field_by_name(field_name)[0]
         except models.FieldDoesNotExist:
-            return _error(cls,
-                '"%s" refers to field "%s", which is missing from model %s.%s.'
-                % (label, field_name, model._meta.app_label, model._meta.object_name))
+            return [
+                checks.Error(
+                    '"%s" refers to field "%s", which is missing from model %s.%s.'
+                        % (label, field_name, model._meta.app_label, model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             if field_name not in cls.list_display:
-                return _error(cls, '"%s" refers to field "%s", which is not defined in "list_display".' % (label, field_name))
+                return [
+                    checks.Error(
+                        '"%s" refers to field "%s", which is not defined in "list_display".'
+                            % (label, field_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             elif field_name in cls.list_display_links:
-                return _error(cls, '"%s" cannot be in both "list_editable" and "list_display_links".' % field_name)
+                return [
+                    checks.Error(
+                        '"%s" cannot be in both "list_editable" and "list_display_links".'
+                            % field_name,
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             elif not cls.list_display_links and cls.list_display[0] in cls.list_editable:
-                return _error(cls,
-                    '"%s" refers to the first field in list_display ("%s"), which cannot be used unless list_display_links is set.'
-                    % (label, cls.list_display[0]))
+                return [
+                    checks.Error(
+                        '"%s" refers to the first field in list_display ("%s"), '
+                            'which cannot be used unless list_display_links is set.'
+                            % (label, cls.list_display[0]),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             elif not field.editable:
-                return _error(cls,
-                    '"%s" refers to field "%s", whih is not editable through the admin.'
-                    % (label, field_name))
+                return [
+                    checks.Error(
+                        '"%s" refers to field "%s", whih is not editable through the admin.'
+                            % (label, field_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
 
     def _check_search_fields(self, cls, model):
         """ Check search_fields is a sequence. """
 
         if not isinstance(cls.search_fields, (list, tuple)):
-            return _error(cls, '"search_fields" must be a list or tuple.')
+            return [
+                checks.Error(
+                    '"search_fields" must be a list or tuple.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -662,11 +1006,22 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 if not isinstance(field, (models.DateField, models.DateTimeField)):
                     raise ValueError
             except models.FieldDoesNotExist:
-                return _error(cls,
-                    '"date_hierarchy" refers to field "%s", which is missing from model %s.%s.'
-                    % (cls.date_hierarchy, model._meta.app_label, model._meta.object_name))
+                return [
+                    checks.Error(
+                        '"date_hierarchy" refers to field "%s", which is missing from model %s.%s.'
+                            % (cls.date_hierarchy, model._meta.app_label, model._meta.object_name),
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             except ValueError:
-                return _error(cls, '"date_hierarchy" must be a DateField or DateTimeField.')
+                return [
+                    checks.Error(
+                        '"date_hierarchy" must be a DateField or DateTimeField.',
+                        hint=None,
+                        obj=cls,
+                    )
+                ]
             else:
                 return []
 
@@ -698,9 +1053,15 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
 
         fk = _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         if fk.name in cls.exclude:
-            return _error(cls,
-                'Cannot exclude the field "%s", because it is the foreign key to the parent model %s.%s.'
-                % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name))
+            return [
+                checks.Error(
+                    'Cannot exclude the field "%s", because it is the foreign key '
+                        'to the parent model %s.%s.'
+                        % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name),
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -708,7 +1069,13 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         try:
             _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
-            return _error(cls, e.args[0])
+            return [
+                checks.Error(
+                    e.args[0],
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -716,7 +1083,13 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         """ Check that extra is an integer. """
 
         if not isinstance(cls.extra, int):
-            return _error(cls, '"extra" must be an integer.')
+            return [
+                checks.Error(
+                    '"extra" must be an integer.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -726,7 +1099,13 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         if cls.max_num is None:
             return []
         elif not isinstance(cls.max_num, int):
-            return _error(cls, '"max_num" must be an integer.')
+            return [
+                checks.Error(
+                    '"max_num" must be an integer.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
 
@@ -734,6 +1113,12 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         """ Check formset is a subclass of BaseModelFormSet. """
 
         if not issubclass(cls.formset, BaseModelFormSet):
-            return _error(cls, '"formset" must inherit from BaseModelFormSet.')
+            return [
+                checks.Error(
+                    '"formset" must inherit from BaseModelFormSet.',
+                    hint=None,
+                    obj=cls,
+                )
+            ]
         else:
             return []
