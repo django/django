@@ -248,7 +248,7 @@ Django quotes column and table names behind the scenes.
     Determines if Django will use the pre-1.6
     :meth:`django.db.models.Model.save()` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
-    The new algorith tries an ``UPDATE`` directly. In some rare cases the
+    The new algorithm tries an ``UPDATE`` directly. In some rare cases the
     ``UPDATE`` of an existing row isn't visible to Django. An example is the
     PostgreSQL ``ON UPDATE`` trigger which returns ``NULL``. In such cases the
     new algorithm will end up doing an ``INSERT`` even when a row exists in
