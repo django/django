@@ -340,7 +340,7 @@ class BaseCommand(object):
 
         return self.check(display_num_errors)
 
-    def check(self, apps=None, display_num_errors=False):
+    def check(self, apps=None, tags=None, display_num_errors=False):
         """
         Uses the system check framework to validate entire Django project.
         Raises CommandError for any serious message (error or critical errors).
@@ -349,7 +349,7 @@ class BaseCommand(object):
 
         """
 
-        all_issues = checks.run_checks(apps=apps)
+        all_issues = checks.run_checks(apps=apps, tags=tags)
 
         msg = ""
         if all_issues:

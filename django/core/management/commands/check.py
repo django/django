@@ -12,10 +12,11 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     option_list = BaseCommand.option_list + (
-        make_option('--tag', action='append', dest='tags',
+        make_option('--tag', '-t', action='append', dest='tags',
             help='Run only checks labeled with given tag.'),
     )
 
     def handle(self, *apps, **options):
         apps = apps or None  # If apps is an empty list, replace with None
-        self.check(apps=apps, display_num_errors=True)
+        tags = options.get('tags', None)
+        self.check(apps=apps, tags=tags, display_num_errors=True)
