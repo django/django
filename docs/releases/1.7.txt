@@ -278,6 +278,10 @@ Miscellaneous
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
+* Session backend ``"django.contrib.sessions.backends.cached_db"`` now respects
+ :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always uses `default`
+ cache.
+
 Features deprecated in 1.7
 ==========================
 
