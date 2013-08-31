@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from StringIO import StringIO
 import sys
 
 from django.conf import settings
@@ -155,6 +156,7 @@ class CheckCommandTests(TestCase):
         simple_system_check.kwargs = None
         tagged_system_check.kwargs = None
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
+        sys.stdout, sys.stderr = StringIO(), StringIO()
 
     def tearDown(self):
         sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
