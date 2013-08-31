@@ -147,9 +147,9 @@ Measurement API
 
 .. class:: Area(**kwargs)
 
-   To initialize a distance object, pass in a keyword corresponding to
+   To initialize an area object, pass in a keyword corresponding to
    the desired :ref:`unit attribute name <supported_units>` set with
-   desired value.  For example, the following creates a distance
+   desired value.  For example, the following creates an area
    object representing 5 square miles::
 
        >>> a = Area(sq_mi=5)
