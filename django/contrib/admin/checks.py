@@ -660,19 +660,18 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
     def check(self, cls, parent_model, **kwargs):
         errors = super(InlineModelAdminChecks, self).check(cls, model=cls.model, **kwargs)
         errors.extend(self._check_fk_name(cls, parent_model))
-        errors.extend(self._check_exclude(cls, parent_model))
+        errors.extend(self._check_exclude_of_parent_model(cls, parent_model))
         errors.extend(self._check_extra(cls))
         errors.extend(self._check_max_num(cls))
         errors.extend(self._check_formset(cls))
         return errors
 
-    # overridden
-    def _check_exclude(self, cls, parent_model):
+    def _check_exclude_of_parent_model(self, cls, parent_model):
         # Do not perform more specific checks if the base checks result in an
         # error.
         errors = super(InlineModelAdminChecks, self)._check_exclude(cls, parent_model)
         if errors:
-            return errors
+            return []
 
         # Skip if `fk_name` is invalid.
         if self._check_fk_name(cls, parent_model):

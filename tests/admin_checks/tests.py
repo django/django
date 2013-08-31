@@ -128,8 +128,6 @@ class SystemChecksTestCase(TestCase):
                 obj=ExcludedFieldsInline,
             )
         ]
-        print 'errors', errors
-        print 'expected', expected
         self.assertEqual(errors, expected)
 
     def test_exclude_inline_model_admin(self):
