@@ -40,7 +40,8 @@ run_checks = framework.run_checks
 def tag(tag):
     def outer(f):
         if not hasattr(f, 'tags'):
-            f.tags = []
-        f.tags.append(tag)
+            f.tag = tag
+        else:
+            raise Exception('You cannot assign more than one tag to a check function.')
         return f
     return outer
