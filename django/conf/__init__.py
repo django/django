@@ -97,7 +97,7 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
-"""Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9."""
+# Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9.
 _deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
 
     'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
@@ -114,7 +114,7 @@ def _handle_cookie_settings_deprecation(setting):
         new = '%s_COOKIE' % prefix
         warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead."
                       % {'old': setting, 'new': new},
-            PendingDeprecationWarning, stacklevel=2)
+            PendingDeprecationWarning, stacklevel=3)
         return (new, attrib)
     return False
 
@@ -135,9 +135,9 @@ class BaseSettings(object):
 
         object.__setattr__(self, name, value)
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         _handle_cookie_settings_deprecation(name)
-        return super(BaseSettings, self).__getattr__(name)
+        return super(BaseSettings, self).__getattribute__(name)
 
 
 class Settings(BaseSettings):
