@@ -5,6 +5,12 @@ import json
 from datetime import datetime
 import unittest
 from xml.dom import minidom
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 
 from django.conf import settings
 from django.core import serializers
@@ -445,14 +451,11 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
         }
     }]"""
 
-try:
-    import yaml
-except ImportError:
-    pass
-else:
-    class YamlSerializerTestCase(SerializersTestBase, TestCase):
-        serializer_name = "yaml"
-        fwd_ref_str = """- fields:
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class YamlSerializerTestCase(SerializersTestBase, TestCase):
+    serializer_name = "yaml"
+    fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]
@@ -468,7 +471,7 @@ else:
   pk: 1
   model: serializers.author"""
 
-        pkless_str = """- fields:
+    pkless_str = """- fields:
     name: Reference
   pk: null
   model: serializers.category
@@ -476,42 +479,44 @@ else:
     name: Non-fiction
   model: serializers.category"""
 
-        @staticmethod
-        def _validate_output(serial_str):
-            try:
-                yaml.safe_load(StringIO(serial_str))
-            except Exception:
-                return False
-            else:
-                return True
+    @staticmethod
+    def _validate_output(serial_str):
+        try:
+            yaml.safe_load(StringIO(serial_str))
+        except Exception:
+            return False
+        else:
+            return True
 
-        @staticmethod
-        def _get_pk_values(serial_str):
-            ret_list = []
-            stream = StringIO(serial_str)
-            for obj_dict in yaml.safe_load(stream):
-                ret_list.append(obj_dict["pk"])
-            return ret_list
+    @staticmethod
+    def _get_pk_values(serial_str):
+        ret_list = []
+        stream = StringIO(serial_str)
+        for obj_dict in yaml.safe_load(stream):
+            ret_list.append(obj_dict["pk"])
+        return ret_list
 
-        @staticmethod
-        def _get_field_values(serial_str, field_name):
-            ret_list = []
-            stream = StringIO(serial_str)
-            for obj_dict in yaml.safe_load(stream):
-                if "fields" in obj_dict and field_name in obj_dict["fields"]:
-                    field_value = obj_dict["fields"][field_name]
-                    # yaml.safe_load will return non-string objects for some
-                    # of the fields we are interested in, this ensures that
-                    # everything comes back as a string
-                    if isinstance(field_value, six.string_types):
-                        ret_list.append(field_value)
-                    else:
-                        ret_list.append(str(field_value))
-            return ret_list
+    @staticmethod
+    def _get_field_values(serial_str, field_name):
+        ret_list = []
+        stream = StringIO(serial_str)
+        for obj_dict in yaml.safe_load(stream):
+            if "fields" in obj_dict and field_name in obj_dict["fields"]:
+                field_value = obj_dict["fields"][field_name]
+                # yaml.safe_load will return non-string objects for some
+                # of the fields we are interested in, this ensures that
+                # everything comes back as a string
+                if isinstance(field_value, six.string_types):
+                    ret_list.append(field_value)
+                else:
+                    ret_list.append(str(field_value))
+        return ret_list
 
-    class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
-        serializer_name = "yaml"
-        fwd_ref_str = """- fields:
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
+    serializer_name = "yaml"
+    fwd_ref_str = """- fields:
     headline: Forward references pose no problem
     pub_date: 2006-06-16 15:00:00
     categories: [1]
