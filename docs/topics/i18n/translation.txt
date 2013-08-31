@@ -674,6 +674,25 @@ markers<contextual-markers>` using the ``context`` keyword:
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
 
+String literals passed to tags and filters
+------------------------------------------
+
+You can translate string literals passed as arguments to tags and filters
+by using the familiar ``_()`` syntax::
+
+    {% some_tag _("Page not found") value|yesno:_("yes,no") %}
+
+In this case, both the tag and the filter will see the translated string,
+so they don't need to be aware of translations.
+
+.. note::
+    In this example, the translation infrastructure will be passed the string
+    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
+    translated string will need to contain the comma so that the filter
+    parsing code knows how to split up the arguments. For example, a German
+    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
+    (keeping the comma intact).
+
 .. _translator-comments-in-templates:
 
 Comments for translators in templates
@@ -782,23 +801,6 @@ three tags::
     {% get_current_language_bidi as LANGUAGE_BIDI %}
 
 These tags also require a ``{% load i18n %}``.
-
-Translation hooks are also available within any template block tag that accepts
-constant strings. In those cases, just use ``_()`` syntax to specify a
-translation string::
-
-    {% some_special_tag _("Page not found") value|yesno:_("yes,no") %}
-
-In this case, both the tag and the filter will see the already-translated
-string, so they don't need to be aware of translations.
-
-.. note::
-    In this example, the translation infrastructure will be passed the string
-    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
-    translated string will need to contain the comma so that the filter
-    parsing code knows how to split up the arguments. For example, a German
-    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
-    (keeping the comma intact).
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
