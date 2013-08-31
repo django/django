@@ -609,6 +609,11 @@ value is used. Defining both ``requires_system_checks`` and
 
 ``validate`` command is deprecated in favour of ``check`` command.
 
+``ModelAdmin.validator``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.validator`` is deprecated in favour of new ``checks`` attribute.
+
 ``django.db.backends.DatabaseValidation.validate_field``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
