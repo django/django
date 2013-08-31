@@ -70,7 +70,7 @@ class ModelState(object):
         """
         # Deconstruct the fields
         fields = []
-        for field in model._meta.fields:
+        for field in model._meta.local_fields:
             name, path, args, kwargs = field.deconstruct()
             field_class = import_by_path(path)
             fields.append((name, field_class(*args, **kwargs)))
