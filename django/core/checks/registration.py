@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from functools import wraps
-
 from django.utils.itercompat import is_iterable
 
 
@@ -19,16 +17,23 @@ class CheckFramework(object):
         """
         self.registered_checks.append(f)
 
-    def run_checks(self, apps):
+    def run_checks(self, apps=None, tags=None):
         """ Run all registered checks and return list of Errors and Warnings.
         """
         errors = []
-        for f in self.registered_checks:
-            new_errors = f(apps=apps)
-            assert is_iterable(new_errors), (
-                "The function %r did not return a list. All functions registered "
-                "in checking framework must return a list." % f)
-            errors.extend(new_errors)
+        if tags is not None:
+            checks = [check for check in self.registered_checks
+                      if hasattr(check, 'tag') and check.tag in tags]
+        else:
+            checks = self.registered_checks
+
+        for f in checks:
+            if tags is None or (hasattr(f, 'tag') and f.tag in tags):
+                new_errors = f(apps=apps)
+                assert is_iterable(new_errors), (
+                    "The function %r did not return a list. All functions registered "
+                    "in checking framework must return a list." % f)
+                errors.extend(new_errors)
         return errors
 
 

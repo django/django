@@ -177,4 +177,4 @@ class CheckCommandTests(TestCase):
     def test_given_tag(self):
         call_command('check', tags=['simpletag'])
         self.assertEqual(simple_system_check.kwargs, None)
-        self.assertEqual(tagged_system_check.kwargs, {})
+        self.assertEqual(tagged_system_check.kwargs, {'apps': None})
