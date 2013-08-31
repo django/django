@@ -46,20 +46,6 @@ class AdminForm(object):
                 **options
             )
 
-    def first_field(self):
-        try:
-            fieldset_name, fieldset_options = self.fieldsets[0]
-            field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, six.string_types):
-                field_name = field_name[0]
-            return self.form[field_name]
-        except (KeyError, IndexError):
-            pass
-        try:
-            return next(iter(self.form))
-        except StopIteration:
-            return None
-
     def _media(self):
         media = self.form.media
         for fs in self:

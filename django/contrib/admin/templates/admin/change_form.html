@@ -66,8 +66,14 @@
 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
-{% if adminform.first_field and add %}
-   <script type="text/javascript">document.getElementById("{{ adminform.first_field.id_for_label }}").focus();</script>
+{% if adminform and add %}
+    <script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                $('form#{{ opts.module_name }}_form :input:visible:enabled:first').focus()
+            });
+        })(django.jQuery);
+    </script>
 {% endif %}
 
 {# JavaScript for prepopulated fields #}
