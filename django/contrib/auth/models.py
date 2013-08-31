@@ -386,9 +386,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
-    def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.username)
-
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
@@ -400,11 +397,11 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         "Returns the short name for the user."
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None):
+    def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.
         """
-        send_mail(subject, message, from_email, [self.email])
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 class User(AbstractUser):

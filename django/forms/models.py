@@ -543,7 +543,7 @@ class BaseModelFormSet(BaseFormSet):
 
     def _existing_object(self, pk):
         if not hasattr(self, '_object_dict'):
-            self._object_dict = dict([(o.pk, o) for o in self.get_queryset()])
+            self._object_dict = dict((o.pk, o) for o in self.get_queryset())
         return self._object_dict.get(pk)
 
     def _construct_form(self, i, **kwargs):
@@ -631,7 +631,11 @@ class BaseModelFormSet(BaseFormSet):
             seen_data = set()
             for form in valid_forms:
                 # get data for each field of each of unique_check
-                row_data = tuple([form.cleaned_data[field] for field in unique_check if field in form.cleaned_data])
+                row_data = (form.cleaned_data[field]
+                            for field in unique_check if field in form.cleaned_data)
+                # Reduce Model instances to their primary key values
+                row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else d
+                                 for d in row_data)
                 if row_data and not None in row_data:
                     # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:
@@ -1177,7 +1181,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={'pk': pk},
                 )
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = set([force_text(getattr(o, key)) for o in qs])
+        pks = set(force_text(getattr(o, key)) for o in qs)
         for val in value:
             if force_text(val) not in pks:
                 raise ValidationError(
@@ -1204,8 +1208,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set([force_text(value) for value in self.prepare_value(initial)])
-        data_set = set([force_text(value) for value in data])
+        initial_set = set(force_text(value) for value in self.prepare_value(initial))
+        data_set = set(force_text(value) for value in data)
         return data_set != initial_set
 
 

@@ -44,6 +44,9 @@ from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str, force_text
+from django.db.backends.mysql.schema import DatabaseSchemaEditor
+from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
 from django.utils import timezone
@@ -171,6 +174,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     allows_primary_key_0 = False
     uses_savepoints = True
+    supports_check_constraints = False
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
@@ -514,6 +518,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
 
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
+
     def is_usable(self):
         try:
             self.connection.ping()
@@ -529,4 +537,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
+        return tuple(int(x) for x in match.groups())

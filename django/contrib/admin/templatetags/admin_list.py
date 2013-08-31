@@ -9,6 +9,7 @@ from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.utils import formats
 from django.utils.html import escapejs, format_html
@@ -216,25 +217,36 @@ def items_for_result(cl, result, form):
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.list_display_links) or field_name in cl.list_display_links:
-            table_tag = {True:'th', False:'td'}[first]
+            table_tag = 'th' if first else 'td'
             first = False
-            url = cl.url_for_result(result)
-            url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
-            # Convert the pk to something that can be used in Javascript.
-            # Problem cases are long ints (23L) and non-ASCII strings.
-            if cl.to_field:
-                attr = str(cl.to_field)
+
+            # Display link to the result's change_view if the url exists, else
+            # display just the result's representation.
+            try:
+                url = cl.url_for_result(result)
+            except NoReverseMatch:
+                link_or_text = result_repr
             else:
-                attr = pk
-            value = result.serializable_value(attr)
-            result_id = escapejs(value)
-            yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
+                url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
+                # Convert the pk to something that can be used in Javascript.
+                # Problem cases are long ints (23L) and non-ASCII strings.
+                if cl.to_field:
+                    attr = str(cl.to_field)
+                else:
+                    attr = pk
+                value = result.serializable_value(attr)
+                result_id = escapejs(value)
+                link_or_text = format_html(
+                    '<a href="{0}"{1}>{2}</a>',
+                    url,
+                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
+                        if cl.is_popup else '',
+                    result_repr)
+
+            yield format_html('<{0}{1}>{2}</{3}>',
                               table_tag,
                               row_class,
-                              url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
-                                if cl.is_popup else '',
-                              result_repr,
+                              link_or_text,
                               table_tag)
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull

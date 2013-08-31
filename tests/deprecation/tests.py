@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.test.testcases import SimpleTestCase
+from django.test import SimpleTestCase
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 

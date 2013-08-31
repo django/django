@@ -107,6 +107,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         validator.validate(cls, model)
 
     def __init__(self):
+        self._orig_formfield_overrides = self.formfield_overrides
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
@@ -123,6 +124,9 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
+            # see #19303 for an explanation of self._orig_formfield_overrides
+            if db_field.__class__ in self._orig_formfield_overrides:
+                kwargs = dict(self._orig_formfield_overrides[db_field.__class__], **kwargs)
             return self.formfield_for_choice_field(db_field, request, **kwargs)
 
         # ForeignKey or ManyToManyFields
@@ -694,16 +698,16 @@ class ModelAdmin(BaseModelAdmin):
             # Avoid trying to iterate over None
             if not class_actions:
                 continue
-            actions.extend([self.get_action(action) for action in class_actions])
+            actions.extend(self.get_action(action) for action in class_actions)
 
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
         # Convert the actions into an OrderedDict keyed by name.
-        actions = OrderedDict([
+        actions = OrderedDict(
             (name, (func, name, desc))
             for func, name, desc in actions
-        ])
+        )
 
         return actions
 

@@ -148,6 +148,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
@@ -258,17 +263,12 @@ class LazyObject(object):
     __dir__ = new_method_proxy(dir)
 
     # Dictionary methods support
-    @new_method_proxy
-    def __getitem__(self, key):
-        return self[key]
+    __getitem__ = new_method_proxy(operator.getitem)
+    __setitem__ = new_method_proxy(operator.setitem)
+    __delitem__ = new_method_proxy(operator.delitem)
 
-    @new_method_proxy
-    def __setitem__(self, key, value):
-        self[key] = value
-
-    @new_method_proxy
-    def __delitem__(self, key):
-        del self[key]
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
 
 
 # Workaround for http://bugs.python.org/issue12370

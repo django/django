@@ -30,10 +30,10 @@ def precision_wkt(geom, prec):
     coord_fmt = ' '.join([num_fmt, num_fmt])
 
     def formatted_coords(coords):
-        return ','.join([coord_fmt % c[:2] for c in coords])
+        return ','.join(coord_fmt % c[:2] for c in coords)
 
     def formatted_poly(poly):
-        return ','.join(['(%s)' % formatted_coords(r) for r in poly])
+        return ','.join('(%s)' % formatted_coords(r) for r in poly)
 
     def formatted_geom(g):
         gtype = str(g.geom_type).upper()
@@ -47,11 +47,11 @@ def precision_wkt(geom, prec):
         elif gtype == 'MULTIPOINT':
             yield formatted_coords(g.coords)
         elif gtype == 'MULTIPOLYGON':
-            yield ','.join(['(%s)' % formatted_poly(p) for p in g])
+            yield ','.join('(%s)' % formatted_poly(p) for p in g)
         elif gtype == 'GEOMETRYCOLLECTION':
-            yield ','.join([''.join([wkt for wkt in formatted_geom(child)]) for child in g])
+            yield ','.join(''.join(wkt for wkt in formatted_geom(child)) for child in g)
         else:
             raise TypeError
         yield ')'
 
-    return ''.join([wkt for wkt in formatted_geom(geom)])
+    return ''.join(wkt for wkt in formatted_geom(geom))

@@ -221,7 +221,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
 
             def as_divs(self):
                 if not self: return ''
-                return mark_safe('<div class="error">%s</div>' % ''.join(['<p>%s</p>' % e for e in self]))
+                return mark_safe('<div class="error">%s</div>' % ''.join('<p>%s</p>' % e for e in self))
 
         # This form should print errors the default way.
         form1 = TestForm({'first_name': 'John'})

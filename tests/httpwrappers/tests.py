@@ -385,6 +385,13 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.tell(), 6)
         self.assertEqual(r.content, b'abcdef')
 
+        # with Content-Encoding header
+        r = HttpResponse()
+        r['Content-Encoding'] = 'winning'
+        r.write(b'abc')
+        r.write(b'def')
+        self.assertEqual(r.content, b'abcdef')
+
     def test_unsafe_redirect(self):
         bad_urls = [
             'data:text/html,<script>window.alert("xss")</script>',

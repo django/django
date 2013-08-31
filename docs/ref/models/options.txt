@@ -106,9 +106,9 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.managed
 
     Defaults to ``True``, meaning Django will create the appropriate database
-    tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`flush`
-    management command. That is, Django *manages* the database tables'
-    lifecycles.
+    tables in :djadmin:`migrate` or as part of migrations and remove them as
+    part of a :djadmin:`flush` management command. That is, Django
+    *manages* the database tables' lifecycles.
 
     If ``False``, no database table creation or deletion operations will be
     performed for this model. This is useful if the model represents an existing
@@ -192,9 +192,9 @@ Django quotes column and table names behind the scenes.
 .. admonition:: Changing order_with_respect_to
 
         ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to handle that as you would any other
-        change to your models if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`syncdb`.
+        named ``_order``, so be sure to make and apply the appropriate
+        migrations if you add or change ``order_with_respect_to``
+        after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------
@@ -256,6 +256,28 @@ Django quotes column and table names behind the scenes.
     If ``proxy = True``, a model which subclasses another model will be treated as
     a :ref:`proxy model <proxy-models>`.
 
+``select_on_save``
+------------------
+
+.. attribute:: Options.select_on_save
+
+    .. versionadded:: 1.6
+
+    Determines if Django will use the pre-1.6
+    :meth:`django.db.models.Model.save()` algorithm. The old algorithm
+    uses ``SELECT`` to determine if there is an existing row to be updated.
+    The new algorithm tries an ``UPDATE`` directly. In some rare cases the
+    ``UPDATE`` of an existing row isn't visible to Django. An example is the
+    PostgreSQL ``ON UPDATE`` trigger which returns ``NULL``. In such cases the
+    new algorithm will end up doing an ``INSERT`` even when a row exists in
+    the database.
+
+    Usually there is no need to set this attribute. The default is
+    ``False``.
+
+    See :meth:`django.db.models.Model.save()` for more about the old and
+    new saving algorithm.
+
 ``unique_together``
 -------------------
 
@@ -285,8 +307,6 @@ Django quotes column and table names behind the scenes.
 ------------------
 
 .. attribute:: Options.index_together
-
-    .. versionadded:: 1.5
 
     Sets of field names that, taken together, are indexed::
 

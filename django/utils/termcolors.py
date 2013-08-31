@@ -5,8 +5,8 @@ termcolors.py
 from django.utils import six
 
 color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
-foreground = dict([(color_names[x], '3%s' % x) for x in range(8)])
-background = dict([(color_names[x], '4%s' % x) for x in range(8)])
+foreground = dict((color_names[x], '3%s' % x) for x in range(8))
+background = dict((color_names[x], '4%s' % x) for x in range(8))
 
 RESET = '0'
 opt_dict = {'bold': '1', 'underscore': '4', 'blink': '5', 'reverse': '7', 'conceal': '8'}
@@ -86,6 +86,10 @@ PALETTES = {
         'HTTP_BAD_REQUEST':  {},
         'HTTP_NOT_FOUND':    {},
         'HTTP_SERVER_ERROR': {},
+        'MIGRATE_HEADING':   {},
+        'MIGRATE_LABEL':     {},
+        'MIGRATE_SUCCESS':   {},
+        'MIGRATE_FAILURE':   {},
     },
     DARK_PALETTE: {
         'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
@@ -101,6 +105,10 @@ PALETTES = {
         'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
         'HTTP_NOT_FOUND':    { 'fg': 'yellow' },
         'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
+        'MIGRATE_HEADING':   { 'fg': 'cyan', 'opts': ('bold',) },
+        'MIGRATE_LABEL':     { 'opts': ('bold',) },
+        'MIGRATE_SUCCESS':   { 'fg': 'green', 'opts': ('bold',) },
+        'MIGRATE_FAILURE':   { 'fg': 'red', 'opts': ('bold',) },
     },
     LIGHT_PALETTE: {
         'ERROR':        { 'fg': 'red', 'opts': ('bold',) },
@@ -116,6 +124,10 @@ PALETTES = {
         'HTTP_BAD_REQUEST':  { 'fg': 'red', 'opts': ('bold',) },
         'HTTP_NOT_FOUND':    { 'fg': 'red' },
         'HTTP_SERVER_ERROR': { 'fg': 'magenta', 'opts': ('bold',) },
+        'MIGRATE_HEADING':   { 'fg': 'cyan', 'opts': ('bold',) },
+        'MIGRATE_LABEL':     { 'opts': ('bold',) },
+        'MIGRATE_SUCCESS':   { 'fg': 'green', 'opts': ('bold',) },
+        'MIGRATE_FAILURE':   { 'fg': 'red', 'opts': ('bold',) },
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE

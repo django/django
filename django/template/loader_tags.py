@@ -78,7 +78,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name = parent_name
         self.template_dirs = template_dirs
-        self.blocks = dict([(n.name, n) for n in nodelist.get_nodes_by_type(BlockNode)])
+        self.blocks = dict((n.name, n) for n in nodelist.get_nodes_by_type(BlockNode))
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
@@ -112,8 +112,8 @@ class ExtendsNode(Node):
             # The ExtendsNode has to be the first non-text node.
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
-                    blocks = dict([(n.name, n) for n in
-                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
+                    blocks = dict((n.name, n) for n in
+                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode))
                     block_context.add_blocks(blocks)
                 break
 
@@ -121,51 +121,33 @@ class ExtendsNode(Node):
         # the same.
         return compiled_parent._render(context)
 
-class BaseIncludeNode(Node):
-    def __init__(self, *args, **kwargs):
+class IncludeNode(Node):
+    def __init__(self, template, *args, **kwargs):
+        self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
         self.isolated_context = kwargs.pop('isolated_context', False)
-        super(BaseIncludeNode, self).__init__(*args, **kwargs)
-
-    def render_template(self, template, context):
-        values = dict([(name, var.resolve(context)) for name, var
-                       in six.iteritems(self.extra_context)])
-        if self.isolated_context:
-            return template.render(context.new(values))
-        with context.push(**values):
-            return template.render(context)
-
-
-class ConstantIncludeNode(BaseIncludeNode):
-    def __init__(self, template_path, *args, **kwargs):
-        super(ConstantIncludeNode, self).__init__(*args, **kwargs)
-        try:
-            t = get_template(template_path)
-            self.template = t
-        except:
-            if settings.TEMPLATE_DEBUG:
-                raise
-            self.template = None
-
-    def render(self, context):
-        if not self.template:
-            return ''
-        return self.render_template(self.template, context)
-
-class IncludeNode(BaseIncludeNode):
-    def __init__(self, template_name, *args, **kwargs):
         super(IncludeNode, self).__init__(*args, **kwargs)
-        self.template_name = template_name
 
     def render(self, context):
         try:
-            template_name = self.template_name.resolve(context)
-            template = get_template(template_name)
-            return self.render_template(template, context)
+            template = self.template.resolve(context)
+            # Does this quack like a Template?
+            if not callable(getattr(template, 'render', None)):
+                # If not, we'll try get_template
+                template = get_template(template)
+            values = {
+                name: var.resolve(context)
+                for name, var in six.iteritems(self.extra_context)
+            }
+            if self.isolated_context:
+                return template.render(context.new(values))
+            with context.push(**values):
+                return template.render(context)
         except:
             if settings.TEMPLATE_DEBUG:
                 raise
             return ''
+
 
 @register.tag('block')
 def do_block(parser, token):
@@ -204,7 +186,7 @@ def do_extends(parser, token):
     uses the literal value "base" as the name of the parent template to extend,
     or ``{% extends variable %}`` uses the value of ``variable`` as either the
     name of the parent template to extend (if it evaluates to a string) or as
-    the parent tempate itelf (if it evaluates to a Template object).
+    the parent template itself (if it evaluates to a Template object).
     """
     bits = token.split_contents()
     if len(bits) != 2:
@@ -255,9 +237,5 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
-    path = bits[1]
-    if path[0] in ('"', "'") and path[-1] == path[0]:
-        return ConstantIncludeNode(path[1:-1], extra_context=namemap,
-                                   isolated_context=isolated_context)
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)

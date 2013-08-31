@@ -79,7 +79,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
+        long_str = ''.join(six.text_type(x) for x in xrange(4000))
         c.execute('INSERT INTO ltext VALUES (%s)', [long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()

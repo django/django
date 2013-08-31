@@ -265,8 +265,8 @@ Methods are copied according to the following rules:
 
 - Public methods are copied by default.
 - Private methods (starting with an underscore) are not copied by default.
-- Methods with a `queryset_only` attribute set to `False` are always copied.
-- Methods with a `queryset_only` attribute set to `True` are never copied.
+- Methods with a ``queryset_only`` attribute set to ``False`` are always copied.
+- Methods with a ``queryset_only`` attribute set to ``True`` are never copied.
 
 For example::
 

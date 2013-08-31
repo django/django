@@ -598,7 +598,7 @@ class DocTestParser:
         # If all lines begin with the same indentation, then strip it.
         min_indent = self._min_indent(string)
         if min_indent > 0:
-            string = '\n'.join([l[min_indent:] for l in string.split('\n')])
+            string = '\n'.join(l[min_indent:] for l in string.split('\n'))
 
         output = []
         charno, lineno = 0, 0
@@ -670,7 +670,7 @@ class DocTestParser:
         source_lines = m.group('source').split('\n')
         self._check_prompt_blank(source_lines, indent, name, lineno)
         self._check_prefix(source_lines[1:], ' '*indent + '.', name, lineno)
-        source = '\n'.join([sl[indent+4:] for sl in source_lines])
+        source = '\n'.join(sl[indent+4:] for sl in source_lines)
 
         # Divide want into lines; check that it's properly indented; and
         # then strip the indentation.  Spaces before the last newline should
@@ -681,7 +681,7 @@ class DocTestParser:
             del want_lines[-1]  # forget final newline & spaces after it
         self._check_prefix(want_lines, ' '*indent, name,
                            lineno + len(source_lines))
-        want = '\n'.join([wl[indent:] for wl in want_lines])
+        want = '\n'.join(wl[indent:] for wl in want_lines)
 
         # If `want` contains a traceback message, then extract it.
         m = self._EXCEPTION_RE.match(want)

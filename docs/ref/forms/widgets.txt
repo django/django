@@ -525,11 +525,6 @@ Selector and checkbox widgets
         A callable that takes the value of the CheckBoxInput and returns
         ``True`` if the checkbox should be checked for that value.
 
-        .. versionchanged:: 1.5
-
-            Exceptions from ``check_test`` used to be silenced by its caller,
-            this is no longer the case, they will propagate upwards.
-
 ``Select``
 ~~~~~~~~~~
 
@@ -768,3 +763,20 @@ Composite widgets
 
         An optional list/tuple of years to use in the "year" select box.
         The default is a list containing the current year and the next 9 years.
+
+    .. attribute:: SelectDateWidget.months
+
+        .. versionadded:: 1.7
+
+        An optional dict of months to use in the "months" select box.
+
+        The keys of the dict correspond to the month number (1-indexed) and
+        the values are the displayed months.
+
+        .. code-block:: python
+
+            MONTHS = {
+                1:_('jan'), 2:_('feb'), 3:_('mar'), 4:_('apr'),
+                5:_('may'), 6:_('jun'), 7:_('jul'), 8:_('aug'),
+                9:_('sep'), 10:_('oct'), 11:_('nov'), 12:_('dec')
+            }

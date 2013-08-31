@@ -32,7 +32,7 @@ simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
+hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
@@ -81,8 +81,8 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs)])
+    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
+                        six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 def format_html_join(sep, format_string, args_generator):

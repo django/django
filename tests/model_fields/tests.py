@@ -12,7 +12,7 @@ from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
     EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
-    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
+    GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
 from django.db.models.fields.files import FileField, ImageField
@@ -78,14 +78,12 @@ class BasicFieldTests(test.TestCase):
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
-    def test_formclass_with_choices(self):
-        # regression for 18162
-        class CustomChoiceField(forms.TypedChoiceField):
-            pass
-        choices = [('a@b.cc', 'a@b.cc'), ('b@b.cc', 'b@b.cc')]
+    def test_choices_form_class(self):
+        """Can supply a custom choices form class. Regression for #20999."""
+        choices = [('a', 'a')]
         field = models.CharField(choices=choices)
-        klass = CustomChoiceField
-        self.assertIsInstance(field.formfield(form_class=klass), klass)
+        klass = forms.TypedMultipleChoiceField
+        self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
 
 class DecimalFieldTests(test.TestCase):
@@ -275,10 +273,23 @@ class BooleanFieldTests(unittest.TestCase):
         Check that a BooleanField defaults to None -- which isn't
         a valid value (#15124).
         """
-        b = BooleanModel()
-        self.assertIsNone(b.bfield)
-        with self.assertRaises(IntegrityError):
-            b.save()
+        # Patch the boolean field's default value. We give it a default
+        # value when defining the model to satisfy the check tests
+        # #20895.
+        boolean_field = BooleanModel._meta.get_field('bfield')
+        self.assertTrue(boolean_field.has_default())
+        old_default = boolean_field.default
+        try:
+            boolean_field.default = NOT_PROVIDED
+            # check patch was succcessful
+            self.assertFalse(boolean_field.has_default())
+            b = BooleanModel()
+            self.assertIsNone(b.bfield)
+            with self.assertRaises(IntegrityError):
+                b.save()
+        finally:
+            boolean_field.default = old_default
+
         nb = NullBooleanModel()
         self.assertIsNone(nb.nbfield)
         nb.save()           # no error
@@ -650,3 +661,26 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             URLField().get_prep_value(lazy_func()),
             six.text_type)
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        class NoopField(models.TextField):
+            def __init__(self, *args, **kwargs):
+                self.prep_value_count = 0
+                super(NoopField, self).__init__(*args, **kwargs)
+
+            def get_prep_value(self, value):
+                self.prep_value_count += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup(
+            'exact', 'TEST', connection=connection, prepared=False
+        )
+        self.assertEqual(field.prep_value_count, 1)

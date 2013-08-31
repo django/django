@@ -30,7 +30,7 @@ class Entry(models.Model):
     title = models.CharField(max_length=250)
     body = models.TextField()
     pub_date = models.DateField()
-    enable_comments = models.BooleanField()
+    enable_comments = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

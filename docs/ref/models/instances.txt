@@ -104,14 +104,9 @@ aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
-your model's :meth:`~Model.save()` method, nor as a result of
-:class:`~django.forms.ModelForm` validation. In the case of
-:class:`~django.forms.ModelForm` validation, :meth:`Model.clean_fields()`,
-:meth:`Model.clean()`, and :meth:`Model.validate_unique()` are all called
-individually.
-
-You'll need to call ``full_clean`` manually when you want to run one-step model
-validation for your own manually created models. For example::
+your model's :meth:`~Model.save()` method. You'll need to call it manually
+when you want to run one-step model validation for your own manually created
+models. For example::
 
     from django.core.exceptions import ValidationError
     try:
@@ -310,15 +305,22 @@ follows this algorithm:
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
   didn't update anything, Django executes an ``INSERT``.
 
-.. versionchanged:: 1.6
-
-    Previously Django used ``SELECT`` - if not found ``INSERT`` else ``UPDATE``
-    algorithm. The old algorithm resulted in one more query in ``UPDATE`` case.
-
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
+
+.. versionchanged:: 1.6
+
+    Previously Django did a ``SELECT`` when the primary key attribute was set.
+    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
+    did an ``INSERT``. The old algorithm results in one more query in the
+    ``UPDATE`` case. There are some rare cases where the database doesn't
+    report that a row was updated even if the database contains a row for the
+    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
+    trigger which returns ``NULL``. In such cases it is possible to revert to the
+    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+    option to ``True``.
 
 .. _ref-models-force-insert:
 
@@ -387,8 +389,6 @@ For more details, see the documentation on :ref:`F() expressions
 
 Specifying which fields to save
 -------------------------------
-
-.. versionadded:: 1.5
 
 If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
@@ -493,6 +493,59 @@ using ``__str__()`` like this::
             # Note use of django.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
             return force_bytes('%s %s' % (self.first_name, self.last_name))
+
+``__eq__``
+----------
+
+.. method:: Model.__eq__()
+
+The equality method is defined such that instances with the same primary
+key value and the same concrete class are considered equal. For proxy
+models, concrete class is defined as the model's first non-proxy parent;
+for all other models it is simply the model's class.
+
+For example::
+
+    form django.db import models
+
+    class MyModel(models.Model):
+        id = models.AutoField(primary_key=True)
+
+    class MyProxyModel(MyModel):
+        class Meta:
+            proxy = True
+
+    class MultitableInherited(MyModel):
+        pass
+
+    MyModel(id=1) == MyModel(id=1)
+    MyModel(id=1) == MyProxyModel(id=1)
+    MyModel(id=1) != MultitableInherited(id=1)
+    MyModel(id=1) != MyModel(id=2)
+
+.. versionchanged:: 1.7
+
+  In previous versions only instances of the exact same class and same
+  primary key value were considered equal.
+
+``__hash__``
+------------
+
+.. method:: Model.__hash__()
+
+The ``__hash__`` method is based on the instance's primary key value. It
+is effectively hash(obj.pk). If the instance doesn't have a primary key
+value then a ``TypeError`` will be raised (otherwise the ``__hash__``
+method would return different values before and after the instance is
+saved, but changing the ``__hash__`` value of an instance `is forbidden
+in Python`_).
+
+.. versionchanged:: 1.7
+
+  In previous versions instance's without primary key value were
+  hashable.
+
+.. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
 
 ``get_absolute_url``
 --------------------

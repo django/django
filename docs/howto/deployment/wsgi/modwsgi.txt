@@ -193,7 +193,7 @@ other approaches:
    configuration).
 
 2. Use an ``Alias`` directive, as demonstrated above, to alias the appropriate
-   URL (probably :setting:`STATIC_URL` + `admin/`) to the actual location of
+   URL (probably :setting:`STATIC_URL` + ``admin/``) to the actual location of
    the admin files.
 
 3. Copy the admin static files so that they live within your Apache

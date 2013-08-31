@@ -16,7 +16,7 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     except UnavailableApp:
         return
 
-    if not router.allow_syncdb(db, ContentType):
+    if not router.allow_migrate(db, ContentType):
         return
 
     ContentType.objects.clear_cache()
@@ -58,10 +58,10 @@ def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, *
     # Confirm that the content type is stale before deletion.
     if to_remove:
         if kwargs.get('interactive', False):
-            content_type_display = '\n'.join([
+            content_type_display = '\n'.join(
                 '    %s | %s' % (ct.app_label, ct.model)
                 for ct in to_remove
-            ])
+            )
             ok_to_delete = input("""The following content types are stale and need to be deleted:
 
 %s
@@ -88,7 +88,7 @@ def update_all_contenttypes(verbosity=2, **kwargs):
     for app in get_apps():
         update_contenttypes(app, None, verbosity, **kwargs)
 
-signals.post_syncdb.connect(update_contenttypes)
+signals.post_migrate.connect(update_contenttypes)
 
 if __name__ == "__main__":
     update_all_contenttypes()

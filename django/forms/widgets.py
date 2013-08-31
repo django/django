@@ -28,7 +28,7 @@ __all__ = (
     'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget',
-    'SplitDateTimeWidget',
+    'SplitDateTimeWidget', 'SplitHiddenDateTimeWidget',
 )
 
 MEDIA_TYPES = ('css','js')

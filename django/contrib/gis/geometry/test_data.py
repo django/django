@@ -20,13 +20,13 @@ TEST_DATA = os.path.join(os.path.dirname(upath(gis.__file__)), 'tests', 'data')
 def tuplize(seq):
     "Turn all nested sequences to tuples in given sequence."
     if isinstance(seq, (list, tuple)):
-        return tuple([tuplize(i) for i in seq])
+        return tuple(tuplize(i) for i in seq)
     return seq
 
 
 def strconvert(d):
     "Converts all keys in dictionary to str type."
-    return dict([(str(k), v) for k, v in six.iteritems(d)])
+    return dict((str(k), v) for k, v in six.iteritems(d))
 
 
 def get_ds_file(name, ext):

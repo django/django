@@ -146,7 +146,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name,
+        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                       seed_cache=False, only_installed=False)
         if m is not None:
             return m
@@ -159,7 +159,7 @@ class ModelBase(type):
         new_fields = new_class._meta.local_fields + \
                      new_class._meta.local_many_to_many + \
                      new_class._meta.virtual_fields
-        field_names = set([f.name for f in new_fields])
+        field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -264,13 +264,13 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        register_models(new_class._meta.app_label, new_class)
-
+        
+        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name,
+        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                          seed_cache=False, only_installed=False)
 
     def copy_managers(cls, base_managers):
@@ -321,7 +321,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
 
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
@@ -459,12 +459,21 @@ class Model(six.with_metaclass(ModelBase)):
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
+        if not isinstance(other, Model):
+            return False
+        if self._meta.concrete_model != other._meta.concrete_model:
+            return False
+        my_pk = self._get_pk_val()
+        if my_pk is None:
+            return self is other
+        return my_pk == other._get_pk_val()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
+        if self._get_pk_val() is None:
+            raise TypeError("Model instances without primary key value are unhashable")
         return hash(self._get_pk_val())
 
     def __reduce__(self):
@@ -658,7 +667,9 @@ class Model(six.with_metaclass(ModelBase)):
             base_qs = cls._base_manager.using(using)
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
-            updated = self._do_update(base_qs, using, pk_val, values, update_fields)
+            forced_update = update_fields or force_update
+            updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+                                      forced_update)
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
@@ -682,21 +693,27 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, meta.pk.attname, result)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """
         This method will try to update the model. If the model was updated (in
         the sense that an update query was done and a matching row was found
         from the DB) the method will return True.
         """
+        filtered = base_qs.filter(pk=pk_val)
         if not values:
             # We can end up here when saving a model in inheritance chain where
             # update_fields doesn't target any field in current model. In that
             # case we just say the update succeeded. Another case ending up here
             # is a model with just PK - in that case check that the PK still
             # exists.
-            return update_fields is not None or base_qs.filter(pk=pk_val).exists()
-        else:
-            return base_qs.filter(pk=pk_val)._update(values) > 0
+            return update_fields is not None or filtered.exists()
+        if self._meta.select_on_save and not forced_update:
+            if filtered.exists():
+                filtered._update(values)
+                return True
+            else:
+                return False
+        return filtered._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
         """

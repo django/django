@@ -38,8 +38,8 @@ class MessageDecoder(json.JSONDecoder):
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return dict([(key, self.process_messages(value))
-                         for key, value in six.iteritems(obj)])
+            return dict((key, self.process_messages(value))
+                         for key, value in six.iteritems(obj))
         return obj
 
     def decode(self, s, **kwargs):
@@ -79,7 +79,9 @@ class CookieStorage(BaseStorage):
         """
         if encoded_data:
             response.set_cookie(self.cookie_name, encoded_data,
-                domain=settings.SESSION_COOKIE_DOMAIN)
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                secure=settings.SESSION_COOKIE_SECURE or None,
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
         else:
             response.delete_cookie(self.cookie_name,
                 domain=settings.SESSION_COOKIE_DOMAIN)

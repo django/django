@@ -8,7 +8,7 @@ def example_view(request):
 
 def model_view(request):
     people = Person.objects.all()
-    return HttpResponse('\n'.join([person.name for person in people]))
+    return HttpResponse('\n'.join(person.name for person in people))
 
 
 def create_model_instance(request):
@@ -18,4 +18,4 @@ def create_model_instance(request):
 
 
 def environ_view(request):
-    return HttpResponse("\n".join(["%s: %r" % (k, v) for k, v in request.environ.items()]))
+    return HttpResponse("\n".join("%s: %r" % (k, v) for k, v in request.environ.items()))

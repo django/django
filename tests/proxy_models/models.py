@@ -117,8 +117,12 @@ class StateProxy(State):
 
 # Proxy models still works with filters (on related fields)
 # and select_related, even when mixed with model inheritance
+@python_2_unicode_compatible
 class BaseUser(models.Model):
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return ':'.join((self.__class__.__name__, self.name,))
 
 class TrackerUser(BaseUser):
     status = models.CharField(max_length=50)
@@ -134,7 +138,7 @@ class Issue(models.Model):
     assignee = models.ForeignKey(TrackerUser)
 
     def __str__(self):
-        return ':'.join((self.__class__.__name__,self.summary,))
+        return ':'.join((self.__class__.__name__, self.summary,))
 
 class Bug(Issue):
     version = models.CharField(max_length=50)

@@ -575,7 +575,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple([self[i] for i in xrange(len(self))])
+        return tuple(self[i] for i in xrange(len(self)))
     coords = tuple
 
     def _listarr(self, func):
@@ -632,14 +632,14 @@ class Polygon(OGRGeometry):
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
     @property
     def point_count(self):
         "The number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def centroid(self):
@@ -686,12 +686,12 @@ class GeometryCollection(OGRGeometry):
     def point_count(self):
         "The number of Points in this Geometry Collection."
         # Summing up the number of points in each geometry in this collection
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
 # Multiple Geometry types.

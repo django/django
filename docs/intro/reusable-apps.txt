@@ -155,7 +155,7 @@ this. For a small app like polls, this process isn't too difficult.
 
           url(r'^polls/', include('polls.urls')),
 
-    3. Run `python manage.py syncdb` to create the polls models.
+    3. Run `python manage.py migrate` to create the polls models.
 
     4. Start the development server and visit http://127.0.0.1:8000/admin/
        to create a poll (you'll need the Admin app enabled).
@@ -201,7 +201,8 @@ Create a file ``django-polls/setup.py`` with the following contents::
             'License :: OSI Approved :: BSD License', # example license
             'Operating System :: OS Independent',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.6',
+            # replace these appropriately if you are using Python 3
+            'Programming Language :: Python :: 2',
             'Programming Language :: Python :: 2.7',
             'Topic :: Internet :: WWW/HTTP',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content',

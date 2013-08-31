@@ -52,7 +52,7 @@ def handle_extensions(extensions=('html',), ignored=('py',)):
     for i, ext in enumerate(ext_list):
         if not ext.startswith('.'):
             ext_list[i] = '.%s' % ext_list[i]
-    return set([x for x in ext_list if x.strip('.') not in ignored])
+    return set(x for x in ext_list if x.strip('.') not in ignored)
 
 def find_command(cmd, path=None, pathext=None):
     if path is None:

@@ -62,7 +62,7 @@ class ResolverMatch(object):
 
     @property
     def view_name(self):
-        return ':'.join([ x for x in [ self.namespace, self.url_name ]  if x ])
+        return ':'.join(filter(bool, (self.namespace, self.url_name)))
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
@@ -274,7 +274,7 @@ class RegexURLResolver(LocaleRegexProvider):
                         for matches, pat, defaults in pattern.reverse_dict.getlist(name):
                             new_matches = []
                             for piece, p_args in parent:
-                                new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
+                                new_matches.extend((piece + suffix, p_args + args) for (suffix, args) in matches)
                             lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
@@ -321,7 +321,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 except Resolver404 as e:
                     sub_tried = e.args[0].get('tried')
                     if sub_tried is not None:
-                        tried.extend([[pattern] + t for t in sub_tried])
+                        tried.extend([pattern] + t for t in sub_tried)
                     else:
                         tried.append([pattern])
                 else:

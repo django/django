@@ -368,12 +368,32 @@ class Field(object):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
+        params = self.db_parameters(connection)
+        if params['type']:
+            if params['check']:
+                return "%s CHECK (%s)" % (params['type'], params['check'])
+            else:
+                return params['type']
+        return None
+
+    def db_parameters(self, connection):
+        """
+        Replacement for db_type, providing a range of different return
+        values (type, checks)
+        """
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return (connection.creation.data_types[self.get_internal_type()]
-                    % data)
+            type_string = connection.creation.data_types[self.get_internal_type()] % data
         except KeyError:
-            return None
+            type_string = None
+        try:
+            check_string = connection.creation.data_type_check_constraints[self.get_internal_type()] % data
+        except KeyError:
+            check_string = None
+        return {
+            "type": type_string,
+            "check": check_string,
+        }
 
     @property
     def unique(self):
@@ -479,6 +499,7 @@ class Field(object):
         """
         if not prepared:
             value = self.get_prep_lookup(lookup_type, value)
+            prepared = True
         if hasattr(value, 'get_compiler'):
             value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql') or hasattr(value, '_as_sql'):
@@ -615,7 +636,7 @@ class Field(object):
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
 
-    def formfield(self, form_class=None, **kwargs):
+    def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """
         Returns a django.forms.Field instance for this database Field.
         """
@@ -636,7 +657,9 @@ class Field(object):
             defaults['coerce'] = self.to_python
             if self.null:
                 defaults['empty_value'] = None
-            if form_class is None or not issubclass(form_class, forms.TypedChoiceField):
+            if choices_form_class is not None:
+                form_class = choices_form_class
+            else:
                 form_class = forms.TypedChoiceField
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass

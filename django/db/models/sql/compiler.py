@@ -319,10 +319,10 @@ class SQLCompiler(object):
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            field, cols, alias, _, _ = self._setup_joins(parts, opts, None)
-            cols, alias = self._final_join_removal(cols, alias)
-            for col in cols:
-                result.append("%s.%s" % (qn(alias), qn2(col)))
+            _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
+            targets, alias, _ = self.query.trim_joins(targets, joins, path)
+            for target in targets:
+                result.append("%s.%s" % (qn(alias), qn2(target.column)))
         return result
 
     def get_ordering(self):
@@ -421,7 +421,7 @@ class SQLCompiler(object):
         return result, params, group_by
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
-            already_seen=None):
+                           already_seen=None):
         """
         Returns the table alias (the name might be ambiguous, the alias will
         not be) and column name for ordering by the given 'name' parameter.
@@ -429,15 +429,15 @@ class SQLCompiler(object):
         """
         name, order = get_order_dir(name, default_order)
         pieces = name.split(LOOKUP_SEP)
-        field, cols, alias, joins, opts = self._setup_joins(pieces, opts, alias)
+        field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
-        if field.rel and len(joins) > 1 and opts.ordering:
+        if field.rel and path and opts.ordering:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple([self.query.alias_map[j].table_name for j in joins])
+            join_tuple = tuple(self.query.alias_map[j].table_name for j in joins)
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
@@ -445,10 +445,10 @@ class SQLCompiler(object):
             results = []
             for item in opts.ordering:
                 results.extend(self.find_ordering_name(item, opts, alias,
-                        order, already_seen))
+                                                       order, already_seen))
             return results
-        cols, alias = self._final_join_removal(cols, alias)
-        return [(alias, cols, order)]
+        targets, alias, _ = self.query.trim_joins(targets, joins, path)
+        return [(alias, [t.column for t in targets], order)]
 
     def _setup_joins(self, pieces, opts, alias):
         """
@@ -461,13 +461,12 @@ class SQLCompiler(object):
         """
         if not alias:
             alias = self.query.get_initial_alias()
-        field, targets, opts, joins, _ = self.query.setup_joins(
+        field, targets, opts, joins, path = self.query.setup_joins(
             pieces, opts, alias)
         # We will later on need to promote those joins that were added to the
         # query afresh above.
         joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
-        cols = [target.column for target in targets]
         if not field.rel:
             # To avoid inadvertent trimming of a necessary alias, use the
             # refcount to show that we are referencing a non-relation field on
@@ -478,28 +477,7 @@ class SQLCompiler(object):
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
         self.query.promote_joins(joins_to_promote)
-        return field, cols, alias, joins, opts
-
-    def _final_join_removal(self, cols, alias):
-        """
-        A helper method for get_distinct and get_ordering. This method will
-        trim extra not-needed joins from the tail of the join chain.
-
-        This is very similar to what is done in trim_joins, but we will
-        trim LEFT JOINS here. It would be a good idea to consolidate this
-        method and query.trim_joins().
-        """
-        if alias:
-            while 1:
-                join = self.query.alias_map[alias]
-                lhs_cols, rhs_cols = zip(*[(lhs_col, rhs_col) for lhs_col, rhs_col in join.join_cols])
-                if set(cols) != set(rhs_cols):
-                    break
-
-                cols = [lhs_cols[rhs_cols.index(col)] for col in cols]
-                self.query.unref_alias(alias)
-                alias = join.lhs_alias
-        return cols, alias
+        return field, targets, alias, joins, path, opts
 
     def get_from_clause(self):
         """
@@ -686,9 +664,8 @@ class SQLCompiler(object):
                 # Use True here because we are looking at the _reverse_ side of
                 # the relation, which is always nullable.
                 new_nullable = True
-                table = model._meta.db_table
-                self.fill_related_selections(model._meta, table, cur_depth + 1,
-                    next, restricted, new_nullable)
+                self.fill_related_selections(model._meta, alias, cur_depth + 1,
+                                             next, restricted, new_nullable)
 
     def deferred_to_columns(self):
         """
@@ -741,11 +718,11 @@ class SQLCompiler(object):
                     loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
                     aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
-                    row = tuple(row[:aggregate_start]) + tuple([
+                    row = tuple(row[:aggregate_start]) + tuple(
                         self.query.resolve_aggregate(value, aggregate, self.connection)
                         for (alias, aggregate), value
                         in zip(self.query.aggregate_select.items(), row[aggregate_start:aggregate_end])
-                    ]) + tuple(row[aggregate_end:])
+                    ) + tuple(row[aggregate_end:])
 
                 yield row
 
@@ -850,7 +827,7 @@ class SQLInsertCompiler(SQLCompiler):
 
         has_fields = bool(self.query.fields)
         fields = self.query.fields if has_fields else [opts.pk]
-        result.append('(%s)' % ', '.join([qn(f.column) for f in fields]))
+        result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
             params = values = [
@@ -889,7 +866,7 @@ class SQLInsertCompiler(SQLCompiler):
             return [(" ".join(result), tuple(params))]
         if can_bulk:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
-            return [(" ".join(result), tuple([v for val in values for v in val]))]
+            return [(" ".join(result), tuple(v for val in values for v in val))]
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
@@ -1030,7 +1007,7 @@ class SQLUpdateCompiler(SQLCompiler):
             # selecting from the updating table (e.g. MySQL).
             idents = []
             for rows in query.get_compiler(self.using).execute_sql(MULTI):
-                idents.extend([r[0] for r in rows])
+                idents.extend(r[0] for r in rows)
             self.query.add_filter(('pk__in', idents))
             self.query.related_ids = idents
         else:

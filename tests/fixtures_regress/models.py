@@ -39,12 +39,6 @@ class Stuff(models.Model):
 class Absolute(models.Model):
     name = models.CharField(max_length=40)
 
-    load_count = 0
-
-    def __init__(self, *args, **kwargs):
-        super(Absolute, self).__init__(*args, **kwargs)
-        Absolute.load_count += 1
-
 
 class Parent(models.Model):
     name = models.CharField(max_length=10)
@@ -68,6 +62,11 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('id',)
+
+
+# Subclass of a model with a ManyToManyField for test_ticket_20820
+class SpecialArticle(Article):
+    pass
 
 
 # Models to regression test #11428

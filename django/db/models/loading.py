@@ -31,28 +31,30 @@ class UnavailableApp(Exception):
     pass
 
 
-class AppCache(object):
+def _initialize():
     """
-    A cache that stores installed applications and their models. Used to
-    provide reverse-relations and for app introspection (e.g. admin).
+    Returns a dictionary to be used as the initial value of the
+    [shared] state of the app cache.
     """
-    # Use the Borg pattern to share state between all instances. Details at
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531.
-    __shared_state = dict(
+    return dict(
         # Keys of app_store are the model modules for each application.
         app_store=ModelDict(),
 
         # Mapping of installed app_labels to model modules for that app.
-        app_labels={},
+        app_labels = {},
 
         # Mapping of app_labels to a dictionary of model names to model code.
         # May contain apps that are not installed.
         app_models=ModelDict(),
 
         # Mapping of app_labels to errors raised when trying to import the app.
-        app_errors={},
+        app_errors = {},
+
+        # Pending lookups for lazy relations
+        pending_lookups = {},
 
         # -- Everything below here is only used when populating the cache --
+        loads_installed = True,
         loaded=False,
         handled=set(),
         postponed=[],
@@ -61,16 +63,36 @@ class AppCache(object):
         available_apps=None,
     )
 
+
+class BaseAppCache(object):
+    """
+    A cache that stores installed applications and their models. Used to
+    provide reverse-relations and for app introspection (e.g. admin).
+
+    This provides the base (non-Borg) AppCache class - the AppCache
+    subclass adds borg-like behaviour for the few cases where it's needed,
+    and adds the code that auto-loads from INSTALLED_APPS.
+    """
+
     def __init__(self):
-        self.__dict__ = self.__shared_state
+        self.__dict__ = _initialize()
+        # This stops _populate loading from INSTALLED_APPS and ignores the
+        # only_installed arguments to get_model[s]
+        self.loads_installed = False
 
     def _populate(self):
+        """
+        Stub method - this base class does no auto-loading.
+        """
         """
         Fill in all the cache information. This method is threadsafe, in the
         sense that every caller will see the same state upon return, and if the
         cache is already initialised, it does no work.
         """
         if self.loaded:
+            return
+        if not self.loads_installed:
+            self.loaded = True
             return
         # Note that we want to use the import lock here - the app loading is
         # in many cases initiated implicitly by importing, and thus it is
@@ -233,12 +255,15 @@ class AppCache(object):
 
         By default, models that aren't part of installed apps will *not*
         be included in the list of models. However, if you specify
-        only_installed=False, they will be.
+        only_installed=False, they will be. If you're using a non-default
+        AppCache, this argument does nothing - all models will be included.
 
         By default, models that have been swapped out will *not* be
         included in the list of models. However, if you specify
         include_swapped, they will be.
         """
+        if not self.loads_installed:
+            only_installed = False
         cache_key = (app_mod, include_auto_created, include_deferred, only_installed, include_swapped)
         model_list = None
         try:
@@ -287,6 +312,8 @@ class AppCache(object):
         Raises UnavailableApp when set_available_apps() in in effect and
         doesn't include app_label.
         """
+        if not self.loads_installed:
+            only_installed = False
         if seed_cache:
             self._populate()
         if only_installed and app_label not in self.app_labels:
@@ -332,7 +359,23 @@ class AppCache(object):
     def unset_available_apps(self):
         self.available_apps = None
 
+
+class AppCache(BaseAppCache):
+    """
+    A cache that stores installed applications and their models. Used to
+    provide reverse-relations and for app introspection (e.g. admin).
+
+    Borg version of the BaseAppCache class.
+    """
+
+    __shared_state = _initialize()
+
+    def __init__(self):
+        self.__dict__ = self.__shared_state
+
+
 cache = AppCache()
+
 
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
