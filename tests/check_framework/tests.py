@@ -34,7 +34,7 @@ class SystemCheckFrameworkTests(TestCase):
             return [1, 2, 3]
         framework = CheckFramework()
         framework.register(f)
-        errors = framework.run_checks(apps=None)
+        errors = framework.run_checks()
         self.assertEqual(errors, [1, 2, 3])
         self.assertEqual(calls[0], 1)
 

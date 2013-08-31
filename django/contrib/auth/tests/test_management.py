@@ -178,7 +178,7 @@ class CustomUserModelValidationTestCase(TestCase):
         """ REQUIRED_FIELDS should be a list. """
 
         from .test_custom_user import CustomUserNonListRequiredFields
-        errors = checks.run_checks(apps=None)
+        errors = checks.run_checks()
         expected = [
             checks.Error(
                 'The REQUIRED_FIELDS must be a list or tuple.',
@@ -193,7 +193,7 @@ class CustomUserModelValidationTestCase(TestCase):
         """ USERNAME_FIELD should not appear in REQUIRED_FIELDS. """
 
         from .test_custom_user import CustomUserBadRequiredFields
-        errors = checks.run_checks(apps=None)
+        errors = checks.run_checks()
         expected = [
             checks.Error(
                 'The field named as the USERNAME_FIELD must not be included '
@@ -209,7 +209,7 @@ class CustomUserModelValidationTestCase(TestCase):
         """ A non-unique USERNAME_FIELD should raise an error. """
 
         from .test_custom_user import CustomUserNonUniqueUsername
-        errors = checks.run_checks(apps=None)
+        errors = checks.run_checks()
         expected = [
             checks.Error(
                 'The CustomUserNonUniqueUsername.username field must be '
@@ -230,7 +230,7 @@ class CustomUserModelValidationTestCase(TestCase):
         """
 
         from .test_custom_user import CustomUserNonUniqueUsername
-        errors = checks.run_checks(apps=None)
+        errors = checks.run_checks()
         expected = [
             checks.Warning(
                 'The CustomUserNonUniqueUsername.username field is pointed to '

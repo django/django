@@ -175,7 +175,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         class Model(models.Model):
             content_object = MyGenericForeignKey()
 
-        errors = checks.run_checks(apps=None)
+        errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
 
 
