@@ -15,6 +15,7 @@ cache class.
 See docs/topics/cache.txt for information on the public API.
 """
 import importlib
+from collections import defaultdict
 try:
     from urllib.parse import parse_qsl
 except ImportError:     # Python 2
@@ -138,4 +139,12 @@ def get_cache(backend, **kwargs):
     signals.request_finished.connect(cache.close)
     return cache
 
-cache = get_cache(DEFAULT_CACHE_ALIAS)
+class CacheDict(defaultdict):
+    def __missing__(self, key):
+        value = get_cache(key)
+        self[key] = value
+        return value
+
+caches = CacheDict()
+
+cache = caches[DEFAULT_CACHE_ALIAS]

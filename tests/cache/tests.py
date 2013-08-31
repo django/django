@@ -17,7 +17,7 @@ import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import get_cache
+from django.core.cache import get_cache, caches
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
 from django.db import router, transaction
@@ -1120,6 +1120,18 @@ class GetCacheTests(unittest.TestCase):
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
+    @override_settings(
+        CACHES={'counting': {'BACKEND': 'cache.liberal_backend.CountingCache'}}
+    )
+    def test_caches(self):
+        """
+        Ensure that repeated accesses to caches don't create new cache class
+        instances.
+        """
+        c1 = caches['counting']
+        c2 = caches['counting']
+        self.assertTrue(c1 is c2)
+        self.assertEqual(c1.count, 1)
 
 @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
