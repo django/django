@@ -7,6 +7,8 @@ from django.utils import six
 from django.db import models
 from django.db.models.loading import cache
 from django.db.migrations.loader import MigrationLoader
+from django.utils.encoding import force_text
+from django.utils.functional import Promise
 
 
 class MigrationWriter(object):
@@ -111,6 +113,9 @@ class MigrationWriter(object):
         # Simple types
         elif isinstance(value, six.integer_types + (float, six.binary_type, six.text_type, bool, type(None))):
             return repr(value), set()
+        # Promise
+        elif isinstance(value, Promise):
+            return repr(force_text(value)), set()
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()

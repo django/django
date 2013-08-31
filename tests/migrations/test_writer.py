@@ -8,6 +8,7 @@ from django.utils import six
 from django.test import TestCase
 from django.db.migrations.writer import MigrationWriter
 from django.db import models, migrations
+from django.utils.translation import ugettext_lazy as _
 
 
 class WriterTests(TestCase):
@@ -58,6 +59,7 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(["a", 2, True, None])
         self.assertSerializedEqual(set([2, 3, "eighty"]))
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
+        self.assertSerializedEqual(_('Hello'))
         # Datetime stuff
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
