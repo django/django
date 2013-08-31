@@ -42,4 +42,4 @@ def autodiscover():
             if module_has_submodule(mod, 'admin'):
                 raise
 
-register(check_admin_app)
+    register(check_admin_app)

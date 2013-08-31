@@ -40,8 +40,8 @@ class SystemChecksTestCase(TestCase):
                 return ['error!']
 
         admin.site.register(Song, MyAdmin)
-
         try:
+            admin.autodiscover()
             errors = checks.run_checks(apps=None)
             expected = ['error!']
             self.assertEqual(errors, expected)
