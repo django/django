@@ -80,5 +80,5 @@ class Command(BaseCommand):
                         open(init_path, "w").close()
                     # We just do this once per app
                     directory_created[app_label] = True
-                with open(writer.path, "w") as fh:
+                with open(writer.path, "wb") as fh:
                     fh.write(writer.as_string())
