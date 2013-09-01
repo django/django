@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import datetime
+import re
 import unittest
 from xml.dom import minidom
 try:
@@ -404,23 +405,10 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         qset = Score.objects.all()
 
         s = serializers.json.Serializer()
-        self.assertEqual(s.serialize(qset, indent=2), """[
-{
-  "pk": 1,
-  "model": "serializers.score",
-  "fields": {
-    "score": 5.0
-  }
-},
-{
-  "pk": 2,
-  "model": "serializers.score",
-  "fields": {
-    "score": 6.0
-  }
-}
-]
-""")
+        json_data = s.serialize(qset, indent=2)
+        for line in json_data.splitlines():
+            if re.search(r'.+,\s*$', line):
+                self.assertEqual(line, line.rstrip())
 
 
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
