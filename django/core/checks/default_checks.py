@@ -4,18 +4,6 @@ from __future__ import unicode_literals
 from . import Warning, tag
 
 
-def _get_models(apps, **kwargs):
-    from django.db import models
-
-    if apps is None:
-        return models.get_models(**kwargs)
-    else:
-        return [model
-            for model in models.get_models(**kwargs)
-            if model._meta.app_label in apps
-        ]
-
-
 # All these checks are registered in __init__.py file.
 
 @tag('models')
