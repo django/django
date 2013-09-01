@@ -10,6 +10,7 @@ from django.core.checks import Error, tag
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registration import CheckFramework
 from django.core.checks.default_checks import check_1_6_compatibility
+from django.core.management.base import CommandError
 from django.core.management import call_command
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
@@ -178,3 +179,7 @@ class CheckCommandTests(TestCase):
         call_command('check', tags=['simpletag'])
         self.assertEqual(simple_system_check.kwargs, None)
         self.assertEqual(tagged_system_check.kwargs, {'apps': None})
+
+    @override_system_checks([simple_system_check, tagged_system_check])
+    def test_invalid_tag(self):
+        self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])

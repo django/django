@@ -36,10 +36,15 @@ class CheckFramework(object):
                 errors.extend(new_errors)
         return errors
 
+    def tag_exists(self, tag):
+        tags = [check.tag for check in self.registered_checks if hasattr(check, 'tag')]
+        return tag in tags
+
 
 framework = CheckFramework()
 register = framework.register
 run_checks = framework.run_checks
+tag_exists = framework.tag_exists
 
 
 def tag(tag):
