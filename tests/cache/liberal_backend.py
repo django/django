@@ -13,5 +13,4 @@ class CountingCache(LocMemCache):
     count = 0
     def __init__(self, *args, **kwargs):
         super(CountingCache, self).__init__(*args, **kwargs)
-        self.__class__.count += 1
-
+        CountingCache.count += 1
