@@ -173,10 +173,11 @@ will be served using mod_wsgi::
 Serving the admin files
 =======================
 
-Note that the Django development server automatically serves the static files
-of the admin app (and any other installed apps), but this is not the case when
-you use any other server arrangement. You're responsible for setting up Apache,
-or whichever media server you're using, to serve the admin files.
+When :mod:`django.contrib.staticfiles` is in :setting:`INSTALLED_APPS`, the
+Django development server automatically serves the static files of the
+admin app (and any other installed apps). This is however not the case when you
+use any other server arrangement. You're responsible for setting up Apache, or
+whichever Web server you're using, to serve the admin files.
 
 The admin files live in (:file:`django/contrib/admin/static/admin`) of the
 Django distribution.

@@ -1411,6 +1411,14 @@ Example: ``"/var/www/example.com/media/"``
 
 See also :setting:`MEDIA_URL`.
 
+.. warning::
+
+    :setting:`MEDIA_ROOT` and :setting:`STATIC_ROOT` must have different
+    values. Before :setting:`STATIC_ROOT` was introduced, it was common to
+    rely or fallback on :setting:`MEDIA_ROOT` to also serve static files;
+    however, since this can have serious security implications, there is a
+    validation check to prevent it.
+
 .. setting:: MEDIA_URL
 
 MEDIA_URL
@@ -1423,6 +1431,11 @@ for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value.
 
 Example: ``"http://media.example.com/"``
+
+.. warning::
+
+    :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
+    values. See :setting:`MEDIA_ROOT` for more details.
 
 .. setting:: MIDDLEWARE_CLASSES
 
