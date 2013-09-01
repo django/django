@@ -689,27 +689,6 @@ class AdminJavaScriptTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def testSingleWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus on first field.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
-        )
-
-    def testMultiWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
-        is such that the first form field has a MultiWidget.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
-        )
-
     def test_js_minified_only_if_debug_is_false(self):
         """
         Ensure that the minified versions of the JS files are only used when
@@ -3541,6 +3520,25 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.selenium.find_element_by_id('fieldsetcollapser0').text,
             "Hide"
+        )
+
+    def test_first_field_focus(self):
+        """JavaScript-assisted auto-focus on first usable form field."""
+        # First form field has a single widget
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/picture/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_name')
+        )
+
+        # First form field has a MultiWidget
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/reservation/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_start_date_0')
         )
 
 
