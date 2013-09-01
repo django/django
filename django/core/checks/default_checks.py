@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from . import Warning
+from . import Warning, tag
 
 
 def _get_models(apps, **kwargs):
@@ -18,6 +18,7 @@ def _get_models(apps, **kwargs):
 
 # All these checks are registered in __init__.py file.
 
+@tag('models')
 def check_all_models(apps=None, **kwargs):
     from django.db import models
 
@@ -27,6 +28,7 @@ def check_all_models(apps=None, **kwargs):
     return errors
 
 
+@tag('compatibility')
 def check_1_6_compatibility(**kwargs):
     return _check_test_runner(**kwargs) + _check_boolean_field_default_value(**kwargs)
 
