@@ -84,7 +84,7 @@ Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-if not six.PY3:
+if six.PY2:
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
     Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 

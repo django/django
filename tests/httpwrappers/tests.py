@@ -46,7 +46,7 @@ class QueryDictTests(unittest.TestCase):
     def test_immutable_basic_operations(self):
         q = QueryDict(str(''))
         self.assertEqual(q.getlist('foo'), [])
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('foo'), False)
         self.assertEqual('foo' in q, False)
         self.assertEqual(list(six.iteritems(q)), [])
@@ -72,10 +72,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
 
-        if not six.PY3:
+        if six.PY2:
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
-        if not six.PY3:
+        if six.PY2:
             self.assertFalse(q.has_key('bar'))
         self.assertFalse('bar' in q)
 
@@ -131,7 +131,7 @@ class QueryDictTests(unittest.TestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        if not six.PY3:
+        if six.PY2:
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
 
@@ -176,10 +176,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
 
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('vote'), True)
         self.assertEqual('vote' in q, True)
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('foo'), False)
         self.assertEqual('foo' in q, False)
         self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
@@ -195,7 +195,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
         self.assertRaises(AttributeError, q.__delitem__, 'vote')
 
-    if not six.PY3:
+    if six.PY2:
         def test_invalid_input_encoding(self):
             """
             QueryDicts must be able to handle invalid input encoding (in this

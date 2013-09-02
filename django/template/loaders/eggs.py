@@ -27,7 +27,7 @@ class Loader(BaseLoader):
                     resource = resource_string(app, pkg_name)
                 except Exception:
                     continue
-                if not six.PY3:
+                if six.PY2:
                     resource = resource.decode(settings.FILE_CHARSET)
                 return (resource, 'egg:%s:%s' % (app, pkg_name))
         raise TemplateDoesNotExist(template_name)

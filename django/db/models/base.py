@@ -264,7 +264,7 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        
+
         new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
@@ -449,7 +449,7 @@ class Model(six.with_metaclass(ModelBase)):
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if not six.PY3 and hasattr(self, '__unicode__'):
+        if six.PY2 and hasattr(self, '__unicode__'):
             if type(self).__unicode__ == Model.__str__:
                 klass_name = type(self).__name__
                 raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"
