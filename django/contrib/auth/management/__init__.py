@@ -141,7 +141,7 @@ def get_system_username():
         # if there is no corresponding entry in the /etc/passwd file
         # (a very restricted chroot environment, for example).
         return ''
-    if not six.PY3:
+    if six.PY2:
         try:
             result = result.decode(DEFAULT_LOCALE_ENCODING)
         except UnicodeDecodeError:

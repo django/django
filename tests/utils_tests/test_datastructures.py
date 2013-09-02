@@ -50,7 +50,7 @@ class SortedDictTests(SimpleTestCase):
         self.d2[7] = 'lucky number 7'
         self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0, 7])
 
-    if not six.PY3:
+    if six.PY2:
         def test_change_keys(self):
             """
             Changing the keys won't do anything, it's only a copy of the

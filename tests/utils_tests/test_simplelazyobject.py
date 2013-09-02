@@ -178,7 +178,7 @@ class TestUtilsSimpleLazyObject(TestCase):
         pickled = pickle.dumps(x, 1)
         pickled = pickle.dumps(x, 2)
 
-        if not six.PY3:
+        if six.PY2:
             import cPickle
 
             # This would fail with "TypeError: expected string or Unicode object, NoneType found".

@@ -376,15 +376,13 @@ explicitly tries both locations, as follows::
     except ImportError:     # Python 2
         from urlparse import urlparse, urlunparse
 
-PY3
+PY2
 ~~~
 
-If you need different code in Python 2 and Python 3, check :data:`six.PY3`::
+If you need different code in Python 2 and Python 3, check :data:`six.PY2`::
 
-    if six.PY3:
-        # do stuff Python 3-wise
-    else:
-        # do stuff Python 2-wise
+    if six.PY2:
+        # compatibility code for Python 2
 
 This is a last resort solution when :mod:`six` doesn't provide an appropriate
 function.

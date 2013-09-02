@@ -46,7 +46,7 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if not six.PY3:             # strftime returns a byte string in Python 2
+    if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
     if is_aware(date):
         offset = date.tzinfo.utcoffset(date)
@@ -60,7 +60,7 @@ def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
     time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
-    if not six.PY3:             # strftime returns a byte string in Python 2
+    if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
     if is_aware(date):
         offset = date.tzinfo.utcoffset(date)

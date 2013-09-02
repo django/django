@@ -409,7 +409,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'conv': django_conversions,
             'charset': 'utf8',
         }
-        if not six.PY3:
+        if six.PY2:
             kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:

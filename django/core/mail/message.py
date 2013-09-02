@@ -322,7 +322,7 @@ class EmailMessage(object):
             try:
                 filename.encode('ascii')
             except UnicodeEncodeError:
-                if not six.PY3:
+                if six.PY2:
                     filename = filename.encode('utf-8')
                 filename = ('utf-8', '', filename)
             attachment.add_header('Content-Disposition', 'attachment',

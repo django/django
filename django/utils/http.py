@@ -171,7 +171,7 @@ def base36_to_int(s):
     value = int(s, 36)
     # ... then do a final check that the value will fit into an int to avoid
     # returning a long (#15067). The long type was removed in Python 3.
-    if not six.PY3 and value > sys.maxint:
+    if six.PY2 and value > sys.maxint:
         raise ValueError("Base36 input too large")
     return value
 
@@ -183,7 +183,7 @@ def int_to_base36(i):
     factor = 0
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if not six.PY3:
+    if six.PY2:
         if not isinstance(i, six.integer_types):
             raise TypeError("Non-integer base36 conversion input.")
         if i > sys.maxint:

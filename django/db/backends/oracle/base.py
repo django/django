@@ -267,7 +267,7 @@ WHEN (new.%(col_name)s IS NULL)
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        if statement and not six.PY3 and not isinstance(statement, unicode):
+        if statement and six.PY2 and not isinstance(statement, unicode):
             statement = statement.decode('utf-8')
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
@@ -576,7 +576,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except DatabaseError: 
+            except DatabaseError:
                 self.operators = self._likec_operators
             else:
                 self.operators = self._standard_operators
@@ -778,7 +778,7 @@ class FormatStylePlaceholderCursor(object):
                 for i, value in enumerate(params):
                     if value.input_size:
                         sizes[i] = value.input_size
-            self.setinputsizes(*sizes)        
+            self.setinputsizes(*sizes)
 
     def _param_generator(self, params):
         # Try dict handling; if that fails, treat as sequence
@@ -806,7 +806,7 @@ class FormatStylePlaceholderCursor(object):
             args = [(':arg%d' % i) for i in range(len(params))]
             query = convert_unicode(query % tuple(args), self.charset)
         return query, self._format_params(params)
-        
+
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params)
         self._guess_input_sizes([params])
@@ -825,7 +825,7 @@ class FormatStylePlaceholderCursor(object):
         # uniform treatment for sequences and iterables
         params_iter = iter(params)
         query, firstparams = self._fix_for_params(query, next(params_iter))
-        # we build a list of formatted params; as we're going to traverse it 
+        # we build a list of formatted params; as we're going to traverse it
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams]+[self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)

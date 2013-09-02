@@ -350,7 +350,7 @@ class ModelTest(TestCase):
              "<Article: Third article>"])
 
         # Slicing works with longs (Python 2 only -- Python 3 doesn't have longs).
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(Article.objects.all()[long(0)], a)
             self.assertQuerysetEqual(Article.objects.all()[long(1):long(3)],
                 ["<Article: Second article>", "<Article: Third article>"])

@@ -162,7 +162,7 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and not six.PY3:
+            if self._delegate_bytes and six.PY2:
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs

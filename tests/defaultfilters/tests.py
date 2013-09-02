@@ -88,7 +88,7 @@ class DefaultFiltersTests(TestCase):
     # The test above fails because of Python 2's float handling. Floats with
     # many zeroes after the decimal point should be passed in as another type
     # such as unicode or Decimal.
-    if not six.PY3:
+    if six.PY2:
         test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
 
 

@@ -78,7 +78,7 @@ Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-if not six.PY3 and Database.version_info >= (2, 4, 1):
+if six.PY2 and Database.version_info >= (2, 4, 1):
     # Starting in 2.4.1, the str type is not accepted anymore, therefore,
     # we convert all str objects to Unicode
     # As registering a adapter for a primitive type causes a small

@@ -426,7 +426,7 @@ class Model(six.with_metaclass(ModelBase)):
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if not six.PY3 and hasattr(self, '__unicode__'):
+        if six.PY2 and hasattr(self, '__unicode__'):
             if type(self).__unicode__ == Model.__str__:
                 klass_name = type(self).__name__
                 raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"

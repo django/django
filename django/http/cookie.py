@@ -49,7 +49,7 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                if not six.PY3 and isinstance(rawdata, six.text_type):
+                if six.PY2 and isinstance(rawdata, six.text_type):
                     rawdata = force_str(rawdata)
                 super(SimpleCookie, self).load(rawdata)
                 for key in self.bad_cookies:

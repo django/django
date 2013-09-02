@@ -12,7 +12,7 @@ from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
 from django.utils.safestring import mark_safe
 
-if not six.PY3:
+if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
     from django.utils.encoding import force_unicode
