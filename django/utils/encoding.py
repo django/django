@@ -6,7 +6,7 @@ from decimal import Decimal
 import locale
 try:
     from urllib.parse import quote
-except ImportError:     # Python 2
+except ImportError:  # Python 2
     from urllib import quote
 
 from django.utils.functional import Promise
@@ -71,9 +71,16 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     try:
         if not isinstance(s, six.string_types):
+            unicode_method_used = False
+
             if hasattr(s, '__unicode__'):
-                s = s.__unicode__()
-            else:
+                try:
+                    s = s.__unicode__()
+                    unicode_method_used = True
+                except TypeError:
+                    pass
+
+            if not unicode_method_used:
                 if six.PY3:
                     if isinstance(s, bytes):
                         s = six.text_type(s, encoding, errors)
