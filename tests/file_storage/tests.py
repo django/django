@@ -567,9 +567,10 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         from django.core.files.images import ImageFile
 
         img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
-        image = ImageFile(open(img_path, 'rb'))
-        image_pil = Image.open(img_path)
-        size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
+        with open(img_path, 'rb') as file:
+            image = ImageFile(file)
+            image_pil = Image.open(img_path)
+            size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
