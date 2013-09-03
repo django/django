@@ -49,6 +49,8 @@ You should also be very careful when storing HTML in the database, especially
 when that HTML is retrieved and displayed.
 
 
+.. _cross-site-request-forgery:
+
 Cross site request forgery (CSRF) protection
 ============================================
 

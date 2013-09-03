@@ -324,6 +324,9 @@ CSRF_COOKIE
 
 .. versionadded:: 1.7
 
+   This setting was added in Django to group all CSRF cookie-related variables
+   in one dictionary type value.
+
 Default::
 
     {
@@ -333,6 +336,12 @@ Default::
         'PATH': '/',
         'SECURE': False
     }
+
+Configures the characteristics of the HTTP cookie used in the included
+protection against :ref:`cross siite request foergery <cross-site-request-forgery>`
+attacks.
+
+The following sub-sections describe the available keys.
 
 .. setting:: CSRF_COOKIE-DOMAIN
 
@@ -1424,8 +1433,8 @@ NAME
 Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
-you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
-:doc:`/topics/i18n/index`.
+you want (but should be different from :setting:`SESSION_COOKIE['NAME']
+<SESSION_COOKIE-NAME>`). See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
@@ -2446,6 +2455,9 @@ SESSION_COOKIE
 
 .. versionadded:: 1.7
 
+    This setting was added in Django to group all session cookie-related
+    variables in one dictionary type value.
+
 Default::
 
     {
@@ -2456,6 +2468,8 @@ Default::
         'PATH': '/',
         'SECURE': False
     }
+
+The following sub-sections desscribe the available keys.
 
 .. setting:: SESSION_COOKIE-AGE
 
