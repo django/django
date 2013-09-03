@@ -213,7 +213,7 @@ function MapWidget(options) {
     var styleMap = new OpenLayers.StyleMap({'default': OpenLayers.Util.applyDefaults(defaults_style, OpenLayers.Feature.Vector.style['default'])});
     this.layers.vector = new OpenLayers.Layer.Vector(" " + this.options.name, {styleMap: styleMap});
     this.map.addLayer(this.layers.vector);
-    wkt = document.getElementById(this.options.id).value;
+    var wkt = document.getElementById(this.options.id).value;
     if (wkt) {
         var feat = OpenLayers.Util.properFeatures(this.read_wkt(wkt), this.options.geom_type);
         this.write_wkt(feat);

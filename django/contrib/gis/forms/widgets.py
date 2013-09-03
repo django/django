@@ -111,5 +111,10 @@ class OSMWidget(BaseGeometryWidget):
             return 900913
 
     def render(self, name, value, attrs=None):
-        return super(OSMWidget, self).render(name, value,
-            {'default_lon': self.default_lon, 'default_lat': self.default_lat})
+        default_attrs = {
+            'default_lon': self.default_lon,
+            'default_lat': self.default_lat,
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        return super(OSMWidget, self).render(name, value, default_attrs)
