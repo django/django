@@ -250,7 +250,9 @@ class SpecializedFieldTest(SimpleTestCase):
 
         geom = self.geometries['point']
         form = PointForm(data={'p': geom})
-        self.assertIn("OpenStreetMap (Mapnik)", form.as_p())
+        rendered = form.as_p()
+        self.assertIn("OpenStreetMap (Mapnik)", rendered)
+        self.assertIn("id: 'id_p',", rendered)
 
 
 @skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
