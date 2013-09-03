@@ -281,7 +281,6 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY
 Default: ``False``
 
 .. deprecated:: 1.6
-
     This setting was largely ineffective because of using cookies for sessions
     and CSRF. See the :doc:`Django 1.6 release notes</releases/1.6>` for more
     information.
@@ -318,10 +317,94 @@ See :doc:`/topics/cache`.
 
 .. _settings-csrf:
 
+.. setting:: CSRF_COOKIE
+
+CSRF_COOKIE
+-----------
+
+.. versionadded:: 1.7
+
+Default::
+
+    {
+        'DOMAIN': None,
+        'HTTPONLY': False,
+        'NAME': 'csrftoken',
+        'PATH': '/',
+        'SECURE': False
+    }
+
+.. setting:: CSRF_COOKIE-DOMAIN
+
+DOMAIN
+~~~~~~
+
+Default: ``None``
+
+The domain to be used when setting the CSRF cookie.  This can be useful for
+easily allowing cross-subdomain requests to be excluded from the normal cross
+site request forgery protection.  It should be set to a string such as
+``".example.com"`` to allow a POST request from a form on one subdomain to be
+accepted by a view served from another subdomain.
+
+Please note that the presence of this setting does not imply that Django's CSRF
+protection is safe from cross-subdomain attacks by default - please see the
+:ref:`CSRF limitations <csrf-limitations>` section.
+
+.. setting:: CSRF_COOKIE-HTTPONLY
+
+HTTPONLY
+~~~~~~~~
+
+Default: ``False``
+
+Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+
+.. setting:: CSRF_COOKIE-NAME
+
+NAME
+~~~~
+
+Default: ``'csrftoken'``
+
+The name of the cookie to use for the CSRF authentication token. This can be whatever you
+want.  See :doc:`/ref/contrib/csrf`.
+
+.. setting:: CSRF_COOKIE-PATH
+
+PATH
+~~~~
+
+Default: ``'/'``
+
+The path set on the CSRF cookie. This should either match the URL path of your
+Django installation or be a parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own CSRF cookie.
+
+.. setting:: CSRF_COOKIE-SECURE
+
+SECURE
+~~~~~~
+
+Default: ``False``
+
+Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
+the cookie will be marked as "secure," which means browsers may ensure that the
+cookie is only sent under an HTTPS connection.
+
 .. setting:: CSRF_COOKIE_DOMAIN
 
 CSRF_COOKIE_DOMAIN
 ------------------
+
+.. deprecated:: 1.7
+   Use :setting:`CSRF_COOKIE` (in particular
+   :setting:`CSRF_COOKIE['DOMAIN'] <CSRF_COOKIE-DOMAIN>`) instead.
 
 Default: ``None``
 
@@ -340,6 +423,10 @@ protection is safe from cross-subdomain attacks by default - please see the
 CSRF_COOKIE_HTTPONLY
 --------------------
 
+.. deprecated:: 1.7
+   Use :setting:`CSRF_COOKIE` (in particular
+   :setting:`CSRF_COOKIE['HTTPONLY'] <CSRF_COOKIE-HTTPONLY>`) instead.
+
 .. versionadded:: 1.6
 
 Default: ``False``
@@ -353,6 +440,10 @@ See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 CSRF_COOKIE_NAME
 ----------------
 
+.. deprecated:: 1.7
+   Use :setting:`CSRF_COOKIE` (in particular
+   :setting:`CSRF_COOKIE['NAME'] <CSRF_COOKIE-NAME>`) instead.
+
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
@@ -362,6 +453,10 @@ want.  See :doc:`/ref/contrib/csrf`.
 
 CSRF_COOKIE_PATH
 ----------------
+
+.. deprecated:: 1.7
+   Use :setting:`CSRF_COOKIE` (in particular
+   :setting:`CSRF_COOKIE['PATH'] <CSRF_COOKIE-PATH>`) instead.
 
 Default: ``'/'``
 
@@ -376,6 +471,10 @@ its own CSRF cookie.
 
 CSRF_COOKIE_SECURE
 ------------------
+
+.. deprecated:: 1.7
+   Use :setting:`CSRF_COOKIE` (in particular
+   :setting:`CSRF_COOKIE['SECURE'] <CSRF_COOKIE-SECURE>`) instead.
 
 Default: ``False``
 
@@ -1308,10 +1407,34 @@ See :ref:`how-django-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
+.. setting:: LANGUAGE_COOKIE
+
+LANGUAGE_COOKIE
+---------------
+
+.. versionadded:: 1.7
+
+Default: ``{ 'NAME: 'django_language' }``
+
+.. setting:: LANGUAGE_COOKIE-NAME
+
+NAME
+~~~~
+
+Default: ``'django_language'``
+
+The name of the cookie to use for the language cookie. This can be whatever
+you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
+:doc:`/topics/i18n/index`.
+
 .. setting:: LANGUAGE_COOKIE_NAME
 
 LANGUAGE_COOKIE_NAME
 --------------------
+
+.. deprecated:: 1.7
+   Use :setting:`LANGUAGE_COOKIE` (in particular
+   :setting:`LANGUAGE_COOKIE['NAME'] <LANGUAGE_COOKIE-NAME>`) instead.
 
 Default: ``'django_language'``
 
@@ -1912,7 +2035,6 @@ TRANSACTIONS_MANAGED
 --------------------
 
 .. deprecated:: 1.6
-
     This setting was deprecated because its name is very misleading. Use the
     :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
     entries instead.
@@ -2317,10 +2439,122 @@ Default: ``default``
 If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
 this selects the cache to use.
 
+.. setting:: SESSION_COOKIE
+
+SESSION_COOKIE
+--------------
+
+.. versionadded:: 1.7
+
+Default::
+
+    {
+        'AGE': 1209600, # 2 weeks, in seconds
+        'DOMAIN': None,
+        'HTTPONLY': True,
+        'NAME': 'sessionid',
+        'PATH': '/',
+        'SECURE': False
+    }
+
+.. setting:: SESSION_COOKIE-AGE
+
+AGE
+~~~
+
+Default: ``1209600`` (2 weeks, in seconds)
+
+The age of session cookies, in seconds.
+
+.. setting:: SESSION_COOKIE-DOMAIN
+
+DOMAIN
+~~~~~~
+
+Default: ``None``
+
+The domain to use for session cookies. Set this to a string such as
+``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
+``None`` for a standard domain cookie.
+
+Be cautious when updating this setting on a production site. If you update
+this setting to enable cross-domain cookies on a site that previously used
+standard domain cookies, existing user cookies will be set to the old
+domain. This may result in them being unable to log in as long as these cookies
+persist.
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
+.. setting:: SESSION_COOKIE-HTTPONLY
+
+HTTPONLY
+~~~~~~~~
+
+Default: ``True``
+
+Whether to use ``HTTPOnly`` flag on the session cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the
+session cookie.
+
+HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
+is not part of the :rfc:`2109` standard for cookies, and it isn't honored
+consistently by all browsers. However, when it is honored, it can be a
+useful way to mitigate the risk of client side script accessing the
+protected cookie data.
+
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+
+.. setting:: SESSION_COOKIE-NAME
+
+NAME
+~~~~
+
+Default: ``'sessionid'``
+
+The name of the cookie to use for sessions. This can be whatever you want (but
+should be different from :setting:`LANGUAGE_COOKIE_NAME`).
+
+.. setting:: SESSION_COOKIE-PATH
+
+PATH
+~~~~
+
+Default: ``'/'``
+
+The path set on the session cookie. This should either match the URL path of your
+Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
+
+.. setting:: SESSION_COOKIE-SECURE
+
+SECURE
+~~~~~~
+
+Default: ``False``
+
+Whether to use a secure cookie for the session cookie. If this is set to
+``True``, the cookie will be marked as "secure," which means browsers may
+ensure that the cookie is only sent under an HTTPS connection.
+
+.. versionadded:: 1.7
+
+This setting also affects cookies set by :mod:`django.contrib.messages`.
+
 .. setting:: SESSION_COOKIE_AGE
 
 SESSION_COOKIE_AGE
 ------------------
+
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['AGE'] <SESSION_COOKIE-AGE>`) instead.
 
 Default: ``1209600`` (2 weeks, in seconds)
 
@@ -2330,6 +2564,10 @@ The age of session cookies, in seconds.
 
 SESSION_COOKIE_DOMAIN
 ---------------------
+
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['DOMAIN'] <SESSION_COOKIE-DOMAIN>`) instead.
 
 Default: ``None``
 
@@ -2349,6 +2587,10 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 SESSION_COOKIE_HTTPONLY
 -----------------------
+
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['HTTPONLY'] <SESSION_COOKIE-HTTPONLY>`) instead.
 
 Default: ``True``
 
@@ -2373,6 +2615,10 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 SESSION_COOKIE_NAME
 -------------------
 
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['NAME'] <SESSION_COOKIE-NAME>`) instead.
+
 Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want (but
@@ -2382,6 +2628,10 @@ should be different from :setting:`LANGUAGE_COOKIE_NAME`).
 
 SESSION_COOKIE_PATH
 -------------------
+
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['PATH'] <SESSION_COOKIE-PATH>`) instead.
 
 Default: ``'/'``
 
@@ -2396,6 +2646,10 @@ its own session cookie.
 
 SESSION_COOKIE_SECURE
 ---------------------
+
+.. deprecated:: 1.7
+   Use :setting:`SESSION_COOKIE` (in particular
+   :setting:`SESSION_COOKIE['SECURE'] <SESSION_COOKIE-SECURE>`) instead.
 
 Default: ``False``
 
