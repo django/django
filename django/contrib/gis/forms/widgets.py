@@ -39,7 +39,7 @@ class BaseGeometryWidget(Widget):
 
     def deserialize(self, value):
         try:
-            return GEOSGeometry(value)
+            return GEOSGeometry(value, self.map_srid)
         except (GEOSException, ValueError) as err:
             logger.error(
                 "Error creating geometry from value '%s' (%s)" % (

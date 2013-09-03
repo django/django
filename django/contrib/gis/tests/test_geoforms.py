@@ -282,3 +282,8 @@ class CustomGeometryWidgetTest(SimpleTestCase):
         # Force deserialize use due to a string value
         self.assertIn(escape(point.json), widget.render('p', point.json))
         self.assertEqual(widget.deserialize_called, 1)
+
+        form = PointForm(data={'p': point.json})
+        self.assertTrue(form.is_valid())
+        # Ensure that resulting geometry has srid set
+        self.assertEqual(form.cleaned_data['p'].srid, 4326)
