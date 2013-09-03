@@ -47,10 +47,15 @@ class GeometryField(forms.Field):
         """
         if value in self.empty_values:
             return None
-        try:
-            return GEOSGeometry(value)
-        except (GEOSException, ValueError, TypeError):
-            raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
+
+        if not isinstance(value, GEOSGeometry):
+            try:
+                value = GEOSGeometry(value)
+                if not value.srid:
+                    value.srid = self.widget.map_srid
+            except (GEOSException, ValueError, TypeError):
+                raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
+        return value
 
     def clean(self, value):
         """
@@ -83,16 +88,14 @@ class GeometryField(forms.Field):
     def _has_changed(self, initial, data):
         """ Compare geographic value of data with its initial value. """
 
-        # Ensure we are dealing with a geographic object
-        if isinstance(initial, six.string_types):
-            try:
-                initial = GEOSGeometry(initial)
-            except (GEOSException, ValueError):
-                initial = None
+        try:
+            data = self.to_python(data)
+            initial = self.to_python(initial)
+        except ValidationError:
+            return True
 
         # Only do a geographic comparison if both values are available
         if initial and data:
-            data = fromstr(data)
             data.transform(initial.srid)
             # If the initial value was not added by the browser, the geometry
             # provided may be slightly different, the first time it is saved.
