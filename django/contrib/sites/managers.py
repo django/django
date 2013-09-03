@@ -47,6 +47,7 @@ class CurrentSiteManager(models.Manager):
                     hint='Ensure that you did not misspell the field name. '
                         'Does the field exist?',
                     obj=self,
+                    id='sites.E001',
                 )
             ]
 
@@ -58,6 +59,7 @@ class CurrentSiteManager(models.Manager):
                         % (self.model._meta.object_name, field_name),
                     hint=None,
                     obj=self,
+                    id='sites.E002',
                 )
             ]
 

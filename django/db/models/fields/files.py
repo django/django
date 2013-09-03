@@ -318,6 +318,7 @@ class FileField(Field):
                     'The field requires an "upload_to" attribute.',
                     hint=None,
                     obj=self,
+                    id='E031',
                 )
             ]
         else:
@@ -455,6 +456,7 @@ class ImageField(FileField):
                     hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
                         'or run command "pip install pillow".',
                     obj=self,
+                    id='E032',
                 )
             ]
         else:

@@ -23,6 +23,7 @@ def check_user_model(**kwargs):
                 'The REQUIRED_FIELDS must be a list or tuple.',
                 hint=None,
                 obj=cls,
+                id='auth.E001',
             )
         )
 
@@ -36,6 +37,7 @@ def check_user_model(**kwargs):
                     'on a custom user model.',
                 hint=None,
                 obj=cls,
+                id='auth.E002',
             )
         )
 
@@ -51,6 +53,7 @@ def check_user_model(**kwargs):
                         % (cls._meta.object_name, cls.USERNAME_FIELD),
                     hint=None,
                     obj=cls,
+                    id='auth.E003',
                 )
             )
         else:
@@ -63,6 +66,7 @@ def check_user_model(**kwargs):
                         % (cls._meta.object_name, cls.USERNAME_FIELD),
                     hint=None,
                     obj=cls,
+                    id='auth.W004',
                 )
             )
 

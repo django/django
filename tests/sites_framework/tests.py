@@ -62,6 +62,7 @@ class SitesFrameworkTestCase(TestCase):
                 hint='Ensure that you did not misspell the field name. '
                     'Does the field exist?',
                 obj=InvalidArticle.on_site,
+                id='sites.E001',
             )
         ]
         self.assertEqual(errors, expected)
@@ -79,6 +80,7 @@ class SitesFrameworkTestCase(TestCase):
                     'and must be a ForeignKey or ManyToManyField.',
                 hint=None,
                 obj=ConfusedArticle.on_site,
+                id='sites.E002',
             )
         ]
         self.assertEqual(errors, expected)

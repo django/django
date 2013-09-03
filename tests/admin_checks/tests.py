@@ -93,6 +93,7 @@ class SystemChecksTestCase(TestCase):
                 '"exclude" must be a list or tuple.',
                 hint=None,
                 obj=ExcludedFields1,
+                id='admin.E014',
             )
         ]
         self.assertEqual(errors, expected)
@@ -107,6 +108,7 @@ class SystemChecksTestCase(TestCase):
                 '"exclude" contains duplicate field(s).',
                 hint=None,
                 obj=ExcludedFields2,
+                id='admin.E015',
             )
         ]
         self.assertEqual(errors, expected)
@@ -126,6 +128,7 @@ class SystemChecksTestCase(TestCase):
                 '"exclude" must be a list or tuple.',
                 hint=None,
                 obj=ExcludedFieldsInline,
+                id='admin.E014',
             )
         ]
         self.assertEqual(errors, expected)
@@ -151,6 +154,7 @@ class SystemChecksTestCase(TestCase):
                     'to the parent model admin_checks.Album.',
                 hint=None,
                 obj=SongInline,
+                id='admin.E064',
             )
         ]
         self.assertEqual(errors, expected)
@@ -170,6 +174,7 @@ class SystemChecksTestCase(TestCase):
                     'missing from model admin_checks.Album.',
                 hint=None,
                 obj=RawIdNonexistingAdmin,
+                id='admin.E002',
             )
         ]
         self.assertEqual(errors, expected)
@@ -207,6 +212,7 @@ class SystemChecksTestCase(TestCase):
                     'ForeignKey to admin_checks.Album.',
                 hint=None,
                 obj=TwoAlbumFKAndAnEInline,
+                id='admin.E065',
             )
         ]
         self.assertEqual(errors, expected)
@@ -267,6 +273,7 @@ class SystemChecksTestCase(TestCase):
                     'of "SongAdmin" nor found in the model admin_checks.Song.',
                 hint=None,
                 obj=SongAdmin,
+                id='admin.E034',
             )
         ]
         self.assertEqual(errors, expected)
@@ -283,6 +290,7 @@ class SystemChecksTestCase(TestCase):
                     'of "CityInline" nor found in the model admin_checks.City.',
                 hint=None,
                 obj=CityInline,
+                id='admin.E034',
             )
         ]
         self.assertEqual(errors, expected)
@@ -321,6 +329,7 @@ class SystemChecksTestCase(TestCase):
                     'because "authors" manually specifies relationship model.',
                 hint=None,
                 obj=BookAdmin,
+                id='admin.E013',
             )
         ]
         self.assertEqual(errors, expected)
@@ -339,6 +348,7 @@ class SystemChecksTestCase(TestCase):
                     '"authors", because "authors" manually specifies relationship model.',
                 hint=None,
                 obj=FieldsetBookAdmin,
+                id='admin.E013',
             )
         ]
         self.assertEqual(errors, expected)

@@ -15,7 +15,7 @@ from django.core.management import call_command
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
-from django.utils.encoding import force_str
+from django.utils.encoding import force_text
 
 from .models import SimpleModel, Book
 
@@ -45,34 +45,39 @@ class MessageTests(TestCase):
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
         expected = "obj: Message\n\tHINT: Hint"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
 
     def test_printing_no_hint(self):
         e = Error("Message", hint=None, obj=DummyObj())
         expected = "obj: Message"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
 
     def test_printing_no_object(self):
         e = Error("Message", hint="Hint", obj=None)
         expected = "?: Message\n\tHINT: Hint"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
+
+    def test_printing_with_given_id(self):
+        e = Error("Message", hint="Hint", obj=DummyObj(), id="ID")
+        expected = "obj: (ID) Message\n\tHINT: Hint"
+        self.assertEqual(force_text(e), expected)
 
     def test_printing_field_error(self):
         field = SimpleModel._meta.get_field('field')
         e = Error("Error", hint=None, obj=field)
         expected = "check_framework.SimpleModel.field: Error"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
 
     def test_printing_model_error(self):
         e = Error("Error", hint=None, obj=SimpleModel)
         expected = "check_framework.SimpleModel: Error"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
 
     def test_printing_manager_error(self):
         manager = SimpleModel.manager
         e = Error("Error", hint=None, obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
-        self.assertEqual(force_str(e), expected)
+        self.assertEqual(force_text(e), expected)
 
     def test_is_error(self):
         e = CheckMessage(40, "Error", hint=None)
@@ -108,6 +113,7 @@ class Compatibility_1_6_Checks(TestCase):
                         'for more information.',
                     hint=None,
                     obj=None,
+                    id='W047',
                 )
             ]
             self.assertEqual(errors, expected)
@@ -132,6 +138,7 @@ class Compatibility_1_6_Checks(TestCase):
                             'for more information.',
                         hint=None,
                         obj=boolean_field,
+                        id='W048',
                     )
                 ]
                 self.assertEqual(errors, expected)
@@ -183,3 +190,31 @@ class CheckCommandTests(TestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
         self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
+
+
+def custom_system_check(apps, **kwargs):
+    return [
+        Error(
+            'Error',
+            hint=None,
+            id='mycheck.E001',
+        )
+    ]
+
+
+class SilencingCheckTests(TestCase):
+
+    def setUp(self):
+        self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
+        sys.stdout, sys.stderr = StringIO(), StringIO()
+
+    def tearDown(self):
+        sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
+
+    @override_settings(SILENCED_SYSTEM_CHECKS=['mycheck.E001'])
+    @override_system_checks([custom_system_check])
+    def test_simple(self):
+        try:
+            call_command('check')
+        except CommandError:
+            self.fail("The mycheck.E001 check should be silenced.")

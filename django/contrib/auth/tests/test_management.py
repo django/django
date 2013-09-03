@@ -184,6 +184,7 @@ class CustomUserModelValidationTestCase(TestCase):
                 'The REQUIRED_FIELDS must be a list or tuple.',
                 hint=None,
                 obj=CustomUserNonListRequiredFields,
+                id='auth.E001',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -200,6 +201,7 @@ class CustomUserModelValidationTestCase(TestCase):
                     'in REQUIRED_FIELDS on a custom user model.',
                 hint=None,
                 obj=CustomUserBadRequiredFields,
+                id='auth.E002',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -215,7 +217,8 @@ class CustomUserModelValidationTestCase(TestCase):
                 'The CustomUserNonUniqueUsername.username field must be '
                     'unique because it is pointed to by USERNAME_FIELD.',
                 hint=None,
-                obj=CustomUserNonUniqueUsername
+                obj=CustomUserNonUniqueUsername,
+                id='auth.E003',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -239,6 +242,7 @@ class CustomUserModelValidationTestCase(TestCase):
                     'usernames.',
                 hint=None,
                 obj=CustomUserNonUniqueUsername,
+                id='auth.W004',
             )
         ]
         self.assertEqual(errors, expected)

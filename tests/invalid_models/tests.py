@@ -50,6 +50,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                 'The field must have "max_length" attribute.',
                 hint=None,
                 obj=field,
+                id='E038',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -65,6 +66,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                 '"max_length" must be a positive integer.',
                 hint=None,
                 obj=field,
+                id='E039',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -80,6 +82,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                 '"max_length" must be a positive integer.',
                 hint=None,
                 obj=field,
+                id='E039',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -95,6 +98,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                 '"choices" must be an iterable (e.g., a list or tuple).',
                 hint=None,
                 obj=field,
+                id='E033',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -112,6 +116,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                     'and the second element is the human-readable name).',
                 hint=None,
                 obj=field,
+                id='E034',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -127,6 +132,7 @@ class CharFieldTests(IsolatedModelsTestCase):
                 '"db_index" must be either None, True or False.',
                 hint=None,
                 obj=field,
+                id='E035',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -145,11 +151,13 @@ class DecimalFieldTests(IsolatedModelsTestCase):
                 'The field requires a "decimal_places" attribute.',
                 hint=None,
                 obj=field,
+                id='E041',
             ),
             Error(
                 'The field requires a "max_digits" attribute.',
                 hint=None,
                 obj=field,
+                id='E043',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -165,11 +173,13 @@ class DecimalFieldTests(IsolatedModelsTestCase):
                 '"decimal_places" attribute must be a non-negative integer.',
                 hint=None,
                 obj=field,
+                id='E042',
             ),
             Error(
                 '"max_digits" attribute must be a positive integer.',
                 hint=None,
                 obj=field,
+                id='E044',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -185,11 +195,13 @@ class DecimalFieldTests(IsolatedModelsTestCase):
                 '"decimal_places" attribute must be a non-negative integer.',
                 hint=None,
                 obj=field,
+                id='E042',
             ),
             Error(
                 '"max_digits" attribute must be a positive integer.',
                 hint=None,
                 obj=field,
+                id='E044',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -205,6 +217,7 @@ class DecimalFieldTests(IsolatedModelsTestCase):
                 '"max_digits" must be greater or equal to "decimal_places".',
                 hint=None,
                 obj=field,
+                id='E040',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -250,6 +263,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where Rel1 is defined?',
                 obj=field,
+                id='E030',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -268,6 +282,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where Rel2 is defined?',
                 obj=field,
+                id='E030',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -299,6 +314,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'ForeignKey("self", symmetrical=False, '
                     'through="AmbiguousRelationship").',
                 obj=field,
+                id='E027',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -328,6 +344,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'a foreign key to Group or Person.',
                 hint=None,
                 obj=InvalidRelationship,
+                id='E028',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -353,6 +370,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'a foreign key to Group or Person.',
                 hint=None,
                 obj=InvalidRelationship,
+                id='E028',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -375,6 +393,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where MissingM2MModel is defined?',
                 obj=field,
+                id='E023',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -395,6 +414,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
                 hint=None,
                 obj=field,
+                id='E024',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -419,6 +439,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'is not permitted.',
                 hint=None,
                 obj=InvalidRelationship,
+                id='E025',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -440,6 +461,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
                 hint=None,
                 obj=field,
+                id='E024',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -462,6 +484,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where AbstractModel is defined?',
                 obj=field,
+                id='E030',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -484,6 +507,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where AbstractModel is defined?',
                 obj=field,
+                id='E030',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -502,6 +526,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'ManyToManyFields must not be unique.',
                 hint=None,
                 obj=field,
+                id='E022',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -520,6 +545,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Target.bad must have unique=True because it is referenced by a foreign key.',
                 hint=None,
                 obj=field,
+                id='E019',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -538,6 +564,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Target.bad must have unique=True because it is referenced by a foreign key.',
                 hint=None,
                 obj=field,
+                id='E019',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -565,6 +592,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 hint='Set unique=True argument on any of the fields '
                     '"country_id,city_id" under model Person.',
                 obj=field,
+                id='E018',
             )
         ]
         self.assertEqual(errors, expected)
@@ -585,6 +613,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'The field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field.',
                 obj=field,
+                id='E020',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -604,6 +633,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'The field specifies on_delete=SET_DEFAULT, but has no default value.',
                 hint=None,
                 obj=field,
+                id='E021',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -620,6 +650,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 'Primary keys must not have null=True.',
                 hint='Set null=False on the field or remove primary_key=True argument.',
                 obj=field,
+                id='E036',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -684,7 +715,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         expected_error = Error(
             'The field defines a relation with the model '
                 'invalid_models.SwappedModel, which has been swapped out.',
-            hint='Update the relation to point at settings.TEST_SWAPPED_MODEL'
+            hint='Update the relation to point at settings.TEST_SWAPPED_MODEL',
+            id='E029',
         )
 
         for field in fields:
@@ -706,6 +738,7 @@ class FileFieldTests(IsolatedModelsTestCase):
                 'The field requires an "upload_to" attribute.',
                 hint=None,
                 obj=field,
+                id='E031',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -724,6 +757,7 @@ class BooleanFieldTests(IsolatedModelsTestCase):
                 'BooleanFields do not acceps null values.',
                 hint='Use a NullBooleanField instead.',
                 obj=field,
+                id='E037',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -743,6 +777,7 @@ class GenericIPAddressFieldTests(IsolatedModelsTestCase):
                     'are not allowed, as blank values are stored as null.',
                 hint=None,
                 obj=field,
+                id='E046',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -761,6 +796,7 @@ class FilePathFieldTests(IsolatedModelsTestCase):
                 'The field must have either "allow_files" or "allow_folders" set to True.',
                 hint=None,
                 obj=field,
+                id='E045',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -875,6 +911,7 @@ class AccessorClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.rel.',
                 obj=Model._meta.get_field('rel'),
+                id='E014',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -894,12 +931,14 @@ class AccessorClashTests(IsolatedModelsTestCase):
                 hint='Add or change a related_name argument to the definition '
                     'for Model.foreign or Model.m2m.',
                 obj=Model._meta.get_field('foreign'),
+                id='E016',
             ),
             Error(
                 'Clash between accessors for Model.m2m and Model.foreign.',
                 hint='Add or change a related_name argument to the definition '
                     'for Model.m2m or Model.foreign.',
                 obj=Model._meta.get_field('m2m'),
+                id='E016',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -955,6 +994,7 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.rel.',
                 obj=Model._meta.get_field('rel'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1010,12 +1050,14 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.rel.',
                 obj=Model._meta.get_field('rel'),
+                id='E014',
             ),
             Error('Reverse query name for field Model.rel clashes with field Target.clash.',
                 hint='Rename field Target.clash or add/change '
                     'a related_name argument to the definition '
                     'for field Model.rel.',
                 obj=Model._meta.get_field('rel'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1076,6 +1118,7 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
                 hint='Rename field Target.clash or add/change a related_name '
                     'argument to the definition for field Model.rel.',
                 obj=Model._meta.get_field('rel'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1095,12 +1138,14 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 hint=u'Add or change a related_name argument to the definition '
                     'for Model.first_m2m or Model.second_m2m.',
                 obj=Model._meta.get_field('first_m2m'),
+                id='E016',
             ),
             Error(
                 'Clash between accessors for Model.second_m2m and Model.first_m2m.',
                 hint=u'Add or change a related_name argument to the definition '
                     'for Model.second_m2m or Model.first_m2m.',
                 obj=Model._meta.get_field('second_m2m'),
+                id='E016',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1117,6 +1162,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.model_set.',
                 obj=Model._meta.get_field('model_set'),
+                id='E014',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1132,6 +1178,7 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 hint='Rename field Model.model or add/change a related_name '
                     'argument to the definition for field Model.model.',
                 obj=Model._meta.get_field('model'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1149,12 +1196,14 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
                 hint='Rename field Model.clash or add/change a related_name '
                     'argument to the definition for field Model.m2m.',
                 obj=Model._meta.get_field('m2m'),
+                id='E014',
             ),
             Error(
                 'Reverse query name for field Model.m2m clashes with field Model.clash.',
                 hint='Rename field Model.clash or add/change a related_name '
                     'argument to the definition for field Model.m2m.',
                 obj=Model._meta.get_field('m2m'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1184,6 +1233,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.model_set.',
                 obj=Model._meta.get_field('model_set'),
+                id='E014',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1200,6 +1250,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.model.',
                 obj=Model._meta.get_field('model'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1217,6 +1268,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.foreign.',
                 obj=Model._meta.get_field('foreign'),
+                id='E014',
             ),
             Error(
                 'Reverse query name for field Model.foreign clashes with field Model.clash.',
@@ -1224,6 +1276,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
                     'a related_name argument to the definition '
                     'for field Model.foreign.',
                 obj=Model._meta.get_field('foreign'),
+                id='E015',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1257,24 +1310,28 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 hint='Rename field Target.id or add/change a related_name '
                     'argument to the definition for field Model.foreign_1.',
                 obj=Model._meta.get_field('foreign_1'),
+                id='E014',
             ),
             Error(
                 'Reverse query name for field Model.foreign_1 clashes with field Target.id.',
                 hint='Rename field Target.id or add/change a related_name '
                     'argument to the definition for field Model.foreign_1.',
                 obj=Model._meta.get_field('foreign_1'),
+                id='E015',
             ),
             Error(
                 'Clash between accessors for Model.foreign_1 and Model.m2m_1.',
                 hint='Add or change a related_name argument to '
                     'the definition for Model.foreign_1 or Model.m2m_1.',
                 obj=Model._meta.get_field('foreign_1'),
+                id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.foreign_1 and Model.m2m_1.',
                 hint='Add or change a related_name argument to '
                     'the definition for Model.foreign_1 or Model.m2m_1.',
                 obj=Model._meta.get_field('foreign_1'),
+                id='E017',
             ),
 
             Error(
@@ -1282,12 +1339,14 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 hint='Add or change a related_name argument '
                     'to the definition for Model.foreign_2 or Model.m2m_2.',
                 obj=Model._meta.get_field('foreign_2'),
+                id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.foreign_2 and Model.m2m_2.',
                 hint='Add or change a related_name argument to '
                     'the definition for Model.foreign_2 or Model.m2m_2.',
                 obj=Model._meta.get_field('foreign_2'),
+                id='E017',
             ),
 
             Error(
@@ -1295,24 +1354,28 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 hint='Rename field Target.id or add/change a related_name '
                     'argument to the definition for field Model.m2m_1.',
                 obj=Model._meta.get_field('m2m_1'),
+                id='E014',
             ),
             Error(
                 'Reverse query name for field Model.m2m_1 clashes with field Target.id.',
                 hint='Rename field Target.id or add/change a related_name '
                     'argument to the definition for field Model.m2m_1.',
                 obj=Model._meta.get_field('m2m_1'),
+                id='E015',
             ),
             Error(
                 'Clash between accessors for Model.m2m_1 and Model.foreign_1.',
                 hint='Add or change a related_name argument to the definition '
                     'for Model.m2m_1 or Model.foreign_1.',
                 obj=Model._meta.get_field('m2m_1'),
+                id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.m2m_1 and Model.foreign_1.',
                 hint='Add or change a related_name argument to '
                     'the definition for Model.m2m_1 or Model.foreign_1.',
                 obj=Model._meta.get_field('m2m_1'),
+                id='E017',
             ),
 
             Error(
@@ -1320,12 +1383,14 @@ class ComplexClashTests(IsolatedModelsTestCase):
                 hint='Add or change a related_name argument to the definition '
                     'for Model.m2m_2 or Model.foreign_2.',
                 obj=Model._meta.get_field('m2m_2'),
+                id='E016',
             ),
             Error(
                 'Clash between reverse query names for Model.m2m_2 and Model.foreign_2.',
                 hint='Add or change a related_name argument to the definition '
                     'for Model.m2m_2 or Model.foreign_2.',
                 obj=Model._meta.get_field('m2m_2'),
+                id='E017',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1344,6 +1409,7 @@ class IndexTogetherTests(IsolatedModelsTestCase):
                 '"index_together" must be a list or tuple.',
                 hint=None,
                 obj=Model,
+                id='E006',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1362,6 +1428,7 @@ class IndexTogetherTests(IsolatedModelsTestCase):
                 'All "index_together" elements must be lists or tuples.',
                 hint=None,
                 obj=Model,
+                id='E007',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1378,7 +1445,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
             Error(
                 '"index_together" points to a missing field named "missing_field".',
                 hint='Ensure that you did not misspell the field name.',
-                obj=Model
+                obj=Model,
+                id='E010',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1399,6 +1467,7 @@ class IndexTogetherTests(IsolatedModelsTestCase):
                     'ManyToManyFields are not supported in "index_together".',
                 hint=None,
                 obj=Model,
+                id='E011',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1418,6 +1487,7 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
                 '"unique_together" must be a list or tuple.',
                 hint=None,
                 obj=Model,
+                id='E008',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1436,6 +1506,7 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
                 'All "unique_together" elements must be lists or tuples.',
                 hint=None,
                 obj=Model,
+                id='E009',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1465,6 +1536,7 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
                 '"unique_together" points to a missing field named "missing_field".',
                 hint='Ensure that you did not misspell the field name.',
                 obj=Model,
+                id='E010',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1485,6 +1557,7 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
                 'ManyToManyFields are not supported in "unique_together".',
                 hint=None,
                 obj=Model,
+                id='E011',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1505,6 +1578,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                 hint='Remove or rename "id" field or '
                     'add primary_key=True to a field.',
                 obj=Model,
+                id='E005',
             )
         ]
         self.assertEqual(errors, expected)
@@ -1520,11 +1594,13 @@ class OtherModelTests(IsolatedModelsTestCase):
                 'Field names must not end with underscores.',
                 hint=None,
                 obj=Model._meta.get_field('field_'),
+                id='E001',
             ),
             Error(
                 'Field names must not end with underscores.',
                 hint=None,
                 obj=Model._meta.get_field('m2m_'),
+                id='E001',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1541,6 +1617,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                     '(even if you want to order by only one field).',
                 hint=None,
                 obj=Model,
+                id='E012',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1556,6 +1633,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                 '"ordering" pointing to a missing "missing_field" field.',
                 hint='Ensure that you did not misspell the field name.',
                 obj=Model,
+                id='E013',
             )
         ]
         self.assertEqual(errors, expected)
@@ -1572,6 +1650,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                 '"TEST_SWAPPED_MODEL_BAD_VALUE" is not of the form "app_label.app_name".',
                 hint=None,
                 obj=Model,
+                id='E002',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1591,6 +1670,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                     'the app name as well as the model is not abstract. Does '
                     'your INSTALLED_APPS setting contain the "not_an_app" app?',
                 obj=Model,
+                id='E003',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -1616,6 +1696,7 @@ class OtherModelTests(IsolatedModelsTestCase):
                     'the intermediary Membership model, which is not permitted.',
                 hint=None,
                 obj=Group,
+                id='E004',
             )
         ]
         self.assertEqual(errors, expected)
