@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 import datetime
+import unittest
+
 from django.test import TransactionTestCase
-from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
@@ -17,7 +18,7 @@ class SchemaTests(TransactionTestCase):
     as sometimes the code to check if a test has worked is almost as complex
     as the code it is testing.
     """
-    
+
     available_apps = []
 
     models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest]
@@ -91,7 +92,7 @@ class SchemaTests(TransactionTestCase):
             lambda: list(Author.objects.all()),
         )
 
-    @skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_fk(self):
         "Tests that creating tables out of FK order, then repointing, works"
         # Create the table
@@ -310,7 +311,7 @@ class SchemaTests(TransactionTestCase):
             BookWithM2M._meta.local_many_to_many.remove(new_field)
             del BookWithM2M._meta._m2m_cache
 
-    @skipUnless(connection.features.supports_check_constraints, "No check constraints")
+    @unittest.skipUnless(connection.features.supports_check_constraints, "No check constraints")
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints

@@ -18,7 +18,6 @@ from django.db.models.fields import (
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
-from django.utils.unittest import skipIf
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
@@ -517,7 +516,7 @@ class PromiseTest(test.TestCase):
             AutoField(primary_key=True).get_prep_value(lazy_func()),
             int)
 
-    @skipIf(six.PY3, "Python 3 has no `long` type.")
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
     def test_BigIntegerField(self):
         lazy_func = lazy(lambda: long(9999999999999999999), long)
         self.assertIsInstance(
