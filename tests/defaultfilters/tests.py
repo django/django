@@ -481,7 +481,7 @@ class DefaultFiltersTests(TestCase):
         @python_2_unicode_compatible
         class ULItem(object):
             def __init__(self, title):
-              self.title = title
+                self.title = title
             def __str__(self):
                 return 'ulitem-%s' % str(self.title)
 

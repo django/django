@@ -29,7 +29,7 @@ class FavoriteAuthors(models.Model):
     likes_author = models.ForeignKey(Author, to_field='name', related_name='likes_me')
 
     class Meta:
-         ordering = ['id']
+        ordering = ['id']
 
 
 @python_2_unicode_compatible

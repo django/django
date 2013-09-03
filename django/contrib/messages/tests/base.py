@@ -31,14 +31,15 @@ def add_level_messages(storage):
 
 
 class override_settings_tags(override_settings):
-     def enable(self):
+    def enable(self):
         super(override_settings_tags, self).enable()
         # LEVEL_TAGS is a constant defined in the
         # django.contrib.messages.storage.base module, so after changing
         # settings.MESSAGE_TAGS, we need to update that constant too.
         self.old_level_tags = base.LEVEL_TAGS
         base.LEVEL_TAGS = utils.get_level_tags()
-     def disable(self):
+
+    def disable(self):
         super(override_settings_tags, self).disable()
         base.LEVEL_TAGS = self.old_level_tags
 

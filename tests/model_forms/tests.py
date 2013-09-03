@@ -88,11 +88,11 @@ class DerivedPostForm(forms.ModelForm):
 
 
 class CustomWriterForm(forms.ModelForm):
-   name = forms.CharField(required=False)
+    name = forms.CharField(required=False)
 
-   class Meta:
-       model = Writer
-       fields = '__all__'
+    class Meta:
+        model = Writer
+        fields = '__all__'
 
 
 class FlexDatePostForm(forms.ModelForm):
@@ -456,11 +456,11 @@ class ModelFormBaseTest(TestCase):
 
     def test_subclassmeta_form(self):
         class SomeCategoryForm(forms.ModelForm):
-             checkbox = forms.BooleanField()
+            checkbox = forms.BooleanField()
 
-             class Meta:
-                 model = Category
-                 fields = '__all__'
+            class Meta:
+                model = Category
+                fields = '__all__'
 
         class SubclassMeta(SomeCategoryForm):
             """ We can also subclass the Meta inner class to change the fields

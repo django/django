@@ -28,7 +28,7 @@ def lookup_needs_distinct(opts, lookup_path):
          isinstance(field.rel, models.ManyToManyRel)) or
         (isinstance(field, models.related.RelatedObject) and
          not field.field.unique)):
-         return True
+        return True
     return False
 
 def prepare_lookup_value(key, value):
