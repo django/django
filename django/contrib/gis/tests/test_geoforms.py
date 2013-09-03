@@ -244,6 +244,15 @@ class SpecializedFieldTest(SimpleTestCase):
         for invalid in [geom for key, geom in self.geometries.items() if key!='geometrycollection']:
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
+    def test_osm_widget(self):
+        class PointForm(forms.Form):
+            p = forms.PointField(widget=forms.OSMWidget)
+
+        geom = self.geometries['point']
+        form = PointForm(data={'p': geom})
+        self.assertIn("OpenStreetMap (Mapnik)", form.as_p())
+
+
 @skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
     "CustomGeometryWidgetTest needs gdal support and a spatial database")
 class CustomGeometryWidgetTest(SimpleTestCase):
