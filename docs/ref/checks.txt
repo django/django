@@ -57,8 +57,9 @@ Constructor arguments are:
 
 ``obj``
     Optional. Point to the invalid object. The object should be a model, field
-    or manager or any other object that defines ``__str__`` method. The method
-    is used while reporting all messages and its result precedes the message, i.
+    or manager or any other object that defines ``__unicode__`` method (on
+    Python 3 you need to define ``__str__`` method). The method is used while
+    reporting all messages and its result precedes the message, i.
     e. model errors are printed using ``applabel.modellabel: message`` pattern.
 
 Messages are comparable. That allows you to easily write tests::
