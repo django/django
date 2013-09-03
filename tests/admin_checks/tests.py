@@ -49,7 +49,6 @@ class SystemChecksTestCase(TestCase):
             admin.site.unregister(Song)
 
     def test_readonly_and_editable(self):
-
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ["original_release"]
             fieldsets = [
