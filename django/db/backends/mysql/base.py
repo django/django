@@ -420,7 +420,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             'conv': django_conversions,
             'charset': 'utf8',
         }
-        if not six.PY3:
+        if six.PY2:
             kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
@@ -537,4 +537,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
-        return tuple([int(x) for x in match.groups()])
+        return tuple(int(x) for x in match.groups())

@@ -82,13 +82,6 @@ class LiveServerAddress(LiveServerBase):
         cls.raises_exception('localhost:8081-blah', ImproperlyConfigured)
         cls.raises_exception('localhost:8081-8082-8083', ImproperlyConfigured)
 
-        # If contrib.staticfiles isn't configured properly, the exception
-        # should bubble up to the main thread.
-        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
-        TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception('localhost:8081', ImproperlyConfigured)
-        TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
         # Restore original environment variable
         if address_predefined:
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
@@ -145,13 +138,18 @@ class LiveServerViews(LiveServerBase):
         f = self.urlopen('/static/example_static_file.txt')
         self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
-    def test_collectstatic_emulation(self):
+    def test_no_collectstatic_emulation(self):
         """
-        Test LiveServerTestCase use of staticfiles' serve() allows it to
-        discover app's static assets without having to collectstatic first.
+        Test that LiveServerTestCase reports a 404 status code when HTTP client
+        tries to access a static file that isn't explictly put under
+        STATIC_ROOT.
         """
-        f = self.urlopen('/static/another_app/another_app_static_file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'static file from another_app')
+        try:
+            self.urlopen('/static/another_app/another_app_static_file.txt')
+        except HTTPError as err:
+            self.assertEqual(err.code, 404, 'Expected 404 response')
+        else:
+            self.fail('Expected 404 response (got %d)' % err.code)
 
     def test_media_files(self):
         """

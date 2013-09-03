@@ -258,6 +258,13 @@ Templates
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
 
+* The :ttag:`include` template tag will now also accept anything with a
+  ``render()`` method (such as a ``Template``) as an argument. String
+  arguments will be looked up using
+  :func:`~django.template.loader.get_template` as always.
+
+* It is now possible to :ttag:`include` templates recursively.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -317,6 +324,27 @@ Miscellaneous
 * The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
+
+* ``django.contrib.auth.models.AbstractUser`` no longer defines a
+  :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
+  returned  ``"/users/%s/" % urlquote(self.username)`` which was arbitrary
+  since applications may or may not define such a url in ``urlpatterns``.
+  Define a ``get_absolute_url()`` method on your own custom user object or use
+  :setting:`ABSOLUTE_URL_OVERRIDES` if you want a URL for your user.
+
+* The static asset-serving functionality of the
+  :class:`django.test.LiveServerTestCase` class has been simplified: Now it's
+  only able to serve content already present in :setting:`STATIC_ROOT` when
+  tests are run. The ability to transparently serve all the static assets
+  (similarly to what one gets with :setting:`DEBUG = True <DEBUG>` at
+  development-time) has been moved to a new class that lives in the
+  ``staticfiles`` application (the one actually in charge of such feature):
+  :class:`django.contrib.staticfiles.testing.StaticLiveServerCase`. In other
+  words, ``LiveServerTestCase`` itself is less powerful but at the same time
+  has less magic.
+
+  Rationale behind this is removal of dependency of non-contrib code on
+  contrib applications.
 
 Features deprecated in 1.7
 ==========================

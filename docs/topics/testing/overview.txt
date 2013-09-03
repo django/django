@@ -1041,11 +1041,25 @@ out the `full reference`_ for more details.
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
 
-.. note::
+.. versionchanged:: 1.7
 
-    ``LiveServerTestCase`` makes use of the :doc:`staticfiles contrib app
-    </howto/static-files/index>` so you'll need to have your project configured
-    accordingly (in particular by setting :setting:`STATIC_URL`).
+    Before Django 1.7 ``LiveServerTestCase`` used to rely on the
+    :doc:`staticfiles contrib app </howto/static-files/index>` to get the
+    static assets of the application(s) under test transparently served at their
+    expected locations during the execution of these tests.
+
+    In Django 1.7 this dependency of core functionality on a ``contrib``
+    appplication has been removed, because of which ``LiveServerTestCase``
+    ability in this respect has been retrofitted to simply publish the contents
+    of the file system under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`
+    URL.
+
+    If you use the ``staticfiles`` app in your project and need to perform live
+    testing then you might want to consider using the
+    :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase` subclass
+    shipped with it instead because it's the one that implements the original
+    behavior now. See :ref:`the relevant documentation
+    <staticfiles-testing-support>` for more details.
 
 .. note::
 

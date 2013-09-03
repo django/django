@@ -330,10 +330,10 @@ class PasswordChangeForm(SetPasswordForm):
             )
         return old_password
 
-PasswordChangeForm.base_fields = OrderedDict([
+PasswordChangeForm.base_fields = OrderedDict(
     (k, PasswordChangeForm.base_fields[k])
     for k in ['old_password', 'new_password1', 'new_password2']
-])
+)
 
 
 class AdminPasswordChangeForm(forms.Form):

@@ -50,7 +50,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage, Telegram)
+    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
+    Telegram, Pizza, Topping)
 from .admin import site, site2
 
 
@@ -687,27 +688,6 @@ class AdminJavaScriptTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-
-    def testSingleWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus on first field.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
-        )
-
-    def testMultiWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
-        is such that the first form field has a MultiWidget.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
-        )
 
     def test_js_minified_only_if_debug_is_false(self):
         """
@@ -1749,9 +1729,9 @@ class SecureViewTests(TestCase):
         """
         Only admin users should be able to use the admin shortcut view.
         """
-        user_ctype = ContentType.objects.get_for_model(User)
-        user = User.objects.get(username='super')
-        shortcut_url = "/test_admin/admin/r/%s/%s/" % (user_ctype.pk, user.pk)
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk='foo')
+        shortcut_url = "/test_admin/admin/r/%s/%s/" % (model_ctype.pk, obj.pk)
 
         # Not logged in: we should see the login page.
         response = self.client.get(shortcut_url, follow=False)
@@ -1762,7 +1742,7 @@ class SecureViewTests(TestCase):
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, 'http://example.com/users/super/')
+        self.assertEqual(response.url, 'http://example.com/dummy/foo/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -3542,6 +3522,25 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
             "Hide"
         )
 
+    def test_first_field_focus(self):
+        """JavaScript-assisted auto-focus on first usable form field."""
+        # First form field has a single widget
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/picture/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_name')
+        )
+
+        # First form field has a MultiWidget
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/reservation/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_start_date_0')
+        )
+
 
 class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
@@ -3637,6 +3636,17 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/choice/%s/' % choice.pk)
         self.assertContains(response, '<p>No opinion</p>', html=True)
         self.assertNotContains(response, '<p>(None)</p>')
+
+    def test_readonly_backwards_ref(self):
+        """
+        Regression test for #16433 - backwards references for related objects
+        broke if the related field is read-only due to the help_text attribute
+        """
+        topping = Topping.objects.create(name='Salami')
+        pizza = Pizza.objects.create(name='Americano')
+        pizza.toppings.add(topping)
+        response = self.client.get('/test_admin/admin/admin_views/topping/add/')
+        self.assertEqual(response.status_code, 200)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

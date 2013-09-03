@@ -191,4 +191,4 @@ OGRFieldTypes = { 0 : OFTInteger,
                  10 : OFTTime,
                  11 : OFTDateTime,
                   }
-ROGRFieldTypes = dict([(cls, num) for num, cls in OGRFieldTypes.items()])
+ROGRFieldTypes = dict((cls, num) for num, cls in OGRFieldTypes.items())

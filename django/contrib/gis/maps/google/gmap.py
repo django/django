@@ -150,7 +150,7 @@ class GoogleMap(object):
     @property
     def icons(self):
         "Returns a sequence of GIcon objects in this map."
-        return set([marker.icon for marker in self.markers if marker.icon])
+        return set(marker.icon for marker in self.markers if marker.icon)
 
 class GoogleMapSet(GoogleMap):
 

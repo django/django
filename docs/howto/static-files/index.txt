@@ -100,6 +100,33 @@ this by adding the following snippet to your urls.py::
     the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
     ``http://static.example.com/``).
 
+.. _staticfiles-testing-support:
+
+Testing
+=======
+
+When running tests that use actual HTTP requests instead of the built-in
+testing client (i.e. when using the built-in :class:`LiveServerTestCase
+<django.test.LiveServerTestCase>`) the static assets need to be served along
+the rest of the content so the test environment reproduces the real one as
+faithfully as possible, but ``LiveServerTestCase`` has only very basic static
+file-serving functionality: It doesn't know about the finders feature of the
+``staticfiles`` application and assumes the static content has already been
+collected under :setting:`STATIC_ROOT`.
+
+Because of this, ``staticfiles`` ships its own
+:class:`django.contrib.staticfiles.testing.StaticLiveServerCase`, a subclass
+of the built-in one that has the ability to transparently serve all the assets
+during execution of these tests in a way very similar to what we get at
+development time with ``DEBUG = True``, i.e. without having to collect them
+using :djadmin:`collectstatic` first.
+
+.. versionadded:: 1.7
+
+    :class:`django.contrib.staticfiles.testing.StaticLiveServerCase` is new in
+    Django 1.7. Previously its functionality was provided by
+    :class:`django.test.LiveServerTestCase`.
+
 Deployment
 ==========
 

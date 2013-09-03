@@ -838,9 +838,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Creating a GeometryCollection WKT string composed of other
         # collections and polygons.
         coll = [mp.wkt for mp in self.geometries.multipolygons if mp.valid]
-        coll.extend([mls.wkt for mls in self.geometries.multilinestrings])
-        coll.extend([p.wkt for p in self.geometries.polygons])
-        coll.extend([mp.wkt for mp in self.geometries.multipoints])
+        coll.extend(mls.wkt for mls in self.geometries.multilinestrings)
+        coll.extend(p.wkt for p in self.geometries.polygons)
+        coll.extend(mp.wkt for mp in self.geometries.multipoints)
         gc_wkt = 'GEOMETRYCOLLECTION(%s)' % ','.join(coll)
 
         # Should construct ok from WKT

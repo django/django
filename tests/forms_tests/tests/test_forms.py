@@ -437,11 +437,11 @@ class FormsTestCase(TestCase):
             name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
 
         f = BeatleForm(auto_id=False)
-        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), """<label><input type="radio" name="name" value="john" /> John</label>
+        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), """<label><input type="radio" name="name" value="john" /> John</label>
 <label><input type="radio" name="name" value="paul" /> Paul</label>
 <label><input type="radio" name="name" value="george" /> George</label>
 <label><input type="radio" name="name" value="ringo" /> Ringo</label>""")
-        self.assertHTMLEqual('\n'.join(['<div>%s</div>' % bf for bf in f['name']]), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
+        self.assertHTMLEqual('\n'.join('<div>%s</div>' % bf for bf in f['name']), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
 <div><label><input type="radio" name="name" value="paul" /> Paul</label></div>
 <div><label><input type="radio" name="name" value="george" /> George</label></div>
 <div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>""")
@@ -452,7 +452,7 @@ class FormsTestCase(TestCase):
             name = CharField()
 
         f = BeatleForm(auto_id=False)
-        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), '<input type="text" name="name" />')
+        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), '<input type="text" name="name" />')
 
     def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:

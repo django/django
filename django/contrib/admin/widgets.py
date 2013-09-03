@@ -119,7 +119,7 @@ def url_params_from_lookup_dict(lookups):
             if callable(v):
                 v = v()
             if isinstance(v, (tuple, list)):
-                v = ','.join([str(x) for x in v])
+                v = ','.join(str(x) for x in v)
             elif isinstance(v, bool):
                 # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
@@ -154,7 +154,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+                url = '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
             else:
                 url = ''
             if "class" not in attrs:
@@ -199,7 +199,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
-            value = ','.join([force_text(v) for v in value])
+            value = ','.join(force_text(v) for v in value)
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)

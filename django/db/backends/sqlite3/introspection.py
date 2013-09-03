@@ -139,7 +139,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
 
             # This will append (column_name, referenced_table_name, referenced_column_name) to key_columns
-            key_columns.append(tuple([s.strip('"') for s in m.groups()]))
+            key_columns.append(tuple(s.strip('"') for s in m.groups()))
 
         return key_columns
 

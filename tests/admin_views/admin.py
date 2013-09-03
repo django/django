@@ -450,6 +450,10 @@ class GadgetAdmin(admin.ModelAdmin):
         return CustomChangeList
 
 
+class ToppingAdmin(admin.ModelAdmin):
+    readonly_fields = ('pizzas',)
+
+
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
 
@@ -763,7 +767,7 @@ site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
 site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
-site.register(Topping)
+site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Question)
 site.register(Answer)

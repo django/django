@@ -640,7 +640,7 @@ beatle J R Ringo False""")
         # You can create your own custom renderers for RadioSelect to use.
         class MyRenderer(RadioFieldRenderer):
            def render(self):
-               return '<br />\n'.join([six.text_type(choice) for choice in self])
+               return '<br />\n'.join(six.text_type(choice) for choice in self)
         w = RadioSelect(renderer=MyRenderer)
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
@@ -835,17 +835,17 @@ beatle J R Ringo False""")
 
     def test_subwidget(self):
         # Each subwidget tag gets a separate ID when the widget has an ID specified
-        self.assertHTMLEqual("\n".join([c.tag() for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))]), """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
+        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
 <input type="checkbox" name="letters" value="b" id="abc_1" />
 <input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" />""")
 
         # Each subwidget tag does not get an ID if the widget does not have an ID specified
-        self.assertHTMLEqual("\n".join([c.tag() for c in CheckboxSelectMultiple().subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))]), """<input checked="checked" type="checkbox" name="letters" value="a" />
+        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple().subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" />
 <input type="checkbox" name="letters" value="b" />
 <input checked="checked" type="checkbox" name="letters" value="c" />""")
 
         # The id_for_label property of the subwidget should return the ID that is used on the subwidget's tag
-        self.assertHTMLEqual("\n".join(['<input type="checkbox" name="letters" value="%s" id="%s" />' % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', [], choices=zip(list('abc'), list('ABC')))]), """<input type="checkbox" name="letters" value="a" id="abc_0" />
+        self.assertHTMLEqual("\n".join('<input type="checkbox" name="letters" value="%s" id="%s" />' % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', [], choices=zip(list('abc'), list('ABC')))), """<input type="checkbox" name="letters" value="a" id="abc_0" />
 <input type="checkbox" name="letters" value="b" id="abc_1" />
 <input type="checkbox" name="letters" value="c" id="abc_2" />""")
 

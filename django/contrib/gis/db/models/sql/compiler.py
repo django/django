@@ -1,15 +1,11 @@
 import datetime
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
 
 from django.conf import settings
 from django.db.backends.util import truncate_name, typecast_date, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six
-from django.utils.six.moves import zip
+from django.utils.six.moves import zip, zip_longest
 from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler

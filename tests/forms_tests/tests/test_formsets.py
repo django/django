@@ -900,7 +900,7 @@ class FormsFormsetTestCase(TestCase):
         }
         formset = AnotherChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertTrue(all([form.is_valid_called for form in formset.forms]))
+        self.assertTrue(all(form.is_valid_called for form in formset.forms))
 
     def test_hard_limit_on_instantiated_forms(self):
         """A formset has a hard limit on the number of forms instantiated."""

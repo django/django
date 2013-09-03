@@ -12,7 +12,7 @@ from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
 from django.utils.safestring import mark_safe
 
-if not six.PY3:
+if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
     from django.utils.encoding import force_unicode
@@ -238,7 +238,7 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
     if len(list_) == 1: return force_text(list_[0])
     return '%s %s %s' % (
         # Translators: This string is used as a separator between list elements
-        _(', ').join([force_text(i) for i in list_][:-1]),
+        _(', ').join(force_text(i) for i in list_[:-1]),
         force_text(last_word), force_text(list_[-1]))
 get_text_list = allow_lazy(get_text_list, six.text_type)
 

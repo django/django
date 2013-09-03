@@ -145,8 +145,8 @@ class MigrationAutodetector(object):
             old_model_state = self.from_state.models[app_label, model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             # New fields
-            old_field_names = set([x for x, y in old_model_state.fields])
-            new_field_names = set([x for x, y in new_model_state.fields])
+            old_field_names = set(x for x, y in old_model_state.fields)
+            new_field_names = set(x for x, y in new_model_state.fields)
             for field_name in new_field_names - old_field_names:
                 field = new_model_state.get_field_by_name(field_name)
                 # Scan to see if this is actually a rename!

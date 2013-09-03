@@ -48,7 +48,7 @@ class TestSigner(TestCase):
             'jkw osanteuh ,rcuh nthu aou oauh ,ud du',
             '\u2019',
         ]
-        if not six.PY3:
+        if six.PY2:
             examples.append(b'a byte string')
         for example in examples:
             signed = signer.sign(example)
@@ -79,7 +79,7 @@ class TestSigner(TestCase):
             'a unicode string \u2019',
             {'a': 'dictionary'},
         ]
-        if not six.PY3:
+        if six.PY2:
             objects.append(b'a byte string')
         for o in objects:
             self.assertNotEqual(o, signing.dumps(o))

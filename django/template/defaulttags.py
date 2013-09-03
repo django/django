@@ -205,7 +205,7 @@ class ForNode(Node):
                     # don't want to leave any vars from the previous loop on the
                     # context.
                     context.pop()
-        return mark_safe(''.join([force_text(n) for n in nodelist]))
+        return mark_safe(''.join(force_text(n) for n in nodelist))
 
 class IfChangedNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
@@ -410,8 +410,8 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_text(k, 'ascii'), v.resolve(context))
-                       for k, v in self.kwargs.items()])
+        kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
+                       for k, v in self.kwargs.items())
 
         view_name = self.view_name.resolve(context)
 
@@ -502,8 +502,8 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
-        values = dict([(key, val.resolve(context)) for key, val in
-                       six.iteritems(self.extra_context)])
+        values = dict((key, val.resolve(context)) for key, val in
+                       six.iteritems(self.extra_context))
         with context.push(**values):
             return self.nodelist.render(context)
 

@@ -54,7 +54,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT column_name, numeric_precision, numeric_scale FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()
                 AND data_type='decimal'""", [table_name])
-        numeric_map = dict([(line[0], tuple([int(n) for n in line[1:]])) for line in cursor.fetchall()])
+        numeric_map = dict((line[0], tuple(int(n) for n in line[1:])) for line in cursor.fetchall())
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [FieldInfo(*((force_text(line[0]),)
@@ -69,7 +69,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Returns a dictionary of {field_name: field_index} for the given table.
         Indexes are 0-based.
         """
-        return dict([(d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name))])
+        return dict((d[0], i) for i, d in enumerate(self.get_table_description(cursor, table_name)))
 
     def get_relations(self, cursor, table_name):
         """

@@ -46,20 +46,6 @@ class AdminForm(object):
                 **options
             )
 
-    def first_field(self):
-        try:
-            fieldset_name, fieldset_options = self.fieldsets[0]
-            field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, six.string_types):
-                field_name = field_name[0]
-            return self.form[field_name]
-        except (KeyError, IndexError):
-            pass
-        try:
-            return next(iter(self.form))
-        except StopIteration:
-            return None
-
     def _media(self):
         media = self.form.media
         for fs in self:
@@ -112,7 +98,7 @@ class Fieldline(object):
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe('\n'.join([self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields]).strip('\n'))
+        return mark_safe('\n'.join(self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields).strip('\n'))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):
