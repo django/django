@@ -161,6 +161,7 @@ class RelatedField(Field):
                         'setting contain the app where %s is defined?'
                         % self.rel.to,
                     obj=self,
+                    id='E030',
                 )
             ]
         return []
@@ -180,6 +181,7 @@ class RelatedField(Field):
                     hint='Update the relation to point at settings.%s'
                         % self.rel.to._meta.swappable,
                     obj=self,
+                    id='E029',
                 )
             ]
         return []
@@ -237,6 +239,7 @@ class RelatedField(Field):
                             'argument to the definition for field %s.'
                             % (clash_name, field_name),
                         obj=self,
+                        id='E014',
                     )
                 )
 
@@ -248,7 +251,8 @@ class RelatedField(Field):
                         hint='Rename field %s or add/change a related_name '
                             'argument to the definition for field %s.'
                             % (clash_name, field_name),
-                        obj=self
+                        obj=self,
+                        id='E015',
                     )
                 )
 
@@ -272,6 +276,7 @@ class RelatedField(Field):
                             'to the definition for %s or %s.'
                             % (field_name, clash_name),
                         obj=self,
+                        id='E016',
                     )
                 )
 
@@ -283,7 +288,8 @@ class RelatedField(Field):
                         hint='Add or change a related_name argument '
                             'to the definition for %s or %s.'
                             % (field_name, clash_name),
-                        obj=self
+                        obj=self,
+                        id='E017',
                     )
                 )
 
@@ -1352,6 +1358,7 @@ class ForeignObject(RelatedField):
                         '"%s" under model %s.'
                         % (field_combination, model_name),
                     obj=self,
+                    id='E018',
                 )
             ]
         elif not has_unique_field:
@@ -1364,6 +1371,7 @@ class ForeignObject(RelatedField):
                         % (model_name, field_name),
                     hint=None,
                     obj=self,
+                    id='E019',
                 )
             ]
         else:
@@ -1544,6 +1552,7 @@ class ForeignKey(ForeignObject):
                     'The field specifies on_delete=SET_NULL, but cannot be null.',
                     hint='Set null=True argument on the field.',
                     obj=self,
+                    id='E020',
                 )
             ]
         elif on_delete == SET_DEFAULT and not self.has_default():
@@ -1552,6 +1561,7 @@ class ForeignKey(ForeignObject):
                     'The field specifies on_delete=SET_DEFAULT, but has no default value.',
                     hint=None,
                     obj=self,
+                    id='E021',
                 )
             ]
         else:
@@ -1857,6 +1867,7 @@ class ManyToManyField(RelatedField):
                     'ManyToManyFields must not be unique.',
                     hint=None,
                     obj=self,
+                    id='E022',
                 )
             ]
         return []
@@ -1875,7 +1886,8 @@ class ManyToManyField(RelatedField):
                         'the model is not abstract. Does your INSTALLED_APPS '
                         'setting contain the app where %s is defined?'
                         % self.rel.through,
-                    obj=self
+                    obj=self,
+                    id='E023',
                 )
             )
 
@@ -1904,6 +1916,7 @@ class ManyToManyField(RelatedField):
                         'Many-to-many fields with intermediate tables must not be symmetrical.',
                         hint=None,
                         obj=self,
+                        id='E024',
                     )
                 )
 
@@ -1921,6 +1934,7 @@ class ManyToManyField(RelatedField):
                                 % (self, from_model_name),
                             hint=None,
                             obj=self.rel.through,
+                            id='E025',
                         )
                     )
 
@@ -1942,7 +1956,8 @@ class ManyToManyField(RelatedField):
                                 'use ForeignKey("self", symmetrical=False, '
                                 'through="%s").'
                                 % relationship_model_name,
-                            obj=self
+                            obj=self,
+                            id='E026',
                         )
                     )
 
@@ -1958,6 +1973,7 @@ class ManyToManyField(RelatedField):
                                 'symmetrical=False, through="%s").'
                                 % relationship_model_name,
                             obj=self,
+                            id='E027',
                         )
                     )
 
@@ -1969,6 +1985,7 @@ class ManyToManyField(RelatedField):
                                 % (self, from_model_name, to_model_name),
                             hint=None,
                             obj=self.rel.through,
+                            id='E028',
                         )
                     )
         return errors

@@ -181,6 +181,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                         % self.fk_field,
                     hint=None,
                     obj=self,
+                    id='contenttypes.E001',
                 )
             ]
         else:
@@ -193,6 +194,7 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
                     'Field names must not end with underscores.',
                     hint=None,
                     obj=self,
+                    id='contenttypes.E002',
                 )
             ]
         else:
@@ -322,6 +324,7 @@ class GenericRelation(ForeignObject):
                             % (opts.object_name, self.object_id_field_name),
                         hint=None,
                         obj=self,
+                        id='contenttypes.E003',
                     )
                 ]
             else:
@@ -349,6 +352,7 @@ class GenericRelation(ForeignObject):
                             % (target._meta.app_label, target._meta.object_name),
                         hint=None,
                         obj=self,
+                        id='contenttypes.E004',
                     )
                 ]
         else:
@@ -368,6 +372,7 @@ def _check_content_type_field(model, field_name, checked_object):
                     % (model._meta.object_name, field_name),
                 hint=None,
                 obj=checked_object,
+                id='contenttypes.E005',
             )
         ]
     else:
@@ -380,6 +385,7 @@ def _check_content_type_field(model, field_name, checked_object):
                         % (field_name, checked_object.__class__.__name__),
                     hint=None,
                     obj=checked_object,
+                    id='contenttypes.E006',
                 )
             ]
         elif field.rel.to != ContentType:
@@ -391,6 +397,7 @@ def _check_content_type_field(model, field_name, checked_object):
                         % (field_name, checked_object.__class__.__name__),
                     hint=None,
                     obj=checked_object,
+                    id='contenttypes.E007',
                 )
             ]
         else:

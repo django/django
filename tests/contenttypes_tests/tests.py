@@ -92,6 +92,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 'The field refers to TaggedItem.content_type field which is missing.',
                 hint=None,
                 obj=TaggedItem.content_object,
+                id='contenttypes.E005',
             )
         ]
         self.assertEqual(errors, expected)
@@ -111,6 +112,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                     'a ForeignKey.',
                 hint=None,
                 obj=Model.content_object,
+                id='contenttypes.E006',
             )
         ]
         self.assertEqual(errors, expected)
@@ -130,6 +132,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                     'a ForeignKey to ContentType.',
                 hint=None,
                 obj=Model.content_object,
+                id='contenttypes.E007',
             )
         ]
         self.assertEqual(errors, expected)
@@ -146,6 +149,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 'The field refers to "object_id" field which is missing.',
                 hint=None,
                 obj=TaggedItem.content_object,
+                id='contenttypes.E001',
             )
         ]
         self.assertEqual(errors, expected)
@@ -163,6 +167,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
                 'Field names must not end with underscores.',
                 hint=None,
                 obj=Model.content_object_,
+                id='contenttypes.E002',
             )
         ]
         self.assertEqual(errors, expected)
@@ -221,6 +226,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                     'the model is not abstract. Does your INSTALLED_APPS '
                     'setting contain the app where MissingModel is defined?',
                 obj=Model.rel.field,
+                id='E030',
             )
         ]
         self.assertEqual(errors, expected)
@@ -251,6 +257,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                 'The field refers to TaggedItem.content_type field which is missing.',
                 hint=None,
                 obj=Bookmark.tags.field,
+                id='contenttypes.E005',
             )
         ]
         self.assertEqual(errors, expected)
@@ -270,6 +277,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                 'The field refers to TaggedItem.object_id field which is missing.',
                 hint=None,
                 obj=Bookmark.tags.field,
+                id='contenttypes.E003',
             )
         ]
         self.assertEqual(errors, expected)
@@ -290,6 +298,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                     'GenericForeignKey.',
                 hint=None,
                 obj=Bookmark.tags.field,
+                id='contenttypes.E004',
             )
         ]
         self.assertEqual(errors, expected)
@@ -318,6 +327,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                     'which has been swapped out.',
                 hint='Update the relation to point at settings.TEST_SWAPPED_MODEL',
                 obj=Model.rel.field,
+                id='E029',
             )
         ]
         self.assertEqual(errors, expected)
@@ -337,6 +347,7 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
                 'Field names must not end with underscores.',
                 hint=None,
                 obj=InvalidBookmark.tags_.field,
+                id='E001',
             )
         ]
         self.assertEqual(errors, expected)

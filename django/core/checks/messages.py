@@ -17,16 +17,17 @@ CRITICAL = 50
 @python_2_unicode_compatible
 class CheckMessage(object):
 
-    def __init__(self, level, msg, hint, obj=None):
+    def __init__(self, level, msg, hint, obj=None, id=None):
         assert isinstance(level, int), "The first argument should be level."
         self.level = level
         self.msg = msg
         self.hint = hint
         self.obj = obj
+        self.id = id
 
     def __eq__(self, other):
         return all(getattr(self, attr) == getattr(other, attr)
-                   for attr in ['level', 'msg', 'hint', 'obj'])
+                   for attr in ['level', 'msg', 'hint', 'obj', 'id'])
 
     def __ne__(self, other):
         return not (self == other)
@@ -44,12 +45,13 @@ class CheckMessage(object):
             obj = '%s.%s' % (app, model._meta.object_name)
         else:
             obj = force_str(self.obj)
+        id = "(%s) " % self.id if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ''
-        return "%s: %s%s" % (obj, self.msg, hint)
+        return "%s: %s%s%s" % (obj, id, self.msg, hint)
 
     def __repr__(self):
-        return "<%s: level=%r, msg=%r, hint=%r, obj=%r>" % \
-            (self.__class__.__name__, self.level, self.msg, self.hint, self.obj)
+        return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % \
+            (self.__class__.__name__, self.level, self.msg, self.hint, self.obj, self.id)
 
     def is_debug(self):
         return self.level == DEBUG
@@ -68,6 +70,10 @@ class CheckMessage(object):
 
     def is_serious(self):
         return self.level >= ERROR
+
+    def is_silenced(self):
+        from django.conf import settings
+        return self.id in settings.SILENCED_SYSTEM_CHECKS
 
 
 Debug = partial(CheckMessage, DEBUG)

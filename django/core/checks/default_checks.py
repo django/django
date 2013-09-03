@@ -41,6 +41,7 @@ def _check_test_runner(apps=None, **kwargs):
                 'for more information.',
                 hint=None,
                 obj=None,
+                id='W047',
             )
         ]
     else:
@@ -69,5 +70,6 @@ def _check_boolean_field_default_value(apps=None, **kwargs):
                 'for more information.',
             hint=None,
             obj=field,
+            id='W048',
         )
         for field in invalid_fields]

@@ -353,9 +353,9 @@ class BaseCommand(object):
 
         msg = ""
         if all_issues:
-            debugs = [e for e in all_issues if e.level < checks.INFO]
-            infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING]
-            warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR]
+            debugs = [e for e in all_issues if e.level < checks.INFO and not e.is_silenced()]
+            infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()]
+            warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR and not e.is_silenced()]
             errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL]
             criticals = [e for e in all_issues if checks.CRITICAL <= e.level]
             sorted_issues = [
@@ -387,7 +387,7 @@ class BaseCommand(object):
                 "%s issues" % len(all_issues)
             )
 
-        if any(e.is_serious() for e in all_issues):
+        if any(e.is_serious() and not e.is_silenced() for e in all_issues):
             raise CommandError(msg)
         elif msg and all_issues:
             self.stderr.write(msg)

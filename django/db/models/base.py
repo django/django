@@ -1042,6 +1042,7 @@ class Model(six.with_metaclass(ModelBase)):
                             % cls._meta.swappable,
                         hint=None,
                         obj=cls,
+                        id='E002',
                     )
                 )
             else:
@@ -1056,7 +1057,8 @@ class Model(six.with_metaclass(ModelBase)):
                                 'is not abstract. Does your INSTALLED_APPS '
                                 'setting contain the "%s" app?'
                                 % app_label,
-                            obj=cls
+                            obj=cls,
+                            id='E003',
                         )
                     )
         return errors
@@ -1108,6 +1110,7 @@ class Model(six.with_metaclass(ModelBase)):
                             % f.rel.through._meta.object_name,
                         hint=None,
                         obj=cls,
+                        id='E004',
                     )
                 )
             else:
@@ -1130,6 +1133,7 @@ class Model(six.with_metaclass(ModelBase)):
                     hint='Remove or rename "id" field '
                         'or add primary_key=True to a field.',
                     obj=cls,
+                    id='E005',
                 )
             ]
         else:
@@ -1169,6 +1173,7 @@ class Model(six.with_metaclass(ModelBase)):
                     '"index_together" must be a list or tuple.',
                     hint=None,
                     obj=cls,
+                    id='E006',
                 )
             ]
 
@@ -1179,6 +1184,7 @@ class Model(six.with_metaclass(ModelBase)):
                     'All "index_together" elements must be lists or tuples.',
                     hint=None,
                     obj=cls,
+                    id='E007',
                 )
             ]
 
@@ -1198,6 +1204,7 @@ class Model(six.with_metaclass(ModelBase)):
                     '"unique_together" must be a list or tuple.',
                     hint=None,
                     obj=cls,
+                    id='E008',
                 )
             ]
 
@@ -1208,6 +1215,7 @@ class Model(six.with_metaclass(ModelBase)):
                     'All "unique_together" elements must be lists or tuples.',
                     hint=None,
                     obj=cls,
+                    id='E009',
                 )
             ]
 
@@ -1232,7 +1240,8 @@ class Model(six.with_metaclass(ModelBase)):
                         '"%s" points to a missing field named "%s".'
                             % (option, field_name),
                         hint='Ensure that you did not misspell the field name.',
-                        obj=cls
+                        obj=cls,
+                        id='E010',
                     )
                 )
             else:
@@ -1243,7 +1252,8 @@ class Model(six.with_metaclass(ModelBase)):
                                 'ManyToManyFields are not supported in "%s".'
                                 % (option, field_name, option),
                             hint=None,
-                            obj=cls
+                            obj=cls,
+                            id='E011',
                         )
                     )
         return errors
@@ -1265,6 +1275,7 @@ class Model(six.with_metaclass(ModelBase)):
                         '(even if you want to order by only one field).',
                     hint=None,
                     obj=cls,
+                    id='E012',
                 )
             ]
 
@@ -1298,6 +1309,7 @@ class Model(six.with_metaclass(ModelBase)):
                         '"ordering" pointing to a missing "%s" field.' % field_name,
                         hint='Ensure that you did not misspell the field name.',
                         obj=cls,
+                        id='E013',
                     )
                 )
         return errors

@@ -705,6 +705,7 @@ class Field(object):
                     'Field names must not end with underscores.',
                     hint=None,
                     obj=self,
+                    id='E001',
                 )
             ]
         else:
@@ -719,6 +720,7 @@ class Field(object):
                         '"choices" must be an iterable (e.g., a list or tuple).',
                         hint=None,
                         obj=self,
+                        id='E033',
                     )
                 ]
             elif any(isinstance(choice, six.string_types) or
@@ -732,6 +734,7 @@ class Field(object):
                             'the human-readable name).',
                         hint=None,
                         obj=self,
+                        id='E034',
                     )
                 ]
             else:
@@ -745,7 +748,8 @@ class Field(object):
                 checks.Error(
                     '"db_index" must be either None, True or False.',
                     hint=None,
-                    obj=self
+                    obj=self,
+                    id='E035',
                 )
             ]
         else:
@@ -762,7 +766,8 @@ class Field(object):
                     'Primary keys must not have null=True.',
                     hint='Set null=False on the field or '
                         'remove primary_key=True argument.',
-                    obj=self
+                    obj=self,
+                    id='E036',
                 )
             ]
         else:
@@ -921,7 +926,8 @@ class BooleanField(Field):
                 checks.Error(
                     'BooleanFields do not acceps null values.',
                     hint='Use a NullBooleanField instead.',
-                    obj=self
+                    obj=self,
+                    id='E037',
                 )
             ]
         else:
@@ -971,6 +977,7 @@ class CharField(Field):
                     'The field must have "max_length" attribute.',
                     hint=None,
                     obj=self,
+                    id='E038',
                 )
             ]
         except ValueError:
@@ -979,6 +986,7 @@ class CharField(Field):
                     '"max_length" must be a positive integer.',
                     hint=None,
                     obj=self,
+                    id='E039',
                 )
             ]
         else:
@@ -1302,6 +1310,7 @@ class DecimalField(Field):
                     '"max_digits" must be greater or equal to "decimal_places".',
                     hint=None,
                     obj=self,
+                    id='E040',
                 )
             )
         return errors
@@ -1317,6 +1326,7 @@ class DecimalField(Field):
                     'The field requires a "decimal_places" attribute.',
                     hint=None,
                     obj=self,
+                    id='E041',
                 )
             ]
         except ValueError:
@@ -1325,6 +1335,7 @@ class DecimalField(Field):
                     '"decimal_places" attribute must be a non-negative integer.',
                     hint=None,
                     obj=self,
+                    id='E042',
                 )
             ]
         else:
@@ -1341,6 +1352,7 @@ class DecimalField(Field):
                     'The field requires a "max_digits" attribute.',
                     hint=None,
                     obj=self,
+                    id='E043',
                 )
             ]
         except ValueError:
@@ -1349,6 +1361,7 @@ class DecimalField(Field):
                     '"max_digits" attribute must be a positive integer.',
                     hint=None,
                     obj=self,
+                    id='E044',
                 )
             ]
         else:
@@ -1435,6 +1448,7 @@ class FilePathField(Field):
                     'The field must have either "allow_files" or "allow_folders" set to True.',
                     hint=None,
                     obj=self,
+                    id='E045',
                 )
             ]
         return []
@@ -1622,6 +1636,7 @@ class GenericIPAddressField(Field):
                         'are not allowed, as blank values are stored as null.',
                     hint=None,
                     obj=self,
+                    id='E046',
                 )
             ]
         return []
