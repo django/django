@@ -325,7 +325,8 @@ Session serialization
 Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
-known by an attacker, the attacker could insert a string into his session
+known by an attacker (there isn't an inherent vulnerability in Django that
+would cause it to leak), the attacker could insert a string into his session
 which, when unpickled, executes arbitrary code on the server. The technique for
 doing so is simple and easily available on the internet. Although the cookie
 session storage signs the cookie-stored data to prevent tampering, a
@@ -349,8 +350,21 @@ Bundled Serializers
 .. class:: serializers.JSONSerializer
 
     A wrapper around the JSON serializer from :mod:`django.core.signing`. Can
-    only serialize basic data types. See the :ref:`custom-serializers` section
-    for more details.
+    only serialize basic data types.
+
+    In addition, as JSON supports only string keys, note that using non-string
+    keys in ``request.session`` won't work as expected::
+
+        >>> # initial assignment
+        >>> request.session[0] = 'bar'
+        >>> # subsequent requests following serialization & deserialization
+        >>> # of session data
+        >>> request.session[0]  # KeyError
+        >>> request.session['0']
+        'bar'
+
+    See the :ref:`custom-serializers` section for more details on limitations
+    of JSON serialization.
 
 .. class:: serializers.PickleSerializer
 
