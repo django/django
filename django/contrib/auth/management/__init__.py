@@ -65,7 +65,7 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
     except UnavailableApp:
         return
 
-    if not router.allow_syncdb(db, auth_app.Permission):
+    if not router.allow_migrate(db, auth_app.Permission):
         return
 
     from django.contrib.contenttypes.models import ContentType
@@ -188,7 +188,7 @@ def get_default_username(check_db=True):
             return ''
     return default_username
 
-signals.post_syncdb.connect(create_permissions,
+signals.post_migrate.connect(create_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
-signals.post_syncdb.connect(create_superuser,
+signals.post_migrate.connect(create_superuser,
     sender=auth_app, dispatch_uid="django.contrib.auth.management.create_superuser")

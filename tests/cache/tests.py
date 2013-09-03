@@ -895,7 +895,7 @@ class DBCacheRouter(object):
         if model._meta.app_label == 'django_cache':
             return 'other'
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         if model._meta.app_label == 'django_cache':
             return db == 'other'
 

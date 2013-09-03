@@ -18,6 +18,7 @@ from django.db.backends import (util, BaseDatabaseFeatures,
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.models import fields
 from django.db.models.sql import aggregates
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
@@ -100,6 +101,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
+    supports_foreign_keys = False
+    supports_check_constraints = False
     autocommits_when_autocommit_is_off = True
     supports_paramstyle_pyformat = False
 
@@ -431,6 +434,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         savepoints when autocommit is disabled.
         """
         self.cursor().execute("BEGIN")
+
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 

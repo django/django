@@ -25,12 +25,17 @@ class DatabaseCreation(BaseDatabaseCreation):
         'GenericIPAddressField': 'inet',
         'NullBooleanField': 'boolean',
         'OneToOneField': 'integer',
-        'PositiveIntegerField': 'integer CHECK ("%(column)s" >= 0)',
-        'PositiveSmallIntegerField': 'smallint CHECK ("%(column)s" >= 0)',
+        'PositiveIntegerField': 'integer',
+        'PositiveSmallIntegerField': 'smallint',
         'SlugField': 'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
+    }
+
+    data_type_check_constraints = {
+        'PositiveIntegerField': '"%(column)s" >= 0',
+        'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
 
     def sql_table_creation_suffix(self):

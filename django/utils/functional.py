@@ -148,6 +148,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()

@@ -356,40 +356,36 @@ Management signals
 
 Signals sent by :doc:`django-admin </ref/django-admin>`.
 
-pre_syncdb
-----------
+pre_migrate
+-----------
 
-.. data:: django.db.models.signals.pre_syncdb
+.. data:: django.db.models.signals.pre_migrate
    :module:
 
-Sent by the :djadmin:`syncdb` command before it starts to install an
+Sent by the :djadmin:`migrate` command before it starts to install an
 application.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
 handlers are registered anywhere else they may not be loaded by
-:djadmin:`syncdb`.
+:djadmin:`migrate`.
 
 Arguments sent with this signal:
 
 ``sender``
-    The ``models`` module that was just installed. That is, if
-    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
-    ``sender`` will be the ``foo.bar.myapp.models`` module.
+    The ``models`` module of the app about to be migrated/synced.
+    For example, if :djadmin:`migrate` is about to install
+    an app called ``"foo.bar.myapp"``, ``sender`` will be the
+    ``foo.bar.myapp.models`` module.
 
 ``app``
     Same as ``sender``.
-
-``create_models``
-    A list of the model classes from any app which :djadmin:`syncdb` plans to
-    create.
-
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
     the :djadminopt:`--verbosity` flag for details.
 
-    Functions which listen for :data:`pre_syncdb` should adjust what they
+    Functions which listen for :data:`pre_migrate` should adjust what they
     output to the screen based on the value of this argument.
 
 ``interactive``
@@ -403,42 +399,55 @@ Arguments sent with this signal:
 ``db``
     The alias of database on which a command will operate.
 
-post_syncdb
------------
+pre_syncdb
+----------
 
-.. data:: django.db.models.signals.post_syncdb
+.. data:: django.db.models.signals.pre_syncdb
    :module:
 
-Sent by the :djadmin:`syncdb` command after it installs an application, and the
+.. deprecated:: 1.7
+
+    This signal has been renamed to :data:`~django.db.models.signals.pre_migrate`.
+
+Alias of :data:`django.db.models.signals.pre_migrate`. As long as this alias
+is present, for backwards-compatability this signal has an extra argument it sends:
+
+``create_models``
+    A list of the model classes from any app which :djadmin:`migrate` is
+    going to create, **only if the app has no migrations**.
+
+post_migrate
+------------
+
+.. data:: django.db.models.signals.post_migrate
+   :module:
+
+Sent by the :djadmin:`migrate` command after it installs an application, and the
 :djadmin:`flush` command.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
 handlers are registered anywhere else they may not be loaded by
-:djadmin:`syncdb`. It is important that handlers of this signal perform
+:djadmin:`migrate`. It is important that handlers of this signal perform
 idempotent changes (e.g. no database alterations) as this may cause the
 :djadmin:`flush` management command to fail if it also ran during the
-:djadmin:`syncdb` command.
+:djadmin:`migrate` command.
 
 Arguments sent with this signal:
 
 ``sender``
     The ``models`` module that was just installed. That is, if
-    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
+    :djadmin:`migrate` just installed an app called ``"foo.bar.myapp"``,
     ``sender`` will be the ``foo.bar.myapp.models`` module.
 
 ``app``
     Same as ``sender``.
 
-``created_models``
-    A list of the model classes from any app which :djadmin:`syncdb` has
-    created so far.
-
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
     the :djadminopt:`--verbosity` flag for details.
 
-    Functions which listen for :data:`post_syncdb` should adjust what they
+    Functions which listen for :data:`post_migrate` should adjust what they
     output to the screen based on the value of this argument.
 
 ``interactive``
@@ -455,14 +464,31 @@ Arguments sent with this signal:
 
 For example, ``yourapp/management/__init__.py`` could be written like::
 
-    from django.db.models.signals import post_syncdb
+    from django.db.models.signals import post_migrate
     import yourapp.models
 
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
 
-    post_syncdb.connect(my_callback, sender=yourapp.models)
+    post_migrate.connect(my_callback, sender=yourapp.models)
+
+post_syncdb
+-----------
+
+.. data:: django.db.models.signals.post_syncdb
+   :module:
+
+.. deprecated:: 1.7
+
+    This signal has been renamed to :data:`~django.db.models.signals.post_migrate`.
+
+Alias of :data:`django.db.models.signals.post_migrate`. As long as this alias
+is present, for backwards-compatability this signal has an extra argument it sends:
+
+``created_models``
+    A list of the model classes from any app which :djadmin:`migrate` has
+    created, **only if the app has no migrations**.
 
 Request/response signals
 ========================

@@ -933,7 +933,7 @@ class TestRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return obj1._state.db in ('default', 'other') and obj2._state.db in ('default', 'other')
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return True
 
 class AuthRouter(object):
@@ -960,7 +960,7 @@ class AuthRouter(object):
             return True
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         "Make sure the auth app only appears on the 'other' db"
         if db == 'other':
             return model._meta.app_label == 'auth'
@@ -1022,30 +1022,30 @@ class RouterTestCase(TestCase):
     def test_syncdb_selection(self):
         "Synchronization behavior is predictable"
 
-        self.assertTrue(router.allow_syncdb('default', User))
-        self.assertTrue(router.allow_syncdb('default', Book))
+        self.assertTrue(router.allow_migrate('default', User))
+        self.assertTrue(router.allow_migrate('default', Book))
 
-        self.assertTrue(router.allow_syncdb('other', User))
-        self.assertTrue(router.allow_syncdb('other', Book))
+        self.assertTrue(router.allow_migrate('other', User))
+        self.assertTrue(router.allow_migrate('other', Book))
 
         # Add the auth router to the chain.
         # TestRouter is a universal synchronizer, so it should have no effect.
         router.routers = [TestRouter(), AuthRouter()]
 
-        self.assertTrue(router.allow_syncdb('default', User))
-        self.assertTrue(router.allow_syncdb('default', Book))
+        self.assertTrue(router.allow_migrate('default', User))
+        self.assertTrue(router.allow_migrate('default', Book))
 
-        self.assertTrue(router.allow_syncdb('other', User))
-        self.assertTrue(router.allow_syncdb('other', Book))
+        self.assertTrue(router.allow_migrate('other', User))
+        self.assertTrue(router.allow_migrate('other', Book))
 
         # Now check what happens if the router order is the other way around
         router.routers = [AuthRouter(), TestRouter()]
 
-        self.assertFalse(router.allow_syncdb('default', User))
-        self.assertTrue(router.allow_syncdb('default', Book))
+        self.assertFalse(router.allow_migrate('default', User))
+        self.assertTrue(router.allow_migrate('default', Book))
 
-        self.assertTrue(router.allow_syncdb('other', User))
-        self.assertFalse(router.allow_syncdb('other', Book))
+        self.assertTrue(router.allow_migrate('other', User))
+        self.assertFalse(router.allow_migrate('other', Book))
 
     def test_partial_router(self):
         "A router can choose to implement a subset of methods"
@@ -1062,8 +1062,8 @@ class RouterTestCase(TestCase):
 
         self.assertTrue(router.allow_relation(dive, dive))
 
-        self.assertTrue(router.allow_syncdb('default', User))
-        self.assertTrue(router.allow_syncdb('default', Book))
+        self.assertTrue(router.allow_migrate('default', User))
+        self.assertTrue(router.allow_migrate('default', Book))
 
         router.routers = [WriteRouter(), AuthRouter(), TestRouter()]
 
@@ -1075,8 +1075,8 @@ class RouterTestCase(TestCase):
 
         self.assertTrue(router.allow_relation(dive, dive))
 
-        self.assertFalse(router.allow_syncdb('default', User))
-        self.assertTrue(router.allow_syncdb('default', Book))
+        self.assertFalse(router.allow_migrate('default', User))
+        self.assertTrue(router.allow_migrate('default', Book))
 
 
     def test_database_routing(self):
@@ -1607,12 +1607,12 @@ class AuthTestCase(TestCase):
         self.assertEqual(User.objects.using('other').count(), 1)
 
     def test_dumpdata(self):
-        "Check that dumpdata honors allow_syncdb restrictions on the router"
+        "Check that dumpdata honors allow_migrate restrictions on the router"
         User.objects.create_user('alice', 'alice@example.com')
         User.objects.db_manager('default').create_user('bob', 'bob@example.com')
 
         # Check that dumping the default database doesn't try to include auth
-        # because allow_syncdb prohibits auth on default
+        # because allow_migrate prohibits auth on default
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='default', stdout=new_io)
         command_output = new_io.getvalue().strip()
@@ -1625,10 +1625,10 @@ class AuthTestCase(TestCase):
         self.assertTrue('"email": "alice@example.com"' in command_output)
 
 class AntiPetRouter(object):
-    # A router that only expresses an opinion on syncdb,
+    # A router that only expresses an opinion on migrate,
     # passing pets to the 'other' database
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         "Make sure the auth app only appears on the 'other' db"
         if db == 'other':
             return model._meta.object_name == 'Pet'
@@ -1917,7 +1917,7 @@ class RouterModelArgumentTestCase(TestCase):
 
 
 class SyncOnlyDefaultDatabaseRouter(object):
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return db == DEFAULT_DB_ALIAS
 
 

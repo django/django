@@ -718,7 +718,7 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any pre-test setup. This includes:
 
         * If the class has an 'available_apps' attribute, restricting the app
-          cache to these applications, then firing post_syncdb -- it must run
+          cache to these applications, then firing post_migrate -- it must run
           with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
@@ -726,8 +726,7 @@ class TransactionTestCase(SimpleTestCase):
         if self.available_apps is not None:
             cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
-                flush.Command.emit_post_syncdb(
-                        verbosity=0, interactive=False, database=db_name)
+                flush.Command.emit_post_migrate(verbosity=0, interactive=False, database=db_name)
         try:
             self._fixture_setup()
         except Exception:
@@ -772,7 +771,7 @@ class TransactionTestCase(SimpleTestCase):
         """Performs any post-test things. This includes:
 
         * Flushing the contents of the database, to leave a clean slate. If
-          the class has an 'available_apps' attribute, post_syncdb isn't fired.
+          the class has an 'available_apps' attribute, post_migrate isn't fired.
         * Force-closing the connection, so the next test gets a clean cursor.
         """
         try:
@@ -790,14 +789,14 @@ class TransactionTestCase(SimpleTestCase):
             cache.unset_available_apps()
 
     def _fixture_teardown(self):
-        # Allow TRUNCATE ... CASCADE and don't emit the post_syncdb signal
+        # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, skip_validation=True,
                          reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_syncdb=self.available_apps is not None)
+                         inhibit_post_migrate=self.available_apps is not None)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
