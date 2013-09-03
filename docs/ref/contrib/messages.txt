@@ -382,6 +382,6 @@ behavior:
 For backends that use cookies, the settings for the cookie are taken from
 the session cookie settings:
 
-* :setting:`SESSION_COOKIE_DOMAIN`
-* :setting:`SESSION_COOKIE_SECURE`
-* :setting:`SESSION_COOKIE_HTTPONLY`
+* :setting:`SESSION_COOKIE-DOMAIN`
+* :setting:`SESSION_COOKIE-SECURE`
+* :setting:`SESSION_COOKIE-HTTPONLY`

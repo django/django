@@ -145,7 +145,7 @@ server, there are some additional steps you may need:
 
   If a browser connects initially via HTTP, which is the default for most
   browsers, it is possible for existing cookies to be leaked. For this reason,
-  you should set your :setting:`SESSION_COOKIE_SECURE` and
+  you should set your :setting:`SESSION_COOKIE-SECURE` and
   :setting:`CSRF_COOKIE_SECURE` settings to ``True``. This instructs the browser
   to only send these cookies over HTTPS connections. Note that this will mean
   that sessions will not work over HTTP, and the CSRF protection will prevent

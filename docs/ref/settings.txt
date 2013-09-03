@@ -369,7 +369,7 @@ Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
-See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+See :setting:`SESSION_COOKIE-HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE-NAME
 
@@ -442,7 +442,7 @@ Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
-See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+See :setting:`SESSION_COOKIE-HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -2397,8 +2397,8 @@ See :ref:`message storage backends <message-storage-backends>` for more details.
 The backends that use cookies --
 :class:`~django.contrib.messages.storage.cookie.CookieStorage` and
 :class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
-use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
-and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
+use the value of :setting:`SESSION_COOKIE-DOMAIN`, :setting:`SESSION_COOKIE-SECURE`
+and :setting:`SESSION_COOKIE-HTTPONLY` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 

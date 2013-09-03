@@ -151,8 +151,8 @@ Minor features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * The backends for :mod:`django.contrib.messages` that use cookies, will now
-  follow the :setting:`SESSION_COOKIE_SECURE` and
-  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+  follow the :setting:`SESSION_COOKIE-SECURE` and
+  :setting:`SESSION_COOKIE-HTTPONLY` settings.
 
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

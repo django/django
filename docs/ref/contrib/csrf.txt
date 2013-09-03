@@ -491,9 +491,9 @@ Settings
 
 A number of settings can be used to control Django's CSRF behavior:
 
-* :setting:`CSRF_COOKIE_DOMAIN`
-* :setting:`CSRF_COOKIE_HTTPONLY`
-* :setting:`CSRF_COOKIE_NAME`
-* :setting:`CSRF_COOKIE_PATH`
-* :setting:`CSRF_COOKIE_SECURE`
+* :setting:`CSRF_COOKIE-DOMAIN`
+* :setting:`CSRF_COOKIE-HTTPONLY`
+* :setting:`CSRF_COOKIE-NAME`
+* :setting:`CSRF_COOKIE-PATH`
+* :setting:`CSRF_COOKIE-SECURE`
 * :setting:`CSRF_FAILURE_VIEW`
