@@ -197,10 +197,7 @@ function MapWidget(options) {
         }
     }
 
-    this.map = new OpenLayers.Map(this.options.map_id, this.options.map_options);
-    if (this.options.base_layer) this.layers.base = this.options.base_layer;
-    else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
-    this.map.addLayer(this.layers.base);
+    this.map = this.create_map();
 
     var defaults_style = {
         'fillColor': '#' + this.options.color,
@@ -259,6 +256,14 @@ function MapWidget(options) {
         this.enableDrawing();
     }
 }
+
+MapWidget.prototype.create_map = function() {
+    var map = new OpenLayers.Map(this.options.map_id, this.options.map_options);
+    if (this.options.base_layer) this.layers.base = this.options.base_layer;
+    else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
+    map.addLayer(this.layers.base);
+    return map
+};
 
 MapWidget.prototype.get_ewkt = function(feat) {
     return "SRID=" + this.options.map_srid + ";" + this.wkt_f.write(feat);
