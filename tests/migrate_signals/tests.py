@@ -6,13 +6,13 @@ from django.utils import six
 from . import models
 
 
-PRE_SYNCDB_ARGS = ['app', 'create_models', 'verbosity', 'interactive', 'db']
-SYNCDB_DATABASE = 'default'
-SYNCDB_VERBOSITY = 1
-SYNCDB_INTERACTIVE = False
+PRE_MIGRATE_ARGS = ['app', 'create_models', 'verbosity', 'interactive', 'db']
+MIGRATE_DATABASE = 'default'
+MIGRATE_VERBOSITY = 1
+MIGRATE_INTERACTIVE = False
 
 
-class PreSyncdbReceiver(object):
+class PreMigrateReceiver(object):
     def __init__(self):
         self.call_counter = 0
         self.call_args = None
@@ -24,7 +24,7 @@ class PreSyncdbReceiver(object):
 
 class OneTimeReceiver(object):
     """
-    Special receiver for handle the fact that test runner calls syncdb for
+    Special receiver for handle the fact that test runner calls migrate for
     several databases and several times for some of them.
     """
 
@@ -33,13 +33,13 @@ class OneTimeReceiver(object):
         self.call_args = None
 
     def __call__(self, signal, sender, **kwargs):
-        # Although test runner calls syncdb for several databases,
+        # Although test runner calls migrate for several databases,
         # testing for only one of them is quite sufficient.
-        if kwargs['db'] == SYNCDB_DATABASE:
+        if kwargs['db'] == MIGRATE_DATABASE:
             self.call_counter = self.call_counter + 1
             self.call_args = kwargs
-            # we need to test only one call of syncdb
-            signals.pre_syncdb.disconnect(pre_syncdb_receiver, sender=models)
+            # we need to test only one call of migrate
+            signals.pre_migrate.disconnect(pre_migrate_receiver, sender=models)
 
 
 # We connect receiver here and not in unit test code because we need to
@@ -48,32 +48,32 @@ class OneTimeReceiver(object):
 #
 #   1. Test runner imports this module.
 #   2. We connect receiver.
-#   3. Test runner calls syncdb for create default database.
+#   3. Test runner calls migrate for create default database.
 #   4. Test runner execute our unit test code.
-pre_syncdb_receiver = OneTimeReceiver()
-signals.pre_syncdb.connect(pre_syncdb_receiver, sender=models)
+pre_migrate_receiver = OneTimeReceiver()
+signals.pre_migrate.connect(pre_migrate_receiver, sender=models)
 
 
-class SyncdbSignalTests(TestCase):
+class MigrateSignalTests(TestCase):
 
     available_apps = [
-        'syncdb_signals',
+        'migrate_signals',
     ]
 
-    def test_pre_syncdb_call_time(self):
-        self.assertEqual(pre_syncdb_receiver.call_counter, 1)
+    def test_pre_migrate_call_time(self):
+        self.assertEqual(pre_migrate_receiver.call_counter, 1)
 
-    def test_pre_syncdb_args(self):
-        r = PreSyncdbReceiver()
-        signals.pre_syncdb.connect(r, sender=models)
-        management.call_command('syncdb', database=SYNCDB_DATABASE,
-            verbosity=SYNCDB_VERBOSITY, interactive=SYNCDB_INTERACTIVE,
+    def test_pre_migrate_args(self):
+        r = PreMigrateReceiver()
+        signals.pre_migrate.connect(r, sender=models)
+        management.call_command('migrate', database=MIGRATE_DATABASE,
+            verbosity=MIGRATE_VERBOSITY, interactive=MIGRATE_INTERACTIVE,
             load_initial_data=False, stdout=six.StringIO())
 
         args = r.call_args
         self.assertEqual(r.call_counter, 1)
-        self.assertEqual(set(args), set(PRE_SYNCDB_ARGS))
+        self.assertEqual(set(args), set(PRE_MIGRATE_ARGS))
         self.assertEqual(args['app'], models)
-        self.assertEqual(args['verbosity'], SYNCDB_VERBOSITY)
-        self.assertEqual(args['interactive'], SYNCDB_INTERACTIVE)
+        self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
+        self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
         self.assertEqual(args['db'], 'default')
