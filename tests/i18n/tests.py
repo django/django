@@ -1195,7 +1195,7 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore()
         session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE['NAME']] = session.session_key
 
         # Clear the session data before request
         session.save()

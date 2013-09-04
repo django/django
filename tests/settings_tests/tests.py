@@ -368,6 +368,8 @@ class CookieSettingsDeprecationTests(TestCase):
     settings_module = settings
 
     def setUp(self):
+        # Make sure we don't leak a modified SESSION_COOKIE setting to other
+        # tests
         self._orig = dict(self.settings_module.SESSION_COOKIE)
 
     def tearDown(self):

@@ -107,8 +107,8 @@ _deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
     'CSRF_COOKIE_NAME', 'CSRF_COOKIE_DOMAIN', 'CSRF_COOKIE_SECURE',
     'CSRF_COOKIE_PATH', 'CSRF_COOKIE_HTTPONLY')
 
-def _handle_cookie_settings_deprecation(setting):
-    """Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9."""
+# Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9.
+def cookie_settings_deprecation_check(setting):
     if setting in _deprecated_cookie_settings:
         prefix, _, attrib = setting.split('_', 2)
         new = '%s_COOKIE' % prefix
@@ -117,6 +117,16 @@ def _handle_cookie_settings_deprecation(setting):
             PendingDeprecationWarning, stacklevel=3)
         return (new, attrib)
     return False
+
+# Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
+def port_cookie_setting(obj, old_setting, setting_value):
+    vals = cookie_settings_deprecation_check(old_setting)
+    if vals:
+        new_setting, cookie_attrib = vals
+        temp = getattr(obj, new_setting)
+        temp[cookie_attrib] = setting_value
+        setattr(obj, new_setting, temp)
+    return vals
 
 
 class BaseSettings(object):
@@ -137,7 +147,7 @@ class BaseSettings(object):
         object.__setattr__(self, name, value)
 
     #def __getattribute__(self, name):
-    #    _handle_cookie_settings_deprecation(name)
+    #    cookie_settings_deprecation_check(name)
     #    return super(BaseSettings, self).__getattribute__(name)
 
 
@@ -171,12 +181,7 @@ class Settings(BaseSettings):
                             "Please fix your settings." % setting)
 
                 # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
-                vals = _handle_cookie_settings_deprecation(setting)
-                if vals:
-                    new, attrib = vals
-                    temp = getattr(self, new)
-                    temp[attrib] = setting_value
-                    setattr(self, new, temp)
+                if port_cookie_setting(self, setting, setting_value):
                     continue
 
                 setattr(self, setting, setting_value)
@@ -220,15 +225,8 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-
         # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
-        vals = _handle_cookie_settings_deprecation(name)
-        if vals:
-            new, attrib = vals
-            temp = getattr(self, new)
-            temp[attrib] = value
-            setattr(self, new, temp)
-
+        port_cookie_setting(self, name, value)
         return super(UserSettingsHolder, self).__setattr__(name, value)
 
     def __delattr__(self, name):
