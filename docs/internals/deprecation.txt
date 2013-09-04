@@ -444,6 +444,8 @@ these changes.
 
 * ``ModelAdmin.declared_fieldsets`` will be removed.
 
+* ``ModelAdmin.get_formsets`` will be removed.
+
 2.0
 ---
 

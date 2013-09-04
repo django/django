@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import warnings
 
 from django.conf import settings
 from django.contrib import admin
@@ -277,7 +278,7 @@ class GenericInlineModelAdminTest(TestCase):
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['keywords', 'id', 'DELETE'])
 
     def test_custom_form_meta_exclude(self):
@@ -307,7 +308,7 @@ class GenericInlineModelAdminTest(TestCase):
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['url', 'keywords', 'id', 'DELETE'])
 
         # Then, only with `ModelForm`  -----------------
@@ -323,7 +324,7 @@ class GenericInlineModelAdminTest(TestCase):
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['description', 'keywords', 'id', 'DELETE'])
 
     def test_get_fieldsets(self):
@@ -345,3 +346,89 @@ class GenericInlineModelAdminTest(TestCase):
         ma = MediaInline(Media, self.site)
         form = ma.get_formset(None).form
         self.assertEqual(form._meta.fields, ['url', 'description'])
+
+    def test_get_formsets_with_inlines(self):
+        """
+        get_formsets() triggers a deprecation warning when get_formsets is
+        overridden.
+        """
+        class MediaForm(ModelForm):
+            class Meta:
+                model = Media
+                exclude = ['url']
+
+        class MediaInline(GenericTabularInline):
+            exclude = ['description']
+            form = MediaForm
+            model = Media
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                MediaInline
+            ]
+
+            def get_formsets(self, request, obj=None):
+                return []
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            ma = EpisodeAdmin(Episode, self.site)
+            list(ma.get_formsets_with_inlines(request))
+            # Verify that the deprecation warning was triggered when get_formsets was called
+            # This verifies that we called that method.
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                MediaInline
+            ]
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            ma = EpisodeAdmin(Episode, self.site)
+            list(ma.get_formsets_with_inlines(request))
+            self.assertEqual(len(w), 0)
+
+    def test_get_formsets_with_inlines_returns_tuples(self):
+        """
+        Ensure that get_formsets_with_inlines() returns the correct tuples.
+        """
+        class MediaForm(ModelForm):
+            class Meta:
+                model = Media
+                exclude = ['url']
+
+        class MediaInline(GenericTabularInline):
+            form = MediaForm
+            model = Media
+
+        class AlternateInline(GenericTabularInline):
+            form = MediaForm
+            model = Media
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                AlternateInline, MediaInline
+            ]
+        ma = EpisodeAdmin(Episode, self.site)
+        inlines = ma.get_inline_instances(request)
+        for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
+            self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
+
+        class EpisodeAdmin(admin.ModelAdmin):
+            inlines = [
+                AlternateInline, MediaInline
+            ]
+
+            def get_formsets(self, request, obj=None):
+                # Catch the deprecation warning to force the usage of get_formsets
+                with warnings.catch_warnings(record=True) as w:
+                    warnings.simplefilter("always")
+                    return super(EpisodeAdmin, self).get_formsets(request, obj)
+
+        ma = EpisodeAdmin(Episode, self.site)
+        inlines = ma.get_inline_instances(request)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
+                self.assertIsInstance(formset, other_inline.get_formset(request).__class__)

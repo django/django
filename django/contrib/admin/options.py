@@ -602,9 +602,47 @@ class ModelAdmin(BaseModelAdmin):
             self.get_changelist_form(request), extra=0,
             fields=self.list_editable, **defaults)
 
-    def get_formsets(self, request, obj=None):
+    def _get_formsets(self, request, obj):
+        """
+        Helper function that exists to allow the deprecation warning to be
+        executed while this function continues to return a generator.
+        """
         for inline in self.get_inline_instances(request, obj):
             yield inline.get_formset(request, obj)
+
+    def get_formsets(self, request, obj=None):
+        warnings.warn(
+            "ModelAdmin.get_formsets() is deprecated and will be removed in "
+            "Django 1.9. Use ModelAdmin.get_formsets_with_inlines() instead.",
+            PendingDeprecationWarning, stacklevel=2
+        )
+        return self._get_formsets(request, obj)
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        """
+        Yields formsets and the corresponding inlines.
+        """
+        # We call get_formsets() [deprecated] and check if it triggers a
+        # warning. If it does, then it's ours and we can safely ignore it, but
+        # if it doesn't then it has been overridden so we must warn about the
+        # deprecation.
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            formsets = self.get_formsets(request, obj)
+
+        if len(w) != 1 or not issubclass(w[0].category, PendingDeprecationWarning):
+            warnings.warn(
+                "ModelAdmin.get_formsets() is deprecated and will be removed in "
+                "Django 1.9. Use ModelAdmin.get_formsets_with_inlines() instead.",
+                PendingDeprecationWarning
+            )
+            if formsets:
+                zipped = zip(formsets, self.get_inline_instances(request, None))
+                for formset, inline in zipped:
+                    yield formset, inline
+        else:
+            for inline in self.get_inline_instances(request, obj):
+                yield inline.get_formset(request, obj), inline
 
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
         return self.paginator(queryset, per_page, orphans, allow_empty_first_page)
@@ -1185,8 +1223,6 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         ModelForm = self.get_form(request)
-        formsets = []
-        inline_instances = self.get_inline_instances(request, None)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             if form.is_valid():
@@ -1195,7 +1231,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form_validated = False
                 new_object = self.model()
-            formsets = self._create_formsets(request, new_object, inline_instances)
+            formsets, inline_instances = self._create_formsets(request, new_object)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, False)
                 self.save_related(request, form, formsets, False)
@@ -1213,7 +1249,7 @@ class ModelAdmin(BaseModelAdmin):
                 if isinstance(f, models.ManyToManyField):
                     initial[k] = initial[k].split(",")
             form = ModelForm(initial=initial)
-            formsets = self._create_formsets(request, self.model(), inline_instances)
+            formsets, inline_instances = self._create_formsets(request, self.model())
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
             self.get_prepopulated_fields(request),
@@ -1266,7 +1302,6 @@ class ModelAdmin(BaseModelAdmin):
                                     current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
-        inline_instances = self.get_inline_instances(request, obj)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
@@ -1275,7 +1310,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 form_validated = False
                 new_object = obj
-            formsets = self._create_formsets(request, new_object, inline_instances)
+            formsets, inline_instances = self._create_formsets(request, new_object)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, True)
                 self.save_related(request, form, formsets, True)
@@ -1285,7 +1320,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             form = ModelForm(instance=obj)
-            formsets = self._create_formsets(request, obj, inline_instances)
+            formsets, inline_instances = self._create_formsets(request, obj)
 
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
             self.get_prepopulated_fields(request, obj),
@@ -1566,14 +1601,15 @@ class ModelAdmin(BaseModelAdmin):
             "admin/object_history.html"
         ], context, current_app=self.admin_site.name)
 
-    def _create_formsets(self, request, obj, inline_instances):
+    def _create_formsets(self, request, obj):
         "Helper function to generate formsets for add/change_view."
         formsets = []
+        inline_instances = []
         prefixes = {}
         get_formsets_args = [request]
         if obj.pk:
             get_formsets_args.append(obj)
-        for FormSet, inline in zip(self.get_formsets(*get_formsets_args), inline_instances):
+        for FormSet, inline in self.get_formsets_with_inlines(*get_formsets_args):
             prefix = FormSet.get_default_prefix()
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
@@ -1590,7 +1626,8 @@ class ModelAdmin(BaseModelAdmin):
                     'save_as_new': '_saveasnew' in request.POST
                 })
             formsets.append(FormSet(**formset_params))
-        return formsets
+            inline_instances.append(inline)
+        return formsets, inline_instances
 
 
 class InlineModelAdmin(BaseModelAdmin):

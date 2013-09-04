@@ -207,7 +207,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'id', 'DELETE'])
 
     def test_custom_form_meta_exclude(self):
@@ -253,7 +253,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'day', 'id', 'DELETE'])
 
     def test_custom_form_validation(self):
@@ -327,7 +327,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'day', 'transport', 'id', 'DELETE'])
 
     def test_queryset_override(self):
@@ -521,7 +521,7 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(
-            list(list(ma.get_formsets(request))[0]().forms[0].fields),
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['extra', 'transport', 'id', 'DELETE', 'main_band'])
 
 
