@@ -369,6 +369,9 @@ normal field object, these examples will *not* work::
     # This will also fail
     >>> TaggedItem.objects.get(content_object=guido)
 
+Likewise, :class:`~django.contrib.contenttypes.generic.GenericForeignKey`\s
+does not appear in :class:`~django.forms.ModelForm`\s.
+
 Reverse generic relations
 -------------------------
 
