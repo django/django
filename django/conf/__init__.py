@@ -118,6 +118,7 @@ def _handle_cookie_settings_deprecation(setting):
         return (new, attrib)
     return False
 
+
 class BaseSettings(object):
     """
     Common logic for settings whether set by a module or by the user.
@@ -135,9 +136,9 @@ class BaseSettings(object):
 
         object.__setattr__(self, name, value)
 
-    def __getattribute__(self, name):
-        _handle_cookie_settings_deprecation(name)
-        return super(BaseSettings, self).__getattribute__(name)
+    #def __getattribute__(self, name):
+    #    _handle_cookie_settings_deprecation(name)
+    #    return super(BaseSettings, self).__getattribute__(name)
 
 
 class Settings(BaseSettings):
@@ -219,6 +220,15 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+
+        # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
+        vals = _handle_cookie_settings_deprecation(name)
+        if vals:
+            new, attrib = vals
+            temp = getattr(self, new)
+            temp[attrib] = value
+            setattr(self, new, temp)
+
         return super(UserSettingsHolder, self).__setattr__(name, value)
 
     def __delattr__(self, name):
