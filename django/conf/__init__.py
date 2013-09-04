@@ -112,7 +112,7 @@ def _handle_cookie_settings_deprecation(setting):
     if setting in _deprecated_cookie_settings:
         prefix, _, attrib = setting.split('_', 2)
         new = '%s_COOKIE' % prefix
-        warnings.warn("The %(old)s setting is deprecated. Use %(new)s instead."
+        warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
                       % {'old': setting, 'new': new},
             PendingDeprecationWarning, stacklevel=3)
         return (new, attrib)

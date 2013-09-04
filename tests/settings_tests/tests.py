@@ -359,3 +359,32 @@ class SecureProxySslHeaderTest(TestCase):
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)
+
+
+class CookieSettingsDeprecationTests(TestCase):
+    """
+    Tests for proper warnings when using deprecated cookie settings.
+    """
+    settings_module = settings
+
+    def test_old_settings_spec(self):
+        with warnings.catch_warnings(record=True) as w:
+            # simulate -Wall
+            warnings.simplefilter("always")
+            # simulate user settings module with a custom value for SESSION_COOKIE_AGE
+            with self.settings(SESSION_COOKIE_AGE=3600):
+                pass
+            # verify that PendingDeprecationWarning has been raised
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+
+    def test_old_settings_read(self):
+        # Again, this time reading the setting
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            with self.settings(SESSION_COOKIE_AGE=3600):
+                # Verify value of the effective setting
+                self.assertEqual(3600, settings.SESSION_COOKIE_AGE)
+                self.assertEqual(3600, settings.SESSION_COOKIE['AGE'])
+            self.assertEqual(len(w), 2)
+            self.assertTrue(issubclass(w[1].category, PendingDeprecationWarning))
