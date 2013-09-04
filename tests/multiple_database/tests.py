@@ -1019,7 +1019,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.db_manager('default').db, 'default')
         self.assertEqual(Book.objects.db_manager('default').all().db, 'default')
 
-    def test_syncdb_selection(self):
+    def test_migrate_selection(self):
         "Synchronization behavior is predictable"
 
         self.assertTrue(router.allow_migrate('default', User))
@@ -1921,7 +1921,7 @@ class SyncOnlyDefaultDatabaseRouter(object):
         return db == DEFAULT_DB_ALIAS
 
 
-class SyncDBTestCase(TestCase):
+class MigrateTestCase(TestCase):
 
     available_apps  = [
         'multiple_database',
@@ -1930,27 +1930,27 @@ class SyncDBTestCase(TestCase):
     ]
     multi_db = True
 
-    def test_syncdb_to_other_database(self):
-        """Regression test for #16039: syncdb with --database option."""
+    def test_migrate_to_other_database(self):
+        """Regression test for #16039: migrate with --database option."""
         cts = ContentType.objects.using('other').filter(app_label='multiple_database')
 
         count = cts.count()
         self.assertGreater(count, 0)
 
         cts.delete()
-        management.call_command('syncdb', verbosity=0, interactive=False,
+        management.call_command('migrate', verbosity=0, interactive=False,
             load_initial_data=False, database='other')
         self.assertEqual(cts.count(), count)
 
-    def test_syncdb_to_other_database_with_router(self):
-        """Regression test for #16039: syncdb with --database option."""
+    def test_migrate_to_other_database_with_router(self):
+        """Regression test for #16039: migrate with --database option."""
         cts = ContentType.objects.using('other').filter(app_label='multiple_database')
 
         cts.delete()
         try:
             old_routers = router.routers
             router.routers = [SyncOnlyDefaultDatabaseRouter()]
-            management.call_command('syncdb', verbosity=0, interactive=False,
+            management.call_command('migrate', verbosity=0, interactive=False,
                 load_initial_data=False, database='other')
         finally:
             router.routers = old_routers

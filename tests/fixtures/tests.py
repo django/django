@@ -48,7 +48,7 @@ class DumpDataAssertMixin(object):
 class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_initial_data(self):
-        # syncdb introduces 1 initial data object from initial_data.json.
+        # migrate introduces 1 initial data object from initial_data.json.
         self.assertQuerysetEqual(Book.objects.all(), [
             '<Book: Achieving self-awareness of Python programs>'
         ])

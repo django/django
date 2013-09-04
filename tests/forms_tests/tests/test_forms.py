@@ -1173,9 +1173,9 @@ class FormsTestCase(TestCase):
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
         # then the latter will get precedence.
         class UserRegistration(Form):
-           username = CharField(max_length=10, initial=initial_django)
-           password = CharField(widget=PasswordInput)
-           options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
+            username = CharField(max_length=10, initial=initial_django)
+            password = CharField(widget=PasswordInput)
+            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>

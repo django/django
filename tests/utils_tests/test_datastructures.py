@@ -6,13 +6,15 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(SimpleTestCase):
+class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
+        super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
         self.d1[7] = 'seven'
         self.d1[1] = 'one'

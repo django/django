@@ -355,7 +355,7 @@ class ObjectC(models.Model):
     objectb = models.ForeignKey(ObjectB)
 
     def __str__(self):
-       return self.name
+        return self.name
 
 @python_2_unicode_compatible
 class SimpleCategory(models.Model):

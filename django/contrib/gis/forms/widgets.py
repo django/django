@@ -39,7 +39,7 @@ class BaseGeometryWidget(Widget):
 
     def deserialize(self, value):
         try:
-            return GEOSGeometry(value)
+            return GEOSGeometry(value, self.map_srid)
         except (GEOSException, ValueError) as err:
             logger.error(
                 "Error creating geometry from value '%s' (%s)" % (
@@ -111,5 +111,10 @@ class OSMWidget(BaseGeometryWidget):
             return 900913
 
     def render(self, name, value, attrs=None):
-        return super(self, OSMWidget).render(name, value,
-            {'default_lon': self.default_lon, 'default_lat': self.default_lat})
+        default_attrs = {
+            'default_lon': self.default_lon,
+            'default_lat': self.default_lat,
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        return super(OSMWidget, self).render(name, value, default_attrs)

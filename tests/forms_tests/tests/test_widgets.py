@@ -639,8 +639,8 @@ beatle J R Ringo False""")
 
         # You can create your own custom renderers for RadioSelect to use.
         class MyRenderer(RadioFieldRenderer):
-           def render(self):
-               return '<br />\n'.join(six.text_type(choice) for choice in self)
+            def render(self):
+                return '<br />\n'.join(six.text_type(choice) for choice in self)
         w = RadioSelect(renderer=MyRenderer)
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
@@ -649,7 +649,7 @@ beatle J R Ringo False""")
 
         # Or you can use custom RadioSelect fields that use your custom renderer.
         class CustomRadioSelect(RadioSelect):
-           renderer = MyRenderer
+            renderer = MyRenderer
         w = CustomRadioSelect()
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />

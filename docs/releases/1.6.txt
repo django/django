@@ -745,7 +745,8 @@ Default session serialization switched to JSON
 Historically, :mod:`django.contrib.sessions` used :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
-known by an attacker, the attacker could insert a string into his session
+known by an attacker (there isn't an inherent vulnerability in Django that
+would cause it to leak), the attacker could insert a string into his session
 which, when unpickled, executes arbitrary code on the server. The technique for
 doing so is simple and easily available on the internet. Although the cookie
 session storage signs the cookie-stored data to prevent tampering, a
@@ -759,7 +760,9 @@ For backwards compatibility, this setting defaulted to using :mod:`pickle`
 in Django 1.5.3, but we've changed the default to JSON in 1.6. If you upgrade
 and switch from pickle to JSON, sessions created before the upgrade will be
 lost. While JSON serialization does not support all Python objects like
-:mod:`pickle` does, we highly recommend using JSON-serialized sessions. See the
+:mod:`pickle` does, we highly recommend using JSON-serialized sessions. Also,
+as JSON requires string keys, you will likely run into problems if you are
+using non-string keys in ``request.session``. See the
 :ref:`session_serialization` documentation for more details.
 
 Miscellaneous
