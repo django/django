@@ -622,34 +622,17 @@ class FilterExpression(object):
 
     def args_check(name, func, provided):
         provided = list(provided)
-        plen = len(provided)
+        # First argument, filter input, is implied.
+        plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
         func = getattr(func, '_decorated_function', func)
         args, varargs, varkw, defaults = getargspec(func)
-        # First argument is filter input.
-        args.pop(0)
-        if defaults:
-            nondefs = args[:-len(defaults)]
-        else:
-            nondefs = args
-        # Args without defaults must be provided.
-        try:
-            for arg in nondefs:
-                provided.pop(0)
-        except IndexError:
-            # Not enough
+        alen = len(args)
+        dlen = len(defaults or [])
+        # Not enough OR Too many
+        if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, len(nondefs), plen))
-
-        # Defaults can be overridden.
-        defaults = list(defaults) if defaults else []
-        try:
-            for parg in provided:
-                defaults.pop(0)
-        except IndexError:
-            # Too many.
-            raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, len(nondefs), plen))
+                                      (name, alen - dlen, plen))
 
         return True
     args_check = staticmethod(args_check)
