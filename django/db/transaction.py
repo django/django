@@ -289,7 +289,7 @@ class Atomic(object):
             connection.in_atomic_block = False
 
         try:
-            if exc_value is None and not connection.needs_rollback:
+            if exc_type is None and not connection.needs_rollback:
                 if connection.in_atomic_block:
                     # Release savepoint if there is one
                     if sid is not None:
@@ -389,7 +389,7 @@ class Transaction(object):
         self.entering(self.using)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.exiting(exc_value, self.using)
+        self.exiting(exc_type, self.using)
 
     def __call__(self, func):
         @wraps(func)
@@ -431,7 +431,7 @@ def autocommit(using=None):
     def entering(using):
         enter_transaction_management(managed=False, using=using)
 
-    def exiting(exc_value, using):
+    def exiting(exc_type, using):
         leave_transaction_management(using=using)
 
     return _transaction_func(entering, exiting, using)
@@ -449,9 +449,9 @@ def commit_on_success(using=None):
     def entering(using):
         enter_transaction_management(using=using)
 
-    def exiting(exc_value, using):
+    def exiting(exc_type, using):
         try:
-            if exc_value is not None:
+            if exc_type is not None:
                 if is_dirty(using=using):
                     rollback(using=using)
             else:
@@ -479,7 +479,7 @@ def commit_manually(using=None):
     def entering(using):
         enter_transaction_management(using=using)
 
-    def exiting(exc_value, using):
+    def exiting(exc_type, using):
         leave_transaction_management(using=using)
 
     return _transaction_func(entering, exiting, using)
@@ -502,7 +502,7 @@ def commit_on_success_unless_managed(using=None, savepoint=False):
         def entering(using):
             pass
 
-        def exiting(exc_value, using):
+        def exiting(exc_type, using):
             set_dirty(using=using)
 
         return _transaction_func(entering, exiting, using)
