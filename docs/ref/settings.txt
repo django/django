@@ -2469,7 +2469,7 @@ Default::
         'SECURE': False
     }
 
-The following sub-sections desscribe the available keys.
+The following sub-sections describe the available keys.
 
 .. setting:: SESSION_COOKIE-AGE
 
