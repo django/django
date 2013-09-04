@@ -50,7 +50,7 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
     sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(columns)s) REFERENCES %(to_table)s (%(to_columns)s) DEFERRABLE INITIALLY DEFERRED"
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s;"
@@ -172,42 +172,45 @@ class BaseDatabaseSchemaEditor(object):
         # Create column SQL, add FK deferreds if needed
         column_sqls = []
         params = []
+        virtual_uniques = []
         for field in model._meta.local_fields:
             # SQL
             definition, extra_params = self.column_sql(model, field)
-            if definition is None:
-                continue
-            # Check constraints can go on the column SQL here
-            db_params = field.db_parameters(connection=self.connection)
-            if db_params['check']:
-                definition += " CHECK (%s)" % db_params['check']
-            # Add the SQL to our big list
-            column_sqls.append("%s %s" % (
-                self.quote_name(field.column),
-                definition,
-            ))
-            params.extend(extra_params)
+            if definition is not None:
+                # Check constraints can go on the column SQL here
+                db_params = field.db_parameters(connection=self.connection)
+                if db_params['check']:
+                    definition += " CHECK (%s)" % db_params['check']
+                # Add the SQL to our big list
+                column_sqls.append("%s %s" % (
+                    self.quote_name(field.column),
+                    definition,
+                ))
+                params.extend(extra_params)
             # Indexes
+            basic_fields = field.resolve_basic_fields()
             if field.db_index and not field.unique:
                 self.deferred_sql.append(
                     self.sql_create_index % {
-                        "name": self._create_index_name(model, [field.column], suffix=""),
+                        "name": self._create_index_name(model, [f.column for f in basic_fields], suffix=""),
                         "table": self.quote_name(model._meta.db_table),
-                        "columns": self.quote_name(field.column),
+                        "columns": "".join(self.quote_name(f.column) for f in basic_fields),
                         "extra": "",
                     }
                 )
             # FK
             if field.rel and self.connection.features.supports_foreign_keys:
                 to_table = field.rel.to._meta.db_table
-                to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+                to_fields = field.rel.to._meta.get_field(field.rel.field_name).resolve_basic_fields()
+                to_columns = [f.column for f in to_fields]
+                from_columns = [f.column for f in basic_fields]
                 self.deferred_sql.append(
                     self.sql_create_fk % {
-                        "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
+                        "name": self._create_index_name(model, from_columns, suffix="_fk_%s_%s" % (to_table, '_'.join(to_columns))),
                         "table": self.quote_name(model._meta.db_table),
-                        "column": self.quote_name(field.column),
+                        "columns": ", ".join(self.quote_name(col) for col in from_columns),
                         "to_table": self.quote_name(to_table),
-                        "to_column": self.quote_name(to_column),
+                        "to_columns": ", ".join(self.quote_name(col) for col in to_columns),
                     }
                 )
             # Autoincrement SQL
@@ -217,7 +220,8 @@ class BaseDatabaseSchemaEditor(object):
                     self.deferred_sql.extend(autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [basic.column for field in fields
+                       for basic in model._meta.get_field_by_name(field)[0].resolve_basic_fields()]
             column_sqls.append(self.sql_create_table_unique % {
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
@@ -229,7 +233,8 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Add any index_togethers
         for fields in model._meta.index_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [basic.column for field in fields
+                       for basic in model._meta.get_field_by_name(field)[0].resolve_basic_fields()]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -347,54 +352,52 @@ class BaseDatabaseSchemaEditor(object):
         # Get the column's definition
         definition, params = self.column_sql(model, field, include_default=True)
         # It might not actually have a column behind it
-        if definition is None:
-            return
-        # Check constraints can go on the column SQL here
-        db_params = field.db_parameters(connection=self.connection)
-        if db_params['check']:
-            definition += " CHECK (%s)" % db_params['check']
-        # Build the SQL and run it
-        sql = self.sql_create_column % {
-            "table": self.quote_name(model._meta.db_table),
-            "column": self.quote_name(field.column),
-            "definition": definition,
-        }
-        self.execute(sql, params)
-        # Drop the default if we need to
-        # (Django usually does not use in-database defaults)
-        if field.default is not None:
-            sql = self.sql_alter_column % {
+        if definition is not None:
+            # Check constraints can go on the column SQL here
+            db_params = field.db_parameters(connection=self.connection)
+            if db_params['check']:
+                definition += " CHECK (%s)" % db_params['check']
+            # Build the SQL and run it
+            sql = self.sql_create_column % {
                 "table": self.quote_name(model._meta.db_table),
-                "changes": self.sql_alter_column_no_default % {
-                    "column": self.quote_name(field.column),
-                }
+                "column": self.quote_name(field.column),
+                "definition": definition,
             }
-            self.execute(sql)
+            self.execute(sql, params)
+            # Drop the default if we need to
+            # (Django usually does not use in-database defaults)
+            if field.default is not None:
+                sql = self.sql_alter_column % {
+                    "table": self.quote_name(model._meta.db_table),
+                    "changes": self.sql_alter_column_no_default % {
+                        "column": self.quote_name(field.column),
+                    }
+                }
+                self.execute(sql)
         # Add an index, if required
+        basic_fields = field.resolve_basic_fields()
         if field.db_index and not field.unique:
             self.deferred_sql.append(
                 self.sql_create_index % {
-                    "name": self._create_index_name(model, [field.column], suffix=""),
+                    "name": self._create_index_name(model, [f.column for f in basic_fields], suffix=""),
                     "table": self.quote_name(model._meta.db_table),
-                    "columns": self.quote_name(field.column),
+                    "columns": ", ".join(self.quote_name(f.column) for f in basic_fields),
                     "extra": "",
                 }
             )
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys:
             to_table = field.rel.to._meta.db_table
-            to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+            to_fields = field.rel.to._meta.get_field(field.rel.field_name).resolve_basic_fields()
+            to_columns = [f.column for f in to_fields]
+            from_columns = [f.column for f in basic_fields]
             self.deferred_sql.append(
                 self.sql_create_fk % {
-                    "name": '%s_refs_%s_%x' % (
-                        field.column,
-                        to_column,
-                        abs(hash((model._meta.db_table, to_table)))
-                    ),
+                    "name": self._create_index_name(model, from_columns, suffix="_fk_%s_%s" % (to_table, '_'.join(to_columns))),
                     "table": self.quote_name(model._meta.db_table),
-                    "column": self.quote_name(field.column),
+                    "columns": ", ".join(self.quote_name(col) for col in from_columns),
                     "to_table": self.quote_name(to_table),
-                    "to_column": self.quote_name(to_column),
+                    "to_columns": ", ".join(self.quote_name(col) for col in to_columns),
                 }
             )
         # Reset connection if required
@@ -432,11 +435,13 @@ class BaseDatabaseSchemaEditor(object):
         changes that are required.
         If strict is true, raises errors if the old column does not match old_field precisely.
         """
+        # TODO: detect changes in enclosed columns for virtual fields
         # Ensure this field is even column-based
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
+        basic_fields = field.resolve_basic_fields()
         if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
@@ -480,7 +485,7 @@ class BaseDatabaseSchemaEditor(object):
                 )
         # Drop any FK constraints, we'll remake them later
         if old_field.rel:
-            fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
+            fk_names = self._constraint_names(model, [f.column for f in old_field.resolve_basic_fields()], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
                     len(fk_names),
@@ -638,14 +643,18 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel:
+        if new_field.rel and self.connection.features.supports_foreign_keys:
+            to_table = field.rel.to._meta.db_table
+            to_fields = field.rel.to._meta.get_field(field.rel.field_name).resolve_basic_fields()
+            to_columns = [f.column for f in to_fields]
+            from_columns = [f.column for f in basic_fields]
             self.execute(
                 self.sql_create_fk % {
+                    "name": self._create_index_name(model, from_columns, suffix="_fk_%s_%s" % (to_table, '_'.join(to_columns))),
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_fk"),
-                    "column": self.quote_name(new_field.column),
-                    "to_table": self.quote_name(new_field.rel.to._meta.db_table),
-                    "to_column": self.quote_name(new_field.rel.get_related_field().column),
+                    "columns": ", ".join(self.quote_name(col) for col in from_columns),
+                    "to_table": self.quote_name(to_table),
+                    "to_columns": ", ".join(self.quote_name(col) for col in to_columns),
                 }
             )
         # Does it have check constraints we need to add?
