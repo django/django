@@ -466,13 +466,13 @@ than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 will search ``myapp/sql/`` as documented. The old location will continue to
 work until Django 1.9.
 
-``declared_fieldsets`` attribute on ``ModelAdmin.``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``declared_fieldsets`` attribute on ``ModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``ModelAdmin.declared_fieldsets`` was deprecated. Despite being a private API,
-it will go through a regular deprecation path. This attribute was mostly used
-by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
-a bug and has been addressed.
+``ModelAdmin.declared_fieldsets`` has been deprecated. Despite being a private
+API, it will go through a regular deprecation path. This attribute was mostly
+used by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was
+considered a bug and has been addressed.
 
 ``syncdb``
 ~~~~~~~~~~
@@ -491,3 +491,10 @@ to ``utils.py`` in an effort to unify all util and utils references:
 * ``django.contrib.gis.db.backends.util``
 * ``django.db.backends.util``
 * ``django.forms.util``
+
+``get_formsets`` method on ``ModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.get_formsets`` has been deprecated in favor of the new
+:meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
+better handle the case of selecting showing inlines on a ``ModelAdmin``.

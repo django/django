@@ -454,7 +454,7 @@ subclass::
 .. attribute:: ModelAdmin.inlines
 
     See :class:`InlineModelAdmin` objects below as well as
-    :meth:`ModelAdmin.get_formsets`.
+    :meth:`ModelAdmin.get_formsets_with_inlines`.
 
 .. attribute:: ModelAdmin.list_display
 
@@ -1365,7 +1365,10 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_formsets(self, request, obj=None)
 
-    Yields :class:`InlineModelAdmin`\s for use in admin add and change views.
+    .. deprecated:: 1.7
+        Use :meth:`get_formsets_with_inlines()` instead.
+
+    Yields  :class:`InlineModelAdmin`\s for use in admin add and change views.
 
     For example if you wanted to display a particular inline only in the change
     view, you could override ``get_formsets`` as follows::
@@ -1379,6 +1382,24 @@ templates used by the :class:`ModelAdmin` views:
                     if isinstance(inline, MyInline) and obj is None:
                         continue
                     yield inline.get_formset(request, obj)
+
+.. method:: ModelAdmin.get_formsets_with_inlines(self, request, obj=None)
+
+    Yields (``FormSet``, :class:`InlineModelAdmin`) pairs for use in admin add
+    and change views.
+
+    For example if you wanted to display a particular inline only in the change
+    view, you could override ``get_formsets_with_inlines`` as follows::
+
+        class MyModelAdmin(admin.ModelAdmin):
+            inlines = [MyInline, SomeOtherInline]
+
+            def get_formsets_with_inlines(self, request, obj=None):
+                for inline in self.get_inline_instances(request, obj):
+                    # hide MyInline in the add view
+                    if isinstance(inline, MyInline) and obj is None:
+                        continue
+                    yield inline.get_formset(request, obj), inline
 
 .. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
