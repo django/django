@@ -38,6 +38,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in delete_fields:
             del body[field.name]
             del mapping[field.column]
+        # Drop any auto-created fields from the new model to avoid
+        # duplicates. Note that we still keep them in mapping in order to
+        # copy their values over.
+        # FIXME: This will break when a ForeignKey is renamed as its
+        # auto-created fields will need to be remapped.
+        for name, field in list(body.items()):
+            if field.auto_created:
+                del body[name]
         # Work inside a new AppCache
         app_cache = BaseAppCache()
         # Construct a new model for the new state
@@ -54,7 +62,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Create a new table with that format
         self.create_model(temp_model)
         # Copy data from the old table
-        field_maps = list(mapping.items())
+        field_maps = [(x, y) for x, y in mapping.items() if not (x is None or y is None)]
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join([x for x, y in field_maps]),
@@ -137,18 +145,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new through table
         self.create_model(new_field.rel.through)
         # Copy the data across
+        old_columns = [f.column for f in old_field.rel.through._meta.local_concrete_fields]
+        new_columns = [f.column for f in new_field.rel.through._meta.local_concrete_fields]
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
             self.quote_name(new_field.rel.through._meta.db_table),
-            ', '.join([
-                "id",
-                new_field.m2m_column_name(),
-                new_field.m2m_reverse_name(),
-            ]),
-            ', '.join([
-                "id",
-                old_field.m2m_column_name(),
-                old_field.m2m_reverse_name(),
-            ]),
+            ', '.join(new_columns),
+            ', '.join(old_columns),
             self.quote_name(old_field.rel.through._meta.db_table),
         ))
         # Delete the old through table

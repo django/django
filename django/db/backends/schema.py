@@ -103,7 +103,7 @@ class BaseDatabaseSchemaEditor(object):
         params = []
         # Check for fields that aren't actually columns (e.g. M2M)
         if sql is None:
-            return None
+            return None, []
         # Optionally add the tablespace if it's an implicitly indexed column
         tablespace = field.db_tablespace or model._meta.db_tablespace
         if tablespace and self.connection.features.supports_tablespaces and field.unique:
