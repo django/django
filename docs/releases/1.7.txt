@@ -154,6 +154,13 @@ Minor features
   follow the :setting:`SESSION_COOKIE_SECURE` and
   :setting:`SESSION_COOKIE_HTTPONLY` settings.
 
+:mod:`django.contrib.sessions`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The ``"django.contrib.sessions.backends.cached_db"`` session backend now
+  respects :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always used
+  the `default` cache.
+
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

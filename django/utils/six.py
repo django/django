@@ -25,7 +25,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 
 # Useful for very coarse version differentiation.
@@ -185,9 +185,9 @@ _moved_attributes = [
     MovedModule("tkinter_messagebox", "tkMessageBox", "tkinter.messagebox"),
     MovedModule("tkinter_tksimpledialog", "tkSimpleDialog",
                 "tkinter.simpledialog"),
-    MovedModule("urllib_parse", "six.moves.urllib_parse", "urllib.parse"),
-    MovedModule("urllib_error", "six.moves.urllib_error", "urllib.error"),
-    MovedModule("urllib", "six.moves.urllib", "six.moves.urllib"),
+    MovedModule("urllib_parse", __name__ + ".moves.urllib_parse", "urllib.parse"),
+    MovedModule("urllib_error", __name__ + ".moves.urllib_error", "urllib.error"),
+    MovedModule("urllib", __name__ + ".moves.urllib", __name__ + ".moves.urllib"),
     MovedModule("urllib_robotparser", "robotparser", "urllib.robotparser"),
     MovedModule("winreg", "_winreg"),
 ]
@@ -195,7 +195,7 @@ for attr in _moved_attributes:
     setattr(_MovedItems, attr.name, attr)
 del attr
 
-moves = sys.modules[__name__ + ".moves"] = _MovedItems("moves")
+moves = sys.modules[__name__ + ".moves"] = _MovedItems(__name__ + ".moves")
 
 
 
@@ -223,8 +223,8 @@ for attr in _urllib_parse_moved_attributes:
     setattr(Module_six_moves_urllib_parse, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_parse"] = Module_six_moves_urllib_parse("six.moves.urllib_parse")
-sys.modules[__name__ + ".moves.urllib.parse"] = Module_six_moves_urllib_parse("six.moves.urllib.parse")
+sys.modules[__name__ + ".moves.urllib_parse"] = Module_six_moves_urllib_parse(__name__ + ".moves.urllib_parse")
+sys.modules[__name__ + ".moves.urllib.parse"] = Module_six_moves_urllib_parse(__name__ + ".moves.urllib.parse")
 
 
 class Module_six_moves_urllib_error(types.ModuleType):
@@ -240,8 +240,8 @@ for attr in _urllib_error_moved_attributes:
     setattr(Module_six_moves_urllib_error, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_error"] = Module_six_moves_urllib_error("six.moves.urllib_error")
-sys.modules[__name__ + ".moves.urllib.error"] = Module_six_moves_urllib_error("six.moves.urllib.error")
+sys.modules[__name__ + ".moves.urllib_error"] = Module_six_moves_urllib_error(__name__ + ".moves.urllib_error")
+sys.modules[__name__ + ".moves.urllib.error"] = Module_six_moves_urllib_error(__name__ + ".moves.urllib.error")
 
 
 class Module_six_moves_urllib_request(types.ModuleType):
@@ -286,8 +286,8 @@ for attr in _urllib_request_moved_attributes:
     setattr(Module_six_moves_urllib_request, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_request"] = Module_six_moves_urllib_request("six.moves.urllib_request")
-sys.modules[__name__ + ".moves.urllib.request"] = Module_six_moves_urllib_request("six.moves.urllib.request")
+sys.modules[__name__ + ".moves.urllib_request"] = Module_six_moves_urllib_request(__name__ + ".moves.urllib_request")
+sys.modules[__name__ + ".moves.urllib.request"] = Module_six_moves_urllib_request(__name__ + ".moves.urllib.request")
 
 
 class Module_six_moves_urllib_response(types.ModuleType):
@@ -304,8 +304,8 @@ for attr in _urllib_response_moved_attributes:
     setattr(Module_six_moves_urllib_response, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_response"] = Module_six_moves_urllib_response("six.moves.urllib_response")
-sys.modules[__name__ + ".moves.urllib.response"] = Module_six_moves_urllib_response("six.moves.urllib.response")
+sys.modules[__name__ + ".moves.urllib_response"] = Module_six_moves_urllib_response(__name__ + ".moves.urllib_response")
+sys.modules[__name__ + ".moves.urllib.response"] = Module_six_moves_urllib_response(__name__ + ".moves.urllib.response")
 
 
 class Module_six_moves_urllib_robotparser(types.ModuleType):
@@ -319,8 +319,8 @@ for attr in _urllib_robotparser_moved_attributes:
     setattr(Module_six_moves_urllib_robotparser, attr.name, attr)
 del attr
 
-sys.modules[__name__ + ".moves.urllib_robotparser"] = Module_six_moves_urllib_robotparser("six.moves.urllib_robotparser")
-sys.modules[__name__ + ".moves.urllib.robotparser"] = Module_six_moves_urllib_robotparser("six.moves.urllib.robotparser")
+sys.modules[__name__ + ".moves.urllib_robotparser"] = Module_six_moves_urllib_robotparser(__name__ + ".moves.urllib_robotparser")
+sys.modules[__name__ + ".moves.urllib.robotparser"] = Module_six_moves_urllib_robotparser(__name__ + ".moves.urllib.robotparser")
 
 
 class Module_six_moves_urllib(types.ModuleType):
@@ -332,7 +332,7 @@ class Module_six_moves_urllib(types.ModuleType):
     robotparser = sys.modules[__name__ + ".moves.urllib_robotparser"]
 
 
-sys.modules[__name__ + ".moves.urllib"] = Module_six_moves_urllib("six.moves.urllib")
+sys.modules[__name__ + ".moves.urllib"] = Module_six_moves_urllib(__name__ + ".moves.urllib")
 
 
 def add_move(move):
