@@ -679,22 +679,32 @@ pickling.)
 Accessing the cache
 -------------------
 
-.. function:: django.core.cache.get_cache(backend, **kwargs)
+.. versionchanged:: 1.7
 
-The cache module, ``django.core.cache``, has a ``cache`` object that's
-automatically created from the ``'default'`` entry in the :setting:`CACHES`
-setting::
+    The cache module, ``django.core.cache``, provides a dict-like object for
+    accessing the caches defined in :setting:`CACHES`.  These are created on
+    demand, and persist for the life of the process.
+
+    >>> from django.core.cache import caches
+    >>> cache = caches['alternate']
+
+If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
+
+The ``default`` cache is still available as ``django.core.cache.cache`` for
+backward compatibility.
 
     >>> from django.core.cache import cache
 
-If you have multiple caches defined in :setting:`CACHES`, then you can use
-:func:`django.core.cache.get_cache` to retrieve a cache object for any key::
+.. function:: django.core.cache.get_cache(backend, **kwargs)
+
+For creating ad-hoc cache configurations, the
+:func:`django.core.cache.get_cache` method can be passed either a cache name,
+or a backend module and additional configuration options.
 
     >>> from django.core.cache import get_cache
     >>> cache = get_cache('alternate')
 
-If the named key does not exist, ``InvalidCacheBackendError`` will be raised.
-
+Each call to ``get_cache`` will return a new instance of the cache class.
 
 Basic usage
 -----------

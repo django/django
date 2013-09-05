@@ -8,3 +8,9 @@ class LiberalKeyValidationMixin(object):
 class CacheClass(LiberalKeyValidationMixin, LocMemCache):
     pass
 
+class CountingCache(LocMemCache):
+    """A Cache class that tracks how many times it has been instantiated."""
+    count = 0
+    def __init__(self, *args, **kwargs):
+        super(CountingCache, self).__init__(*args, **kwargs)
+        CountingCache.count += 1
