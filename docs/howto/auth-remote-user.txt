@@ -87,6 +87,17 @@ Attributes
 Methods
 ~~~~~~~
 
+.. method:: RemoteUserBackend.authenticate(remote_user)
+
+    The username passed as ``remote_user`` is considered trusted. This method
+    simply returns the ``User`` object with the given username, creating a new
+    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``True``.
+
+    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``False`` and a ``User`` object with the given username is not found in the
+    database.
+
 .. method:: RemoteUserBackend.clean_username(username)
 
    Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
