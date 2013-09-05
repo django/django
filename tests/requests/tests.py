@@ -50,7 +50,8 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
-        self.assertTrue(getattr(request.META['testmethod'], 'do_not_call_in_templates', False))
+        for m in request.META.values():
+            self.assertEqual(callable(m), getattr(m, 'do_not_call_in_templates', False))
 
     def test_wsgirequest_with_script_name(self):
         """
