@@ -152,10 +152,12 @@ class MigrationWriter(object):
                 klass = value.im_class
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
+            elif value.__name__ == '<lambda>':
+                raise ValueError("Cannot serialize function: lambda")
+            elif value.__module__ is None:
+                raise ValueError("Cannot serialize function %r: No module" % value)
             else:
                 module = value.__module__
-                if module is None:
-                    raise ValueError("Cannot serialize function %r: No module" % value)
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Classes
         elif isinstance(value, type):
