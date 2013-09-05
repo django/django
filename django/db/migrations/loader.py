@@ -63,6 +63,7 @@ class MigrationLoader(object):
                 if "No module named" in str(e) and "migrations" in str(e):
                     self.unmigrated_apps.add(app_label)
                     continue
+                raise
             self.migrated_apps.add(app_label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
