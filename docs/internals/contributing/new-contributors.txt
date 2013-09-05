@@ -10,6 +10,13 @@ First steps
 
 Start with these easy tasks to discover Django's development process.
 
+* **Sign the Contributor License Agreement**
+
+  The code that you write belongs to you or your employer. If your
+  contribution is more than one or two lines of code, you need to sign the
+  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
+  explanation.
+
 * **Triage tickets**
 
   If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you
@@ -51,6 +58,8 @@ Start with these easy tasks to discover Django's development process.
 
       .. _reports page: https://code.djangoproject.com/wiki/Reports
 
+.. _CLA: https://www.djangoproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
 .. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
 
 
