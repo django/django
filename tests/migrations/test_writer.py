@@ -60,6 +60,9 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(set([2, 3, "eighty"]))
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
         self.assertSerializedEqual(_('Hello'))
+        # Functions
+        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+            self.assertSerializedEqual(lambda x: 42)
         # Datetime stuff
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
