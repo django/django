@@ -77,3 +77,10 @@ class LoaderTests(TestCase):
             migration_loader.get_migration_by_prefix("migrations", "0")
         with self.assertRaises(KeyError):
             migration_loader.get_migration_by_prefix("migrations", "blarg")
+
+    def test_load_import_error(self):
+        migration_loader = MigrationLoader(connection)
+
+        with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.import_error"}):
+            with self.assertRaises(ImportError):
+                migration_loader.load_disk()
