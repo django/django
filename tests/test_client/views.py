@@ -1,7 +1,3 @@
-try:
-    from urllib.parse import urlencode
-except ImportError:     # Python 2
-    from urllib import urlencode
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -13,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import Context, Template
 from django.utils.decorators import method_decorator
+from django.utils.six.moves.urllib.parse import urlencode
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"

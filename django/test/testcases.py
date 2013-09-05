@@ -8,10 +8,6 @@ import json
 import os
 import re
 import sys
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
 import select
 import socket
 import threading
@@ -39,6 +35,7 @@ from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml)
 from django.utils import six, unittest as ut2
 from django.utils.encoding import force_text
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.unittest import skipIf # Imported here for backward compatibility
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve

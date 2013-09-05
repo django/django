@@ -7,10 +7,6 @@ import shutil
 import sys
 import tempfile
 import time
-try:
-    from urllib.request import urlopen
-except ImportError:     # Python 2
-    from urllib2 import urlopen
 import zlib
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -27,10 +23,11 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import LiveServerTestCase, SimpleTestCase
+from django.test.utils import override_settings
 from django.utils import six
 from django.utils import unittest
+from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
-from django.test.utils import override_settings
 
 try:
     from django.utils.image import Image

@@ -17,6 +17,7 @@ from django.test.utils import override_settings, str_prefix
 from django.utils import six
 from django.utils.unittest import skipIf
 from django.utils.http import cookie_date, urlencode
+from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
 from django.utils.timezone import utc
 
 
@@ -493,8 +494,7 @@ class RequestsTests(SimpleTestCase):
         """
         Test a POST with non-utf-8 payload encoding.
         """
-        from django.utils.http import urllib_parse
-        payload = FakePayload(urllib_parse.urlencode({'key': 'España'.encode('latin-1')}))
+        payload = FakePayload(original_urlencode({'key': 'España'.encode('latin-1')}))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_LENGTH': len(payload),

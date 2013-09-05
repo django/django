@@ -13,11 +13,6 @@ from io import BytesIO
 import socket
 import sys
 import traceback
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
-from django.utils.six.moves import socketserver
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -25,6 +20,8 @@ from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.module_loading import import_by_path
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urljoin
+from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler', 'MAX_SOCKET_CHUNK_SIZE')
 

@@ -4,14 +4,11 @@ import codecs
 import datetime
 from decimal import Decimal
 import locale
-try:
-    from urllib.parse import quote
-except ImportError:     # Python 2
-    from urllib import quote
 import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):

@@ -3,16 +3,12 @@
 from __future__ import unicode_literals
 
 import re
-try:
-    from urllib.parse import quote, unquote, urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urllib import quote, unquote
-    from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
 
 from .html_parser import HTMLParser, HTMLParseError

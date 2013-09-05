@@ -1,14 +1,10 @@
-try:
-    from urllib.parse import urlparse, urlunparse
-except ImportError:     # Python 2
-    from urlparse import urlparse, urlunparse
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
 from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
+from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.shortcuts import resolve_url
 from django.utils.encoding import force_bytes, force_text
 from django.views.decorators.debug import sensitive_post_parameters
