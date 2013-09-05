@@ -367,15 +367,6 @@ Moved modules
 Some modules were renamed in Python 3. The :mod:`django.utils.six.moves
 <six.moves>` module provides a compatible location to import them.
 
-The ``urllib``, ``urllib2`` and ``urlparse`` modules were reworked in depth
-and :mod:`django.utils.six.moves <six.moves>` doesn't handle them. Django
-explicitly tries both locations, as follows::
-
-    try:
-        from urllib.parse import urlparse, urlunparse
-    except ImportError:     # Python 2
-        from urlparse import urlparse, urlunparse
-
 PY2
 ~~~
 

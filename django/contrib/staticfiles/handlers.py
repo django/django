@@ -1,13 +1,8 @@
-try:
-    from urllib.parse import urlparse
-    from urllib.request import url2pathname
-except ImportError:     # Python 2
-    from urllib import url2pathname
-    from urlparse import urlparse
-
 from django.conf import settings
 from django.core.handlers.base import get_path_info
 from django.core.handlers.wsgi import WSGIHandler
+from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.six.moves.urllib.request import url2pathname
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve

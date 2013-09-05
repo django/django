@@ -13,12 +13,6 @@ import threading
 import unittest
 from unittest import skipIf         # Imported here for backward compatibility
 from unittest.util import safe_repr
-try:
-    from urllib.parse import urlsplit, urlunsplit, urlparse, unquote
-    from urllib.request import url2pathname
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit, urlparse
-    from urllib import url2pathname, unquote
 
 from django.conf import settings
 from django.core import mail
@@ -40,8 +34,10 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
 from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, compare_xml)
-from django.utils import six
 from django.utils.encoding import force_text
+from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
+from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
 
 

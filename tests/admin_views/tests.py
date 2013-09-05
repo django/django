@@ -5,10 +5,6 @@ import os
 import re
 import datetime
 import unittest
-try:
-    from urllib.parse import urljoin
-except ImportError:  # Python 2
-    from urlparse import urljoin
 
 from django.conf import settings, global_settings
 from django.core import mail
@@ -30,15 +26,16 @@ from django.forms.util import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import patch_logger
+from django.test.utils import override_settings
 from django.utils import formats
 from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode, urlquote
+from django.utils.six.moves.urllib.parse import urljoin
 from django.utils._os import upath
 from django.utils import six
-from django.test.utils import override_settings
 
 # local test models
 from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,

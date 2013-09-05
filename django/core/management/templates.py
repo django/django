@@ -8,10 +8,6 @@ import shutil
 import stat
 import sys
 import tempfile
-try:
-    from urllib.request import urlretrieve
-except ImportError:     # Python 2
-    from urllib import urlretrieve
 
 from optparse import make_option
 from os import path
@@ -19,6 +15,7 @@ from os import path
 import django
 from django.template import Template, Context
 from django.utils import archive
+from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions

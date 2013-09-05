@@ -6,10 +6,6 @@ from __future__ import unicode_literals
 
 import copy
 from itertools import chain
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import warnings
 
 from django.conf import settings
@@ -20,6 +16,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
+from django.utils.six.moves.urllib.parse import urljoin
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput',

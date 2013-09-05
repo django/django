@@ -5,16 +5,14 @@ Tests for django.core.servers.
 from __future__ import unicode_literals
 
 import os
-try:
-    from urllib.request import urlopen, HTTPError
-except ImportError:     # Python 2
-    from urllib2 import urlopen, HTTPError
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
 from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
 from django.utils.http import urlencode
+from django.utils.six.moves.urllib.error import HTTPError
+from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 
 from .models import Person

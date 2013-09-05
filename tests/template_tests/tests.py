@@ -13,10 +13,6 @@ import os
 import sys
 import traceback
 import unittest
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import warnings
 
 from django import template
@@ -33,6 +29,7 @@ from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urljoin
 
 from i18n import TransRealMixin
 

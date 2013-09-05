@@ -5,12 +5,6 @@ import calendar
 import datetime
 import re
 import sys
-try:
-    from urllib import parse as urllib_parse
-except ImportError:     # Python 2
-    import urllib as urllib_parse
-    import urlparse
-    urllib_parse.urlparse = urlparse.urlparse
 
 from binascii import Error as BinasciiError
 from email.utils import formatdate
@@ -19,6 +13,9 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
+from django.utils.six.moves.urllib.parse import (
+        quote, quote_plus, unquote, unquote_plus, urlparse,
+        urlencode as original_urlencode)
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
@@ -40,7 +37,7 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote(force_str(url), force_str(safe)))
+    return force_text(quote(force_str(url), force_str(safe)))
 urlquote = allow_lazy(urlquote, six.text_type)
 
 def urlquote_plus(url, safe=''):
@@ -50,7 +47,7 @@ def urlquote_plus(url, safe=''):
     returned string can safely be used as part of an argument to a subsequent
     iri_to_uri() call without double-quoting occurring.
     """
-    return force_text(urllib_parse.quote_plus(force_str(url), force_str(safe)))
+    return force_text(quote_plus(force_str(url), force_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, six.text_type)
 
 def urlunquote(quoted_url):
@@ -58,7 +55,7 @@ def urlunquote(quoted_url):
     A wrapper for Python's urllib.unquote() function that can operate on
     the result of django.utils.http.urlquote().
     """
-    return force_text(urllib_parse.unquote(force_str(quoted_url)))
+    return force_text(unquote(force_str(quoted_url)))
 urlunquote = allow_lazy(urlunquote, six.text_type)
 
 def urlunquote_plus(quoted_url):
@@ -66,7 +63,7 @@ def urlunquote_plus(quoted_url):
     A wrapper for Python's urllib.unquote_plus() function that can operate on
     the result of django.utils.http.urlquote_plus().
     """
-    return force_text(urllib_parse.unquote_plus(force_str(quoted_url)))
+    return force_text(unquote_plus(force_str(quoted_url)))
 urlunquote_plus = allow_lazy(urlunquote_plus, six.text_type)
 
 def urlencode(query, doseq=0):
@@ -79,7 +76,7 @@ def urlencode(query, doseq=0):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return urllib_parse.urlencode(
+    return original_urlencode(
         [(force_str(k),
          [force_str(i) for i in v] if isinstance(v, (list,tuple)) else force_str(v))
             for k, v in query],
@@ -243,7 +240,7 @@ def same_origin(url1, url2):
     """
     Checks if two URLs are 'same-origin'
     """
-    p1, p2 = urllib_parse.urlparse(url1), urllib_parse.urlparse(url2)
+    p1, p2 = urlparse(url1), urlparse(url2)
     try:
         return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
     except ValueError:
@@ -258,6 +255,6 @@ def is_safe_url(url, host=None):
     """
     if not url:
         return False
-    url_info = urllib_parse.urlparse(url)
+    url_info = urlparse(url)
     return (not url_info.netloc or url_info.netloc == host) and \
         (not url_info.scheme or url_info.scheme in ['http', 'https'])
