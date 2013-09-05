@@ -245,7 +245,7 @@ class Sqlite3InMemoryTestDbs(TestCase):
     available_apps = []
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
-                         "This is a sqlite-specific issue")
+                         "This is an sqlite-specific issue")
     def test_transaction_support(self):
         """Ticket #16329: sqlite3 in-memory test databases"""
         old_db_connections = db.connections

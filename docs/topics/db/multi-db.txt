@@ -433,7 +433,7 @@ Consider the following example::
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
-issues a SQL ``INSERT`` statement. This creates a primary key, and
+issues an SQL ``INSERT`` statement. This creates a primary key, and
 Django assigns that primary key to ``p``.
 
 When the save occurs in statement 2, ``p`` already has a primary key
@@ -457,7 +457,7 @@ database::
     >>> p.save(using='second') # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
-to ensure that Django does a SQL ``INSERT``::
+to ensure that Django does an SQL ``INSERT``::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')

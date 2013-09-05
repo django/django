@@ -402,7 +402,7 @@ class EscapingChecks(TestCase):
         self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
-                         "This is a sqlite-specific issue")
+                         "This is an sqlite-specific issue")
     def test_sqlite_parameter_escaping(self):
         #13648: '%s' escaping support for sqlite3
         cursor = connection.cursor()

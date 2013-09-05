@@ -1515,7 +1515,7 @@ number of roles in which color is used:
 * ``notice`` - A minor error.
 * ``sql_field`` - The name of a model field in SQL.
 * ``sql_coltype`` - The type of a model field in SQL.
-* ``sql_keyword`` - A SQL keyword.
+* ``sql_keyword`` - An SQL keyword.
 * ``sql_table`` - The name of a model in SQL.
 * ``http_info`` - A 1XX HTTP Informational server response.
 * ``http_success`` - A 2XX HTTP Success server response.

@@ -639,7 +639,7 @@ Parameters not quoted in ``connection.queries``
 ``sqlite3`` does not provide a way to retrieve the SQL after quoting and
 substituting the parameters. Instead, the SQL in ``connection.queries`` is
 rebuilt with a simple string interpolation. It may be incorrect. Make sure
-you add quotes where necessary before copying a query into a SQLite shell.
+you add quotes where necessary before copying a query into an SQLite shell.
 
 .. _oracle-notes:
 
