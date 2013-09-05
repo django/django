@@ -1,8 +1,11 @@
+from unittest import skipIf
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
+from django.utils import six
 
 
 class RecorderTests(TestCase):
@@ -84,3 +87,16 @@ class LoaderTests(TestCase):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.import_error"}):
             with self.assertRaises(ImportError):
                 migration_loader.load_disk()
+
+    def test_load_module_file(self):
+        migration_loader = MigrationLoader(connection)
+
+        with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.file"}):
+            migration_loader.load_disk()
+
+    @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
+    def test_load_empty_dir(self):
+        migration_loader = MigrationLoader(connection)
+
+        with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
+            migration_loader.load_disk()
