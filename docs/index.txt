@@ -65,7 +65,8 @@ manipulating the data of your Web application. Learn more about it below:
 
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
-  :doc:`QuerySet method reference <ref/models/querysets>`
+  :doc:`QuerySet method reference <ref/models/querysets>` |
+  :doc:`Query-related classes <ref/models/queries>`
 
 * **Model instances:**
   :doc:`Instance methods <ref/models/instances>` |

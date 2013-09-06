@@ -324,7 +324,7 @@ requests. These include:
   to :meth:`~django.shortcuts.render_to_response()` providing a
   :class:`~django.template.RequestContext` by default.
 
-* Support for combining :ref:`F() expressions <query-expressions>`
+* Support for combining :class:`F expressions <django.db.models.F>`
   with timedelta values when retrieving or updating database values.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
