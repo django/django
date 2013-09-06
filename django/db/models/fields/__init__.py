@@ -396,10 +396,7 @@ class Field(object):
         }
 
     def db_type_suffix(self, connection):
-        try:
-            return connection.creation.data_types_suffix[self.get_internal_type()]
-        except KeyError:
-            return False
+        return connection.creation.data_types_suffix.get(self.get_internal_type(), False)
 
     @property
     def unique(self):
