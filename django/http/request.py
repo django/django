@@ -20,7 +20,7 @@ from django.http.multipartparser import MultiPartParser
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
-
+from urlparse import urljoin, urlsplit, parse_qsl
 
 RAISE_ERROR = object()
 absolute_http_url_re = re.compile(r"^https?://", re.I)
@@ -115,13 +115,28 @@ class HttpRequest(object):
         """
         Builds an absolute URI from the location and the variables available in
         this request. If no location is specified, the absolute URI is built on
-        ``request.get_full_path()``.
+       ``request.get_full_path()``.
+        Builds an absolute URI, using location and/or variables available in
+        the request, and returns it. If ``location`` is provided and is
+        absolute, it is simply converted to an RFC 3987 compliant URI and
+        returned. If ``location`` is provided but is relative or is
+        scheme-relative (i.e., //example.com/), it is urljoined to a base URL
+        constructed from the request variables.
         """
         if not location:
-            location = self.get_full_path()
-        if not absolute_http_url_re.match(location):
-            current_uri = '%s://%s%s' % ('https' if self.is_secure() else 'http',
-                                         self.get_host(), self.path)
+            # Make it an absolute url (but schemeless and domainless) for the
+            # edge case that the path starts with '//'.
+            location = '///%s' % self.get_full_path()
+        bits = urlsplit(location)
+        if not bits.scheme or not bits.netloc:
+            current_uri = '%(scheme)s://%(host)s%(path)s' % {
+                'scheme': 'https' if self.is_secure() else 'http',
+                'host': self.get_host(),
+                'path': self.path
+            }
+            # Join the constructed URL with the provided location, which will
+            # allow the provided ``location`` to apply query strings to the
+            # base path as well as override the host, if it begins with //
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
 
