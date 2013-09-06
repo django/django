@@ -36,4 +36,4 @@ class BaseEmailBackend(object):
         Sends one or more EmailMessage objects and returns the number of email
         messages sent.
         """
-        raise NotImplementedError('subclasses of BaseEmailBackend must provide a send_messages() method')
+        raise NotImplementedError('subclasses of BaseEmailBackend may provide a send_messages() method')

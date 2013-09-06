@@ -99,7 +99,7 @@ class Origin(object):
         self.name = name
 
     def reload(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Origin must provide a reload() method')
 
     def __str__(self):
         return self.name
@@ -385,7 +385,7 @@ class TokenParser(object):
         """
         Overload this method to do the actual parsing and return the result.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Tokenparser must provide a top() method')
 
     def more(self):
         """

@@ -246,7 +246,7 @@ class AbstractBaseUser(models.Model):
         return is_password_usable(self.password)
 
     def get_full_name(self):
-        raise NotImplementedError('sublasses of ListFilter must provide a get_full_name() method')
+        raise NotImplementedError('subclasses of ListFilter must provide a get_full_name() method')
 
     def get_short_name(self):
         raise NotImplementedError('subclasses of AbstractBaseUser must override get_short_name() method.')
@@ -442,7 +442,7 @@ class AnonymousUser(object):
         return 1  # instances always return the same hash value
 
     def save(self):
-        raise NotImplementedError('Django provides no DB representation for anonymous users objects')
+        raise NotImplementedError('Django provides no DB representation for anonymous user objects')
 
     def delete(self):
         raise NotImplementedError('Django provides no DB representation for anonymous user objects')
