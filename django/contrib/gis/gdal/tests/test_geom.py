@@ -54,7 +54,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(None, OGRGeomType('none').django)
 
         # Per change in #21021, initialization with `Geometry` type
-        #should return 'Geometry' as the OGRGeomType name.
+        # should return 'Geometry' as the OGRGeomType name.
         gt = OGRGeomType('Geometry')
         self.assertEqual(102, gt.num)
         self.assertEqual('Geometry', gt.name)
