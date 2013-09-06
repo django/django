@@ -160,7 +160,7 @@ class HttpResponseBase(six.Iterator):
         except UnicodeError as e:
             if mime_encode:
                 # Wrapping in str() is a workaround for #12422 under Python 2.
-                value = str(Header(value, 'utf-8').encode())
+                value = str(Header(value, 'utf-8', maxlinelen=float("inf")).encode())
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
