@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import gettext as gettext_module
 from importlib import import_module
 import os
 import pickle
@@ -1262,3 +1263,34 @@ class CountrySpecificLanguageTests(TransRealMixin, TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('pt-br', lang)
+
+class LanguageNotFoundTests(TransRealMixin, TestCase):
+
+    def setUp(self):
+        super(LanguageNotFoundTests, self).setUp()
+        self.gettext_find_builtin = gettext_module.find
+
+    def tearDown(self):
+        gettext_module.find = self.gettext_find_builtin
+        super(LanguageNotFoundTests, self).tearDown()
+
+    def mockGettextFind(self):
+        def mocked_gettext_find(*args, **kwargs):
+            return None
+        gettext_module.find = mocked_gettext_find
+
+    @override_settings(
+       LANGUAGES=(
+           ('iu', 'Inuktitut'),
+       ),
+       LANGUAGE_CODE='iu',
+       LOCALE_PATHS=extended_locale_paths,
+    )
+    def test_unfamilar_language(self):
+       activate('iu-ca')
+       deactivate()
+
+    def test_failure_finding_po_files(self):
+        self.flush_caches()
+        self.mockGettextFind()
+        self.assertRaises(IOError, activate, 'en')
