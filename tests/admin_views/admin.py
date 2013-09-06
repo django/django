@@ -30,7 +30,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram)
+    ShortMessage, Telegram, FilteredManager)
 
 
 def callable_year(dt_value):
@@ -674,6 +674,12 @@ def callable_on_unknown(obj):
 class AttributeErrorRaisingAdmin(admin.ModelAdmin):
     list_display = [callable_on_unknown, ]
 
+
+class CustomManagerAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return FilteredManager.objects
+
+
 class MessageTestingAdmin(admin.ModelAdmin):
     actions = ["message_debug", "message_info", "message_success",
                "message_warning", "message_error", "message_extra_tags"]
@@ -773,6 +779,7 @@ site.register(Question)
 site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
+site.register(FilteredManager, CustomManagerAdmin)
 site.register(PluggableSearchPerson, PluggableSearchPersonAdmin)
 site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
 site.register(AdminOrderedField, AdminOrderedFieldAdmin)
