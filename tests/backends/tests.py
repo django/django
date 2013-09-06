@@ -10,7 +10,7 @@ import unittest
 from django.conf import settings
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, transaction, InterfaceError)
+    DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
@@ -944,6 +944,9 @@ class BackendUtilTests(TestCase):
         equal('0.1234567890', 12, 0,
               '0')
 
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
 class UnicodeArrayTestCase(TestCase):
 
     def select(self, val):
@@ -951,18 +954,12 @@ class UnicodeArrayTestCase(TestCase):
         cursor.execute("select %s", (val,))
         return cursor.fetchone()[0]
 
-    @unittest.skipUnless(
-        connection.vendor == 'postgresql',
-        "This test applies only to PostgreSQL")
     def test_select_ascii_array(self):
 
         a = ["awef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
 
-    @unittest.skipUnless(
-        connection.vendor == 'postgresql',
-        "This test applies only to PostgreSQL")
     def test_select_unicode_array(self):
         a = [u"ᄲawef"]
         b = self.select(a)
