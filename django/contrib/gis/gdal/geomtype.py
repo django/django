@@ -19,6 +19,7 @@ class OGRGeomType(object):
               7 : 'GeometryCollection',
               100 : 'None',
               101 : 'LinearRing',
+              102 : 'Geometry',
               1 + wkb25bit: 'Point25D',
               2 + wkb25bit: 'LineString25D',
               3 + wkb25bit: 'Polygon25D',
@@ -36,7 +37,6 @@ class OGRGeomType(object):
             num = type_input.num
         elif isinstance(type_input, six.string_types):
             type_input = type_input.lower()
-            if type_input == 'geometry': type_input='unknown'
             num = self._str_types.get(type_input, None)
             if num is None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)

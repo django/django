@@ -31,6 +31,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         OGRGeomType('GeometrycollectioN')
         OGRGeomType('LINearrING')
         OGRGeomType('Unknown')
+        OGRGeomType('Geometry')
 
         # Should throw TypeError on this input
         self.assertRaises(OGRException, OGRGeomType, 23)
@@ -52,10 +53,11 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual('GeometryField', OGRGeomType('Unknown').django)
         self.assertEqual(None, OGRGeomType('none').django)
 
-        # 'Geometry' initialization implies an unknown geometry type.
+        # Per change in #21021, initialization with `Geometry` type
+        #should return 'Geometry' as the OGRGeomType name.
         gt = OGRGeomType('Geometry')
-        self.assertEqual(0, gt.num)
-        self.assertEqual('Unknown', gt.name)
+        self.assertEqual(102, gt.num)
+        self.assertEqual('Geometry', gt.name)
 
     def test00b_geomtype_25d(self):
         "Testing OGRGeomType object with 25D types."
