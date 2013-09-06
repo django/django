@@ -342,6 +342,8 @@ only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
 
+.. _ref-models-field-updates-using-f-expressions:
+
 Updating attributes based on existing fields
 --------------------------------------------
 
@@ -356,35 +358,21 @@ achieve this is to do something like::
 If the old ``number_sold`` value retrieved from the database was 10, then
 the value of 11 will be written back to the database.
 
-This sequence has a standard update problem in that it contains a race
-condition. If another thread of execution has already saved an updated value
-after the current thread retrieved the old value, the current thread will only
-save the old value plus one, rather than the new (current) value plus one.
-
-The process can be made robust and slightly faster by expressing the update
-relative to the original field value, rather than as an explicit assignment of
-a new value. Django provides :ref:`F() expressions <query-expressions>` for
-performing this kind of relative update. Using ``F()`` expressions, the
-previous example is expressed as::
+The process can be made robust, :ref:`avoiding a race condition
+<avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
+the update relative to the original field value, rather than as an explicit
+assignment of a new value. Django provides :class:`F expressions
+<django.db.models.F>` for performing this kind of relative update. Using
+:class:`F expressions <django.db.models.F>`, the previous example is expressed
+as::
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold = F('number_sold') + 1
     >>> product.save()
 
-This approach doesn't use the initial value from the database. Instead, it
-makes the database do the update based on whatever value is current at the time
-that the :meth:`~Model.save()` is executed.
-
-Once the object has been saved, you must reload the object in order to access
-the actual value that was applied to the updated field::
-
-    >>> product = Products.objects.get(pk=product.pk)
-    >>> print(product.number_sold)
-    42
-
-For more details, see the documentation on :ref:`F() expressions
-<query-expressions>` and their :ref:`use in update queries
+For more details, see the documentation on :class:`F expressions
+<django.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
 Specifying which fields to save
