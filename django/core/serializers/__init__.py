@@ -17,7 +17,6 @@ To add your own serializers, use the SERIALIZATION_MODULES setting::
 """
 
 import importlib
-import sys
 
 from django.conf import settings
 from django.utils import six
