@@ -10,7 +10,7 @@ import unittest
 from django.conf import settings
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, transaction)
+    DatabaseError, IntegrityError, transaction, InterfaceError)
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
@@ -943,3 +943,30 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+class UnicodeArrayTestCase(TestCase):
+
+    def select(self, val):
+        cursor = connection.cursor()
+        cursor.execute("select %s", (val,))
+        return cursor.fetchone()[0]
+
+    def test_select_ascii_array(self):
+        a = ["awef"]
+        try:
+            b = self.select(a)
+            self.assertEqual(a[0], b[0])
+        except InterfaceError:
+            #this means that our test Db doesn't support
+            # selecting based on arrays (it's probably SQLite).
+            pass
+
+    def test_select_unicode_array(self):
+        a = [u"ᄲawef"]
+        try:
+            b = self.select(a)
+            self.assertEqual(a[0], b[0])
+        except InterfaceError:
+            #this means that our test Db doesn't support
+            # selecting based on arrays (it's probably SQLite).
+            pass
