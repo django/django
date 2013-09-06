@@ -4,7 +4,7 @@ from django.db import models
 # to create the tables for models where db_tablespace is set. To avoid this
 # problem, we mark the models as unmanaged, and temporarily revert them to
 # managed during each test. We also set them to use the same tables as the
-# "reference" models to avoid errors when other tests run 'syncdb'
+# "reference" models to avoid errors when other tests run 'migrate'
 # (proxy_models_inheritance does).
 
 class ScientistRef(models.Model):

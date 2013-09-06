@@ -276,7 +276,7 @@ WHEN (new.%(col_name)s IS NULL)
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        if statement and not six.PY3 and not isinstance(statement, unicode):
+        if statement and six.PY2 and not isinstance(statement, unicode):
             statement = statement.decode('utf-8')
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
@@ -585,7 +585,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except DatabaseError: 
+            except DatabaseError:
                 self.operators = self._likec_operators
             else:
                 self.operators = self._standard_operators
@@ -627,7 +627,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
-    
+
     def schema_editor(self):
         "Returns a new instance of this backend's SchemaEditor"
         return DatabaseSchemaEditor(self)
@@ -773,7 +773,7 @@ class FormatStylePlaceholderCursor(object):
         try:
             return dict((k, OracleParam(v, self, True)) for k, v in params.items())
         except AttributeError:
-            return tuple([OracleParam(p, self, True) for p in params])
+            return tuple(OracleParam(p, self, True) for p in params)
 
     def _guess_input_sizes(self, params_list):
         # Try dict handling; if that fails, treat as sequence
@@ -860,12 +860,12 @@ class FormatStylePlaceholderCursor(object):
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchmany(size)])
+        return tuple(_rowfactory(r, self.cursor)
+                      for r in self.cursor.fetchmany(size))
 
     def fetchall(self):
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchall()])
+        return tuple(_rowfactory(r, self.cursor)
+                      for r in self.cursor.fetchall())
 
     def var(self, *args):
         return VariableWrapper(self.cursor.var(*args))

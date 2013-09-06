@@ -62,7 +62,7 @@ def paragraph():
 
     The paragraph consists of between 1 and 4 sentences, inclusive.
     """
-    return ' '.join([sentence() for i in range(random.randint(1, 4))])
+    return ' '.join(sentence() for i in range(random.randint(1, 4)))
 
 def paragraphs(count, common=True):
     """

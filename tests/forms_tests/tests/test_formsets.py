@@ -91,7 +91,7 @@ class FormsFormsetTestCase(TestCase):
         # for adding data. By default, it displays 1 blank form. It can display more,
         # but we'll look at how to do so later.
         formset = self.make_choiceformset()
-        
+
         self.assertHTMLEqual(str(formset), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="1000" />
 <tr><th>Choice:</th><td><input type="text" name="choices-0-choice" /></td></tr>
 <tr><th>Votes:</th><td><input type="number" name="choices-0-votes" /></td></tr>""")
@@ -366,7 +366,7 @@ class FormsFormsetTestCase(TestCase):
         # it's going to be deleted.
 
         class CheckForm(Form):
-           field = IntegerField(min_value=100)
+            field = IntegerField(min_value=100)
 
         data = {
             'check-TOTAL_FORMS': '3', # the number of forms rendered
@@ -900,7 +900,7 @@ class FormsFormsetTestCase(TestCase):
         }
         formset = AnotherChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertTrue(all([form.is_valid_called for form in formset.forms]))
+        self.assertTrue(all(form.is_valid_called for form in formset.forms))
 
     def test_hard_limit_on_instantiated_forms(self):
         """A formset has a hard limit on the number of forms instantiated."""
@@ -978,7 +978,7 @@ class FormsFormsetTestCase(TestCase):
 
     def test_validate_max_ignores_forms_marked_for_deletion(self):
         class CheckForm(Form):
-           field = IntegerField()
+            field = IntegerField()
 
         data = {
             'check-TOTAL_FORMS': '2',
@@ -1004,7 +1004,7 @@ class FormsFormsetTestCase(TestCase):
             ([('Calexico', '100'), ('Calexico', '')], 1),
             ([('Calexico', ''), ('Calexico', '')], 2),
         ]
-        
+
         for formset_data, expected_error_count in data:
             formset = self.make_choiceformset(formset_data)
             self.assertEqual(formset.total_error_count(), expected_error_count)

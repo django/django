@@ -38,9 +38,9 @@ class SwappableModelTests(TestCase):
         Permission.objects.filter(content_type__app_label='swappable_models').delete()
         ContentType.objects.filter(app_label='swappable_models').delete()
 
-        # Re-run syncdb. This will re-build the permissions and content types.
+        # Re-run migrate. This will re-build the permissions and content types.
         new_io = StringIO()
-        management.call_command('syncdb', load_initial_data=False, interactive=False, stdout=new_io)
+        management.call_command('migrate', load_initial_data=False, interactive=False, stdout=new_io)
 
         # Check that content types and permissions exist for the swapped model,
         # but not for the swappable model.

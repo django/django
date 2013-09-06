@@ -29,12 +29,12 @@ class CustomManagerTests(TestCase):
             manager.public_method()
             # Don't copy private methods.
             with self.assertRaises(AttributeError):
-               manager._private_method()
+                manager._private_method()
             # Copy methods with `manager=True` even if they are private.
             manager._optin_private_method()
             # Don't copy methods with `manager=False` even if they are public.
             with self.assertRaises(AttributeError):
-               manager.optout_public_method()
+                manager.optout_public_method()
 
             # Test that the overridden method is called.
             queryset = manager.filter()

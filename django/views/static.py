@@ -9,15 +9,12 @@ import os
 import stat
 import posixpath
 import re
-try:
-    from urllib.parse import unquote
-except ImportError:     # Python 2
-    from urllib import unquote
 
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
     HttpResponseNotModified, StreamingHttpResponse)
 from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_noop
 
 def serve(request, path, document_root=None, show_indexes=False):

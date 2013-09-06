@@ -13,10 +13,6 @@ import os
 import sys
 import traceback
 import unittest
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import warnings
 
 from django import template
@@ -33,6 +29,7 @@ from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urljoin
 
 from i18n import TransRealMixin
 
@@ -338,6 +335,51 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_include_template_argument(self):
+        """
+        Support any render() supporting object
+        """
+        ctx = Context({
+            'tmpl': Template('This worked!'),
+        })
+        outer_tmpl = Template('{% include tmpl %}')
+        output = outer_tmpl.render(ctx)
+        self.assertEqual(output, 'This worked!')
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_immediate_missing(self):
+        """
+        Regression test for #16417 -- {% include %} tag raises TemplateDoesNotExist at compile time if TEMPLATE_DEBUG is True
+
+        Test that an {% include %} tag with a literal string referencing a
+        template that does not exist does not raise an exception at parse
+        time.
+        """
+        ctx = Context()
+        tmpl = Template('{% include "this_does_not_exist.html" %}')
+        self.assertIsInstance(tmpl, Template)
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_recursive(self):
+        comments = [
+            {
+                'comment': 'A1',
+                'children': [
+                    {'comment': 'B1', 'children': []},
+                    {'comment': 'B2', 'children': []},
+                    {'comment': 'B3', 'children': [
+                        {'comment': 'C1', 'children': []}
+                    ]},
+                ]
+            }
+        ]
+
+        t = loader.get_template('recursive_include.html')
+        self.assertEqual(
+            "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
+            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+        )
+
 
 class TemplateRegressionTests(TestCase):
 
@@ -462,7 +504,7 @@ class TemplateTests(TransRealMixin, TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
+            dict((name, t[0]) for name, t in six.iteritems(template_tests)),
             use_cached_loader=True,
         )
 
@@ -1832,3 +1874,12 @@ class RequestContextTests(unittest.TestCase):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
+
+    def test_stack_size(self):
+        """
+        Regression test for #7116, Optimize RequetsContext construction
+        """
+        ctx = RequestContext(self.fake_request, {})
+        # The stack should now contain 3 items:
+        # [builtins, supplied context, context processor]
+        self.assertEqual(len(ctx.dicts), 3)

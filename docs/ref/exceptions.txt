@@ -131,6 +131,15 @@ URL Resolver exceptions
 
 URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
 
+Resolver404
+--------------
+.. exception:: Resolver404
+
+    The :exc:`Resolver404` exception is raised by
+    :func:`django.core.urlresolvers.resolve()` if the path passed to
+    ``resolve()`` doesn't map to a view. It's a subclass of
+    :class:`django.http.Http404`
+
 NoReverseMatch
 --------------
 .. exception:: NoReverseMatch

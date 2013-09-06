@@ -206,8 +206,16 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         interactive=interactive,
         failfast=failfast,
     )
-    failures = test_runner.run_tests(
-        test_labels or get_installed(), extra_tests=extra_tests)
+    # Catch warnings thrown in test DB setup -- remove in Django 1.9
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            'ignore',
+            "Custom SQL location '<app_label>/models/sql' is deprecated, "
+            "use '<app_label>/sql' instead.",
+            PendingDeprecationWarning
+        )
+        failures = test_runner.run_tests(
+            test_labels or get_installed(), extra_tests=extra_tests)
 
     teardown(state)
     return failures

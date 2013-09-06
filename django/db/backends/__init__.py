@@ -728,7 +728,7 @@ class BaseDatabaseOperations(object):
 
     def cache_key_culling_sql(self):
         """
-        Returns a SQL query that retrieves the first cache key greater than the
+        Returns an SQL query that retrieves the first cache key greater than the
         n smallest.
 
         This is used by the 'db' cache backend to determine where to start
@@ -960,7 +960,7 @@ class BaseDatabaseOperations(object):
 
     def random_function_sql(self):
         """
-        Returns a SQL expression that returns a random value.
+        Returns an SQL expression that returns a random value.
         """
         return 'RANDOM()'
 
@@ -1255,7 +1255,7 @@ class BaseDatabaseIntrospection(object):
                 if not router.allow_migrate(self.connection.alias, model):
                     continue
                 tables.add(model._meta.db_table)
-                tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
+                tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
         tables = list(tables)
         if only_existing:
             existing_tables = self.table_names()

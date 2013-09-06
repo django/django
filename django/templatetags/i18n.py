@@ -147,7 +147,7 @@ class BlockTranslateNode(Node):
         default_value = settings.TEMPLATE_STRING_IF_INVALID
         render_value = lambda v: render_value_in_context(
             context.get(v, default_value), context)
-        data = dict([(v, render_value(v)) for v in vars])
+        data = dict((v, render_value(v)) for v in vars)
         context.pop()
         try:
             result = result % data

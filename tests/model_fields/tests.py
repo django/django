@@ -18,7 +18,6 @@ from django.db.models.fields import (
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
-from django.utils.unittest import skipIf
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigInt, Post, NullBooleanModel,
@@ -78,14 +77,12 @@ class BasicFieldTests(test.TestCase):
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
 
-    def test_formclass_with_choices(self):
-        # regression for 18162
-        class CustomChoiceField(forms.TypedChoiceField):
-            pass
-        choices = [('a@b.cc', 'a@b.cc'), ('b@b.cc', 'b@b.cc')]
+    def test_choices_form_class(self):
+        """Can supply a custom choices form class. Regression for #20999."""
+        choices = [('a', 'a')]
         field = models.CharField(choices=choices)
-        klass = CustomChoiceField
-        self.assertIsInstance(field.formfield(form_class=klass), klass)
+        klass = forms.TypedMultipleChoiceField
+        self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
 
 class DecimalFieldTests(test.TestCase):
@@ -519,7 +516,7 @@ class PromiseTest(test.TestCase):
             AutoField(primary_key=True).get_prep_value(lazy_func()),
             int)
 
-    @skipIf(six.PY3, "Python 3 has no `long` type.")
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
     def test_BigIntegerField(self):
         lazy_func = lazy(lambda: long(9999999999999999999), long)
         self.assertIsInstance(
@@ -663,3 +660,26 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             URLField().get_prep_value(lazy_func()),
             six.text_type)
+
+
+class CustomFieldTests(unittest.TestCase):
+
+    def test_14786(self):
+        """
+        Regression test for #14786 -- Test that field values are not prepared
+        twice in get_db_prep_lookup().
+        """
+        class NoopField(models.TextField):
+            def __init__(self, *args, **kwargs):
+                self.prep_value_count = 0
+                super(NoopField, self).__init__(*args, **kwargs)
+
+            def get_prep_value(self, value):
+                self.prep_value_count += 1
+                return super(NoopField, self).get_prep_value(value)
+
+        field = NoopField()
+        field.get_db_prep_lookup(
+            'exact', 'TEST', connection=connection, prepared=False
+        )
+        self.assertEqual(field.prep_value_count, 1)

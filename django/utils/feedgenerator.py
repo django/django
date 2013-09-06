@@ -24,15 +24,12 @@ http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/
 from __future__ import unicode_literals
 
 import datetime
-try:
-    from urllib.parse import urlparse
-except ImportError:     # Python 2
-    from urlparse import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils import datetime_safe
 from django.utils import six
 from django.utils.six import StringIO
+from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import is_aware
 
 def rfc2822_date(date):
@@ -46,7 +43,7 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if not six.PY3:             # strftime returns a byte string in Python 2
+    if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
     if is_aware(date):
         offset = date.tzinfo.utcoffset(date)
@@ -60,7 +57,7 @@ def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
     time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
-    if not six.PY3:             # strftime returns a byte string in Python 2
+    if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
     if is_aware(date):
         offset = date.tzinfo.utcoffset(date)

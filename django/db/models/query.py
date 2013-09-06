@@ -534,7 +534,7 @@ class QuerySet(object):
         if not id_list:
             return {}
         qs = self.filter(pk__in=id_list).order_by()
-        return dict([(obj._get_pk_val(), obj) for obj in qs])
+        return dict((obj._get_pk_val(), obj) for obj in qs)
 
     def delete(self):
         """
@@ -1206,7 +1206,7 @@ class ValuesListQuerySet(ValuesQuerySet):
 
             for row in self.query.get_compiler(self.db).results_iter():
                 data = dict(zip(names, row))
-                yield tuple([data[f] for f in fields])
+                yield tuple(data[f] for f in fields)
 
     def _clone(self, *args, **kwargs):
         clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)

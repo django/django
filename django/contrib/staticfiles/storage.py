@@ -5,11 +5,6 @@ from importlib import import_module
 import os
 import posixpath
 import re
-try:
-    from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlsplit, urlunsplit, urldefrag
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
@@ -19,6 +14,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
+from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
 from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns

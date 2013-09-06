@@ -783,10 +783,11 @@ class TestAppStaticStorage(TestCase):
         os.mkdir(self.search_path)
         module_path = os.path.join(self.search_path, 'foo_module')
         os.mkdir(module_path)
-        open(os.path.join(module_path, '__init__.py'), 'w')
+        self.init_file = open(os.path.join(module_path, '__init__.py'), 'w')
         sys.path.append(os.path.abspath(self.search_path))
 
     def tearDown(self):
+        self.init_file.close()
         sys.path.remove(os.path.abspath(self.search_path))
         shutil.rmtree(self.search_path)
 

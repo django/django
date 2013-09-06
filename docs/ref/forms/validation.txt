@@ -403,6 +403,12 @@ example::
                     raise forms.ValidationError("Did not send for 'help' in "
                             "the subject despite CC'ing yourself.")
 
+.. versionchanged:: 1.7
+
+    In previous versions of Django, ``form.clean()`` was required to return
+    a dictionary of ``cleaned_data``. This method may still return a dictionary
+    of data to be used, but it's no longer required.
+
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 

@@ -4,13 +4,10 @@ import codecs
 import datetime
 from decimal import Decimal
 import locale
-try:
-    from urllib.parse import quote
-except ImportError:     # Python 2
-    from urllib import quote
 
 from django.utils.functional import Promise
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -30,7 +27,7 @@ def python_2_unicode_compatible(klass):
     To support Python 2 and 3 with a single code base, define a __str__ method
     returning text and apply this decorator to the class.
     """
-    if not six.PY3:
+    if six.PY2:
         klass.__unicode__ = klass.__str__
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass

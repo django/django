@@ -57,7 +57,7 @@ class Worksheet(models.Model):
 # Regression for #11226 -- A model with the same name that another one to
 # which it has a m2m relation. This shouldn't cause a name clash between
 # the automatically created m2m intermediary table FK field names when
-# running syncdb
+# running migrate
 class User(models.Model):
     name = models.CharField(max_length=30)
     friends = models.ManyToManyField(auth.User)

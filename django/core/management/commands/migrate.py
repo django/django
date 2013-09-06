@@ -164,7 +164,7 @@ class Command(BaseCommand):
             for app_name, model_list in all_models
         )
 
-        create_models = set([x for x in itertools.chain(*manifest.values())])
+        create_models = set(itertools.chain(*manifest.values()))
         emit_pre_migrate_signal(create_models, self.verbosity, self.interactive, connection.alias)
 
         # Create the tables for each model

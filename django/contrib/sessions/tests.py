@@ -16,6 +16,7 @@ from django.contrib.sessions.backends.signed_cookies import SessionStore as Cook
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import get_cache
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
@@ -385,6 +386,11 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             warnings.simplefilter("ignore")
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
+
+    @override_settings(SESSION_CACHE_ALIAS='sessions')
+    def test_non_default_cache(self):
+        #21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
+        self.assertRaises(InvalidCacheBackendError, self.backend)
 
 
 @override_settings(USE_TZ=True)

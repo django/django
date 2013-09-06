@@ -89,7 +89,7 @@ class TranslationTests(TransRealMixin, TestCase):
         s4 = ugettext_lazy('Some other string')
         self.assertEqual(False, s == s4)
 
-        if not six.PY3:
+        if six.PY2:
             # On Python 2, gettext_lazy should not transform a bytestring to unicode
             self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
 

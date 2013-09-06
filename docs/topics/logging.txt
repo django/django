@@ -216,8 +216,9 @@ Django logging configuration <default-logging-configuration>`. From Django
 1.5 forward, the project's logging configuration is merged with Django's
 defaults, hence you can decide if you want to add to, or replace the existing
 configuration. To completely override the default configuration, set the
-``disable_existing_loggers`` key to True in the :setting:`LOGGING`
-dictConfig. Alternatively you can redefine some or all of the loggers.
+``disable_existing_loggers`` key to ``True`` (which is the default) in the
+:setting:`LOGGING` dictConfig. Alternatively you can redefine some or all of
+the loggers by setting ``disable_existing_loggers`` to ``False``.
 
 Logging is configured as soon as settings have been loaded
 (either manually using :func:`~django.conf.settings.configure` or when at least
