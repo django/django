@@ -122,7 +122,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
             return s
         else:
             return s.decode('utf-8', errors).encode(encoding, errors)
-    if strings_only and (s is None or isinstance(s, int)):
+    if strings_only and is_protected_type(s):
         return s
     if isinstance(s, Promise):
         return six.text_type(s).encode(encoding, errors)
