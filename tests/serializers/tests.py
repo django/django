@@ -451,6 +451,10 @@ class NoYamlSerializerTestCase(TestCase):
         jane = Author(name="Jane")
         self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
 
+    def test_deserializer_pyyaml_error_message(self):
+        """Using yaml deserializer without pyyaml raises ImportError"""
+        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
+
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
 class YamlSerializerTestCase(SerializersTestBase, TestCase):
