@@ -246,10 +246,10 @@ class AbstractBaseUser(models.Model):
         return is_password_usable(self.password)
 
     def get_full_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('instances of AbstractBaseUser must override get_full_name() method.')
 
     def get_short_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('instances of AbstractBaseUser must override get_short_name() method.')
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -442,16 +442,16 @@ class AnonymousUser(object):
         return 1  # instances always return the same hash value
 
     def save(self):
-        raise NotImplementedError
+        raise NotImplementedError('Django provides no DB representation for anonymous users objects')
 
     def delete(self):
-        raise NotImplementedError
+        raise NotImplementedError('Django provides no DB representation for anonymous user objects')
 
     def set_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError('Django provides no DB representation for anonymous user objects')
 
     def check_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError('Django provides no DB representation for anonymous user objects')
 
     def _get_groups(self):
         return self._groups
