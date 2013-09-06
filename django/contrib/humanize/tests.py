@@ -28,6 +28,7 @@ from i18n import TransRealMixin
 
 now = datetime.datetime(2012, 3, 9, 22, 30)
 
+
 class MockDateTime(datetime.datetime):
     @classmethod
     def now(self, tz=None):
@@ -40,11 +41,11 @@ class MockDateTime(datetime.datetime):
 
 class HumanizeTests(TransRealMixin, TestCase):
 
-    def humanize_tester(self, test_list, result_list, method):
+    def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
             t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, escape(result),
+            self.assertEqual(rendered, normalize_result_func(result),
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
 
     def test_ordinal(self):
@@ -57,6 +58,19 @@ class HumanizeTests(TransRealMixin, TestCase):
 
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'ordinal')
+
+    def test_i18n_html_ordinal(self):
+        """Allow html in output on i18n strings"""
+        test_list = ('1', '2', '3', '4', '11', '12',
+                     '13', '101', '102', '103', '111',
+                     'something else', None)
+        result_list = ('1<sup>er</sup>', '2<sup>e</sup>', '3<sup>e</sup>', '4<sup>e</sup>',
+                       '11<sup>e</sup>', '12<sup>e</sup>', '13<sup>e</sup>', '101<sup>er</sup>',
+                       '102<sup>e</sup>', '103<sup>e</sup>', '111<sup>e</sup>', 'something else',
+                       'None')
+
+        with translation.override('fr-fr'):
+            self.humanize_tester(test_list, result_list, 'ordinal', lambda x: x)
 
     def test_intcomma(self):
         test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
