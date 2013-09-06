@@ -502,13 +502,15 @@ password resets. You must then provide some key implementation details:
 
     .. attribute:: REQUIRED_FIELDS
 
-        A list of the field names that *must* be provided when creating a user
-        via the :djadmin:`createsuperuser` management command. The user will be
-        prompted to supply a value for each of these fields. It should include
-        any field for which :attr:`~django.db.models.Field.blank` is ``False``
-        or undefined, but may include additional fields you want prompted for
-        when a user is created interactively. However, it will not work for
-        :class:`~django.db.models.ForeignKey` fields.
+        A list of the field names that will be prompted for when creating a
+        user via the :djadmin:`createsuperuser` management command. The user
+        will be prompted to supply a value for each of these fields. It must
+        include any field for which :attr:`~django.db.models.Field.blank` is
+        ``False`` or undefined and may include additional fields you want
+        prompted for when a user is created interactively. However, it will not
+        work for :class:`~django.db.models.ForeignKey` fields.
+        ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
+        creating a user in the admin.
 
         For example, here is the partial definition for a ``User`` model that
         defines two required fields - a date of birth and height::
