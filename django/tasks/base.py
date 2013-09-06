@@ -22,8 +22,7 @@ class Task(object):
         self.run = func
 
     def __repr__(self):
-        return "<task %s(*%r, **%r)>" % (
-            self.name, self.args, self.kwargs)
+        return "<task %s>" % self.name
 
     def _get_backend(self):
         return DummyBackend()
