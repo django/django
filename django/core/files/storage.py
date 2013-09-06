@@ -215,6 +215,7 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
+                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()
