@@ -1290,6 +1290,11 @@ class LanguageNotFoundTests(TransRealMixin, TestCase):
        activate('iu-ca')
        deactivate()
 
+    @override_settings(LANGUAGE_CODE='fr-xx')
+    def test_language_fallback(self):
+        activate('iu')
+        self.assertEqual('fr-xx', get_language())
+
     def test_failure_finding_po_files(self):
         self.flush_caches()
         self.mockGettextFind()
