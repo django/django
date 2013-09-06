@@ -79,8 +79,8 @@ documentation:
 * **MySQL**, **PostgreSQL**, **SQLite**
 
 * **SQL** -- when referring to SQL, the expected pronunciation should be
-  "Ess Queue Ell" and not "sequel", and all instances of "SQL" should be
-  preceded by "an" and not "a".
+  "Ess Queue Ell" and not "sequel". Thus in a phrase like "Returns an
+  SQL expression", "SQL" should be preceded by "an" and not "a".
 
 * **Python** -- when referring to the language, capitalize Python.
 
