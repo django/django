@@ -1,6 +1,7 @@
 from django.tasks.base import Task
 from django.tasks.register import registry
 
+
 def task(name_or_func=None, name=None):
     # @task
     if callable(name_or_func):
