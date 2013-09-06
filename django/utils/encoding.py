@@ -60,8 +60,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    # Handle the common case first, saves 30-40% when s is an instance of
-    # six.text_type. This function gets called often in that setting.
+    # Handle the common case first for performance reasons.
     if isinstance(s, six.text_type):
         return s
     if strings_only and is_protected_type(s):
@@ -115,8 +114,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if isinstance(s, six.memoryview):
-        s = bytes(s)
+    # Handle the common case first for performance reasons.
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
@@ -124,6 +122,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
             return s.decode('utf-8', errors).encode(encoding, errors)
     if strings_only and is_protected_type(s):
         return s
+    if isinstance(s, six.memoryview):
+        return bytes(s)
     if isinstance(s, Promise):
         return six.text_type(s).encode(encoding, errors)
     if not isinstance(s, six.string_types):
