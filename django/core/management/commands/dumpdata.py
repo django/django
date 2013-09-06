@@ -106,11 +106,11 @@ class Command(BaseCommand):
         # Check that the serialization format exists; this is a shortcut to
         # avoid collating all the objects and _then_ failing.
         if format not in serializers.get_public_serializer_formats():
-            raise CommandError("Unknown serialization format: %s" % format)
+            try:
+                serializers.get_serializer(format)
+            except serializers.SerializerDoesNotExist:
+                pass
 
-        try:
-            serializers.get_serializer(format)
-        except KeyError:
             raise CommandError("Unknown serialization format: %s" % format)
 
         def get_objects():
