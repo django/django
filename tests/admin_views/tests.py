@@ -48,7 +48,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping)
+    Telegram, Pizza, Topping, FilteredManager)
 from .admin import site, site2
 
 
@@ -2656,6 +2656,12 @@ class AdminCustomQuerysetTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         self.pks = [EmptyModel.objects.create().id for i in range(3)]
+        self.super_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'super',
+            'password': 'secret',
+        }
 
     def test_changelist_view(self):
         response = self.client.get('/test_admin/admin/admin_views/emptymodel/')
@@ -2872,6 +2878,20 @@ class AdminCustomQuerysetTest(TestCase):
             '<li class="success">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
             html=True
         )
+
+    def test_history_view_custom_qs(self):
+        """
+        Ensure that custom querysets are considered for the admin history view.
+        Refs #21013.
+        """
+        self.client.post('/test_admin/admin/', self.super_login)
+        FilteredManager.objects.create(pk=1)
+        FilteredManager.objects.create(pk=2)
+        response = self.client.get('/test_admin/admin/admin_views/filteredmanager/')
+        self.assertContains(response, "PK=1")
+        self.assertContains(response, "PK=2")
+        self.assertEqual(self.client.get('/test_admin/admin/admin_views/filteredmanager/1/history/').status_code, 200)
+        self.assertEqual(self.client.get('/test_admin/admin/admin_views/filteredmanager/2/history/').status_code, 200)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
