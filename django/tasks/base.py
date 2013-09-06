@@ -40,7 +40,7 @@ class Task(object):
         task_id = backend.delay(self, *args, **kwargs)
         return TaskResult(backend, task_id)
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         # call it right away
-        return self._run(*self.args, **self.kwargs)
+        return self.run(*args, **kwargs)
 

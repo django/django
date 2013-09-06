@@ -49,3 +49,19 @@ class TestTaskDecorator(unittest.TestCase):
 
         self.assertIn('some_name', registry._registry)
         self.assertIs(t, registry._registry['some_name'])
+
+class TestTask(unittest.TestCase):
+    def test_task_works_as_original_callable(self):
+        o = object()
+        def f():
+            return o
+
+        t = Task(f)
+        self.assertIs(o, t())
+
+    def test_all_args_and_kwargs_are_passed(self):
+        t = Task(dummy_task)
+        self.assertEqual(
+            ((1, 2, 42), {'answer': 42, 'question': None}),
+            t(1, 2, 42, answer=42, question=None)
+        )
