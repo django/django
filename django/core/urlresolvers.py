@@ -313,7 +313,7 @@ class RegexURLResolver(LocaleRegexProvider):
     def resolve(self, path):
         # Coerce path to text
         # Needed to force reverse_lazy objects to text
-        path = six.text_type(path)
+        path = force_text(path)
         tried = []
         match = self.regex.search(path)
         if match:
