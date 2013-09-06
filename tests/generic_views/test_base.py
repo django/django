@@ -472,7 +472,7 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
 
 class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
 
-    def test_create_view_with_form_only(self):
+    def test_template_mixin_without_template(self):
         """
         We want to makes sure that if you use a template mixin, but forget the
         template, it still tells you it's ImproperlyConfigured instead of
