@@ -88,11 +88,9 @@ your project's ``manage.py`` utility::
 
     $ ./manage.py test
 
-Test discovery is based on the unittest module's `built-in test discovery`.  By
-default, this will discover tests in any file named "test*.py" under the
-current working directory.
-
-.. _built-in test discovery: http://docs.python.org/2/library/unittest.html#test-discovery
+Test discovery is based on the unittest module's :py:ref:`built-in test
+discovery <unittest-test-discovery>`.  By default, this will discover tests in
+any file named "test*.py" under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
