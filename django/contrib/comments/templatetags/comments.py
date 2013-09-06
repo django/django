@@ -112,7 +112,7 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
 
     def get_context_value_from_queryset(self, context, qs):
         """Subclasses should override this."""
-        raise NotImplementedError('subclasses must provide get_context_value_from_queryset() method')
+        raise NotImplementedError('subclasses of BaseCommentNode must provide get_context_value_from_queryset() method')
 
 class CommentListNode(BaseCommentNode):
     """Insert a list of comments into the context."""

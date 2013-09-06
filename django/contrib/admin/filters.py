@@ -33,26 +33,26 @@ class ListFilter(object):
         """
         Returns True if some choices would be output for this filter.
         """
-        raise NotImplementedError('instances of ListFilter must provide a has_output() method')
+        raise NotImplementedError('sublasses of ListFilter must provide a has_output() method')
 
     def choices(self, cl):
         """
         Returns choices ready to be output in the template.
         """
-        raise NotImplementedError('instances of ListFilter must provide a choices() method')
+        raise NotImplementedError('subclasses of ListFilter must provide a choices() method')
 
     def queryset(self, request, queryset):
         """
         Returns the filtered queryset.
         """
-        raise NotImplementedError('instances of ListFilter must provide a queryset() method')
+        raise NotImplementedError('subclasses of ListFilter must provide a queryset() method')
 
     def expected_parameters(self):
         """
         Returns the list of parameter names that are expected from the
         request's query string and that will be used by this filter.
         """
-        raise NotImplementedError('instances of ListFilter must provide a expected_parameters() method')
+        raise NotImplementedError('subclasses of ListFilter must provide a expected_parameters() method')
 
 
 class SimpleListFilter(ListFilter):
