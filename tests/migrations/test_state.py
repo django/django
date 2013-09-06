@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import models
 from django.db.models.loading import BaseAppCache
-from django.db.migrations.state import ProjectState, ModelState
+from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
 
 
 class StateTests(TestCase):
@@ -166,3 +166,12 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(F))
         final_app_cache = project_state.render()
         self.assertEqual(len(final_app_cache.get_models()), 6)
+
+        # Now make an invalid ProjectState and make sure it fails
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(A))
+        project_state.add_model_state(ModelState.from_model(B))
+        project_state.add_model_state(ModelState.from_model(C))
+        project_state.add_model_state(ModelState.from_model(F))
+        with self.assertRaises(InvalidBasesError):
+            project_state.render()
