@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import unittest
 import warnings
 
 from django.contrib.sites.models import Site
@@ -9,6 +10,12 @@ from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.utils import six
 
 from .models import Article, Book, Spy, Tag, Visa
+
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -390,3 +397,13 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
             '<Article: Time to reform copyright>',
             '<Article: Poker has no place on ESPN>',
         ])
+
+
+@unittest.skipIf(HAS_YAML, "Yaml is installed")
+class NoYamlDumpdataTestCase(TestCase):
+    """Not having pyyaml installed provides a misleading error
+
+    #12756
+    """
+    def test_missing_pyyaml_error_message(self):
+        self.assertRaises(ImportError, management.call_command, 'dumpdata', format='yaml')
