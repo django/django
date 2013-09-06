@@ -1638,7 +1638,7 @@ class SecureViewTests(TestCase):
     def test_secure_view_shows_login_if_not_logged_in(self):
         "Ensure that we see the login form"
         response = self.client.get('/test_admin/admin/secure-view/')
-        self.assertTemplateUsed(response, 'admin/login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
 
     def test_secure_view_login_successfully_redirects_to_original_url(self):
         response = self.client.get('/test_admin/admin/secure-view/')
@@ -1732,7 +1732,7 @@ class SecureViewTests(TestCase):
 
         # Not logged in: we should see the login page.
         response = self.client.get(shortcut_url, follow=False)
-        self.assertTemplateUsed(response, 'admin/login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
 
         # Logged in? Redirect.
         self.client.login(username='super', password='secret')
@@ -4283,7 +4283,7 @@ class AdminViewLogoutTest(TestCase):
         # follow the redirect and test results.
         response = self.client.get('/test_admin/admin/logout/', follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
         self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
         self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
 

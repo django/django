@@ -303,9 +303,8 @@ class AdminSite(object):
         defaults = {
             'current_app': self.name,
             'extra_context': extra_context or {},
+            'template_name': self.logout_template or 'registration/logged_out.html'
         }
-        if self.logout_template is not None:
-            defaults['template_name'] = self.logout_template
         return logout(request, **defaults)
 
     @never_cache
@@ -325,7 +324,7 @@ class AdminSite(object):
             'extra_context': context,
             'current_app': self.name,
             'authentication_form': self.login_form or AdminAuthenticationForm,
-            'template_name': self.login_template or 'admin/login.html',
+            'template_name': self.login_template or 'registration/login.html',
         }
         return login(request, **defaults)
 
