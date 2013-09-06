@@ -245,6 +245,11 @@ CachedStaticFilesStorage
     * you've collected all your static files by using the
       :djadmin:`collectstatic` management command
 
+    .. warning::
+
+        :djadmin:`runserver` ``--insecure`` doesn't work with :setting:`DEBUG`
+        False and :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+
     Since creating the MD5 hash can be a performance burden to your website
     during runtime, ``staticfiles`` will automatically try to cache the
     hashed name for each file path using Django's :doc:`caching
