@@ -74,10 +74,7 @@ class BaseDatabaseSchemaEditor(object):
         if exc_type is None:
             for sql in self.deferred_sql:
                 self.execute(sql)
-            atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(None, None, None)
-        else:
-            # Continue propagating exception
-            return None
+        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
