@@ -19,7 +19,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
     SwallowAdmin, DynamicListFilterChildAdmin, InvitationAdmin,
-    DynamicSearchFieldsChildAdmin)
+    DynamicSearchFieldsChildAdmin, NoListDisplayLinksParentAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject, CustomIdUser)
@@ -459,6 +459,16 @@ class ChangeListTests(TestCase):
         list_display_links = m.get_list_display_links(request, list_display)
         self.assertEqual(list_display, ('parent', 'name', 'age'))
         self.assertEqual(list_display_links, ['age'])
+
+    def test_no_list_display_links(self):
+        """#15185 -- Allow no links from the 'change list' view grid."""
+        p = Parent.objects.create(name='parent')
+        m = NoListDisplayLinksParentAdmin(Parent, admin.site)
+        superuser = self._create_superuser('superuser')
+        request = self._mocked_authenticated_request('/parent/', superuser)
+        response = m.changelist_view(request)
+        link = reverse('admin:admin_changelist_parent_change', args=(p.pk,))
+        self.assertNotContains(response, '<a href="%s">' % link)
 
     def test_tuple_list_display(self):
         """

@@ -967,6 +967,11 @@ class ValidationTests(unittest.TestCase):
 
         ValidationTestModelAdmin.validate(ValidationTestModel)
 
+        class ValidationTestModelAdmin(ModelAdmin):
+            list_display_links = None
+
+        ValidationTestModelAdmin.validate(ValidationTestModel)
+
     def test_list_filter_validation(self):
 
         class ValidationTestModelAdmin(ModelAdmin):

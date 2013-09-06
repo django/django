@@ -164,6 +164,10 @@ Minor features
   new :func:`~django.contrib.admin.register` decorator to register a
   :class:`~django.contrib.admin.ModelAdmin`.
 
+* You may specify :meth:`ModelAdmin.list_display_links
+  <django.contrib.admin.ModelAdmin.list_display_links>` ``= None`` to disable
+  links on the change list page grid.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
