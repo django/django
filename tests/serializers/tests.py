@@ -14,7 +14,7 @@ except ImportError:
 
 
 from django.conf import settings
-from django.core import serializers
+from django.core import management, serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
 from django.utils import six
@@ -438,6 +438,26 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
             "name": "Agnes"
         }
     }]"""
+
+
+@unittest.skipIf(HAS_YAML, "Yaml is installed")
+class NoYamlSerializerTestCase(TestCase):
+    """Not having pyyaml installed provides a misleading error
+
+    #12756
+    """
+    def test_missing_pyyaml_error_message(self):
+        """Using yaml serializer without pyyaml raises ImportError"""
+        jane = Author(name="Jane")
+        self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
+
+    def test_deserializer_pyyaml_error_message(self):
+        """Using yaml deserializer without pyyaml raises ImportError"""
+        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
+
+    def test_missing_pyyaml_error_message(self):
+        self.assertRaisesRegexp(management.CommandError, r'No module named yaml',
+                management.call_command, 'dumpdata', format='yaml')
 
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
