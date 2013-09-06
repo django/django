@@ -279,6 +279,15 @@ class FloatField(IntegerField):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
 
+    def validate(self, value):
+        super(FloatField, self).validate(value)
+
+        # Check for NaN (which is the only thing not equal to itself) and +/- infinity
+        if value != value or value in (Decimal('Inf'), Decimal('-Inf')):
+            raise ValidationError(self.error_messages['invalid'], code='invalid')
+
+        return value
+
     def widget_attrs(self, widget):
         attrs = super(FloatField, self).widget_attrs(widget)
         if isinstance(widget, NumberInput):

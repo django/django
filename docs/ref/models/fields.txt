@@ -1062,11 +1062,12 @@ define the details of how the relation works.
     only allows the choice of related objects with a ``pub_date`` before the
     current date to be chosen.
 
-    Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object for more :ref:`complex queries <complex-lookups-with-q>`. However,
-    if ``limit_choices_to`` is a :class:`~django.db.models.Q` object then it
-    will only have an effect on the choices available in the admin when the
-    field is not listed in ``raw_id_fields`` in the ``ModelAdmin`` for the model.
+    Instead of a dictionary this can also be a :class:`Q object
+    <django.db.models.Q>` for more :ref:`complex queries
+    <complex-lookups-with-q>`. However, if ``limit_choices_to`` is a :class:`Q
+    object <django.db.models.Q>` then it will only have an effect on the
+    choices available in the admin when the field is not listed in
+    ``raw_id_fields`` in the ``ModelAdmin`` for the model.
 
 .. attribute:: ForeignKey.related_name
 

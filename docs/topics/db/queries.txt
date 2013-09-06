@@ -588,18 +588,16 @@ relation). Conditions in subsequent
 :meth:`~django.db.models.query.QuerySet.exclude` calls that refer to the same
 relation may end up filtering on different linked objects.
 
-.. _query-expressions:
+.. _using-f-expressions-in-filters:
 
 Filters can reference fields on the model
 -----------------------------------------
-
-.. class:: F
 
 In the examples given so far, we have constructed filters that compare
 the value of a model field with a constant. But what if you want to compare
 the value of a model field with another field on the same model?
 
-Django provides the :ref:`F() expressions <query-expressions>` to allow such
+Django provides :class:`F expressions <django.db.models.F>` to allow such
 comparisons. Instances of ``F()`` act as a reference to a model field within a
 query. These references can then be used in query filters to compare the values
 of two different fields on the same model instance.
@@ -779,15 +777,11 @@ being evaluated and therefore populate the cache::
 Complex lookups with Q objects
 ==============================
 
-.. class:: Q
-
 Keyword argument queries -- in :meth:`~django.db.models.query.QuerySet.filter`,
 etc. -- are "AND"ed together. If you need to execute more complex queries (for
-example, queries with ``OR`` statements), you can use ``Q`` objects.
+example, queries with ``OR`` statements), you can use :class:`Q objects <django.db.models.Q>`.
 
-.. comment: Link to Q does not work, since this documentation does not exist yet.
-
-A :class:`~django.db.models.Q` object (``django.db.models.Q``) is an object
+A :class:`Q object <django.db.models.Q>` (``django.db.models.Q``) is an object
 used to encapsulate a collection of keyword arguments. These keyword arguments
 are specified as in "Field lookups" above.
 
@@ -1019,10 +1013,10 @@ over them and call :meth:`~django.db.models.Model.save`::
     for item in my_queryset:
         item.save()
 
-Calls to update can also use :ref:`F() objects <query-expressions>` to update
-one field based on the value of another field in the model. This is especially
-useful for incrementing counters based upon their current value. For example, to
-increment the pingback count for every entry in the blog::
+Calls to update can also use :class:`F expressions <django.db.models.F>` to
+update one field based on the value of another field in the model. This is
+especially useful for incrementing counters based upon their current value. For
+example, to increment the pingback count for every entry in the blog::
 
     >>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
 

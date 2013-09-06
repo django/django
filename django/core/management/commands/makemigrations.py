@@ -52,7 +52,7 @@ class Command(BaseCommand):
         changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)
 
         # No changes? Tell them.
-        if not changes:
+        if not changes and self.verbosity >= 1:
             if len(app_labels) == 1:
                 self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
             elif len(app_labels) > 1:
@@ -63,13 +63,15 @@ class Command(BaseCommand):
 
         directory_created = {}
         for app_label, migrations in changes.items():
-            self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
+            if self.verbosity >= 1:
+                self.stdout.write(self.style.MIGRATE_HEADING("Migrations for '%s':" % app_label) + "\n")
             for migration in migrations:
                 # Describe the migration
                 writer = MigrationWriter(migration)
-                self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
-                for operation in migration.operations:
-                    self.stdout.write("    - %s\n" % operation.describe())
+                if self.verbosity >= 1:
+                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
+                    for operation in migration.operations:
+                        self.stdout.write("    - %s\n" % operation.describe())
                 # Write it
                 migrations_directory = os.path.dirname(writer.path)
                 if not directory_created.get(app_label, False):
@@ -80,5 +82,5 @@ class Command(BaseCommand):
                         open(init_path, "w").close()
                     # We just do this once per app
                     directory_created[app_label] = True
-                with open(writer.path, "w") as fh:
+                with open(writer.path, "wb") as fh:
                     fh.write(writer.as_string())

@@ -759,10 +759,45 @@ Django uses the template loaders in order according to the
 :setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
 match.
 
+.. currentmodule:: django.template
+
+Template origin
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
+``origin`` attribute depending on the source they are loaded from.
+
+.. class:: loader.LoaderOrigin
+
+    Templates created from a template loader will use the
+    ``django.template.loader.LoaderOrigin`` class.
+
+    .. attribute:: name
+
+        The path to the template as returned by the template loader.
+        For loaders that read from the file system, this is the full
+        path to the template.
+
+    .. attribute:: loadname
+
+        The relative path to the template as passed into the
+        template loader.
+
+.. class:: StringOrigin
+
+    Templates created from a ``Template`` class will use the
+    ``django.template.StringOrigin`` class.
+
+    .. attribute:: source
+
+        The string used to create the template.
+
 The ``render_to_string`` shortcut
 ===================================
 
-.. function:: django.template.loader.render_to_string(template_name, dictionary=None, context_instance=None)
+.. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which largely

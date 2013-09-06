@@ -395,6 +395,9 @@ class Field(object):
             "check": check_string,
         }
 
+    def db_type_suffix(self, connection):
+        return connection.creation.data_types_suffix.get(self.get_internal_type())
+
     @property
     def unique(self):
         return self._unique or self.primary_key

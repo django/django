@@ -50,8 +50,20 @@ class MigrationAutodetector(object):
         self.migrations = {}
         old_app_cache = self.from_state.render()
         new_app_cache = self.to_state.render()
+        # Prepare lists of old/new model keys that we care about
+        # (i.e. ignoring proxy ones)
+        old_model_keys = [
+            (al, mn)
+            for al, mn in self.from_state.models.keys()
+            if not old_app_cache.get_model(al, mn)._meta.proxy
+        ]
+        new_model_keys = [
+            (al, mn)
+            for al, mn in self.to_state.models.keys()
+            if not new_app_cache.get_model(al, mn)._meta.proxy
+        ]
         # Adding models. Phase 1 is adding models with no outward relationships.
-        added_models = set(self.to_state.models.keys()) - set(self.from_state.models.keys())
+        added_models = set(new_model_keys) - set(old_model_keys)
         pending_add = {}
         for app_label, model_name in added_models:
             model_state = self.to_state.models[app_label, model_name]
@@ -130,7 +142,7 @@ class MigrationAutodetector(object):
             )
             self.add_dependency(app_label, other_app_label)
         # Removing models
-        removed_models = set(self.from_state.models.keys()) - set(self.to_state.models.keys())
+        removed_models = set(old_model_keys) - set(new_model_keys)
         for app_label, model_name in removed_models:
             model_state = self.from_state.models[app_label, model_name]
             self.add_to_migration(
@@ -140,7 +152,7 @@ class MigrationAutodetector(object):
                 )
             )
         # Changes within models
-        kept_models = set(self.from_state.models.keys()).intersection(self.to_state.models.keys())
+        kept_models = set(old_model_keys).intersection(new_model_keys)
         for app_label, model_name in kept_models:
             old_model_state = self.from_state.models[app_label, model_name]
             new_model_state = self.to_state.models[app_label, model_name]
