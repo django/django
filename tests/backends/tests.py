@@ -951,22 +951,19 @@ class UnicodeArrayTestCase(TestCase):
         cursor.execute("select %s", (val,))
         return cursor.fetchone()[0]
 
+    @unittest.skipUnless(
+        connection.vendor == 'postgresql',
+        "This test applies only to PostgreSQL")
     def test_select_ascii_array(self):
-        a = ["awef"]
-        try:
-            b = self.select(a)
-            self.assertEqual(a[0], b[0])
-        except InterfaceError:
-            #this means that our test Db doesn't support
-            # selecting based on arrays (it's probably SQLite).
-            pass
 
+        a = ["awef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
+
+    @unittest.skipUnless(
+        connection.vendor == 'postgresql',
+        "This test applies only to PostgreSQL")
     def test_select_unicode_array(self):
         a = [u"ᄲawef"]
-        try:
-            b = self.select(a)
-            self.assertEqual(a[0], b[0])
-        except InterfaceError:
-            #this means that our test Db doesn't support
-            # selecting based on arrays (it's probably SQLite).
-            pass
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
