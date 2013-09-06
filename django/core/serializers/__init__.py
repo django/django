@@ -17,6 +17,7 @@ To add your own serializers, use the SERIALIZATION_MODULES setting::
 """
 
 import importlib
+import sys
 
 from django.conf import settings
 from django.utils import six
@@ -71,6 +72,14 @@ def get_serializer(format):
     if not _serializers:
         _load_serializers()
     if format not in _serializers:
+        # Issue 12756 describes describes that trying to use the yaml
+        # serializer without having pyyaml installed will lead to a misleading
+        # "serializer does not exist" error.  Here, if the requested format is
+        # yaml and the yaml module is not in sys.modules, attempt to import it,
+        # which will lead to an ImportError; a more meaningful exception.
+        if format == "yaml" and format not in sys.modules:
+            import yaml
+
         raise SerializerDoesNotExist(format)
     return _serializers[format].Serializer
 
