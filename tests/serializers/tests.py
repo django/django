@@ -451,7 +451,7 @@ class YamlImportModuleMock(object):
     serializer is being imported.  The importlib.import_module() call is
     being made in the serializers.register_serializer().
 
-    #12756
+    Refs: #12756
     """
     def __init__(self):
         self._import_module = importlib.import_module
@@ -466,7 +466,7 @@ class YamlImportModuleMock(object):
 class NoYamlSerializerTestCase(TestCase):
     """Not having pyyaml installed provides a misleading error
 
-    #12756
+    Refs: #12756
     """
     @classmethod
     def setUpClass(cls):
@@ -489,7 +489,7 @@ class NoYamlSerializerTestCase(TestCase):
         # clear out cached serializers to clean out BadSerializer instances
         serializers._serializers = {}
 
-    def test_missing_pyyaml_error_message(self):
+    def test_serializer_pyyaml_error_message(self):
         """Using yaml serializer without pyyaml raises ImportError"""
         jane = Author(name="Jane")
         self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
@@ -498,7 +498,8 @@ class NoYamlSerializerTestCase(TestCase):
         """Using yaml deserializer without pyyaml raises ImportError"""
         self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
 
-    def test_missing_pyyaml_error_message(self):
+    def test_dumpdata_pyyaml_error_message(self):
+        """Calling dumpdata produces an error when yaml package missing"""
         self.assertRaisesRegexp(management.CommandError, YAML_IMPORT_ERROR_MESSAGE,
                 management.call_command, 'dumpdata', format='yaml')
 

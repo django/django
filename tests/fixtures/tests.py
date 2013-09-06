@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import unittest
 import warnings
 
 from django.contrib.sites.models import Site
