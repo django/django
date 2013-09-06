@@ -257,8 +257,10 @@ class ModelAdminValidator(BaseValidator):
                                     % (cls.__name__, idx, field))
 
     def validate_list_display_links(self, cls, model):
-        " Validate that list_display_links is a unique subset of list_display. "
+        " Validate that list_display_links either is None or a unique subset of list_display."
         if hasattr(cls, 'list_display_links'):
+            if cls.list_display_links is None:
+                return
             check_isseq(cls, 'list_display_links', cls.list_display_links)
             for idx, field in enumerate(cls.list_display_links):
                 if field not in cls.list_display:
@@ -344,15 +346,16 @@ class ModelAdminValidator(BaseValidator):
                     raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "
                         "'%s' which is not defined in 'list_display'."
                         % (cls.__name__, idx, field_name))
-                if field_name in cls.list_display_links:
-                    raise ImproperlyConfigured("'%s' cannot be in both '%s.list_editable'"
-                        " and '%s.list_display_links'"
-                        % (field_name, cls.__name__, cls.__name__))
-                if not cls.list_display_links and cls.list_display[0] in cls.list_editable:
-                    raise ImproperlyConfigured("'%s.list_editable[%d]' refers to"
-                        " the first field in list_display, '%s', which can't be"
-                        " used unless list_display_links is set."
-                        % (cls.__name__, idx, cls.list_display[0]))
+                if cls.list_display_links is not None:
+                    if field_name in cls.list_display_links:
+                        raise ImproperlyConfigured("'%s' cannot be in both '%s.list_editable'"
+                            " and '%s.list_display_links'"
+                            % (field_name, cls.__name__, cls.__name__))
+                    if not cls.list_display_links and cls.list_display[0] in cls.list_editable:
+                        raise ImproperlyConfigured("'%s.list_editable[%d]' refers to"
+                            " the first field in list_display, '%s', which can't be"
+                            " used unless list_display_links is set."
+                            % (cls.__name__, idx, cls.list_display[0]))
                 if not field.editable:
                     raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
                         "field, '%s', which isn't editable through the admin."
