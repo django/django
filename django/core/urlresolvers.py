@@ -311,6 +311,7 @@ class RegexURLResolver(LocaleRegexProvider):
         return self._app_dict[language_code]
 
     def resolve(self, path):
+        path = force_text(path)  # path may be a reverse_lazy object
         tried = []
         match = self.regex.search(path)
         if match:

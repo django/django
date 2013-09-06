@@ -205,9 +205,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             return True
 
-    def schema_editor(self):
+    def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self)
+        return DatabaseSchemaEditor(self, *args, **kwargs)
 
     @cached_property
     def psycopg2_version(self):
