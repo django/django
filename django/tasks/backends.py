@@ -19,6 +19,9 @@ class DummyBackend(object):
             return SUCCESS
         return UNKNOWN
 
+    def kill(self, task_id):
+        return
+
     def get_result(self, task_id):
         try:
             return self._results.pop(task_id)

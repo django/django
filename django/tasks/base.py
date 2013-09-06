@@ -11,6 +11,9 @@ class TaskResult(object):
     def status(self, **kwargs):
         return self._backend.status(self._task_id, **kwargs)
 
+    def kill(self, **kwargs):
+        return self._backend.kill(self._task_id, **kwargs)
+
     def get_result(self, **kwargs):
         return self._backend.get_result(self._task_id, **kwargs)
 
