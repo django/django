@@ -51,6 +51,12 @@ class ErrorDict(dict):
     def as_text(self):
         return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
 
+    def as_dict(self):
+        return dict(
+            (k, map(unicode, v))
+            for (k, v) in self.iteritems()
+        )
+
 @python_2_unicode_compatible
 class ErrorList(list):
     """
