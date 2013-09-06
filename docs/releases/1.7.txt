@@ -111,8 +111,10 @@ Minor features
 :mod:`django.contrib.admin`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* You can now implement ``site_header``, ``site_title`` and ``index_title``
-  attributes on a custom ``AdminSite`` in order to easily change the admin
+* You can now implement :attr:`~django.contrib.admin.AdminSite.site_header`,
+  :attr:`~django.contrib.admin.AdminSite.site_title`, and
+  :attr:`~django.contrib.admin.AdminSite.index_title` attributes on a custom
+  :class:`~django.contrib.admin.AdminSite` in order to easily change the admin
   site's page title and header text. No more needing to override templates!
 
 * Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
