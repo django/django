@@ -4,10 +4,25 @@ from __future__ import unicode_literals
 import unittest
 import datetime
 
-from django.utils.encoding import force_bytes, filepath_to_uri
+from django.utils import six
+from django.utils.encoding import force_bytes, force_text, filepath_to_uri
 
 
 class TestEncodingUtils(unittest.TestCase):
+    def test_force_text_exception(self):
+        """
+        Check that broken __unicode__/__str__ actually raises an error.
+        """
+        class MyString(object):
+            def __str__(self):
+                return b'\xc3\xb6\xc3\xa4\xc3\xbc'
+
+            __unicode__ = __str__
+
+        # str(s) raises a TypeError on python 3 if the result is not a text type.
+        # python 2 fails when it tries converting from str to unicode (via ASCII).
+        exception = TypeError if six.PY3 else UnicodeError
+        self.assertRaises(exception, force_text, MyString())
 
     def test_force_bytes_exception(self):
         """
