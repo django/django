@@ -290,6 +290,13 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
         self.assertRaises(UnicodeError, r.__setitem__, 'føø'.encode('utf-8'), 'bar')
 
+    def test_long_line(self):
+        # Bug #20889: long lines trigger newlines to be added to headers
+        # (which is not allowed due to bug #10188)
+        h = HttpResponse()
+        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
+        f = f.decode('utf-8')
+        h['Content-Disposition'] = u'attachment; filename="%s"' % f
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
