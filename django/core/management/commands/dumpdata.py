@@ -103,6 +103,9 @@ class Command(BaseCommand):
                         continue
                     app_list[app] = None
 
+        # #12756 - See if getting a serializer fails
+        serializers.get_serializer(format)
+
         # Check that the serialization format exists; this is a shortcut to
         # avoid collating all the objects and _then_ failing.
         if format not in serializers.get_public_serializer_formats():
