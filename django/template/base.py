@@ -124,6 +124,7 @@ class Template(object):
             origin = StringOrigin(template_string)
         self.nodelist = compile_string(template_string, origin)
         self.name = name
+        self.origin = origin
 
     def __iter__(self):
         for node in self.nodelist:

@@ -63,6 +63,14 @@ class MigrationLoader(object):
                 if "No module named" in str(e) and "migrations" in str(e):
                     self.unmigrated_apps.add(app_label)
                     continue
+                raise
+            else:
+                # PY3 will happily import empty dirs as namespaces.
+                if not hasattr(module, '__file__'):
+                    continue
+                # Module is not a package (e.g. migrations.py).
+                if not hasattr(module, '__path__'):
+                    continue
             self.migrated_apps.add(app_label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
