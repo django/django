@@ -36,104 +36,99 @@ Related objects reference
       In this example, the methods below will be available both on
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
-.. _related-manager-methods:
+    .. method:: add(obj1, [obj2, ...])
 
-Related Manager Methods
------------------------
+        Adds the specified model objects to the related object set.
 
-.. method:: add(obj1, [obj2, ...])
+        Example::
 
-    Adds the specified model objects to the related object set.
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry.objects.get(id=234)
+            >>> b.entry_set.add(e) # Associates Entry e with Blog b.
 
-    Example::
+        In the example above, in the case of a
+        :class:`~django.db.models.ForeignKey` relationship,
+        ``e.save()`` is called by the related manager to perform the update.
+        Using ``add()`` with a many-to-many relationship, however, will not
+        call any ``save()`` methods, but rather create the relationships
+        using :meth:`QuerySet.bulk_create()
+        <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
+        some custom logic when a relationship is created, listen to the
+        :data:`~django.db.models.signals.m2m_changed` signal.
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry.objects.get(id=234)
-        >>> b.entry_set.add(e) # Associates Entry e with Blog b.
+    .. method:: create(**kwargs)
 
-    In the example above, in the case of a
-    :class:`~django.db.models.ForeignKey` relationship,
-    ``e.save()`` is called by the related manager to perform the update.
-    Using ``add()`` with a many-to-many relationship, however, will not
-    call any ``save()`` methods, but rather create the relationships
-    using :meth:`QuerySet.bulk_create()
-    <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
-    some custom logic when a relationship is created, listen to the
-    :data:`~django.db.models.signals.m2m_changed` signal.
+        Creates a new object, saves it and puts it in the related object set.
+        Returns the newly created object::
 
-.. method:: create(**kwargs)
+            >>> b = Blog.objects.get(id=1)
+            >>> e = b.entry_set.create(
+            ...     headline='Hello',
+            ...     body_text='Hi',
+            ...     pub_date=datetime.date(2005, 1, 1)
+            ... )
 
-    Creates a new object, saves it and puts it in the related object set.
-    Returns the newly created object::
+            # No need to call e.save() at this point -- it's already been saved.
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = b.entry_set.create(
-        ...     headline='Hello',
-        ...     body_text='Hi',
-        ...     pub_date=datetime.date(2005, 1, 1)
-        ... )
+        This is equivalent to (but much simpler than)::
 
-        # No need to call e.save() at this point -- it's already been saved.
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry(
+            ...     blog=b,
+            ...     headline='Hello',
+            ...     body_text='Hi',
+            ...     pub_date=datetime.date(2005, 1, 1)
+            ... )
+            >>> e.save(force_insert=True)
 
-    This is equivalent to (but much simpler than)::
+        Note that there's no need to specify the keyword argument of the model
+        that defines the relationship. In the above example, we don't pass the
+        parameter ``blog`` to ``create()``. Django figures out that the new
+        ``Entry`` object's ``blog`` field should be set to ``b``.
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry(
-        ...     blog=b,
-        ...     headline='Hello',
-        ...     body_text='Hi',
-        ...     pub_date=datetime.date(2005, 1, 1)
-        ... )
-        >>> e.save(force_insert=True)
+    .. method:: remove(obj1, [obj2, ...])
 
-    Note that there's no need to specify the keyword argument of the model
-    that defines the relationship. In the above example, we don't pass the
-    parameter ``blog`` to ``create()``. Django figures out that the new
-    ``Entry`` object's ``blog`` field should be set to ``b``.
+        Removes the specified model objects from the related object set::
 
-.. method:: remove(obj1, [obj2, ...])
+            >>> b = Blog.objects.get(id=1)
+            >>> e = Entry.objects.get(id=234)
+            >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
 
-    Removes the specified model objects from the related object set::
+        Similar to :meth:`add()`, ``e.save()`` is called in the example above
+        to perform the update. Using ``remove()`` with a many-to-many
+        relationship, however, will delete the relationships using
+        :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which
+        means no model ``save()`` methods are called; listen to the
+        :data:`~django.db.models.signals.m2m_changed` signal if you wish to
+        execute custom code when a relationship is deleted.
 
-        >>> b = Blog.objects.get(id=1)
-        >>> e = Entry.objects.get(id=234)
-        >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
+        For :class:`~django.db.models.ForeignKey` objects, this method only
+        exists if ``null=True``. If the related field can't be set to ``None``
+        (``NULL``), then an object can't be removed from a relation without
+        being added to another. In the above example, removing ``e`` from
+        ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
+        the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
+        ``null=True``, this is invalid.
 
-    Similar to :meth:`add()`, ``e.save()`` is called in the example above
-    to perform the update. Using ``remove()`` with a many-to-many
-    relationship, however, will delete the relationships using
-    :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which
-    means no model ``save()`` methods are called; listen to the
-    :data:`~django.db.models.signals.m2m_changed` signal if you wish to
-    execute custom code when a relationship is deleted.
+    .. method:: clear()
 
-    For :class:`~django.db.models.ForeignKey` objects, this method only
-    exists if ``null=True``. If the related field can't be set to ``None``
-    (``NULL``), then an object can't be removed from a relation without
-    being added to another. In the above example, removing ``e`` from
-    ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
-    the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
-    ``null=True``, this is invalid.
+        Removes all objects from the related object set::
 
-.. method:: clear()
+            >>> b = Blog.objects.get(id=1)
+            >>> b.entry_set.clear()
 
-    Removes all objects from the related object set::
+        Note this doesn't delete the related objects -- it just disassociates
+        them.
 
-        >>> b = Blog.objects.get(id=1)
-        >>> b.entry_set.clear()
+        Just like ``remove()``, ``clear()`` is only available on
+        :class:`~django.db.models.ForeignKey`\s where ``null=True``.
 
-    Note this doesn't delete the related objects -- it just disassociates
-    them.
+    .. note::
 
-    Just like ``remove()``, ``clear()`` is only available on
-    :class:`~django.db.models.ForeignKey`\s where ``null=True``.
-
-.. note::
-
-   Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
-   apply database changes immediately for all types of related fields. In other
-   words, there is no need to call ``save()`` on either end of the
-   relationship.
+       Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
+       apply database changes immediately for all types of related fields. In other
+       words, there is no need to call ``save()`` on either end of the
+       relationship.
 
 .. _direct-assignment:
 
