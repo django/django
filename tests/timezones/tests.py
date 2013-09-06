@@ -599,7 +599,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -623,7 +623,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30.405060")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -647,7 +647,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30.405060+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -671,7 +671,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 10:20:30+00:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -695,7 +695,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30+03:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -719,7 +719,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
