@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import re
 import threading
 import unittest
 
@@ -106,6 +107,25 @@ class OracleChecks(unittest.TestCase):
         # wasn't the case.
         c.execute(query)
         self.assertEqual(c.fetchone()[0], 1)
+
+
+class SQLiteTests(TestCase):
+    longMessage = True
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                        "Test valid only for SQLite")
+    def test_autoincrement(self):
+        """
+        Check that auto_increment fields are created with the AUTOINCREMENT
+        keyword in order to be monotonically increasing. Refs #10164.
+        """
+        statements = connection.creation.sql_create_model(models.Square,
+            style=no_style())
+        match = re.search('"id" ([^,]+),', statements[0][0])
+        self.assertIsNotNone(match)
+        self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1), "Wrong SQL used to create an auto-increment "
+            "column on SQLite")
 
 
 class MySQLTests(TestCase):

@@ -34,6 +34,16 @@ class AdminSite(object):
     functions that present a full admin interface for the collection of registered
     models.
     """
+
+    # Text to put at the end of each page's <title>.
+    site_title = _('Django site admin')
+
+    # Text to put in each page's <h1>.
+    site_header = _('Django administration')
+
+    # Text to put at the top of the admin index page.
+    index_title = _('Site administration')
+
     login_form = None
     index_template = None
     app_index_template = None
@@ -190,8 +200,7 @@ class AdminSite(object):
             if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
                 auth_logout(request)
             if not self.has_permission(request):
-                if request.path == reverse('admin:logout',
-                                           current_app=self.name):
+                if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
                 return self.login(request)
@@ -217,40 +226,35 @@ class AdminSite(object):
 
         # Admin-site-wide views.
         urlpatterns = patterns('',
-            url(r'^$',
-                wrap(self.index),
-                name='index'),
-            url(r'^logout/$',
-                wrap(self.logout),
-                name='logout'),
-            url(r'^password_change/$',
-                wrap(self.password_change, cacheable=True),
-                name='password_change'),
-            url(r'^password_change/done/$',
-                wrap(self.password_change_done, cacheable=True),
-                name='password_change_done'),
-            url(r'^jsi18n/$',
-                wrap(self.i18n_javascript, cacheable=True),
-                name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
-                wrap(contenttype_views.shortcut),
-                name='view_on_site'),
-            url(r'^(?P<app_label>\w+)/$',
-                wrap(self.app_index),
-                name='app_list')
+            url(r'^$', wrap(self.index), name='index'),
+            url(r'^logout/$', wrap(self.logout), name='logout'),
+            url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
+            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
+            url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
+            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
+            url(r'^(?P<app_label>\w+)/$', wrap(self.app_index), name='app_list'),
         )
 
         # Add in each model's views.
         for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name),
-                    include(model_admin.urls))
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
             )
         return urlpatterns
 
     @property
     def urls(self):
         return self.get_urls(), self.app_name, self.name
+
+    def each_context(self):
+        """
+        Returns a dictionary of variables to put in the template context for
+        *every* page in the admin site.
+        """
+        return {
+            'site_title': self.site_title,
+            'site_header': self.site_header,
+        }
 
     def password_change(self, request):
         """
@@ -260,7 +264,8 @@ class AdminSite(object):
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
             'current_app': self.name,
-            'post_change_redirect': url
+            'post_change_redirect': url,
+            'extra_context': self.each_context(),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -273,7 +278,7 @@ class AdminSite(object):
         from django.contrib.auth.views import password_change_done
         defaults = {
             'current_app': self.name,
-            'extra_context': extra_context or {},
+            'extra_context': dict(self.each_context(), **(extra_context or {})),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -302,7 +307,7 @@ class AdminSite(object):
         from django.contrib.auth.views import logout
         defaults = {
             'current_app': self.name,
-            'extra_context': extra_context or {},
+            'extra_context': dict(self.each_context(), **(extra_context or {})),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -314,11 +319,11 @@ class AdminSite(object):
         Displays the login form for the given HttpRequest.
         """
         from django.contrib.auth.views import login
-        context = {
-            'title': _('Log in'),
-            'app_path': request.get_full_path(),
-            REDIRECT_FIELD_NAME: request.get_full_path(),
-        }
+        context = dict(self.each_context(),
+            title=_('Log in'),
+            app_path=request.get_full_path(),
+        )
+        context[REDIRECT_FIELD_NAME] = request.get_full_path()
         context.update(extra_context or {})
 
         defaults = {
@@ -382,10 +387,10 @@ class AdminSite(object):
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
 
-        context = {
-            'title': _('Site administration'),
-            'app_list': app_list,
-        }
+        context = dict(self.each_context(),
+            title=self.index_title,
+            app_list=app_list,
+        )
         context.update(extra_context or {})
         return TemplateResponse(request, self.index_template or
                                 'admin/index.html', context,
@@ -436,11 +441,11 @@ class AdminSite(object):
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
-        context = {
-            'title': _('%s administration') % capfirst(app_label),
-            'app_list': [app_dict],
-            'app_label': app_label,
-        }
+        context = dict(self.each_context(),
+            title=_('%s administration') % capfirst(app_label),
+            app_list=[app_dict],
+            app_label=app_label,
+        )
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.app_index_template or [
