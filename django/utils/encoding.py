@@ -67,16 +67,15 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     try:
         if not isinstance(s, six.string_types):
-            if hasattr(s, '__unicode__'):
-                s = s.__unicode__()
-            else:
-                if six.PY3:
-                    if isinstance(s, bytes):
-                        s = six.text_type(s, encoding, errors)
-                    else:
-                        s = six.text_type(s)
+            if six.PY3:
+                if isinstance(s, bytes):
+                    s = six.text_type(s, encoding, errors)
                 else:
-                    s = six.text_type(bytes(s), encoding, errors)
+                    s = six.text_type(s)
+            elif hasattr(s, '__unicode__'):
+                s = six.text_type(s)
+            else:
+                s = six.text_type(bytes(s), encoding, errors)
         else:
             # Note: We use .decode() here, instead of six.text_type(s, encoding,
             # errors), so that if s is a SafeBytes, it ends up being a
