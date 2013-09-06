@@ -14,8 +14,6 @@ from unittest import skipIf
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from django.http import HttpRequest
-from django.shortcuts import render
 from django.template.base import TemplateDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.test.utils import (override_settings, setup_test_template_loader,
