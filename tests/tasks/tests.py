@@ -44,4 +44,8 @@ class TestTaskDecorator(unittest.TestCase):
         self.assertIs(t.run, dummier_task)
         self.assertEqual('tasks.tests.DummierTask', t.name)
 
+    def test_decorator_registers_the_task(self):
+        t = task(dummy_task, name='some_name')
 
+        self.assertIn('some_name', registry._registry)
+        self.assertIs(t, registry._registry['some_name'])
