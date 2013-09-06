@@ -324,4 +324,4 @@ class SessionBase(object):
         NotImplementedError. If it isn't necessary, because the backend has
         a built-in expiration mechanism, it should be a no-op.
         """
-        raise NotImplementedError('subclasses of SessionBase must provide a clear_expired() method')
+        raise NotImplementedError('subclasses of SessionBase with backends that use a clear_expired() method must provide a clear_expired() method')

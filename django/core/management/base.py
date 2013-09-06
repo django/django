@@ -361,7 +361,7 @@ class AppCommand(BaseCommand):
         the command line.
 
         """
-        raise NotImplementedError('subclasses of BaseCommand may provide a handle_app() method')
+        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
 
 
 class LabelCommand(BaseCommand):

@@ -446,7 +446,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         raise NotImplementedError('subclasses of BaseEmailBackendTests must provide a get_mailbox_content() method')
 
     def flush_mailbox(self):
-        raise NotImplementedError('subclasses of BaseEmailBackendTests may provide a flush_mailbox() method')
+        raise NotImplementedError('subclasses of BaseEmailBackendTests may require a flush_mailbox() method')
 
     def get_the_message(self):
         mailbox = self.get_mailbox_content()
