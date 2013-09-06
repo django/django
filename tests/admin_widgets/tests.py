@@ -699,7 +699,12 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.assertActiveButtons(mode, field_name, False, False, True, False)
 
         # Choose some options ------------------------------------------------
-        self.get_select_option(from_box, str(self.lisa.id)).click()
+        from_lisa_select_option = self.get_select_option(from_box, str(self.lisa.id))
+
+        # Check the title attribute is there for tool tips: ticket #20821
+        self.assertEqual(from_lisa_select_option.get_attribute('title'), from_lisa_select_option.get_attribute('text'))
+
+        from_lisa_select_option.click()
         self.get_select_option(from_box, str(self.jason.id)).click()
         self.get_select_option(from_box, str(self.bob.id)).click()
         self.get_select_option(from_box, str(self.john.id)).click()
@@ -713,6 +718,10 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.assertSelectOptions(to_box,
                         [str(self.lisa.id), str(self.bob.id),
                          str(self.jason.id), str(self.john.id)])
+
+        # Check the tooltip is still there after moving: ticket #20821
+        to_lisa_select_option = self.get_select_option(to_box, str(self.lisa.id))
+        self.assertEqual(to_lisa_select_option.get_attribute('title'), to_lisa_select_option.get_attribute('text'))
 
         # Remove some options -------------------------------------------------
         self.get_select_option(to_box, str(self.lisa.id)).click()
