@@ -255,13 +255,12 @@ If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
 need to convert it to use migrations; this is a simple process::
 
-    python manage.py makemigrations --force yourappname
+    python manage.py makemigrations yourappname
 
-This will make a new initial migration for your app (the ``--force`` argument
-is to override Django's default behaviour, as it thinks your app does not want
-migrations). Now, when you run :djadmin:`migrate`, Django will detect that
-you have an initial migration *and* that the tables it wants to create already
-exist, and will mark the migration as already applied.
+This will make a new initial migration for your app. Now, when you run
+:djadmin:`migrate`, Django will detect that you have an initial migration
+*and* that the tables it wants to create already exist, and will mark the
+migration as already applied.
 
 Note that this only works given two things:
 

@@ -1,9 +1,5 @@
 import os
 import errno
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import itertools
 from datetime import datetime
 
@@ -14,6 +10,7 @@ from django.core.files.move import file_move_safe
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_by_path
+from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
 

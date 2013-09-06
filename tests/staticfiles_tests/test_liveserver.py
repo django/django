@@ -5,13 +5,10 @@ django.test.LiveServerTestCase.
 """
 
 import os
-try:
-    from urllib.request import urlopen
-except ImportError:     # Python 2
-    from urllib2 import urlopen
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
+from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 
 from django.contrib.staticfiles.testing import StaticLiveServerCase

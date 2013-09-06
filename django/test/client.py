@@ -7,11 +7,6 @@ import mimetypes
 from copy import copy
 from importlib import import_module
 from io import BytesIO
-try:
-    from urllib.parse import unquote, urlparse, urlsplit
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -28,6 +23,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.utils import six
+from django.utils.six.moves.urllib.parse import unquote, urlparse, urlsplit
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
