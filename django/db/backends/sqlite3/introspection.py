@@ -175,7 +175,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         results = results[results.index('(') + 1:results.rindex(')')]
         for field_desc in results.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY$', field_desc)
+            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?$', field_desc)
             if m:
                 return m.groups()[0]
         return None
