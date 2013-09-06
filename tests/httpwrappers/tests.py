@@ -294,7 +294,8 @@ class HttpResponseTests(unittest.TestCase):
         # Bug #20889: long lines trigger newlines to be added to headers
         # (which is not allowed due to bug #10188)
         h = HttpResponse()
-        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.decode('utf-8')
+        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
+        f = f.decode('utf-8')
         h['Content-Disposition'] = u'attachment; filename="%s"' % f
 
     def test_newlines_in_headers(self):
