@@ -257,7 +257,7 @@ class LazyObject(object):
         """
         Must be implemented by subclasses to initialise the wrapped object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Introspection support
     __dir__ = new_method_proxy(dir)

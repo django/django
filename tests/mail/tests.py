@@ -443,10 +443,10 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
             self.assertEqual(first[:len(second)], second, "First string doesn't start with the second.")
 
     def get_mailbox_content(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseEmailBackendTests must provide a get_mailbox_content() method')
 
     def flush_mailbox(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseEmailBackendTests may require a flush_mailbox() method')
 
     def get_the_message(self):
         mailbox = self.get_mailbox_content()

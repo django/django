@@ -177,7 +177,7 @@ class SyndicationFeed(object):
         Outputs the feed in the given encoding to outfile, which is a file-like
         object. Subclasses should override this.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SyndicationFeed must provide a write() method')
 
     def writeString(self, encoding):
         """

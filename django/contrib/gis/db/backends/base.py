@@ -101,7 +101,7 @@ class BaseSpatialOperations(object):
         Returns the database column type for the geometry field on
         the spatial backend.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_type() method')
 
     def get_distance(self, f, value, lookup_type):
         """
@@ -117,7 +117,7 @@ class BaseSpatialOperations(object):
         stored procedure call to the transformation function of the spatial
         backend.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
 
     def get_expression_column(self, evaluator):
         """
@@ -134,14 +134,14 @@ class BaseSpatialOperations(object):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_lookup_sql() method')
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseSpatialOperations must a provide geometry_columns() method')
 
     def spatial_ref_sys(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')
 
 @python_2_unicode_compatible
 class SpatialRefSysMixin(object):

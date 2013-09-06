@@ -65,7 +65,7 @@ class TimeFormat(Formatter):
 
     def B(self):
         "Swatch Internet time"
-        raise NotImplementedError
+        raise NotImplementedError('may be implemented in a future release')
 
     def e(self):
         """

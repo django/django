@@ -192,7 +192,7 @@ class BasePasswordHasher(object):
         """
         Checks if the given password is correct
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BasePasswordHasher must provide a verify() method')
 
     def encode(self, password, salt):
         """
@@ -201,7 +201,7 @@ class BasePasswordHasher(object):
         The result is normally formatted as "algorithm$salt$hash" and
         must be fewer than 128 characters.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BasePasswordHasher must provide an encode() method')
 
     def safe_summary(self, encoded):
         """
@@ -210,7 +210,7 @@ class BasePasswordHasher(object):
         The result is a dictionary and will be used where the password field
         must be displayed to construct a safe representation of the password.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BasePasswordHasher must provide a safe_summary() method')
 
 
 class PBKDF2PasswordHasher(BasePasswordHasher):

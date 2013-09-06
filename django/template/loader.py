@@ -61,7 +61,7 @@ class BaseLoader(object):
         name.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseLoader must provide a load_template_source() method')
 
     def reset(self):
         """

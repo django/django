@@ -28,7 +28,7 @@ class BaseFinder(object):
         the first found file path will be returned; if set
         to ``True`` a list of all found files paths is returned.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseFinder must provide a find() method')
 
     def list(self, ignore_patterns):
         """
@@ -36,7 +36,7 @@ class BaseFinder(object):
         a two item iterable consisting of the relative path and storage
         instance.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseFinder must provide a list() method')
 
 
 class FileSystemFinder(BaseFinder):
