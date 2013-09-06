@@ -17,9 +17,14 @@ class TaskResult(object):
 
 class Task(object):
     def __init__(self, func=None, name=None):
-        if not func and not hasattr(self, 'run'):
+        if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
             raise
         self.run = func
+        if name is not None:
+            self.name = name
+        elif not hasattr(self, 'name'):
+            n = getattr(func, '__name__', func.__class__.__name__)
+            self.name = '%s.%s' % (func.__module__, n)
 
     def __repr__(self):
         return "<task %s>" % self.name
