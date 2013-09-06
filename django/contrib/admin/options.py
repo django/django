@@ -1183,16 +1183,16 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
-        context = {
-            'title': _('Add %s') % force_text(opts.verbose_name),
-            'adminform': adminForm,
-            'is_popup': IS_POPUP_VAR in request.REQUEST,
-            'media': media,
-            'inline_admin_formsets': inline_admin_formsets,
-            'errors': helpers.AdminErrorList(form, formsets),
-            'app_label': opts.app_label,
-            'preserved_filters': self.get_preserved_filters(request),
-        }
+        context = dict(self.admin_site.each_context(),
+            title=_('Add %s') % force_text(opts.verbose_name),
+            adminform=adminForm,
+            is_popup=IS_POPUP_VAR in request.REQUEST,
+            media=media,
+            inline_admin_formsets=inline_admin_formsets,
+            errors=helpers.AdminErrorList(form, formsets),
+            app_label=opts.app_label,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
         return self.render_change_form(request, context, form_url=form_url, add=True)
 
@@ -1254,18 +1254,18 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
-        context = {
-            'title': _('Change %s') % force_text(opts.verbose_name),
-            'adminform': adminForm,
-            'object_id': object_id,
-            'original': obj,
-            'is_popup': IS_POPUP_VAR in request.REQUEST,
-            'media': media,
-            'inline_admin_formsets': inline_admin_formsets,
-            'errors': helpers.AdminErrorList(form, formsets),
-            'app_label': opts.app_label,
-            'preserved_filters': self.get_preserved_filters(request),
-        }
+        context = dict(self.admin_site.each_context(),
+            title=_('Change %s') % force_text(opts.verbose_name),
+            adminform=adminForm,
+            object_id=object_id,
+            original=obj,
+            is_popup=IS_POPUP_VAR in request.REQUEST,
+            media=media,
+            inline_admin_formsets=inline_admin_formsets,
+            errors=helpers.AdminErrorList(form, formsets),
+            app_label=opts.app_label,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
         return self.render_change_form(request, context, change=True, obj=obj, form_url=form_url)
 
@@ -1400,23 +1400,23 @@ class ModelAdmin(BaseModelAdmin):
         selection_note_all = ungettext('%(total_count)s selected',
             'All %(total_count)s selected', cl.result_count)
 
-        context = {
-            'module_name': force_text(opts.verbose_name_plural),
-            'selection_note': _('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
-            'selection_note_all': selection_note_all % {'total_count': cl.result_count},
-            'title': cl.title,
-            'is_popup': cl.is_popup,
-            'cl': cl,
-            'media': media,
-            'has_add_permission': self.has_add_permission(request),
-            'opts': cl.opts,
-            'app_label': app_label,
-            'action_form': action_form,
-            'actions_on_top': self.actions_on_top,
-            'actions_on_bottom': self.actions_on_bottom,
-            'actions_selection_counter': self.actions_selection_counter,
-            'preserved_filters': self.get_preserved_filters(request),
-        }
+        context = dict(self.admin_site.each_context(),
+            module_name=force_text(opts.verbose_name_plural),
+            selection_note=_('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
+            selection_note_all=selection_note_all % {'total_count': cl.result_count},
+            title=cl.title,
+            is_popup=cl.is_popup,
+            cl=cl,
+            media=media,
+            has_add_permission=self.has_add_permission(request),
+            opts=cl.opts,
+            app_label=app_label,
+            action_form=action_form,
+            actions_on_top=self.actions_on_top,
+            actions_on_bottom=self.actions_on_bottom,
+            actions_selection_counter=self.actions_selection_counter,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.change_list_template or [
@@ -1483,17 +1483,17 @@ class ModelAdmin(BaseModelAdmin):
         else:
             title = _("Are you sure?")
 
-        context = {
-            "title": title,
-            "object_name": object_name,
-            "object": obj,
-            "deleted_objects": deleted_objects,
-            "perms_lacking": perms_needed,
-            "protected": protected,
-            "opts": opts,
-            "app_label": app_label,
-            'preserved_filters': self.get_preserved_filters(request),
-        }
+        context = dict(self.admin_site.each_context(),
+            title=title,
+            object_name=object_name,
+            object=obj,
+            deleted_objects=deleted_objects,
+            perms_lacking=perms_needed,
+            protected=protected,
+            opts=opts,
+            app_label=app_label,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.delete_confirmation_template or [
@@ -1520,15 +1520,15 @@ class ModelAdmin(BaseModelAdmin):
             content_type__id__exact=ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
 
-        context = {
-            'title': _('Change history: %s') % force_text(obj),
-            'action_list': action_list,
-            'module_name': capfirst(force_text(opts.verbose_name_plural)),
-            'object': obj,
-            'app_label': app_label,
-            'opts': opts,
-            'preserved_filters': self.get_preserved_filters(request),
-        }
+        context = dict(self.admin_site.each_context(),
+            title=_('Change history: %s') % force_text(obj),
+            action_list=action_list,
+            module_name=capfirst(force_text(opts.verbose_name_plural)),
+            object=obj,
+            app_label=app_label,
+            opts=opts,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [
             "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
