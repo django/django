@@ -7,11 +7,13 @@ from io import BytesIO
 from threading import Lock
 
 from django import http
+from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
+from django.utils import six
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
@@ -73,8 +75,8 @@ class LimitedStream(object):
 
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
-        script_name = base.get_script_name(environ)
-        path_info = base.get_path_info(environ)
+        script_name = get_script_name(environ)
+        path_info = get_path_info(environ)
         if not path_info:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -183,7 +185,7 @@ class WSGIHandler(base.BaseHandler):
                     self._request_middleware = None
                     raise
 
-        set_script_prefix(base.get_script_name(environ))
+        set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__)
         try:
             request = self.request_class(environ)
@@ -206,3 +208,45 @@ class WSGIHandler(base.BaseHandler):
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
         start_response(force_str(status), response_headers)
         return response
+
+
+def get_path_info(environ):
+    """
+    Returns the HTTP request's PATH_INFO as a unicode string.
+    """
+    path_info = environ.get('PATH_INFO', str('/'))
+    # Under Python 3, strings in environ are decoded with ISO-8859-1;
+    # re-encode to recover the original bytestring provided by the web server.
+    if six.PY3:
+        path_info = path_info.encode('iso-8859-1')
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return path_info.decode('utf-8')
+
+
+def get_script_name(environ):
+    """
+    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite has been used, returns what would have been
+    the script name prior to any rewriting (so it's the script name as seen
+    from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
+    set (to anything).
+    """
+    if settings.FORCE_SCRIPT_NAME is not None:
+        return force_text(settings.FORCE_SCRIPT_NAME)
+
+    # If Apache's mod_rewrite had a whack at the URL, Apache set either
+    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
+    # rewrites. Unfortunately not every Web server (lighttpd!) passes this
+    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
+    # needed.
+    script_url = environ.get('SCRIPT_URL', environ.get('REDIRECT_URL', str('')))
+    if script_url:
+        script_name = script_url[:-len(environ.get('PATH_INFO', str('')))]
+    else:
+        script_name = environ.get('SCRIPT_NAME', str(''))
+    # Under Python 3, strings in environ are decoded with ISO-8859-1;
+    # re-encode to recover the original bytestring provided by the web server.
+    if six.PY3:
+        script_name = script_name.encode('iso-8859-1')
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return script_name.decode('utf-8')

@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.core.handlers.base import get_path_info
-from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.six.moves.urllib.request import url2pathname
 
