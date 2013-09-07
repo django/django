@@ -702,7 +702,7 @@ class ParentWithDependentChildren(models.Model):
     on validation of the parent
     """
     some_required_info = models.PositiveIntegerField()
-    family_name = models.CharField(max_length=255)
+    family_name = models.CharField(max_length=255, blank=False)
 
     
 class DependentChild(models.Model):
