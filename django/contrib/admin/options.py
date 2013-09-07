@@ -1146,7 +1146,7 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = True
             else:
                 form_validated = False
-                new_object = self.model()
+                new_object = form.instance
             formsets = self._create_formsets(request, new_object, inline_instances)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, False)
@@ -1225,7 +1225,7 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = self.save_form(request, form, change=True)
             else:
                 form_validated = False
-                new_object = obj
+                new_object = form.instance
             formsets = self._create_formsets(request, new_object, inline_instances)
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, True)
