@@ -700,7 +700,7 @@ class ParentWithDependentChildren(models.Model):
     Model where the validation of child foreign-key relationships depends
     on validation of the parent
     """
-    some_required_info = models.CharField(max_length=255)
+    some_required_info = models.PositiveIntegerField()
     family_name = models.CharField(max_length=255)
     
     class Meta:

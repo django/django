@@ -703,6 +703,28 @@ class ChoiceList(admin.ModelAdmin):
     fields = ['choice']
 
 
+class DependentChildAdminForm(forms.ModelForm):
+    """
+    Issue #20522
+    Form to test child dependency on parent object's validation
+    """
+    def clean(self):
+        parent = self.cleaned_data.get('parent')
+        if parent.family_name != self.cleaned_data.get('family_name'):
+                raise ValidationError("Children must share a family name with their parents " +
+                                      "in this contrived test case")
+        return super(DependentChildAdminForm, self).clean()
+
+
+class DependentChildInline(admin.TabularInline):
+    model = DependentChild
+    form = DependentChildAdminForm
+
+
+class ParentWithDependentChildrenAdmin(admin.ModelAdmin):
+    inlines = [DependentChildInline]
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -783,6 +805,7 @@ site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
 site.register(UserMessenger, MessageTestingAdmin)
 site.register(Choice, ChoiceList)
+site.register(ParentWithDependentChildren, ParentWithDependentChildrenAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
