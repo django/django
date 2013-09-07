@@ -387,7 +387,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
+            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
     def test_relations_to_non_primary_key(self):
@@ -402,7 +402,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -444,7 +444,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
 
@@ -496,7 +496,6 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         # Used to fail with a name error.
         w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_admin_site)
         self.assertFalse(w.can_add_related)
-
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -952,4 +951,50 @@ class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    urls = "admin_widgets.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_foreign_key_using_to_field(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get('%s%s' % (
+            self.live_server_url,
+            '/admin_widgets/profile/add/'))
+
+        main_window = self.selenium.current_window_handle
+        # Click the Add User button to add new
+        self.selenium.find_element_by_id('add_id_user').click()
+        self.selenium.switch_to_window('id_user')
+        self.wait_page_loaded()
+        password_field = self.selenium.find_element_by_id('id_password')
+        password_field.send_keys('password')
+
+        username_field = self.selenium.find_element_by_id('id_username')
+        username_value = 'newuser'
+        username_field.send_keys(username_value)
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to_window(main_window)
+        user_select = self.selenium.find_element_by_id('id_user')
+        new_option = user_select.find_elements_by_tag_name('option')[-1]
+        self.assertEqual(username_value, new_option.get_attribute('value'))
+
+        # Go ahead and submit the form to make sure it works
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.wait_page_loaded()
+        profiles = models.Profile.objects.all()
+        self.assertEqual(len(profiles), 1)
+        self.assertEqual(profiles[0].user.username, username_value)
+
+class RelatedFieldWidgetSeleniumChromeTests(RelatedFieldWidgetSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class RelatedFieldWidgetSeleniumIETests(RelatedFieldWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

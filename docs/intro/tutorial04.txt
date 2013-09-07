@@ -14,13 +14,13 @@ tutorial, so that the template contains an HTML ``<form>`` element:
 
 .. code-block:: html+django
 
-    <h1>{{ poll.question }}</h1>
+    <h1>{{ question.question_text }}</h1>
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <form action="{% url 'polls:vote' poll.id %}" method="post">
+    <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
-    {% for choice in poll.choice_set.all %}
+    {% for choice in question.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
         <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
     {% endfor %}
@@ -29,13 +29,13 @@ tutorial, so that the template contains an HTML ``<form>`` element:
 
 A quick rundown:
 
-* The above template displays a radio button for each poll choice. The
-  ``value`` of each radio button is the associated poll choice's ID. The
+* The above template displays a radio button for each question choice. The
+  ``value`` of each radio button is the associated question choice's ID. The
   ``name`` of each radio button is ``"choice"``. That means, when somebody
   selects one of the radio buttons and submits the form, it'll send the
   POST data ``choice=3``. This is the basic concept of HTML forms.
 
-* We set the form's ``action`` to ``{% url 'polls:vote' poll.id %}``, and we
+* We set the form's ``action`` to ``{% url 'polls:vote' question.id %}``, and we
   set ``method="post"``. Using ``method="post"`` (as opposed to
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
@@ -56,7 +56,7 @@ Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line::
 
-    url(r'^(?P<poll_id>\d+)/vote/$', views.vote, name='vote'),
+    url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``::
@@ -64,16 +64,16 @@ create a real version. Add the following to ``polls/views.py``::
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
-    from polls.models import Choice, Poll
+    from polls.models import Choice, Question
     # ...
-    def vote(request, poll_id):
-        p = get_object_or_404(Poll, pk=poll_id)
+    def vote(request, question_id):
+        p = get_object_or_404(Question, pk=question_id)
         try:
             selected_choice = p.choice_set.get(pk=request.POST['choice'])
         except (KeyError, Choice.DoesNotExist):
-            # Redisplay the poll voting form.
+            # Redisplay the question voting form.
             return render(request, 'polls/detail.html', {
-                'poll': p,
+                'question': p,
                 'error_message': "You didn't select a choice.",
             })
         else:
@@ -100,7 +100,7 @@ This code includes a few things we haven't covered yet in this tutorial:
 
 * ``request.POST['choice']`` will raise :exc:`~exceptions.KeyError` if
   ``choice`` wasn't provided in POST data. The above code checks for
-  :exc:`~exceptions.KeyError` and redisplays the poll form with an error
+  :exc:`~exceptions.KeyError` and redisplays the question form with an error
   message if ``choice`` isn't given.
 
 * After incrementing the choice count, the code returns an
@@ -133,14 +133,15 @@ As mentioned in Tutorial 3, ``request`` is a :class:`~django.http.HttpRequest`
 object. For more on :class:`~django.http.HttpRequest` objects, see the
 :doc:`request and response documentation </ref/request-response>`.
 
-After somebody votes in a poll, the ``vote()`` view redirects to the results
-page for the poll. Let's write that view::
+After somebody votes in a question, the ``vote()`` view redirects to the results
+page for the question. Let's write that view::
 
     from django.shortcuts import get_object_or_404, render
 
-    def results(request, poll_id):
-        poll = get_object_or_404(Poll, pk=poll_id)
-        return render(request, 'polls/results.html', {'poll': poll})
+
+    def results(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        return render(request, 'polls/results.html', {'question': question})
 
 This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 3
 </intro/tutorial03>`. The only difference is the template name. We'll fix this
@@ -150,17 +151,17 @@ Now, create a ``polls/results.html`` template:
 
 .. code-block:: html+django
 
-    <h1>{{ poll.question }}</h1>
+    <h1>{{ question.question_text }}</h1>
 
     <ul>
-    {% for choice in poll.choice_set.all %}
+    {% for choice in question.choice_set.all %}
         <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
     {% endfor %}
     </ul>
 
-    <a href="{% url 'polls:detail' poll.id %}">Vote again?</a>
+    <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
 
-Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
+Now, go to ``/polls/1/`` in your browser and vote in the question. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
@@ -214,7 +215,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so::
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
         url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
-        url(r'^(?P<poll_id>\d+)/vote/$', views.vote, name='vote'),
+        url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
     )
 
 Amend views
@@ -229,27 +230,29 @@ views and use Django's generic views instead. To do so, open the
     from django.core.urlresolvers import reverse
     from django.views import generic
 
-    from polls.models import Choice, Poll
+    from polls.models import Choice, Question
+
 
     class IndexView(generic.ListView):
         template_name = 'polls/index.html'
-        context_object_name = 'latest_poll_list'
+        context_object_name = 'latest_question_list'
 
         def get_queryset(self):
-            """Return the last five published polls."""
-            return Poll.objects.order_by('-pub_date')[:5]
+            """Return the last five published questions."""
+            return Question.objects.order_by('-pub_date')[:5]
 
 
     class DetailView(generic.DetailView):
-        model = Poll
+        model = Question
         template_name = 'polls/detail.html'
 
 
     class ResultsView(generic.DetailView):
-        model = Poll
+        model = Question
         template_name = 'polls/results.html'
 
-    def vote(request, poll_id):
+
+    def vote(request, question_id):
         ....
 
 We're using two generic views here:
@@ -263,12 +266,12 @@ two views abstract the concepts of "display a list of objects" and
 
 * The :class:`~django.views.generic.detail.DetailView` generic view
   expects the primary key value captured from the URL to be called
-  ``"pk"``, so we've changed ``poll_id`` to ``pk`` for the generic
+  ``"pk"``, so we've changed ``question_id`` to ``pk`` for the generic
   views.
 
 By default, the :class:`~django.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.
-In our case, it'll use the template ``"polls/poll_detail.html"``. The
+In our case, it'll use the template ``"polls/question_detail.html"``. The
 ``template_name`` attribute is used to tell Django to use a specific
 template name instead of the autogenerated default template name. We
 also specify the ``template_name`` for the ``results`` list view --
@@ -283,13 +286,13 @@ name>_list.html``; we use ``template_name`` to tell
 ``"polls/index.html"`` template.
 
 In previous parts of the tutorial, the templates have been provided
-with a context that contains the ``poll`` and ``latest_poll_list``
-context variables. For ``DetailView`` the ``poll`` variable is provided
-automatically -- since we're using a Django model (``Poll``), Django
+with a context that contains the ``question`` and ``latest_question_list``
+context variables. For ``DetailView`` the ``question`` variable is provided
+automatically -- since we're using a Django model (``Question``), Django
 is able to determine an appropriate name for the context variable.
 However, for ListView, the automatically generated context variable is
-``poll_list``. To override this we provide the ``context_object_name``
-attribute, specifying that we want to use ``latest_poll_list`` instead.
+``question_list``. To override this we provide the ``context_object_name``
+attribute, specifying that we want to use ``latest_question_list`` instead.
 As an alternative approach, you could change your templates to match
 the new default context variables -- but it's a lot easier to just
 tell Django to use the variable you want.

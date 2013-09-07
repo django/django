@@ -679,6 +679,14 @@ To run Django's test suite, the user needs these *additional* privileges:
 * CONNECT WITH ADMIN OPTION
 * RESOURCE WITH ADMIN OPTION
 
+The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
+will require execute permissions on it. It's normally accessible to all users
+by default, but in case it is not, you'll need to grant permissions like so:
+
+.. code-block:: sql
+
+    GRANT EXECUTE ON SYS.DBMS_LOB TO user;
+
 Connecting to the database
 --------------------------
 

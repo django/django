@@ -44,6 +44,7 @@ from django.views.decorators.csrf import csrf_protect
 
 
 IS_POPUP_VAR = '_popup'
+TO_FIELD_VAR = '_to_field'
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -932,6 +933,8 @@ class ModelAdmin(BaseModelAdmin):
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
+            'to_field_var': TO_FIELD_VAR,
+            'is_popup_var': IS_POPUP_VAR
         })
         if add and self.add_form_template is not None:
             form_template = self.add_form_template
@@ -951,13 +954,20 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
-
         msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
+
         if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj._meta.pk.attname
+            value = obj.serializable_value(attr)
             return SimpleTemplateResponse('admin/popup_response.html', {
-                'pk_value': escape(pk_value),
+                'pk_value': escape(pk_value), # for possible backwards-compatibility
+                'value': escape(value),
                 'obj': escapejs(obj)
             })
 
@@ -988,6 +998,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         Determines the HttpResponse for the change_view stage.
         """
+
         opts = self.model._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
@@ -1224,6 +1235,7 @@ class ModelAdmin(BaseModelAdmin):
             title=_('Add %s') % force_text(opts.verbose_name),
             adminform=adminForm,
             is_popup=IS_POPUP_VAR in request.REQUEST,
+            to_field=request.REQUEST.get(TO_FIELD_VAR),
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1297,6 +1309,7 @@ class ModelAdmin(BaseModelAdmin):
             object_id=object_id,
             original=obj,
             is_popup=IS_POPUP_VAR in request.REQUEST,
+            to_field=request.REQUEST.get(TO_FIELD_VAR),
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1443,6 +1456,7 @@ class ModelAdmin(BaseModelAdmin):
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
             title=cl.title,
             is_popup=cl.is_popup,
+            to_field=cl.to_field,
             cl=cl,
             media=media,
             has_add_permission=self.has_add_permission(request),
