@@ -693,3 +693,31 @@ class Simple(models.Model):
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
+    
+class ParentWithDependentChildren(models.Model):
+    """
+    Issue #20522
+    Model where the validation of child foreign-key relationships depends
+    on validation of the parent
+    """
+    some_required_info = models.CharField(max_length=255)
+    family_name = models.CharField(max_length=255)
+    
+    class Meta:
+        verbose_name_plural = "parents with dependent children"
+        
+    def __unicode__(self):
+        return u'%s? +%d!' % (self.some_required_info, self.contingent_field)
+
+    
+class DependentChild(models.Model):
+    """
+    Issue #20522
+    Model that depends on validation of the parent class for one of its
+    fields to validate during clean
+    """
+    parent = models.ForeignKey(ParentWithDependentChildren)
+    family_name = models.CharField(max_length=255)
+    
+    class Meta:
+        verbose_name_plural = "dependent children"
