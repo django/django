@@ -694,6 +694,7 @@ class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
     
+ 
 class ParentWithDependentChildren(models.Model):
     """
     Issue #20522
@@ -702,12 +703,6 @@ class ParentWithDependentChildren(models.Model):
     """
     some_required_info = models.PositiveIntegerField()
     family_name = models.CharField(max_length=255)
-    
-    class Meta:
-        verbose_name_plural = "parents with dependent children"
-        
-    def __unicode__(self):
-        return u'%s? +%d!' % (self.some_required_info, self.contingent_field)
 
     
 class DependentChild(models.Model):
@@ -718,6 +713,3 @@ class DependentChild(models.Model):
     """
     parent = models.ForeignKey(ParentWithDependentChildren)
     family_name = models.CharField(max_length=255)
-    
-    class Meta:
-        verbose_name_plural = "dependent children"

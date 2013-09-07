@@ -48,7 +48,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping)
+    Telegram, Pizza, Topping, ParentWithDependentChildren)
 from .admin import site, site2
 
 
@@ -4506,3 +4506,63 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
 class NamespacedAdminKeepChangeListFiltersTests(AdminKeepChangeListFiltersTests):
     admin_site = site2
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))    
+class AdminViewFormValidationTests(TestCase):
+    fixtures = ['admin-views-users.xml']
+    urls = "admin_views.urls"
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_add_view_form_and_formsets_run_validation(self):
+        """
+        Issue #20522
+        Verifying that if the parent form fails validation, the inlines also
+        run validation even if validation is contingent on parent form data
+        """
+        # The form validation should fail because 'some_required_info' is
+        # not included on the parent form, and the family_name of the parent
+        # does not match that of the child
+        post_data = {"family_name": "Test1",
+                     "dependentchild_set-TOTAL_FORMS": "1",
+                     "dependentchild_set-INITIAL_FORMS": "0",
+                     "dependentchild_set-MAX_NUM_FORMS": "1",
+                     "dependentchild_set-0-id": "",
+                     "dependentchild_set-0-parent": "",
+                     "dependentchild_set-0-family_name": "Test2"}
+        response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/add/', 
+                                    post_data)
+        self.assertTrue(response.context['adminform'].form.errors)
+        import pdb; pdb.set_trace()
+        for error_set in response.context['inline_admin_formset'].formset.errors:
+            self.assertTrue(error_set)
+    
+    def test_change_view_form_and_formsets_run_validation(self):
+        """
+        Issue #20522
+        Verifying that if the parent form fails validation, the inlines also
+        run validation even if validation is contingent on parent form data
+        """
+        pwdc = ParentWithDependentChildren.objects.create(some_required_info=6,
+                                                          family_name="Test1")
+        # The form validation should fail because 'some_required_info' is
+        # not included on the parent form, and the family_name of the parent
+        # does not match that of the child
+        post_data = {"family_name": "Test1",
+                     "dependentchild_set-TOTAL_FORMS": "1",
+                     "dependentchild_set-INITIAL_FORMS": "0",
+                     "dependentchild_set-MAX_NUM_FORMS": "1",
+                     "dependentchild_set-0-id": "",
+                     "dependentchild_set-0-parent": str(pwdc.id),
+                     "dependentchild_set-0-family_name": "Test2"}
+        response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/%d/' 
+                                    % pwdc.id, post_data)
+        
+        self.assertTrue(response.context['adminform'].form.errors)
+        for error_set in response.context['inline_admin_formset'].formset.errors:
+            self.assertTrue(error_set)
