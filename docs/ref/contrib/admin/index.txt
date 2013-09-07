@@ -1514,6 +1514,35 @@ templates used by the :class:`ModelAdmin` views:
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
 
+.. method:: ModelAdmin.response_add(self, request, obj, post_url_continue=None)
+
+    Determines the HttpResponse for the add_view stage.
+
+    ``response_add`` is called after the admin form is submitted and
+    just after the object and all the related instances have
+    been created and saved. You can override it to change the default behavior
+    after the object has been created.
+
+.. method:: ModelAdmin.response_change(self, request, obj)
+
+    Determines the HttpResponse for the change_view stage.
+
+    ``response_change`` is called after the admin form is submitted and
+    just after the object and all the related instances have
+    been saved. You can override it to change the default
+    behavior after the object has been changedn.
+
+.. method:: ModelAdmin.response_delete(self, request, obj_display)
+
+    Determines the HttpResponse for the delete_view stage.
+
+    ``response_delete`` is called after the object has been
+    deleted. You can override it to change the default
+    behavior after the object has been deleted.
+
+    ``obj_display`` is a string with the name of the deleted
+    object.
+
 Other methods
 ~~~~~~~~~~~~~
 
