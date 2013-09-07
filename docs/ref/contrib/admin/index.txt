@@ -1516,7 +1516,8 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.response_add(self, request, obj, post_url_continue=None)
 
-    Determines the HttpResponse for the add_view stage.
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`add_view` stage.
 
     ``response_add`` is called after the admin form is submitted and
     just after the object and all the related instances have
@@ -1525,7 +1526,8 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.response_change(self, request, obj)
 
-    Determines the HttpResponse for the change_view stage.
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`change_view` stage.
 
     ``response_change`` is called after the admin form is submitted and
     just after the object and all the related instances have
@@ -1534,7 +1536,10 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.response_delete(self, request, obj_display)
 
-    Determines the HttpResponse for the delete_view stage.
+    .. versionadded:: 1.7
+
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`delete_view` stage.
 
     ``response_delete`` is called after the object has been
     deleted. You can override it to change the default
