@@ -500,8 +500,8 @@ class NoYamlSerializerTestCase(TestCase):
 
     def test_dumpdata_pyyaml_error_message(self):
         """Calling dumpdata produces an error when yaml package missing"""
-        self.assertRaisesRegexp(management.CommandError, YAML_IMPORT_ERROR_MESSAGE,
-                management.call_command, 'dumpdata', format='yaml')
+        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+            management.call_command('dumpdata', format='yaml')
 
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")
