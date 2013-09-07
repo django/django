@@ -1537,7 +1537,9 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry
         # First check if the user can see this history.
         model = self.model
-        obj = get_object_or_404(model, pk=unquote(object_id))
+        obj = self.get_object(request, unquote(object_id))
+        if obj is None:
+            raise Http404('No %s matches the given query.' % model._meta.object_name)
 
         if not self.has_change_permission(request, obj):
             raise PermissionDenied
