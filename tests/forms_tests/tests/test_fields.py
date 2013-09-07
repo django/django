@@ -254,6 +254,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '1.0a')
         self.assertEqual(f.max_value, None)
         self.assertEqual(f.min_value, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'Infinity')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'NaN')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '-Inf')
 
     def test_floatfield_2(self):
         f = FloatField(required=False)

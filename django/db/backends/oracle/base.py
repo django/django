@@ -320,6 +320,16 @@ WHEN (new.%(col_name)s IS NULL)
         name = name.replace('%', '%%')
         return name.upper()
 
+    def quote_parameter(self, value):
+        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
+            return "'%s'" % value
+        elif isinstance(value, six.string_types):
+            return repr(value)
+        elif isinstance(value, bool):
+            return "1" if value else "0"
+        else:
+            return str(value)
+
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
@@ -628,9 +638,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
 
-    def schema_editor(self):
+    def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self)
+        return DatabaseSchemaEditor(self, *args, **kwargs)
 
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):

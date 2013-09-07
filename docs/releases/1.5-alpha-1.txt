@@ -562,11 +562,12 @@ Miscellaneous
   needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
-* The :ref:`F() expressions <query-expressions>` supported bitwise operators by
-  ``&`` and ``|``. These operators are now available using ``.bitand()`` and
-  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be consistent with
-  :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
-  the operators are used as boolean AND and OR operators.
+* The :class:`F expressions <django.db.models.F>` supported bitwise operators
+  by ``&`` and ``|``. These operators are now available using ``.bitand()`` and
+  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be
+  consistent with :ref:`Q() expressions <complex-lookups-with-q>` and
+  ``QuerySet`` combining where the operators are used as boolean AND and OR
+  operators.
 
 * The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
   HTML validation against pre-HTML5 Strict DTDs, you should add a div around it

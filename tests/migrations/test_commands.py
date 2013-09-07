@@ -48,6 +48,20 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_sqlmigrate(self):
+        """
+        Makes sure that sqlmigrate does something.
+        """
+        # Test forwards. All the databases agree on CREATE TABLE, at least.
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
+        self.assertIn("create table", stdout.getvalue().lower())
+        # And backwards is a DROP TABLE
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout, backwards=True)
+        self.assertIn("drop table", stdout.getvalue().lower())
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """

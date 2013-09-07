@@ -8,7 +8,7 @@ import unittest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, resolve, get_callable,
+from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -218,6 +218,19 @@ class ResolverTests(unittest.TestCase):
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
         self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+
+    def test_reverse_lazy_object_coercion_by_resolve(self):
+        """
+        Verifies lazy object returned by reverse_lazy is coerced to
+        text by resolve(). Previous to #21043, this would raise a TypeError.
+        """
+        urls = 'urlpatterns_reverse.named_urls'
+        proxy_url = reverse_lazy('named-url1', urlconf=urls)
+        resolver = get_resolver(urls)
+        try:
+            match = resolver.resolve(proxy_url)
+        except TypeError:
+            self.fail('Failed to coerce lazy object to text')
 
     def test_non_regex(self):
         """

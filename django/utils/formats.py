@@ -40,14 +40,14 @@ def reset_format_cache():
     _format_cache = {}
     _format_modules_cache = {}
 
-def iter_format_modules(lang):
+def iter_format_modules(lang, format_module_path=None):
     """
     Does the heavy lifting of finding format modules.
     """
     if check_for_language(lang):
         format_locations = ['django.conf.locale.%s']
-        if settings.FORMAT_MODULE_PATH:
-            format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
+        if format_module_path:
+            format_locations.append(format_module_path + '.%s')
             format_locations.reverse()
         locale = to_locale(lang)
         locales = [locale]
@@ -66,7 +66,7 @@ def get_format_modules(lang=None, reverse=False):
     """
     if lang is None:
         lang = get_language()
-    modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang)))
+    modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang, settings.FORMAT_MODULE_PATH)))
     if reverse:
         return list(reversed(modules))
     return modules

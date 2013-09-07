@@ -521,7 +521,7 @@ class BaseDatabaseWrapper(object):
         """
         raise NotImplementedError
 
-    def schema_editor(self):
+    def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
         raise NotImplementedError()
 
@@ -955,6 +955,15 @@ class BaseDatabaseOperations(object):
         """
         Returns a quoted version of the given table, index or column name. Does
         not quote the given name if it's already been quoted.
+        """
+        raise NotImplementedError()
+
+    def quote_parameter(self, value):
+        """
+        Returns a quoted version of the value so it's safe to use in an SQL
+        string. This should NOT be used to prepare SQL statements to send to
+        the database; it is meant for outputting SQL statements to a file
+        or the console for later execution by a developer/DBA.
         """
         raise NotImplementedError()
 
