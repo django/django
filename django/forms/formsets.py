@@ -394,14 +394,23 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None, validate_max=False):
+                    can_delete=False, max_num=None, validate_max=False,
+                    absolute_max=None):
     """Return a FormSet for the given form class."""
     if max_num is None:
-        max_num = DEFAULT_MAX_NUM
+        if absolute_max is not None:
+            max_num = min(absolute_max, DEFAULT_MAX_NUM)
+        else:
+            max_num = DEFAULT_MAX_NUM
+
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
-    # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
-    # if max_num is None in the first place)
-    absolute_max = max_num + DEFAULT_MAX_NUM
+    # if not explicitly set, the default is max_num + DEFAULT_MAX_NUM
+    if absolute_max is None:
+        absolute_max = max_num + DEFAULT_MAX_NUM
+
+    if absolute_max < max_num:
+        raise ValueError("max_num must be less than or equal to absolute_max")
+
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num, 'absolute_max': absolute_max,
