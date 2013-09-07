@@ -78,7 +78,7 @@ var CalendarNamespace = {
         // Draw blanks after end of month (optional, but makes for valid code)
         while (tableRow.childNodes.length < 7) {
             var _cell = quickElement('td', tableRow, ' ');
-            _cell.style.backgroundColor = '#f3f3f3';
+            _cell.className = "nonday";
         }
 
         calDiv.appendChild(calTable);
@@ -86,7 +86,7 @@ var CalendarNamespace = {
 }
 
 // Calendar -- A calendar instance
-function Calendar(div_id, callback) {
+function Calendar(div_id, callback, selected) {
     // div_id (string) is the ID of the element in which the calendar will
     //     be displayed
     // callback (string) is the name of a JavaScript function that will be
@@ -97,10 +97,16 @@ function Calendar(div_id, callback) {
     this.today = new Date();
     this.currentMonth = this.today.getMonth() + 1;
     this.currentYear = this.today.getFullYear();
+    if (typeof selected == 'undefined') {
+        this.selected = this.today;
+    }
+    else {
+        this.selected = selected;
+    }
 }
 Calendar.prototype = {
     drawCurrent: function() {
-        CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback);
+        CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback, this.selected);
     },
     drawDate: function(month, year) {
         this.currentMonth = month;
