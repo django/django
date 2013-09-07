@@ -280,6 +280,32 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
 
+    def test_run_sql(self):
+        """
+        Tests the AlterIndexTogether operation.
+        """
+        project_state = self.set_up_test_model("test_runsql")
+        # Create the operation
+        operation = migrations.RunSQL(
+            "CREATE TABLE i_love_ponies (id int, special_thing int)",
+            "DROP TABLE i_love_ponies",
+            state_operations = [migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
+        )
+        # Test the state alteration
+        new_state = project_state.clone()
+        operation.state_forwards("test_runsql", new_state)
+        self.assertEqual(len(new_state.models["test_runsql", "somethingelse"].fields), 1)
+        # Make sure there's no table
+        self.assertTableNotExists("i_love_ponies")
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runsql", editor, project_state, new_state)
+        self.assertTableExists("i_love_ponies")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_runsql", editor, new_state, project_state)
+        self.assertTableNotExists("i_love_ponies")
+
 
 class MigrateNothingRouter(object):
     """
