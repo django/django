@@ -17,8 +17,7 @@ from unittest.util import safe_repr
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.handlers.base import get_path_info
+from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
