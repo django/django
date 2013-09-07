@@ -153,10 +153,7 @@ class UpdateQuery(Query):
 
         Updates are coalesced so that we only run one update query per ancestor.
         """
-        try:
-            self.related_updates[model].append((field, None, value))
-        except KeyError:
-            self.related_updates[model] = [(field, None, value)]
+        self.related_updates.setdefault(model, []).append((field, None, value))
 
     def get_related_updates(self):
         """

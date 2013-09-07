@@ -523,7 +523,10 @@ def streamTest(format, self):
         else:
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
-for format in serializers.get_serializer_formats():
+for format in [
+            f for f in serializers.get_serializer_formats()
+            if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)
+        ]:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))

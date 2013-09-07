@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 'Defaults to the "default" database.'),
         make_option('--fake', action='store_true', dest='fake', default=False,
             help='Mark migrations as run without actually running them'),
-        make_option('--list', action='store_true', dest='list', default=False,
+        make_option('--list', '-l', action='store_true', dest='list', default=False,
             help='Show a list of all known migrations and which are applied'),
     )
 

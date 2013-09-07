@@ -55,7 +55,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(temp_model)
         # Copy data from the old table
         field_maps = list(mapping.items())
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join(x for x, y in field_maps),
             ', '.join(y for x, y in field_maps),
@@ -137,7 +137,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new through table
         self.create_model(new_field.rel.through)
         # Copy the data across
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(new_field.rel.through._meta.db_table),
             ', '.join([
                 "id",

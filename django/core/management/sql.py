@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models
 from django.db.models import get_models
-from django.utils._os import upath
 
 
 def sql_create(app, style, connection):

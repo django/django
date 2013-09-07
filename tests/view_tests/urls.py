@@ -68,4 +68,5 @@ urlpatterns += patterns('view_tests.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
     url(r'^raises_template_does_not_exist/(?P<path>.+)$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
+    url(r'^render_no_template/$', 'render_no_template', name='render_no_template'),
 )

@@ -92,6 +92,14 @@ class NaiveAuthorCreate(generic.CreateView):
     fields = '__all__'
 
 
+class TemplateResponseWithoutTemplate(generic.detail.SingleObjectTemplateResponseMixin, generic.View):
+    # we don't define the usual template_name here
+
+    def __init__(self):
+        # Dummy object, but attr is required by get_template_name()
+        self.object = None
+
+
 class AuthorCreate(generic.CreateView):
     model = Author
     success_url = '/list/authors/'

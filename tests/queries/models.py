@@ -17,8 +17,12 @@ class ProxyCategory(DumbCategory):
     class Meta:
         proxy = True
 
+@python_2_unicode_compatible
 class NamedCategory(DumbCategory):
     name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class Tag(models.Model):

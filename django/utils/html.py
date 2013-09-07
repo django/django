@@ -210,7 +210,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
-        match = None
         if '.' in word or '@' in word or ':' in word:
             # Deal with punctuation.
             lead, middle, trail = '', word, ''

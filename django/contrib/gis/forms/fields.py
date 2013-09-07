@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # While this couples the geographic forms to the GEOS library,
@@ -85,7 +84,7 @@ class GeometryField(forms.Field):
         try:
             data = self.to_python(data)
             initial = self.to_python(initial)
-        except ValidationError:
+        except forms.ValidationError:
             return True
 
         # Only do a geographic comparison if both values are available
