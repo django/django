@@ -1309,6 +1309,27 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/secure-view/')
         self.assertContains(response, 'id="login-form"')
 
+    def testAppIndexFailEarly(self):
+        """
+        If a user has no module perms, avoid iterating over all the modeladmins
+        in the registry.
+        """
+        opts = Article._meta
+        change_user = User.objects.get(username='changeuser')
+        permission = get_perm(Article, get_permission_codename('change', opts))
+
+        self.client.post('/test_admin/admin/', self.changeuser_login)
+
+        # the user has no module permissions, because this module doesn't exist
+        change_user.user_permissions.remove(permission)
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.assertEqual(response.status_code, 403)
+
+        # the user now has module permissions
+        change_user.user_permissions.add(permission)
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.assertEqual(response.status_code, 200)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewsNoUrlTest(TestCase):
