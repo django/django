@@ -1054,15 +1054,23 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.limit_choices_to
 
-    A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
-    that limit the available admin or ModelForm choices for this object. Use
-    this with functions from the Python ``datetime`` module to limit choices of
-    objects by date. For example::
+    Sets a limit to the available choices for this field when this field is
+    rendered using a ``ModelForm`` or the admin (by default, all objects
+    are available to choose). Either a dictionary, a :class:`~django.db.models.Q`
+    object, or a callable returning a dictionary or :class:`~django.db.models.Q`
+    object can be used.
+
+    The dictionary, if used, should be a dictionary of lookup keyword arguments
+    (see :doc:`/topics/db/queries`) that limit the queryset for the generated
+    ``ModelChoiceField``. Use this with functions from the Python ``datetime``
+    module to limit choices of objects by date. For example::
 
         limit_choices_to = {'pub_date__lte': datetime.date.today}
 
     only allows the choice of related objects with a ``pub_date`` before the
-    current date to be chosen.
+    current date to be chosen. As a callable::
+
+        limit_choices_to = lambda: {'pub_date__lte': datetime.date.today}
 
     Instead of a dictionary this can also be a :class:`Q object
     <django.db.models.Q>` for more :ref:`complex queries
@@ -1070,6 +1078,15 @@ define the details of how the relation works.
     object <django.db.models.Q>` then it will only have an effect on the
     choices available in the admin when the field is not listed in
     ``raw_id_fields`` in the ``ModelAdmin`` for the model.
+
+.. note::
+
+    If a callable is used for ``limit_choices_to``, it will be invoked every time a
+    new form is instantiated. It may also be invoked when a model is validated using
+    various management commands, as well as in the admin. The admin constructs
+    querysets to validate its form inputs in various edge cases multiple times,
+    so there is a possibility your callable may be invoked that many times.
+    Make sure there are no undesired side effects to this behavior in your case.
 
 .. attribute:: ForeignKey.related_name
 

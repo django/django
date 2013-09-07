@@ -769,6 +769,15 @@ class ChoiceField(Field):
                                         initial=initial, help_text=help_text, *args, **kwargs)
         self.choices = choices
 
+    def get_limit_choices_to(self):
+        """
+        Returns 'limit_choices_to' for this form field. If it is a callable,
+        it will be invoked and the result will be returned.
+        """
+        if callable(self.limit_choices_to):
+            return self.limit_choices_to()
+        return self.limit_choices_to
+
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
         result._choices = copy.deepcopy(self._choices, memo)
