@@ -289,7 +289,8 @@ class BaseFormSet(object):
         # We loop over every form.errors here rather than short circuiting on the
         # first failure to make sure validation gets triggered for every form.
         forms_valid = True
-        err = self.errors
+        # This triggers a full clean.
+        self.errors
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             if self.can_delete:

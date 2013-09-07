@@ -85,7 +85,7 @@ def parse_backend_conf(backend, **kwargs):
     else:
         try:
             # Trying to import the given backend, in case it's a dotted path
-            backend_cls = import_by_path(backend)
+            import_by_path(backend)
         except ImproperlyConfigured as e:
             raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
                 backend, e))

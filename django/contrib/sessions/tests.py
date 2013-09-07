@@ -425,10 +425,6 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(ImproperlyConfigured, self.backend)
 
     def test_invalid_key_backslash(self):
-        # This key should be refused and a new session should be created
-        self.assertTrue(self.backend("a\\b\\c").load())
-
-    def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
         # This is tested directly on _key_to_file, as load() will swallow
         # a SuspiciousOperation in the same way as an IOError - by creating

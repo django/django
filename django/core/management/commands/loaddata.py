@@ -6,7 +6,6 @@ import os
 import warnings
 import zipfile
 from optparse import make_option
-import warnings
 
 from django.conf import settings
 from django.core import serializers
