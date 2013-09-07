@@ -1549,7 +1549,7 @@ your test suite.
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
 
-.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
+.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
     Asserts that the response return a ``status_code`` redirect status, it
     redirected to ``expected_url`` (including any GET data), and the final
@@ -1558,6 +1558,11 @@ your test suite.
     If your request used the ``follow`` argument, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
+
+    .. versionadded:: 1.7
+
+    If ``fetch_redirect_response`` is provided as False, the final page won't
+    be loaded.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
