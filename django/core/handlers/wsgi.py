@@ -20,6 +20,9 @@ from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
 
 logger = logging.getLogger('django.request')
 
+# encode() and decode() expect the charset to be a native string.
+ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
+
 
 class LimitedStream(object):
     '''
@@ -214,13 +217,10 @@ def get_path_info(environ):
     """
     Returns the HTTP request's PATH_INFO as a unicode string.
     """
-    path_info = environ.get('PATH_INFO', str('/'))
-    # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the web server.
-    if six.PY3:
-        path_info = path_info.encode('iso-8859-1')
+    path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
+
     # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return path_info.decode('utf-8')
+    return path_info.decode(UTF_8)
 
 
 def get_script_name(environ):
@@ -239,14 +239,29 @@ def get_script_name(environ):
     # rewrites. Unfortunately not every Web server (lighttpd!) passes this
     # information through all the time, so FORCE_SCRIPT_NAME, above, is still
     # needed.
-    script_url = environ.get('SCRIPT_URL', environ.get('REDIRECT_URL', str('')))
+    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '')
+    if not script_url:
+        script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
+
     if script_url:
-        script_name = script_url[:-len(environ.get('PATH_INFO', str('')))]
+        path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
+        script_name = script_url[:-len(path_info)]
     else:
-        script_name = environ.get('SCRIPT_NAME', str(''))
-    # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the web server.
-    if six.PY3:
-        script_name = script_name.encode('iso-8859-1')
+        script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
+
     # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return script_name.decode('utf-8')
+    return script_name.decode(UTF_8)
+
+
+def get_bytes_from_wsgi(environ, key, default):
+    """
+    Get a value from the WSGI environ dictionary as bytes.
+
+    key and default should be str objects. Under Python 2 they may also be
+    unicode objects provided they only contain ASCII characters.
+    """
+    value = environ.get(str(key), str(default))
+    # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+    # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
+    # is the default. Re-encode to recover the original bytestring.
+    return value if six.PY2 else value.encode(ISO_8859_1)
