@@ -48,3 +48,5 @@ site.register(models.Bee)
 site.register(models.Advisor)
 
 site.register(models.School, SchoolAdmin)
+
+site.register(models.Profile)
