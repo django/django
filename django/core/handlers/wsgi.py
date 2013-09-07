@@ -12,6 +12,7 @@ from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_str, force_text, iri_to_uri
+from django.utils import six
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
@@ -147,7 +148,10 @@ class WSGIRequest(http.HttpRequest):
 
     def _get_cookies(self):
         if not hasattr(self, '_cookies'):
-            self._cookies = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
+            raw_cookie = self.environ.get('HTTP_COOKIE', str(''))
+            if six.PY3:
+                raw_cookie = raw_cookie.encode('iso-8859-1').decode('utf-8')
+            self._cookies = http.parse_cookie(raw_cookie)
         return self._cookies
 
     def _set_cookies(self, cookies):
