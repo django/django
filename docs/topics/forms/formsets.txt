@@ -109,9 +109,9 @@ so long as the total number of forms does not exceed ``max_num``.
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit. If
-``max_num`` has a value of ``None`` and ``absolute_max`` is specified,
-``max_num`` will be set to the same value as ``absolute_max``. See
-:ref:`formsets-absolute-max`.
+``max_num`` has a value of ``None`` and ``absolute_max`` is specified with a
+value lower than the default max_num (1000), a ``ValueError`` will be
+raised. See :ref:`formsets-absolute-max`.
 
 If the number of forms in the initial data exceeds ``max_num``, all initial
 data forms will be displayed regardless.  (No extra forms will be displayed.)
@@ -165,6 +165,9 @@ An ``absolute_max`` value of ``None`` (the default) results in an
 
 If both ``absolute_max`` and ``max_number`` are specified and ``absolute_max``
 is less than ``max_number``, a ``ValueError`` will be raised.
+
+If ``max_num`` has a value of ``None`` and ``absolute_max`` is specified with a
+value lower than the default max_num (1000), a ``ValueError`` will be raised.
 
 .. seealso::
     :ref:`validate_max`

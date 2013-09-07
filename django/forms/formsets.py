@@ -398,19 +398,29 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
                     absolute_max=None):
     """Return a FormSet for the given form class."""
+
+    # max_num is a limit on how many empty forms are created along with initial
+    # data
+    # absolute_max is a hard limit on forms instantiated, to prevent
+    # memory-exhaustion attacks. If not explicitly set, the default is
+    # max_num + DEFAULT_MAX_NUM
+
     if max_num is None:
-        if absolute_max is not None:
-            max_num = min(absolute_max, DEFAULT_MAX_NUM)
+        max_num = DEFAULT_MAX_NUM
+        if absolute_max is None:
+            absolute_max = max_num + DEFAULT_MAX_NUM
         else:
-            max_num = DEFAULT_MAX_NUM
-
-    # hard limit on forms instantiated, to prevent memory-exhaustion attacks
-    # if not explicitly set, the default is max_num + DEFAULT_MAX_NUM
-    if absolute_max is None:
-        absolute_max = max_num + DEFAULT_MAX_NUM
-
-    if absolute_max < max_num:
-        raise ValueError("max_num must be less than or equal to absolute_max")
+            if absolute_max < DEFAULT_MAX_NUM:
+                raise ValueError(
+                    'absolute_max must be greater than the default max_num ' +
+                    '({0})'.format(DEFAULT_MAX_NUM))
+    else:
+        if absolute_max is None:
+            absolute_max = max_num + DEFAULT_MAX_NUM
+        else:
+            if absolute_max < max_num:
+                raise ValueError(
+                    'max_num must be less than or equal to absolute_max')
 
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
