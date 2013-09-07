@@ -107,12 +107,40 @@ class ClientTest(TestCase):
         # Check that the response was a 302 (redirect) with absolute URI
         self.assertRedirects(response, '/test_client/get_view/', host=host)
 
+    def test_redirect_dont_fetch_redirect_response(self):
+        """
+        GET a URL that redirects elsewhere without fetching
+        the actual response.
+        """
+        response = self.client.get('/test_client/redirect_view/')
+        # Check that the response was a 302 (redirect) and that
+        # assertRedirect() understands to put an implicit http://testserver/ in
+        # front of non-absolute URLs.
+        self.assertRedirects(response, '/test_client/get_view/', fetch_redirect_response=False)
+
+        host = 'django.testserver'
+        client_providing_host = Client(HTTP_HOST=host)
+        response = client_providing_host.get('/test_client/redirect_view/')
+        # Check that the response was a 302 (redirect) with absolute URI
+        self.assertRedirects(response, '/test_client/get_view/', host=host, fetch_redirect_response=False)
+
     def test_redirect_with_query(self):
         "GET a URL that redirects with given GET parameters"
         response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
 
         # Check if parameters are intact
         self.assertRedirects(response, 'http://testserver/test_client/get_view/?var=value')
+
+    def test_redirect_with_query_dont_fetch_redirect_response(self):
+        """
+        GET a URL that redirects with given GET parameters without fetching
+        the actual response.
+        """
+        response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
+
+        # Check if parameters are intact
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/?var=value',
+                             fetch_redirect_response=False)
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
@@ -125,14 +153,51 @@ class ClientTest(TestCase):
         # Check that the response was a 301 (permanent redirect) with absolute URI
         self.assertRedirects(response, 'http://django.testserver/test_client/get_view/', status_code=301)
 
+    def test_permanent_redirect_dont_fetch_redirect_response(self):
+        """
+        GET a URL that redirects permanently elsewhere without
+        fetching the actual response.
+        """
+        response = self.client.get('/test_client/permanent_redirect_view/')
+        # Check that the response was a 301 (permanent redirect)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=301,
+                             fetch_redirect_response=False)
+
+        client_providing_host = Client(HTTP_HOST='django.testserver')
+        response = client_providing_host.get('/test_client/permanent_redirect_view/')
+        # Check that the response was a 301 (permanent redirect) with absolute URI
+        self.assertRedirects(response, 'http://django.testserver/test_client/get_view/', status_code=301,
+                             fetch_redirect_response=False)
+
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
         response = self.client.get('/test_client/temporary_redirect_view/')
         # Check that the response was a 302 (non-permanent redirect)
         self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302)
 
+    def test_temporary_redirect_dont_fetch_redirect_response(self):
+        """
+        GET a URL that does a non-permanent redirect without
+        fetching the actual response.
+        """
+        response = self.client.get('/test_client/temporary_redirect_view/')
+        # Check that the response was a 302 (non-permanent redirect)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302,
+                             fetch_redirect_response=False)
+
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
+        response = self.client.get('/test_client/double_redirect_view/')
+
+        # Check that the response was a 302, and that
+        # the attempt to get the redirection location returned 301 when retrieved
+        self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/', target_status_code=301)
+
+    def test_redirect_to_strange_location_dont_fetch_redirect_response(self):
+        """
+        GET a URL that redirects to a non-200 page without
+        fetching the actual response.
+        """
         response = self.client.get('/test_client/double_redirect_view/')
 
         # Check that the response was a 302, and that
@@ -143,6 +208,16 @@ class ClientTest(TestCase):
         "A URL that redirects can be followed to termination."
         response = self.client.get('/test_client/double_redirect_view/', follow=True)
         self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200)
+        self.assertEqual(len(response.redirect_chain), 2)
+
+    def test_follow_redirect_dont_fetch_redirect_response(self):
+        """
+        A URL that redirects can be followed to termination. This doesn't
+        fetch the redirect response.
+        """
+        response = self.client.get('/test_client/double_redirect_view/', follow=True)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200,
+                             fetch_redirect_response=False)
         self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
