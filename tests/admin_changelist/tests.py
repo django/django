@@ -462,12 +462,12 @@ class ChangeListTests(TestCase):
 
     def test_no_list_display_links(self):
         """#15185 -- Allow no links from the 'change list' view grid."""
-        parent = Parent.objects.create(name='parent')
+        p = Parent.objects.create(name='parent')
         m = NoListDisplayLinksParentAdmin(Parent, admin.site)
         superuser = self._create_superuser('superuser')
         request = self._mocked_authenticated_request('/parent/', superuser)
         response = m.changelist_view(request)
-        link = reverse('admin:admin_changelist_parent_change', args=(1,))
+        link = reverse('admin:admin_changelist_parent_change', args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
 
     def test_tuple_list_display(self):

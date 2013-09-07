@@ -178,6 +178,7 @@ def items_for_result(cl, result, form):
     """
     Generates the actual list of data.
     """
+
     def link_in_col(is_first, field_name, cl):
         if cl.list_display_links is None:
             return False
