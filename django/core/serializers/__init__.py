@@ -68,7 +68,7 @@ def register_serializer(format, serializer_module, serializers=None):
 
     try:
         module = importlib.import_module(serializer_module)
-    except ImportError, exc:
+    except ImportError as exc:
         bad_serializer = BadSerializer(exc)
 
         module = type('BadSerializerModule', (object,), {
