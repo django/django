@@ -336,7 +336,7 @@ class RequestFactory(object):
             query_string = force_bytes(parsed[4])
             # WSGI requires latin-1 encoded strings. See get_path_info().
             if six.PY3:
-                query_string = query_string.decode('iso-8859-1')2053020530
+                query_string = query_string.decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
