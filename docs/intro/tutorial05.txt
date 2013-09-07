@@ -130,22 +130,22 @@ We identify a bug
 -----------------
 
 Fortunately, there's a little bug in the ``polls`` application for us to fix
-right away: the ``Poll.was_published_recently()`` method returns ``True`` if
-the ``Poll`` was published within the last day (which is correct) but also if
-the ``Poll``’s ``pub_date`` field is in the future (which certainly isn't).
+right away: the ``Question.was_published_recently()`` method returns ``True`` if
+the ``Question`` was published within the last day (which is correct) but also if
+the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
 
-You can see this in the Admin; create a poll whose date lies in the future;
-you'll see that the ``Poll`` change list claims it was published recently.
+You can see this in the Admin; create a question whose date lies in the future;
+you'll see that the ``Question`` change list claims it was published recently.
 
 You can also see this using the shell::
 
     >>> import datetime
     >>> from django.utils import timezone
-    >>> from polls.models import Poll
-    >>> # create a Poll instance with pub_date 30 days in the future
-    >>> future_poll = Poll(pub_date=timezone.now() + datetime.timedelta(days=30))
+    >>> from polls.models import Question
+    >>> # create a Question instance with pub_date 30 days in the future
+    >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
-    >>> future_poll.was_published_recently()
+    >>> future_question.was_published_recently()
     True
 
 Since things in the future are not 'recent', this is clearly wrong.
@@ -167,20 +167,21 @@ Put the following in the ``tests.py`` file in the ``polls`` application::
     from django.utils import timezone
     from django.test import TestCase
 
-    from polls.models import Poll
+    from polls.models import Question
 
-    class PollMethodTests(TestCase):
+    class QuestionMethodTests(TestCase):
 
-        def test_was_published_recently_with_future_poll(self):
+        def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() should return False for polls whose
             pub_date is in the future
             """
-            future_poll = Poll(pub_date=timezone.now() + datetime.timedelta(days=30))
-            self.assertEqual(future_poll.was_published_recently(), False)
+            time = timezone.now() + datetime.timedelta(days=30)
+            future_question = Question(pub_date=time)
+            self.assertEqual(future_question.was_published_recently(), False)
 
 What we have done here is created a :class:`django.test.TestCase` subclass
-with a method that creates a ``Poll`` instance with a ``pub_date`` in the
+with a method that creates a ``Question`` instance with a ``pub_date`` in the
 future. We then check the output of ``was_published_recently()`` - which
 *ought* to be False.
 
@@ -196,11 +197,11 @@ and you'll see something like::
     Creating test database for alias 'default'...
     F
     ======================================================================
-    FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
+    FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionMethodTests)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
-        self.assertEqual(future_poll.was_published_recently(), False)
+      File "/path/to/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_question
+        self.assertEqual(future_question.was_published_recently(), False)
     AssertionError: True != False
 
     ----------------------------------------------------------------------
@@ -219,7 +220,7 @@ What happened is this:
 
 * it looked for test methods - ones whose names begin with ``test``
 
-* in ``test_was_published_recently_with_future_poll`` it created a ``Poll``
+* in ``test_was_published_recently_with_future_question`` it created a ``Question``
   instance whose ``pub_date`` field is 30 days in the future
 
 * ... and using the ``assertEqual()`` method, it discovered that its
@@ -232,14 +233,14 @@ occurred.
 Fixing the bug
 --------------
 
-We already know what the problem is: ``Poll.was_published_recently()`` should
+We already know what the problem is: ``Question.was_published_recently()`` should
 return ``False`` if its ``pub_date`` is in the future. Amend the method in
 ``models.py``, so that it will only return ``True`` if the date is also in the
 past::
 
     def was_published_recently(self):
         now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <  now
+        return now - datetime.timedelta(days=1) <= self.pub_date < now
 
 and run the test again::
 
@@ -269,23 +270,25 @@ introduced another.
 Add two more test methods to the same class, to test the behavior of the method
 more comprehensively::
 
-    def test_was_published_recently_with_old_poll(self):
+    def test_was_published_recently_with_old_question(self):
         """
         was_published_recently() should return False for polls whose pub_date
         is older than 1 day
         """
-        old_poll = Poll(pub_date=timezone.now() - datetime.timedelta(days=30))
-        self.assertEqual(old_poll.was_published_recently(), False)
+        time = timezone.now() - datetime.timedelta(days=30)
+        old_question = Question(pub_date=time)
+        self.assertEqual(old_question.was_published_recently(), False)
 
-    def test_was_published_recently_with_recent_poll(self):
+    def test_was_published_recently_with_recent_question(self):
         """
         was_published_recently() should return True for polls whose pub_date
         is within the last day
         """
-        recent_poll = Poll(pub_date=timezone.now() - datetime.timedelta(hours=1))
-        self.assertEqual(recent_poll.was_published_recently(), True)
+        time = timezone.now() - datetime.timedelta(hours=1)
+        recent_question = Question(pub_date=time)
+        self.assertEqual(recent_question.was_published_recently(), True)
 
-And now we have three tests that confirm that ``Poll.was_published_recently()``
+And now we have three tests that confirm that ``Question.was_published_recently()``
 returns sensible values for past, recent, and future polls.
 
 Again, ``polls`` is a simple application, but however complex it grows in the
@@ -295,9 +298,9 @@ that the method we have written tests for will behave in expected ways.
 Test a view
 ===========
 
-The polls application is fairly undiscriminating: it will publish any poll,
+The polls application is fairly undiscriminating: it will publish any question,
 including ones whose ``pub_date`` field lies in the future. We should improve
-this. Setting a ``pub_date`` in the future should mean that the Poll is
+this. Setting a ``pub_date`` in the future should mean that the Question is
 published at that moment, but invisible until then.
 
 A test for a view
@@ -360,17 +363,17 @@ With that ready, we can ask the client to do some work for us::
     >>> # note - you might get unexpected results if your ``TIME_ZONE``
     >>> # in ``settings.py`` is not correct. If you need to change it,
     >>> # you will also need to restart your shell session
-    >>> from polls.models import Poll
+    >>> from polls.models import Question
     >>> from django.utils import timezone
-    >>> # create a Poll and save it
-    >>> p = Poll(question="Who is your favorite Beatle?", pub_date=timezone.now())
+    >>> # create a Question and save it
+    >>> p = Question(question_text="Who is your favorite Beatle?", pub_date=timezone.now())
     >>> p.save()
     >>> # check the response once again
     >>> response = client.get('/polls/')
     >>> response.content
     '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
-    >>> response.context['latest_poll_list']
-    [<Poll: Who is your favorite Beatle?>]
+    >>> response.context['latest_question_list']
+    [<Question: Who is your favorite Beatle?>]
 
 Improving our view
 ------------------
@@ -383,13 +386,13 @@ based on :class:`~django.views.generic.list.ListView`::
 
     class IndexView(generic.ListView):
         template_name = 'polls/index.html'
-        context_object_name = 'latest_poll_list'
+        context_object_name = 'latest_question_list'
 
         def get_queryset(self):
             """Return the last five published polls."""
-            return Poll.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by('-pub_date')[:5]
 
-``response.context_data['latest_poll_list']`` extracts the data this view
+``response.context_data['latest_question_list']`` extracts the data this view
 places into the context.
 
 We need to amend the ``get_queryset`` method and change it so that it also
@@ -405,11 +408,11 @@ and then we must amend the ``get_queryset`` method like so::
         Return the last five published polls (not including those set to be
         published in the future).
         """
-        return Poll.objects.filter(
+        return Question.objects.filter(
             pub_date__lte=timezone.now()
         ).order_by('-pub_date')[:5]
 
-``Poll.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
+``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing Polls whose ``pub_date`` is less than or equal to - that is, earlier
 than or equal to - ``timezone.now``.
 
@@ -429,16 +432,18 @@ Add the following to ``polls/tests.py``::
 
 and we'll create a factory method to create polls as well as a new test class::
 
-    def create_poll(question, days):
+    def create_question(question_text, days):
         """
-        Creates a poll with the given `question` published the given number of
-        `days` offset to now (negative for polls published in the past,
-        positive for polls that have yet to be published).
+        Creates a question with the given `question_text` published the given
+        number of `days` offset to now (negative for polls published
+        in the past, positive for polls that have yet to be published).
         """
-        return Poll.objects.create(question=question,
-            pub_date=timezone.now() + datetime.timedelta(days=days))
+        time = timezone.now() + datetime.timedelta(days=days)
+        return Question.objects.create(question_text=question_text,
+                                       pub_date=time)
 
-    class PollViewTests(TestCase):
+
+    class QuestionViewTests(TestCase):
         def test_index_view_with_no_polls(self):
             """
             If no polls exist, an appropriate message should be displayed.
@@ -446,17 +451,17 @@ and we'll create a factory method to create polls as well as a new test class::
             response = self.client.get(reverse('polls:index'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_poll_list'], [])
+            self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
-        def test_index_view_with_a_past_poll(self):
+        def test_index_view_with_a_past_question(self):
             """
-            Polls with a pub_date in the past should be displayed on the index page.
+            Polls with a pub_date in the past should be displayed on the index page
             """
-            create_poll(question="Past poll.", days=-30)
+            create_question(question_text="Past question.", days=-30)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
-                response.context['latest_poll_list'],
-                ['<Poll: Past poll.>']
+                response.context['latest_question_list'],
+                ['<Question: Past question.>']
             )
 
         def test_index_view_with_a_future_poll(self):
@@ -464,52 +469,54 @@ and we'll create a factory method to create polls as well as a new test class::
             Polls with a pub_date in the future should not be displayed on the
             index page.
             """
-            create_poll(question="Future poll.", days=30)
+            create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
-            self.assertContains(response, "No polls are available.", status_code=200)
-            self.assertQuerysetEqual(response.context['latest_poll_list'], [])
+            self.assertContains(response, "No polls are available.",
+                                status_code=200)
+            self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
-        def test_index_view_with_future_poll_and_past_poll(self):
+        def test_index_view_with_future_question_and_past_question(self):
             """
             Even if both past and future polls exist, only past polls should be
             displayed.
             """
-            create_poll(question="Past poll.", days=-30)
-            create_poll(question="Future poll.", days=30)
+            create_question(question_text="Past question.", days=-30)
+            create_question(question_text="Future question.", days=30)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
-                response.context['latest_poll_list'],
-                ['<Poll: Past poll.>']
+                response.context['latest_question_list'],
+                ['<Question: Past question.>']
             )
 
         def test_index_view_with_two_past_polls(self):
             """
             The polls index page may display multiple polls.
             """
-            create_poll(question="Past poll 1.", days=-30)
-            create_poll(question="Past poll 2.", days=-5)
+            create_question(question_text="Past quesiton 1.", days=-30)
+            create_question(question_text="Past question 2.", days=-5)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(
-                response.context['latest_poll_list'],
-                 ['<Poll: Past poll 2.>', '<Poll: Past poll 1.>']
+                response.context['latest_question_list'],
+                ['<Question: Past question 2.>', '<Question: Past question 1.>']
             )
+
 
 Let's look at some of these more closely.
 
-First is a poll factory method, ``create_poll``, to take some repetition out
+First is a question factory method, ``create_question``, to take some repetition out
 of the process of creating polls.
 
 ``test_index_view_with_no_polls`` doesn't create any polls, but checks the
-message: "No polls are available." and verifies the ``latest_poll_list`` is
+message: "No polls are available." and verifies the ``latest_question_list`` is
 empty. Note that the :class:`django.test.TestCase` class provides some
 additional assertion methods. In these examples, we use
 :meth:`~django.test.SimpleTestCase.assertContains()` and
 :meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
 
-In ``test_index_view_with_a_past_poll``, we create a poll and verify that it
+In ``test_index_view_with_a_past_question``, we create a question and verify that it
 appears in the list.
 
-In ``test_index_view_with_a_future_poll``, we create a poll with a ``pub_date``
+In ``test_index_view_with_a_future_question``, we create a question with a ``pub_date``
 in the future. The database is reset for each test method, so the first poll is
 no longer there, and so again the index shouldn't have any polls in it.
 
@@ -531,30 +538,36 @@ need to add a similar  constraint to ``DetailView``::
             """
             Excludes any polls that aren't published yet.
             """
-            return Poll.objects.filter(pub_date__lte=timezone.now())
+            return Question.objects.filter(pub_date__lte=timezone.now())
 
-And of course, we will add some tests, to check that a ``Poll`` whose
+And of course, we will add some tests, to check that a ``Question`` whose
 ``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
 in the future is not::
 
-    class PollIndexDetailTests(TestCase):
-        def test_detail_view_with_a_future_poll(self):
+    class QuestionIndexDetailTests(TestCase):
+        def test_detail_view_with_a_future_question(self):
             """
-            The detail view of a poll with a pub_date in the future should
+            The detail view of a question with a pub_date in the future should
             return a 404 not found.
             """
-            future_poll = create_poll(question='Future poll.', days=5)
-            response = self.client.get(reverse('polls:detail', args=(future_poll.id,)))
+            future_question = create_question(question_text='Future question.',
+                                              days=5)
+            response = self.client.get(reverse('polls:detail',
+                                       args=(future_question.id,)))
             self.assertEqual(response.status_code, 404)
 
-        def test_detail_view_with_a_past_poll(self):
+        def test_detail_view_with_a_past_question(self):
             """
-            The detail view of a poll with a pub_date in the past should display
-            the poll's question.
+            The detail view of a question with a pub_date in the past should
+            display the question's text.
             """
-            past_poll = create_poll(question='Past Poll.', days=-5)
-            response = self.client.get(reverse('polls:detail', args=(past_poll.id,)))
-            self.assertContains(response, past_poll.question, status_code=200)
+            past_question = create_question(question_text='Past Question.',
+                                            days=-5)
+            response = self.client.get(reverse('polls:detail',
+                                       args=(past_question.id,)))
+            self.assertContains(response, past_question.question_text,
+                                status_code=200)
+
 
 Ideas for more tests
 --------------------
@@ -566,8 +579,8 @@ just created; in fact there will be a lot of repetition.
 We could also improve our application in other ways, adding tests along the
 way. For example, it's silly that ``Polls`` can be published on the site that
 have no ``Choices``. So, our views could check for this, and exclude such
-``Polls``. Our tests would create a ``Poll`` without ``Choices`` and then test
-that it's not published, as well as create a similar ``Poll`` *with*
+``Polls``. Our tests would create a ``Question`` without ``Choices`` and then test
+that it's not published, as well as create a similar ``Question`` *with*
 ``Choices``, and test that it *is* published.
 
 Perhaps logged-in admin users should be allowed to see unpublished ``Polls``,
