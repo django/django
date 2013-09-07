@@ -44,6 +44,7 @@ from django.views.decorators.csrf import csrf_protect
 
 
 IS_POPUP_VAR = '_popup'
+TO_FIELD_VAR = '_to_field'
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -932,6 +933,8 @@ class ModelAdmin(BaseModelAdmin):
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
+            'to_field_var': TO_FIELD_VAR,
+            'is_popup_var': IS_POPUP_VAR
         })
         if add and self.add_form_template is not None:
             form_template = self.add_form_template
@@ -951,13 +954,20 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
-
         msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
+
         if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj._meta.pk.attname
+            value = obj.serializable_value(attr)
             return SimpleTemplateResponse('admin/popup_response.html', {
-                'pk_value': escape(pk_value),
+                'pk_value': escape(pk_value), # for possible backwards-compatibility
+                'value': escape(value),
                 'obj': escapejs(obj)
             })
 
@@ -988,6 +998,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         Determines the HttpResponse for the change_view stage.
         """
+
         opts = self.model._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
@@ -1126,6 +1137,43 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.WARNING)
             return None
 
+    def response_delete(self, request, obj_display):
+        """
+        Determines the HttpResponse for the delete_view stage.
+        """
+
+        opts = self.model._meta
+
+        self.message_user(request, _(
+            'The %(name)s "%(obj)s" was deleted successfully.') % {
+                                   'name': force_text(opts.verbose_name),
+                                   'obj': force_text(obj_display)},
+                          messages.SUCCESS)
+
+        if self.has_change_permission(request, None):
+            post_url = reverse('admin:%s_%s_changelist' %
+                               (opts.app_label, opts.model_name),
+                               current_app=self.admin_site.name)
+            preserved_filters = self.get_preserved_filters(request)
+            post_url = add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': opts}, post_url
+            )
+        else:
+            post_url = reverse('admin:index',
+                               current_app=self.admin_site.name)
+        return HttpResponseRedirect(post_url)
+
+    def render_delete_form(self, request, context):
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        return TemplateResponse(request,
+            self.delete_confirmation_template or [
+            "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
+            "admin/{}/delete_confirmation.html".format(app_label),
+            "admin/delete_confirmation.html"
+       ], context, current_app=self.admin_site.name)
+
     @csrf_protect_m
     @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
@@ -1187,6 +1235,7 @@ class ModelAdmin(BaseModelAdmin):
             title=_('Add %s') % force_text(opts.verbose_name),
             adminform=adminForm,
             is_popup=IS_POPUP_VAR in request.REQUEST,
+            to_field=request.REQUEST.get(TO_FIELD_VAR),
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1260,6 +1309,7 @@ class ModelAdmin(BaseModelAdmin):
             object_id=object_id,
             original=obj,
             is_popup=IS_POPUP_VAR in request.REQUEST,
+            to_field=request.REQUEST.get(TO_FIELD_VAR),
             media=media,
             inline_admin_formsets=inline_admin_formsets,
             errors=helpers.AdminErrorList(form, formsets),
@@ -1406,6 +1456,7 @@ class ModelAdmin(BaseModelAdmin):
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
             title=cl.title,
             is_popup=cl.is_popup,
+            to_field=cl.to_field,
             cl=cl,
             media=media,
             has_add_permission=self.has_add_permission(request),
@@ -1457,24 +1508,7 @@ class ModelAdmin(BaseModelAdmin):
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
-            self.message_user(request, _(
-                'The %(name)s "%(obj)s" was deleted successfully.') % {
-                                       'name': force_text(opts.verbose_name),
-                                       'obj': force_text(obj_display)},
-                              messages.SUCCESS)
-
-            if self.has_change_permission(request, None):
-                post_url = reverse('admin:%s_%s_changelist' %
-                                   (opts.app_label, opts.model_name),
-                                   current_app=self.admin_site.name)
-                preserved_filters = self.get_preserved_filters(request)
-                post_url = add_preserved_filters(
-                    {'preserved_filters': preserved_filters, 'opts': opts}, post_url
-                )
-            else:
-                post_url = reverse('admin:index',
-                                   current_app=self.admin_site.name)
-            return HttpResponseRedirect(post_url)
+            return self.response_delete(request, obj_display)
 
         object_name = force_text(opts.verbose_name)
 
@@ -1496,11 +1530,7 @@ class ModelAdmin(BaseModelAdmin):
         )
         context.update(extra_context or {})
 
-        return TemplateResponse(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.model_name),
-            "admin/%s/delete_confirmation.html" % app_label,
-            "admin/delete_confirmation.html"
-        ], context, current_app=self.admin_site.name)
+        return self.render_delete_form(request, context)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
