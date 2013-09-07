@@ -6,7 +6,6 @@ from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
-from django.utils.http import urlquote
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone

@@ -1,6 +1,5 @@
 import hashlib
 import operator
-import sys
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
