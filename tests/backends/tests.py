@@ -963,3 +963,23 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class UnicodeArrayTestCase(TestCase):
+
+    def select(self, val):
+        cursor = connection.cursor()
+        cursor.execute("select %s", (val,))
+        return cursor.fetchone()[0]
+
+    def test_select_ascii_array(self):
+        a = ["awef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
+
+    def test_select_unicode_array(self):
+        a = [u"ᄲawef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
