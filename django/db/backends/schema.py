@@ -90,7 +90,7 @@ class BaseDatabaseSchemaEditor(object):
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
         if self.collect_sql:
-            self.collected_sql.append((sql % map(self.connection.ops.quote_parameter, params)) + ";")
+            self.collected_sql.append((sql % list(map(self.connection.ops.quote_parameter, params))) + ";")
         else:
             cursor.execute(sql, params)
 
