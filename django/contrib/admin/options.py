@@ -1126,6 +1126,43 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.WARNING)
             return None
 
+    def response_delete(self, request, obj_display):
+        """
+        Determines the HttpResponse for the delete_view stage.
+        """
+
+        opts = self.model._meta
+
+        self.message_user(request, _(
+            'The %(name)s "%(obj)s" was deleted successfully.') % {
+                                   'name': force_text(opts.verbose_name),
+                                   'obj': force_text(obj_display)},
+                          messages.SUCCESS)
+
+        if self.has_change_permission(request, None):
+            post_url = reverse('admin:%s_%s_changelist' %
+                               (opts.app_label, opts.model_name),
+                               current_app=self.admin_site.name)
+            preserved_filters = self.get_preserved_filters(request)
+            post_url = add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': opts}, post_url
+            )
+        else:
+            post_url = reverse('admin:index',
+                               current_app=self.admin_site.name)
+        return HttpResponseRedirect(post_url)
+
+    def render_delete_form(self, request, context):
+        opts = self.model._meta
+        app_label = opts.app_label
+
+        return TemplateResponse(request,
+            self.delete_confirmation_template or [
+            "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
+            "admin/{}/delete_confirmation.html".format(app_label),
+            "admin/delete_confirmation.html"
+       ], context, current_app=self.admin_site.name)
+
     @csrf_protect_m
     @transaction.atomic
     def add_view(self, request, form_url='', extra_context=None):
@@ -1457,24 +1494,7 @@ class ModelAdmin(BaseModelAdmin):
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
-            self.message_user(request, _(
-                'The %(name)s "%(obj)s" was deleted successfully.') % {
-                                       'name': force_text(opts.verbose_name),
-                                       'obj': force_text(obj_display)},
-                              messages.SUCCESS)
-
-            if self.has_change_permission(request, None):
-                post_url = reverse('admin:%s_%s_changelist' %
-                                   (opts.app_label, opts.model_name),
-                                   current_app=self.admin_site.name)
-                preserved_filters = self.get_preserved_filters(request)
-                post_url = add_preserved_filters(
-                    {'preserved_filters': preserved_filters, 'opts': opts}, post_url
-                )
-            else:
-                post_url = reverse('admin:index',
-                                   current_app=self.admin_site.name)
-            return HttpResponseRedirect(post_url)
+            return self.response_delete(request, obj_display)
 
         object_name = force_text(opts.verbose_name)
 
@@ -1496,11 +1516,7 @@ class ModelAdmin(BaseModelAdmin):
         )
         context.update(extra_context or {})
 
-        return TemplateResponse(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.model_name),
-            "admin/%s/delete_confirmation.html" % app_label,
-            "admin/delete_confirmation.html"
-        ], context, current_app=self.admin_site.name)
+        return self.render_delete_form(request, context)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
