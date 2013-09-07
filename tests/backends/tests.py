@@ -980,6 +980,6 @@ class UnicodeArrayTestCase(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_select_unicode_array(self):
-        a = [u"ᄲawef"]
+        a = ["ᄲawef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
