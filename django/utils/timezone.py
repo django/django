@@ -1,10 +1,12 @@
-"""Timezone helper functions.
+"""
+Timezone-related classes and functions.
 
 This module uses pytz when it's available and fallbacks when it isn't.
 """
 
 from datetime import datetime, timedelta, tzinfo
 from threading import local
+import sys
 import time as _time
 
 try:
@@ -45,12 +47,14 @@ class UTC(tzinfo):
     def dst(self, dt):
         return ZERO
 
-class LocalTimezone(tzinfo):
+class ReferenceLocalTimezone(tzinfo):
     """
     Local time implementation taken from Python's docs.
 
     Used only when pytz isn't available, and most likely inaccurate. If you're
     having trouble with this class, don't waste your time, just install pytz.
+
+    Kept identical to the reference version. Subclasses contain improvements.
     """
 
     def __init__(self):
@@ -91,6 +95,23 @@ class LocalTimezone(tzinfo):
         tt = _time.localtime(stamp)
         return tt.tm_isdst > 0
 
+class LocalTimezone(ReferenceLocalTimezone):
+    """
+    Slightly improved local time implementation focusing on correctness.
+
+    It still crashes on dates before 1970 or after 2038, but at least the
+    error message is helpful.
+    """
+
+    def _isdst(self, dt):
+        try:
+            return super(LocalTimezone, self)._isdst(dt)
+        except (OverflowError, ValueError) as exc:
+            exc_type = type(exc)
+            exc_value = exc_type(
+                    "Unsupported value: %r. You should install pytz." % dt)
+            exc_value.__cause__ = exc
+            six.reraise(exc_type, exc_value, sys.exc_info()[2])
 
 utc = pytz.utc if pytz else UTC()
 """UTC time zone as a tzinfo instance."""
