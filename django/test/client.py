@@ -271,9 +271,13 @@ class RequestFactory(object):
         "Construct a GET request."
 
         parsed = urlparse(path)
+        query_string = urlencode(data, doseq=True) or force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
             'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
+            'QUERY_STRING':    query_string,
             'REQUEST_METHOD':  str('GET'),
         }
         r.update(extra)
@@ -286,11 +290,15 @@ class RequestFactory(object):
         post_data = self._encode_data(data, content_type)
 
         parsed = urlparse(path)
+        query_string = force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
             'CONTENT_LENGTH': len(post_data),
             'CONTENT_TYPE':   content_type,
             'PATH_INFO':      self._get_path(parsed),
-            'QUERY_STRING':   force_str(parsed[4]),
+            'QUERY_STRING':   query_string,
             'REQUEST_METHOD': str('POST'),
             'wsgi.input':     FakePayload(post_data),
         }
@@ -301,9 +309,13 @@ class RequestFactory(object):
         "Construct a HEAD request."
 
         parsed = urlparse(path)
+        query_string = urlencode(data, doseq=True) or force_str(parsed[4])
+        if six.PY3:
+            query_string = query_string.encode('utf-8').decode('iso-8859-1')
+
         r = {
             'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
+            'QUERY_STRING':    query_string,
             'REQUEST_METHOD':  str('HEAD'),
         }
         r.update(extra)
