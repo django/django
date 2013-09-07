@@ -549,6 +549,79 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'none')
 
+    def test_calendar_nonday_class(self):
+        """
+        Ensure cells that are not days of the month have the `nonday` CSS class.
+        Refs #4574.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+        # Open a page that has a date and time picker widgets
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        # fill in the birth date.
+        self.selenium.find_element_by_id('id_birthdate_0').send_keys('2013-06-01')
+
+        # Click the calendar icon
+        self.selenium.find_element_by_id('calendarlink0').click()
+
+        # get all the tds within the calendar
+        calendar0 = self.selenium.find_element_by_id('calendarin0')
+        tds = calendar0.find_elements_by_tag_name('td')
+
+        # make sure the first and last 6 cells have class nonday
+        for td in tds[:6] + tds[-6:]:
+            self.assertEqual(td.get_attribute('class'), 'nonday')
+
+    def test_calendar_selected_class(self):
+        """
+        Ensure cell for the day in the input has the `selected` CSS class.
+        Refs #4574.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+        # Open a page that has a date and time picker widgets
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        # fill in the birth date.
+        self.selenium.find_element_by_id('id_birthdate_0').send_keys('2013-06-01')
+
+        # Click the calendar icon
+        self.selenium.find_element_by_id('calendarlink0').click()
+
+        # get all the tds within the calendar
+        calendar0 = self.selenium.find_element_by_id('calendarin0')
+        tds = calendar0.find_elements_by_tag_name('td')
+
+        # verify the selected cell
+        selected = tds[6]
+        self.assertEqual(selected.get_attribute('class'), 'selected')
+
+        self.assertEqual(selected.text, '1')
+
+    def test_calendar_no_selected_class(self):
+        """
+        Ensure no cells are given the selected class when the field is empty.
+        Refs #4574.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+        # Open a page that has a date and time picker widgets
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        # Click the calendar icon
+        self.selenium.find_element_by_id('calendarlink0').click()
+
+        # get all the tds within the calendar
+        calendar0 = self.selenium.find_element_by_id('calendarin0')
+        tds = calendar0.find_elements_by_tag_name('td')
+
+        # verify there are no cells with the selected class
+        selected = [td for td in tds if td.get_attribute('class') == 'selected']
+
+        self.assertEqual(len(selected), 0)
+
+
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
