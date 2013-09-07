@@ -4538,7 +4538,6 @@ class AdminViewFormValidationTests(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/parentwithdependentchildren/add/', 
                                     post_data)
         self.assertTrue(response.context['adminform'].form.errors)
-        import pdb; pdb.set_trace()
         for error_set in response.context['inline_admin_formset'].formset.errors:
             self.assertTrue(error_set)
     
