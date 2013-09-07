@@ -282,17 +282,17 @@ class PlainTextReportTests(TestCase):
         "An exception report can be generated for just a request"
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
     def test_message_only(self):
         reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
-        text = reporter.get_traceback_text()
+        reporter.get_traceback_text()
 
 
 class ExceptionReportTestMixin(object):
@@ -376,7 +376,7 @@ class ExceptionReportTestMixin(object):
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -409,7 +409,7 @@ class ExceptionReportTestMixin(object):
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -449,7 +449,7 @@ class ExceptionReportTestMixin(object):
         with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
-            response = view(request)
+            view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
