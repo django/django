@@ -438,7 +438,7 @@ class BaseDatabaseSchemaEditor(object):
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
-        basic_fields = field.resolve_basic_fields()
+        basic_fields = new_field.resolve_basic_fields()
         if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None or new_type is None:
@@ -641,8 +641,8 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Does it have a foreign key?
         if new_field.rel and self.connection.features.supports_foreign_keys:
-            to_table = field.rel.to._meta.db_table
-            to_fields = field.rel.to._meta.get_field(field.rel.field_name).resolve_basic_fields()
+            to_table = new_field.rel.to._meta.db_table
+            to_fields = new_field.rel.to._meta.get_field(new_field.rel.field_name).resolve_basic_fields()
             to_columns = [f.column for f in to_fields]
             from_columns = [f.column for f in basic_fields]
             self.execute(
