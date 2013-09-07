@@ -93,7 +93,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = self._parse_content_type(self.META.get('CONTENT_TYPE', ''))
+        _, content_params = self._parse_content_type(environ.get('CONTENT_TYPE', ''))
         if 'charset' in content_params:
             try:
                 codecs.lookup(content_params['charset'])
@@ -103,7 +103,7 @@ class WSGIRequest(http.HttpRequest):
                 self.encoding = content_params['charset']
         self._post_parse_error = False
         try:
-            content_length = int(self.environ.get('CONTENT_LENGTH'))
+            content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
@@ -111,7 +111,7 @@ class WSGIRequest(http.HttpRequest):
         self.resolver_match = None
 
     def _is_secure(self):
-        return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
+        return self.environ.get('wsgi.url_scheme') == 'https'
 
     def _parse_content_type(self, ctype):
         """
