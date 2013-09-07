@@ -232,13 +232,26 @@ class AdminSite(object):
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
-            url(r'^(?P<app_label>\w+)/$', wrap(self.app_index), name='app_list'),
         )
 
-        # Add in each model's views.
+        # Add in each model's views, and create a list of valid URLS for the
+        # app_index
+        valid_app_labels = []
         for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
+            )
+            if model._meta.app_label not in valid_app_labels:
+                valid_app_labels.append(model._meta.app_label)
+
+        # if there were modeladmins registered, we should have a list of app
+        # labels for which we need to allow access to the app_index view,
+        # previously this was just a wildcard \w+, allowing reversal of
+        # anything into a supposedly valid URI.
+        if len(valid_app_labels) > 0:
+            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+            urlpatterns += patterns('',
+                url(regex, wrap(self.app_index), name='app_list'),
             )
         return urlpatterns
 
