@@ -41,6 +41,16 @@ class HandlerTests(TestCase):
         response = handler(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)
 
+    def test_non_ascii_query_string(self):
+        """Test that non-ASCII query strings are properly decoded (#20530)."""
+        environ = RequestFactory().get('/').environ
+        raw_query_string = 'want=café'
+        if six.PY3:
+            raw_query_string = raw_query_string.encode('utf-8').decode('iso-8859-1')
+        environ['QUERY_STRING'] = raw_query_string
+        request = WSGIRequest(environ)
+        self.assertEqual(request.GET['want'], "café")
+
     def test_non_ascii_cookie(self):
         """Test that non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
         environ = RequestFactory().get('/').environ
@@ -49,6 +59,9 @@ class HandlerTests(TestCase):
             raw_cookie = raw_cookie.encode('utf-8').decode('iso-8859-1')
         environ['HTTP_COOKIE'] = raw_cookie
         request = WSGIRequest(environ)
+        # If would be nicer if request.COOKIES returned unicode values.
+        # However the current cookie parser doesn't do this and fixing it is
+        # much more work than fixing #20557. Feel free to remove force_str()!
         self.assertEqual(request.COOKIES['want'], force_str("café"))
 
 
