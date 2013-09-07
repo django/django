@@ -321,6 +321,17 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+:meth:`django.db.models.manager.BaseManager.db_manager()`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously it was possible to reset the internal variable ``_db`` by calling
+``db_manager(using=None)``. Due to a database routing issue, the ``db_manager``
+signature was changed from ``def db_manager(self, using)`` to
+``def db_manager(self, using=None, hints=None)``. If ``using`` is passed in as
+``None`` it will now be silently ignored and the previous value of ``_db`` will
+be used.  The new ``hints`` argument follows the same semantics as ``hints``
+for database routers.
+
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
 

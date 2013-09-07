@@ -1956,3 +1956,148 @@ class MigrateTestCase(TestCase):
             router.routers = old_routers
 
         self.assertEqual(cts.count(), 0)
+
+
+class RouteForWriteTestCase(TestCase):
+    multi_db = True
+    RAISE_MSG = 'Db for write called'
+
+    class Rtr(object):
+        def db_for_write(self, model, **hints):
+            raise AttributeError(RouteForWriteTestCase.RAISE_MSG)
+
+    def setUp(self):
+        self._old_rtrs = router.routers
+
+    def tearDown(self):
+        router.routers = self._old_rtrs
+
+    def enable_router(self):
+        router.routers = [RouteForWriteTestCase.Rtr()]
+
+    def test_fk_delete(self):
+        owner = Person.objects.create(name='Someone')
+        pet = Pet.objects.create(name='fido', owner=owner)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, pet.owner.delete)
+
+    def test_reverse_fk_delete(self):
+        owner = Person.objects.create(name='Someone')
+        to_del_qs = owner.pet_set.all()
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, to_del_qs.delete)
+
+    def test_reverse_fk_get_or_create(self):
+        owner = Person.objects.create(name='Someone')
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 owner.pet_set.get_or_create, name='fido')
+
+    def test_reverse_fk_update(self):
+        owner = Person.objects.create(name='Someone')
+        pet = Pet.objects.create(name='fido', owner=owner)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 owner.pet_set.update, name='max')
+
+    def test_m2m_add(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, book.authors.add, auth)
+
+    def test_m2m_clear(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, book.authors.clear)
+
+    def test_m2m_delete(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, book.authors.all().delete)
+
+    def test_m2m_get_or_create(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 book.authors.get_or_create, name='Someone else')
+
+    def test_m2m_remove(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, book.authors.remove, auth)
+
+    def test_m2m_update(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 book.authors.all().update, name='Different')
+
+    def test_reverse_m2m_add(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.add, book)
+
+    def test_reverse_m2m_clear(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.clear)
+
+    def test_reverse_m2m_delete(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.all().delete)
+
+    def test_reverse_m2m_get_or_create(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.get_or_create,
+                                 title="New Book",
+                                 published=datetime.datetime.now())
+
+    def test_reverse_m2m_remove(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.remove, book)
+
+    def test_m2m_update(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG,
+                                 auth.book_set.all().update, title='Different')
