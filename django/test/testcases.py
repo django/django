@@ -225,12 +225,14 @@ class SimpleTestCase(unittest.TestCase):
         return override_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix=''):
+                        target_status_code=200, host=None, msg_prefix='',
+                        fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
 
         Note that assertRedirects won't work for external links since it uses
-        TestClient to do a request.
+        TestClient to do a request (use fetch_redirect_response=False to check
+        such links without fetching thtem).
         """
         if msg_prefix:
             msg_prefix += ": "
@@ -264,14 +266,15 @@ class SimpleTestCase(unittest.TestCase):
             url = response.url
             scheme, netloc, path, query, fragment = urlsplit(url)
 
-            redirect_response = response.client.get(path, QueryDict(query))
+            if fetch_redirect_response:
+                redirect_response = response.client.get(path, QueryDict(query))
 
-            # Get the redirection page, using the same client that was used
-            # to obtain the original response.
-            self.assertEqual(redirect_response.status_code, target_status_code,
-                msg_prefix + "Couldn't retrieve redirection page '%s':"
-                " response code was %d (expected %d)" %
-                    (path, redirect_response.status_code, target_status_code))
+                # Get the redirection page, using the same client that was used
+                # to obtain the original response.
+                self.assertEqual(redirect_response.status_code, target_status_code,
+                    msg_prefix + "Couldn't retrieve redirection page '%s':"
+                    " response code was %d (expected %d)" %
+                        (path, redirect_response.status_code, target_status_code))
 
         e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
                                                               expected_url)

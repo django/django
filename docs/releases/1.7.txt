@@ -293,6 +293,11 @@ Tests
   :attr:`~django.test.runner.DiscoverRunner.test_runner`, which facilitate
   overriding the way tests are collected and run.
 
+* The ``fetch_redirect_response`` argument was added to
+  :meth:`~django.test.SimpleTestCase.assertRedirects`. Since the test
+  client can't fetch externals URLs, this allows you to use ``assertRedirects``
+  with redirects that aren't part of your Django app.
+
 Backwards incompatible changes in 1.7
 =====================================
 
