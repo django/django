@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
@@ -36,13 +36,13 @@ class AdminSite(object):
     """
 
     # Text to put at the end of each page's <title>.
-    site_title = _('Django site admin')
+    site_title = ugettext_lazy('Django site admin')
 
     # Text to put in each page's <h1>.
-    site_header = _('Django administration')
+    site_header = ugettext_lazy('Django administration')
 
     # Text to put at the top of the admin index page.
-    index_title = _('Site administration')
+    index_title = ugettext_lazy('Site administration')
 
     login_form = None
     index_template = None
