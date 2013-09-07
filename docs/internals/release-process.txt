@@ -133,6 +133,20 @@ Django 1.3 and 1.4. At this point in time:
 * Documentation fixes will be applied to trunk, and, if easily backported, to
   the ``1.3.X`` branch.
 
+.. _lts-releases:
+
+Long-term support (LTS) releases
+================================
+
+Additionally, the Django team will occasionally designate certain releases
+to be "Long-term support" (LTS) releases. LTS releases will get security fixes
+applied for a guaranteed period of time, typically 3+ years, regardless of
+the pace of releases afterwards.
+
+The follow releases have been designated for long-term support:
+
+    * Django 1.4, supported until at least March 2015.
+
 .. _release-process:
 
 Release process
