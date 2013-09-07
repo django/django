@@ -132,7 +132,10 @@ class WSGIRequest(http.HttpRequest):
     def _get_get(self):
         if not hasattr(self, '_get'):
             # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self._encoding)
+            raw_query_string = self.environ.get('QUERY_STRING', str(''))
+            if six.PY3:
+                raw_query_string = raw_query_string.encode('iso-8859-1').decode('utf-8')
+            self._get = http.QueryDict(raw_query_string, encoding=self._encoding)
         return self._get
 
     def _set_get(self, get):
