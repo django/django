@@ -1,8 +1,11 @@
-from django.core.handlers.wsgi import WSGIHandler
+from __future__ import unicode_literals
+
+from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from django.core.signals import request_started, request_finished
 from django.db import close_old_connections, connection
 from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.utils import six
 
 
 class HandlerTests(TestCase):
@@ -30,10 +33,18 @@ class HandlerTests(TestCase):
     def test_bad_path_info(self):
         """Tests for bug #15672 ('request' referenced before assignment)"""
         environ = RequestFactory().get('/').environ
-        environ['PATH_INFO'] = '\xed'
+        environ['PATH_INFO'] = b'\xed' if six.PY2 else '\xed'
         handler = WSGIHandler()
         response = handler(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)
+
+    def test_non_ascii_cookie(self):
+        """Test that non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
+        environ = RequestFactory().get('/').environ
+        raw_cookie = 'want="café"'.encode('utf-8')
+        environ['HTTP_COOKIE'] = raw_cookie if six.PY2 else raw_cookie.decode('iso-8859-1')
+        request = WSGIRequest(environ)
+        self.assertEqual(request.COOKIES['want'], "café")
 
 
 class TransactionsPerRequestTests(TransactionTestCase):

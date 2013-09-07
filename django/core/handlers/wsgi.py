@@ -136,7 +136,8 @@ class WSGIRequest(http.HttpRequest):
     def _get_get(self):
         if not hasattr(self, '_get'):
             # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self._encoding)
+            raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
+            self._get = http.QueryDict(raw_query_string, encoding=self._encoding)
         return self._get
 
     def _set_get(self, get):
@@ -152,7 +153,8 @@ class WSGIRequest(http.HttpRequest):
 
     def _get_cookies(self):
         if not hasattr(self, '_cookies'):
-            self._cookies = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
+            raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
+            self._cookies = http.parse_cookie(raw_cookie)
         return self._cookies
 
     def _set_cookies(self, cookies):
@@ -265,3 +267,15 @@ def get_bytes_from_wsgi(environ, key, default):
     # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
     # is the default. Re-encode to recover the original bytestring.
     return value if six.PY2 else value.encode(ISO_8859_1)
+
+
+def get_str_from_wsgi(environ, key, default):
+    """
+    Get a value from the WSGI environ dictionary as bytes.
+
+    key and default should be str objects. Under Python 2 they may also be
+    unicode objects provided they only contain ASCII characters.
+    """
+    value = environ.get(str(key), str(default))
+    # Same comment as above
+    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
