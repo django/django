@@ -239,9 +239,15 @@ Management Commands
 Models
 ^^^^^^
 
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
 * The new :attr:`~django.db.models.Options.default_permissions` model
   ``Meta`` option allows you to customize (or disable) creation of the default
   add, change, and delete permissions.
+
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
 
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
@@ -251,12 +257,6 @@ Signals
 
 * The ``enter`` argument was added to the
   :data:`~django.test.signals.setting_changed` signal.
-
-* The :meth:`QuerySet.update_or_create()
-  <django.db.models.query.QuerySet.update_or_create>` method was added.
-
-* :attr:`~django.db.models.Options.app_label` is no longer required for models
-  that are defined in a ``models`` package within an app.
 
 Templates
 ^^^^^^^^^
