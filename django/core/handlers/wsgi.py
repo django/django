@@ -90,6 +90,9 @@ class WSGIRequest(http.HttpRequest):
         self.path_info = path_info
         self.path = '%s/%s' % (script_name.rstrip('/'), path_info.lstrip('/'))
         self.META = environ
+        for v in self.META.values():
+            if callable(v):
+                v.do_not_call_in_templates = True
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
