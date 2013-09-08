@@ -24,8 +24,12 @@ class TimezoneTests(unittest.TestCase):
     def test_localtime_out_of_range(self):
         local_tz = timezone.LocalTimezone()
         long_ago = datetime.datetime(1900, 1, 1, tzinfo=timezone.utc)
-        with six.assertRaisesRegex(self, OverflowError, "install pytz"):
+        try:
             timezone.localtime(long_ago, local_tz)
+        except OverflowError as exc:
+            self.assertIn("install pytz", exc.args[0])
+        else:
+            raise unittest.SkipTest("Failed to trigger an OverflowError")
 
     def test_now(self):
         with override_settings(USE_TZ=True):
