@@ -183,7 +183,7 @@ class GeoModelTest(TestCase):
     def test_inherited_geofields(self):
         "Test GeoQuerySet methods on inherited Geometry fields."
         # Creating a Pennsylvanian city.
-        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
+        PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
 
         # All transformation SQL will need to be performed on the
         # _parent_ table.
@@ -410,7 +410,6 @@ class GeoQuerySetTest(TestCase):
     def test_diff_intersection_union(self):
         "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
         geom = Point(5, 23)
-        tol = 1
         qs = Country.objects.all().difference(geom).sym_difference(geom).union(geom)
 
         # XXX For some reason SpatiaLite does something screwey with the Texas geometry here.  Also,
@@ -692,7 +691,7 @@ class GeoQuerySetTest(TestCase):
                '12.46472 43.89555,12.45917 43.89611,12.41639 43.90472,'
                '12.41222 43.90610,12.40782 43.91366,12.40389 43.92667,'
                '12.40500 43.94833,12.40889 43.95499,12.41580 43.95795)))')
-        sm = Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
+        Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
 
         # Because floating-point arithmetic isn't exact, we set a tolerance
         # to pass into GEOS `equals_exact`.

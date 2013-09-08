@@ -74,7 +74,6 @@ class SpatiaLiteCreation(DatabaseCreation):
 
         if isinstance(f, GeometryField):
             gqn = self.connection.ops.geo_quote_name
-            qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
 
             output.append(style.SQL_KEYWORD('SELECT ') +

@@ -106,7 +106,6 @@ class AdminScriptTestCase(unittest.TestCase):
         return paths
 
     def run_test(self, script, args, settings_file=None, apps=None):
-        project_dir = test_dir
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))

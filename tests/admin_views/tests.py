@@ -377,9 +377,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                   (AdminOrderedAdminMethod, 'adminorderedadminmethod'),
                   (AdminOrderedCallable, 'adminorderedcallable')]
         for model, url in models:
-            a1 = model.objects.create(stuff='The Last Item', order=3)
-            a2 = model.objects.create(stuff='The First Item', order=1)
-            a3 = model.objects.create(stuff='The Middle Item', order=2)
+            model.objects.create(stuff='The Last Item', order=3)
+            model.objects.create(stuff='The First Item', order=1)
+            model.objects.create(stuff='The Middle Item', order=2)
             response = self.client.get('/test_admin/admin/admin_views/%s/' % url, {})
             self.assertEqual(response.status_code, 200)
             # Should have 3 columns including action checkbox col.
@@ -596,7 +596,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (against 9bea85795705d015cdadc82c68b99196a8554f5c)
         """
         user = User.objects.get(username='super')
-        password = user.password
         user.set_unusable_password()
         user.save()
 
@@ -734,7 +733,7 @@ class SaveAsTests(TestCase):
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
         post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 1, 'age': 42}
-        response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
+        self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=1)), 1)
 
@@ -1065,7 +1064,7 @@ class AdminViewPermissionsTest(TestCase):
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
-        login = self.client.login(username='joepublic', password='secret')
+        self.client.login(username='joepublic', password='secret')
         # Check and make sure that if user expires, data still persists
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
@@ -1442,7 +1441,7 @@ class AdminViewDeletedObjectsTest(TestCase):
 
         """
         plot = Plot.objects.get(pk=3)
-        tag = FunkyTag.objects.create(content_object=plot, name='hott')
+        FunkyTag.objects.create(content_object=plot, name='hott')
         should_contain = """<li>Funky tag: hott"""
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
@@ -2222,8 +2221,8 @@ class AdminSearchTest(TestCase):
         self.assertNotContains(response, "Guido")
 
     def test_pluggable_search(self):
-        p1 = PluggableSearchPerson.objects.create(name="Bob", age=10)
-        p2 = PluggableSearchPerson.objects.create(name="Amy", age=20)
+        PluggableSearchPerson.objects.create(name="Bob", age=10)
+        PluggableSearchPerson.objects.create(name="Amy", age=20)
 
         response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=Bob')
         # confirm the search returned one object
@@ -2342,7 +2341,7 @@ class AdminActionsTest(TestCase):
             'action': 'mail_admin',
             'index': 0,
         }
-        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
 
@@ -2362,7 +2361,7 @@ class AdminActionsTest(TestCase):
         self.assertIsInstance(confirmation, TemplateResponse)
         self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
-        response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
+        self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
     def test_non_localized_pk(self):
@@ -2538,7 +2537,7 @@ action)</option>
             # ...but we clicked "go" on the top form.
             'index': 0
         }
-        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
 
         # Send mail, don't delete.
         self.assertEqual(len(mail.outbox), 1)

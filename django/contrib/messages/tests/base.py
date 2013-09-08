@@ -230,7 +230,7 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))

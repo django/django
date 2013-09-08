@@ -216,7 +216,7 @@ class LayerMapping(object):
                     for rel_name, ogr_field in ogr_name.items():
                         idx = check_ogr_fld(ogr_field)
                         try:
-                            rel_field = rel_model._meta.get_field(rel_name)
+                            rel_model._meta.get_field(rel_name)
                         except models.fields.FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))

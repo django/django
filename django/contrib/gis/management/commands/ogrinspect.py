@@ -93,8 +93,8 @@ class Command(LabelCommand):
         show_mapping = options.pop('mapping', False)
 
         # Getting rid of settings that `_ogrinspect` doesn't like.
-        verbosity = options.pop('verbosity', False)
-        settings = options.pop('settings', False)
+        options.pop('verbosity', False)
+        options.pop('settings', False)
 
         # Returning the output of ogrinspect with the given arguments
         # and options.
