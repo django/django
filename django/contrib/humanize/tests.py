@@ -14,10 +14,9 @@ from django.template import Template, Context, defaultfilters
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.html import escape
-from django.utils.timezone import utc
+from django.utils.timezone import utc, get_fixed_timezone
 from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils import tzinfo
 
 from i18n import TransRealMixin
 
@@ -153,8 +152,8 @@ class HumanizeTests(TransRealMixin, TestCase):
 
     def test_naturalday_tz(self):
         today = datetime.date.today()
-        tz_one = tzinfo.FixedOffset(datetime.timedelta(hours=-12))
-        tz_two = tzinfo.FixedOffset(datetime.timedelta(hours=12))
+        tz_one = get_fixed_timezone(-720)
+        tz_two = get_fixed_timezone(720)
 
         # Can be today or yesterday
         date_one = datetime.datetime(today.year, today.month, today.day, tzinfo=tz_one)

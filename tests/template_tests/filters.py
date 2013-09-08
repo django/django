@@ -11,9 +11,9 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from django.test.utils import str_prefix
-from django.utils.tzinfo import LocalTimezone, FixedOffset
-from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 # These two classes are used to test auto-escaping of __unicode__ output.
 @python_2_unicode_compatible
@@ -31,8 +31,8 @@ class SafeClass:
 #                   'expected string output' or Exception class)
 def get_filter_tests():
     now = datetime.now()
-    now_tz = datetime.now(LocalTimezone(now))
-    now_tz_i = datetime.now(FixedOffset((3 * 60) + 15)) # imaginary time zone
+    now_tz = timezone.make_aware(now, timezone.get_default_timezone())
+    now_tz_i = timezone.localtime(now_tz, timezone.get_fixed_timezone(195))
     today = date.today()
 
     # NOTE: \xa0 avoids wrapping between value and unit
@@ -355,7 +355,7 @@ def get_filter_tests():
         'date04': (r'{{ d|date:"o" }}', {'d': datetime(2008, 12, 29)}, '2009'),
         'date05': (r'{{ d|date:"o" }}', {'d': datetime(2010, 1, 3)}, '2009'),
         # Timezone name
-        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
+        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=timezone.get_fixed_timezone(30))}, '+0030'),
         'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
         # Ticket 19370: Make sure |date doesn't blow up on a midnight time object
         'date08': (r'{{ t|date:"H:i" }}', {'t': time(0, 1)}, '00:01'),
@@ -363,7 +363,7 @@ def get_filter_tests():
         # Ticket 20693: Add timezone support to built-in time template filter
         'time01': (r'{{ dt|time:"e:O:T:Z" }}', {'dt': now_tz_i}, '+0315:+0315:+0315:11700'),
         'time02': (r'{{ dt|time:"e:T" }}', {'dt': now}, ':' + now_tz.tzinfo.tzname(now_tz)),
-        'time03': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0, tzinfo=FixedOffset(30))}, '4 a.m.::::'),
+        'time03': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0, tzinfo=timezone.get_fixed_timezone(30))}, '4 a.m.::::'),
         'time04': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0)}, '4 a.m.::::'),
         'time05': (r'{{ d|time:"P:e:O:T:Z" }}', {'d': today}, ''),
         'time06': (r'{{ obj|time:"P:e:O:T:Z" }}', {'obj': 'non-datetime-value'}, ''),

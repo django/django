@@ -4,7 +4,8 @@ import datetime
 import unittest
 
 from django.utils.timesince import timesince, timeuntil
-from django.utils.tzinfo import LocalTimezone, FixedOffset
+from django.utils import timezone
+
 
 class TimesinceTests(unittest.TestCase):
 
@@ -95,8 +96,8 @@ class TimesinceTests(unittest.TestCase):
     def test_different_timezones(self):
         """ When using two different timezones. """
         now = datetime.datetime.now()
-        now_tz = datetime.datetime.now(LocalTimezone(now))
-        now_tz_i = datetime.datetime.now(FixedOffset((3 * 60) + 15))
+        now_tz = timezone.make_aware(now, timezone.get_default_timezone())
+        now_tz_i = timezone.localtime(now_tz, timezone.get_fixed_timezone(195))
 
         self.assertEqual(timesince(now), '0\xa0minutes')
         self.assertEqual(timesince(now_tz), '0\xa0minutes')
