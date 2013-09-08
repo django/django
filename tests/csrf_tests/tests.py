@@ -376,7 +376,7 @@ class CsrfViewMiddlewareTest(TestCase):
             logger.setLevel(logging.WARNING)
 
             req = self._get_GET_no_csrf_cookie_request()
-            resp = view(req)
+            view(req)
         finally:
             logger.removeHandler(test_handler)
             logger.setLevel(old_log_level)

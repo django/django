@@ -9,15 +9,15 @@ from .models import Tag, Celebrity, Fan, Staff, StaffTag
 class DistinctOnTests(TestCase):
     def setUp(self):
         t1 = Tag.objects.create(name='t1')
-        t2 = Tag.objects.create(name='t2', parent=t1)
+        Tag.objects.create(name='t2', parent=t1)
         t3 = Tag.objects.create(name='t3', parent=t1)
-        t4 = Tag.objects.create(name='t4', parent=t3)
-        t5 = Tag.objects.create(name='t5', parent=t3)
+        Tag.objects.create(name='t4', parent=t3)
+        Tag.objects.create(name='t5', parent=t3)
 
         p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
         p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
         p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
-        p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
+        Staff.objects.create(id=4, name="p1", organisation="o2")
         p1_o1.coworkers.add(p2_o1, p3_o1)
         StaffTag.objects.create(staff=p1_o1, tag=t1)
         StaffTag.objects.create(staff=p1_o1, tag=t1)

@@ -73,8 +73,8 @@ class DeleteCascadeTests(TestCase):
         """
         person = Person.objects.create(name='Nelson Mandela')
         award = Award.objects.create(name='Nobel', content_object=person)
-        note = AwardNote.objects.create(note='a peace prize',
-                                        award=award)
+        AwardNote.objects.create(note='a peace prize',
+                                 award=award)
         self.assertEqual(AwardNote.objects.count(), 1)
         person.delete()
         self.assertEqual(Award.objects.count(), 0)
@@ -93,8 +93,8 @@ class DeleteCascadeTests(TestCase):
         paints = Toy.objects.create(name='Paints')
         played = PlayedWith.objects.create(child=juan, toy=paints,
                                            date=datetime.date.today())
-        note = PlayedWithNote.objects.create(played=played,
-                                             note='the next Jackson Pollock')
+        PlayedWithNote.objects.create(played=played,
+                                      note='the next Jackson Pollock')
         self.assertEqual(PlayedWithNote.objects.count(), 1)
         paints.delete()
         self.assertEqual(PlayedWith.objects.count(), 0)
@@ -105,7 +105,7 @@ class DeleteCascadeTests(TestCase):
         policy = Policy.objects.create(pk=1, policy_number="1234")
         version = Version.objects.create(policy=policy)
         location = Location.objects.create(version=version)
-        item = Item.objects.create(version=version, location=location)
+        Item.objects.create(version=version, location=location)
         policy.delete()
 
 
@@ -135,7 +135,7 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
 
         """
         apple = Food.objects.create(name="apple")
-        eaten = Eaten.objects.create(food=apple, meal="lunch")
+        Eaten.objects.create(food=apple, meal="lunch")
 
         apple.delete()
         self.assertFalse(Food.objects.exists())
@@ -146,7 +146,7 @@ class LargeDeleteTests(TestCase):
     def test_large_deletes(self):
         "Regression for #13309 -- if the number of objects > chunk size, deletion still occurs"
         for x in range(300):
-            track = Book.objects.create(pagecount=x+100)
+            Book.objects.create(pagecount=x+100)
         # attach a signal to make sure we will not fast-delete
         def noop(*args, **kwargs):
             pass

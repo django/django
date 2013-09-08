@@ -696,7 +696,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Assigning polygon's exterior ring w/the new shell
             poly.exterior_ring = new_shell
-            s = str(new_shell) # new shell is still accessible
+            str(new_shell) # new shell is still accessible
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 

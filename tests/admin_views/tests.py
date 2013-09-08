@@ -2435,7 +2435,7 @@ class AdminActionsTest(TestCase):
             'action': 'external_mail',
             'index': 0,
         }
-        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
@@ -3679,12 +3679,12 @@ class RawIdFieldsTest(TestCase):
     def test_limit_choices_to(self):
         """Regression test for 14880"""
         actor = Actor.objects.create(name="Palin", age=27)
-        inquisition1 = Inquisition.objects.create(expected=True,
-                                                  leader=actor,
-                                                  country="England")
-        inquisition2 = Inquisition.objects.create(expected=False,
-                                                  leader=actor,
-                                                  country="Spain")
+        Inquisition.objects.create(expected=True,
+                                   leader=actor,
+                                   country="England")
+        Inquisition.objects.create(expected=False,
+                                   leader=actor,
+                                   country="Spain")
         response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
         # Find the link
         m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_inquisition"', response.content)
@@ -3872,7 +3872,7 @@ class GroupAdminTest(TestCase):
             'name': 'newgroup',
         })
 
-        new_group = Group.objects.order_by('-id')[0]
+        Group.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/group/')
         self.assertEqual(Group.objects.count(), group_count + 1)
 
@@ -4229,7 +4229,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             'child_set-0-name': 'Paul',
             'child_set-1-name': 'Catherine',
         }
-        response = self.client.post('/test_admin/admin/admin_views/parent/add/', post)
+        self.client.post('/test_admin/admin/admin_views/parent/add/', post)
         self.assertEqual(1, Parent.objects.count())
         self.assertEqual(2, Child.objects.count())
 
@@ -4251,7 +4251,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             'child_set-1-name': 'Catherine',
             'child_set-1-id': catherine.id,
         }
-        response = self.client.post('/test_admin/admin/admin_views/parent/%s/' % parent.id, post)
+        self.client.post('/test_admin/admin/admin_views/parent/%s/' % parent.id, post)
 
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
@@ -4260,8 +4260,8 @@ class AdminCustomSaveRelatedTests(TestCase):
 
     def test_should_be_able_to_edit_related_objects_on_changelist_view(self):
         parent = Parent.objects.create(name='Josh Rock')
-        paul = Child.objects.create(parent=parent, name='Paul')
-        catherine = Child.objects.create(parent=parent, name='Catherine')
+        Child.objects.create(parent=parent, name='Paul')
+        Child.objects.create(parent=parent, name='Catherine')
         post = {
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '1',
@@ -4271,7 +4271,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             '_save': 'Save'
         }
 
-        response = self.client.post('/test_admin/admin/admin_views/parent/', post)
+        self.client.post('/test_admin/admin/admin_views/parent/', post)
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)

@@ -531,11 +531,11 @@ class ModelTest(TestCase):
     def test_year_lookup_edge_case(self):
         # Edge-case test: A year lookup should retrieve all objects in
         # the given year, including Jan. 1 and Dec. 31.
-        a11 = Article.objects.create(
+        Article.objects.create(
             headline='Article 11',
             pub_date=datetime(2008, 1, 1),
         )
-        a12 = Article.objects.create(
+        Article.objects.create(
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
@@ -591,15 +591,15 @@ class ModelTest(TestCase):
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
-        a10 = Article.objects.create(
+        Article.objects.create(
             headline="Article 10",
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
-        a11 = Article.objects.create(
+        Article.objects.create(
             headline='Article 11',
             pub_date=datetime(2008, 1, 1),
         )
-        a12 = Article.objects.create(
+        Article.objects.create(
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
@@ -615,15 +615,15 @@ class ModelTest(TestCase):
         # If you use 'select' with extra() and names containing dashes on a
         # query that's *not* a values() query, those extra 'select' values
         # will silently be ignored.
-        a10 = Article.objects.create(
+        Article.objects.create(
             headline="Article 10",
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
-        a11 = Article.objects.create(
+        Article.objects.create(
             headline='Article 11',
             pub_date=datetime(2008, 1, 1),
         )
-        a12 = Article.objects.create(
+        Article.objects.create(
             headline='Article 12',
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
@@ -640,7 +640,7 @@ class ModelTest(TestCase):
         """
         notlazy = 'test'
         lazy = ugettext_lazy(notlazy)
-        reporter = Article.objects.create(headline=lazy, pub_date=datetime.now())
+        Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
         # test that assign + save works with Promise objecs
