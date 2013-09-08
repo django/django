@@ -9,7 +9,7 @@ models. It detects common problems and report them providing hints.
 
 Checks can be triggered explicitly via ``python manage.py check`` command.
 It's also triggered implicitly before most command, including ``runserver``
-and ``syncdb``. For performance issues, the checks are not performed if
+and ``migrate``. For performance issues, the checks are not performed if
 ``DEBUG`` is set to False.
 
 The framework is really flexible and allow you to write functions (or other
@@ -24,11 +24,11 @@ models. In other cases, you need to `register the function`_.
 CheckMessage
 ============
 
-.. class:: django.core.checks.CheckMessage(level, msg, hint, obj=None)
+.. class:: django.core.checks.CheckMessage(level, msg, hint, obj=None, id=None)
 
 :class:`~django.core.checks.CheckMessage` is the key concept of
 :mod:`django.core.checks` module and represents a single message,
-i. e. a warning or an error. The concept is very similar to messages from
+i.e. a warning or an error. The concept is very similar to messages from
 `message framework` or `logging framework`_. Messages are tagged with ``level``
 indicating how serious the message is.
 
@@ -59,8 +59,26 @@ Constructor arguments are:
     Optional. Point to the invalid object. The object should be a model, field
     or manager or any other object that defines ``__unicode__`` method (on
     Python 3 you need to define ``__str__`` method). The method is used while
-    reporting all messages and its result precedes the message, i.
-    e. model errors are printed using ``applabel.modellabel: message`` pattern.
+    reporting all messages and its result precedes the message, i.e. model
+    errors are printed using ``applabel.modellabel: message`` pattern.
+
+``id``
+    Optional string. Short and unique name of an issue. Follow "applabel.X001"
+    style, where ``X`` is one of ``C``, ``E``, ``W``, ``I``, ``D`` letters;
+    i.e. a warning may have ``applabel.W001`` id and an error can be
+    ``applabel.E002``. The message number must be unique amount an app, so
+    ``applabel.E001`` and ``anotherapp.E001`` are OK. Do not reuse one number
+    for more than one message, e.g. avoid ``applabel.E001`` and
+    ``applabel.W001``.
+
+There are shortcuts to make creating messages with common levels easier. You can
+omit ``level`` argument because the level is indicated by the class name.
+
+.. class:: django.core.checks.Debug(msg, hint, obj=None)
+.. class:: django.core.checks.Info(msg, hint, obj=None)
+.. class:: django.core.checks.Warning(msg, hint, obj=None)
+.. class:: django.core.checks.Error(msg, hint, obj=None)
+.. class:: django.core.checks.Critical(msg, hint, obj=None)
 
 Messages are comparable. That allows you to easily write tests::
 
@@ -71,18 +89,10 @@ Messages are comparable. That allows you to easily write tests::
             'an error',
             hint=None,
             obj=checked_object,
+            id='myapp.E001',
         )
     ]
     self.assertEqual(errors, expected_errors)
-
-There are shortcuts to make creating messages with common levels easier. You can
-omit ``level`` argument because the level is indicated by the class name.
-
-.. class:: django.core.checks.Debug(msg, hint, obj=None)
-.. class:: django.core.checks.Info(msg, hint, obj=None)
-.. class:: django.core.checks.Warning(msg, hint, obj=None)
-.. class:: django.core.checks.Error(msg, hint, obj=None)
-.. class:: django.core.checks.Critical(msg, hint, obj=None)
 
 .. _field-checking:
 
@@ -120,9 +130,14 @@ you can implement this check::
             if (self.min is not None and
                 self.max is not None and
                 self.min > self.max):
-                return [checks.Error('min greated than max.',
-                    hint='Lower min or upper max.',
-                    obj=self)]
+                return [
+                    checks.Error(
+                        'min greated than max.',
+                        hint='Lower min or upper max.',
+                        obj=self,
+                        id='myapp.E001',
+                    )
+                ]
             return [] # When no error, return an empty list
 
 Database backend specific checks are performed in
@@ -168,3 +183,19 @@ Note that checks are performed just after loading apps and you need to
 register them earlier. It's recommended to call the ``register`` function at
 the module level so the checks will be registered at the the time of importing
 the module.
+
+Labeling checks
+---------------
+
+System check framework allow you to run only a subset of all checks, i.e. you
+can run only compatibility checks or only security checks. You can tag your
+check using `tag` decorator::
+
+    from checks import tag, register
+
+    @tag('security')
+    def my_check(apps, **kwargs):
+        # ... perform security checks and collect errors
+        return errors
+
+    register(my_check)
