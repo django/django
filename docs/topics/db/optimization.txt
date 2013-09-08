@@ -306,6 +306,17 @@ instead of::
 
    entry.blog.id
 
+Don't order results if you don't care
+-------------------------------------
+
+Ordering is not free; each field to order by is an operation the database must
+perform. If a model has a default ordering (:attr:`Meta.ordering
+<django.db.models.Options.ordering>`) and you don't need it, remove
+it on a ``QuerySet`` by calling
+:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+
+Adding an index to your database may help to improve ordering performance.
+
 Insert in bulk
 ==============
 
