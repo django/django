@@ -26,10 +26,10 @@ class TimezoneTests(unittest.TestCase):
         long_ago = datetime.datetime(1900, 1, 1, tzinfo=timezone.utc)
         try:
             timezone.localtime(long_ago, local_tz)
-        except OverflowError as exc:
+        except (OverflowError, ValueError) as exc:
             self.assertIn("install pytz", exc.args[0])
         else:
-            raise unittest.SkipTest("Failed to trigger an OverflowError")
+            raise unittest.SkipTest("Failed to trigger an OverflowError or ValueError")
 
     def test_now(self):
         with override_settings(USE_TZ=True):
