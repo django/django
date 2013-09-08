@@ -927,6 +927,17 @@ For a complete discussion on the usage of the following see the
 
     :class:`~datetime.tzinfo` instance that represents UTC.
 
+.. function:: get_fixed_timezone(offset)
+
+    .. versionadded:: 1.7
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
 .. function:: get_default_timezone()
 
     Returns a :class:`~datetime.tzinfo` instance that represents the
@@ -1021,6 +1032,9 @@ For a complete discussion on the usage of the following see the
 ``django.utils.tzinfo``
 =======================
 
+.. deprecated:: 1.7
+    Use :mod:`~django.utils.timezone` instead.
+
 .. module:: django.utils.tzinfo
    :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
 
@@ -1028,6 +1042,12 @@ For a complete discussion on the usage of the following see the
 
     Fixed offset in minutes east from UTC.
 
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
+
 .. class:: LocalTimezone
 
     Proxy timezone information from time module.
+
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_default_timezone` instead.

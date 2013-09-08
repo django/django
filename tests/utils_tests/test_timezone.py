@@ -6,11 +6,10 @@ import unittest
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
-from django.utils.tzinfo import FixedOffset
 
 
-EAT = FixedOffset(180)      # Africa/Nairobi
-ICT = FixedOffset(420)      # Asia/Bangkok
+EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
+ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
 
 class TimezoneTests(unittest.TestCase):

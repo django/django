@@ -308,6 +308,16 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+pytz may be required
+~~~~~~~~~~~~~~~~~~~~
+
+If your project handles datetimes before 1970 or after 2037 and Django raises
+a :exc:`~exceptions.ValueError` when encountering them, you will have to
+install pytz_. You may be affected by this problem if you use Django's time
+zone-related date formats or :mod:`django.contrib.syndication`.
+
+.. _pytz: https://pypi.python.org/pypi/pytz/
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -388,6 +398,15 @@ Features deprecated in 1.7
 ``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
 respectively :mod:`logging.config` and :mod:`importlib` provided for Python
 versions prior to 2.7. They have been deprecated.
+
+``django.utils.tzinfo``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.tzinfo`` provided two :class:`~datetime.tzinfo` subclasses,
+``LocalTimezone`` and ``FixedOffset``. They've been deprecated in favor of
+more correct alternatives provided by :mod:`django.utils.timezone`,
+:func:`django.utils.timezone.get_default_timezone` and
+:func:`django.utils.timezone.get_fixed_timezone`.
 
 ``django.utils.unittest``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
