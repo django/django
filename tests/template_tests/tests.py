@@ -98,6 +98,9 @@ class SomeClass:
     def method4(self):
         raise SomeOtherException
 
+    def method5(self):
+        raise TypeError
+
     def __getitem__(self, key):
         if key == 'silent_fail_key':
             raise SomeException
@@ -679,6 +682,9 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+
+            # Don't silence a TypeError if it was raised inside a callable
+            'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
 
             # Don't get confused when parsing something that is almost, but not
             # quite, a template tag.

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import re
 from functools import partial
 from importlib import import_module
-from inspect import getargspec
+from inspect import getargspec, getcallargs
 
 from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,
@@ -788,10 +788,13 @@ class Variable(object):
                     else:
                         try: # method call (assuming no args required)
                             current = current()
-                        except TypeError: # arguments *were* required
-                            # GOTCHA: This will also catch any TypeError
-                            # raised in the function itself.
-                            current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
+                        except TypeError:
+                            try:
+                                getcallargs(current)
+                            except TypeError: # arguments *were* required
+                                current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
+                            else:
+                                raise
         except Exception as e:
             if getattr(e, 'silent_variable_failure', False):
                 current = settings.TEMPLATE_STRING_IF_INVALID
