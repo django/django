@@ -18,11 +18,10 @@ Writing your own checks
 The framework is really flexible and allow you to write functions (or other
 callable objects like methods) performing any kind of checks. The function has
 to receive ``**kwargs`` and return list of messages. If there are no message,
-you still have to return an empty list. In case of fields and managers, you
-can just override ``check`` method. There is relevant classmethod for models.
-In other cases, you need to `register the function`_.
+you still have to return an empty list. The function need to be `registered`_
+or called from another check.
 
-.. _`register the function`: `registering-checks`_
+.. _`registered`: `registering-checks`_
 
 .. class:: django.core.checks.CheckMessage(level, msg, hint, obj=None, id=None)
 
@@ -96,26 +95,18 @@ Messages are comparable. That allows you to easily write tests::
 
 .. _`registering-checks`:
 
-Registering checks
-------------------
+Registering and labeling checks
+-------------------------------
 
-You may be interested in app-specific checks or other kinds of checks which
-are connected with neither fields, managers nor models. In that case, you need
-to write a function (or other kind of callable object) performing the checks
-and register it.
+Your check function need to be registered explicitly in system check
+framework.
 
-.. method:: register(callable)
-
-The callable has to follow the contract defined at the beginning of this doc
--- it receives ``**kwargs`` and returns list of errors and warnings.
+.. method:: register(check_function)
 
 Note that checks are performed just after loading apps and you need to
 register them earlier. It's recommended to call the ``register`` function at
 the module level so the checks will be registered at the the time of importing
 the module.
-
-Labeling checks
----------------
 
 System check framework allow you to run only a subset of all checks, i.e. you
 can run only compatibility checks or only security checks. You can tag your
@@ -135,8 +126,10 @@ check using `tag` decorator::
 Field checks
 ------------
 
-If you created your own field, you may want to add some checking. In that
-case, you need to override `check` method: it should call the superclass (1),
+You do not need to register check function if it's called from another check
+function. It's easy in the case of fields, managers and models checks.
+
+You need to override ``check`` method: it should call the superclass (1),
 perform its own checks which may end in new errors or warnings (2) and
 eventually return list of all errors and warnings (3). It's recommended to
 delegate checks to separated methods whose names start with ``_check_``, i. e.
