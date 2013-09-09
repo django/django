@@ -167,16 +167,25 @@ class FileUploadTests(TestCase):
 
     def test_filename_overflow(self):
         """File names over 256 characters (dangerous on some platforms) get fixed up."""
-        name = "%s.txt" % ("f"*500)
-        payload = client.FakePayload("\r\n".join([
-            '--' + client.BOUNDARY,
-            'Content-Disposition: form-data; name="file"; filename="%s"' % name,
-            'Content-Type: application/octet-stream',
-            '',
-            'Oops.'
-            '--' + client.BOUNDARY + '--',
-            '',
-        ]))
+        long_part = 'ab' * 130
+        cases = [
+            # name, filename, expected
+            ('plain', long_part, long_part[:255]),
+            ('long_name', long_part + ".txt", long_part[:251] + ".txt"),
+            ('long_ext', "file." + long_part, "." + long_part[:254]),
+            ('long_both', long_part + "." + long_part, "." + long_part[:254]),
+        ]
+        payload = client.FakePayload()
+        for name, filename, _ in cases:
+            payload.write("\r\n".join([
+                '--' + client.BOUNDARY,
+                'Content-Disposition: form-data; name="{0}"; filename="{1}"',
+                'Content-Type: application/octet-stream',
+                '',
+                'Oops.',
+                ''
+            ]).format(name, filename))
+        payload.write('\r\n--' + client.BOUNDARY + '--\r\n')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
@@ -184,8 +193,12 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input':     payload,
         }
-        got = json.loads(self.client.request(**r).content.decode('utf-8'))
-        self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
+        result = json.loads(self.client.request(**r).content.decode('utf-8'))
+        for name, _, expected in cases:
+            got = result[name]
+            self.assertEqual(expected, got, 'Mismatch for {0}'.format(name))
+            self.assertTrue(len(got) < 256,
+                            "Got a long file name (%s characters)." % len(got))
 
     def test_content_type_extra(self):
         """Uploaded files may have content type parameters available."""
