@@ -6,7 +6,7 @@ import sys
 
 from django.conf import settings
 from django.core import checks
-from django.core.checks import Error, tag
+from django.core.checks import Error
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registration import CheckFramework
 from django.core.checks.default_checks import check_1_6_compatibility
@@ -30,11 +30,11 @@ class SystemCheckFrameworkTests(TestCase):
     def test_register_and_run_checks(self):
         calls = [0]
 
+        framework = CheckFramework()
+        @framework.register()
         def f(**kwargs):
             calls[0] += 1
             return [1, 2, 3]
-        framework = CheckFramework()
-        framework.register(f)
         errors = framework.run_checks()
         self.assertEqual(errors, [1, 2, 3])
         self.assertEqual(calls[0], 1)
@@ -152,10 +152,10 @@ def simple_system_check(**kwargs):
     return []
 
 
-@tag('simpletag')
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
     return []
+tagged_system_check.tags = ['simpletag']
 
 
 class CheckCommandTests(TestCase):

@@ -21,9 +21,6 @@ won't stop you, but will issue the message. You can hide unwanted warnings or
 force Django to run even if there are serious messages bu overriding
 :setting:`SILENCED_SYSTEM_CHECKS` setting.
 
-Silencing system checks
-=======================
-
 Writing your own checks
 =======================
 
@@ -113,25 +110,23 @@ Registering and labeling checks
 Your check function need to be registered explicitly in system check
 framework.
 
-.. method:: register(check_function)
+.. method:: register(*tags)(function)
 
 Note that checks are performed just after loading apps and you need to
-register them earlier. It's recommended to call the ``register`` function at
-the module level so the checks will be registered at the the time of importing
-the module.
+register them earlier. It's recommended to use ``register`` function as a
+decorator so your function will be registered at the the time of importing the
+module.
 
 System check framework allow you to run only a subset of all checks, i.e. you
-can run only compatibility checks or only security checks. You can tag your
-check using `tag` decorator::
+can run only compatibility checks or only security checks. You can label your
+own checks easily::
 
-    from checks import tag, register
+    from checks import register
 
-    @tag('security')
+    @register('security')
     def my_check(apps, **kwargs):
         # ... perform security checks and collect errors
         return errors
-
-    register(my_check)
 
 .. _field-checking:
 
