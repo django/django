@@ -7,13 +7,16 @@ from django.contrib.admin.options import (ModelAdmin, TabularInline,
      HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.admin.validation import ModelAdminValidator
 from django.contrib.admin import (SimpleListFilter,
      BooleanFieldListFilter)
 from django.core.checks import Error
+from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 from django.utils.encoding import force_text
+
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
@@ -1450,3 +1453,17 @@ class FormsetCheckTests(CheckTestCase):
             inlines = [ValidationTestInline]
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+
+class CustomModelAdminTests(CheckTestCase):
+
+    def test_deprecation(self):
+
+        class CustomValidator(ModelAdminValidator):
+            def validate_me(self, model_admin, model):
+                raise ImproperlyConfigured('error!')
+
+        class CustomModelAdmin(ModelAdmin):
+            validator = CustomValidator
+
+        self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
