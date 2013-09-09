@@ -814,7 +814,7 @@ Miscellaneous
   ``{% url %}`` tag, it causes template rendering to fail like always when
   ``NoReverseMatch`` is raised.
 
-* :meth:`django.test.client.Client.logout` now calls
+* :meth:`django.test.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the
   :func:`~django.contrib.auth.signals.user_logged_out` signal.
 
