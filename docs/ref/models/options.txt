@@ -221,6 +221,12 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+.. admonition:: Warning
+
+        Ordering is not a free operation. Each field you add to the ordering will incur
+        a cost from your database. Each foreign key you add will include all
+        of its default orderings implicitly.
+
 ``permissions``
 ---------------
 

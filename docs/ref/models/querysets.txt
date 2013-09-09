@@ -334,6 +334,12 @@ You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
+.. admonition:: Warning
+
+        Ordering is not a free operation. Each field you add to the ordering will incur
+        a cost from your database. Each foreign key you add will include all
+        of its default orderings implicitly.
+
 reverse
 ~~~~~~~
 

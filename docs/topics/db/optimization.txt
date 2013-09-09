@@ -338,3 +338,13 @@ This also applies to :class:`ManyToManyFields
     my_band.members.add(my_friend)
 
 ...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+
+Don't order if you don't care
+-------------------------------
+
+Ordering is not free; each field added is an operation the database has to perform.
+
+
+Note
+-------------------------------
+Adding indexes will speed up queries which contains a whare clause or a join.
