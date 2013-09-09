@@ -313,8 +313,6 @@ Django provides a small set of tools that come in handy when writing tests.
 The test client
 ---------------
 
-.. currentmodule:: django.test
-
 The test client is a Python class that acts as a dummy Web browser, allowing
 you to test your views and interact with your Django-powered application
 programmatically.
@@ -802,8 +800,6 @@ The following is a simple unit test using the test client::
 
 Provided test case classes
 --------------------------
-
-.. currentmodule:: django.test
 
 Normal Python unit test classes extend a base class of
 :class:`unittest.TestCase`. Django provides a few extensions of this base class:
@@ -1328,8 +1324,6 @@ Django provides a standard Python context manager (see :pep:`343`)
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
-.. currentmodule:: django.test
-
 .. function:: override_settings
 
 In case you want to override a setting for just one test method or even the
@@ -1356,6 +1350,11 @@ The decorator can also be applied to test case classes::
         def test_login(self):
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+.. versionchanged:: 1.7
+
+    Previously, ``override_settings`` was imported from 
+    ``django.test.utils``.
 
 .. note::
 
@@ -1422,8 +1421,6 @@ For more detail on email services during tests, see `Email services`_ below.
 
 Assertions
 ~~~~~~~~~~
-
-.. currentmodule:: django.test
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
