@@ -20,6 +20,7 @@ import unittest
 import django
 from django import conf, get_version
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
 from django.utils.encoding import force_text
@@ -1535,6 +1536,11 @@ class CommandTypes(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %s)]" % verbosity)
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %s)]" % verbosity)
+
+    def test_requires_model_validation_and_requires_system_checks_both_defined(self):
+        from .management.commands.validation_command import InvalidCommand
+        self.assertRaises(ImproperlyConfigured, InvalidCommand)
+
 
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
