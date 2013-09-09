@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from types import MethodType
 
 from django.core.checks import Error
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
 from django.db.models.loading import cache
 from django.test import TestCase
@@ -249,6 +250,33 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         field = Model._meta.get_field('field')
         errors = field.check()
         expected = []
+        self.assertEqual(errors, expected)
+
+
+class ImageFieldTests(IsolatedModelsTestCase):
+
+    def test_pillow_installed(self):
+        try:
+            import django.utils.image
+        except ImproperlyConfigured:
+            pillow_installed = False
+        else:
+            pillow_installed = True
+
+        class Model(models.Model):
+            field = models.ImageField(upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [] if pillow_installed else [
+            Error(
+                'To use ImageFields, Pillow must be installed.',
+                hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
+                    'or run command "pip install pillow".',
+                obj=field,
+                id='E032',
+            ),
+        ]
         self.assertEqual(errors, expected)
 
 
