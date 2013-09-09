@@ -615,4 +615,7 @@ class CookieTests(unittest.TestCase):
     def test_bad_cookie(self):
         r = HttpResponse()
         r.set_cookie("a:.b/", 1)
-        self.assertEqual(len(r.cookies.bad_cookies), 1)
+        if (hasattr(r.cookies, 'bad_cookies')):
+            self.assertEqual(len(r.cookies.bad_cookies), 1)
+        else:
+            self.assertEqual(len(r.cookies), 0)
