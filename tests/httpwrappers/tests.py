@@ -618,3 +618,12 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
+
+    @unittest.skipUnless(six.PY2, "PY3 throws an exception on invalid cookie keys.")
+    def test_bad_cookie(self):
+        """
+        Regression test for #18403
+        """
+        r = HttpResponse()
+        r.set_cookie("a:.b/", 1)
+        self.assertEqual(len(r.cookies.bad_cookies), 1)
