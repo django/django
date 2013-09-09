@@ -89,18 +89,37 @@ documentation for the :djadminopt:`--verbosity` option.
 Available commands
 ==================
 
-check
------
+check <appname appname ...>
+---------------------------
 
 .. django-admin:: check
 
 .. versionadded:: 1.6
 
-Performs a series of checks to verify a given setup (settings/application code)
-is compatible with the current version of Django.
+Uses the :ref:`system check framework <system-check-framework>` to validate
+entire Django project and prints any messages (mostly errors and warnings) to
+standard error output. It's an extended version of old ``validate`` and
+``check`` commands.
 
-Upon finding things that are incompatible or require notifying the user, it
-issues a series of warnings.
+System checks includes validating all installed models (according to the
+:setting:`INSTALLED_APPS` setting) and performs compatibility checks (is your
+setup and application code compatible with the current Django version?) as
+well as custom checks.
+
+You can validate some apps by listing them::
+
+    python manage.py auth admin myapp
+
+If you do not specify any app, all apps will be checked.
+
+.. django-admin-option:: --tag <tagname>
+
+:ref:`System check framework <system-check-framework>` perform many different
+types of checks, e.g. model checks, security checks or compatibility checks.
+If you want to perform only a certain kind of checks, follow ``--tag``
+(``-t``) keyword argument with the name of the check group::
+
+    python manage.py --tag security -t compatibility
 
 compilemessages
 ---------------
@@ -1258,15 +1277,6 @@ To run on 1.2.3.4:7000 with a ``test`` fixture::
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
-
-check
------
-
-.. django-admin:: check
-
-Uses the system check framework to validate entire Django project, i.e.
-validates all installed models (according to the :setting:`INSTALLED_APPS`
-setting) and prints errors to standard error output.
 
 Commands provided by applications
 =================================
