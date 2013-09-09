@@ -28,6 +28,7 @@ class DatabaseValidation(BaseDatabaseValidation):
                         'greated than 255 when it is unique.',
                     hint=None,
                     obj=field,
+                    id='E047',
                 )
             )
         return errors

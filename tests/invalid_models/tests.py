@@ -137,6 +137,26 @@ class CharFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_too_long_char_field_under_mysql(self):
+        from django.db.backends.mysql.validation import DatabaseValidation
+
+        class Model(models.Model):
+            field = models.CharField(unique=True, max_length=256)
+
+        field = Model._meta.get_field('field')
+        validator = DatabaseValidation(connection=None)
+        errors = validator.check_field(field)
+        expected = [
+            Error(
+                'Under mysql backend, the field cannot have a "max_length" '
+                    'greated than 255 when it is unique.',
+                hint=None,
+                obj=field,
+                id='E047',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
 
 class DecimalFieldTests(IsolatedModelsTestCase):
 
