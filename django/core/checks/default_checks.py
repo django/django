@@ -30,7 +30,8 @@ def _check_test_runner(apps=None, **kwargs):
 
     from django.conf import settings
 
-    if not hasattr(settings.RAW_SETTINGS_MODULE, 'TEST_RUNNER'):
+    user_settings = settings._wrapped
+    if 'TEST_RUNNER' not in user_settings.__dict__:
         return [
             Warning(
                 'You have not explicitly set "TEST_RUNNER". In Django 1.6, '

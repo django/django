@@ -136,8 +136,6 @@ class Settings(BaseSettings):
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
 
-        self.RAW_SETTINGS_MODULE = mod
-
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)

@@ -98,8 +98,8 @@ class Compatibility_1_6_Checks(TestCase):
 
     def test_test_runner_not_set_explicitly(self):
         # We remove the TEST_RUNNER attribute from custom settings module.
-        old_test_runner = settings.RAW_SETTINGS_MODULE.TEST_RUNNER
-        del settings.RAW_SETTINGS_MODULE.TEST_RUNNER
+        old_test_runner = settings._wrapped.TEST_RUNNER
+        del settings._wrapped.TEST_RUNNER
 
         try:
             errors = check_1_6_compatibility()
@@ -119,7 +119,7 @@ class Compatibility_1_6_Checks(TestCase):
             self.assertEqual(errors, expected)
         finally:
             # Restore TEST_RUNNER value
-            settings.RAW_SETTINGS_MODULE.TEST_RUNNER = old_test_runner
+            settings._wrapped.TEST_RUNNER = old_test_runner
 
     def test_boolean_field_default_value(self):
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
