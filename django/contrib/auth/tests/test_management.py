@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.contrib.auth import models, management
+from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
@@ -12,7 +13,7 @@ from django.core import checks
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, override_system_checks
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -174,6 +175,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):
         """ REQUIRED_FIELDS should be a list. """
 
@@ -190,6 +192,7 @@ class CustomUserModelValidationTestCase(TestCase):
         self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
+    @override_system_checks([check_user_model])
     def test_username_not_in_required_fields(self):
         """ USERNAME_FIELD should not appear in REQUIRED_FIELDS. """
 
@@ -207,6 +210,7 @@ class CustomUserModelValidationTestCase(TestCase):
         self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
+    @override_system_checks([check_user_model])
     def test_username_non_unique(self):
         """ A non-unique USERNAME_FIELD should raise an error. """
 
@@ -227,6 +231,7 @@ class CustomUserModelValidationTestCase(TestCase):
                        AUTHENTICATION_BACKENDS=[
                            'my.custom.backend',
                        ])
+    @override_system_checks([check_user_model])
     def test_username_non_unique_with_custom_backend(self):
         """ A non-unique USERNAME_FIELD should raise an error only if we use the
         default authentication backend. Otherwise, an warning should be raised.

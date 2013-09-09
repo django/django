@@ -2,20 +2,16 @@ import inspect
 import re
 
 from django.conf import settings
-from django.core.checks import register
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+import django.contrib.auth.checks
 from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
-from .checks import check_user_model
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
 REDIRECT_FIELD_NAME = 'next'
-
-
-register(check_user_model)
 
 
 def load_backend(path):
