@@ -611,3 +611,10 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
+
+    def test_bad_cookie(self):
+        c = SimpleCookie()
+        bad_name = 'a:.b/'
+        c.load({bad_name: 'val'})
+        self.assertEqual(len(c.bad_cookies), 1)
+        self.assertTrue(bad_name in c.bad_cookies)
