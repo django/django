@@ -1296,6 +1296,19 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/secure-view/')
         self.assertContains(response, 'id="login-form"')
 
+    def testDisabledStaffPermissionsWhenLoggedIn(self):
+        self.client.login(username='super', password='secret')
+        superuser = User.objects.get(username='super')
+        superuser.is_staff = False
+        superuser.save()
+
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'id="login-form"')
+        self.assertNotContains(response, 'Log out')
+
+        response = self.client.get('/test_admin/admin/secure-view/')
+        self.assertContains(response, 'id="login-form"')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewsNoUrlTest(TestCase):
