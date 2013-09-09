@@ -8,7 +8,6 @@ from django.contrib.admin.sites import AdminSite, site
 from django.contrib.admin.filters import (ListFilter, SimpleListFilter,
     FieldListFilter, BooleanFieldListFilter, RelatedFieldListFilter,
     ChoicesFieldListFilter, DateFieldListFilter, AllValuesFieldListFilter)
-from django.core.checks import register
 
 
 def autodiscover():
@@ -41,5 +40,3 @@ def autodiscover():
             # attempting to import it, otherwise we want it to bubble up.
             if module_has_submodule(mod, 'admin'):
                 raise
-
-register(check_admin_app)
