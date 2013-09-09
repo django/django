@@ -225,7 +225,7 @@ Django quotes column and table names behind the scenes.
 
     Ordering is not a free operation. Each field you add to the ordering
     incurs a cost to your database. Each foreign key you add will
-    impliclty include all of its default orderings as well.
+    implicitly include all of its default orderings as well.
 
 ``permissions``
 ---------------
