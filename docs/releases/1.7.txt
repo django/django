@@ -345,13 +345,18 @@ Miscellaneous
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
-* The :meth:`django.db.backends.sqlite3.DatabaseCreation.sql_create_model`
-  will now create :class:`~django.db.models.AutoField` columns in SQLite
-  databases using the ``AUTOINCREMENT`` option, which guarantees monotonic
+* :class:`~django.db.models.AutoField` columns in SQLite databases will now be
+  created using the ``AUTOINCREMENT`` option, which guarantees monotonic
   increments. This will cause primary key numbering behavior to change on
-  SQLite, becoming consistent with most other SQL databases. If you have a
-  database created with an older version of Django, you will need to migrate
-  it to take advantage of this feature. See ticket #10164 for details.
+  SQLite, becoming consistent with most other SQL databases. This will only
+  apply to newly created tables. If you have a database created with an older
+  version of Django, you will need to migrate it to take advantage of this
+  feature. For example, you could do the following:
+
+  #) Use :djadmin:`dumpdata` to save your data.
+  #) Rename the existing database file (keep it as a backup).
+  #) Run :djadmin:`migrate` to create the updated schema.
+  #) Use :djadmin:`loaddata` to import the fixtures you exported in (1).
 
 * ``django.contrib.auth.models.AbstractUser`` no longer defines a
   :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
