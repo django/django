@@ -296,7 +296,7 @@ class HttpResponseTests(unittest.TestCase):
         h = HttpResponse()
         f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
         f = f.decode('utf-8')
-        h['Content-Disposition'] = u'attachment; filename="%s"' % f
+        h['Content-Disposition'] = 'attachment; filename="%s"' % f
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
