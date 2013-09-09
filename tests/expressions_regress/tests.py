@@ -7,7 +7,8 @@ import datetime
 
 from django.db import connection
 from django.db.models import F
-from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import Approximate
 
 from .models import Number, Experiment
 

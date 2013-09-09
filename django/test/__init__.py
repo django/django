@@ -7,4 +7,4 @@ from django.test.testcases import (TestCase, TransactionTestCase,
     SimpleTestCase, LiveServerTestCase, skipIfDBFeature,
     skipUnlessDBFeature
 )
-from django.test.utils import Approximate
+from django.test.utils import override_settings

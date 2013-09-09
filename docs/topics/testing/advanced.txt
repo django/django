@@ -5,18 +5,18 @@ Advanced testing topics
 The request factory
 ===================
 
-.. module:: django.test.client
+.. currentmodule:: django.test
 
 .. class:: RequestFactory
 
-The :class:`~django.test.client.RequestFactory` shares the same API as
+The :class:`~django.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
 view function the same way as you would test any other function -- as
 a black box, with exactly known inputs, testing for specific outputs.
 
-The API for the :class:`~django.test.client.RequestFactory` is a slightly
+The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
@@ -38,8 +38,7 @@ Example
 The following is a simple unit test using the request factory::
 
     from django.contrib.auth.models import User
-    from django.test import TestCase
-    from django.test.client import RequestFactory
+    from django.test import TestCase, RequestFactory
 
     class SimpleTest(TestCase):
         def setUp(self):
@@ -164,8 +163,6 @@ exception will be raised.
 
 Advanced features of ``TransactionTestCase``
 ============================================
-
-.. currentmodule:: django.test
 
 .. attribute:: TransactionTestCase.available_apps
 

@@ -8,7 +8,8 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
-from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import Approximate
 from django.utils import six
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
