@@ -15,6 +15,15 @@ triggered implicitly before most command, including :djadmin:`runserver` and
 :djadmin:`migrate`. For performance issues, the checks are not performed if ``DEBUG``
 is set to False.
 
+Django will not allow you to run server if there is any serious message like
+an error or critical error. If there are light messages like warnings, Django
+won't stop you, but will issue the message. You can hide unwanted warnings or
+force Django to run even if there are serious messages bu overriding
+:setting:`SILENCED_SYSTEM_CHECKS` setting.
+
+Silencing system checks
+=======================
+
 Writing your own checks
 =======================
 
