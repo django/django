@@ -25,7 +25,6 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
-from django.utils.tzinfo import FixedOffset
 
 from .forms import EventForm, EventSplitForm, EventModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
@@ -40,8 +39,8 @@ from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayE
 # 10:20:30 in UTC and 17:20:30 in ICT.
 
 UTC = timezone.utc
-EAT = FixedOffset(180)      # Africa/Nairobi
-ICT = FixedOffset(420)      # Asia/Bangkok
+EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
+ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
 TZ_SUPPORT = hasattr(time, 'tzset')
 

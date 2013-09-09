@@ -7,12 +7,12 @@ from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext
-from django.utils import feedgenerator, tzinfo
+from django.utils import feedgenerator
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils import six
-from django.utils.timezone import is_naive
+from django.utils.timezone import get_default_timezone, is_naive, make_aware
 
 
 def add_domain(domain, url, secure=False):
@@ -186,15 +186,15 @@ class Feed(object):
             else:
                 author_email = author_link = None
 
+            tz = get_default_timezone()
+
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
             if pubdate and is_naive(pubdate):
-                ltz = tzinfo.LocalTimezone(pubdate)
-                pubdate = pubdate.replace(tzinfo=ltz)
+                pubdate = make_aware(pubdate, tz)
 
             updateddate = self.__get_dynamic_attr('item_updateddate', item)
             if updateddate and is_naive(updateddate):
-                ltz = tzinfo.LocalTimezone(updateddate)
-                updateddate = updateddate.replace(tzinfo=ltz)
+                updateddate = make_aware(updateddate, tz)
 
             feed.add_item(
                 title = title,

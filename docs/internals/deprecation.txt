@@ -417,6 +417,8 @@ these changes.
 
 * ``django.utils.importlib`` will be removed.
 
+* ``django.utils.tzinfo`` will be removed.
+
 * ``django.utils.unittest`` will be removed.
 
 * The ``syncdb`` command will be removed.
