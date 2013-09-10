@@ -1957,7 +1957,7 @@ class FormsTestCase(TestCase):
             some_field = CharField()
 
             def as_p(self):
-                return self._html_output(u'<p id="p_%(field_name)s"></p>', u'%s', '</p>', u' %s', True)
+                return self._html_output('<p id="p_%(field_name)s"></p>', '%s', '</p>', ' %s', True)
 
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
