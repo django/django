@@ -1950,3 +1950,14 @@ class FormsTestCase(TestCase):
         boundfield = SomeForm(label_suffix='!')['field']
 
         self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')
+
+    def test_field_name(self):
+        """#5749 - `field_name` may be used as a key in _html_output()."""
+        class SomeForm(Form):
+            some_field = CharField()
+
+            def as_p(self):
+                return self._html_output(u'<p id="p_%(field_name)s"></p>', u'%s', '</p>', u' %s', True)
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
