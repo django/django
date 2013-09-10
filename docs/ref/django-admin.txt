@@ -1637,6 +1637,7 @@ Examples::
 
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
+      management.call_command('loaddata', 'test_data', verbosity=0) 
 
 Note that command line options for a subcommand that take no arguments, like the above
 example are called as a keyword with ``True`` or ``False``, another example would be::
