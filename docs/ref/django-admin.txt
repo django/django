@@ -1530,6 +1530,15 @@ Examples::
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
 
+Note that command options that take no arguments are passed as keywords
+with ``True`` or ``False``::
+
+      management.call_command('dumpdata', use_natural_keys=True)
+
+Command options which take multiple options are passed a list::
+
+      management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
+
 Output redirection
 ==================
 
