@@ -55,7 +55,7 @@ var CalendarNamespace = {
         tableRow = quickElement('tr', tableBody);
         for (var i = 0; i < startingPos; i++) {
             var _cell = quickElement('td', tableRow, ' ');
-            _cell.style.backgroundColor = '#f3f3f3';
+            _cell.className = "nonday";
         }
 
         // Draw days of month
