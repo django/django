@@ -1628,6 +1628,7 @@ To call a management command from code use ``call_command``.
 
 ``*args``
   a list of arguments accepted by the command.
+  
 
 ``**options``
   named options accepted on the command-line.
@@ -1636,7 +1637,17 @@ Examples::
 
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
-      management.call_command('loaddata', 'test_data', verbosity=0)
+
+Note that command line options for a subcommand that take no arguments, like the above
+example are called as a keyword with ``True`` or ``False``, another example would be::
+
+      management.call_command('dumpdata', use_natural_keys=True)        
+
+Other command line options which take multiple options will be called with a list. For
+example the above mentiond ``--exclude`` option for the subcommand ``dumpdata`` would be::
+
+      management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
+ 
 
 Output redirection
 ==================
