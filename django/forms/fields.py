@@ -977,6 +977,11 @@ class MultiValueField(Field):
                 f.required = False
         self.fields = fields
 
+    def __deepcopy__(self, memo):
+        result = super(MultiValueField, self).__deepcopy__(memo)
+        result.fields = tuple([x.__deepcopy__(memo) for x in self.fields])
+        return result
+
     def validate(self, value):
         pass
 
