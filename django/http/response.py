@@ -17,7 +17,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
-from django.utils.six.moves import map
+from django.utils.six.moves import map, http_cookies
 
 
 # See http://www.iana.org/assignments/http-status-codes
@@ -218,7 +218,10 @@ class HttpResponseBase(six.Iterator):
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
 
         """
-        self.cookies[key] = value
+        try:
+            self.cookies[key] = value
+        except http_cookies.CookieError:
+            return
         if expires is not None:
             if isinstance(expires, datetime.datetime):
                 if timezone.is_aware(expires):
