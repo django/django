@@ -338,6 +338,25 @@ execute and tear down the test suite.
 Attributes
 ~~~~~~~~~~
 
+.. attribute:: DiscoverRunner.test_suite
+
+    .. versionadded:: 1.7
+
+    The class used to build the test suite. By default it is set to
+    ``unittest.TestSuite``. This can be overridden if you wish to implement
+    different logic for collecting tests.
+
+.. attribute:: DiscoverRunner.test_runner
+
+    .. versionadded:: 1.7
+
+    This is the class of the low-level test runner which is used to execute
+    the individual tests and format the results. By default it is set to
+    ``unittest.TextTestRunner``. Despite the unfortunate similarity in
+    naming conventions, this is not the same type of class as
+    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    can override this attribute to modify the way tests are run and reported.
+
 .. attribute:: DiscoverRunner.test_loader
 
     This is the class that loads tests, whether from TestCases or modules or

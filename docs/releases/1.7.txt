@@ -285,6 +285,14 @@ Templates
 * ``TypeError`` exceptions are not longer silenced when raised during the
   rendering of a template.
 
+Tests
+^^^^^
+
+* :class:`~django.test.runner.DiscoverRunner` has two new attributes,
+  :attr:`~django.test.runner.DiscoverRunner.test_suite` and
+  :attr:`~django.test.runner.DiscoverRunner.test_runner`, which facilitate
+  overriding the way tests are collected and run.
+
 Backwards incompatible changes in 1.7
 =====================================
 
