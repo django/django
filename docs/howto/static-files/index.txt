@@ -106,7 +106,7 @@ this by adding the following snippet to your urls.py::
 
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
-    `:mod:`django.contrib.staticfiles`.
+    :mod:`django.contrib.staticfiles`.
 
 Serving files uploaded by a user during development.
 ====================================================
