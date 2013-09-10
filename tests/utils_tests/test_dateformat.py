@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.dateformat import format
 from django.utils import dateformat
-from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone
+from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
 from django.utils import translation
 
 
@@ -34,16 +34,17 @@ class DateFormatTests(TestCase):
 
     def test_datetime_with_local_tzinfo(self):
         ltz = get_default_timezone()
-        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=ltz)
+        dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.replace(tzinfo=None))
 
     def test_datetime_with_tzinfo(self):
         tz = get_fixed_timezone(-510)
         ltz = get_default_timezone()
-        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
+        dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
+        # astimezone() is safe here because the target timezone doesn't have DST
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
