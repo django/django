@@ -341,40 +341,37 @@ been well-tested and are easy to use.
 Cache arguments
 ---------------
 
-In addition to the defining the engine and name of the each cache
-backend, each cache backend can be given additional arguments to
-control caching behavior. These arguments are provided as additional
-keys in the :setting:`CACHES` setting. Valid arguments are as follows:
+Each cache backend can be given additional arguments to control caching
+behavior. These arguments are provided as additional keys in the
+:setting:`CACHES` setting. Valid arguments are as follows:
 
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
-  seconds, to use for the cache. This argument defaults to 300
+  seconds, to use for the cache. This argument defaults to ``300``
   seconds (5 minutes).
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
-  passed to cache backend. The list options understood by each
-  backend vary with each backend.
+  passed to the cache backend. The list of valid options will vary
+  with each backend, and cache backends backed by a third-party library
+  will pass their options directly to the underlying cache library.
 
   Cache backends that implement their own culling strategy (i.e.,
   the ``locmem``, ``filesystem`` and ``database`` backends) will
   honor the following options:
 
-  * ``MAX_ENTRIES``: the maximum number of entries allowed in
+  * ``MAX_ENTRIES``: The maximum number of entries allowed in
     the cache before old values are deleted. This argument
     defaults to ``300``.
 
   * ``CULL_FREQUENCY``: The fraction of entries that are culled
     when ``MAX_ENTRIES`` is reached. The actual ratio is
-    ``1/CULL_FREQUENCY``, so set ``CULL_FREQUENCY``: to ``2`` to
-    cull half of the entries when ``MAX_ENTRIES`` is reached.
+    ``1 / CULL_FREQUENCY``, so set ``CULL_FREQUENCY`` to ``2`` to
+    cull half the entries when ``MAX_ENTRIES`` is reached. This argument
+    should be an integer and defaults to ``3``.
 
     A value of ``0`` for ``CULL_FREQUENCY`` means that the
     entire cache will be dumped when ``MAX_ENTRIES`` is reached.
-    This makes culling *much* faster at the expense of more
-    cache misses.
-
-  Cache backends backed by a third-party library will pass their
-  options directly to the underlying cache library. As a result,
-  the list of valid options depends on the library in use.
+    On some backends (``database`` in particular) this makes culling *much*
+    faster at the expense of more cache misses.
 
 * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
   automatically included (prepended by default) to all cache keys
