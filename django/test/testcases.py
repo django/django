@@ -699,6 +699,9 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can enable only a subset of apps for faster tests
     available_apps = None
 
+    # Subclasses can define fixtures which will be automatically installed.
+    fixtures = None
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -746,7 +749,7 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
@@ -838,7 +841,7 @@ class TestCase(TransactionTestCase):
         disable_transaction_methods()
 
         for db_name in self._databases_names(include_mirrors=False):
-            if hasattr(self, 'fixtures'):
+            if self.fixtures:
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
