@@ -20,8 +20,9 @@ class MigrateTests(MigrationTestBase):
     Tests running the migrate command.
     """
 
-    # `auth` app is imported, but not installed in this test (thanks to
+    # `auth` app is imported, but not installed in these tests (thanks to
     # MigrationTestBase), so we need to exclude checks registered by this app.
+
     @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
@@ -49,6 +50,7 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_list(self):
         """
@@ -109,6 +111,9 @@ class MakeMigrationsTests(MigrationTestBase):
             return
         shutil.rmtree(dname)
 
+    # `auth` app is imported, but not installed in this test (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+    @override_system_checks([])
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
         cache.register_models('migrations', UnicodeModel)
