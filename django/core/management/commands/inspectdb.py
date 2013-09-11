@@ -117,7 +117,12 @@ class Command(NoArgsCommand):
                         if not field_type in ('TextField(', 'CharField('):
                             extra_params['null'] = True
 
-                field_desc = '%s = models.%s' % (att_name, field_type)
+                field_desc = '%s = %s%s' % (
+                    att_name,
+                    # Custom fields will have a dotted path
+                    '' if '.' in field_type else 'models.',
+                    field_type,
+                )
                 if extra_params:
                     if not field_desc.endswith('('):
                         field_desc += ', '
