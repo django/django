@@ -65,8 +65,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
                         "%s;" % tablespace_sql)
 
+            index_prefix = '%s__%s' % (db_table, f.rel.to._meta.db_table) if f.rel and f.rel.to else db_table
             if not f.unique:
-                output = [get_index_sql('%s_%s' % (db_table, f.column))]
+                output = [get_index_sql('%s__%s' % (index_prefix, f.column))]
 
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
@@ -74,9 +75,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             # C locale. See #12234.
             db_type = f.db_type(connection=self.connection)
             if db_type.startswith('varchar'):
-                output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
-                                            ' varchar_pattern_ops'))
+                output.append(get_index_sql('%s__%s__like' % (index_prefix, f.column),
+                    ' varchar_pattern_ops'))
             elif db_type.startswith('text'):
-                output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
-                                            ' text_pattern_ops'))
+                output.append(get_index_sql('%s__%s__like' % (index_prefix, f.column),
+                    ' text_pattern_ops'))
         return output
