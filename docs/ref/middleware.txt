@@ -90,6 +90,20 @@ GZip middleware
 
 .. class:: GZipMiddleware
 
+.. warning::
+
+    Security researchers recently revealed that when compression techniques
+    (including ``GZipMiddleware``) are used on a website, the site becomes
+    exposed to a number of possible attacks. These approaches can be used to
+    compromise, amongst other things, Django's CSRF protection. Before using
+    ``GZipMiddleware`` on your site, you should consider very carefully whether
+    you are subject to these attacks. If you're in *any* doubt about whether
+    you're affected, you should avoid using ``GZipMiddleware``. For more
+    details, see the `the BREACH paper (PDF)`_ and `breachattack.com`_.
+
+    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: http://breachattack.com
+
 Compresses content for browsers that understand GZip compression (all modern
 browsers).
 

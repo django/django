@@ -1164,7 +1164,10 @@ site's performance:
   and ``Last-Modified`` headers.
 
 * :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
-  modern browsers, saving bandwidth and transfer time.
+  modern browsers, saving bandwidth and transfer time. Be warned, however,
+  that compression techniques like ``GZipMiddleware`` are subject to attacks.
+  See the warning in :class:`~django.middleware.gzip.GZipMiddleware` for
+  details.
 
 Order of MIDDLEWARE_CLASSES
 ===========================
