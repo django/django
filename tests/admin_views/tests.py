@@ -48,8 +48,9 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
-    Telegram, Pizza, Topping, FilteredManager)
+    Telegram, Pizza, Topping, FilteredManager, StumpJoke)
 from .admin import site, site2
+from .forms import StumpJokeForm
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3777,6 +3778,28 @@ class RawIdFieldsTest(TestCase):
         response2 = self.client.get(popup_url)
         self.assertNotContains(response2, "Kilbraken")
         self.assertContains(response2, "Palin")
+
+
+class LimitChoicesToTest(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user('threepwood')
+        self.user2 = User.objects.create_user('marley')
+
+        self.user1.date_joined = datetime.datetime.today() + datetime.timedelta(days=1)
+        self.user1.save()
+
+        self.user2.date_joined = datetime.datetime.today() - datetime.timedelta(days=1)
+        self.user2.save()
+
+    def test_limit_choices_to_callable_for_fk_rel(self):
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.user1, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertNotIn(self.user2, stumpjokeform.fields['most_recently_fooled'].queryset)
+
+    def test_limit_choices_to_callable_for_m2m_rel(self):
+        stumpjokeform = StumpJokeForm()
+        self.assertIn(self.user1, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertNotIn(self.user2, stumpjokeform.fields['has_fooled_today'].queryset)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

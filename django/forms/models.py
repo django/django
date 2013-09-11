@@ -295,6 +295,7 @@ class BaseModelForm(BaseForm):
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, instance=None):
         opts = self._meta
+
         if opts.model is None:
             raise ValueError('ModelForm has no model class specified.')
         if instance is None:
@@ -307,12 +308,25 @@ class BaseModelForm(BaseForm):
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
+
         # self._validate_unique will be set to True by BaseModelForm.clean().
         # It is False by default so overriding self.clean() and failing to call
         # super will stop validate_unique from being called.
         self._validate_unique = False
+
         super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
                                             error_class, label_suffix, empty_permitted)
+
+        # This form instance should now have its own set of fields in
+        # ``self.fields``. Apply the attribute 'limit_choices_to', if applicable.
+        for field_name in self.fields:
+            formfield = self.fields[field_name]
+            if hasattr(formfield, 'queryset'):
+                limit_choices_to = formfield.limit_choices_to
+                if limit_choices_to is not None:
+                    if callable(limit_choices_to):
+                        limit_choices_to = limit_choices_to()
+                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
 
     def _update_errors(self, errors):
         for field, messages in errors.error_dict.items():
@@ -1058,7 +1072,8 @@ class ModelChoiceField(ChoiceField):
 
     def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
-                 help_text='', to_field_name=None, *args, **kwargs):
+                 help_text='', to_field_name=None, limit_choices_to=None,
+                 *args, **kwargs):
         if required and (initial is not None):
             self.empty_label = None
         else:
@@ -1070,6 +1085,7 @@ class ModelChoiceField(ChoiceField):
         Field.__init__(self, required, widget, label, initial, help_text,
                        *args, **kwargs)
         self.queryset = queryset
+        self.limit_choices_to = limit_choices_to  # added to limit queryset later.
         self.choice_cache = None
         self.to_field_name = to_field_name
 
