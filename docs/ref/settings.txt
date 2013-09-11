@@ -350,9 +350,9 @@ DOMAIN
 
 Default: ``None``
 
-The domain to be used when setting the CSRF cookie.  This can be useful for
+The domain to be used when setting the CSRF cookie. This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
-site request forgery protection.  It should be set to a string such as
+site request forgery protection. It should be set to a string such as
 ``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
@@ -379,7 +379,7 @@ NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/contrib/csrf`.
+want. See :doc:`/ref/contrib/csrf`.
 
 .. setting:: CSRF_COOKIE-PATH
 
@@ -417,16 +417,6 @@ CSRF_COOKIE_DOMAIN
 
 Default: ``None``
 
-The domain to be used when setting the CSRF cookie.  This can be useful for
-easily allowing cross-subdomain requests to be excluded from the normal cross
-site request forgery protection.  It should be set to a string such as
-``".example.com"`` to allow a POST request from a form on one subdomain to be
-accepted by a view served from another subdomain.
-
-Please note that the presence of this setting does not imply that Django's CSRF
-protection is safe from cross-subdomain attacks by default - please see the
-:ref:`CSRF limitations <csrf-limitations>` section.
-
 .. setting:: CSRF_COOKIE_HTTPONLY
 
 CSRF_COOKIE_HTTPONLY
@@ -440,9 +430,9 @@ CSRF_COOKIE_HTTPONLY
 
 Default: ``False``
 
-Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the CSRF cookie.
-See :setting:`SESSION_COOKIE-HTTPONLY` for details on ``HttpOnly``.
+.. note::
+   This setting was added in Django 1.6 but was deprecated in 1.7 as a
+   standalone setting. Now it's one of the members of :setting:`CSRF_COOKIE`.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -455,9 +445,6 @@ CSRF_COOKIE_NAME
 
 Default: ``'csrftoken'``
 
-The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/contrib/csrf`.
-
 .. setting:: CSRF_COOKIE_PATH
 
 CSRF_COOKIE_PATH
@@ -469,13 +456,6 @@ CSRF_COOKIE_PATH
 
 Default: ``'/'``
 
-The path set on the CSRF cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
-
-This is useful if you have multiple Django instances running under the same
-hostname. They can use different cookie paths, and each instance will only see
-its own CSRF cookie.
-
 .. setting:: CSRF_COOKIE_SECURE
 
 CSRF_COOKIE_SECURE
@@ -486,10 +466,6 @@ CSRF_COOKIE_SECURE
    :setting:`CSRF_COOKIE['SECURE'] <CSRF_COOKIE-SECURE>`) instead.
 
 Default: ``False``
-
-Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
-the cookie will be marked as "secure," which means browsers may ensure that the
-cookie is only sent under an HTTPS connection.
 
 .. setting:: CSRF_FAILURE_VIEW
 
@@ -2585,8 +2561,6 @@ SESSION_COOKIE_AGE
 
 Default: ``1209600`` (2 weeks, in seconds)
 
-The age of session cookies, in seconds.
-
 .. setting:: SESSION_COOKIE_DOMAIN
 
 SESSION_COOKIE_DOMAIN
@@ -2597,18 +2571,6 @@ SESSION_COOKIE_DOMAIN
    :setting:`SESSION_COOKIE['DOMAIN'] <SESSION_COOKIE-DOMAIN>`) instead.
 
 Default: ``None``
-
-The domain to use for session cookies. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
-
-Be cautious when updating this setting on a production site. If you update
-this setting to enable cross-domain cookies on a site that previously used
-standard domain cookies, existing user cookies will be set to the old
-domain. This may result in them being unable to log in as long as these cookies
-persist.
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 
@@ -2621,22 +2583,6 @@ SESSION_COOKIE_HTTPONLY
 
 Default: ``True``
 
-Whether to use ``HTTPOnly`` flag on the session cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the
-session cookie.
-
-HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
-is not part of the :rfc:`2109` standard for cookies, and it isn't honored
-consistently by all browsers. However, when it is honored, it can be a
-useful way to mitigate the risk of client side script accessing the
-protected cookie data.
-
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
-
-.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
-
 .. setting:: SESSION_COOKIE_NAME
 
 SESSION_COOKIE_NAME
@@ -2647,9 +2593,6 @@ SESSION_COOKIE_NAME
    :setting:`SESSION_COOKIE['NAME'] <SESSION_COOKIE-NAME>`) instead.
 
 Default: ``'sessionid'``
-
-The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from :setting:`LANGUAGE_COOKIE_NAME`).
 
 .. setting:: SESSION_COOKIE_PATH
 
@@ -2662,13 +2605,6 @@ SESSION_COOKIE_PATH
 
 Default: ``'/'``
 
-The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
-
-This is useful if you have multiple Django instances running under the same
-hostname. They can use different cookie paths, and each instance will only see
-its own session cookie.
-
 .. setting:: SESSION_COOKIE_SECURE
 
 SESSION_COOKIE_SECURE
@@ -2679,14 +2615,6 @@ SESSION_COOKIE_SECURE
    :setting:`SESSION_COOKIE['SECURE'] <SESSION_COOKIE-SECURE>`) instead.
 
 Default: ``False``
-
-Whether to use a secure cookie for the session cookie. If this is set to
-``True``, the cookie will be marked as "secure," which means browsers may
-ensure that the cookie is only sent under an HTTPS connection.
-
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_ENGINE
 
