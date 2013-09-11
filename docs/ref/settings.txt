@@ -338,7 +338,7 @@ Default::
     }
 
 Configures the characteristics of the HTTP cookie used in the included
-protection against :ref:`cross siite request foergery <cross-site-request-forgery>`
+protection against :ref:`cross siite request forgery <cross-site-request-forgery>`
 attacks.
 
 The following sub-sections describe the available keys.
@@ -1422,10 +1422,6 @@ LANGUAGE_COOKIE_NAME
    :setting:`LANGUAGE_COOKIE['NAME'] <LANGUAGE_COOKIE-NAME>`) instead.
 
 Default: ``'django_language'``
-
-The name of the cookie to use for the language cookie. This can be whatever
-you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
-:doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGES
 

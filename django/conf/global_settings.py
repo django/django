@@ -140,7 +140,7 @@ LOCALE_PATHS = ()
 LANGUAGE_COOKIE = {
     'NAME': 'django_language',
 }
-LANGUAGE_COOKIE_NAME = LANGUAGE_COOKIE['NAME'] # Deprecated
+LANGUAGE_COOKIE_NAME = LANGUAGE_COOKIE['NAME'] # Deprecated in 1.7, remove in 1.9
 
 # If you set this to True, Django will format dates, numbers and calendars
 # according to user current locale.
@@ -476,12 +476,12 @@ SESSION_COOKIE = {
     'PATH': '/',                                        # The path of the session cookie.
     'HTTPONLY': True,                                   # Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
 }
-SESSION_COOKIE_NAME = SESSION_COOKIE['NAME']            # Deprecated
-SESSION_COOKIE_AGE = SESSION_COOKIE['AGE']              # Deprecated
-SESSION_COOKIE_DOMAIN = SESSION_COOKIE['DOMAIN']        # Deprecated
-SESSION_COOKIE_SECURE = SESSION_COOKIE['SECURE']        # Deprecated
-SESSION_COOKIE_PATH = SESSION_COOKIE['PATH']            # Deprecated
-SESSION_COOKIE_HTTPONLY = SESSION_COOKIE['HTTPONLY']    # Deprecated
+SESSION_COOKIE_NAME = SESSION_COOKIE['NAME']            # Deprecated in 1.7, remove in 1.9.
+SESSION_COOKIE_AGE = SESSION_COOKIE['AGE']              # Deprecated in 1.7, remove in 1.9.
+SESSION_COOKIE_DOMAIN = SESSION_COOKIE['DOMAIN']        # Deprecated in 1.7, remove in 1.9.
+SESSION_COOKIE_SECURE = SESSION_COOKIE['SECURE']        # Deprecated in 1.7, remove in 1.9.
+SESSION_COOKIE_PATH = SESSION_COOKIE['PATH']            # Deprecated in 1.7, remove in 1.9.
+SESSION_COOKIE_HTTPONLY = SESSION_COOKIE['HTTPONLY']    # Deprecated in 1.7, remove in 1.9.
 SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
@@ -566,11 +566,11 @@ CSRF_COOKIE = {
     'SECURE': False,
     'HTTPONLY': False,
 }
-CSRF_COOKIE_NAME = CSRF_COOKIE['NAME']          # Deprecated 1.7, remove in 1.9.
-CSRF_COOKIE_DOMAIN = CSRF_COOKIE['DOMAIN']      # Deprecated 1.7, remove in 1.9.
-CSRF_COOKIE_PATH = CSRF_COOKIE['PATH']          # Deprecated 1.7, remove in 1.9.
-CSRF_COOKIE_SECURE = CSRF_COOKIE['SECURE']      # Deprecated 1.7, remove in 1.9.
-CSRF_COOKIE_HTTPONLY = CSRF_COOKIE['HTTPONLY']  # Deprecated 1.7, remove in 1.9.
+CSRF_COOKIE_NAME = CSRF_COOKIE['NAME']          # Deprecated in 1.7, remove in 1.9.
+CSRF_COOKIE_DOMAIN = CSRF_COOKIE['DOMAIN']      # Deprecated in 1.7, remove in 1.9.
+CSRF_COOKIE_PATH = CSRF_COOKIE['PATH']          # Deprecated in 1.7, remove in 1.9.
+CSRF_COOKIE_SECURE = CSRF_COOKIE['SECURE']      # Deprecated in 1.7, remove in 1.9.
+CSRF_COOKIE_HTTPONLY = CSRF_COOKIE['HTTPONLY']  # Deprecated in 1.7, remove in 1.9.
 
 ############
 # MESSAGES #
