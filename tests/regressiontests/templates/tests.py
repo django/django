@@ -1766,6 +1766,8 @@ class RequestContextTests(BaseTemplateResponseTest):
         )
 
 
+@unittest.skipIf(' ' in __file__,
+    "The {%% ssi %%} tag in Django 1.4 doesn't support spaces in path.")
 class SSITests(unittest.TestCase):
     def setUp(self):
         self.this_dir = os.path.dirname(os.path.abspath(__file__))
