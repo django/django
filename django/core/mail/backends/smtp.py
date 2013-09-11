@@ -3,26 +3,32 @@ import smtplib
 import ssl
 import threading
 
-from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
 from django.core.mail.message import sanitize_address
 from django.utils.encoding import force_bytes
+from django.utils.unsetting import uses_settings
 
 
 class EmailBackend(BaseEmailBackend):
     """
     A wrapper that manages the SMTP network connection.
     """
+    @uses_settings({'EMAIL_HOST': ['host', None],
+                    'EMAIL_PORT': ['port', None],
+                    'EMAIL_HOST_USER': ['username', None],
+                    'EMAIL_HOST_PASSWORD': ['password', None],
+                    'EMAIL_USE_TLS': ['use_tls', None],
+                    'EMAIL_USE_SSL': ['use_ssl', None]})
     def __init__(self, host=None, port=None, username=None, password=None,
                  use_tls=None, fail_silently=False, use_ssl=None, **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
-        self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-        self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls
+        self.use_ssl = use_ssl
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "

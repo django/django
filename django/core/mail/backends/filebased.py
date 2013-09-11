@@ -3,18 +3,22 @@
 import datetime
 import os
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 from django.utils import six
+from django.utils.unsetting import uses_settings
+
 
 class EmailBackend(ConsoleEmailBackend):
+
+    @uses_settings('EMAIL_FILE_PATH', 'file_path', None)
     def __init__(self, *args, **kwargs):
         self._fname = None
+
         if 'file_path' in kwargs:
             self.file_path = kwargs.pop('file_path')
         else:
-            self.file_path = getattr(settings, 'EMAIL_FILE_PATH',None)
+            raise TypeError("file_path is a `<required argument for EmailBackend")
         # Make sure self.file_path is a string.
         if not isinstance(self.file_path, six.string_types):
             raise ImproperlyConfigured('Path for saving emails is invalid: %r' % self.file_path)
