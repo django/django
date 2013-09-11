@@ -146,10 +146,6 @@ class BaseSettings(object):
 
         object.__setattr__(self, name, value)
 
-    #def __getattribute__(self, name):
-    #    cookie_settings_deprecation_check(name)
-    #    return super(BaseSettings, self).__getattribute__(name)
-
 
 class Settings(BaseSettings):
     def __init__(self, settings_module):

@@ -391,14 +391,6 @@ class CookieSettingsDeprecationTests(TestCase):
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
 
-    #def test_old_setting_read(self):
-    #    """If user access a deprecated setting, a deprecation warning is generated"""
-    #    with warnings.catch_warnings(record=True) as w:
-    #        warnings.simplefilter("always")
-    #        settings.SESSION_COOKIE_AGE
-    #        self.assertEqual(len(w), 1)
-    #        self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
-
     def test_old_setting_set_and_read(self):
         """If user specifies a deprecated setting, it still works"""
         with warnings.catch_warnings(record=True) as w:
