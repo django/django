@@ -151,16 +151,17 @@ class RelatedField(Field):
     def _check_relation_model_exists(self):
         rel_is_missing = self.rel.to not in get_models()
         rel_is_string = isinstance(self.rel.to, six.string_types)
+        model_name = self.rel.to if rel_is_string else self.rel.to._meta.object_name
         if rel_is_missing and (rel_is_string or not self.rel.to._meta.swapped):
             return [
                 checks.Error(
                     'The field has a relation with model %s, which '
                         'has either not been installed or is abstract.'
-                        % self.rel.to,
+                        % model_name,
                     hint='Ensure that you did not misspell the model name and '
                         'the model is not abstract. Does your INSTALLED_APPS '
                         'setting contain the app where %s is defined?'
-                        % self.rel.to,
+                        % model_name,
                     obj=self,
                     id='E030',
                 )
@@ -204,6 +205,11 @@ class RelatedField(Field):
         # `is_hidden` returns True), then there are no clashes to check and we
         # can skip these fields.
         if self.rel.is_hidden():
+            return []
+
+        try:
+            self.related
+        except AttributeError:
             return []
 
         # Consider that we are checking field `Model.foreign` and the models
@@ -1296,6 +1302,11 @@ class ForeignObject(RelatedField):
         except FieldDoesNotExist:
             return []
 
+        try:
+            self.related
+        except AttributeError:
+            return []
+
         has_unique_field = any(rel_field.unique
             for rel_field in self.foreign_related_fields)
         if not has_unique_field and len(self.foreign_related_fields) > 1:
@@ -1345,7 +1356,6 @@ class ForeignKey(ForeignObject):
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
-            assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
@@ -1606,7 +1616,7 @@ class ManyToManyField(RelatedField):
 
     def __init__(self, to, db_constraint=True, **kwargs):
         try:
-            assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
+            to._meta
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
             # Class names must be ASCII in Python 2.x, so we forcibly coerce it here to break early if there's a problem.
