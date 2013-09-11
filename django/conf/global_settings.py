@@ -566,11 +566,11 @@ CSRF_COOKIE = {
     'SECURE': False,
     'HTTPONLY': False,
 }
-CSRF_COOKIE_NAME = CSRF_COOKIE['NAME']          # Deprecated
-CSRF_COOKIE_DOMAIN = CSRF_COOKIE['DOMAIN']      # Deprecated
-CSRF_COOKIE_PATH = CSRF_COOKIE['PATH']          # Deprecated
-CSRF_COOKIE_SECURE = CSRF_COOKIE['SECURE']      # Deprecated
-CSRF_COOKIE_HTTPONLY = CSRF_COOKIE['HTTPONLY']  # Deprecated
+CSRF_COOKIE_NAME = CSRF_COOKIE['NAME']          # Deprecated 1.7, remove in 1.9.
+CSRF_COOKIE_DOMAIN = CSRF_COOKIE['DOMAIN']      # Deprecated 1.7, remove in 1.9.
+CSRF_COOKIE_PATH = CSRF_COOKIE['PATH']          # Deprecated 1.7, remove in 1.9.
+CSRF_COOKIE_SECURE = CSRF_COOKIE['SECURE']      # Deprecated 1.7, remove in 1.9.
+CSRF_COOKIE_HTTPONLY = CSRF_COOKIE['HTTPONLY']  # Deprecated 1.7, remove in 1.9.
 
 ############
 # MESSAGES #

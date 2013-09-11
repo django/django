@@ -98,7 +98,7 @@ class LazySettings(LazyObject):
 
 
 # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9.
-_deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
+_DEPRECATED_COOKIE_SETTINGS = ('LANGUAGE_COOKIE_NAME',
 
     'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
     'SESSION_COOKIE_DOMAIN', 'SESSION_COOKIE_SECURE', 'SESSION_COOKIE_PATH',
@@ -109,7 +109,7 @@ _deprecated_cookie_settings = ('LANGUAGE_COOKIE_NAME',
 
 # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9.
 def cookie_settings_deprecation_check(setting):
-    if setting in _deprecated_cookie_settings:
+    if setting in _DEPRECATED_COOKIE_SETTINGS:
         prefix, _, attrib = setting.split('_', 2)
         new = '%s_COOKIE' % prefix
         warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
