@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import re
-from unittest import expectedFailure
+from unittest import expectedFailure, skipUnless
 
 from django.core.management import call_command
 from django.db import connection
@@ -162,3 +162,25 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
+
+    @skipUnless(connection.vendor == 'sqlite',
+                         "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
+    def test_custom_fields(self):
+        """
+        Introspection of columns with a custom field (#21090)
+        """
+        out = StringIO()
+        orig_data_types_reverse = connection.introspection.data_types_reverse
+        try:
+            connection.introspection.data_types_reverse = {
+                'text': 'myfields.TextField',
+                'bigint': 'BigIntegerField',
+            }
+            call_command('inspectdb',
+                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
+                         stdout=out)
+            output = out.getvalue()
+            self.assertIn("text_field = myfields.TextField()", output)
+            self.assertIn("big_int_field = models.BigIntegerField()", output)
+        finally:
+            connection.introspection.data_types_reverse = orig_data_types_reverse
