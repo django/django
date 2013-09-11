@@ -14,8 +14,8 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.utils import six
+from django.utils.unsetting import uses_settings
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -158,7 +158,8 @@ def get_fixed_timezone(offset):
 # wrap the expression in a function and cache the result.
 _localtime = None
 
-def get_default_timezone():
+@uses_settings('TIME_ZONE', 'timezone')
+def get_default_timezone(timezone=None):
     """
     Returns the default time zone as a tzinfo instance.
 
@@ -166,8 +167,8 @@ def get_default_timezone():
     """
     global _localtime
     if _localtime is None:
-        if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
-            _localtime = pytz.timezone(settings.TIME_ZONE)
+        if isinstance(timezone, six.string_types) and pytz is not None:
+            _localtime = pytz.timezone(timezone)
         else:
             # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
             _localtime = LocalTimezone()
@@ -264,6 +265,7 @@ class override(object):
 
 # Templates
 
+@uses_settings('USE_TZ', 'use_tz', fallback_trigger_value=None)
 def template_localtime(value, use_tz=None):
     """
     Checks if value is a datetime and converts it to local time if necessary.
@@ -274,7 +276,7 @@ def template_localtime(value, use_tz=None):
     This function is designed for use by the template engine.
     """
     should_convert = (isinstance(value, datetime)
-        and (settings.USE_TZ if use_tz is None else use_tz)
+        and use_tz
         and not is_naive(value)
         and getattr(value, 'convert_to_local_time', True))
     return localtime(value) if should_convert else value
@@ -297,11 +299,12 @@ def localtime(value, timezone=None):
         value = timezone.normalize(value)
     return value
 
-def now():
+@uses_settings('USE_TZ', 'use_tz', fallback_trigger_value=None)
+def now(use_tz=None):
     """
     Returns an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
-    if settings.USE_TZ:
+    if use_tz:
         # timeit shows that datetime.now(tz=utc) is 24% slower
         return datetime.utcnow().replace(tzinfo=utc)
     else:
