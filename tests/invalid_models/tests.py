@@ -23,6 +23,39 @@ class IsolatedModelsTestCase(TestCase):
     tearDown = setUp
 
 
+class AutoFieldTests(IsolatedModelsTestCase):
+
+    def test_valid_case(self):
+        class Model(models.Model):
+            id = models.AutoField(primary_key=True)
+
+        field = Model._meta.get_field('id')
+        errors = field.check()
+        expected = []
+        self.assertEqual(errors, expected)
+
+    def test_primary_key(self):
+        class Model(models.Model):
+            field = models.AutoField(primary_key=False)
+
+            # Prevent Django from autocreating `id` AutoField, which would
+            # result in an error, because a model must have exactly one
+            # AutoField.
+            another = models.IntegerField(primary_key=True)
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                'The field must have primary_key=True, because it is an AutoField.',
+                hint=None,
+                obj=field,
+                id='E048',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+
 class CharFieldTests(IsolatedModelsTestCase):
 
     def test_valid_field(self):

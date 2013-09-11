@@ -802,8 +802,6 @@ class AutoField(Field):
     }
 
     def __init__(self, *args, **kwargs):
-        assert kwargs.get('primary_key', False) is True, \
-               "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
@@ -852,6 +850,24 @@ class AutoField(Field):
 
     def formfield(self, **kwargs):
         return None
+
+    def check(self, **kwargs):
+        errors = super(AutoField, self).check(**kwargs)
+        errors.extend(self._check_primary_key())
+        return errors
+
+    def _check_primary_key(self):
+        if not self.primary_key:
+            return [
+                checks.Error(
+                    'The field must have primary_key=True, because it is an AutoField.',
+                    hint=None,
+                    obj=self,
+                    id='E048',
+                ),
+            ]
+        else:
+            return []
 
 
 class BooleanField(Field):
