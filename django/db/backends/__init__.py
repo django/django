@@ -627,6 +627,9 @@ class BaseDatabaseFeatures(object):
     # which can't do it for MyISAM tables
     can_introspect_foreign_keys = True
 
+    # Can the backend introspect an AutoField, instead of an IntegerField?
+    can_introspect_autofield = False
+
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
