@@ -435,6 +435,17 @@ but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
+
+Time zone support for ``day``, ``month``, and ``week_day`` lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 introduces time zone support for ``day``, ``month``, and ``week_day``
+lookups, which were previously performed in UTC rather than the active timezone.
+
+This requires time zone definitions in the database when :setting:`USE_TZ` is
+``True``. :ref:`Learn more <database-time-zone-definitions>`.
+
+
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
