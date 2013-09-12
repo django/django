@@ -84,24 +84,22 @@ class AdminEmailHandler(logging.Handler):
                 record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
-            request_repr = filter.get_request_repr(request)
+            request_repr = '\n{0}'.format(filter.get_request_repr(request))
         except Exception:
             subject = '%s: %s' % (
                 record.levelname,
                 record.getMessage()
             )
             request = None
-            request_repr = "Request repr() unavailable."
+            request_repr = "unavailable"
         subject = self.format_subject(subject)
 
         if record.exc_info:
             exc_info = record.exc_info
-            stack_trace = '\n'.join(traceback.format_exception(*record.exc_info))
         else:
             exc_info = (None, record.getMessage(), None)
-            stack_trace = 'No stack trace available'
 
-        message = "%s\n\n%s" % (stack_trace, request_repr)
+        message = "%s\n\nRequest repr(): %s" % (self.format(record), request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = reporter.get_traceback_html() if self.include_html else None
         mail.mail_admins(subject, message, fail_silently=True,
