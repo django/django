@@ -42,7 +42,8 @@ class InspectDBTestCase(TestCase):
             out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
             self.assertEqual(definition, out_def)
 
-        assertFieldType('id', "models.IntegerField(primary_key=True)")
+        if not connection.features.can_introspect_autofield:
+            assertFieldType('id', "models.IntegerField(primary_key=True) # AutoField?")
         assertFieldType('big_int_field', "models.BigIntegerField()")
         if connection.vendor == 'mysql':
             # No native boolean type on MySQL
