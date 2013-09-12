@@ -6,6 +6,7 @@ from django.test.utils import str_prefix
 
 from .models import Tag, Celebrity, Fan, Staff, StaffTag
 
+@skipUnlessDBFeature('can_distinct_on_fields')
 class DistinctOnTests(TestCase):
     def setUp(self):
         t1 = Tag.objects.create(name='t1')
@@ -29,7 +30,6 @@ class DistinctOnTests(TestCase):
         self.fan2 = Fan.objects.create(fan_of=celeb1)
         self.fan3 = Fan.objects.create(fan_of=celeb2)
 
-    @skipUnlessDBFeature('can_distinct_on_fields')
     def test_basic_distinct_on(self):
         """QuerySet.distinct('field', ...) works"""
         # (qset, expected) tuples
@@ -101,7 +101,6 @@ class DistinctOnTests(TestCase):
         c2 = c1.distinct('pk')
         self.assertNotIn('OUTER JOIN', str(c2.query))
 
-    @skipUnlessDBFeature('can_distinct_on_fields')
     def test_distinct_not_implemented_checks(self):
         # distinct + annotate not allowed
         with self.assertRaises(NotImplementedError):
