@@ -50,17 +50,18 @@
 {% block content %}
   <div id="content-main">
     {% block object-tools %}
-      {% if has_add_permission %}
-        <ul class="object-tools">
-          {% block object-tools-items %}
+      <ul class="object-tools">
+            <li style="display:none"></li>
+        {% block object-tools-items %}
+          {% if has_add_permission %}
             <li>
               <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
                 {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
               </a>
             </li>
-          {% endblock %}
-        </ul>
-      {% endif %}
+          {% endif %}
+        {% endblock %}
+      </ul>
     {% endblock %}
     {% if cl.formset.errors %}
         <p class="errornote">
