@@ -32,12 +32,12 @@
 
 {% for site_views in views_by_site %}
 <div class="module">
-<h2 id="site{{ site_views.grouper.id }}">{% blocktrans with site_views.grouper.name as name %}Views by URL on {{ name }}{% endblocktrans %}</h2>
+<h2 id="site{{ site_views.grouper.id }}">{% blocktrans with name=site_views.grouper.name %}Views by URL on {{ name }}{% endblocktrans %}</h2>
 
 {% for view in site_views.list|dictsort:"url" %}
 {% ifchanged %}
 <h3><a href="{% url 'django-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
-<p class="small quiet">{% blocktrans with view.full_name as name %}View function: {{ name }}{% endblocktrans %}</p>
+<p class="small quiet">{% blocktrans with name=view.full_name %}View function: {{ name }}{% endblocktrans %}</p>
 <p>{{ view.title }}</p>
 <hr />
 {% endifchanged %}

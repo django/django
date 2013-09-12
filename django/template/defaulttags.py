@@ -1408,12 +1408,10 @@ def do_with(parser, token):
             ...
         {% endwith %}
 
-    The legacy format of ``{% with person.some_sql_method as total %}`` is
-    still accepted.
     """
     bits = token.split_contents()
     remaining_bits = bits[1:]
-    extra_context = token_kwargs(remaining_bits, parser, support_legacy=True)
+    extra_context = token_kwargs(remaining_bits, parser)
     if not extra_context:
         raise TemplateSyntaxError("%r expected at least one variable "
                                   "assignment" % bits[0])

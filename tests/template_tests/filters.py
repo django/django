@@ -327,7 +327,7 @@ def get_filter_tests():
         'length_is03': ('{% if mystring|length_is:"4" %}Four{% endif %}', {'mystring': 'word'}, 'Four'),
         'length_is04': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': 'Python'}, 'Not Four'),
         'length_is05': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': ''}, 'Not Four'),
-        'length_is06': ('{% with var|length as my_length %}{{ my_length }}{% endwith %}', {'var': 'django'}, '6'),
+        'length_is06': ('{% with my_length=var|length %}{{ my_length }}{% endwith %}', {'var': 'django'}, '6'),
         # Boolean return value from length_is should not be coerced to a string
         'length_is07': (r'{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}', {}, 'Length not 0'),
         'length_is08': (r'{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}', {}, 'Length is 1'),

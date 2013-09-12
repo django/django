@@ -933,7 +933,7 @@ class MiscTests(TransRealMixin, TestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_in_translatable_block(self):
         t_sing = Template("{% load i18n %}{% blocktrans %}The result was {{ percent }}%{% endblocktrans %}")
-        t_plur = Template("{% load i18n %}{% blocktrans count num as number %}{{ percent }}% represents {{ num }} object{% plural %}{{ percent }}% represents {{ num }} objects{% endblocktrans %}")
+        t_plur = Template("{% load i18n %}{% blocktrans count number=num %}{{ percent }}% represents {{ num }} object{% plural %}{{ percent }}% represents {{ num }} objects{% endblocktrans %}")
         with translation.override('de'):
             self.assertEqual(t_sing.render(Context({'percent': 42})), 'Das Ergebnis war 42%')
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '42% stellt 1 Objekt dar')
@@ -946,7 +946,7 @@ class MiscTests(TransRealMixin, TestCase):
         singular or plural
         """
         t_sing = Template("{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}")
-        t_plur = Template("{% load i18n %}{% blocktrans count num as number %}%(percent)s% represents {{ num }} object{% plural %}%(percent)s% represents {{ num }} objects{% endblocktrans %}")
+        t_plur = Template("{% load i18n %}{% blocktrans count number=num %}%(percent)s% represents {{ num }} object{% plural %}%(percent)s% represents {{ num }} objects{% endblocktrans %}")
         with translation.override('de'):
             # Strings won't get translated as they don't match after escaping %
             self.assertEqual(t_sing.render(Context({'num_comments': 42})), 'There are %(num_comments)s comments')

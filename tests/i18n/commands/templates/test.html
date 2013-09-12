@@ -7,7 +7,7 @@ string's meaning unveiled
 
 {# Translators: Django template comment for translators #}
 <p>{% blocktrans %}I think that 100% is more that 50% of anything.{% endblocktrans %}</p>
-{% blocktrans with 'txt' as obj %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
+{% blocktrans with obj='txt' %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
 
 {% comment %}Some random comment
 Some random comment

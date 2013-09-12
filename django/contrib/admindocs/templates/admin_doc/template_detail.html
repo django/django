@@ -17,7 +17,7 @@
 
 {% regroup templates|dictsort:"site_id" by site as templates_by_site %}
 {% for group in templates_by_site %}
-    <h2>{% blocktrans with group.grouper as grouper %}Search path for template "{{ name }}" on {{ grouper }}:{% endblocktrans %}</h2>
+    <h2>{% blocktrans with grouper=group.grouper %}Search path for template "{{ name }}" on {{ grouper }}:{% endblocktrans %}</h2>
     <ol>
     {% for template in group.list|dictsort:"order" %}
         <li><code>{{ template.file }}</code>{% if not template.exists %} <em>{% trans '(does not exist)' %}</em>{% endif %}</li>
