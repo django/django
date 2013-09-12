@@ -9,6 +9,11 @@ from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
 
 site = admin.AdminSite(name="admin")
 
+
+def make_orphan(modeladmin, request, queryset):
+    queryse.update(parent=None)
+
+
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
@@ -17,9 +22,13 @@ class CustomPaginator(Paginator):
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ['event_date_func']
+    actions = [make_orphan]
 
     def event_date_func(self, event):
         return event.date
+
+    def has_add_permission(self, request):
+        return False
 
 site.register(Event, EventAdmin)
 

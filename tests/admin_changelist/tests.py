@@ -344,6 +344,18 @@ class ChangeListTests(TestCase):
         self.assertContains(response, formats.localize(event.date))
         self.assertNotContains(response, six.text_type(event.date))
 
+    def test_custom_actions_list_display(self):
+        """
+        Regression test for #19536: disabling add action still show other
+        actions
+        """
+        User.objects.create_superuser(
+            username='super', email='super@localhost', password='secret')
+        self.client.login(username='super', password='secret')
+        event = Event.objects.create(date=datetime.date.today())
+        response = self.client.get('/admin/admin_changelist/event/')
+        self.assertContains(response, 'orphan')
+
     def test_dynamic_list_display(self):
         """
         Regression tests for #14206: dynamic list_display support.
