@@ -435,6 +435,21 @@ but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
+Time zone-aware ``day``, ``month``, and ``week_day`` lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 introduces time zone support for :lookup:`day`, :lookup:`month`,
+and :lookup:`week_day` lookups when :setting:`USE_TZ` is ``True``. These
+lookups were previously performed in UTC regardless of the current time zone.
+
+This requires :ref:`time zone definitions in the database
+<database-time-zone-definitions>`. If you're using SQLite, you must install
+pytz_. If you're using MySQL, you must install pytz_ and load the time zone
+tables with `mysql_tzinfo_to_sql`_.
+
+.. _pytz: http://pytz.sourceforge.net/
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
