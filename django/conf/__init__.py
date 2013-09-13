@@ -109,8 +109,9 @@ class BaseSettings(object):
                 "to a tuple, not a string.")
         elif name == "INSTALLED_APPS":
             value = list(value)  # force evaluation of generators on Python 3
-            if len(value) != len(set(value)):
-                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
+            apps = [s.split('.')[-1] for s in value]
+            if len(value) != len(set(apps)):
+                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique app names.")
 
         object.__setattr__(self, name, value)
 
