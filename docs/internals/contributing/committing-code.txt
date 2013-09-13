@@ -34,6 +34,8 @@ Decisions on new committers will follow the process explained in
 existing committer privately. Public requests for commit access are potential
 flame-war starters, and will simply be ignored.
 
+.. _handling-pull-requests:
+
 Handling pull requests
 ----------------------
 
