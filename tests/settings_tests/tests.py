@@ -241,7 +241,7 @@ class UniqueSettingsTests(TestCase):
     def test_unique(self):
         """
         An ImproperlyConfigured exception is raised if the INSTALLED_APPS contains
-        any duplicate appication name.
+        any duplicate appication names.
         """
         with self.assertRaises(ImproperlyConfigured):
             self.settings_module.INSTALLED_APPS = ("myApp1", "myApp1", "myApp2", "myApp3")
