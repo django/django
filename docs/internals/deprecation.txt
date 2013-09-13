@@ -22,6 +22,9 @@ about each item can often be found in the release notes of two versions prior.
 
 * ``SimpleTestCase.urls`` will be removed.
 
+* Using an incorrect count of unpacked values in the ``for`` template tag
+  will raise an exception rather than fail silently.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

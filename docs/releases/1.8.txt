@@ -270,3 +270,9 @@ removed in Django 2.0. Use :func:`@override_settings(ROOT_URLCONF=...)
 Related to the previous item, the ``prefix`` argument to
 :func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
 list of :func:`django.conf.urls.url` instances instead.
+
+Using an incorrect count of unpacked values in the :ttag:`for` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
+exception rather than fail silently in Django 2.0.

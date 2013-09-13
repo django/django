@@ -17,6 +17,7 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
@@ -158,7 +159,8 @@ class ForNode(Node):
             nodelist = []
             if self.is_reversed:
                 values = reversed(values)
-            unpack = len(self.loopvars) > 1
+            num_loopvars = len(self.loopvars)
+            unpack = num_loopvars > 1
             # Create a forloop value in the context.  We'll update counters on each
             # iteration just below.
             loop_dict = context['forloop'] = {'parentloop': parentloop}
@@ -177,6 +179,21 @@ class ForNode(Node):
                 if unpack:
                     # If there are multiple loop variables, unpack the item into
                     # them.
+
+                    # To complete this deprecation, remove from here to the
+                    # try/except block as well as the try/except itself,
+                    # leaving `unpacked_vars = ...` and the "else" statements.
+                    if not isinstance(item, (list, tuple)):
+                        len_item = 1
+                    else:
+                        len_item = len(item)
+                    # Check loop variable count before unpacking
+                    if num_loopvars != len_item:
+                        warnings.warn(
+                            "Need {0} values to unpack in for loop; got {1}. "
+                            "This will raise an exception in Django 2.0."
+                            .format(num_loopvars, len_item),
+                            RemovedInDjango20Warning)
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
