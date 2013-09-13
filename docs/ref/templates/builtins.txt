@@ -2164,7 +2164,7 @@ If ``value`` is ``"http://www.example.org/"``, the output will be
 urlize
 ^^^^^^
 
-Converts URLs in text into clickable links.
+Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
 ``www.``. For example, ``http://goo.gl/aia1t`` will get converted but
@@ -2193,6 +2193,11 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
 ``"Check out <a href="http://www.djangoproject.com"
 rel="nofollow">www.djangoproject.com</a>"``.
 
+In addition to web links, ``urlize`` also converts email addresses into
+``mailto:`` links. If ``value`` is
+``"Send questions to foo@example.com"``, the output will be
+``"Send questions to <a href="mailto:foo@example.com">foo@example</a>"``.
+
 The ``urlize`` filter also takes an optional parameter ``autoescape``. If
 ``autoescape`` is ``True``, the link text and URLs will be escaped using
 Django's built-in :tfilter:`escape` filter. The default value for
@@ -2208,7 +2213,7 @@ Django's built-in :tfilter:`escape` filter. The default value for
 urlizetrunc
 ^^^^^^^^^^^
 
-Converts URLs into clickable links just like urlize_, but truncates URLs
+Converts URLs and email addresses into clickable links just like urlize_, but truncates URLs
 longer than the given character limit.
 
 **Argument:** Number of characters that link text should be truncated to,
