@@ -80,10 +80,10 @@ class QuerySet(object):
         if model is None:
             # if model is None, then self should be emptyqs and the related
             # objects do not matter.
-            self._known_related_objects = {}
+            obj_dict['_known_related_objects'] = {}
         else:
             opts = model._meta
-            self._known_related_objects = dict(
+            obj_dict['_known_related_objects'] = dict(
                 (opts.get_field(field.name if hasattr(field, 'name') else field), val)
                 for field, val in obj_dict['_known_related_objects'].items()
             )

@@ -73,3 +73,15 @@ class PickleabilityTestCase(TestCase):
         empty = pickle.loads(dumped)
         self.assertQuerysetEqual(
             empty, [])
+
+    def test_pickle_prefetch_related_idempotence(self):
+        p = Post.objects.create()
+        posts = Post.objects.prefetch_related('materials')
+
+        # First pickling
+        posts = pickle.loads(pickle.dumps(posts))
+        self.assertQuerysetEqual(posts, [p], lambda x: x)
+
+        # Second pickling
+        posts = pickle.loads(pickle.dumps(posts))
+        self.assertQuerysetEqual(posts, [p], lambda x: x)
