@@ -102,7 +102,7 @@ Installing some prerequisites
 The current state of Python packaging is a bit muddled with various tools. For
 this tutorial, we're going to use distribute_ to build our package. It's a
 community-maintained fork of the older ``setuptools`` project. We'll also be
-using `pip`_ to uninstall it after we're finished. You should install these
+using `pip`_ to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
 Django with pip<installing-official-release>`. You can install ``distribute``
 the same way.
@@ -263,28 +263,18 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    tools that run as that user, so ``virtualenv`` is a more robust solution
    (see below).
 
-1. Inside ``django-polls/dist``, untar the new package
-   ``django-polls-0.1.tar.gz`` (e.g. ``tar xzvf django-polls-0.1.tar.gz``). If
-   you're using Windows, you can download the command-line tool bsdtar_ to do
-   this, or you can use a GUI-based tool such as 7-zip_.
+1. To install the package, use pip (you already :ref:`installed it
+   <installing-reusable-apps-prerequisites>`, right?)::
 
-2. Change into the directory created in step 1 (e.g. ``cd django-polls-0.1``).
+    pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
-3. If you're using GNU/Linux, Mac OS X or some other flavor of Unix, enter the
-   command ``python setup.py install --user`` at the shell prompt.  If you're
-   using Windows, start up a command shell and run the command
-   ``setup.py install --user``.
-
-   With luck, your Django project should now work correctly again. Run the
+2. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
-4. To uninstall the package, use pip (you already :ref:`installed it
-   <installing-reusable-apps-prerequisites>`, right?)::
+3. To uninstall the package, use pip::
 
     pip uninstall django-polls
 
-.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
-.. _7-zip: http://www.7-zip.org/
 .. _pip: http://pypi.python.org/pypi/pip
 
 Publishing your app
