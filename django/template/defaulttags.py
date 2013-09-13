@@ -176,6 +176,16 @@ class ForNode(Node):
                 if unpack:
                     # If there are multiple loop variables, unpack the item into
                     # them.
+
+                    # Check loop variable count before unpacking
+                    if len(self.loopvars) > len(item):
+                        warnings.warn(
+                            "Need more than {0} values to unpack".format(len(item)),
+                            DeprecationWarning)
+                    else:
+                        warnings.warn(
+                            "Too many values to unpack",
+                            DeprecationWarning)
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
