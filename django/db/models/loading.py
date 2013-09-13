@@ -293,14 +293,6 @@ class BaseAppCache(object):
                             if m._meta.app_label in self.available_apps]
         return model_list
 
-    def get_models_from_apps(self, apps, **kwargs):
-        if apps is None:
-            return self.get_models(**kwargs)
-        else:
-            return [model
-                for model in self.get_models(**kwargs)
-                if model._meta.app_label in apps]
-
     def get_model(self, app_label, model_name,
                   seed_cache=True, only_installed=True):
         """
@@ -384,7 +376,6 @@ get_app_path = cache.get_app_path
 get_app_paths = cache.get_app_paths
 get_app = cache.get_app
 get_models = cache.get_models
-get_models_from_apps = cache.get_models
 get_model = cache.get_model
 register_models = cache.register_models
 load_app = cache.load_app
