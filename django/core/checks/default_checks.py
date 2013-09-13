@@ -4,14 +4,12 @@ from __future__ import unicode_literals
 from . import Warning, register
 
 
-# All these checks are registered in __init__.py file.
-
 @register('models')
 def check_all_models(apps=None, **kwargs):
     from django.db import models
 
     errors = []
-    for cls in models.get_models_from_apps(apps, include_swapped=True):
+    for cls in _get_models_from_apps(apps, include_swapped=True):
         errors.extend(cls.check())
     return errors
 
@@ -58,7 +56,7 @@ def _check_boolean_field_default_value(apps=None, **kwargs):
     from django.db import models
 
     invalid_fields = [field
-        for cls in models.get_models_from_apps(apps)
+        for cls in _get_models_from_apps(apps)
         for field in cls._meta.local_fields
         if isinstance(field, models.BooleanField) and not field.has_default()]
 
@@ -74,3 +72,17 @@ def _check_boolean_field_default_value(apps=None, **kwargs):
             id='W048',
         )
         for field in invalid_fields]
+
+
+def _get_models_from_apps(apps, **kwargs):
+    """ Return all models from a given set of apps. If apps is None, return all
+    installed models. """
+
+    from django.db import models
+
+    if apps is None:
+        return models.get_models(**kwargs)
+    else:
+        return [model
+                for model in models.get_models(**kwargs)
+                if model._meta.app_label in apps]
