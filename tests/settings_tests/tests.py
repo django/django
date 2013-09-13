@@ -241,10 +241,13 @@ class UniqueSettingsTests(TestCase):
     def test_unique(self):
         """
         An ImproperlyConfigured exception is raised if the INSTALLED_APPS contains
-        any duplicate strings.
+        any duplicate appication names.
         """
         with self.assertRaises(ImproperlyConfigured):
             self.settings_module.INSTALLED_APPS = ("myApp1", "myApp1", "myApp2", "myApp3")
+
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.INSTALLED_APPS = ("package1.myApp1", "package2.myApp1")
 
 
 class TrailingSlashURLTests(TestCase):
