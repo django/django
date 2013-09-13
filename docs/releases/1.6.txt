@@ -1061,12 +1061,12 @@ security problem described in the section above, because they can automatically
 create a ``ModelForm`` that uses all fields for a model.
 
 For this reason, if you use these views for editing models, you must also supply
-the ``fields`` attribute, which is a list of model fields and works in the same
-way as the :class:`~django.forms.ModelForm` ``Meta.fields`` attribute. Alternatively,
-you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
-defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
-subclass to be used with a model but without an explicit list of fields is
-deprecated.
+the ``fields`` attribute (new in Django 1.6), which is a list of model fields
+and works in the same way as the :class:`~django.forms.ModelForm`
+``Meta.fields`` attribute. Alternatively, you can set set the ``form_class``
+attribute to a ``ModelForm`` that explicitly defines the fields to be used.
+Defining an ``UpdateView`` or ``CreateView`` subclass to be used with a model
+but without an explicit list of fields is deprecated.
 
 .. _m2m-help_text-deprecation:
 
