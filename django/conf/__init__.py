@@ -110,7 +110,7 @@ class BaseSettings(object):
         elif name == "INSTALLED_APPS":
             value = list(value)  # force evaluation of generators on Python 3
             apps = map(lambda s: s.split('.')[-1], value)
-            if len(value) != len(set(value)) or len(value) != len(set(apps)):
+            if len(value) != len(set(apps)):
                 raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique application names.")
 
         object.__setattr__(self, name, value)
