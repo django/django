@@ -9,7 +9,7 @@ from django.core import checks
 from django.core.checks import Error
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registration import CheckFramework
-from django.core.checks.default_checks import check_1_6_compatibility
+from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command
 from django.db.models.fields import NOT_PROVIDED
@@ -83,8 +83,7 @@ class MessageTests(TestCase):
         e = CheckMessage(40, "Error", hint=None)
         self.assertTrue(e.is_error())
 
-
-class Compatibility_1_6_Checks(TestCase):
+class Django_1_6_0_CompatibilityChecks(TestCase):
 
     @override_settings(TEST_RUNNER='django.test.runner.DiscoverRunner')
     def test_test_runner_new_default(self):

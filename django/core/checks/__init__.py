@@ -6,3 +6,4 @@ from .messages import (CheckMessage,
         DEBUG, INFO, WARNING, ERROR, CRITICAL)
 from .registration import register, run_checks, tag_exists
 import django.core.checks.default_checks
+import django.core.checks.compatibility.django_1_6_0
