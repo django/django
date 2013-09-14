@@ -79,9 +79,6 @@ class MessageTests(TestCase):
         expected = "check_framework.SimpleModel.manager: Error"
         self.assertEqual(force_text(e), expected)
 
-    def test_is_error(self):
-        e = CheckMessage(40, "Error", hint=None)
-        self.assertTrue(e.is_error())
 
 class Django_1_6_0_CompatibilityChecks(TestCase):
 
