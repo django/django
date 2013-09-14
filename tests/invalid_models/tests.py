@@ -23,6 +23,17 @@ class IsolatedModelsTestCase(TestCase):
     tearDown = setUp
 
 
+# Content:
+#
+# 1) ordinary field tests -- i.e. tests of BooleanField
+# 2) relative field tests -- mainly clash tests
+# 3) tests of backend-specific field checks
+# 4) model tests -- i.e. tests of index_together
+
+###############################################################################
+# 1) ORDINARY FIELD TESTS
+###############################################################################
+
 class AutoFieldTests(IsolatedModelsTestCase):
 
     def test_valid_case(self):
@@ -51,6 +62,25 @@ class AutoFieldTests(IsolatedModelsTestCase):
                 hint=None,
                 obj=field,
                 id='E048',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+
+class BooleanFieldTests(IsolatedModelsTestCase):
+
+    def test_nullable_boolean_field(self):
+        class Model(models.Model):
+            field = models.BooleanField(null=True)
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                'BooleanFields do not acceps null values.',
+                hint='Use a NullBooleanField instead.',
+                obj=field,
+                id='E037',
             ),
         ]
         self.assertEqual(errors, expected)
@@ -286,6 +316,105 @@ class DecimalFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
+class FileFieldTests(IsolatedModelsTestCase):
+
+    def test_valid_case(self):
+        class Model(models.Model):
+            field = models.FileField(upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = []
+        self.assertEqual(errors, expected)
+
+    def test_missing_upload_to(self):
+        class Model(models.Model):
+            field = models.FileField()
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                'The field requires an "upload_to" attribute.',
+                hint=None,
+                obj=field,
+                id='E031',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique(self):
+        class Model(models.Model):
+            field = models.FileField(unique=False, upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                '"unique" is not a valid argument for FileField.',
+                hint=None,
+                obj=field,
+                id='E049',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_primary_key(self):
+        class Model(models.Model):
+            field = models.FileField(primary_key=False, upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                '"primary_key" is not a valid argument for FileField.',
+                hint=None,
+                obj=field,
+                id='E050',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+
+class FilePathFieldTests(IsolatedModelsTestCase):
+
+    def test_forbidden_files_and_folders(self):
+        class Model(models.Model):
+            field = models.FilePathField(allow_files=False, allow_folders=False)
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                'The field must have either "allow_files" or "allow_folders" set to True.',
+                hint=None,
+                obj=field,
+                id='E045',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+
+class GenericIPAddressFieldTests(IsolatedModelsTestCase):
+
+    def test_non_nullable_blank(self):
+        class Model(models.Model):
+            field = models.GenericIPAddressField(null=False, blank=True)
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                'The field cannot accept blank values if null values '
+                    'are not allowed, as blank values are stored as null.',
+                hint=None,
+                obj=field,
+                id='E046',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+
 class ImageFieldTests(IsolatedModelsTestCase):
 
     def test_pillow_installed(self):
@@ -312,6 +441,10 @@ class ImageFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+
+###############################################################################
+# 2) RELATIVE FIELD TESTS
+###############################################################################
 
 class RelativeFieldTests(IsolatedModelsTestCase):
 
@@ -678,7 +811,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-
     def test_on_delete_set_null_on_non_nullable_field(self):
         class Person(models.Model):
             pass
@@ -804,183 +936,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             expected_error.obj = field
             errors = field.check(from_model=Model)
             self.assertEqual(errors, [expected_error])
-
-
-class FileFieldTests(IsolatedModelsTestCase):
-
-    def test_valid_case(self):
-        class Model(models.Model):
-            field = models.FileField(upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = []
-        self.assertEqual(errors, expected)
-
-    def test_missing_upload_to(self):
-        class Model(models.Model):
-            field = models.FileField()
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                'The field requires an "upload_to" attribute.',
-                hint=None,
-                obj=field,
-                id='E031',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-    def test_unique(self):
-        class Model(models.Model):
-            field = models.FileField(unique=False, upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                '"unique" is not a valid argument for FileField.',
-                hint=None,
-                obj=field,
-                id='E049',
-            )
-        ]
-        self.assertEqual(errors, expected)
-
-    def test_primary_key(self):
-        class Model(models.Model):
-            field = models.FileField(primary_key=False, upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                '"primary_key" is not a valid argument for FileField.',
-                hint=None,
-                obj=field,
-                id='E050',
-            )
-        ]
-        self.assertEqual(errors, expected)
-
-
-class BooleanFieldTests(IsolatedModelsTestCase):
-
-    def test_nullable_boolean_field(self):
-        class Model(models.Model):
-            field = models.BooleanField(null=True)
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                'BooleanFields do not acceps null values.',
-                hint='Use a NullBooleanField instead.',
-                obj=field,
-                id='E037',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-
-class GenericIPAddressFieldTests(IsolatedModelsTestCase):
-
-    def test_non_nullable_blank(self):
-        class Model(models.Model):
-            field = models.GenericIPAddressField(null=False, blank=True)
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                'The field cannot accept blank values if null values '
-                    'are not allowed, as blank values are stored as null.',
-                hint=None,
-                obj=field,
-                id='E046',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-
-class FilePathFieldTests(IsolatedModelsTestCase):
-
-    def test_forbidden_files_and_folders(self):
-        class Model(models.Model):
-            field = models.FilePathField(allow_files=False, allow_folders=False)
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                'The field must have either "allow_files" or "allow_folders" set to True.',
-                hint=None,
-                obj=field,
-                id='E045',
-            ),
-        ]
-        self.assertEqual(errors, expected)
-
-
-class BackendSpecificChecksTests(IsolatedModelsTestCase):
-
-    def test_check_field(self):
-        """ Test if backend specific checks are performed. """
-
-        error = Error('an error', hint=None)
-
-        def mock(self, field, **kwargs):
-            return [error]
-
-        class Model(models.Model):
-            field = models.IntegerField()
-
-        field = Model._meta.get_field('field')
-
-        # Mock connection.validation.check_field method.
-        v = connection.validation
-        old_check_field = v.check_field
-        v.check_field = MethodType(mock, v)
-        try:
-            errors = field.check()
-        finally:
-            # Unmock connection.validation.check_field method.
-            v.check_field = old_check_field
-
-        self.assertEqual(errors, [error])
-
-    def test_validate_field(self):
-        """ Errors raised by deprecated `validate_field` method should be
-        collected. """
-
-        def mock(self, errors, opts, field):
-            errors.add(opts, "An error!")
-
-        class Model(models.Model):
-            field = models.IntegerField()
-
-        field = Model._meta.get_field('field')
-        expected = [
-            Error(
-                "An error!",
-                hint=None,
-                obj=field,
-            )
-        ]
-
-        # Mock connection.validation.validate_field method.
-        v = connection.validation
-        old_validate_field = v.validate_field
-        v.validate_field = MethodType(mock, v)
-        try:
-            errors = field.check()
-        finally:
-            # Unmock connection.validation.validate_field method.
-            v.validate_field = old_validate_field
-
-        self.assertEqual(errors, expected)
 
 
 class AccessorClashTests(IsolatedModelsTestCase):
@@ -1517,6 +1472,73 @@ class ComplexClashTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+
+###############################################################################
+# 3) TESTS OF BACKEND-SPECIFIC FIELD CHECKS
+###############################################################################
+
+class BackendSpecificChecksTests(IsolatedModelsTestCase):
+
+    def test_check_field(self):
+        """ Test if backend specific checks are performed. """
+
+        error = Error('an error', hint=None)
+
+        def mock(self, field, **kwargs):
+            return [error]
+
+        class Model(models.Model):
+            field = models.IntegerField()
+
+        field = Model._meta.get_field('field')
+
+        # Mock connection.validation.check_field method.
+        v = connection.validation
+        old_check_field = v.check_field
+        v.check_field = MethodType(mock, v)
+        try:
+            errors = field.check()
+        finally:
+            # Unmock connection.validation.check_field method.
+            v.check_field = old_check_field
+
+        self.assertEqual(errors, [error])
+
+    def test_validate_field(self):
+        """ Errors raised by deprecated `validate_field` method should be
+        collected. """
+
+        def mock(self, errors, opts, field):
+            errors.add(opts, "An error!")
+
+        class Model(models.Model):
+            field = models.IntegerField()
+
+        field = Model._meta.get_field('field')
+        expected = [
+            Error(
+                "An error!",
+                hint=None,
+                obj=field,
+            )
+        ]
+
+        # Mock connection.validation.validate_field method.
+        v = connection.validation
+        old_validate_field = v.validate_field
+        v.validate_field = MethodType(mock, v)
+        try:
+            errors = field.check()
+        finally:
+            # Unmock connection.validation.validate_field method.
+            v.validate_field = old_validate_field
+
+        self.assertEqual(errors, expected)
+
+
+###############################################################################
+# 4) MODEL TESTS
+###############################################################################
 
 class IndexTogetherTests(IsolatedModelsTestCase):
 
