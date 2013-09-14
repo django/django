@@ -23,11 +23,15 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
             raise SkipTest('Selenium tests not requested')
         try:
             webdriver_class = import_by_path(cls.webdriver_class)
-        except Exception as e:
-            raise SkipTest('Selenium webdriver "%s" not installed or not '
-                           'operational: %s' % (cls.webdriver_class, str(e)))
+        except ImportError as e:
+            raise SkipTest('Selenium webdriver "%s" not installed: %s'
+                            % (cls.webdriver_class, str(e)))
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
-        cls.selenium = webdriver_class()
+        try:
+            cls.selenium = webdriver_class()
+        except Exception as e:
+            raise SkipTest('Selenium webdriver "%s" not operational: %s'
+                           % (cls.webdriver_class, str(e)))
 
     @classmethod
     def tearDownClass(cls):
