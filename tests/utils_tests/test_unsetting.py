@@ -66,3 +66,35 @@ class UnsettingTests(unittest.TestCase):
             self.assertEqual(foo(some_setting="devotion to the pope"),
                              ("devotion to the pope", other_setting)
                              )
+
+    @unittest.expectedFailure
+    def test_stacked_unsettings(self):
+        """Stacking doesn't work for certain edge cases, like
+           when the outer-declared argument is set to the 
+           fallback_trigger_value and that's why we have the dict api
+        """
+        some_setting = "seduced by the french"
+        other_setting = "totally orthogonal"
+
+        settings = {'SOME_SETTING': some_setting,
+                    'OTHER_SETTING': other_setting}
+
+        with override_settings(**settings):
+            @uses_settings({'OTHER_SETTING': ['other_setting', None],
+                            'SOME_SETTING': 'some_setting'})
+            def willwork(some_setting, other_setting):
+                return some_setting, other_setting
+
+            self.assertEqual(willwork(some_setting="devotion to the pope", other_setting=None),
+                             ("devotion to the pope", other_setting)
+                             )
+
+            @uses_settings('OTHER_SETTING', 'other_setting', None)
+            @uses_settings('SOME_SETTING', 'some_setting')
+            def willfail(some_setting, other_setting):
+                return some_setting, other_setting
+
+            self.assertEqual(willfail(some_setting="devotion to the pope", other_setting=None),
+                             ("devotion to the pope", other_setting)
+                             )
+
