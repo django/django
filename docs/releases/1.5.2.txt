@@ -57,6 +57,6 @@ Bugfixes
 * Ensured that the WSGI request's path is correctly based on the
   ``SCRIPT_NAME`` environment variable or the :setting:`FORCE_SCRIPT_NAME`
   setting, regardless of whether or not either has a trailing slash (#20169).
-* Fixed an obscure bug with the :func:`~django.test.utils.override_settings`
+* Fixed an obscure bug with the :func:`~django.test.override_settings`
   decorator. If you hit an ``AttributeError: 'Settings' object has no attribute
   '_original_allowed_hosts'`` exception, it's probably fixed (#20636).

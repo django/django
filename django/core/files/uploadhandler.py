@@ -104,7 +104,7 @@ class FileUploadHandler(object):
         Receive data from the streamed upload parser. ``start`` is the position
         in the file of the chunk.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of FileUploadHandler must provide a recieve_data_chunk() method')
 
     def file_complete(self, file_size):
         """
@@ -113,7 +113,7 @@ class FileUploadHandler(object):
 
         Subclasses should return a valid ``UploadedFile`` object.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of FileUploadHandler must provide a file_complete() method')
 
     def upload_complete(self):
         """

@@ -849,6 +849,7 @@ class MiscTests(TransRealMixin, TestCase):
         self.assertEqual([], p('de;q=0.a'))
         self.assertEqual([], p('12-345'))
         self.assertEqual([], p(''))
+        self.assertEqual([], p('en; q=1,'))
 
     def test_parse_literal_http_header(self):
         """

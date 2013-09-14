@@ -23,11 +23,18 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    if [v for v in attrs.values() if v is True or v is False]:
-        warnings.warn(
-            'The meaning of boolean values for widget attributes will change in Django 1.8',
-            DeprecationWarning
-        )
+    for attr_name, value in attrs.items():
+        if type(value) is bool:
+            warnings.warn(
+                "In Django 1.8, widget attribute %(attr_name)s=%(bool_value)s "
+                "will %(action)s. To preserve current behavior, use the "
+                "string '%(bool_value)s' instead of the boolean value." % {
+                    'attr_name': attr_name,
+                    'action': "be rendered as '%s'" % attr_name if value else "not be rendered",
+                    'bool_value': value,
+                },
+                DeprecationWarning
+            )
     return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
 
 @python_2_unicode_compatible

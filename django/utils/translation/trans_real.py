@@ -668,7 +668,10 @@ def parse_accept_lang_header(lang_string):
         if first:
             return []
         if priority:
-            priority = float(priority)
+            try:
+                priority = float(priority)
+            except ValueError:
+                return []
         if not priority:        # if priority is 0.0 at this point make it 1.0
             priority = 1.0
         result.append((lang, priority))

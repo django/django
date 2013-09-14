@@ -185,7 +185,8 @@ class BaseForm(object):
                     'label': force_text(label),
                     'field': six.text_type(bf),
                     'help_text': help_text,
-                    'html_class_attr': html_class_attr
+                    'html_class_attr': html_class_attr,
+                    'field_name': bf.html_name,
                 })
 
         if top_errors:

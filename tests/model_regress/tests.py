@@ -8,7 +8,7 @@ import unittest
 from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
-from django.utils import tzinfo
+from django.utils.timezone import get_fixed_timezone
 from django.db import connection, router
 from django.db.models.sql import InsertQuery
 
@@ -189,8 +189,8 @@ class ModelTests(TestCase):
         # Regression test for #10443.
         # The idea is that all these creations and saving should work without
         # crashing. It's not rocket science.
-        dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=tzinfo.FixedOffset(600))
-        dt2 = datetime.datetime(2008, 8, 31, 17, 20, tzinfo=tzinfo.FixedOffset(600))
+        dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=get_fixed_timezone(600))
+        dt2 = datetime.datetime(2008, 8, 31, 17, 20, tzinfo=get_fixed_timezone(600))
         obj = Article.objects.create(
             headline="A headline", pub_date=dt1, article_text="foo"
         )

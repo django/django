@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import copy
 import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1793,6 +1794,26 @@ class FormsTestCase(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
 
+    def test_multivalue_deep_copy(self):
+        """
+        #19298 -- MultiValueField needs to override the default as it needs
+        to deep-copy subfields:
+        """
+        class ChoicesField(MultiValueField):
+            def __init__(self, fields=(), *args, **kwargs):
+                fields = (ChoiceField(label='Rank',
+                           choices=((1,1),(2,2))),
+                          CharField(label='Name', max_length=10))
+                super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
+
+
+        field = ChoicesField()
+        field2 = copy.deepcopy(field)
+        self.assertTrue(isinstance(field2, ChoicesField))
+        self.assertFalse(id(field2.fields) == id(field.fields))
+        self.assertFalse(id(field2.fields[0].choices) ==
+                         id(field.fields[0].choices))
+
     def test_multivalue_optional_subfields(self):
         class PhoneField(MultiValueField):
             def __init__(self, *args, **kwargs):
@@ -1950,3 +1971,14 @@ class FormsTestCase(TestCase):
         boundfield = SomeForm(label_suffix='!')['field']
 
         self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')
+
+    def test_field_name(self):
+        """#5749 - `field_name` may be used as a key in _html_output()."""
+        class SomeForm(Form):
+            some_field = CharField()
+
+            def as_p(self):
+                return self._html_output('<p id="p_%(field_name)s"></p>', '%s', '</p>', ' %s', True)
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')

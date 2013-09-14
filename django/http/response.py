@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import time
+import sys
 from email.header import Header
 try:
     from urllib.parse import urlparse
@@ -160,7 +161,7 @@ class HttpResponseBase(six.Iterator):
         except UnicodeError as e:
             if mime_encode:
                 # Wrapping in str() is a workaround for #12422 under Python 2.
-                value = str(Header(value, 'utf-8').encode())
+                value = str(Header(value, 'utf-8', maxlinelen=sys.maxsize).encode())
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise

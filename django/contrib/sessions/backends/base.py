@@ -284,7 +284,7 @@ class SessionBase(object):
         """
         Returns True if the given session_key already exists.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SessionBase must provide an exists() method')
 
     def create(self):
         """
@@ -292,7 +292,7 @@ class SessionBase(object):
         a unique key and will have saved the result once (with empty data)
         before the method returns.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SessionBase must provide a create() method')
 
     def save(self, must_create=False):
         """
@@ -300,20 +300,20 @@ class SessionBase(object):
         is created (otherwise a CreateError exception is raised). Otherwise,
         save() can update an existing object with the same key.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SessionBase must provide a save() method')
 
     def delete(self, session_key=None):
         """
         Deletes the session data under this key. If the key is None, the
         current session key value is used.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SessionBase must provide a delete() method')
 
     def load(self):
         """
         Loads the session data and returns a dictionary.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of SessionBase must provide a load() method')
 
     @classmethod
     def clear_expired(cls):
@@ -324,4 +324,4 @@ class SessionBase(object):
         NotImplementedError. If it isn't necessary, because the backend has
         a built-in expiration mechanism, it should be a no-op.
         """
-        raise NotImplementedError
+        raise NotImplementedError('This backend does not support clear_expired().')

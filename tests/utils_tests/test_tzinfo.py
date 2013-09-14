@@ -4,10 +4,16 @@ import os
 import pickle
 import time
 import unittest
+import warnings
 
-from django.utils.tzinfo import FixedOffset, LocalTimezone
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 
-class TzinfoTests(unittest.TestCase):
+# Swallow the import-time warning to test the deprecated implementation.
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+    from django.utils.tzinfo import FixedOffset, LocalTimezone
+
+class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

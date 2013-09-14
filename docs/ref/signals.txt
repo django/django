@@ -565,7 +565,7 @@ setting_changed
 
 This signal is sent when the value of a setting is changed through the
 ``django.test.TestCase.settings()`` context manager or the
-:func:`django.test.utils.override_settings` decorator/context manager.
+:func:`django.test.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
 original value is restored ("teardown"). Use the ``enter`` argument to

@@ -405,6 +405,10 @@ class ClientTest(TestCase):
 
         # TODO: Log in with right permissions and request the page again
 
+    def test_external_redirect(self):
+        response = self.client.get('/test_client/django_project_redirect/')
+        self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially

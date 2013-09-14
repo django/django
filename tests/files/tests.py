@@ -132,7 +132,6 @@ class FileStorageTests(TestCase):
             self.assertEqual(f.read(), b'content')
 
 
-
 class FileTests(unittest.TestCase):
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()

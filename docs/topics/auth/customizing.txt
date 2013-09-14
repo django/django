@@ -869,8 +869,7 @@ would test three possible User models -- the default, plus the two User
 models provided by ``auth`` app::
 
     from django.contrib.auth.tests.utils import skipIfCustomUser
-    from django.test import TestCase
-    from django.test.utils import override_settings
+    from django.test import TestCase, override_settings
 
 
     class ApplicationTestCase(TestCase):

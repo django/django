@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from unittest import TestCase
 
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
-    Template, TemplateSyntaxError)
+    Template, TemplateSyntaxError, Library)
 from django.test.utils import override_settings
 from django.utils import six
 
@@ -94,3 +94,42 @@ class ParserTests(TestCase):
         with six.assertRaisesRegex(self, TemplateSyntaxError, msg) as cm:
             Template("{% if 1 %}{{ foo@bar }}{% endif %}")
         self.assertEqual(cm.exception.django_template_source[1], (10, 23))
+
+    def test_filter_args_count(self):
+        p = Parser("")
+        l = Library()
+        @l.filter
+        def no_arguments(value):
+            pass
+        @l.filter
+        def one_argument(value, arg):
+            pass
+        @l.filter
+        def one_opt_argument(value, arg=False):
+            pass
+        @l.filter
+        def two_arguments(value, arg, arg2):
+            pass
+        @l.filter
+        def two_one_opt_arg(value, arg, arg2=False):
+            pass
+        p.add_library(l)
+        for expr in (
+                '1|no_arguments:"1"',
+                '1|two_arguments',
+                '1|two_arguments:"1"',
+                '1|two_one_opt_arg',
+            ):
+            with self.assertRaises(TemplateSyntaxError):
+                FilterExpression(expr, p)
+        for expr in (
+                # Correct number of arguments
+                '1|no_arguments',
+                '1|one_argument:"1"',
+                # One optional
+                '1|one_opt_argument',
+                '1|one_opt_argument:"1"',
+                # Not supplying all
+                '1|two_one_opt_arg:"1"',
+            ):
+            FilterExpression(expr, p)

@@ -257,3 +257,6 @@ def mass_mail_sending_view(request):
     c.send_messages([m1,m2])
 
     return HttpResponse("Mail sent")
+
+def django_project_redirect(request):
+    return HttpResponseRedirect('https://www.djangoproject.com/')

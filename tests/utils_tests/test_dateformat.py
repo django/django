@@ -1,42 +1,28 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, date
-import os
 import time
-import unittest
 
+from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.dateformat import format
 from django.utils import dateformat
+from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
 from django.utils import translation
-from django.utils.timezone import utc
-from django.utils.tzinfo import FixedOffset, LocalTimezone
 
 
-class DateFormatTests(unittest.TestCase):
+@override_settings(TIME_ZONE='Europe/Copenhagen')
+class DateFormatTests(TestCase):
+
+    # Run tests that require a time zone only when the OS supports it.
+    tz_tests = hasattr(time, 'tzset')
+
     def setUp(self):
-        self.old_TZ = os.environ.get('TZ')
-        os.environ['TZ'] = 'Europe/Copenhagen'
         self._orig_lang = translation.get_language()
         translation.activate('en-us')
 
-        try:
-            # Check if a timezone has been set
-            time.tzset()
-            self.tz_tests = True
-        except AttributeError:
-            # No timezone available. Don't run the tests that require a TZ
-            self.tz_tests = False
-
     def tearDown(self):
         translation.activate(self._orig_lang)
-        if self.old_TZ is None:
-            del os.environ['TZ']
-        else:
-            os.environ['TZ'] = self.old_TZ
-
-        # Cleanup - force re-evaluation of TZ environment variable.
-        if self.tz_tests:
-            time.tzset()
 
     def test_date(self):
         d = date(2009, 5, 16)
@@ -47,17 +33,18 @@ class DateFormatTests(unittest.TestCase):
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt)
 
     def test_datetime_with_local_tzinfo(self):
-        ltz = LocalTimezone(datetime.now())
-        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=ltz)
+        ltz = get_default_timezone()
+        dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.replace(tzinfo=None))
 
     def test_datetime_with_tzinfo(self):
-        tz = FixedOffset(-510)
-        ltz = LocalTimezone(datetime.now())
-        dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
+        tz = get_fixed_timezone(-510)
+        ltz = get_default_timezone()
+        dt = make_aware(datetime(2009, 5, 16, 5, 30, 30), ltz)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz), dt)
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz), dt)
+        # astimezone() is safe here because the target timezone doesn't have DST
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U'))), dt.astimezone(ltz).replace(tzinfo=None))
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), tz).utctimetuple(), dt.utctimetuple())
         self.assertEqual(datetime.fromtimestamp(int(format(dt, 'U')), ltz).utctimetuple(), dt.utctimetuple())
@@ -128,7 +115,7 @@ class DateFormatTests(unittest.TestCase):
         timestamp = datetime(2008, 5, 19, 11, 45, 23, 123456)
 
         # 3h30m to the west of UTC
-        tz = FixedOffset(-3*60 - 30)
+        tz = get_fixed_timezone(-210)
         aware_dt = datetime(2009, 5, 16, 5, 30, 30, tzinfo=tz)
 
         if self.tz_tests:

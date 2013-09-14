@@ -319,7 +319,7 @@ Before we try to fix anything, let's have a look at the tools at our disposal.
 The Django test client
 ----------------------
 
-Django provides a test :class:`~django.test.client.Client` to simulate a user
+Django provides a test :class:`~django.test.Client` to simulate a user
 interacting with the code at the view level.  We can use it in ``tests.py``
 or even in the shell.
 
@@ -341,7 +341,7 @@ Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
 this won't be required)::
 
-    >>> from django.test.client import Client
+    >>> from django.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
@@ -494,7 +494,7 @@ class::
             """
             The questions index page may display multiple questions.
             """
-            create_question(question_text="Past quesiton 1.", days=-30)
+            create_question(question_text="Past question 1.", days=-30)
             create_question(question_text="Past question 2.", days=-5)
             response = self.client.get(reverse('polls:index'))
             self.assertQuerysetEqual(

@@ -6,7 +6,7 @@ from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils import six
@@ -232,13 +232,24 @@ class AdminSite(object):
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
-            url(r'^(?P<app_label>\w+)/$', wrap(self.app_index), name='app_list'),
         )
 
-        # Add in each model's views.
+        # Add in each model's views, and create a list of valid URLS for the
+        # app_index
+        valid_app_labels = []
         for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
+            )
+            if model._meta.app_label not in valid_app_labels:
+                valid_app_labels.append(model._meta.app_label)
+
+        # If there were ModelAdmins registered, we should have a list of app
+        # labels for which we need to allow access to the app_index view,
+        if valid_app_labels:
+            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+            urlpatterns += patterns('',
+                url(regex, wrap(self.app_index), name='app_list'),
             )
         return urlpatterns
 
@@ -399,44 +410,45 @@ class AdminSite(object):
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
+        if not has_module_perms:
+            raise PermissionDenied
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
-                if has_module_perms:
-                    perms = model_admin.get_model_perms(request)
+                perms = model_admin.get_model_perms(request)
 
-                    # Check whether user has any perm for this module.
-                    # If so, add the module to the model_list.
-                    if True in perms.values():
-                        info = (app_label, model._meta.model_name)
-                        model_dict = {
-                            'name': capfirst(model._meta.verbose_name_plural),
-                            'object_name': model._meta.object_name,
-                            'perms': perms,
+                # Check whether user has any perm for this module.
+                # If so, add the module to the model_list.
+                if True in perms.values():
+                    info = (app_label, model._meta.model_name)
+                    model_dict = {
+                        'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
+                        'perms': perms,
+                    }
+                    if perms.get('change'):
+                        try:
+                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if perms.get('add'):
+                        try:
+                            model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if app_dict:
+                        app_dict['models'].append(model_dict),
+                    else:
+                        # First time around, now that we know there's
+                        # something to display, add in the necessary meta
+                        # information.
+                        app_dict = {
+                            'name': app_label.title(),
+                            'app_label': app_label,
+                            'app_url': '',
+                            'has_module_perms': has_module_perms,
+                            'models': [model_dict],
                         }
-                        if perms.get('change', False):
-                            try:
-                                model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if perms.get('add', False):
-                            try:
-                                model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if app_dict:
-                            app_dict['models'].append(model_dict),
-                        else:
-                            # First time around, now that we know there's
-                            # something to display, add in the necessary meta
-                            # information.
-                            app_dict = {
-                                'name': app_label.title(),
-                                'app_label': app_label,
-                                'app_url': '',
-                                'has_module_perms': has_module_perms,
-                                'models': [model_dict],
-                            }
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.

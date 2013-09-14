@@ -334,6 +334,12 @@ You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
+.. warning::
+
+    Ordering is not a free operation. Each field you add to the ordering
+    incurs a cost to your database. Each foreign key you add will
+    implicitly include all of its default orderings as well.
+
 reverse
 ~~~~~~~
 
@@ -2268,7 +2274,8 @@ SQL equivalent::
 (The exact SQL syntax varies for each database engine.)
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: day
 
@@ -2291,7 +2298,8 @@ Note this will match any record with a pub_date on the third day of the month,
 such as January 3, July 3, etc.
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: week_day
 
@@ -2315,7 +2323,8 @@ Note this will match any record with a ``pub_date`` that falls on a Monday (day
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: hour
 

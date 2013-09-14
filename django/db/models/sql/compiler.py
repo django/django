@@ -391,7 +391,7 @@ class SQLCompiler(object):
                     if not distinct or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
                         group_by.append((elt, []))
-            elif get_order_dir(field)[0] not in self.query.extra:
+            elif not self.query._extra or get_order_dir(field)[0] not in self.query._extra:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 for table, cols, order in self.find_ordering_name(field,
@@ -987,7 +987,7 @@ class SQLUpdateCompiler(SQLCompiler):
         # We need to use a sub-select in the where clause to filter on things
         # from other tables.
         query = self.query.clone(klass=Query)
-        query.extra = {}
+        query._extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
         # Recheck the count - it is possible that fiddling with the select

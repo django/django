@@ -47,7 +47,7 @@ but a few of the key features are:
 * A new ``makemigrations`` command provides an easy way to autodetect changes
   to your models and make migrations for them.
 
-* :data:`~django.db.models.signals.post_syncdb` and
+* :data:`~django.db.models.signals.pre_syncdb` and
   :data:`~django.db.models.signals.post_syncdb` have been renamed to
   :data:`~django.db.models.signals.pre_migrate` and
   :data:`~django.db.models.signals.post_migrate` respectively. The
@@ -285,6 +285,19 @@ Templates
 * ``TypeError`` exceptions are not longer silenced when raised during the
   rendering of a template.
 
+Tests
+^^^^^
+
+* :class:`~django.test.runner.DiscoverRunner` has two new attributes,
+  :attr:`~django.test.runner.DiscoverRunner.test_suite` and
+  :attr:`~django.test.runner.DiscoverRunner.test_runner`, which facilitate
+  overriding the way tests are collected and run.
+
+* The ``fetch_redirect_response`` argument was added to
+  :meth:`~django.test.SimpleTestCase.assertRedirects`. Since the test
+  client can't fetch externals URLs, this allows you to use ``assertRedirects``
+  with redirects that aren't part of your Django app.
+
 Backwards incompatible changes in 1.7
 =====================================
 
@@ -307,6 +320,16 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+pytz may be required
+~~~~~~~~~~~~~~~~~~~~
+
+If your project handles datetimes before 1970 or after 2037 and Django raises
+a :exc:`~exceptions.ValueError` when encountering them, you will have to
+install pytz_. You may be affected by this problem if you use Django's time
+zone-related date formats or :mod:`django.contrib.syndication`.
+
+.. _pytz: https://pypi.python.org/pypi/pytz/
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -345,13 +368,18 @@ Miscellaneous
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
-* The :meth:`django.db.backends.sqlite3.DatabaseCreation.sql_create_model`
-  will now create :class:`~django.db.models.AutoField` columns in SQLite
-  databases using the ``AUTOINCREMENT`` option, which guarantees monotonic
+* :class:`~django.db.models.AutoField` columns in SQLite databases will now be
+  created using the ``AUTOINCREMENT`` option, which guarantees monotonic
   increments. This will cause primary key numbering behavior to change on
-  SQLite, becoming consistent with most other SQL databases. If you have a
-  database created with an older version of Django, you will need to migrate
-  it to take advantage of this feature. See ticket #10164 for details.
+  SQLite, becoming consistent with most other SQL databases. This will only
+  apply to newly created tables. If you have a database created with an older
+  version of Django, you will need to migrate it to take advantage of this
+  feature. For example, you could do the following:
+
+  #) Use :djadmin:`dumpdata` to save your data.
+  #) Rename the existing database file (keep it as a backup).
+  #) Run :djadmin:`migrate` to create the updated schema.
+  #) Use :djadmin:`loaddata` to import the fixtures you exported in (1).
 
 * ``django.contrib.auth.models.AbstractUser`` no longer defines a
   :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
@@ -383,6 +411,15 @@ Features deprecated in 1.7
 ``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
 respectively :mod:`logging.config` and :mod:`importlib` provided for Python
 versions prior to 2.7. They have been deprecated.
+
+``django.utils.tzinfo``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.tzinfo`` provided two :class:`~datetime.tzinfo` subclasses,
+``LocalTimezone`` and ``FixedOffset``. They've been deprecated in favor of
+more correct alternatives provided by :mod:`django.utils.timezone`,
+:func:`django.utils.timezone.get_default_timezone` and
+:func:`django.utils.timezone.get_fixed_timezone`.
 
 ``django.utils.unittest``
 ~~~~~~~~~~~~~~~~~~~~~~~~~

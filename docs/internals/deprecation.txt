@@ -117,9 +117,9 @@ these changes.
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
   handler should be used instead.
 
-* The ``template`` attribute on :class:`~django.test.client.Response`
+* The ``template`` attribute on :class:`~django.test.Response`
   objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.client.Response.templates` attribute should be
+  The :attr:`~django.test.Response.templates` attribute should be
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
@@ -416,6 +416,8 @@ these changes.
 * ``django.utils.dictconfig`` will be removed.
 
 * ``django.utils.importlib`` will be removed.
+
+* ``django.utils.tzinfo`` will be removed.
 
 * ``django.utils.unittest`` will be removed.
 

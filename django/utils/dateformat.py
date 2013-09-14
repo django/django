@@ -18,11 +18,10 @@ import calendar
 import datetime
 
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
-from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.utils import six
-from django.utils.timezone import is_aware, is_naive
+from django.utils.timezone import get_default_timezone, is_aware, is_naive
 
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
@@ -48,7 +47,7 @@ class TimeFormat(Formatter):
         # or time objects (against established django policy).
         if isinstance(obj, datetime.datetime):
             if is_naive(obj):
-                self.timezone = LocalTimezone(obj)
+                self.timezone = get_default_timezone()
             else:
                 self.timezone = obj.tzinfo
 
@@ -66,7 +65,7 @@ class TimeFormat(Formatter):
 
     def B(self):
         "Swatch Internet time"
-        raise NotImplementedError
+        raise NotImplementedError('may be implemented in a future release')
 
     def e(self):
         """

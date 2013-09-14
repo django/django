@@ -435,6 +435,21 @@ but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
 
+Time zone-aware ``day``, ``month``, and ``week_day`` lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.6 introduces time zone support for :lookup:`day`, :lookup:`month`,
+and :lookup:`week_day` lookups when :setting:`USE_TZ` is ``True``. These
+lookups were previously performed in UTC regardless of the current time zone.
+
+This requires :ref:`time zone definitions in the database
+<database-time-zone-definitions>`. If you're using SQLite, you must install
+pytz_. If you're using MySQL, you must install pytz_ and load the time zone
+tables with `mysql_tzinfo_to_sql`_.
+
+.. _pytz: http://pytz.sourceforge.net/
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -814,7 +829,7 @@ Miscellaneous
   ``{% url %}`` tag, it causes template rendering to fail like always when
   ``NoReverseMatch`` is raised.
 
-* :meth:`django.test.client.Client.logout` now calls
+* :meth:`django.test.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the
   :func:`~django.contrib.auth.signals.user_logged_out` signal.
 
@@ -1046,12 +1061,12 @@ security problem described in the section above, because they can automatically
 create a ``ModelForm`` that uses all fields for a model.
 
 For this reason, if you use these views for editing models, you must also supply
-the ``fields`` attribute, which is a list of model fields and works in the same
-way as the :class:`~django.forms.ModelForm` ``Meta.fields`` attribute. Alternatively,
-you can set set the ``form_class`` attribute to a ``ModelForm`` that explicitly
-defines the fields to be used. Defining an ``UpdateView`` or ``CreateView``
-subclass to be used with a model but without an explicit list of fields is
-deprecated.
+the ``fields`` attribute (new in Django 1.6), which is a list of model fields
+and works in the same way as the :class:`~django.forms.ModelForm`
+``Meta.fields`` attribute. Alternatively, you can set set the ``form_class``
+attribute to a ``ModelForm`` that explicitly defines the fields to be used.
+Defining an ``UpdateView`` or ``CreateView`` subclass to be used with a model
+but without an explicit list of fields is deprecated.
 
 .. _m2m-help_text-deprecation:
 

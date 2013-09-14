@@ -190,7 +190,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         The 'value' given is not guaranteed to be valid input, so subclass
         implementations should program defensively.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Widget must provide a render() method')
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         "Helper function for building an attribute dictionary."

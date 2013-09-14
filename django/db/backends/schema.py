@@ -148,7 +148,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         Only used for backends which have requires_literal_defaults feature
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseSchemaEditor for backends which have requires_literal_defaults must provide a prepare_default() method')
 
     def effective_default(self, field):
         """
