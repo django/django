@@ -1,7 +1,6 @@
 import re
+
 from .base import Operation
-from django.db import models, router
-from django.db.migrations.state import ModelState
 
 
 class SeparateDatabaseAndState(Operation):
