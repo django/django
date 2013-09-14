@@ -5,6 +5,7 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 from __future__ import unicode_literals
 
+import datetime
 import decimal
 import re
 import platform
@@ -50,13 +51,16 @@ try:
 except ImportError:
     pytz = None
 
+from django.conf import settings
 from django.db import utils
-from django.db.backends import *
+from django.db.backends import BaseDatabaseFeatures, BaseDatabaseOperations, BaseDatabaseWrapper, BaseDatabaseValidation, util
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
+from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
+from django.utils.functional import cached_property
 
 
 DatabaseError = Database.DatabaseError
