@@ -908,8 +908,8 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            '"prepopulated_fields" refers to "users", which must be neither '
-                'a DateTimeField, ForeignKey nor ManyToManyField.',
+            '"prepopulated_fields" refers to "users", which must not be '
+                'a DateTimeField, ForeignKey or ManyToManyField.',
             'admin.E027')
 
     def test_valid_case(self):
