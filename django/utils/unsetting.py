@@ -36,7 +36,9 @@ class SettingDetails():
 
 def uses_settings(setting_name_or_dict, kw_arg=None, fallback_trigger_value=_OVERWRITE_SENTINEL):
     """
-    Decorator for functions
+    Utility decorator to assist in incrementally removing settings dependencies
+    from functions and methods in django core (and, if useful, django apps)
+
     :param setting_name_or_dict: setting attribute, e.g. 'USE_TZ'.  
                   Alternatively, you can send in a dict like {'USE_TZ': ['use_tz', None]}
                   where the None value is an optionally set fallback_trigger_value per setting key
@@ -44,6 +46,56 @@ def uses_settings(setting_name_or_dict, kw_arg=None, fallback_trigger_value=_OVE
     :param fallback_trigger_value: In some cases, explicitly setting the parameter
                   should still use the settings attribute, especially when
                   there was an existing required parameter
+
+    The typical use case is a an old function/method looks like:
+        def foobar(a, b, c=None):
+            if getattr(settings, 'FOO_ENABLE_C', False):
+                do_something(c)
+            ...
+    This decorator makes it easy to remove the need for a django settings import.
+    You would modify this function above to something like:
+        @uses_settings('FOO_ENABLE_C', 'enable_c')
+        def foobar(a, b, c=None, enable_c=False):
+            if enable_c:
+                do_something(c)
+            ...
+    which will allow you to import foobar's module without settings needing
+    to be run just to enable whatever 'c' does.
+    The change above might be considered a 'lazy' api change -- just adding an 
+    argument and moving on.  However, since foobar() already has a 'c' parameter
+    maybe c=None is pretty much the same as FOO_ENABLE_C=False.  In that case,
+    we would change the code to something like:
+        @uses_settings('FOO_ENABLE_C', 'c', fallback_trigger_value=None)
+        def foobar(a, b, c=None):
+            if c is not None:
+                do_something(c)
+            ...
+    This is a slightly cleaner api going forward.
+    The last setting for fallback_trigger_value, handles a sublte case.
+    With the @uses_setting decorator, calling foobar(1, 2) will
+    result in c being set to getattr(settings, 'FOO_ENABLE', None)
+    because c is not set explicitly as an argument.  If we had not
+    included the fallback_trigger_value, then foobar(1, 2, c=None)
+    would *keep* c=None, because c is set explicitly.
+
+    However, with some of django's APIs, setting, e.g. c=None is meant
+    to signal that the function should use the setting.  This is what
+    fallback_trigger_value is for.  If the argument is set explicitly to
+    a certain value, then that should *also* trigger using settings
+
+    Some functions/methods have more than one setting and you want to
+    map mutliple settings to arguments.  In that case, stacking will
+    not work for obscure and frustrating python decorator context issues
+    WRONG:
+        @uses_settings('FOO', 'foo')
+        @uses_settings('BAR', 'bar', False)
+        def abc(foo=None, bar=False):
+            ...
+    Instead, you can send @uses_settings a dictionary like so:
+    RIGHT:
+        @uses_settings({'FOO': 'foo',
+                        'BAR': ['bar', False]})
+        def abc(foo=None, bar=False):
     """
     def _dec(func):
         if _NEVER_USE_SETTINGS:
