@@ -556,7 +556,7 @@ class BaseModelAdminChecks(object):
                 checks.Error(
                     '"ordering" has the random ordering marker "?", '
                         'but contains other fields as well.',
-                    hint=None,
+                    hint='Either remove the "?", or remove the other fields.',
                     obj=cls,
                     id='admin.E031',
                 )

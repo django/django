@@ -552,13 +552,14 @@ class ModelAdminTests(TestCase):
 
 class CheckTestCase(TestCase):
 
-    def assertIsInvalid(self, model_admin, model, msg, id=None, invalid_obj=None):
+    def assertIsInvalid(self, model_admin, model, msg,
+            id=None, hint=None, invalid_obj=None):
         invalid_obj = invalid_obj or model_admin
         errors = model_admin.check(model=model)
         expected = [
             Error(
                 msg,
-                hint=None,
+                hint=hint,
                 obj=invalid_obj,
                 id=id,
             )
@@ -1202,7 +1203,8 @@ class OrderingCheckTests(CheckTestCase):
             ValidationTestModelAdmin, ValidationTestModel,
             '"ordering" has the random ordering marker "?", but contains '
                 'other fields as well.',
-            'admin.E031')
+            'admin.E031',
+            hint='Either remove the "?", or remove the other fields.')
 
     def test_valid_random_marker_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
