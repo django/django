@@ -68,8 +68,6 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-            if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
-                raise ValueError
         except models.FieldDoesNotExist:
             return [
                 checks.Error(
@@ -80,17 +78,18 @@ class BaseModelAdminChecks(object):
                     id='admin.E002',
                 )
             ]
-        except ValueError:
-            return [
-                checks.Error(
-                    '"%s" must be a ForeignKey or ManyToManyField.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E003',
-                )
-            ]
         else:
-            return []
+            if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
+                return [
+                    checks.Error(
+                        '"%s" must be a ForeignKey or ManyToManyField.' % label,
+                        hint=None,
+                        obj=cls,
+                        id='admin.E003',
+                    )
+                ]
+            else:
+                return []
 
     def _check_fields(self, cls, model):
         """ Check that `fields` only refer to existing fields, doesn't contain
@@ -230,26 +229,25 @@ class BaseModelAdminChecks(object):
         else:
             try:
                 field = model._meta.get_field(field_name)
-                if (isinstance(field, models.ManyToManyField) and
-                        not field.rel.through._meta.auto_created):
-                    raise ValueError
             except models.FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
                 return []
-            except ValueError:
-                return [
-                    checks.Error(
-                        '"%s" cannot include the ManyToManyField "%s", '
-                            'because "%s" manually specifies relationship model.'
-                            % (label, field_name, field_name),
-                        hint=None,
-                        obj=cls,
-                        id='admin.E013',
-                    )
-                ]
             else:
-                return []
+                if (isinstance(field, models.ManyToManyField) and
+                        not field.rel.through._meta.auto_created):
+                    return [
+                        checks.Error(
+                            '"%s" cannot include the ManyToManyField "%s", '
+                                'because "%s" manually specifies relationship model.'
+                                % (label, field_name, field_name),
+                            hint=None,
+                            obj=cls,
+                            id='admin.E013',
+                        )
+                    ]
+                else:
+                    return []
 
     def _check_exclude(self, cls, model):
         """ Check that exclude is a sequence without duplicates. """
@@ -338,8 +336,6 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-            if not isinstance(field, models.ManyToManyField):
-                raise ValueError
         except models.FieldDoesNotExist:
             return [
                 checks.Error(
@@ -350,17 +346,18 @@ class BaseModelAdminChecks(object):
                     id='admin.E019',
                 )
             ]
-        except ValueError:
-            return [
-                checks.Error(
-                    '"%s" must be a ManyToManyField.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E020',
-                )
-            ]
         else:
-            return []
+            if not isinstance(field, models.ManyToManyField):
+                return [
+                    checks.Error(
+                        '"%s" must be a ManyToManyField.' % label,
+                        hint=None,
+                        obj=cls,
+                        id='admin.E020',
+                    )
+                ]
+            else:
+                return []
 
     def _check_radio_fields(self, cls, model):
         """ Check that `radio_fields` is a dictionary. """
