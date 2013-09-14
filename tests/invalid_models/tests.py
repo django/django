@@ -808,6 +808,15 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
 class FileFieldTests(IsolatedModelsTestCase):
 
+    def test_valid_case(self):
+        class Model(models.Model):
+            field = models.FileField(upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = []
+        self.assertEqual(errors, expected)
+
     def test_missing_upload_to(self):
         class Model(models.Model):
             field = models.FileField()
@@ -821,6 +830,38 @@ class FileFieldTests(IsolatedModelsTestCase):
                 obj=field,
                 id='E031',
             ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique(self):
+        class Model(models.Model):
+            field = models.FileField(unique=False, upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                '"unique" is not a valid argument for FileField.',
+                hint=None,
+                obj=field,
+                id='E049',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_primary_key(self):
+        class Model(models.Model):
+            field = models.FileField(primary_key=False, upload_to='somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                '"primary_key" is not a valid argument for FileField.',
+                hint=None,
+                obj=field,
+                id='E050',
+            )
         ]
         self.assertEqual(errors, expected)
 
