@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.checks import register
+from django.core import checks
 
 
-@register()
+@checks.register()
 def check_generic_foreign_keys(**kwargs):
     from .generic import GenericForeignKey
     from django.db import models
