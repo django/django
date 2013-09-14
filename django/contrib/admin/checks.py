@@ -478,8 +478,8 @@ class BaseModelAdminChecks(object):
         except ValueError:
             return [
                 checks.Error(
-                    '"%s" refers to "%s", which must be neither a DateTimeField, '
-                        'ForeignKey nor ManyToManyField.'
+                    '"%s" refers to "%s", which must not be a DateTimeField, '
+                        'ForeignKey or ManyToManyField.'
                         % (label, field_name),
                     hint=None,
                     obj=cls,
