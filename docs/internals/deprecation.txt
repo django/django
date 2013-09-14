@@ -410,6 +410,9 @@ these changes.
 * The ``Model._meta.get_(add|change|delete)_permission`` methods will
   be removed.
 
+* Incorrect count of unpacked values of list or tuple variables in ``for`` tag
+  will raise ValueError.
+
 1.9
 ---
 
