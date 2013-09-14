@@ -53,21 +53,6 @@ class CheckMessage(object):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % \
             (self.__class__.__name__, self.level, self.msg, self.hint, self.obj, self.id)
 
-    def is_debug(self):
-        return self.level == DEBUG
-
-    def is_info(self):
-        return self.level == INFO
-
-    def is_warning(self):
-        return self.level == WARNING
-
-    def is_error(self):
-        return self.level == ERROR
-
-    def is_critical(self):
-        return self.level == CRITICAL
-
     def is_serious(self):
         return self.level >= ERROR
 
@@ -76,8 +61,26 @@ class CheckMessage(object):
         return self.id in settings.SILENCED_SYSTEM_CHECKS
 
 
-Debug = partial(CheckMessage, DEBUG)
-Info = partial(CheckMessage, INFO)
-Warning = partial(CheckMessage, WARNING)
-Error = partial(CheckMessage, ERROR)
-Critical = partial(CheckMessage, CRITICAL)
+class Debug(CheckMessage):
+    def __init__(self, *args, **kwargs):
+        return super(Debug, self).__init__(DEBUG, *args, **kwargs)
+
+
+class Info(CheckMessage):
+    def __init__(self, *args, **kwargs):
+        return super(Info, self).__init__(INFO, *args, **kwargs)
+
+
+class Warning(CheckMessage):
+    def __init__(self, *args, **kwargs):
+        return super(Warning, self).__init__(WARNING, *args, **kwargs)
+
+
+class Error(CheckMessage):
+    def __init__(self, *args, **kwargs):
+        return super(Error, self).__init__(ERROR, *args, **kwargs)
+
+
+class Critical(CheckMessage):
+    def __init__(self, *args, **kwargs):
+        return super(Critical, self).__init__(CRITICAL, *args, **kwargs)
