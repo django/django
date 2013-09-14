@@ -15,6 +15,7 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
+from django.utils import six
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -969,7 +970,7 @@ class Queries1Tests(BaseQuerysetTest):
         q = NamedCategory.objects.filter(tag__parent__isnull=True)
         self.assertTrue(str(q.query).count('INNER JOIN') == 1)
         self.assertTrue(str(q.query).count('LEFT OUTER JOIN') == 1)
-        self.assertQuerysetEqual( q, ['<NamedCategory: NamedCategory object>'])
+        self.assertQuerysetEqual(q, ['<NamedCategory: Generic>'])
 
     def test_ticket_10790_4(self):
         # Querying across m2m field should not strip the m2m table from join.
@@ -1278,6 +1279,13 @@ class Queries4Tests(BaseQuerysetTest):
 
         Item.objects.create(name='i1', created=datetime.datetime.now(), note=n1, creator=self.a1)
         Item.objects.create(name='i2', created=datetime.datetime.now(), note=n1, creator=self.a3)
+
+    def test_ticket11811(self):
+        unsaved_category = NamedCategory(name="Other")
+        with six.assertRaisesRegex(self, ValueError,
+                'Unsaved model instance <NamedCategory: Other> '
+                'cannot be used in an ORM query.'):
+            Tag.objects.filter(pk=self.t1.pk).update(category=unsaved_category)
 
     def test_ticket14876(self):
         # Note: when combining the query we need to have information available

@@ -98,6 +98,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name # Quoting once is enough.
         return '"%s"' % name
 
+    def quote_parameter(self, value):
+        # Inner import so backend fails nicely if it's not present
+        import psycopg2
+        return psycopg2.extensions.adapt(value)
+
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 

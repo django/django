@@ -88,11 +88,9 @@ your project's ``manage.py`` utility::
 
     $ ./manage.py test
 
-Test discovery is based on the unittest module's `built-in test discovery`.  By
-default, this will discover tests in any file named "test*.py" under the
-current working directory.
-
-.. _built-in test discovery: http://docs.python.org/2/library/unittest.html#test-discovery
+Test discovery is based on the unittest module's :py:ref:`built-in test
+discovery <unittest-test-discovery>`.  By default, this will discover tests in
+any file named "test*.py" under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
@@ -315,9 +313,6 @@ Django provides a small set of tools that come in handy when writing tests.
 The test client
 ---------------
 
-.. module:: django.test.client
-   :synopsis: Django's test client.
-
 The test client is a Python class that acts as a dummy Web browser, allowing
 you to test your views and interact with your Django-powered application
 programmatically.
@@ -351,10 +346,10 @@ A comprehensive test suite should use a combination of both test types.
 Overview and a quick example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the test client, instantiate ``django.test.client.Client`` and retrieve
+To use the test client, instantiate ``django.test.Client`` and retrieve
 Web pages::
 
-    >>> from django.test.client import Client
+    >>> from django.test import Client
     >>> c = Client()
     >>> response = c.post('/login/', {'username': 'john', 'password': 'smith'})
     >>> response.status_code
@@ -415,7 +410,7 @@ Note a few important things about how the test client works:
 Making requests
 ~~~~~~~~~~~~~~~
 
-Use the ``django.test.client.Client`` class to make requests.
+Use the ``django.test.Client`` class to make requests.
 
 .. class:: Client(enforce_csrf_checks=False, **defaults)
 
@@ -426,8 +421,8 @@ Use the ``django.test.client.Client`` class to make requests.
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
     The values from the ``extra`` keywords arguments passed to
-    :meth:`~django.test.client.Client.get()`,
-    :meth:`~django.test.client.Client.post()`, etc. have precedence over
+    :meth:`~django.test.Client.get()`,
+    :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
@@ -780,7 +775,7 @@ Example
 The following is a simple unit test using the test client::
 
     import unittest
-    from django.test.client import Client
+    from django.test import Client
 
     class SimpleTest(unittest.TestCase):
         def setUp(self):
@@ -799,14 +794,12 @@ The following is a simple unit test using the test client::
 
 .. seealso::
 
-    :class:`django.test.client.RequestFactory`
+    :class:`django.test.RequestFactory`
 
 .. _django-testcase-subclasses:
 
 Provided test case classes
 --------------------------
-
-.. currentmodule:: django.test
 
 Normal Python unit test classes extend a base class of
 :class:`unittest.TestCase`. Django provides a few extensions of this base class:
@@ -849,7 +842,7 @@ functionality like:
     for equality.
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.client.Client`.
+* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
 * Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
 
 .. versionchanged:: 1.6
@@ -1113,7 +1106,7 @@ worry about state (such as cookies) carrying over from one test to another.
 This means, instead of instantiating a ``Client`` in each test::
 
     import unittest
-    from django.test.client import Client
+    from django.test import Client
 
     class SimpleTest(unittest.TestCase):
         def test_details(self):
@@ -1148,8 +1141,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase
-    from django.test.client import Client
+    from django.test import TestCase, Client
 
     class MyTestClient(Client):
         # Specialized methods for your environment...
@@ -1332,17 +1324,14 @@ Django provides a standard Python context manager (see :pep:`343`)
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
-.. currentmodule:: django.test.utils
-
 .. function:: override_settings
 
 In case you want to override a setting for just one test method or even the
 whole :class:`~django.test.TestCase` class, Django provides the
-:func:`~django.test.utils.override_settings` decorator (see :pep:`318`). It's
+:func:`~django.test.override_settings` decorator (see :pep:`318`). It's
 used like this::
 
-    from django.test import TestCase
-    from django.test.utils import override_settings
+    from django.test import TestCase, override_settings
 
     class LoginTestCase(TestCase):
 
@@ -1353,8 +1342,7 @@ used like this::
 
 The decorator can also be applied to test case classes::
 
-    from django.test import TestCase
-    from django.test.utils import override_settings
+    from django.test import TestCase, override_settings
 
     @override_settings(LOGIN_URL='/other/login/')
     class LoginTestCase(TestCase):
@@ -1362,6 +1350,11 @@ The decorator can also be applied to test case classes::
         def test_login(self):
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+.. versionchanged:: 1.7
+
+    Previously, ``override_settings`` was imported from
+    ``django.test.utils``.
 
 .. note::
 
@@ -1428,8 +1421,6 @@ For more detail on email services during tests, see `Email services`_ below.
 
 Assertions
 ~~~~~~~~~~
-
-.. currentmodule:: django.test
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
@@ -1551,7 +1542,7 @@ your test suite.
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
 
-.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
+.. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
     Asserts that the response return a ``status_code`` redirect status, it
     redirected to ``expected_url`` (including any GET data), and the final
@@ -1560,6 +1551,12 @@ your test suite.
     If your request used the ``follow`` argument, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
+
+    .. versionadded:: 1.7
+
+    If ``fetch_redirect_response`` is ``False``, the final page won't be
+    loaded. Since the test client can't fetch externals URLs, this is
+    particularly useful if ``expected_url`` isn't part of your Django app.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 

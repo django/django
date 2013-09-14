@@ -6,7 +6,10 @@ import unittest
 from zipimport import zipimporter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_by_path, module_has_submodule
+from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils import six
+from django.utils.module_loading import autodiscover_modules, import_by_path, module_has_submodule
 from django.utils._os import upath
 
 
@@ -129,6 +132,32 @@ class ModuleImportTestCase(unittest.TestCase):
 
         self.assertIsNotNone(traceback.tb_next.tb_next,
             'Should have more than the calling frame in the traceback.')
+
+@override_settings(INSTALLED_APPS=('utils_tests.test_module',))
+class AutodiscoverModulesTestCase(SimpleTestCase):
+
+    def test_autodiscover_modules_found(self):
+        autodiscover_modules('good_module')
+
+    def test_autodiscover_modules_not_found(self):
+        autodiscover_modules('missing_module')
+
+    def test_autodiscover_modules_found_but_bad_module(self):
+        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+            autodiscover_modules('bad_module')
+
+    def test_autodiscover_modules_several_one_bad_module(self):
+        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+            autodiscover_modules('good_module', 'bad_module')
+
+    def test_autodiscover_modules_several_found(self):
+        autodiscover_modules('good_module', 'another_good_module')
+
+    def test_validate_registry_keeps_intact(self):
+        from .test_module import site
+        with six.assertRaisesRegex(self, Exception, "Some random exception."):
+            autodiscover_modules('another_bad_module', register_to=site)
+        self.assertEqual(site._registry, {})
 
 
 class ProxyFinder(object):

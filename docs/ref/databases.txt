@@ -214,7 +214,10 @@ full-text indexing and searching.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point.
+choice at this point. However, note that the the InnoDB autoincrement counter
+is lost on a MySQL restart because it does not remember the
+``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
+result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
 
 If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
 tables, ensure that your tables are using the same storage engine (i.e. MyISAM
@@ -675,6 +678,14 @@ To run Django's test suite, the user needs these *additional* privileges:
 * DROP TABLESPACE
 * CONNECT WITH ADMIN OPTION
 * RESOURCE WITH ADMIN OPTION
+
+The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
+will require execute permissions on it. It's normally accessible to all users
+by default, but in case it is not, you'll need to grant permissions like so:
+
+.. code-block:: sql
+
+    GRANT EXECUTE ON SYS.DBMS_LOB TO user;
 
 Connecting to the database
 --------------------------

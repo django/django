@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import importlib
 import json
 from datetime import datetime
 import re
@@ -14,9 +15,10 @@ except ImportError:
 
 
 from django.conf import settings
-from django.core import serializers
+from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase, Approximate
+from django.test import TestCase, TransactionTestCase
+from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -438,6 +440,69 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
             "name": "Agnes"
         }
     }]"""
+
+
+YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
+class YamlImportModuleMock(object):
+    """Provides a wrapped import_module function to simulate yaml ImportError
+
+    In order to run tests that verify the behavior of the YAML serializer
+    when run on a system that has yaml installed (like the django CI server),
+    mock import_module, so that it raises an ImportError when the yaml
+    serializer is being imported.  The importlib.import_module() call is
+    being made in the serializers.register_serializer().
+
+    Refs: #12756
+    """
+    def __init__(self):
+        self._import_module = importlib.import_module
+
+    def import_module(self, module_path):
+        if module_path == serializers.BUILTIN_SERIALIZERS['yaml']:
+            raise ImportError(YAML_IMPORT_ERROR_MESSAGE)
+
+        return self._import_module(module_path)
+
+
+class NoYamlSerializerTestCase(TestCase):
+    """Not having pyyaml installed provides a misleading error
+
+    Refs: #12756
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Removes imported yaml and stubs importlib.import_module"""
+        super(NoYamlSerializerTestCase, cls).setUpClass()
+
+        cls._import_module_mock = YamlImportModuleMock()
+        importlib.import_module = cls._import_module_mock.import_module
+
+        # clear out cached serializers to emulate yaml missing
+        serializers._serializers = {}
+
+    @classmethod
+    def tearDownClass(cls):
+        """Puts yaml back if necessary"""
+        super(NoYamlSerializerTestCase, cls).tearDownClass()
+
+        importlib.import_module = cls._import_module_mock._import_module
+
+        # clear out cached serializers to clean out BadSerializer instances
+        serializers._serializers = {}
+
+    def test_serializer_pyyaml_error_message(self):
+        """Using yaml serializer without pyyaml raises ImportError"""
+        jane = Author(name="Jane")
+        self.assertRaises(ImportError, serializers.serialize, "yaml", [jane])
+
+    def test_deserializer_pyyaml_error_message(self):
+        """Using yaml deserializer without pyyaml raises ImportError"""
+        self.assertRaises(ImportError, serializers.deserialize, "yaml", "")
+
+    def test_dumpdata_pyyaml_error_message(self):
+        """Calling dumpdata produces an error when yaml package missing"""
+        with six.assertRaisesRegex(self, management.CommandError, YAML_IMPORT_ERROR_MESSAGE):
+            management.call_command('dumpdata', format='yaml')
 
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")

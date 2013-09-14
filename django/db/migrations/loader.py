@@ -63,6 +63,14 @@ class MigrationLoader(object):
                 if "No module named" in str(e) and "migrations" in str(e):
                     self.unmigrated_apps.add(app_label)
                     continue
+                raise
+            else:
+                # PY3 will happily import empty dirs as namespaces.
+                if not hasattr(module, '__file__'):
+                    continue
+                # Module is not a package (e.g. migrations.py).
+                if not hasattr(module, '__path__'):
+                    continue
             self.migrated_apps.add(app_label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py[c|o] files
@@ -74,9 +82,18 @@ class MigrationLoader(object):
                         migration_names.add(import_name)
             # Load them
             for migration_name in migration_names:
-                migration_module = import_module("%s.%s" % (module_name, migration_name))
+                try:
+                    migration_module = import_module("%s.%s" % (module_name, migration_name))
+                except ImportError as e:
+                    # Ignore South import errors, as we're triggering them
+                    if "south" in str(e).lower():
+                        continue
+                    raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_label))
+                # Ignore South-style migrations
+                if hasattr(migration_module.Migration, "forwards"):
+                    continue
                 self.disk_migrations[app_label, migration_name] = migration_module.Migration(migration_name, app_label)
 
     def get_migration_by_prefix(self, app_label, name_prefix):

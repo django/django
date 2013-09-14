@@ -131,6 +131,11 @@ def raises_template_does_not_exist(request, path='i_dont_exist.html'):
     except TemplateDoesNotExist:
         return technical_500_response(request, *sys.exc_info())
 
+def render_no_template(request):
+    # If we do not specify a template, we need to make sure the debug
+    # view doesn't blow up.
+    return render(request, [], {})
+
 def send_log(request, exc_info):
     logger = getLogger('django.request')
     # The default logging config has a logging filter to ensure admin emails are

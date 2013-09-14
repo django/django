@@ -130,3 +130,11 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class Profile(models.Model):
+    user = models.ForeignKey('auth.User', 'username')
+
+    def __str__(self):
+        return self.user.username

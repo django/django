@@ -92,55 +92,55 @@ class Storage(object):
         """
         Deletes the specified file from the storage system.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a delete() method')
 
     def exists(self, name):
         """
         Returns True if a file referened by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a exists() method')
 
     def listdir(self, path):
         """
         Lists the contents of the specified path, returning a 2-tuple of lists;
         the first item being directories, the second item being files.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a listdir() method')
 
     def size(self, name):
         """
         Returns the total size, in bytes, of the file specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a size() method')
 
     def url(self, name):
         """
         Returns an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a url() method')
 
     def accessed_time(self, name):
         """
         Returns the last accessed time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
 
     def created_time(self, name):
         """
         Returns the creation time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a created_time() method')
 
     def modified_time(self, name):
         """
         Returns the last modified time (as datetime object) of the file
         specified by name.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
 
 class FileSystemStorage(Storage):
     """
@@ -215,6 +215,7 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
+                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()

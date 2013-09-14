@@ -1,3 +1,5 @@
+# encoding: utf8
+from __future__ import unicode_literals
 from optparse import make_option
 from collections import OrderedDict
 from importlib import import_module
@@ -11,7 +13,7 @@ from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.loader import AmbiguityError
+from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.utils.module_loading import module_has_submodule
 
 
@@ -26,6 +28,8 @@ class Command(BaseCommand):
                 'Defaults to the "default" database.'),
         make_option('--fake', action='store_true', dest='fake', default=False,
             help='Mark migrations as run without actually running them'),
+        make_option('--list', '-l', action='store_true', dest='list', default=False,
+            help='Show a list of all known migrations and which are applied'),
     )
 
     help = "Updates database schema. Manages both apps with migrations and those without."
@@ -47,6 +51,10 @@ class Command(BaseCommand):
         # Get the database we're operating from
         db = options.get('database')
         connection = connections[db]
+
+        # If they asked for a migration listing, quit main execution flow and show it
+        if options.get("list", False):
+            return self.show_migration_list(connection, args)
 
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
@@ -243,3 +251,39 @@ class Command(BaseCommand):
             call_command('loaddata', 'initial_data', verbosity=self.verbosity, database=connection.alias, skip_validation=True)
 
         return created_models
+
+    def show_migration_list(self, connection, apps=None):
+        """
+        Shows a list of all migrations on the system, or only those of
+        some named apps.
+        """
+        # Load migrations from disk/DB
+        loader = MigrationLoader(connection)
+        graph = loader.graph
+        # If we were passed a list of apps, validate it
+        if apps:
+            invalid_apps = []
+            for app in apps:
+                if app_label not in loader.migrated_apps:
+                    invalid_apps.append(app)
+            if invalid_apps:
+                raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
+        # Otherwise, show all apps in alphabetic order
+        else:
+            apps = sorted(loader.migrated_apps)
+        # For each app, print its migrations in order from oldest (roots) to
+        # newest (leaves).
+        for app in apps:
+            self.stdout.write(app, self.style.MIGRATE_LABEL)
+            shown = set()
+            for node in graph.leaf_nodes(app):
+                for plan_node in graph.forwards_plan(node):
+                    if plan_node not in shown and plan_node[0] == app:
+                        if plan_node in loader.applied_migrations:
+                            self.stdout.write(" [X] %s" % plan_node[1])
+                        else:
+                            self.stdout.write(" [ ] %s" % plan_node[1])
+                        shown.add(plan_node)
+            # If we didn't print anything, then a small message
+            if not shown:
+                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)

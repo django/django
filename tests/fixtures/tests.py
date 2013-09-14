@@ -24,6 +24,17 @@ class TestCaseFixtureLoadingTests(TestCase):
         ])
 
 
+class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
+    """
+    Make sure that subclasses can remove fixtures from parent class (#21089).
+    """
+    fixtures = []
+
+    def testClassFixtures(self):
+        "Check that there were no fixture objects installed"
+        self.assertEqual(Article.objects.count(), 0)
+
+
 class DumpDataAssertMixin(object):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,

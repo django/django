@@ -643,7 +643,7 @@ The generic relation classes -- ``GenericForeignKey`` and ``GenericRelation``
 Testing
 -------
 
-:meth:`django.test.client.Client.login` has changed
+:meth:`django.test.Client.login` has changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Old (0.96)::

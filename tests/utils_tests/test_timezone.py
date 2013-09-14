@@ -4,12 +4,12 @@ import pickle
 import unittest
 
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils import timezone
-from django.utils.tzinfo import FixedOffset
 
 
-EAT = FixedOffset(180)      # Africa/Nairobi
-ICT = FixedOffset(420)      # Asia/Bangkok
+EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
+ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
 
 class TimezoneTests(unittest.TestCase):
@@ -19,6 +19,16 @@ class TimezoneTests(unittest.TestCase):
         local_tz = timezone.LocalTimezone()
         local_now = timezone.localtime(now, local_tz)
         self.assertEqual(local_now.tzinfo, local_tz)
+
+    def test_localtime_out_of_range(self):
+        local_tz = timezone.LocalTimezone()
+        long_ago = datetime.datetime(1900, 1, 1, tzinfo=timezone.utc)
+        try:
+            timezone.localtime(long_ago, local_tz)
+        except (OverflowError, ValueError) as exc:
+            self.assertIn("install pytz", exc.args[0])
+        else:
+            raise unittest.SkipTest("Failed to trigger an OverflowError or ValueError")
 
     def test_now(self):
         with override_settings(USE_TZ=True):

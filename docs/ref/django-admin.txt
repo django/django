@@ -993,6 +993,24 @@ Prints the CREATE INDEX SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
+sqlmigrate <appname> <migrationname>
+------------------------------------
+
+.. django-admin:: sqlmigrate
+
+Prints the SQL for the named migration. This requires an active database
+connection, which it will use to resolve constraint names; this means you must
+generate the SQL against a copy of the database you wish to later apply it on.
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to generate the SQL.
+
+.. django-admin-option:: --backwards
+
+By default, the SQL created is for running the migration in the forwards
+direction. Pass ``--backwards`` to generate the SQL for
+un-applying the migration instead.
+
 sqlsequencereset <appname appname ...>
 --------------------------------------
 
@@ -1619,6 +1637,15 @@ Examples::
       from django.core import management
       management.call_command('flush', verbosity=0, interactive=False)
       management.call_command('loaddata', 'test_data', verbosity=0)
+
+Note that command options that take no arguments are passed as keywords
+with ``True`` or ``False``::
+
+      management.call_command('dumpdata', use_natural_keys=True)
+
+Command options which take multiple options are passed a list::
+
+      management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
 
 Output redirection
 ==================

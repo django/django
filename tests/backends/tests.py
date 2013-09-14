@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import re
 import threading
 import unittest
 
@@ -106,6 +107,25 @@ class OracleChecks(unittest.TestCase):
         # wasn't the case.
         c.execute(query)
         self.assertEqual(c.fetchone()[0], 1)
+
+
+class SQLiteTests(TestCase):
+    longMessage = True
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                        "Test valid only for SQLite")
+    def test_autoincrement(self):
+        """
+        Check that auto_increment fields are created with the AUTOINCREMENT
+        keyword in order to be monotonically increasing. Refs #10164.
+        """
+        statements = connection.creation.sql_create_model(models.Square,
+            style=no_style())
+        match = re.search('"id" ([^,]+),', statements[0][0])
+        self.assertIsNotNone(match)
+        self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1), "Wrong SQL used to create an auto-increment "
+            "column on SQLite")
 
 
 class MySQLTests(TestCase):
@@ -943,3 +963,23 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class UnicodeArrayTestCase(TestCase):
+
+    def select(self, val):
+        cursor = connection.cursor()
+        cursor.execute("select %s", (val,))
+        return cursor.fetchone()[0]
+
+    def test_select_ascii_array(self):
+        a = ["awef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
+
+    def test_select_unicode_array(self):
+        a = ["ᄲawef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])

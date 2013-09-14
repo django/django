@@ -96,27 +96,27 @@ class BaseCache(object):
 
         Returns True if the value was stored, False otherwise.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide an add() method')
 
     def get(self, key, default=None, version=None):
         """
         Fetch a given key from the cache. If the key does not exist, return
         default, which itself defaults to None.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a get() method')
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a value in the cache. If timeout is given, that timeout will be
         used for the key; otherwise the default cache timeout will be used.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
     def delete(self, key, version=None):
         """
         Delete a key from the cache, failing silently.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a delete() method')
 
     def get_many(self, keys, version=None):
         """
@@ -190,7 +190,7 @@ class BaseCache(object):
 
     def clear(self):
         """Remove *all* values from the cache at once."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCache must provide a clear() method')
 
     def validate_key(self, key):
         """

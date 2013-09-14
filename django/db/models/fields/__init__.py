@@ -114,8 +114,8 @@ class Field(object):
         self.default = default
         self.editable = editable
         self.serialize = serialize
-        self.unique_for_date, self.unique_for_month = (unique_for_date,
-                                                       unique_for_month)
+        self.unique_for_date = unique_for_date
+        self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
         self._choices = choices or []
         self.help_text = help_text
@@ -394,6 +394,9 @@ class Field(object):
             "type": type_string,
             "check": check_string,
         }
+
+    def db_type_suffix(self, connection):
+        return connection.creation.data_types_suffix.get(self.get_internal_type())
 
     @property
     def unique(self):

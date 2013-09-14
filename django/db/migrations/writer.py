@@ -74,6 +74,26 @@ class MigrationWriter(object):
         return os.path.join(basedir, self.filename)
 
     @classmethod
+    def serialize_deconstructed(cls, path, args, kwargs):
+        module, name = path.rsplit(".", 1)
+        if module == "django.db.models":
+            imports = set(["from django.db import models"])
+            name = "models.%s" % name
+        else:
+            imports = set(["import %s" % module])
+            name = path
+        arg_strings = []
+        for arg in args:
+            arg_string, arg_imports = cls.serialize(arg)
+            arg_strings.append(arg_string)
+            imports.update(arg_imports)
+        for kw, arg in kwargs.items():
+            arg_string, arg_imports = cls.serialize(arg)
+            imports.update(arg_imports)
+            arg_strings.append("%s=%s" % (kw, arg_string))
+        return "%s(%s)" % (name, ", ".join(arg_strings)), imports
+
+    @classmethod
     def serialize(cls, value):
         """
         Serializes the value to a string that's parsable by Python, along
@@ -119,23 +139,7 @@ class MigrationWriter(object):
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
-            module, name = path.rsplit(".", 1)
-            if module == "django.db.models":
-                imports = set(["from django.db import models"])
-                name = "models.%s" % name
-            else:
-                imports = set(["import %s" % module])
-                name = path
-            arg_strings = []
-            for arg in args:
-                arg_string, arg_imports = cls.serialize(arg)
-                arg_strings.append(arg_string)
-                imports.update(arg_imports)
-            for kw, arg in kwargs.items():
-                arg_string, arg_imports = cls.serialize(arg)
-                imports.update(arg_imports)
-                arg_strings.append("%s=%s" % (kw, arg_string))
-            return "%s(%s)" % (name, ", ".join(arg_strings)), imports
+            return cls.serialize_deconstructed(path, args, kwargs)
         # Functions
         elif isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
             # Special-cases, as these don't have im_class
@@ -152,10 +156,14 @@ class MigrationWriter(object):
                 klass = value.im_class
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
+            elif hasattr(value, 'deconstruct'):
+                return cls.serialize_deconstructed(*value.deconstruct())
+            elif value.__name__ == '<lambda>':
+                raise ValueError("Cannot serialize function: lambda")
+            elif value.__module__ is None:
+                raise ValueError("Cannot serialize function %r: No module" % value)
             else:
                 module = value.__module__
-                if module is None:
-                    raise ValueError("Cannot serialize function %r: No module" % value)
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Classes
         elif isinstance(value, type):

@@ -112,7 +112,7 @@ import unittest, difflib, pdb, tempfile
 import warnings
 
 from django.utils import six
-from django.utils.six.moves import StringIO, xrange
+from django.utils.six.moves import StringIO
 
 if sys.platform.startswith('java'):
     # On Jython, isclass() reports some modules as classes. Patch it.

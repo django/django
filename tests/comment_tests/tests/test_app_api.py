@@ -21,7 +21,7 @@ class CommentAppAPITests(CommentTestCase):
     )
     def testGetMissingCommentApp(self):
         with six.assertRaisesRegex(self, ImproperlyConfigured, 'missing_app'):
-            _ = comments.get_comment_app()
+            comments.get_comment_app()
 
     def testGetForm(self):
         self.assertEqual(comments.get_form(), CommentForm)

@@ -98,6 +98,9 @@ class SomeClass:
     def method4(self):
         raise SomeOtherException
 
+    def method5(self):
+        raise TypeError
+
     def __getitem__(self, key):
         if key == 'silent_fail_key':
             raise SomeException
@@ -236,6 +239,19 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_loader_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = loader.get_template('login.html')
+            self.assertEqual(template.origin.loadname, 'login.html')
+
+    def test_string_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = Template('string template')
+            self.assertEqual(template.origin.source, 'string template')
+
+    def test_debug_false_origin(self):
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin, None)
 
     def test_include_missing_template(self):
         """
@@ -666,6 +682,9 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+
+            # Don't silence a TypeError if it was raised inside a callable
+            'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
 
             # Don't get confused when parsing something that is almost, but not
             # quite, a template tag.
@@ -1883,3 +1902,34 @@ class RequestContextTests(unittest.TestCase):
         # The stack should now contain 3 items:
         # [builtins, supplied context, context processor]
         self.assertEqual(len(ctx.dicts), 3)
+
+
+class SSITests(TestCase):
+    def setUp(self):
+        self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
+
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return template.Template('{%% ssi "%s" %%}' % path).render(Context())
+
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    def test_relative_include_exploit(self):
+        """
+        May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
+
+        e.g. if ALLOWED_INCLUDE_ROOTS = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            for path in disallowed_paths:
+                self.assertEqual(self.render_ssi(path), '')

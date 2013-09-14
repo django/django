@@ -74,7 +74,7 @@ class MigrationGraph(object):
                 roots.add(node)
         return roots
 
-    def leaf_nodes(self):
+    def leaf_nodes(self, app=None):
         """
         Returns all leaf nodes - that is, nodes with no dependents in their app.
         These are the "most current" version of an app's schema.
@@ -84,7 +84,7 @@ class MigrationGraph(object):
         """
         leaves = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependents.get(node, set())):
+            if not any(key[0] == node[0] for key in self.dependents.get(node, set())) and (not app or app == node[0]):
                 leaves.add(node)
         return leaves
 

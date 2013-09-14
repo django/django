@@ -469,7 +469,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
-        prev = fromstr('POINT (0 0)')
+        fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
             self.assertEqual(mpoly.geom_type, 'MultiPolygon')
@@ -696,7 +696,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Assigning polygon's exterior ring w/the new shell
             poly.exterior_ring = new_shell
-            s = str(new_shell) # new shell is still accessible
+            str(new_shell) # new shell is still accessible
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 
@@ -709,7 +709,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
-                s = str(new) # what was used for the assignment is still accessible
+                str(new) # what was used for the assignment is still accessible
                 self.assertEqual(mp[i], new)
                 self.assertEqual(mp[i].wkt, new.wkt)
                 self.assertNotEqual(pnt, mp[i])
@@ -730,7 +730,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertNotEqual(mpoly[i], poly)
                 # Testing the assignment
                 mpoly[i] = poly
-                s = str(poly) # Still accessible
+                str(poly) # Still accessible
                 self.assertEqual(mpoly[i], poly)
                 self.assertNotEqual(mpoly[i], old_poly)
 

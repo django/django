@@ -1,6 +1,7 @@
 """Default tags used by the template system, available to all templates."""
 from __future__ import unicode_literals
 
+import os
 import sys
 import re
 from datetime import datetime
@@ -54,7 +55,6 @@ class CsrfTokenNode(Node):
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
-            from django.conf import settings
             if settings.DEBUG:
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
@@ -329,6 +329,7 @@ class RegroupNode(Node):
         return ''
 
 def include_is_allowed(filepath):
+    filepath = os.path.abspath(filepath)
     for root in settings.ALLOWED_INCLUDE_ROOTS:
         if filepath.startswith(root):
             return True

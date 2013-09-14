@@ -1,6 +1,5 @@
 import hashlib
 import operator
-import sys
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
@@ -54,14 +53,17 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s;"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    def __init__(self, connection):
+    def __init__(self, connection, collect_sql=False):
         self.connection = connection
+        self.collect_sql = collect_sql
+        if self.collect_sql:
+            self.collected_sql = []
 
     # State-managing methods
 
@@ -74,10 +76,7 @@ class BaseDatabaseSchemaEditor(object):
         if exc_type is None:
             for sql in self.deferred_sql:
                 self.execute(sql)
-            atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(None, None, None)
-        else:
-            # Continue propagating exception
-            return None
+        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
@@ -89,7 +88,10 @@ class BaseDatabaseSchemaEditor(object):
         cursor = self.connection.cursor()
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)" % (sql, params))
-        cursor.execute(sql, params)
+        if self.collect_sql:
+            self.collected_sql.append((sql % list(map(self.connection.ops.quote_parameter, params))) + ";")
+        else:
+            cursor.execute(sql, params)
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
@@ -146,7 +148,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         Only used for backends which have requires_literal_defaults feature
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseDatabaseSchemaEditor for backends which have requires_literal_defaults must provide a prepare_default() method')
 
     def effective_default(self, field):
         """

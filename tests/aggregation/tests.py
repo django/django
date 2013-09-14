@@ -6,7 +6,8 @@ import re
 
 from django.db import connection
 from django.db.models import Avg, Sum, Count, Max, Min
-from django.test import TestCase, Approximate
+from django.test import TestCase
+from django.test.utils import Approximate
 from django.test.utils import CaptureQueriesContext
 
 from .models import Author, Publisher, Book, Store

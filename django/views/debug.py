@@ -233,6 +233,10 @@ class ExceptionReporter(object):
             from django.template.loader import template_source_loaders
             self.template_does_not_exist = True
             self.loader_debug_info = []
+            # If the template_source_loaders haven't been populated yet, you need
+            # to provide an empty list for this for loop to not fail.
+            if template_source_loaders is None:
+                template_source_loaders = []
             for loader in template_source_loaders:
                 try:
                     source_list_func = loader.get_template_sources

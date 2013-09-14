@@ -728,9 +728,8 @@ class FormattingTests(TransRealMixin, TestCase):
         with translation.override('de-at', deactivate=True):
             de_format_mod = import_module('django.conf.locale.de.formats')
             self.assertEqual(list(iter_format_modules('de')), [de_format_mod])
-            with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
-                test_de_format_mod = import_module('i18n.other.locale.de.formats')
-                self.assertEqual(list(iter_format_modules('de')), [test_de_format_mod, de_format_mod])
+            test_de_format_mod = import_module('i18n.other.locale.de.formats')
+            self.assertEqual(list(iter_format_modules('de', 'i18n.other.locale')), [test_de_format_mod, de_format_mod])
 
     def test_iter_format_modules_stability(self):
         """
@@ -850,6 +849,7 @@ class MiscTests(TransRealMixin, TestCase):
         self.assertEqual([], p('de;q=0.a'))
         self.assertEqual([], p('12-345'))
         self.assertEqual([], p(''))
+        self.assertEqual([], p('en; q=1,'))
 
     def test_parse_literal_http_header(self):
         """

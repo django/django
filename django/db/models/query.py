@@ -314,11 +314,9 @@ class QuerySet(object):
 
         query = self.query.clone()
         force_subq = query.low_mark != 0 or query.high_mark is not None
-        aggregate_names = []
         for (alias, aggregate_expr) in kwargs.items():
             query.add_aggregate(aggregate_expr, self.model, alias,
                                 is_summary=True)
-            aggregate_names.append(alias)
         return query.get_aggregation(using=self.db, force_subq=force_subq)
 
     def count(self):

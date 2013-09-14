@@ -111,7 +111,7 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :ref:`F() object query expressions <query-expressions>` to do filtering
+* Use :class:`F expressions <django.db.models.F>` to do filtering
   against other fields within the same model.
 
 * Use :doc:`annotate to do aggregation in the database </topics/db/aggregation>`.
@@ -305,6 +305,17 @@ its primary key. i.e. do::
 instead of::
 
    entry.blog.id
+
+Don't order results if you don't care
+-------------------------------------
+
+Ordering is not free; each field to order by is an operation the database must
+perform. If a model has a default ordering (:attr:`Meta.ordering
+<django.db.models.Options.ordering>`) and you don't need it, remove
+it on a ``QuerySet`` by calling
+:meth:`~django.db.models.query.QuerySet.order_by()` with no parameters.
+
+Adding an index to your database may help to improve ordering performance.
 
 Insert in bulk
 ==============

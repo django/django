@@ -6,7 +6,6 @@ from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
-from django.utils.http import urlquote
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -246,10 +245,10 @@ class AbstractBaseUser(models.Model):
         return is_password_usable(self.password)
 
     def get_full_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_full_name() method')
 
     def get_short_name(self):
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -442,16 +441,16 @@ class AnonymousUser(object):
         return 1  # instances always return the same hash value
 
     def save(self):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def delete(self):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def set_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def check_password(self, raw_password):
-        raise NotImplementedError
+        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
     def _get_groups(self):
         return self._groups

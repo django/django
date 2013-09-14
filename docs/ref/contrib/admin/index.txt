@@ -1514,6 +1514,40 @@ templates used by the :class:`ModelAdmin` views:
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
 
+.. method:: ModelAdmin.response_add(self, request, obj, post_url_continue=None)
+
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`add_view` stage.
+
+    ``response_add`` is called after the admin form is submitted and
+    just after the object and all the related instances have
+    been created and saved. You can override it to change the default behavior
+    after the object has been created.
+
+.. method:: ModelAdmin.response_change(self, request, obj)
+
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`change_view` stage.
+
+    ``response_change`` is called after the admin form is submitted and
+    just after the object and all the related instances have
+    been saved. You can override it to change the default
+    behavior after the object has been changedn.
+
+.. method:: ModelAdmin.response_delete(self, request, obj_display)
+
+    .. versionadded:: 1.7
+
+    Determines the :class:`~django.http.HttpResponse` for the
+    :meth:`delete_view` stage.
+
+    ``response_delete`` is called after the object has been
+    deleted. You can override it to change the default
+    behavior after the object has been deleted.
+
+    ``obj_display`` is a string with the name of the deleted
+    object.
+
 Other methods
 ~~~~~~~~~~~~~
 
@@ -2162,7 +2196,7 @@ creating your own ``AdminSite`` instance (see below), and changing the
     Python class), and register your models and ``ModelAdmin`` subclasses
     with it instead of using the default.
 
-    When constructing an instance of an ``AdminSite``, you are able to provide
+    When constructing an instance of an ``AdminSite``, you can provide
     a unique instance name using the ``name`` argument to the constructor. This
     instance name is used to identify the instance, especially when
     :ref:`reversing admin URLs <admin-reverse-urls>`. If no instance name is
@@ -2173,6 +2207,27 @@ creating your own ``AdminSite`` instance (see below), and changing the
 
 Templates can override or extend base admin templates as described in
 `Overriding Admin Templates`_.
+
+.. attribute:: AdminSite.site_header
+
+    .. versionadded:: 1.7
+
+    The text to put at the top of each admin page, as an ``<h1>`` (a string).
+    By default, this is "Django administration".
+
+.. attribute:: AdminSite.site_title
+
+    .. versionadded:: 1.7
+
+    The text to put at the end of each admin page's ``<title>`` (a string). By
+    default, this is "Django site admin".
+
+.. attribute:: AdminSite.index_title
+
+    .. versionadded:: 1.7
+
+    The text to put at the top of the admin index page (a string). By default,
+    this is "Site administration".
 
 .. attribute:: AdminSite.index_template
 

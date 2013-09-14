@@ -61,6 +61,22 @@ class MigrationExecutor(object):
             else:
                 self.unapply_migration(migration, fake=fake)
 
+    def collect_sql(self, plan):
+        """
+        Takes a migration plan and returns a list of collected SQL
+        statements that represent the best-efforts version of that plan.
+        """
+        statements = []
+        for migration, backwards in plan:
+            with self.connection.schema_editor(collect_sql=True) as schema_editor:
+                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                if not backwards:
+                    migration.apply(project_state, schema_editor)
+                else:
+                    migration.unapply(project_state, schema_editor)
+                statements.extend(schema_editor.collected_sql)
+        return statements
+
     def apply_migration(self, migration, fake=False):
         """
         Runs a migration forwards.

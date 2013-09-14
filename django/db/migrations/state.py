@@ -1,7 +1,12 @@
 from django.db import models
 from django.db.models.loading import BaseAppCache
 from django.db.models.options import DEFAULT_NAMES
+from django.utils import six
 from django.utils.module_loading import import_by_path
+
+
+class InvalidBasesError(ValueError):
+    pass
 
 
 class ProjectState(object):
@@ -28,8 +33,21 @@ class ProjectState(object):
         "Turns the project state into actual models in a new AppCache"
         if self.app_cache is None:
             self.app_cache = BaseAppCache()
-            for model in self.models.values():
-                model.render(self.app_cache)
+            # We keep trying to render the models in a loop, ignoring invalid
+            # base errors, until the size of the unrendered models doesn't
+            # decrease by at least one, meaning there's a base dependency loop/
+            # missing base.
+            unrendered_models = list(self.models.values())
+            while unrendered_models:
+                new_unrendered_models = []
+                for model in unrendered_models:
+                    try:
+                        model.render(self.app_cache)
+                    except InvalidBasesError:
+                        new_unrendered_models.append(model)
+                if len(new_unrendered_models) == len(unrendered_models):
+                    raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
+                unrendered_models = new_unrendered_models
         return self.app_cache
 
     @classmethod
@@ -86,7 +104,11 @@ class ModelState(object):
                 else:
                     options[name] = model._meta.original_attrs[name]
         # Make our record
-        bases = tuple(model for model in model.__bases__ if (not hasattr(model, "_meta") or not model._meta.abstract))
+        bases = tuple(
+            ("%s.%s" % (base._meta.app_label, base._meta.object_name.lower()) if hasattr(base, "_meta") else base)
+            for base in model.__bases__
+            if (not hasattr(base, "_meta") or not base._meta.abstract)
+        )
         if not bases:
             bases = (models.Model, )
         return cls(
@@ -123,7 +145,12 @@ class ModelState(object):
             meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
-        # TODO: Use the actual bases
+        bases = tuple(
+            (app_cache.get_model(*base.split(".", 1)) if isinstance(base, six.string_types) else base)
+            for base in self.bases
+        )
+        if None in bases:
+            raise InvalidBasesError("Cannot resolve one or more bases from %r" % self.bases)
         # Turn fields into a dict for the body, add other bits
         body = dict(self.fields)
         body['Meta'] = meta
@@ -131,7 +158,7 @@ class ModelState(object):
         # Then, make a Model object
         return type(
             self.name,
-            tuple(self.bases),
+            bases,
             body,
         )
 

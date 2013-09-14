@@ -14,6 +14,8 @@ class DiscoverRunner(object):
     A Django test runner that uses unittest2 test discovery.
     """
 
+    test_suite = TestSuite
+    test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, )
     option_list = (
@@ -42,7 +44,7 @@ class DiscoverRunner(object):
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        suite = TestSuite()
+        suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
@@ -107,7 +109,7 @@ class DiscoverRunner(object):
         return setup_databases(self.verbosity, self.interactive, **kwargs)
 
     def run_suite(self, suite, **kwargs):
-        return unittest.TextTestRunner(
+        return self.test_runner(
             verbosity=self.verbosity,
             failfast=self.failfast,
         ).run(suite)
@@ -201,7 +203,8 @@ def reorder_suite(suite, classes):
     classes[1], etc. Tests with no match in classes are placed last.
     """
     class_count = len(classes)
-    bins = [unittest.TestSuite() for i in range(class_count+1)]
+    suite_class = type(suite)
+    bins = [suite_class() for i in range(class_count+1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
         bins[0].addTests(bins[i+1])
@@ -218,8 +221,9 @@ def partition_suite(suite, classes, bins):
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
+    suite_class = type(suite)
     for test in suite:
-        if isinstance(test, unittest.TestSuite):
+        if isinstance(test, suite_class):
             partition_suite(test, classes, bins)
         else:
             for i in range(len(classes)):

@@ -15,7 +15,7 @@ from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import DisallowedModelAdminLookup
-from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR
+from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
 
@@ -25,7 +25,6 @@ ORDER_VAR = 'o'
 ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
-TO_FIELD_VAR = 't'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (

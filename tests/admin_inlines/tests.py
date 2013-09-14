@@ -8,11 +8,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 # local test models
-from .admin import InnerInline, TitleInline, site
+from .admin import InnerInline
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Title, Novel, Chapter, FootNote, BinaryTree)
+    Sighting, Novel, Chapter, FootNote, BinaryTree)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -45,7 +45,7 @@ class TestInline(TestCase):
     def test_readonly_stacked_inline_label(self):
         """Bug #13174."""
         holder = Holder.objects.create(dummy=42)
-        inner = Inner.objects.create(holder=holder, dummy=42, readonly='')
+        Inner.objects.create(holder=holder, dummy=42, readonly='')
         response = self.client.get('/admin/admin_inlines/holder/%i/'
                                    % holder.id)
         self.assertContains(response, '<label>Inner readonly label:</label>')
@@ -195,7 +195,7 @@ class TestInline(TestCase):
 
     def test_custom_get_extra_form(self):
         bt_head = BinaryTree.objects.create(name="Tree Head")
-        bt_child = BinaryTree.objects.create(name="First Child", parent=bt_head)
+        BinaryTree.objects.create(name="First Child", parent=bt_head)
 
         # The maximum number of forms should respect 'get_max_num' on the
         # ModelAdmin
@@ -575,7 +575,6 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         Ensure that the "Add another XXX" link correctly adds items to the
         inline form.
         """
-        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/admin/admin_inlines/profilecollection/add/'))

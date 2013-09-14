@@ -35,10 +35,12 @@ def SET(value):
     else:
         def set_on_delete(collector, field, sub_objs, using):
             collector.add_field_update(field, value, sub_objs)
+    set_on_delete.deconstruct = lambda: ('django.db.models.SET', (value,), {})
     return set_on_delete
 
 
-SET_NULL = SET(None)
+def SET_NULL(collector, field, sub_objs, using):
+    collector.add_field_update(field, None, sub_objs)
 
 
 def SET_DEFAULT(collector, field, sub_objs, using):

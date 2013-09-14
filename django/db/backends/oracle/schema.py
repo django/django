@@ -1,12 +1,11 @@
 import copy
-import datetime
-from django.utils import six
+
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-    
+
     sql_create_column = "ALTER TABLE %(table)s ADD %(column)s %(definition)s"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_alter_column_null = "MODIFY %(column)s NULL"
@@ -15,7 +14,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
-    
+
     def delete_model(self, model):
         # Run superclass action
         super(DatabaseSchemaEditor, self).delete_model(model)
@@ -93,11 +92,4 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return self.normalize_name(for_name + "_" + suffix)
 
     def prepare_default(self, value):
-        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
-            return "'%s'" % value
-        elif isinstance(value, six.string_types):
-            return repr(value)
-        elif isinstance(value, bool):
-            return "1" if value else "0"
-        else:
-            return str(value)
+        return self.connection.ops.quote_parameter(value)
