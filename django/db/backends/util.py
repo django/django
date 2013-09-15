@@ -19,13 +19,17 @@ class CursorWrapper(object):
         self.cursor = cursor
         self.db = db
 
+    SET_DIRTY_ATTRS = frozenset(['execute', 'executemany', 'callproc'])
+    WRAP_ERROR_ATTRS = frozenset([
+        'callproc', 'close', 'execute', 'executemany',
+        'fetchone', 'fetchmany', 'fetchall', 'nextset'])
+
     def __getattr__(self, attr):
-        if attr in ('execute', 'executemany', 'callproc'):
+        if attr in CursorWrapper.SET_DIRTY_ATTRS:
             self.db.set_dirty()
         cursor_attr = getattr(self.cursor, attr)
-        if attr in ('callproc', 'close', 'execute', 'executemany',
-                    'fetchone', 'fetchmany', 'fetchall', 'nextset'):
-            return self.db.wrap_database_errors()(cursor_attr)
+        if attr in CursorWrapper.WRAP_ERROR_ATTRS:
+            return self.db.wrap_database_errors(cursor_attr)
         else:
             return cursor_attr
 
@@ -39,7 +43,7 @@ class CursorDebugWrapper(CursorWrapper):
         self.db.set_dirty()
         start = time()
         try:
-            with self.db.wrap_database_errors():
+            with self.db.wrap_database_errors:
                 if params is None:
                     # params default might be backend specific
                     return self.cursor.execute(sql)
@@ -60,7 +64,7 @@ class CursorDebugWrapper(CursorWrapper):
         self.db.set_dirty()
         start = time()
         try:
-            with self.db.wrap_database_errors():
+            with self.db.wrap_database_errors:
                 return self.cursor.executemany(sql, param_list)
         finally:
             stop = time()
