@@ -119,6 +119,8 @@ Filtering error reports
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. currentmodule:: django.views.decorators.debug
+
 Error reports are really helpful for debugging errors, so it is generally
 useful to record as much relevant information about those errors as possible.
 For example, by default Django records the `full traceback`_ for the
@@ -246,11 +248,13 @@ attribute::
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 
+.. currentmodule:: django.views.debug
+
 Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
 following methods:
 
-.. class:: django.views.debug.SafeExceptionReporterFilter
+.. class:: SafeExceptionReporterFilter
 
 .. method:: SafeExceptionReporterFilter.is_active(self, request)
 
