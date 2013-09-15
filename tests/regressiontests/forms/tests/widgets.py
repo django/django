@@ -1112,6 +1112,7 @@ class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             reverse('article_form', args=[article.pk])))
         self.selenium.find_element_by_id('submit').submit()
+        self.wait_page_loaded()
         article = Article.objects.get(pk=article.pk)
         # Should be "\nTst\n" after #19251 is fixed
         self.assertEqual(article.content, "\r\nTst\r\n")
