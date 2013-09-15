@@ -1,0 +1,21 @@
+==========================
+Django 1.5.3 release notes
+==========================
+
+*September 14, 2013*
+
+This is Django 1.5.4, the fourth release in the Django 1.5 series. It addresses
+one security issue.
+
+Denial-of-service via password hashers
+--------------------------------------
+
+In previous versions of Django no limit was imposed on the plaintext
+length of a password. This allows a denial-of-service attack through
+submission of bogus but extremely large passwords, tying up server
+resources performing the (expensive, and increasingly expensive with
+the length of the password) calculation of the corresponding hash.
+
+As of 1.5.3, Django's authentication framework imposes a 4096-byte
+limit on passwords, and will fail authentication with any submitted
+password of greater length.
