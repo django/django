@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
+import functools
 import hashlib
 
 from django.dispatch import receiver
@@ -16,6 +17,7 @@ from django.utils.translation import ugettext_noop as _
 
 
 UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
+MAXIMUM_PASSWORD_LENGTH = 4096  # The maximum length a password can be to prevent DoS
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
 
@@ -25,6 +27,18 @@ def reset_hashers(**kwargs):
         global HASHERS, PREFERRED_HASHER
         HASHERS = None
         PREFERRED_HASHER = None
+
+
+def password_max_length(max_length):
+    def inner(fn):
+        @functools.wraps(fn)
+        def wrapper(self, password, *args, **kwargs):
+            if len(password) > max_length:
+                raise ValueError("Invalid password; Must be less than or equal"
+                                 " to %d bytes" % max_length)
+            return fn(self, password, *args, **kwargs)
+        return wrapper
+    return inner
 
 
 def is_password_usable(encoded):
@@ -225,6 +239,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     iterations = 10000
     digest = hashlib.sha256
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt, iterations=None):
         assert password
         assert salt and '$' not in salt
@@ -234,6 +249,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         hash = base64.b64encode(hash).decode('ascii').strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
@@ -279,6 +295,7 @@ class BCryptPasswordHasher(BasePasswordHasher):
         bcrypt = self._load_library()
         return bcrypt.gensalt(self.rounds)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         bcrypt = self._load_library()
         # Need to reevaluate the force_bytes call once bcrypt is supported on
@@ -286,6 +303,7 @@ class BCryptPasswordHasher(BasePasswordHasher):
         data = bcrypt.hashpw(force_bytes(password), salt)
         return "%s$%s" % (self.algorithm, data)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
@@ -310,12 +328,14 @@ class SHA1PasswordHasher(BasePasswordHasher):
     """
     algorithm = "sha1"
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
         hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
@@ -338,12 +358,14 @@ class MD5PasswordHasher(BasePasswordHasher):
     """
     algorithm = "md5"
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
         hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
@@ -374,11 +396,13 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     def salt(self):
         return ''
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert salt == ''
         hash = hashlib.sha1(force_bytes(password)).hexdigest()
         return 'sha1$$%s' % hash
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
@@ -408,10 +432,12 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     def salt(self):
         return ''
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         assert salt == ''
         return hashlib.md5(force_bytes(password)).hexdigest()
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         if len(encoded) == 37 and encoded.startswith('md5$$'):
             encoded = encoded[5:]
@@ -437,6 +463,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     def salt(self):
         return get_random_string(2)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def encode(self, password, salt):
         crypt = self._load_library()
         assert len(salt) == 2
@@ -444,6 +471,7 @@ class CryptPasswordHasher(BasePasswordHasher):
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
 
+    @password_max_length(MAXIMUM_PASSWORD_LENGTH)
     def verify(self, password, encoded):
         crypt = self._load_library()
         algorithm, salt, data = encoded.split('$', 2)
@@ -458,4 +486,3 @@ class CryptPasswordHasher(BasePasswordHasher):
             (_('salt'), salt),
             (_('hash'), mask_hash(data, show=3)),
         ])
-
