@@ -8,14 +8,17 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
-    model_format_dict, NestedObjects, lookup_needs_distinct)
-from django.contrib.admin import validation
+from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
+    InlineModelAdminChecks)
+from django.contrib.admin.util import (unquote, flatten_fieldsets,
+    get_deleted_objects, model_format_dict, NestedObjects,
+    lookup_needs_distinct)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied, ValidationError, FieldError
+from django.core import checks
+from django.core.exceptions import PermissionDenied, ValidationError, FieldError, ImproperlyConfigured
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
@@ -30,16 +33,16 @@ from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.utils.decorators import method_decorator
-from django.utils.html import escape, escapejs
-from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.decorators import method_decorator
 from django.utils.deprecation import RenameMethodsBase
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-from django.utils.encoding import force_text
+from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_protect
 
 
@@ -99,13 +102,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
     readonly_fields = ()
     ordering = None
 
-    # validation
-    validator_class = validation.BaseValidator
-
-    @classmethod
-    def validate(cls, model):
-        validator = cls.validator_class()
-        validator.validate(cls, model)
+    checks = BaseModelAdminChecks
 
     def __init__(self):
         self._orig_formfield_overrides = self.formfield_overrides
@@ -402,7 +399,29 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+    @classmethod
+    def check(cls, model, **kwargs):
+        errors = []
+        if hasattr(cls, 'validator'):
+            warnings.warn(
+                'ModelAdmin.validator is deprecated. Use "checks" instead.',
+                PendingDeprecationWarning)
+            validator = cls.validator()
+            try:
+                validator.validate(cls, model)
+            except ImproperlyConfigured as e:
+                errors.append(
+                    checks.Error(
+                        e.args[0],
+                        hint=None,
+                        obj=cls,
+                    )
+                )
+        errors.extend(cls.checks().check(cls, model, **kwargs))
+        return errors
 
+
+@python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -436,8 +455,7 @@ class ModelAdmin(BaseModelAdmin):
     actions_on_bottom = False
     actions_selection_counter = True
 
-    # validation
-    validator_class = validation.ModelAdminValidator
+    checks = ModelAdminChecks
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -1592,7 +1610,11 @@ class ModelAdmin(BaseModelAdmin):
             formsets.append(FormSet(**formset_params))
         return formsets
 
+    def __str__(self):
+        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
+
+@python_2_unicode_compatible
 class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
@@ -1611,8 +1633,7 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name_plural = None
     can_delete = True
 
-    # validation
-    validator_class = validation.InlineValidator
+    checks = InlineModelAdminChecks
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1757,6 +1778,9 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+
+    def __str__(self):
+        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
 
 class StackedInline(InlineModelAdmin):

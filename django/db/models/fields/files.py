@@ -3,6 +3,8 @@ import os
 
 from django import forms
 from django.db.models.fields import Field
+from django.core import checks
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -220,9 +222,8 @@ class FileField(Field):
     description = _("File")
 
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
-        for arg in ('primary_key', 'unique'):
-            if arg in kwargs:
-                raise TypeError("'%s' is not a valid argument for %s." % (arg, self.__class__))
+        self._primary_key_set_explicitly = 'primary_key' in kwargs
+        self._unique_set_explicitly = 'unique' in kwargs
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
@@ -303,6 +304,54 @@ class FileField(Field):
             defaults['required'] = False
         defaults.update(kwargs)
         return super(FileField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(FileField, self).check(**kwargs)
+        errors.extend(self._check_upload_to())
+        errors.extend(self._check_unique())
+        errors.extend(self._check_primary_key())
+        return errors
+
+    def _check_upload_to(self):
+        if not self.upload_to:
+            return [
+                checks.Error(
+                    'The field requires an "upload_to" attribute.',
+                    hint=None,
+                    obj=self,
+                    id='E031',
+                )
+            ]
+        else:
+            return []
+
+    def _check_unique(self):
+        if self._unique_set_explicitly:
+            return [
+                checks.Error(
+                    '"unique" is not a valid argument for %s.'
+                        % self.__class__.__name__,
+                    hint=None,
+                    obj=self,
+                    id='E049',
+                )
+            ]
+        else:
+            return []
+
+    def _check_primary_key(self):
+        if self._primary_key_set_explicitly:
+            return [
+                checks.Error(
+                    '"primary_key" is not a valid argument for %s.'
+                        % self.__class__.__name__,
+                    hint=None,
+                    obj=self,
+                    id='E050',
+                )
+            ]
+        else:
+            return []
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -420,3 +469,25 @@ class ImageField(FileField):
         defaults = {'form_class': forms.ImageField}
         defaults.update(kwargs)
         return super(ImageField, self).formfield(**defaults)
+
+    def check(self, **kwargs):
+        errors = super(ImageField, self).check(**kwargs)
+        errors.extend(self._check_image_library_installed())
+        return errors
+
+    def _check_image_library_installed(self):
+        try:
+            from django.utils.image import Image
+        except ImproperlyConfigured:
+            return [
+                checks.Error(
+                    'To use ImageFields, Pillow must be installed.',
+                    hint='Get Pillow at https://pypi.python.org/pypi/Pillow '
+                        'or run command "pip install pillow".',
+                    obj=self,
+                    id='E032',
+                )
+            ]
+        else:
+            return []
+

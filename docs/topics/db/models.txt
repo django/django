@@ -153,8 +153,8 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-    this field. If this is given, the default form widget will be a select box
+    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
+    field. If this is given, the default form widget will be a select box
     instead of the standard text field and will limit choices to the choices
     given.
 
@@ -957,7 +957,7 @@ The reverse name of the ``common.ChildA.m2m`` field will be
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
 to construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`migrate`).
+errors when you perform system checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1050,7 +1050,7 @@ are putting those types of relations on a subclass of another model,
 you **must** specify the
 :attr:`~django.db.models.ForeignKey.related_name` attribute on each
 such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`migrate`.
+:djadmin:`check` or :djadmin:`migrate`.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::

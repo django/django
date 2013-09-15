@@ -1,6 +1,7 @@
+from django.core import management
 from django.db.models import signals
 from django.test import TestCase
-from django.core import management
+from django.test.utils import override_system_checks
 from django.utils import six
 
 from . import models
@@ -63,6 +64,9 @@ class MigrateSignalTests(TestCase):
     def test_pre_migrate_call_time(self):
         self.assertEqual(pre_migrate_receiver.call_counter, 1)
 
+    # `auth` app is imported, but not installed in this test, so we need to
+    # exclude checks registered by this app.
+    @override_system_checks([])
     def test_pre_migrate_args(self):
         r = PreMigrateReceiver()
         signals.pre_migrate.connect(r, sender=models)

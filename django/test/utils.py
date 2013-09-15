@@ -239,6 +239,26 @@ class override_settings(object):
                                  setting=key, value=new_value, enter=False)
 
 
+def override_system_checks(new_checks):
+    """ Acts as a decorator. Overrides list of registered system checks.
+    Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
+    you also need to exclude its system checks. """
+
+    from django.core.checks.registration import framework
+
+    def outer(test_func):
+        @wraps(test_func)
+        def inner(*args, **kwargs):
+            old_checks = framework.registered_checks
+            framework.registered_checks = new_checks
+            try:
+                return test_func(*args, **kwargs)
+            finally:
+                framework.registered_checks = old_checks
+        return inner
+    return outer
+
+
 def compare_xml(want, got):
     """Tries to do a 'xml-comparison' of want and got.  Plain string
     comparison doesn't always work because, for example, attribute

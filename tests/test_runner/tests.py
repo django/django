@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 from importlib import import_module
 from optparse import make_option
-import sys
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
@@ -13,7 +12,7 @@ from django.core.management import call_command
 from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
-from django.test.utils import IgnoreAllDeprecationWarningsMixin
+from django.test.utils import IgnoreAllDeprecationWarningsMixin, override_system_checks
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -247,6 +246,9 @@ class Sqlite3InMemoryTestDbs(TestCase):
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
+    # `setup_databases` triggers system check framework, but we do not want to
+    # perform checks.
+    @override_system_checks([])
     def test_transaction_support(self):
         """Ticket #16329: sqlite3 in-memory test databases"""
         old_db_connections = db.connections

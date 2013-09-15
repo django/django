@@ -18,7 +18,7 @@ class Command(NoArgsCommand):
                 'introspect.  Defaults to using the "default" database.'),
     )
 
-    requires_model_validation = False
+    requires_system_checks = False
 
     db_module = 'django.db'
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin.py`` or ``manage.py``).
@@ -5,14 +8,15 @@ be executed through ``django-admin.py`` or ``manage.py``).
 """
 import os
 import sys
+import warnings
 
 from optparse import make_option, OptionParser
 
 import django
+from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
-from django.utils.six import StringIO
 
 
 class CommandError(Exception):
@@ -134,13 +138,18 @@ class BaseCommand(object):
         wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
         ``False``.
 
+    ``requires_system_checks``
+        A boolean; if ``True``, entire Django project will be checked for errors
+        prior to executing the command. If it's missing, the value of
+        ``requires_model_validation`` is used. If the latter flag is missing
+        too, the default value (``True``) is used. Defining both
+        ``requires_system_checks`` and ``requires_model_validation`` results in
+        an error.
+
     ``requires_model_validation``
-        A boolean; if ``True``, validation of installed models will be
-        performed prior to executing the command. Default value is
-        ``True``. To validate an individual application's models
-        rather than all applications' models, call
-        ``self.validate(app)`` from ``handle()``, where ``app`` is the
-        application's Python module.
+        A deprecated boolean. If ``requires_system_checks`` is missing, then
+        this value is used. Defining both ``requires_system_checks`` and
+        ``requires_model_validation`` results in an error.
 
     ``leave_locale_alone``
         A boolean indicating whether the locale set in settings should be
@@ -179,12 +188,39 @@ class BaseCommand(object):
 
     # Configuration shortcuts that alter various logic.
     can_import_settings = True
-    requires_model_validation = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
 
+    # Uncomment the following line of code after deprecation plan for
+    # requires_model_validation comes to completion:
+    #
+    # requires_system_checks = True
+
     def __init__(self):
         self.style = color_style()
+
+        # `requires_model_validation` is deprecated in favour of
+        # `requires_system_checks`. If both options are present, an error is
+        # raised. Otherwise the present option is used. If none of them is
+        # defined, the default value (True) is used.
+        has_old_option = hasattr(self, 'requires_model_validation')
+        has_new_option = hasattr(self, 'requires_system_checks')
+
+        if has_old_option:
+            warnings.warn(
+                '"requires_model_validation" is deprecated '
+                'in favour of "requires_system_checks".',
+                PendingDeprecationWarning)
+        if has_old_option and has_new_option:
+            raise ImproperlyConfigured(
+                'Command %s defines both "requires_model_validation" '
+                'and "requires_system_checks", which is illegal. Use only '
+                '"requires_system_checks".' % self.__class__.__name__)
+
+        self.requires_system_checks = (
+            self.requires_system_checks if has_new_option else
+            self.requires_model_validation if has_old_option else
+            True)
 
     def get_version(self):
         """
@@ -251,8 +287,8 @@ class BaseCommand(object):
 
     def execute(self, *args, **options):
         """
-        Try to execute this command, performing model validation if
-        needed (as controlled by the attribute
+        Try to execute this command, performing system checks if needed (as
+        controlled by attributes ``self.requires_system_checks`` and
         ``self.requires_model_validation``, except if force-skipped).
         """
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
@@ -284,8 +320,10 @@ class BaseCommand(object):
             translation.activate('en-us')
 
         try:
-            if self.requires_model_validation and not options.get('skip_validation'):
-                self.validate()
+            if (self.requires_system_checks and
+                    not options.get('skip_validation') and  # This will be removed at the end of deprecation proccess for `skip_validation`.
+                    not options.get('skip_checks')):
+                self.check()
             output = self.handle(*args, **options)
             if output:
                 if self.output_transaction:
@@ -303,21 +341,63 @@ class BaseCommand(object):
                 translation.activate(saved_locale)
 
     def validate(self, app=None, display_num_errors=False):
-        """
-        Validates the given app, raising CommandError for any errors.
+        """ Deprecated. Delegates to ``check``. ``app`` argument is ignored. """
 
-        If app is None, then this will validate all installed apps.
+        return self.check(display_num_errors)
+
+    def check(self, apps=None, tags=None, display_num_errors=False):
+        """
+        Uses the system check framework to validate entire Django project.
+        Raises CommandError for any serious message (error or critical errors).
+        If there are only light messages (like warnings), they are printed to
+        stderr and no exception is raised.
 
         """
-        from django.core.management.validation import get_validation_errors
-        s = StringIO()
-        num_errors = get_validation_errors(s, app)
-        if num_errors:
-            s.seek(0)
-            error_text = s.read()
-            raise CommandError("One or more models did not validate:\n%s" % error_text)
+
+        all_issues = checks.run_checks(apps=apps, tags=tags)
+
+        msg = ""
+        if all_issues:
+            debugs = [e for e in all_issues if e.level < checks.INFO and not e.is_silenced()]
+            infos = [e for e in all_issues if checks.INFO <= e.level < checks.WARNING and not e.is_silenced()]
+            warnings = [e for e in all_issues if checks.WARNING <= e.level < checks.ERROR and not e.is_silenced()]
+            errors = [e for e in all_issues if checks.ERROR <= e.level < checks.CRITICAL]
+            criticals = [e for e in all_issues if checks.CRITICAL <= e.level]
+            sorted_issues = [
+                (criticals, 'CRITICALS'),
+                (errors, 'ERRORS'),
+                (warnings, 'WARNINGS'),
+                (infos, 'INFOS'),
+                (debugs, 'DEBUGS'),
+            ]
+
+            for issues, group_name in sorted_issues:
+                if issues:
+                    formatted = (
+                        color_style().ERROR(force_str(e))
+                        if e.is_serious()
+                        else color_style().WARNING(force_str(e))
+                        for e in issues)
+                    formatted = "\n".join(sorted(formatted))
+                    msg += '\n%s:\n%s\n' % (group_name, formatted)
+
+            msg = "There are some issues:\n%s" % msg
+
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
+            if msg:
+                msg += '\n'
+            msg += "System check identified %s." % (
+                "no problems" if len(all_issues) == 0 else
+                "1 issue" if len(all_issues) == 1 else
+                "%s issues" % len(all_issues)
+            )
+
+        if any(e.is_serious() and not e.is_silenced() for e in all_issues):
+            raise CommandError(msg)
+        elif msg and all_issues:
+            self.stderr.write(msg)
+        elif msg:
+            self.stdout.write(msg)
 
     def handle(self, *args, **options):
         """

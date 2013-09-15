@@ -227,13 +227,21 @@ All attributes can be set in your derived class and can be used in
   wrapped with ``BEGIN;`` and ``COMMIT;``. Default value is
   ``False``.
 
+.. attribute:: BaseCommand.requires_system_checks
+
+  A boolean; if ``True``, entire Django project will be checked for errors
+  prior to executing the command. If it's missing, the value of
+  ``requires_model_validation`` is used. If the latter flag is missing too,
+  the default value (``True``) is used. Defining both
+  ``requires_system_checks`` and ``requires_model_validation`` results in an
+  error.
+
 .. attribute:: BaseCommand.requires_model_validation
 
-  A boolean; if ``True``, validation of installed models will be
-  performed prior to executing the command. Default value is
-  ``True``. To validate an individual application's models
-  rather than all applications' models, call
-  :meth:`~BaseCommand.validate` from :meth:`~BaseCommand.handle`.
+  A deprecated boolean. Use ``requires_system_checks`` instead. If
+  ``requires_system_checks`` is missing, then this value is used. Defining
+  both ``requires_system_checks`` and ``requires_model_validation`` results in
+  an error.
 
 .. attribute:: BaseCommand.leave_locale_alone
 
@@ -299,11 +307,19 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     The actual logic of the command. Subclasses must implement this method.
 
+.. method:: BaseCommand.check(display_num_errors=False)
+
+    Uses the system check framework to validate entire Django project. Yes,
+    it's includes model validation and compatibility checks. For any serious
+    issue (like an error or critical error), raises :class:`CommandError`. If
+    there are only light issues (like warnings), does not raise any exception.
+    In both cases, prints to stderr. When there are no issues, prints to
+    stdout.
+
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
-    Validates the given app, raising :class:`CommandError` for any errors.
+    Deprecated. Use "check" instead. Delegates to "check". `app` argument is ignored.
 
-    If ``app`` is None, then all installed apps are validated.
 
 
 .. _ref-basecommand-subclasses:

@@ -92,6 +92,17 @@ The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
 class method has been added to :ref:`create Manager with QuerySet methods
 <create-manager-with-queryset-methods>`.
 
+New system check framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`System check framework </ref/checks>` is a set of static checks
+validating mainly apps and models. It detects common problems and report
+them providing hints. The framework is extensible and it's possible to
+write custom checks.
+
+To perform system checks, you need to run ``check`` command. ``validate``
+command is deprecated now.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -460,3 +471,24 @@ a bug and has been addressed.
 The ``syncdb`` command has been deprecated in favour of the new ``migrate``
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
+
+``django.core.management.BaseCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``requires_model_validation`` is deprecated in favour of a new
+``requires_system_checks`` flag. If the latter flag is missing, then the former flag
+value is used. Defining both ``requires_system_checks`` and
+``requires_model_validation`` results in an error.
+
+``check`` method's replaced old ``validate`` method.
+
+``validate`` command is deprecated in favour of ``check`` command.
+
+``ModelAdmin.validator``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.validator`` is deprecated in favour of new ``checks`` attribute.
+
+``django.db.backends.DatabaseValidation.validate_field``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method is deprecated in favour of a new ``check_field`` method.

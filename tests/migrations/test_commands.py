@@ -6,7 +6,7 @@ import shutil
 
 from django.core.management import call_command
 from django.db.models.loading import cache
-from django.test.utils import override_settings
+from django.test.utils import override_settings, override_system_checks
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -20,11 +20,13 @@ class MigrateTests(MigrationTestBase):
     Tests running the migrate command.
     """
 
+    # `auth` app is imported, but not installed in these tests (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
-        """
-        Tests basic usage of the migrate command.
-        """
+        """ Tests basic usage of the migrate command. """
         # Make sure no tables are created
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
@@ -48,6 +50,7 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
@@ -86,6 +89,9 @@ class MakeMigrationsTests(MigrationTestBase):
             return
         shutil.rmtree(dname)
 
+    # `auth` app is imported, but not installed in this test (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+    @override_system_checks([])
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
         cache.register_models('migrations', UnicodeModel)

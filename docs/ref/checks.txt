@@ -1,0 +1,201 @@
+.. module:: django.core.checks
+
+.. _`system-check-framework`:
+
+======================
+System check framework
+======================
+
+System check framework is a set of static checks validating mainly apps and
+models. It detects common problems and report them providing hints. The
+framework is open-ended, so you can easily add your own checks.
+
+Checks can be triggered explicitly via :djadmin:`check` command. It's also
+triggered implicitly before most command, including :djadmin:`runserver` and
+:djadmin:`migrate`. For performance issues, the checks are not performed if ``DEBUG``
+is set to False.
+
+Django will not allow you to run server if there is any serious message like
+an error or critical error. If there are light messages like warnings, Django
+won't stop you, but will issue the message. You can hide unwanted warnings or
+force Django to run even if there are serious messages bu overriding
+:setting:`SILENCED_SYSTEM_CHECKS` setting.
+
+Writing your own checks
+=======================
+
+The framework is really flexible and allow you to write functions (or other
+callable objects like methods) performing any kind of checks. The function has
+to receive ``**kwargs`` and return list of messages. If there are no message,
+you still have to return an empty list. The function need to be `registered`_
+or called from another check.
+
+.. _`registered`: `registering-checks`_
+
+.. class:: django.core.checks.CheckMessage(level, msg, hint, obj=None, id=None)
+
+:class:`~django.core.checks.CheckMessage` is the key concept of
+:mod:`django.core.checks` module and represents a single message, e.g. a
+warning or an error. The concept is very similar to messages from `message
+framework` or `logging framework`_. Messages are tagged with ``level``
+indicating how serious the message is. They can have an unique identificator.
+
+.. _`logging framework`: http://docs.python.org/2/library/logging.html
+
+Constructor arguments are:
+
+``level``
+    A positive integer. Determines how serious the message is. Use one of the
+    predefined values: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``,
+    ``CRITICAL``. If the level is greater or equal to ``ERROR``, then Django
+    stops everything and doesn't allow to i. e. run a server. Messages with
+    level lower than ``ERROR`` (i. e. warnings) are still reported, but Django
+    allows you to run server.
+
+``msg``
+    A required single-line string.
+
+``hint``
+    A single-line string or ``None`` if you cannot provide any hint. Note that
+    this argument is required even if you pass ``None``::
+
+        Error('error message') # bad
+        Error('error message', None) # good
+        Error('error message', hint=None) # good (preferable)
+
+``obj``
+    Optional. Point to the invalid object. The object should be a model, field
+    or manager or any other object that defines ``__unicode__`` method (on
+    Python 3 you need to define ``__str__`` method). The method is used while
+    reporting all messages and its result precedes the message, i.e. model
+    errors are printed using ``applabel.modellabel: message`` pattern.
+
+``id``
+    Optional string. Short and unique name of an issue. Follow "applabel.X001"
+    style, where ``X`` is one of ``C``, ``E``, ``W``, ``I``, ``D`` letters;
+    i.e. a warning may have ``applabel.W001`` id and an error can be
+    ``applabel.E002``. The message number must be unique amount an app, so
+    ``applabel.E001`` and ``anotherapp.E001`` are OK. Do not reuse one number
+    for more than one message, e.g. avoid ``applabel.E001`` and
+    ``applabel.W001``.
+
+There are shortcuts to make creating messages with common levels easier. You can
+omit ``level`` argument because the level is indicated by the class name.
+
+.. class:: django.core.checks.Debug(msg, hint, obj=None)
+.. class:: django.core.checks.Info(msg, hint, obj=None)
+.. class:: django.core.checks.Warning(msg, hint, obj=None)
+.. class:: django.core.checks.Error(msg, hint, obj=None)
+.. class:: django.core.checks.Critical(msg, hint, obj=None)
+
+Messages are comparable. That allows you to easily write tests::
+
+    from django.core.checks import Error
+    errors = checked_object.check()
+    expected_errors = [
+        Error(
+            'an error',
+            hint=None,
+            obj=checked_object,
+            id='myapp.E001',
+        )
+    ]
+    self.assertEqual(errors, expected_errors)
+
+.. _`registering-checks`:
+
+Registering and labeling checks
+-------------------------------
+
+Your check function need to be registered explicitly in system check
+framework.
+
+.. method:: register(*tags)(function)
+
+Note that checks are performed just after loading apps and you need to
+register them earlier. It's recommended to use ``register`` function as a
+decorator so your function will be registered at the the time of importing the
+module.
+
+System check framework allow you to run only a subset of all checks, i.e. you
+can run only compatibility checks or only security checks. You can label your
+own checks easily::
+
+    from checks import register
+
+    @register('security')
+    def my_check(apps, **kwargs):
+        # ... perform security checks and collect errors
+        return errors
+
+.. _field-checking:
+
+Field checks
+------------
+
+You do not need to register check function if it's called from another check
+function. It's easy in the case of fields, managers and models checks.
+
+You need to override ``check`` method: it should call the superclass (1),
+perform its own checks which may end in new errors or warnings (2) and
+eventually return list of all errors and warnings (3). It's recommended to
+delegate checks to separated methods whose names start with ``_check_``, i. e.
+``_check_min_max_values``.
+
+Consider an example where you are implementing ``RangedIntegerField``. It adds
+``min`` and ``max`` arguments to the constructor. You want to check if min
+value is smaller or equal to max value. Here is a snippet of code showing how
+you can implement this check::
+
+    from django.core import checks
+    from django.db import models
+
+    class RangedIntegerField(models.IntegerField):
+        def __init__(self, min=None, max=None, **kwargs):
+            super(RangedIntegerField, self).__init__(**kwargs)
+            self.min = min
+            self.max = max
+
+        def check(self, **kwargs):
+            errors = super(MyField, self).check(**kwargs) # (1) call the superclass
+            # (2) Do some custom checks and add errors and warning to `errors`:
+            errors.extend(self._check_min_max_values(**kwargs))
+            return errors # (3) return all errors and warnings
+
+        def _check_min_max_values(self, **kwargs):
+            if (self.min is not None and
+                self.max is not None and
+                self.min > self.max):
+                return [
+                    checks.Error(
+                        'min greated than max.',
+                        hint='Lower min or upper max.',
+                        obj=self,
+                        id='myapp.E001',
+                    )
+                ]
+            return [] # When no error, return an empty list
+
+Database backend specific checks are performed in
+``DatabaseValidation.check_field`` method. The API of ``DatabaseValidation``
+is not formally stable and may change in future.
+
+Manager checks
+--------------
+
+Manager checks are very similar to :ref:`field checking <field-checking>`. The
+only difference is that your class needs to inherit from ``models.Manager``.
+
+Model checks
+------------
+
+It's possible to check Model classes. Note that the framework verifies the
+class, not it's instances. It works exactly the same as field checks except that
+you need to use classmethods::
+
+    class MyModel(models.Model):
+        @classmethod
+        def check(cls, **kwargs):
+            errors = super(MyModel, cls).check(**kwargs)
+            # ... your own checks ...
+            return errors

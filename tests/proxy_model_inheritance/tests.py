@@ -4,10 +4,11 @@ import os
 import sys
 
 from django.conf import settings
+from django.core.checks.registration import framework as check_framework
 from django.core.management import call_command
 from django.db.models.loading import cache, load_app
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, override_system_checks
 from django.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
@@ -39,6 +40,9 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         del cache.app_models['app1']
         del cache.app_models['app2']
 
+    # `auth` app is imported, but not installed in this test, so we need to
+    # exclude checks registered by this app.
+    @override_system_checks([])
     def test_table_exists(self):
         try:
             cache.set_available_apps(settings.INSTALLED_APPS)

@@ -1,14 +1,26 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import warnings
 
-from django.core.checks.compatibility.base import check_compatibility
-from django.core.management.base import NoArgsCommand
+from optparse import make_option
+
+from django.core import checks
+from django.core.management.base import BaseCommand, CommandError
 
 
-class Command(NoArgsCommand):
-    help = "Checks your configuration's compatibility with this version " + \
-           "of Django."
+class Command(BaseCommand):
+    help = "Uses the system check framework to validate entire Django project."
 
-    def handle_noargs(self, **options):
-        for message in check_compatibility():
-            warnings.warn(message)
+    requires_system_checks = False
+
+    option_list = BaseCommand.option_list + (
+        make_option('--tag', '-t', action='append', dest='tags',
+            help='Run only checks labeled with given tag.'),
+    )
+
+    def handle(self, *apps, **options):
+        apps = apps or None  # If apps is an empty list, replace with None
+        tags = options.get('tags', None)
+        if tags and any(not checks.tag_exists(tag) for tag in tags):
+            invalid_tag = next(tag for tag in tags if not checks.tag_exists(tag))
+            raise CommandError('There is no system check labeled with "%s" tag.' % invalid_tag)
+        self.check(apps=apps, tags=tags, display_num_errors=True)

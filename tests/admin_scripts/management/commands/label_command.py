@@ -3,7 +3,7 @@ from django.core.management.base import LabelCommand
 
 class Command(LabelCommand):
     help = "Test Label-based commands"
-    requires_model_validation = False
+    requires_system_checks = False
     args = '<label>'
 
     def handle_label(self, label, **options):

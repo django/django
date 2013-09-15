@@ -3,6 +3,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+import django.contrib.auth.checks
 from django.utils.module_loading import import_by_path
 from django.middleware.csrf import rotate_token
 

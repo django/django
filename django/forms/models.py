@@ -901,13 +901,12 @@ class BaseInlineFormSet(BaseModelFormSet):
         return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
 
 
-def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
+def _get_foreign_key(parent_model, model, fk_name=None):
     """
     Finds and returns the ForeignKey from model to parent if there is one
     (returns None if can_fail is True and no such field exists). If fk_name is
-    provided, assume it is the name of the ForeignKey field. Unles can_fail is
-    True, an exception is raised if there is no ForeignKey from model to
-    parent_model.
+    provided, assume it is the name of the ForeignKey field. An exception is
+    raised if there is no ForeignKey from model to parent_model.
     """
     # avoid circular import
     from django.db.models import ForeignKey
@@ -919,9 +918,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if not isinstance(fk, ForeignKey) or \
                     (fk.rel.to != parent_model and
                      fk.rel.to not in parent_model._meta.get_parent_list()):
-                raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
+                raise ValueError(
+                    '"fk_name" refers to "%s" field, which is not a ForeignKey to %s.%s.'
+                    % (fk_name, parent_model._meta.app_label, parent_model._meta.object_name))
         elif len(fks_to_parent) == 0:
-            raise Exception("%s has no field named '%s'" % (model, fk_name))
+            raise ValueError(
+                '"fk_name" refers to "%s" field, which is missing from model %s.%s.'
+                % (fk_name, model._meta.app_label, model._meta.object_name))
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         fks_to_parent = [
@@ -933,11 +936,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
         elif len(fks_to_parent) == 0:
-            if can_fail:
-                return
-            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
+            raise ValueError(
+                '"fk_name" must be explicitly defined, because there are no ForeignKey from %s.%s to %s.%s.'
+                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
         else:
-            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+            raise ValueError(
+                '"fk_name" must be explicitly defined, because %s.%s has more than one ForeignKey to %s.%s.'
+                % (model._meta.app_label, model._meta.object_name, parent_model._meta.app_label, parent_model._meta.object_name))
     return fk
 
 
