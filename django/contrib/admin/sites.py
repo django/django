@@ -98,9 +98,6 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    admin_class.validate(model)
-
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
 
