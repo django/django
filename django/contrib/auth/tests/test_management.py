@@ -242,10 +242,9 @@ class CustomUserModelValidationTestCase(TestCase):
         expected = [
             checks.Warning(
                 'The CustomUserNonUniqueUsername.username field is pointed to '
-                    'by USERNAME_FIELD, but it is not unique. Ensure that '
-                    'your authentication backend can handle non-unique '
-                    'usernames.',
-                hint=None,
+                    'by USERNAME_FIELD, but it is not unique.',
+                hint='Ensure that your authentication backend can handle '
+                    'non-unique usernames.',
                 obj=CustomUserNonUniqueUsername,
                 id='auth.W004',
             )

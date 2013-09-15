@@ -57,11 +57,10 @@ def check_user_model(**kwargs):
             errors.append(
                 checks.Warning(
                     'The %s.%s field is pointed to by USERNAME_FIELD, '
-                        'but it is not unique. Ensure that '
-                        'your authentication backend can handle '
-                        'non-unique usernames.'
+                        'but it is not unique.'
                         % (cls._meta.object_name, cls.USERNAME_FIELD),
-                    hint=None,
+                    hint='Ensure that your authentication backend can handle '
+                        'non-unique usernames.',
                     obj=cls,
                     id='auth.W004',
                 )
