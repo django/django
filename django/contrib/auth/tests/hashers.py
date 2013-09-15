@@ -33,7 +33,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
         )
 
     def test_pkbdf2(self):
@@ -47,7 +47,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "seasalt",
             "pbkdf2_sha256",
         )
@@ -63,7 +63,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "seasalt",
             "sha1",
         )
@@ -79,7 +79,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "seasalt",
             "md5",
         )
@@ -99,7 +99,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "",
             "unsalted_md5",
         )
@@ -117,7 +117,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "",
             "unslated_sha1",
         )
@@ -133,7 +133,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             "seasalt",
             "crypt",
         )
@@ -149,7 +149,7 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertRaises(
             ValueError,
             make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
+            "1" * (MAXIMUM_PASSWORD_LENGTH + 1),
             hasher="bcrypt",
         )
 
@@ -172,8 +172,8 @@ class TestUtilsHashPass(unittest.TestCase):
         def encode(s, password, salt):
             return True
 
-        self.assertTrue(encode(None, b"1234", b"1234"))
-        self.assertRaises(ValueError, encode, None, b"1234567890A", b"1234")
+        self.assertTrue(encode(None, "1234", "1234"))
+        self.assertRaises(ValueError, encode, None, "1234567890A", "1234")
 
     def test_low_level_pkbdf2(self):
         hasher = PBKDF2PasswordHasher()
