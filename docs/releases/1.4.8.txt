@@ -1,0 +1,21 @@
+==========================
+Django 1.4.7 release notes
+==========================
+
+*September 14, 2013*
+
+Django 1.4.8 fixes one security issue present in previous Django releases in
+the 1.4 series.
+
+Denial-of-service via password hashers
+--------------------------------------
+
+In previous versions of Django no limit was imposed on the plaintext
+length of a password. This allows a denial-of-service attack through
+submission of bogus but extremely large passwords, tying up server
+resources performing the (expensive, and increasingly expensive with
+the length of the password) calculation of the corresponding hash.
+
+As of 1.4.8, Django's authentication framework imposes a 4096-byte
+limit on passwords, and will fail authentication with any submitted
+password of greater length.
