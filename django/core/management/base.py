@@ -191,6 +191,11 @@ class BaseCommand(object):
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
 
+    # Uncomment the following line of code after deprecation plan for
+    # requires_model_validation comes to completion:
+    #
+    # requires_system_checks = True
+
     def __init__(self):
         self.style = color_style()
 
