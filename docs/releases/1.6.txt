@@ -783,6 +783,10 @@ using non-string keys in ``request.session``. See the
 4096-byte limit on passwords
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. note::
+    This behavior was also added in the Django 1.5.4 and 1.4.8 security
+    releases.
+
 Historically, Django has imposed no length limit on plaintext
 passwords. This enables a denial-of-service attack through submission
 of bogus but extremely large passwords, tying up server resources
@@ -791,7 +795,6 @@ of the password) calculation of the corresponding hash.
 
 Django now imposes a 4096-byte limit on password length, and will fail
 authentication with any submitted password of greater length.
-
 
 Miscellaneous
 ~~~~~~~~~~~~~
