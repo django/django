@@ -402,14 +402,6 @@ Miscellaneous
   Rationale behind this is removal of dependency of non-contrib code on
   contrib applications.
 
-* Passwords longer than 4096 bytes in length will no longer work and will
-  instead raise a ``ValueError`` when using the hasher directory or the
-  built in forms shipped with ``django.contrib.auth`` will fail validation.
-
-  The rationale behind this is a possibility of a Denial of Service attack when
-  using a slow password hasher, such as the default PBKDF2, and sending very
-  large passwords.
-
 Features deprecated in 1.7
 ==========================
 
