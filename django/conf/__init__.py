@@ -136,6 +136,36 @@ class BaseSettings(object):
             temp[attrib] = setting_value
             setattr(self, new_setting, temp)
 
+    def handle_cookie_settings(self, mod):
+        """Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9"""
+        for setting in _DEPRECATED_COOKIE_SETTINGS:
+            prefix, _, attrib = setting.split('_', 2)
+            new_setting = '%s_COOKIE' % prefix
+            #if setting not in dir(mod):
+            #    if new_setting in dir(mod):
+            #        temp = getattr(self, new_setting)
+            #        setting_value = temp[attrib]
+            #        setattr(self, setting, setting_value)
+            #else:
+            #    warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
+            #                % {'old': setting, 'new': new_setting}, PendingDeprecationWarning, stacklevel=2)
+            #    setting_value = getattr(self, setting)
+            #    temp = getattr(self, new_setting)
+            #    temp[attrib] = setting_value
+            #    setattr(self, new_setting, temp)
+            if setting in dir(mod):
+                warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
+                            % {'old': setting, 'new': new_setting}, PendingDeprecationWarning, stacklevel=2)
+                if new_setting not in dir(mod):
+                    setting_value = getattr(self, setting)
+                    temp = getattr(self, new_setting)
+                    temp[attrib] = setting_value
+                    setattr(self, new_setting, temp)
+            if new_setting in dir(mod):
+                temp = getattr(self, new_setting)
+                setting_value = temp[attrib]
+                setattr(self, setting, setting_value)
+
 
 class Settings(BaseSettings):
     def __init__(self, settings_module):
@@ -166,9 +196,6 @@ class Settings(BaseSettings):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
 
-                # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
-                self.check_and_port_cookie_settings(setting, setting_value)
-
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:
@@ -185,6 +212,9 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+        # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
+        self.handle_cookie_settings(mod)
 
 
 class UserSettingsHolder(BaseSettings):
