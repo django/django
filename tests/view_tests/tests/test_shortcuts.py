@@ -27,6 +27,12 @@ class ShortcutTests(TestCase):
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
+    def test_render_to_response_with_dirs(self):
+        response = self.client.get('/shortcuts/render_to_response/dirs/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'spam eggs\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+
     def test_render(self):
         response = self.client.get('/shortcuts/render/')
         self.assertEqual(response.status_code, 200)
@@ -54,6 +60,12 @@ class ShortcutTests(TestCase):
     def test_render_with_current_app(self):
         response = self.client.get('/shortcuts/render/current_app/')
         self.assertEqual(response.context.current_app, "foobar_app")
+
+    def test_render_with_dirs(self):
+        response = self.client.get('/shortcuts/render/dirs/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'spam eggs\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_with_current_app_conflict(self):
         self.assertRaises(ValueError, self.client.get, '/shortcuts/render/current_app_conflict/')
