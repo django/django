@@ -6,9 +6,11 @@ from unittest import skipUnless
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils import timezone
 
+from . import views
 from .models import Book, BookSigning
 
 TZ_SUPPORT = hasattr(time, 'tzset')
@@ -132,6 +134,12 @@ class ArchiveIndexViewTests(TestCase):
         res = self.client.get('/dates/books/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), list(reversed(sorted(res.context['date_list']))))
+
+    def test_datebaselistview_regression_t17795(self):
+        factory = RequestFactory()
+        request = factory.get('/dates/books/')
+        res = views.BookArchive.as_view()(request, foo='bar')
+        self.assertEqual(res.context_data.get('foo'), 'bar')
 
 
 class YearArchiveViewTests(TestCase):
