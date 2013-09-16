@@ -768,7 +768,7 @@ site.register(UnchangeableObject, UnchangeableObjectAdmin)
 #     related OneToOne object not registered in admin
 # when deleting Book so as exercise all four troublesome (w.r.t escaping
 # and calling force_text to avoid problems on Python 2.3) paths through
-# contrib.admin.util's get_deleted_objects function.
+# contrib.admin.utils's get_deleted_objects function.
 site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
 site.register(ChapterXtra1, ChapterXtra1Admin)

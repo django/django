@@ -77,7 +77,7 @@ class Options(object):
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
-        from django.db.backends.util import truncate_name
+        from django.db.backends.utils import truncate_name
 
         cls._meta = self
         self.model = cls

@@ -13,7 +13,7 @@ from decimal import Decimal
 from django.db.backends.oracle.base import DatabaseOperations
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
-from django.contrib.gis.db.backends.util import SpatialFunction
+from django.contrib.gis.db.backends.utils import SpatialFunction
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.utils import six

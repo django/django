@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.forms.fields import Field, ChoiceField
 from django.forms.forms import BaseForm, get_declared_fields
 from django.forms.formsets import BaseFormSet, formset_factory
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property, CheckboxSelectMultiple)
 from django.utils.encoding import smart_text, force_text

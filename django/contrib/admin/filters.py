@@ -12,7 +12,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.contrib.admin.util import (get_model_from_relation,
+from django.contrib.admin.utils import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
 from django.contrib.admin.options import IncorrectLookupParameters
 

@@ -10,7 +10,7 @@ import warnings
 
 from django.core.exceptions import ValidationError
 from django.forms.fields import Field, FileField
-from django.forms.util import flatatt, ErrorDict, ErrorList
+from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible

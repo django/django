@@ -3,7 +3,7 @@
 import datetime
 import unittest
 
-from django.db.backends import util as typecasts
+from django.db.backends import utils as typecasts
 from django.utils import six
 
 

@@ -444,6 +444,15 @@ these changes.
 
 * ``ModelAdmin.declared_fieldsets`` will be removed.
 
+* Instances of ``util.py`` in the Django codebase have been renamed to
+  ``utils.py`` in an effort to unify all util and utils references.
+  The modules that provided backwards compatability will be removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
+
 2.0
 ---
 

@@ -4,7 +4,7 @@ except ImportError:
     from urlparse import parse_qsl, urlparse, urlunparse
 
 from django import template
-from django.contrib.admin.util import quote
+from django.contrib.admin.utils import quote
 from django.core.urlresolvers import resolve, Resolver404
 from django.utils.http import urlencode
 

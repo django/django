@@ -1122,14 +1122,14 @@ class DecimalField(Field):
         Formats a number into a string with the requisite number of digits and
         decimal places.
         """
-        # Method moved to django.db.backends.util.
+        # Method moved to django.db.backends.utils.
         #
         # It is preserved because it is used by the oracle backend
         # (django.db.backends.oracle.query), and also for
         # backwards-compatibility with any external code which may have used
         # this method.
-        from django.db.backends import util
-        return util.format_number(value, self.max_digits, self.decimal_places)
+        from django.db.backends import utils
+        return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
         return connection.ops.value_to_db_decimal(self.to_python(value),

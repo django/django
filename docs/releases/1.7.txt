@@ -460,3 +460,14 @@ a bug and has been addressed.
 The ``syncdb`` command has been deprecated in favour of the new ``migrate``
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
+
+``util`` modules renamed to ``utils``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following instances of ``util.py`` in the Django codebase have been renamed
+to ``utils.py`` in an effort to unify all util and utils references:
+
+* ``django.contrib.admin.util``
+* ``django.contrib.gis.db.backends.util``
+* ``django.db.backends.util``
+* ``django.forms.util``

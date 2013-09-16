@@ -37,7 +37,7 @@ except ImportError:
 
 from django.conf import settings
 from django.db import utils
-from django.db.backends import (util, BaseDatabaseFeatures,
+from django.db.backends import (utils as backend_utils, BaseDatabaseFeatures,
     BaseDatabaseOperations, BaseDatabaseWrapper)
 from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
@@ -91,9 +91,9 @@ def adapt_datetime_with_timezone_support(value, conv):
 # timezone support is active, Django expects timezone-aware datetime objects.
 django_conversions = conversions.copy()
 django_conversions.update({
-    FIELD_TYPE.TIME: util.typecast_time,
-    FIELD_TYPE.DECIMAL: util.typecast_decimal,
-    FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
+    FIELD_TYPE.TIME: backend_utils.typecast_time,
+    FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
+    FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
     FIELD_TYPE.DATETIME: parse_datetime_with_timezone_support,
     datetime.datetime: adapt_datetime_with_timezone_support,
 })
@@ -109,7 +109,7 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
 # point is to raise Warnings as exceptions, this can be done with the Python
 # warning module, and this is setup when the connection is created, and the
-# standard util.CursorDebugWrapper can be used. Also, using sql_mode
+# standard backend_utils.CursorDebugWrapper can be used. Also, using sql_mode
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 class CursorWrapper(object):

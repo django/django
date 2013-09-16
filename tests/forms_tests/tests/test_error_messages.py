@@ -215,7 +215,7 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
                 raise ValidationError("I like to be awkward.")
 
         @python_2_unicode_compatible
-        class CustomErrorList(util.ErrorList):
+        class CustomErrorList(utils.ErrorList):
             def __str__(self):
                 return self.as_divs()
 

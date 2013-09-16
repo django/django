@@ -382,7 +382,7 @@ class ProxyModelAdminTests(TestCase):
         base_user = BaseUser.objects.all()[0]
         issue = Issue.objects.all()[0]
         with self.assertNumQueries(7):
-            collector = admin.util.NestedObjects('default')
+            collector = admin.utils.NestedObjects('default')
             collector.collect(ProxyTrackerUser.objects.all())
         self.assertTrue(tracker_user in collector.edges.get(None, ()))
         self.assertTrue(base_user in collector.edges.get(None, ()))

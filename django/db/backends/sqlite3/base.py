@@ -13,7 +13,7 @@ import re
 
 from django.conf import settings
 from django.db import utils
-from django.db.backends import (util, BaseDatabaseFeatures,
+from django.db.backends import (utils as backend_utils, BaseDatabaseFeatures,
     BaseDatabaseOperations, BaseDatabaseWrapper, BaseDatabaseValidation)
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
@@ -80,10 +80,10 @@ Database.register_converter(str("date"), decoder(parse_date))
 Database.register_converter(str("datetime"), decoder(parse_datetime_with_timezone_support))
 Database.register_converter(str("timestamp"), decoder(parse_datetime_with_timezone_support))
 Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
+Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
-Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
+Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 if six.PY2:
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
     Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
@@ -282,7 +282,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
-            return util.typecast_decimal(field.format_number(value))
+            return backend_utils.typecast_decimal(field.format_number(value))
         elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
             return int(value)
         elif internal_type == 'DateField':
@@ -487,7 +487,7 @@ def _sqlite_date_extract(lookup_type, dt):
     if dt is None:
         return None
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if lookup_type == 'week_day':
@@ -498,7 +498,7 @@ def _sqlite_date_extract(lookup_type, dt):
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if lookup_type == 'year':
@@ -513,7 +513,7 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
     if dt is None:
         return None
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if tzname is not None:
@@ -526,7 +526,7 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if tzname is not None:
@@ -547,7 +547,7 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
 
 def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
         delta = datetime.timedelta(int(days), int(secs), int(usecs))
         if conn.strip() == '+':
             dt = dt + delta

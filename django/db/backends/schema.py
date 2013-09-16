@@ -2,7 +2,7 @@ import hashlib
 import operator
 
 from django.db.backends.creation import BaseDatabaseCreation
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField
 from django.db.transaction import atomic
 from django.utils.log import getLogger

@@ -14,7 +14,7 @@ from importlib import import_module
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
-from django.db.backends import util
+from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
 from django.utils.functional import cached_property
@@ -158,7 +158,7 @@ class BaseDatabaseWrapper(object):
             (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
-            cursor = util.CursorWrapper(self._cursor(), self)
+            cursor = utils.CursorWrapper(self._cursor(), self)
         return cursor
 
     def commit(self):
@@ -495,7 +495,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor that logs all queries in self.queries.
         """
-        return util.CursorDebugWrapper(cursor, self)
+        return utils.CursorDebugWrapper(cursor, self)
 
     @contextmanager
     def temporary_connection(self):
@@ -1131,7 +1131,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return util.format_number(value, max_digits, decimal_places)
+        return utils.format_number(value, max_digits, decimal_places)
 
     def year_lookup_bounds_for_date_field(self, value):
         """

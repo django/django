@@ -5,7 +5,7 @@ import datetime
 
 from django.forms import *
 from django.forms.extras import SelectDateWidget
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six

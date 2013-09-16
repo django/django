@@ -8,7 +8,7 @@ from django.db.utils import load_backend
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 
-from .util import truncate_name
+from .utils import truncate_name
 
 # The prefix to put on the default database name when creating
 # the test database.
