@@ -939,6 +939,14 @@ class ForeignObject(RelatedField):
 
         super(ForeignObject, self).__init__(**kwargs)
 
+    def get_enclosed_fields(self):
+        return self.local_related_fields
+
+    def resolve_basic_fields(self):
+        return [f
+                for myfield in self.get_enclosed_fields()
+                for f in myfield.resolve_basic_fields()]
+
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be '
@@ -1202,8 +1210,8 @@ class ForeignKey(ForeignObject):
         # itself.
         return self.auxiliary_field.clone_for_foreignkey(*args, **kwargs)
 
-    def resolve_basic_fields(self):
-        return self.auxiliary_field.resolve_basic_fields()
+    def get_enclosed_fields(self):
+        return [self.auxiliary_field]
 
     @cached_property
     def related_field(self):
