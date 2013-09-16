@@ -160,8 +160,8 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **db_hints):
-        db = router.db_for_read(self.related.model, **db_hints)
-        return self.related.model._base_manager.using(db)
+        base_mgr = self.related.model._base_manager
+        return bm.db_manager(hints=db_hints)
 
     def get_prefetch_queryset(self, instances):
         rel_obj_attr = attrgetter(self.related.field.attname)
@@ -257,14 +257,13 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **db_hints):
-        db = router.db_for_read(self.field.rel.to, **db_hints)
-        rel_mgr = self.field.rel.to._default_manager
+        rel_mgr = self.field.rel.to._default_manager.db_manager(hints=db_hints)
         # If the related manager indicates that it should be used for
         # related fields, respect that.
         if getattr(rel_mgr, 'use_for_related_fields', False):
-            return rel_mgr.using(db)
+            return rel_mgr
         else:
-            return QuerySet(self.field.rel.to).using(db)
+            return QuerySet(self.field.rel.to, hints=db_hints)
 
     def get_prefetch_queryset(self, instances):
         rel_obj_attr = self.field.get_foreign_related_value
@@ -408,8 +407,12 @@ class ForeignRelatedObjectsDescriptor(object):
                     return self.instance._prefetched_objects_cache[rel_field.related_query_name()]
                 except (AttributeError, KeyError):
                     db = self._db or router.db_for_read(self.model, instance=self.instance)
-                    qs = super(RelatedManager, self).get_queryset().using(db).filter(**self.core_filters)
                     empty_strings_as_null = connections[db].features.interprets_empty_strings_as_nulls
+                    qs = super(RelatedManager, self).get_queryset()
+                    qs._add_routing_hints(instance=self.instance)
+                    if self._db:
+                        qs = qs.using(self._db)
+                    qs = qs.filter(**self.core_filters)
                     for field in rel_field.foreign_related_fields:
                         val = getattr(self.instance, field.attname)
                         if val is None or (val == '' and empty_strings_as_null):
@@ -421,9 +424,12 @@ class ForeignRelatedObjectsDescriptor(object):
                 rel_obj_attr = rel_field.get_local_related_value
                 instance_attr = rel_field.get_foreign_related_value
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-                db = self._db or router.db_for_read(self.model, instance=instances[0])
                 query = {'%s__in' % rel_field.name: instances}
-                qs = super(RelatedManager, self).get_queryset().using(db).filter(**query)
+                qs = super(RelatedManager, self).get_queryset()
+                qs._add_routing_hints(instance=self.instance)
+                if self._db:
+                    qs = qs.using(self._db)
+                qs = qs.filter(**query)
                 # Since we just bypassed this class' get_queryset(), we must manage
                 # the reverse relation manually.
                 for rel_obj in qs:
@@ -517,14 +523,23 @@ def create_many_related_manager(superclass, rel):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                db = self._db or router.db_for_read(self.instance.__class__, instance=self.instance)
-                return super(ManyRelatedManager, self).get_queryset().using(db)._next_is_sticky().filter(**self.core_filters)
+                qs = super(ManyRelatedManager, self).get_queryset()
+                if self._db:
+                    qs = qs.using(self._db)
+                if self.instance:
+                    qs._add_routing_hints(instance=self.instance)
+                return qs._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_queryset(self, instances):
             instance = instances[0]
             db = self._db or router.db_for_read(instance.__class__, instance=instance)
             query = {'%s__in' % self.query_field_name: instances}
-            qs = super(ManyRelatedManager, self).get_queryset().using(db)._next_is_sticky().filter(**query)
+            qs = super(ManyRelatedManager, self).get_queryset()
+            if self._db:
+                qs = qs.using(db)
+            if self.instance:
+                qs._add_routing_hints(instance=instance)
+            qs = qs._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
