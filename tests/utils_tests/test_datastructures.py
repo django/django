@@ -221,11 +221,7 @@ class MultiValueDictTests(SimpleTestCase):
                           [('name', ['Adrian', 'Simon']),
                            ('position', ['Developer'])])
 
-        # MultiValueDictKeyError: "Key 'lastname' not found in
-        # <MultiValueDict: {'position': ['Developer'],
-        #                   'name': ['Adrian', 'Simon']}>"
-        six.assertRaisesRegex(self, MultiValueDictKeyError,
-            r'"Key \'lastname\' not found in <MultiValueDict',
+        six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
             d.__getitem__, 'lastname')
 
         self.assertEqual(d.get('lastname'), None)
