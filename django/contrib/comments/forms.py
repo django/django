@@ -1,6 +1,6 @@
 import time
 from django import forms
-from django.forms.util import ErrorDict
+from django.forms.utils import ErrorDict
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment

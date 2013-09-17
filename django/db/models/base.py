@@ -159,7 +159,7 @@ class ModelBase(type):
         new_fields = new_class._meta.local_fields + \
                      new_class._meta.local_many_to_many + \
                      new_class._meta.local_private_fields
-        field_names = set([f.name for f in new_fields])
+        field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -267,7 +267,7 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        
+
         new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
@@ -326,7 +326,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
 
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
@@ -458,7 +458,7 @@ class Model(six.with_metaclass(ModelBase)):
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if not six.PY3 and hasattr(self, '__unicode__'):
+        if six.PY2 and hasattr(self, '__unicode__'):
             if type(self).__unicode__ == Model.__str__:
                 klass_name = type(self).__name__
                 raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"
@@ -694,7 +694,9 @@ class Model(six.with_metaclass(ModelBase)):
             base_qs = cls._base_manager.using(using)
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
-            updated = self._do_update(base_qs, using, pk_val, values, update_fields)
+            forced_update = update_fields or force_update
+            updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+                                      forced_update)
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
@@ -718,21 +720,27 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, meta.pk.attname, result)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """
         This method will try to update the model. If the model was updated (in
         the sense that an update query was done and a matching row was found
         from the DB) the method will return True.
         """
+        filtered = base_qs.filter(pk=pk_val)
         if not values:
             # We can end up here when saving a model in inheritance chain where
             # update_fields doesn't target any field in current model. In that
             # case we just say the update succeeded. Another case ending up here
             # is a model with just PK - in that case check that the PK still
             # exists.
-            return update_fields is not None or base_qs.filter(pk=pk_val).exists()
-        else:
-            return base_qs.filter(pk=pk_val)._update(values) > 0
+            return update_fields is not None or filtered.exists()
+        if self._meta.select_on_save and not forced_update:
+            if filtered.exists():
+                filtered._update(values)
+                return True
+            else:
+                return False
+        return filtered._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
         """
@@ -787,6 +795,8 @@ class Model(six.with_metaclass(ModelBase)):
         return getattr(self, cachename)
 
     def prepare_database_save(self, unused):
+        if self.pk is None:
+            raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
         return self.pk
 
     def clean(self):

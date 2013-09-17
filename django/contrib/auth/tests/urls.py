@@ -23,14 +23,14 @@ def remote_user_auth_view(request):
     return HttpResponse(t.render(c))
 
 def auth_processor_no_attr_access(request):
-    r1 = render_to_response('context_processors/auth_attrs_no_access.html',
+    render_to_response('context_processors/auth_attrs_no_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
     # *After* rendering, we check whether the session was accessed
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed':request.session.accessed})
 
 def auth_processor_attr_access(request):
-    r1 = render_to_response('context_processors/auth_attrs_access.html',
+    render_to_response('context_processors/auth_attrs_access.html',
         RequestContext(request, {}, processors=[context_processors.auth]))
     return render_to_response('context_processors/auth_attrs_test_access.html',
         {'session_accessed':request.session.accessed})

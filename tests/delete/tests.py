@@ -216,8 +216,8 @@ class DeletionTests(TestCase):
         r = R.objects.create(pk=1)
         s1 = S.objects.create(pk=1, r=r)
         s2 = S.objects.create(pk=2, r=r)
-        t1 = T.objects.create(pk=1, s=s1)
-        t2 = T.objects.create(pk=2, s=s2)
+        T.objects.create(pk=1, s=s1)
+        T.objects.create(pk=2, s=s2)
         r.delete()
         self.assertEqual(
             pre_delete_order, [(T, 2), (T, 1), (S, 2), (S, 1), (R, 1)]
@@ -302,7 +302,7 @@ class DeletionTests(TestCase):
     def test_hidden_related(self):
         r = R.objects.create()
         h = HiddenUser.objects.create(r=r)
-        p = HiddenUserProfile.objects.create(user=h)
+        HiddenUserProfile.objects.create(user=h)
 
         r.delete()
         self.assertEqual(HiddenUserProfile.objects.count(), 0)

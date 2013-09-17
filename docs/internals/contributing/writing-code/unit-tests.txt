@@ -117,13 +117,13 @@ of the ``i18n`` module, type:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.TranslationTests
+    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
 Going beyond that, you can specify an individual test method like this:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.TranslationTests.test_lazy_objects
+    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -220,4 +220,4 @@ If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 To run tests for just one contrib app (e.g. ``auth``), use the same
 method as above::
 
-    ./runtests.py --settings=settings auth
+    ./runtests.py --settings=settings django.contrib.auth

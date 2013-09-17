@@ -22,6 +22,6 @@ class DistanceField(BaseField):
 class GeomField(BaseField):
     """
     Wrapper for Geometry values.  It is a lightweight alternative to 
-    using GeometryField (which requires a SQL query upon instantiation).
+    using GeometryField (which requires an SQL query upon instantiation).
     """
     pass

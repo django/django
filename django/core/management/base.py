@@ -325,7 +325,7 @@ class BaseCommand(object):
         this method.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
 
 
 class AppCommand(BaseCommand):
@@ -361,7 +361,7 @@ class AppCommand(BaseCommand):
         the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
 
 
 class LabelCommand(BaseCommand):
@@ -397,7 +397,7 @@ class LabelCommand(BaseCommand):
         string as given on the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
 
 
 class NoArgsCommand(BaseCommand):
@@ -423,4 +423,4 @@ class NoArgsCommand(BaseCommand):
         Perform this command's actions.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of NoArgsCommand must provide a handle_noargs() method')

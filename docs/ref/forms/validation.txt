@@ -219,10 +219,10 @@ through the ``Form.non_field_errors()`` method.
 
 When you really do need to attach the error to a particular field, you should
 store (or amend) a key in the ``Form._errors`` attribute. This attribute is an
-instance of a ``django.forms.util.ErrorDict`` class. Essentially, though, it's
+instance of a ``django.forms.utils.ErrorDict`` class. Essentially, though, it's
 just a dictionary. There is a key in the dictionary for each field in the form
 that has an error. Each value in the dictionary is a
-``django.forms.util.ErrorList`` instance, which is a list that knows how to
+``django.forms.utils.ErrorList`` instance, which is a list that knows how to
 display itself in different ways. So you can treat ``_errors`` as a dictionary
 mapping field names to lists.
 
@@ -402,6 +402,12 @@ example::
                 if "help" not in subject:
                     raise forms.ValidationError("Did not send for 'help' in "
                             "the subject despite CC'ing yourself.")
+
+.. versionchanged:: 1.7
+
+    In previous versions of Django, ``form.clean()`` was required to return
+    a dictionary of ``cleaned_data``. This method may still return a dictionary
+    of data to be used, but it's no longer required.
 
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.

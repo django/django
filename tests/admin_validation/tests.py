@@ -244,14 +244,14 @@ class ValidationTestCase(TestCase):
 
     def test_nested_fields(self):
         class NestedFieldsAdmin(admin.ModelAdmin):
-           fields = ('price', ('name', 'subtitle'))
+            fields = ('price', ('name', 'subtitle'))
         NestedFieldsAdmin.validate(Book)
 
     def test_nested_fieldsets(self):
         class NestedFieldsetAdmin(admin.ModelAdmin):
-           fieldsets = (
-               ('Main', {'fields': ('price', ('name', 'subtitle'))}),
-           )
+            fieldsets = (
+                ('Main', {'fields': ('price', ('name', 'subtitle'))}),
+            )
         NestedFieldsetAdmin.validate(Book)
 
     def test_explicit_through_override(self):

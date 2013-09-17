@@ -231,7 +231,7 @@ class SortedDict(dict):
         Replaces the normal dict.__repr__ with a version that returns the keys
         in their sorted order.
         """
-        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in six.iteritems(self)])
+        return '{%s}' % ', '.join('%r: %r' % (k, v) for k, v in six.iteritems(self))
 
     def clear(self):
         super(SortedDict, self).clear()
@@ -334,7 +334,7 @@ class MultiValueDict(dict):
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = dict([(k, self.getlist(k)) for k in self])
+        obj_dict['_data'] = dict((k, self.getlist(k)) for k in self)
         return obj_dict
 
     def __setstate__(self, obj_dict):

@@ -9,5 +9,6 @@ class AllOGRFields(models.Model):
     f_datetime = models.DateTimeField()
     f_time = models.TimeField()
     geom = models.PolygonField()
+    point = models.PointField()
 
     objects = models.GeoManager()

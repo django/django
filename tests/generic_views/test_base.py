@@ -468,3 +468,15 @@ class UseMultipleObjectMixinTest(unittest.TestCase):
         # Overwrite the view's queryset with queryset from kwarg
         context = test_view.get_context_data(object_list=queryset)
         self.assertEqual(context['object_list'], queryset)
+
+
+class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
+
+    def test_template_mixin_without_template(self):
+        """
+        We want to makes sure that if you use a template mixin, but forget the
+        template, it still tells you it's ImproperlyConfigured instead of
+        TemplateDoesNotExist.
+        """
+        view = views.TemplateResponseWithoutTemplate()
+        self.assertRaises(ImproperlyConfigured, view.get_template_names)

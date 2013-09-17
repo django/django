@@ -8,7 +8,7 @@ from .models import Person, Book, Car, PersonManager, PublishedBookManager
 
 class CustomManagerTests(TestCase):
     def test_manager(self):
-        p1 = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
         p2 = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
 
         # Test a custom `Manager` method.
@@ -29,12 +29,12 @@ class CustomManagerTests(TestCase):
             manager.public_method()
             # Don't copy private methods.
             with self.assertRaises(AttributeError):
-               manager._private_method()
+                manager._private_method()
             # Copy methods with `manager=True` even if they are private.
             manager._optin_private_method()
             # Don't copy methods with `manager=False` even if they are public.
             with self.assertRaises(AttributeError):
-               manager.optout_public_method()
+                manager.optout_public_method()
 
             # Test that the overridden method is called.
             queryset = manager.filter()
@@ -63,7 +63,7 @@ class CustomManagerTests(TestCase):
         # manager
         self.assertIsInstance(p2.books, PublishedBookManager)
 
-        b1 = Book.published_objects.create(
+        Book.published_objects.create(
             title="How to program", author="Rodney Dangerfield", is_published=True
         )
         b2 = Book.published_objects.create(
@@ -85,8 +85,8 @@ class CustomManagerTests(TestCase):
             lambda b: b.title
         )
 
-        c1 = Car.cars.create(name="Corvette", mileage=21, top_speed=180)
-        c2 = Car.cars.create(name="Neon", mileage=31, top_speed=100)
+        Car.cars.create(name="Corvette", mileage=21, top_speed=180)
+        Car.cars.create(name="Neon", mileage=31, top_speed=100)
 
         self.assertQuerysetEqual(
             Car.cars.order_by("name"), [

@@ -4,7 +4,7 @@ except ImportError:
     from urlparse import parse_qsl, urlparse, urlunparse
 
 from django import template
-from django.contrib.admin.util import quote
+from django.contrib.admin.utils import quote
 from django.core.urlresolvers import resolve, Resolver404
 from django.utils.http import urlencode
 
@@ -22,7 +22,7 @@ def admin_urlquote(value):
 
 
 @register.simple_tag(takes_context=True)
-def add_preserved_filters(context, url, popup=False):
+def add_preserved_filters(context, url, popup=False, to_field=None):
     opts = context.get('opts')
     preserved_filters = context.get('preserved_filters')
 
@@ -48,6 +48,9 @@ def add_preserved_filters(context, url, popup=False):
     if popup:
         from django.contrib.admin.options import IS_POPUP_VAR
         merged_qs[IS_POPUP_VAR] = 1
+    if to_field:
+        from django.contrib.admin.options import TO_FIELD_VAR
+        merged_qs[TO_FIELD_VAR] = to_field
 
     merged_qs.update(parsed_qs)
 

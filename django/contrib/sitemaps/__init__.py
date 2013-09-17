@@ -1,11 +1,8 @@
 from django.contrib.sites.models import Site
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
-try:
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
-except ImportError:     # Python 2
-    from urllib import urlencode, urlopen
+from django.utils.six.moves.urllib.parse import urlencode
+from django.utils.six.moves.urllib.request import urlopen
 
 PING_URL = "http://www.google.com/webmasters/tools/ping"
 

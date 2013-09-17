@@ -22,7 +22,8 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
-                 'index_together', 'app_cache', 'default_permissions')
+                 'index_together', 'app_cache', 'default_permissions',
+                 'select_on_save')
 
 @python_2_unicode_compatible
 class Options(object):
@@ -37,6 +38,7 @@ class Options(object):
         self.ordering = []
         self.unique_together = []
         self.index_together = []
+        self.select_on_save = False
         self.default_permissions = ('add', 'change', 'delete')
         self.permissions = []
         self.object_name, self.app_label = None, app_label
@@ -77,7 +79,7 @@ class Options(object):
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
-        from django.db.backends.util import truncate_name
+        from django.db.backends.utils import truncate_name
 
         cls._meta = self
         self.model = cls
@@ -352,8 +354,8 @@ class Options(object):
                     cache.append((field, model))
                 else:
                     cache.append((field, parent))
-        cache.extend([(f, None) for f in self.local_fields])
-        cache.extend([(f, None) for f in self.local_private_fields])
+        cache.extend((f, None) for f in self.local_fields)
+        cache.extend((f, None) for f in self.local_private_fields)
         self._field_cache = tuple(cache)
         self._field_name_cache = [x for x, _ in cache]
 

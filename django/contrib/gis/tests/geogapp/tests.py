@@ -42,7 +42,7 @@ class GeographyTest(TestCase):
         "Testing GeoQuerySet.distance() support on non-point geography fields."
         # `GeoQuerySet.distance` is not allowed geometry fields.
         htown = City.objects.get(name='Houston')
-        qs = Zipcode.objects.distance(htown.point)
+        Zipcode.objects.distance(htown.point)
 
     def test04_invalid_operators_functions(self):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."

@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.admin.util import (flatten_fieldsets, lookup_field,
+from django.contrib.admin.utils import (flatten_fieldsets, lookup_field,
     display_for_field, label_for_field, help_text_for_field)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
@@ -45,20 +45,6 @@ class AdminForm(object):
                 model_admin=self.model_admin,
                 **options
             )
-
-    def first_field(self):
-        try:
-            fieldset_name, fieldset_options = self.fieldsets[0]
-            field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, six.string_types):
-                field_name = field_name[0]
-            return self.form[field_name]
-        except (KeyError, IndexError):
-            pass
-        try:
-            return next(iter(self.form))
-        except StopIteration:
-            return None
 
     def _media(self):
         media = self.form.media
@@ -112,7 +98,7 @@ class Fieldline(object):
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe('\n'.join([self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields]).strip('\n'))
+        return mark_safe('\n'.join(self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields).strip('\n'))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):
@@ -322,7 +308,7 @@ class InlineFieldset(Fieldset):
             yield Fieldline(self.form, field, self.readonly_fields,
                 model_admin=self.model_admin)
 
-class AdminErrorList(forms.util.ErrorList):
+class AdminErrorList(forms.utils.ErrorList):
     """
     Stores all errors for the form/formsets in an add/change stage view.
     """

@@ -27,16 +27,28 @@ BUILTIN_SERIALIZERS = {
     "xml"    : "django.core.serializers.xml_serializer",
     "python" : "django.core.serializers.python",
     "json"   : "django.core.serializers.json",
+    "yaml"   : "django.core.serializers.pyyaml",
 }
 
-# Check for PyYaml and register the serializer if it's available.
-try:
-    import yaml
-    BUILTIN_SERIALIZERS["yaml"] = "django.core.serializers.pyyaml"
-except ImportError:
-    pass
-
 _serializers = {}
+
+
+class BadSerializer(object):
+    """
+    Stub serializer to hold exception raised during registration
+
+    This allows the serializer registration to cache serializers and if there
+    is an error raised in the process of creating a serializer it will be
+    raised and passed along to the caller when the serializer is used.
+    """
+    internal_use_only = False
+
+    def __init__(self, exception):
+        self.exception = exception
+
+    def __call__(self, *args, **kwargs):
+        raise self.exception
+
 
 def register_serializer(format, serializer_module, serializers=None):
     """Register a new serializer.
@@ -53,11 +65,22 @@ def register_serializer(format, serializer_module, serializers=None):
     """
     if serializers is None and not _serializers:
         _load_serializers()
-    module = importlib.import_module(serializer_module)
+
+    try:
+        module = importlib.import_module(serializer_module)
+    except ImportError as exc:
+        bad_serializer = BadSerializer(exc)
+
+        module = type('BadSerializerModule', (object,), {
+            'Deserializer': bad_serializer,
+            'Serializer': bad_serializer,
+        })
+
     if serializers is None:
         _serializers[format] = module
     else:
         serializers[format] = module
+
 
 def unregister_serializer(format):
     "Unregister a given serializer. This is not a thread-safe operation."

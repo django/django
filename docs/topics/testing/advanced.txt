@@ -5,18 +5,18 @@ Advanced testing topics
 The request factory
 ===================
 
-.. module:: django.test.client
+.. currentmodule:: django.test
 
 .. class:: RequestFactory
 
-The :class:`~django.test.client.RequestFactory` shares the same API as
+The :class:`~django.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
 view function the same way as you would test any other function -- as
 a black box, with exactly known inputs, testing for specific outputs.
 
-The API for the :class:`~django.test.client.RequestFactory` is a slightly
+The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
@@ -38,8 +38,7 @@ Example
 The following is a simple unit test using the request factory::
 
     from django.contrib.auth.models import User
-    from django.test import TestCase
-    from django.test.client import RequestFactory
+    from django.test import TestCase, RequestFactory
 
     class SimpleTest(TestCase):
         def setUp(self):
@@ -164,8 +163,6 @@ exception will be raised.
 
 Advanced features of ``TransactionTestCase``
 ============================================
-
-.. currentmodule:: django.test
 
 .. attribute:: TransactionTestCase.available_apps
 
@@ -298,11 +295,13 @@ Defining a test runner
 
 .. currentmodule:: django.test.runner
 
+.. versionadded:: 1.6
+
 A test runner is a class defining a ``run_tests()`` method. Django ships
-with a ``DiscoverRunner`` class that defines the default Django
-testing behavior. This class defines the ``run_tests()`` entry point,
-plus a selection of other methods that are used to by ``run_tests()`` to
-set up, execute and tear down the test suite.
+with a ``DiscoverRunner`` class that defines the default Django testing
+behavior. This class defines the ``run_tests()`` entry point, plus a
+selection of other methods that are used to by ``run_tests()`` to set up,
+execute and tear down the test suite.
 
 .. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, **kwargs)
 
@@ -338,6 +337,32 @@ set up, execute and tear down the test suite.
 
 Attributes
 ~~~~~~~~~~
+
+.. attribute:: DiscoverRunner.test_suite
+
+    .. versionadded:: 1.7
+
+    The class used to build the test suite. By default it is set to
+    ``unittest.TestSuite``. This can be overridden if you wish to implement
+    different logic for collecting tests.
+
+.. attribute:: DiscoverRunner.test_runner
+
+    .. versionadded:: 1.7
+
+    This is the class of the low-level test runner which is used to execute
+    the individual tests and format the results. By default it is set to
+    ``unittest.TextTestRunner``. Despite the unfortunate similarity in
+    naming conventions, this is not the same type of class as
+    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    can override this attribute to modify the way tests are run and reported.
+
+.. attribute:: DiscoverRunner.test_loader
+
+    This is the class that loads tests, whether from TestCases or modules or
+    otherwise and bundles them into test suites for the runner to execute.
+    By default it is set to ``unittest.defaultTestLoader``. You can override
+    this attribute if your tests are going to be loaded in unusual ways.
 
 .. attribute:: DiscoverRunner.option_list
 

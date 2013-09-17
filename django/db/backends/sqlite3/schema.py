@@ -63,10 +63,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.create_model(temp_model)
         # Copy data from the old table
         field_maps = [(x, y) for x, y in mapping.items() if not (x is None or y is None)]
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
-            ', '.join([x for x, y in field_maps]),
-            ', '.join([y for x, y in field_maps]),
+            ', '.join(x for x, y in field_maps),
+            ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
         # Delete the old table
@@ -147,7 +147,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Copy the data across
         old_columns = [f.column for f in old_field.rel.through._meta.local_concrete_fields]
         new_columns = [f.column for f in new_field.rel.through._meta.local_concrete_fields]
-        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(new_field.rel.through._meta.db_table),
             ', '.join(new_columns),
             ', '.join(old_columns),

@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 import datetime
+import unittest
+
 from django.test import TransactionTestCase
-from django.utils.unittest import skipUnless
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
@@ -18,11 +19,10 @@ class SchemaTests(TransactionTestCase):
     as sometimes the code to check if a test has worked is almost as complex
     as the code it is testing.
     """
-    
+
     available_apps = []
 
     models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget]
-    no_table_strings = ["no such table", "unknown table", "does not exist"]
 
     # Utility functions
 
@@ -34,30 +34,25 @@ class SchemaTests(TransactionTestCase):
         "Deletes all model tables for our models for a clean test environment"
         cursor = connection.cursor()
         connection.disable_constraint_checking()
+        table_names = connection.introspection.table_names(cursor)
         for model in self.models:
             # Remove any M2M tables first
             for field in model._meta.local_many_to_many:
                 with atomic():
-                    try:
+                    tbl = field.rel.through._meta.db_table
+                    if tbl in table_names:
                         cursor.execute(connection.schema_editor().sql_delete_table % {
-                            "table": connection.ops.quote_name(field.rel.through._meta.db_table),
+                            "table": connection.ops.quote_name(tbl),
                         })
-                    except DatabaseError as e:
-                        if any([s in str(e).lower() for s in self.no_table_strings]):
-                            pass
-                        else:
-                            raise
+                        table_names.remove(tbl)
             # Then remove the main tables
             with atomic():
-                try:
+                tbl = model._meta.db_table
+                if tbl in table_names:
                     cursor.execute(connection.schema_editor().sql_delete_table % {
-                        "table": connection.ops.quote_name(model._meta.db_table),
+                        "table": connection.ops.quote_name(tbl),
                     })
-                except DatabaseError as e:
-                    if any([s in str(e).lower() for s in self.no_table_strings]):
-                        pass
-                    else:
-                        raise
+                    table_names.remove(tbl)
         connection.enable_constraint_checking()
 
     def column_classes(self, model):
@@ -98,7 +93,7 @@ class SchemaTests(TransactionTestCase):
             lambda: list(Author.objects.all()),
         )
 
-    @skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_fk(self):
         "Tests that creating tables out of FK order, then repointing, works"
         # Create the table
@@ -317,7 +312,7 @@ class SchemaTests(TransactionTestCase):
             BookWithM2M._meta.local_many_to_many.remove(new_field)
             del BookWithM2M._meta._m2m_cache
 
-    @skipUnless(connection.features.supports_check_constraints, "No check constraints")
+    @unittest.skipUnless(connection.features.supports_check_constraints, "No check constraints")
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints
@@ -649,3 +644,16 @@ class SchemaTests(TransactionTestCase):
         self.assertTrue(
             connection.introspection.get_indexes(connection.cursor(), Tag._meta.db_table)['slug']['primary_key'],
         )
+
+    def test_context_manager_exit(self):
+        """
+        Ensures transaction is correctly closed when an error occurs
+        inside a SchemaEditor context.
+        """
+        class SomeError(Exception):
+            pass
+        try:
+            with connection.schema_editor() as editor:
+                raise SomeError
+        except SomeError:
+            self.assertFalse(connection.in_atomic_block)

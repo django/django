@@ -22,51 +22,54 @@ class BaseGeometryWidget(Widget):
     map_srid = 4326
     map_width = 600
     map_height = 400
-    display_wkt = False
+    display_raw = False
 
     supports_3d = False
     template_name = ''  # set on subclasses
 
     def __init__(self, attrs=None):
         self.attrs = {}
-        for key in ('geom_type', 'map_srid', 'map_width', 'map_height', 'display_wkt'):
+        for key in ('geom_type', 'map_srid', 'map_width', 'map_height', 'display_raw'):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
+
+    def serialize(self, value):
+        return value.wkt if value else ''
+
+    def deserialize(self, value):
+        try:
+            return GEOSGeometry(value, self.map_srid)
+        except (GEOSException, ValueError) as err:
+            logger.error(
+                "Error creating geometry from value '%s' (%s)" % (
+                value, err)
+            )
+        return None
 
     def render(self, name, value, attrs=None):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
         if isinstance(value, six.string_types):
-            try:
-                value = GEOSGeometry(value)
-            except (GEOSException, ValueError) as err:
-                logger.error(
-                    "Error creating geometry from value '%s' (%s)" % (
-                    value, err)
-                )
-                value = None
+            value = self.deserialize(value)
 
-        wkt = ''
         if value:
             # Check that srid of value and map match
             if value.srid != self.map_srid:
                 try:
                     ogr = value.ogr
                     ogr.transform(self.map_srid)
-                    wkt = ogr.wkt
+                    value = ogr
                 except gdal.OGRException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
                         value.srid, self.map_srid, err)
                     )
-            else:
-                wkt = value.wkt
 
         context = self.build_attrs(attrs,
             name=name,
             module='geodjango_%s' % name.replace('-','_'),  # JS-safe
-            wkt=wkt,
+            serialized=self.serialize(value),
             geom_type=gdal.OGRGeomType(self.attrs['geom_type']),
             STATIC_URL=settings.STATIC_URL,
             LANGUAGE_BIDI=translation.get_language_bidi(),
@@ -108,5 +111,10 @@ class OSMWidget(BaseGeometryWidget):
             return 900913
 
     def render(self, name, value, attrs=None):
-        return super(self, OSMWidget).render(name, value,
-            {'default_lon': self.default_lon, 'default_lat': self.default_lat})
+        default_attrs = {
+            'default_lon': self.default_lon,
+            'default_lat': self.default_lat,
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        return super(OSMWidget, self).render(name, value, default_attrs)

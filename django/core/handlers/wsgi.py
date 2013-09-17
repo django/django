@@ -7,16 +7,21 @@ from io import BytesIO
 from threading import Lock
 
 from django import http
+from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
+from django.utils import six
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
 
 logger = logging.getLogger('django.request')
+
+# encode() and decode() expect the charset to be a native string.
+ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
 
 
 class LimitedStream(object):
@@ -73,8 +78,8 @@ class LimitedStream(object):
 
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
-        script_name = base.get_script_name(environ)
-        path_info = base.get_path_info(environ)
+        script_name = get_script_name(environ)
+        path_info = get_path_info(environ)
         if not path_info:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
@@ -88,7 +93,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = self._parse_content_type(self.META.get('CONTENT_TYPE', ''))
+        _, content_params = self._parse_content_type(environ.get('CONTENT_TYPE', ''))
         if 'charset' in content_params:
             try:
                 codecs.lookup(content_params['charset'])
@@ -98,7 +103,7 @@ class WSGIRequest(http.HttpRequest):
                 self.encoding = content_params['charset']
         self._post_parse_error = False
         try:
-            content_length = int(self.environ.get('CONTENT_LENGTH'))
+            content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
             content_length = 0
         self._stream = LimitedStream(self.environ['wsgi.input'], content_length)
@@ -106,7 +111,7 @@ class WSGIRequest(http.HttpRequest):
         self.resolver_match = None
 
     def _is_secure(self):
-        return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
+        return self.environ.get('wsgi.url_scheme') == 'https'
 
     def _parse_content_type(self, ctype):
         """
@@ -131,7 +136,8 @@ class WSGIRequest(http.HttpRequest):
     def _get_get(self):
         if not hasattr(self, '_get'):
             # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self._encoding)
+            raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
+            self._get = http.QueryDict(raw_query_string, encoding=self._encoding)
         return self._get
 
     def _set_get(self, get):
@@ -147,7 +153,8 @@ class WSGIRequest(http.HttpRequest):
 
     def _get_cookies(self):
         if not hasattr(self, '_cookies'):
-            self._cookies = http.parse_cookie(self.environ.get('HTTP_COOKIE', ''))
+            raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
+            self._cookies = http.parse_cookie(raw_cookie)
         return self._cookies
 
     def _set_cookies(self, cookies):
@@ -183,7 +190,7 @@ class WSGIHandler(base.BaseHandler):
                     self._request_middleware = None
                     raise
 
-        set_script_prefix(base.get_script_name(environ))
+        set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__)
         try:
             request = self.request_class(environ)
@@ -206,3 +213,69 @@ class WSGIHandler(base.BaseHandler):
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
         start_response(force_str(status), response_headers)
         return response
+
+
+def get_path_info(environ):
+    """
+    Returns the HTTP request's PATH_INFO as a unicode string.
+    """
+    path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
+
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return path_info.decode(UTF_8)
+
+
+def get_script_name(environ):
+    """
+    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite has been used, returns what would have been
+    the script name prior to any rewriting (so it's the script name as seen
+    from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
+    set (to anything).
+    """
+    if settings.FORCE_SCRIPT_NAME is not None:
+        return force_text(settings.FORCE_SCRIPT_NAME)
+
+    # If Apache's mod_rewrite had a whack at the URL, Apache set either
+    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
+    # rewrites. Unfortunately not every Web server (lighttpd!) passes this
+    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
+    # needed.
+    script_url = get_bytes_from_wsgi(environ, 'SCRIPT_URL', '')
+    if not script_url:
+        script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
+
+    if script_url:
+        path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
+        script_name = script_url[:-len(path_info)]
+    else:
+        script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
+
+    # It'd be better to implement URI-to-IRI decoding, see #19508.
+    return script_name.decode(UTF_8)
+
+
+def get_bytes_from_wsgi(environ, key, default):
+    """
+    Get a value from the WSGI environ dictionary as bytes.
+
+    key and default should be str objects. Under Python 2 they may also be
+    unicode objects provided they only contain ASCII characters.
+    """
+    value = environ.get(str(key), str(default))
+    # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+    # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
+    # is the default. Re-encode to recover the original bytestring.
+    return value if six.PY2 else value.encode(ISO_8859_1)
+
+
+def get_str_from_wsgi(environ, key, default):
+    """
+    Get a value from the WSGI environ dictionary as bytes.
+
+    key and default should be str objects. Under Python 2 they may also be
+    unicode objects provided they only contain ASCII characters.
+    """
+    value = environ.get(str(key), str(default))
+    # Same comment as above
+    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)

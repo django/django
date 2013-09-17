@@ -8,7 +8,7 @@ from django.db.utils import load_backend
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 
-from .util import truncate_name
+from .utils import truncate_name
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -23,6 +23,7 @@ class BaseDatabaseCreation(object):
     destruction of test databases.
     """
     data_types = {}
+    data_types_suffix = {}
     data_type_check_constraints = {}
 
     def __init__(self, connection):
@@ -53,6 +54,7 @@ class BaseDatabaseCreation(object):
         qn = self.connection.ops.quote_name
         for f in opts.local_concrete_fields:
             col_type = f.db_type(connection=self.connection)
+            col_type_suffix = f.db_type_suffix(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
                 # Skip ManyToManyFields, because they're not represented as
@@ -88,6 +90,8 @@ class BaseDatabaseCreation(object):
                         (model, f.auxiliary_to))
                 else:
                     field_output.extend(ref_output)
+            if col_type_suffix:
+                field_output.append(style.SQL_KEYWORD(col_type_suffix))
             table_output.append(' '.join(field_output))
         unique_togethers = []
         for field_constraints in opts.unique_together:

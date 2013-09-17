@@ -46,6 +46,15 @@ if os.name == 'nt':
                 except (OSError):
                     pass
 
+        @property
+        def closed(self):
+            """
+            This attribute needs to be accessible in certain situations,
+            because this class is supposed to mock the API of the class
+            tempfile.NamedTemporaryFile in the Python standard library.
+            """
+            return self.file.closed
+
         def __del__(self):
             self.close()
 

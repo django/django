@@ -117,9 +117,9 @@ these changes.
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
   handler should be used instead.
 
-* The ``template`` attribute on :class:`~django.test.client.Response`
+* The ``template`` attribute on :class:`~django.test.Response`
   objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.client.Response.templates` attribute should be
+  The :attr:`~django.test.Response.templates` attribute should be
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
@@ -417,6 +417,8 @@ these changes.
 
 * ``django.utils.importlib`` will be removed.
 
+* ``django.utils.tzinfo`` will be removed.
+
 * ``django.utils.unittest`` will be removed.
 
 * The ``syncdb`` command will be removed.
@@ -441,6 +443,15 @@ these changes.
   :class:`collections.OrderedDict` from the Python standard library instead.
 
 * ``ModelAdmin.declared_fieldsets`` will be removed.
+
+* Instances of ``util.py`` in the Django codebase have been renamed to
+  ``utils.py`` in an effort to unify all util and utils references.
+  The modules that provided backwards compatability will be removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
 
 2.0
 ---

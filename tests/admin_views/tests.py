@@ -5,40 +5,37 @@ import os
 import re
 import datetime
 import unittest
-try:
-    from urllib.parse import urljoin
-except ImportError:  # Python 2
-    from urlparse import urljoin
 
 from django.conf import settings, global_settings
 from django.core import mail
 from django.core.files import temp as tempfile
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 # Register auth models with the admin.
 from django.contrib.auth import get_permission_codename
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
-from django.contrib.admin.util import quote
+from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.test.utils import patch_logger
+from django.test.utils import override_settings
 from django.utils import formats
 from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes
 from django.utils.html import escape
 from django.utils.http import urlencode, urlquote
+from django.utils.six.moves.urllib.parse import urljoin
 from django.utils._os import upath
 from django.utils import six
-from django.test.utils import override_settings
 
 # local test models
 from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
@@ -50,7 +47,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     OtherStory, ComplexSortedPerson, PluggableSearchPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
-    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage, Telegram)
+    Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
+    Telegram, Pizza, Topping, FilteredManager)
 from .admin import site, site2
 
 
@@ -379,9 +377,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                   (AdminOrderedAdminMethod, 'adminorderedadminmethod'),
                   (AdminOrderedCallable, 'adminorderedcallable')]
         for model, url in models:
-            a1 = model.objects.create(stuff='The Last Item', order=3)
-            a2 = model.objects.create(stuff='The First Item', order=1)
-            a3 = model.objects.create(stuff='The Middle Item', order=2)
+            model.objects.create(stuff='The Last Item', order=3)
+            model.objects.create(stuff='The First Item', order=1)
+            model.objects.create(stuff='The Middle Item', order=2)
             response = self.client.get('/test_admin/admin/admin_views/%s/' % url, {})
             self.assertEqual(response.status_code, 200)
             # Should have 3 columns including action checkbox col.
@@ -598,7 +596,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (against 9bea85795705d015cdadc82c68b99196a8554f5c)
         """
         user = User.objects.get(username='super')
-        password = user.password
         user.set_unusable_password()
         user.save()
 
@@ -642,6 +639,20 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
         # Check the format of the shown object -- shouldn't contain a change link
         self.assertContains(response, '<th class="field-__str__">UnchangeableObject object</th>', html=True)
+
+    def test_invalid_appindex_url(self):
+        """
+        #21056 -- URL reversing shouldn't work for nonexistent apps.
+        """
+        good_url = '/test_admin/admin/admin_views/'
+        confirm_good_url = reverse('admin:app_list',
+                                   kwargs={'app_label': 'admin_views'})
+        self.assertEqual(good_url, confirm_good_url)
+
+        with self.assertRaises(NoReverseMatch):
+            reverse('admin:app_list', kwargs={'app_label': 'this_should_fail'})
+        with self.assertRaises(NoReverseMatch):
+            reverse('admin:app_list', args=('admin_views2',))
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -687,27 +698,6 @@ class AdminJavaScriptTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-
-    def testSingleWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus on first field.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
-        )
-
-    def testMultiWidgetFirsFieldFocus(self):
-        """
-        JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
-        is such that the first form field has a MultiWidget.
-        """
-        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % 'admin')
-        self.assertContains(
-            response,
-            '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
-        )
 
     def test_js_minified_only_if_debug_is_false(self):
         """
@@ -757,7 +747,7 @@ class SaveAsTests(TestCase):
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
         post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 1, 'age': 42}
-        response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
+        self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=1)), 1)
 
@@ -1088,7 +1078,7 @@ class AdminViewPermissionsTest(TestCase):
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
-        login = self.client.login(username='joepublic', password='secret')
+        self.client.login(username='joepublic', password='secret')
         # Check and make sure that if user expires, data still persists
         self.client.get('/test_admin/admin/')
         self.client.post('/test_admin/admin/', self.super_login)
@@ -1320,6 +1310,40 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get('/test_admin/admin/secure-view/')
         self.assertContains(response, 'id="login-form"')
 
+    def testDisabledStaffPermissionsWhenLoggedIn(self):
+        self.client.login(username='super', password='secret')
+        superuser = User.objects.get(username='super')
+        superuser.is_staff = False
+        superuser.save()
+
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'id="login-form"')
+        self.assertNotContains(response, 'Log out')
+
+        response = self.client.get('/test_admin/admin/secure-view/')
+        self.assertContains(response, 'id="login-form"')
+
+    def testAppIndexFailEarly(self):
+        """
+        If a user has no module perms, avoid iterating over all the modeladmins
+        in the registry.
+        """
+        opts = Article._meta
+        change_user = User.objects.get(username='changeuser')
+        permission = get_perm(Article, get_permission_codename('change', opts))
+
+        self.client.post('/test_admin/admin/', self.changeuser_login)
+
+        # the user has no module permissions, because this module doesn't exist
+        change_user.user_permissions.remove(permission)
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.assertEqual(response.status_code, 403)
+
+        # the user now has module permissions
+        change_user.user_permissions.add(permission)
+        response = self.client.get('/test_admin/admin/admin_views/')
+        self.assertEqual(response.status_code, 200)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewsNoUrlTest(TestCase):
@@ -1465,7 +1489,7 @@ class AdminViewDeletedObjectsTest(TestCase):
 
         """
         plot = Plot.objects.get(pk=3)
-        tag = FunkyTag.objects.create(content_object=plot, name='hott')
+        FunkyTag.objects.create(content_object=plot, name='hott')
         should_contain = """<li>Funky tag: hott"""
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
@@ -1749,9 +1773,9 @@ class SecureViewTests(TestCase):
         """
         Only admin users should be able to use the admin shortcut view.
         """
-        user_ctype = ContentType.objects.get_for_model(User)
-        user = User.objects.get(username='super')
-        shortcut_url = "/test_admin/admin/r/%s/%s/" % (user_ctype.pk, user.pk)
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk='foo')
+        shortcut_url = "/test_admin/admin/r/%s/%s/" % (model_ctype.pk, obj.pk)
 
         # Not logged in: we should see the login page.
         response = self.client.get(shortcut_url, follow=False)
@@ -1762,7 +1786,7 @@ class SecureViewTests(TestCase):
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, 'http://example.com/users/super/')
+        self.assertEqual(response.url, 'http://example.com/dummy/foo/')
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -2222,7 +2246,7 @@ class AdminSearchTest(TestCase):
         from django.contrib.admin.views.main import TO_FIELD_VAR
         response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
-        self.assertContains(response, '<input type="hidden" name="t" value="username"/>', html=True)
+        self.assertContains(response, '<input type="hidden" name="_to_field" value="username"/>', html=True)
 
     def test_exact_matches(self):
         response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
@@ -2245,8 +2269,8 @@ class AdminSearchTest(TestCase):
         self.assertNotContains(response, "Guido")
 
     def test_pluggable_search(self):
-        p1 = PluggableSearchPerson.objects.create(name="Bob", age=10)
-        p2 = PluggableSearchPerson.objects.create(name="Amy", age=20)
+        PluggableSearchPerson.objects.create(name="Bob", age=10)
+        PluggableSearchPerson.objects.create(name="Amy", age=20)
 
         response = self.client.get('/test_admin/admin/admin_views/pluggablesearchperson/?q=Bob')
         # confirm the search returned one object
@@ -2365,7 +2389,7 @@ class AdminActionsTest(TestCase):
             'action': 'mail_admin',
             'index': 0,
         }
-        response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
 
@@ -2385,7 +2409,7 @@ class AdminActionsTest(TestCase):
         self.assertIsInstance(confirmation, TemplateResponse)
         self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
-        response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
+        self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
     def test_non_localized_pk(self):
@@ -2459,7 +2483,7 @@ class AdminActionsTest(TestCase):
             'action': 'external_mail',
             'index': 0,
         }
-        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
@@ -2561,7 +2585,7 @@ action)</option>
             # ...but we clicked "go" on the top form.
             'index': 0
         }
-        response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
+        self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
 
         # Send mail, don't delete.
         self.assertEqual(len(mail.outbox), 1)
@@ -2679,6 +2703,12 @@ class AdminCustomQuerysetTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         self.pks = [EmptyModel.objects.create().id for i in range(3)]
+        self.super_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'super',
+            'password': 'secret',
+        }
 
     def test_changelist_view(self):
         response = self.client.get('/test_admin/admin/admin_views/emptymodel/')
@@ -2895,6 +2925,20 @@ class AdminCustomQuerysetTest(TestCase):
             '<li class="success">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
             html=True
         )
+
+    def test_history_view_custom_qs(self):
+        """
+        Ensure that custom querysets are considered for the admin history view.
+        Refs #21013.
+        """
+        self.client.post('/test_admin/admin/', self.super_login)
+        FilteredManager.objects.create(pk=1)
+        FilteredManager.objects.create(pk=2)
+        response = self.client.get('/test_admin/admin/admin_views/filteredmanager/')
+        self.assertContains(response, "PK=1")
+        self.assertContains(response, "PK=2")
+        self.assertEqual(self.client.get('/test_admin/admin/admin_views/filteredmanager/1/history/').status_code, 200)
+        self.assertEqual(self.client.get('/test_admin/admin/admin_views/filteredmanager/2/history/').status_code, 200)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -3542,6 +3586,25 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
             "Hide"
         )
 
+    def test_first_field_focus(self):
+        """JavaScript-assisted auto-focus on first usable form field."""
+        # First form field has a single widget
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/picture/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_name')
+        )
+
+        # First form field has a MultiWidget
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/reservation/add/'))
+        self.assertEqual(
+            self.selenium.switch_to_active_element(),
+            self.selenium.find_element_by_id('id_start_date_0')
+        )
+
 
 class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
@@ -3638,6 +3701,17 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<p>No opinion</p>', html=True)
         self.assertNotContains(response, '<p>(None)</p>')
 
+    def test_readonly_backwards_ref(self):
+        """
+        Regression test for #16433 - backwards references for related objects
+        broke if the related field is read-only due to the help_text attribute
+        """
+        topping = Topping.objects.create(name='Salami')
+        pizza = Pizza.objects.create(name='Americano')
+        pizza.toppings.add(topping)
+        response = self.client.get('/test_admin/admin/admin_views/topping/add/')
+        self.assertEqual(response.status_code, 200)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class RawIdFieldsTest(TestCase):
@@ -3653,12 +3727,12 @@ class RawIdFieldsTest(TestCase):
     def test_limit_choices_to(self):
         """Regression test for 14880"""
         actor = Actor.objects.create(name="Palin", age=27)
-        inquisition1 = Inquisition.objects.create(expected=True,
-                                                  leader=actor,
-                                                  country="England")
-        inquisition2 = Inquisition.objects.create(expected=False,
-                                                  leader=actor,
-                                                  country="Spain")
+        Inquisition.objects.create(expected=True,
+                                   leader=actor,
+                                   country="England")
+        Inquisition.objects.create(expected=False,
+                                   leader=actor,
+                                   country="Spain")
         response = self.client.get('/test_admin/admin/admin_views/sketch/add/')
         # Find the link
         m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_inquisition"', response.content)
@@ -3846,7 +3920,7 @@ class GroupAdminTest(TestCase):
             'name': 'newgroup',
         })
 
-        new_group = Group.objects.order_by('-id')[0]
+        Group.objects.order_by('-id')[0]
         self.assertRedirects(response, '/test_admin/admin/auth/group/')
         self.assertEqual(Group.objects.count(), group_count + 1)
 
@@ -4203,7 +4277,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             'child_set-0-name': 'Paul',
             'child_set-1-name': 'Catherine',
         }
-        response = self.client.post('/test_admin/admin/admin_views/parent/add/', post)
+        self.client.post('/test_admin/admin/admin_views/parent/add/', post)
         self.assertEqual(1, Parent.objects.count())
         self.assertEqual(2, Child.objects.count())
 
@@ -4225,7 +4299,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             'child_set-1-name': 'Catherine',
             'child_set-1-id': catherine.id,
         }
-        response = self.client.post('/test_admin/admin/admin_views/parent/%s/' % parent.id, post)
+        self.client.post('/test_admin/admin/admin_views/parent/%s/' % parent.id, post)
 
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
@@ -4234,8 +4308,8 @@ class AdminCustomSaveRelatedTests(TestCase):
 
     def test_should_be_able_to_edit_related_objects_on_changelist_view(self):
         parent = Parent.objects.create(name='Josh Rock')
-        paul = Child.objects.create(parent=parent, name='Paul')
-        catherine = Child.objects.create(parent=parent, name='Catherine')
+        Child.objects.create(parent=parent, name='Paul')
+        Child.objects.create(parent=parent, name='Catherine')
         post = {
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '1',
@@ -4245,7 +4319,7 @@ class AdminCustomSaveRelatedTests(TestCase):
             '_save': 'Save'
         }
 
-        response = self.client.post('/test_admin/admin/admin_views/parent/', post)
+        self.client.post('/test_admin/admin/admin_views/parent/', post)
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)

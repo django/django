@@ -13,7 +13,7 @@ import re
 
 from django.conf import settings
 from django.db import utils
-from django.db.backends import (util, BaseDatabaseFeatures,
+from django.db.backends import (utils as backend_utils, BaseDatabaseFeatures,
     BaseDatabaseOperations, BaseDatabaseWrapper, BaseDatabaseValidation)
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
@@ -80,12 +80,13 @@ Database.register_converter(str("date"), decoder(parse_date))
 Database.register_converter(str("datetime"), decoder(parse_datetime_with_timezone_support))
 Database.register_converter(str("timestamp"), decoder(parse_datetime_with_timezone_support))
 Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("decimal"), decoder(util.typecast_decimal))
+Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
-Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-Database.register_adapter(str, lambda s: s.decode('utf-8'))
-Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
+Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
+if six.PY2:
+    Database.register_adapter(str, lambda s: s.decode('utf-8'))
+    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -105,6 +106,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_check_constraints = False
     autocommits_when_autocommit_is_off = True
     supports_paramstyle_pyformat = False
+    supports_sequence_reset = False
 
     @cached_property
     def uses_savepoints(self):
@@ -212,6 +214,25 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name # Quoting once is enough.
         return '"%s"' % name
 
+    def quote_parameter(self, value):
+        # Inner import to allow nice failure for backend if not present
+        import _sqlite3
+        try:
+            value = _sqlite3.adapt(value)
+        except _sqlite3.ProgrammingError:
+            pass
+        # Manual emulation of SQLite parameter quoting
+        if isinstance(value, six.integer_types):
+            return str(value)
+        elif isinstance(value, six.string_types):
+            return six.text_type(value)
+        elif isinstance(value, type(True)):
+            return str(int(value))
+        elif value is None:
+            return "NULL"
+        else:
+            raise ValueError("Cannot quote parameter value %r" % value)
+
     def no_limit_value(self):
         return -1
 
@@ -261,7 +282,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
-            return util.typecast_decimal(field.format_number(value))
+            return backend_utils.typecast_decimal(field.format_number(value))
         elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
             return int(value)
         elif internal_type == 'DateField':
@@ -435,9 +456,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         self.cursor().execute("BEGIN")
 
-    def schema_editor(self):
+    def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self)
+        return DatabaseSchemaEditor(self, *args, **kwargs)
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 
@@ -466,7 +487,7 @@ def _sqlite_date_extract(lookup_type, dt):
     if dt is None:
         return None
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if lookup_type == 'week_day':
@@ -477,7 +498,7 @@ def _sqlite_date_extract(lookup_type, dt):
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if lookup_type == 'year':
@@ -492,7 +513,7 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
     if dt is None:
         return None
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if tzname is not None:
@@ -505,7 +526,7 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
     if tzname is not None:
@@ -526,7 +547,7 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
 
 def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     try:
-        dt = util.typecast_timestamp(dt)
+        dt = backend_utils.typecast_timestamp(dt)
         delta = datetime.timedelta(int(days), int(secs), int(usecs))
         if conn.strip() == '+':
             dt = dt + delta

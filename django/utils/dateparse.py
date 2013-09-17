@@ -8,8 +8,8 @@
 import datetime
 import re
 from django.utils import six
-from django.utils.timezone import utc
-from django.utils.tzinfo import FixedOffset
+from django.utils.timezone import utc, get_fixed_timezone
+
 
 date_re = re.compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$'
@@ -26,6 +26,7 @@ datetime_re = re.compile(
     r'(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?'
     r'(?P<tzinfo>Z|[+-]\d{2}:?\d{2})?$'
 )
+
 
 def parse_date(value):
     """Parses a string and return a datetime.date.
@@ -59,7 +60,7 @@ def parse_datetime(value):
     """Parses a string and return a datetime.datetime.
 
     This function supports time zone offsets. When the input contains one,
-    the output uses an instance of FixedOffset as tzinfo.
+    the output uses a timezone with a fixed offset from UTC.
 
     Raises ValueError if the input is well formatted but not a valid datetime.
     Returns None if the input isn't well formatted.
@@ -76,7 +77,7 @@ def parse_datetime(value):
             offset = 60 * int(tzinfo[1:3]) + int(tzinfo[-2:])
             if tzinfo[0] == '-':
                 offset = -offset
-            tzinfo = FixedOffset(offset)
+            tzinfo = get_fixed_timezone(offset)
         kw = dict((k, int(v)) for k, v in six.iteritems(kw) if v is not None)
         kw['tzinfo'] = tzinfo
         return datetime.datetime(**kw)

@@ -1,6 +1,7 @@
 """Default tags used by the template system, available to all templates."""
 from __future__ import unicode_literals
 
+import os
 import sys
 import re
 from datetime import datetime
@@ -16,7 +17,7 @@ from django.template.base import (Node, NodeList, Template, Context, Library,
     render_value_in_context)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.utils import six
@@ -54,7 +55,6 @@ class CsrfTokenNode(Node):
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
-            from django.conf import settings
             if settings.DEBUG:
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
             return ''
@@ -154,7 +154,7 @@ class ForNode(Node):
             len_values = len(values)
             if len_values < 1:
                 return self.nodelist_empty.render(context)
-            nodelist = NodeList()
+            nodelist = []
             if self.is_reversed:
                 values = reversed(values)
             unpack = len(self.loopvars) > 1
@@ -205,7 +205,7 @@ class ForNode(Node):
                     # don't want to leave any vars from the previous loop on the
                     # context.
                     context.pop()
-        return nodelist.render(context)
+        return mark_safe(''.join(force_text(n) for n in nodelist))
 
 class IfChangedNode(Node):
     child_nodelists = ('nodelist_true', 'nodelist_false')
@@ -329,6 +329,7 @@ class RegroupNode(Node):
         return ''
 
 def include_is_allowed(filepath):
+    filepath = os.path.abspath(filepath)
     for root in settings.ALLOWED_INCLUDE_ROOTS:
         if filepath.startswith(root):
             return True
@@ -410,8 +411,8 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_text(k, 'ascii'), v.resolve(context))
-                       for k, v in self.kwargs.items()])
+        kwargs = dict((smart_text(k, 'ascii'), v.resolve(context))
+                       for k, v in self.kwargs.items())
 
         view_name = self.view_name.resolve(context)
 
@@ -502,8 +503,8 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
-        values = dict([(key, val.resolve(context)) for key, val in
-                       six.iteritems(self.extra_context)])
+        values = dict((key, val.resolve(context)) for key, val in
+                       six.iteritems(self.extra_context))
         with context.push(**values):
             return self.nodelist.render(context)
 

@@ -92,8 +92,6 @@ class SpatialRefSysTest(unittest.TestCase):
             ellps2 = srs.ellipsoid
 
             for i in range(3):
-                param1 = ellps1[i]
-                param2 = ellps2[i]
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
 def suite():

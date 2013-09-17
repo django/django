@@ -58,11 +58,11 @@ class LayerMapTest(TestCase):
         # ensuring that a LayerMapError is raised.
         for bad_map in (bad1, bad2, bad3):
             with self.assertRaises(LayerMapError):
-                lm = LayerMapping(City, city_shp, bad_map)
+                LayerMapping(City, city_shp, bad_map)
 
         # A LookupError should be thrown for bogus encodings.
         with self.assertRaises(LookupError):
-            lm = LayerMapping(City, city_shp, city_mapping, encoding='foobar')
+            LayerMapping(City, city_shp, city_mapping, encoding='foobar')
 
     def test_simple_layermap(self):
         "Test LayerMapping import of a simple point shapefile."

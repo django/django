@@ -13,10 +13,6 @@ import os
 import sys
 import traceback
 import unittest
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import warnings
 
 from django import template
@@ -33,6 +29,7 @@ from django.utils._os import upath
 from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urljoin
 
 from i18n import TransRealMixin
 
@@ -100,6 +97,9 @@ class SomeClass:
 
     def method4(self):
         raise SomeOtherException
+
+    def method5(self):
+        raise TypeError
 
     def __getitem__(self, key):
         if key == 'silent_fail_key':
@@ -239,6 +239,19 @@ class TemplateLoaderTests(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_loader_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = loader.get_template('login.html')
+            self.assertEqual(template.origin.loadname, 'login.html')
+
+    def test_string_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = Template('string template')
+            self.assertEqual(template.origin.source, 'string template')
+
+    def test_debug_false_origin(self):
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin, None)
 
     def test_include_missing_template(self):
         """
@@ -337,6 +350,51 @@ class TemplateLoaderTests(TestCase):
         finally:
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
+
+    def test_include_template_argument(self):
+        """
+        Support any render() supporting object
+        """
+        ctx = Context({
+            'tmpl': Template('This worked!'),
+        })
+        outer_tmpl = Template('{% include tmpl %}')
+        output = outer_tmpl.render(ctx)
+        self.assertEqual(output, 'This worked!')
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_immediate_missing(self):
+        """
+        Regression test for #16417 -- {% include %} tag raises TemplateDoesNotExist at compile time if TEMPLATE_DEBUG is True
+
+        Test that an {% include %} tag with a literal string referencing a
+        template that does not exist does not raise an exception at parse
+        time.
+        """
+        ctx = Context()
+        tmpl = Template('{% include "this_does_not_exist.html" %}')
+        self.assertIsInstance(tmpl, Template)
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_recursive(self):
+        comments = [
+            {
+                'comment': 'A1',
+                'children': [
+                    {'comment': 'B1', 'children': []},
+                    {'comment': 'B2', 'children': []},
+                    {'comment': 'B3', 'children': [
+                        {'comment': 'C1', 'children': []}
+                    ]},
+                ]
+            }
+        ]
+
+        t = loader.get_template('recursive_include.html')
+        self.assertEqual(
+            "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
+            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+        )
 
 
 class TemplateRegressionTests(TestCase):
@@ -462,7 +520,7 @@ class TemplateTests(TransRealMixin, TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
+            dict((name, t[0]) for name, t in six.iteritems(template_tests)),
             use_cached_loader=True,
         )
 
@@ -624,6 +682,9 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+
+            # Don't silence a TypeError if it was raised inside a callable
+            'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
 
             # Don't get confused when parsing something that is almost, but not
             # quite, a template tag.
@@ -1832,3 +1893,43 @@ class RequestContextTests(unittest.TestCase):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
+
+    def test_stack_size(self):
+        """
+        Regression test for #7116, Optimize RequetsContext construction
+        """
+        ctx = RequestContext(self.fake_request, {})
+        # The stack should now contain 3 items:
+        # [builtins, supplied context, context processor]
+        self.assertEqual(len(ctx.dicts), 3)
+
+
+class SSITests(TestCase):
+    def setUp(self):
+        self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
+
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return template.Template('{%% ssi "%s" %%}' % path).render(Context())
+
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    def test_relative_include_exploit(self):
+        """
+        May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
+
+        e.g. if ALLOWED_INCLUDE_ROOTS = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            for path in disallowed_paths:
+                self.assertEqual(self.render_ssi(path), '')

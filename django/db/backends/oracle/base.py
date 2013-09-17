@@ -5,6 +5,7 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
 from __future__ import unicode_literals
 
+import datetime
 import decimal
 import re
 import platform
@@ -50,13 +51,17 @@ try:
 except ImportError:
     pytz = None
 
+from django.conf import settings
 from django.db import utils
-from django.db.backends import *
+from django.db.backends import (BaseDatabaseFeatures, BaseDatabaseOperations,
+    BaseDatabaseWrapper, BaseDatabaseValidation, utils as backend_utils)
 from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
+from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
+from django.utils.functional import cached_property
 
 
 DatabaseError = Database.DatabaseError
@@ -237,7 +242,7 @@ WHEN (new.%(col_name)s IS NULL)
             value = float(value)
         # Convert floats to decimals
         elif value is not None and field and field.get_internal_type() == 'DecimalField':
-            value = util.typecast_decimal(field.format_number(value))
+            value = backend_utils.typecast_decimal(field.format_number(value))
         # cx_Oracle always returns datetime.datetime objects for
         # DATE and TIMESTAMP columns, but Django wants to see a
         # python datetime.date, .time, or .datetime.  We use the type
@@ -278,7 +283,7 @@ WHEN (new.%(col_name)s IS NULL)
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        if statement and not six.PY3 and not isinstance(statement, unicode):
+        if statement and six.PY2 and not isinstance(statement, unicode):
             statement = statement.decode('utf-8')
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
@@ -314,13 +319,23 @@ WHEN (new.%(col_name)s IS NULL)
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % util.truncate_name(name.upper(),
+            name = '"%s"' % backend_utils.truncate_name(name.upper(),
                                                self.max_name_length())
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
         name = name.replace('%', '%%')
         return name.upper()
+
+    def quote_parameter(self, value):
+        if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
+            return "'%s'" % value
+        elif isinstance(value, six.string_types):
+            return repr(value)
+        elif isinstance(value, bool):
+            return "1" if value else "0"
+        else:
+            return str(value)
 
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
@@ -470,11 +485,11 @@ WHEN (new.%(col_name)s IS NULL)
 
     def _get_sequence_name(self, table):
         name_length = self.max_name_length() - 3
-        return '%s_SQ' % util.truncate_name(table, name_length).upper()
+        return '%s_SQ' % backend_utils.truncate_name(table, name_length).upper()
 
     def _get_trigger_name(self, table):
         name_length = self.max_name_length() - 3
-        return '%s_TR' % util.truncate_name(table, name_length).upper()
+        return '%s_TR' % backend_utils.truncate_name(table, name_length).upper()
 
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
@@ -587,7 +602,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except DatabaseError: 
+            except DatabaseError:
                 self.operators = self._likec_operators
             else:
                 self.operators = self._standard_operators
@@ -629,10 +644,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
-    
-    def schema_editor(self):
+
+    def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self)
+        return DatabaseSchemaEditor(self, *args, **kwargs)
 
     # Oracle doesn't support savepoint commits.  Ignore them.
     def _savepoint_commit(self, sid):
@@ -775,7 +790,7 @@ class FormatStylePlaceholderCursor(object):
         try:
             return dict((k, OracleParam(v, self, True)) for k, v in params.items())
         except AttributeError:
-            return tuple([OracleParam(p, self, True) for p in params])
+            return tuple(OracleParam(p, self, True) for p in params)
 
     def _guess_input_sizes(self, params_list):
         # Try dict handling; if that fails, treat as sequence
@@ -862,12 +877,12 @@ class FormatStylePlaceholderCursor(object):
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchmany(size)])
+        return tuple(_rowfactory(r, self.cursor)
+                      for r in self.cursor.fetchmany(size))
 
     def fetchall(self):
-        return tuple([_rowfactory(r, self.cursor)
-                      for r in self.cursor.fetchall()])
+        return tuple(_rowfactory(r, self.cursor)
+                      for r in self.cursor.fetchall())
 
     def var(self, *args):
         return VariableWrapper(self.cursor.var(*args))

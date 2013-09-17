@@ -65,7 +65,7 @@ tutorial, remember?  If you didn't create one or forgot the password you can
 
 You should see the Django admin index page:
 
-.. image:: _images/admin02t.png
+.. image:: _images/admin02.png
    :alt: Django admin index page
 
 You should see a few types of editable content: groups and users. They are
@@ -77,39 +77,39 @@ Make the poll app modifiable in the admin
 
 But where's our poll app? It's not displayed on the admin index page.
 
-Just one thing to do: we need to tell the admin that ``Poll``
+Just one thing to do: we need to tell the admin that ``Question``
 objects have an admin interface. To do this, open the :file:`polls/admin.py`
 file, and edit it to look like this::
 
     from django.contrib import admin
-    from polls.models import Poll
+    from polls.models import Question
 
-    admin.site.register(Poll)
+    admin.site.register(Question)
 
 Explore the free admin functionality
 ====================================
 
-Now that we've registered ``Poll``, Django knows that it should be displayed on
+Now that we've registered ``Question``, Django knows that it should be displayed on
 the admin index page:
 
 .. image:: _images/admin03t.png
    :alt: Django admin index page, now with polls displayed
 
-Click "Polls." Now you're at the "change list" page for polls. This page
-displays all the polls in the database and lets you choose one to change it.
-There's the "What's up?" poll we created in the first tutorial:
+Click "Questions". Now you're at the "change list" page for questions. This page
+displays all the question in the database and lets you choose one to change it.
+There's the "What's up?" question we created in the first tutorial:
 
 .. image:: _images/admin04t.png
    :alt: Polls change list page
 
-Click the "What's up?" poll to edit it:
+Click the "What's up?" question to edit it:
 
 .. image:: _images/admin05t.png
-   :alt: Editing form for poll object
+   :alt: Editing form for question object
 
 Things to note here:
 
-* The form is automatically generated from the ``Poll`` model.
+* The form is automatically generated from the ``Question`` model.
 
 * The different model field types (:class:`~django.db.models.DateTimeField`,
   :class:`~django.db.models.CharField`) correspond to the appropriate HTML
@@ -134,7 +134,7 @@ The bottom part of the page gives you a couple of options:
 * Delete -- Displays a delete confirmation page.
 
 If the value of "Date published" doesn't match the time when you created the
-poll in Tutorial 1, it probably means you forgot to set the correct value for
+question in Tutorial 1, it probably means you forgot to set the correct value for
 the :setting:`TIME_ZONE` setting. Change it, reload the page and check that
 the correct value appears.
 
@@ -144,27 +144,28 @@ You'll see a page listing all changes made to this object via the Django admin,
 with the timestamp and username of the person who made the change:
 
 .. image:: _images/admin06t.png
-   :alt: History page for poll object
+   :alt: History page for question object
 
 Customize the admin form
 ========================
 
 Take a few minutes to marvel at all the code you didn't have to write. By
-registering the Poll model with ``admin.site.register(Poll)``, Django was able
-to construct a default form representation. Often, you'll want to customize how
-the admin form looks and works. You'll do this by telling Django the options
-you want when you register the object.
+registering the ``Question`` model with ``admin.site.register(Question)``,
+Django was able to construct a default form representation. Often, you'll want
+to customize how the admin form looks and works. You'll do this by telling
+Django the options you want when you register the object.
 
 Let's see how this works by re-ordering the fields on the edit form. Replace
-the ``admin.site.register(Poll)`` line with::
+the ``admin.site.register(Question)`` line with::
 
     from django.contrib import admin
-    from polls.models import Poll
+    from polls.models import Question
 
-    class PollAdmin(admin.ModelAdmin):
-        fields = ['pub_date', 'question']
 
-    admin.site.register(Poll, PollAdmin)
+    class QuestionAdmin(admin.ModelAdmin):
+        fields = ['pub_date', 'question_text']
+
+    admin.site.register(Question, QuestionAdmin)
 
 You'll follow this pattern -- create a model admin object, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
@@ -183,15 +184,16 @@ And speaking of forms with dozens of fields, you might want to split the form
 up into fieldsets::
 
     from django.contrib import admin
-    from polls.models import Poll
+    from polls.models import Question
 
-    class PollAdmin(admin.ModelAdmin):
+
+    class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
-            (None,               {'fields': ['question']}),
+            (None,               {'fields': ['question_text']}),
             ('Date information', {'fields': ['pub_date']}),
         ]
 
-    admin.site.register(Poll, PollAdmin)
+    admin.site.register(Question, QuestionAdmin)
 
 The first element of each tuple in ``fieldsets`` is the title of the fieldset.
 Here's what our form looks like now:
@@ -205,11 +207,12 @@ This is useful when you have a long form that contains a number of fields that
 aren't commonly used::
 
         from django.contrib import admin
-        from polls.models import Poll
+        from polls.models import Question
 
-        class PollAdmin(admin.ModelAdmin):
+
+        class QuestionAdmin(admin.ModelAdmin):
             fieldsets = [
-                (None,               {'fields': ['question']}),
+                (None,               {'fields': ['question_text']}),
                 ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
             ]
 
@@ -219,13 +222,13 @@ aren't commonly used::
 Adding related objects
 ======================
 
-OK, we have our Poll admin page. But a ``Poll`` has multiple ``Choices``, and
+OK, we have our Question admin page. But a ``Question`` has multiple ``Choices``, and
 the admin page doesn't display choices.
 
 Yet.
 
 There are two ways to solve this problem. The first is to register ``Choice``
-with the admin just as we did with ``Poll``. That's easy::
+with the admin just as we did with ``Question``. That's easy::
 
     from django.contrib import admin
     from polls.models import Choice
@@ -238,48 +241,51 @@ looks like this:
 .. image:: _images/admin10.png
    :alt: Choice admin page
 
-In that form, the "Poll" field is a select box containing every poll in the
+In that form, the "Question" field is a select box containing every question in the
 database. Django knows that a :class:`~django.db.models.ForeignKey` should be
-represented in the admin as a ``<select>`` box. In our case, only one poll
+represented in the admin as a ``<select>`` box. In our case, only one question
 exists at this point.
 
-Also note the "Add Another" link next to "Poll." Every object with a
+Also note the "Add Another" link next to "Question." Every object with a
 ``ForeignKey`` relationship to another gets this for free. When you click "Add
-Another," you'll get a popup window with the "Add poll" form. If you add a poll
-in that window and click "Save," Django will save the poll to the database and
+Another," you'll get a popup window with the "Add question" form. If you add a question
+in that window and click "Save," Django will save the question to the database and
 dynamically add it as the selected choice on the "Add choice" form you're
 looking at.
 
 But, really, this is an inefficient way of adding ``Choice`` objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
-``Poll`` object. Let's make that happen.
+``Question`` object. Let's make that happen.
 
-Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Poll``
+Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
 registration code to read::
 
     from django.contrib import admin
-    from polls.models import Choice, Poll
+    from polls.models import Choice, Question
+
 
     class ChoiceInline(admin.StackedInline):
         model = Choice
         extra = 3
 
-    class PollAdmin(admin.ModelAdmin):
+
+    class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
-            (None,               {'fields': ['question']}),
-            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+            (None,               {'fields': ['question_text']}),
+            ('Date information', {'fields': ['pub_date'],
+                                  'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
 
-    admin.site.register(Poll, PollAdmin)
+    admin.site.register(Question, QuestionAdmin)
 
-This tells Django: "``Choice`` objects are edited on the ``Poll`` admin page. By
+This tells Django: "``Choice`` objects are edited on the ``Question`` admin page. By
 default, provide enough fields for 3 choices."
 
-Load the "Add poll" page to see how that looks:
+Load the "Add question" page to see how that looks:
 
 .. image:: _images/admin11t.png
-   :alt: Add poll page now has choices on it
+   :alt: Add question page now has choices on it
 
 It works like this: There are three slots for related Choices -- as specified
 by ``extra`` -- and each time you come back to the "Change" page for an
@@ -305,7 +311,7 @@ With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
 
 .. image:: _images/admin12t.png
-   :alt: Add poll page now has more compact choices
+   :alt: Add question page now has more compact choices
 
 Note that there is an extra "Delete?" column that allows removing rows added
 using the "Add Another Choice" button and rows that have already been saved.
@@ -313,8 +319,8 @@ using the "Add Another Choice" button and rows that have already been saved.
 Customize the admin change list
 ===============================
 
-Now that the Poll admin page is looking good, let's make some tweaks to the
-"change list" page -- the one that displays all the polls in the system.
+Now that the Question admin page is looking good, let's make some tweaks to the
+"change list" page -- the one that displays all the questions in the system.
 
 Here's what it looks like at this point:
 
@@ -326,18 +332,18 @@ more helpful if we could display individual fields. To do that, use the
 ``list_display`` admin option, which is a tuple of field names to display, as
 columns, on the change list page for the object::
 
-    class PollAdmin(admin.ModelAdmin):
+    class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question', 'pub_date')
+        list_display = ('question_text', 'pub_date')
 
 Just for good measure, let's also include the ``was_published_recently`` custom
 method from Tutorial 1::
 
-    class PollAdmin(admin.ModelAdmin):
+    class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question', 'pub_date', 'was_published_recently')
+        list_display = ('question_text', 'pub_date', 'was_published_recently')
 
-Now the poll change list page looks like this:
+Now the question change list page looks like this:
 
 .. image:: _images/admin13t.png
    :alt: Polls change list page, updated
@@ -352,7 +358,7 @@ representation of the output.
 You can improve that by giving that method (in :file:`polls/models.py`) a few
 attributes, as follows::
 
-    class Poll(models.Model):
+    class Question(models.Model):
         # ...
         def was_published_recently(self):
             return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
@@ -360,8 +366,8 @@ attributes, as follows::
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
-Edit your :file:`polls/admin.py` file again and add an improvement to the Poll
-change list page: Filters. Add the following line to ``PollAdmin``::
+Edit your :file:`polls/admin.py` file again and add an improvement to the Question
+change list page: Filters. Add the following line to ``QuestionAdmin``::
 
     list_filter = ['pub_date']
 
@@ -378,10 +384,10 @@ knows to give appropriate filter options: "Any date," "Today," "Past 7 days,"
 
 This is shaping up well. Let's add some search capability::
 
-    search_fields = ['question']
+    search_fields = ['question_text']
 
 That adds a search box at the top of the change list. When somebody enters
-search terms, Django will search the ``question`` field. You can use as many
+search terms, Django will search the ``question_text`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
 scenes, keep it reasonable, to keep your database happy.
 

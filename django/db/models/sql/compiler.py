@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import FieldError
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
@@ -391,7 +391,7 @@ class SQLCompiler(object):
                     if not distinct or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
                         group_by.append((elt, []))
-            elif get_order_dir(field)[0] not in self.query.extra:
+            elif not self.query._extra or get_order_dir(field)[0] not in self.query._extra:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 for table, cols, order in self.find_ordering_name(field,
@@ -437,7 +437,7 @@ class SQLCompiler(object):
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple([self.query.alias_map[j].table_name for j in joins])
+            join_tuple = tuple(self.query.alias_map[j].table_name for j in joins)
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
@@ -718,11 +718,11 @@ class SQLCompiler(object):
                     loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
                     aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
-                    row = tuple(row[:aggregate_start]) + tuple([
+                    row = tuple(row[:aggregate_start]) + tuple(
                         self.query.resolve_aggregate(value, aggregate, self.connection)
                         for (alias, aggregate), value
                         in zip(self.query.aggregate_select.items(), row[aggregate_start:aggregate_end])
-                    ]) + tuple(row[aggregate_end:])
+                    ) + tuple(row[aggregate_end:])
 
                 yield row
 
@@ -827,7 +827,7 @@ class SQLInsertCompiler(SQLCompiler):
 
         has_fields = bool(self.query.fields)
         fields = self.query.fields if has_fields else [opts.pk]
-        result.append('(%s)' % ', '.join([qn(f.column) for f in fields]))
+        result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
             params = values = [
@@ -866,7 +866,7 @@ class SQLInsertCompiler(SQLCompiler):
             return [(" ".join(result), tuple(params))]
         if can_bulk:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
-            return [(" ".join(result), tuple([v for val in values for v in val]))]
+            return [(" ".join(result), tuple(v for val in values for v in val))]
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
@@ -993,7 +993,7 @@ class SQLUpdateCompiler(SQLCompiler):
         # We need to use a sub-select in the where clause to filter on things
         # from other tables.
         query = self.query.clone(klass=Query)
-        query.extra = {}
+        query._extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
         # Recheck the count - it is possible that fiddling with the select
@@ -1013,7 +1013,7 @@ class SQLUpdateCompiler(SQLCompiler):
             # selecting from the updating table (e.g. MySQL).
             idents = []
             for rows in query.get_compiler(self.using).execute_sql(MULTI):
-                idents.extend([r[0] for r in rows])
+                idents.extend(r[0] for r in rows)
             self.query.add_filter(('pk__in', idents))
             self.query.related_ids = idents
         else:
@@ -1055,7 +1055,7 @@ class SQLDateCompiler(SQLCompiler):
             from django.db.models.fields import DateField
             fields = [DateField()]
         else:
-            from django.db.backends.util import typecast_date
+            from django.db.backends.utils import typecast_date
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
         offset = len(self.query.extra_select)
@@ -1081,7 +1081,7 @@ class SQLDateTimeCompiler(SQLCompiler):
             from django.db.models.fields import DateTimeField
             fields = [DateTimeField()]
         else:
-            from django.db.backends.util import typecast_timestamp
+            from django.db.backends.utils import typecast_timestamp
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
         offset = len(self.query.extra_select)

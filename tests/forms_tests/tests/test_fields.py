@@ -254,6 +254,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '1.0a')
         self.assertEqual(f.max_value, None)
         self.assertEqual(f.min_value, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'Infinity')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'NaN')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '-Inf')
 
     def test_floatfield_2(self):
         f = FloatField(required=False)
@@ -1140,6 +1143,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1160,6 +1164,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1180,6 +1185,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):

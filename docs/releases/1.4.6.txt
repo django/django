@@ -26,6 +26,6 @@ header and browsers seem to ignore JavaScript there.
 Bugfixes
 ========
 
-* Fixed an obscure bug with the :func:`~django.test.utils.override_settings`
+* Fixed an obscure bug with the :func:`~django.test.override_settings`
   decorator. If you hit an ``AttributeError: 'Settings' object has no attribute
   '_original_allowed_hosts'`` exception, it's probably fixed (#20636).

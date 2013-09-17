@@ -37,7 +37,7 @@ class GeoRegressionTests(TestCase):
                   'description' : name,
                   'kml' : '<Point><coordinates>5.0,23.0</coordinates></Point>'
                   }]
-        kmz = render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
+        render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
 
     @no_spatialite
     @no_mysql
@@ -52,20 +52,20 @@ class GeoRegressionTests(TestCase):
     def test_unicode_date(self):
         "Testing dates are converted properly, even on SpatiaLite. See #16408."
         founded = datetime(1857, 5, 23)
-        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
-                                                    founded=founded)
+        PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
+                                        founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.datetimes('founded', 'day')[0])
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):
-         "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
-         # contrived example, but need a geo lookup paired with an id__in lookup
-         pueblo = City.objects.get(name='Pueblo')
-         state = State.objects.filter(poly__contains=pueblo.point)
-         cities_within_state = City.objects.filter(id__in=state)
+        "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
+        # contrived example, but need a geo lookup paired with an id__in lookup
+        pueblo = City.objects.get(name='Pueblo')
+        state = State.objects.filter(poly__contains=pueblo.point)
+        cities_within_state = City.objects.filter(id__in=state)
 
-         # .count() should not throw TypeError in __eq__
-         self.assertEqual(cities_within_state.count(), 1)
+        # .count() should not throw TypeError in __eq__
+        self.assertEqual(cities_within_state.count(), 1)
 
     def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"

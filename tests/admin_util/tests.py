@@ -5,7 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.util import (display_for_field, flatten_fieldsets,
+from django.contrib.admin.utils import (display_for_field, flatten_fieldsets,
     label_for_field, lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site

@@ -46,7 +46,7 @@ class QueryDictTests(unittest.TestCase):
     def test_immutable_basic_operations(self):
         q = QueryDict(str(''))
         self.assertEqual(q.getlist('foo'), [])
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('foo'), False)
         self.assertEqual('foo' in q, False)
         self.assertEqual(list(six.iteritems(q)), [])
@@ -72,10 +72,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
 
-        if not six.PY3:
+        if six.PY2:
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
-        if not six.PY3:
+        if six.PY2:
             self.assertFalse(q.has_key('bar'))
         self.assertFalse('bar' in q)
 
@@ -131,7 +131,7 @@ class QueryDictTests(unittest.TestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        if not six.PY3:
+        if six.PY2:
             self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
 
@@ -176,10 +176,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
 
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('vote'), True)
         self.assertEqual('vote' in q, True)
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(q.has_key('foo'), False)
         self.assertEqual('foo' in q, False)
         self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
@@ -195,7 +195,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.setdefault, 'foo', 'bar')
         self.assertRaises(AttributeError, q.__delitem__, 'vote')
 
-    if not six.PY3:
+    if six.PY2:
         def test_invalid_input_encoding(self):
             """
             QueryDicts must be able to handle invalid input encoding (in this
@@ -290,6 +290,13 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(UnicodeError, r.__setitem__, 'føø', 'bar')
         self.assertRaises(UnicodeError, r.__setitem__, 'føø'.encode('utf-8'), 'bar')
 
+    def test_long_line(self):
+        # Bug #20889: long lines trigger newlines to be added to headers
+        # (which is not allowed due to bug #10188)
+        h = HttpResponse()
+        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
+        f = f.decode('utf-8')
+        h['Content-Disposition'] = 'attachment; filename="%s"' % f
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -383,6 +390,13 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse(['abc'])
         r.write('def')
         self.assertEqual(r.tell(), 6)
+        self.assertEqual(r.content, b'abcdef')
+
+        # with Content-Encoding header
+        r = HttpResponse()
+        r['Content-Encoding'] = 'winning'
+        r.write(b'abc')
+        r.write(b'def')
         self.assertEqual(r.content, b'abcdef')
 
     def test_unsafe_redirect(self):
@@ -604,3 +618,12 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
+
+    @unittest.skipUnless(six.PY2, "PY3 throws an exception on invalid cookie keys.")
+    def test_bad_cookie(self):
+        """
+        Regression test for #18403
+        """
+        r = HttpResponse()
+        r.set_cookie("a:.b/", 1)
+        self.assertEqual(len(r.cookies.bad_cookies), 1)

@@ -160,7 +160,7 @@ class ChangeListTests(TestCase):
 
         new_parent = Parent.objects.create(name='parent')
         for i in range(200):
-            new_child = Child.objects.create(name='name %s' % i, parent=new_parent)
+            Child.objects.create(name='name %s' % i, parent=new_parent)
         request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
         m = ChildAdmin(Child, admin.site)
 
@@ -176,7 +176,7 @@ class ChangeListTests(TestCase):
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
         for i in range(200):
-            new_child = Child.objects.create(name='name %s' % i, parent=new_parent)
+            Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
         m = CustomPaginationAdmin(Child, admin.site)

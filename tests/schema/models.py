@@ -3,7 +3,7 @@ from django.db.models.loading import BaseAppCache
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate AppCache so the main test
-# runner doesn't syncdb them.
+# runner doesn't migrate them.
 
 new_app_cache = BaseAppCache()
 

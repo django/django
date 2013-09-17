@@ -36,14 +36,14 @@ class ModelBackend(object):
                 user_groups_query = 'group__%s' % user_groups_field.related_query_name()
                 perms = Permission.objects.filter(**{user_groups_query: user_obj})
             perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            user_obj._group_perm_cache = set(["%s.%s" % (ct, name) for ct, name in perms])
+            user_obj._group_perm_cache = set("%s.%s" % (ct, name) for ct, name in perms)
         return user_obj._group_perm_cache
 
     def get_all_permissions(self, user_obj, obj=None):
         if user_obj.is_anonymous() or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = set(["%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related()])
+            user_obj._perm_cache = set("%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related())
             user_obj._perm_cache.update(self.get_group_permissions(user_obj))
         return user_obj._perm_cache
 

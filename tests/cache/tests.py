@@ -310,7 +310,7 @@ class BaseCacheTests(object):
         # Don't want fields with callable as default to be called on cache write
         expensive_calculation.num_runs = 0
         Poll.objects.all().delete()
-        my_poll = Poll.objects.create(question="What?")
+        Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
         defer_qs = Poll.objects.all().defer('question')
         self.assertEqual(defer_qs.count(), 1)
@@ -323,14 +323,14 @@ class BaseCacheTests(object):
         # Don't want fields with callable as default to be called on cache read
         expensive_calculation.num_runs = 0
         Poll.objects.all().delete()
-        my_poll = Poll.objects.create(question="What?")
+        Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
         defer_qs = Poll.objects.all().defer('question')
         self.assertEqual(defer_qs.count(), 1)
         self.cache.set('deferred_queryset', defer_qs)
         self.assertEqual(expensive_calculation.num_runs, 1)
         runs_before_cache_read = expensive_calculation.num_runs
-        cached_polls = self.cache.get('deferred_queryset')
+        self.cache.get('deferred_queryset')
         # We only want the default expensive calculation run on creation and set
         self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
 
@@ -1776,7 +1776,7 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         time.sleep(2)
 
         # ... the default cache will still hit
-        cache = get_cache('default')
+        get_cache('default')
         response = default_view(request, '11')
         self.assertEqual(response.content, b'Hello World 1')
 

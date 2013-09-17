@@ -1,9 +1,14 @@
 # encoding: utf8
+
+from __future__ import unicode_literals
+
 import datetime
+
 from django.utils import six
 from django.test import TestCase
 from django.db.migrations.writer import MigrationWriter
 from django.db import models, migrations
+from django.utils.translation import ugettext_lazy as _
 
 
 class WriterTests(TestCase):
@@ -48,12 +53,20 @@ class WriterTests(TestCase):
         # Basic values
         self.assertSerializedEqual(1)
         self.assertSerializedEqual(None)
-        self.assertSerializedEqual("foobar")
-        self.assertSerializedEqual(u"föobár")
+        self.assertSerializedEqual(b"foobar")
+        self.assertSerializedEqual("föobár")
         self.assertSerializedEqual({1: 2})
         self.assertSerializedEqual(["a", 2, True, None])
         self.assertSerializedEqual(set([2, 3, "eighty"]))
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
+        self.assertSerializedEqual(_('Hello'))
+        # Functions
+        with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
+            self.assertSerializedEqual(lambda x: 42)
+        self.assertSerializedEqual(models.SET_NULL)
+        string, imports = MigrationWriter.serialize(models.SET(42))
+        self.assertEqual(string, 'models.SET(42)')
+        self.serialize_round_trip(models.SET(42))
         # Datetime stuff
         self.assertSerializedEqual(datetime.datetime.utcnow())
         self.assertSerializedEqual(datetime.datetime.utcnow)
@@ -67,7 +80,7 @@ class WriterTests(TestCase):
         """
         Tests serializing a simple migration.
         """
-        migration = type("Migration", (migrations.Migration,), {
+        migration = type(str("Migration"), (migrations.Migration,), {
             "operations": [
                 migrations.DeleteModel("MyModel"),
                 migrations.AddField("OtherModel", "field_name", models.DateTimeField(default=datetime.datetime.utcnow))

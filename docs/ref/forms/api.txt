@@ -571,12 +571,12 @@ method you're using::
 Customizing the error list format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, forms use ``django.forms.util.ErrorList`` to format validation
+By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
 pass that in at construction time (replace ``__unicode__`` by ``__str__`` on
 Python 3)::
 
-    >>> from django.forms.util import ErrorList
+    >>> from django.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
     ...     def __unicode__(self):
     ...         return self.as_divs()
@@ -591,6 +591,10 @@ Python 3)::
     <div class="errorlist"><div class="error">Enter a valid email address.</div></div>
     <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
+.. versionchanged:: 1.7
+
+    ``django.forms.util`` was renamed to ``django.forms.utils``.
 
 More granular output
 ~~~~~~~~~~~~~~~~~~~~

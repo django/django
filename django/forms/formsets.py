@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -289,7 +289,8 @@ class BaseFormSet(object):
         # We loop over every form.errors here rather than short circuiting on the
         # first failure to make sure validation gets triggered for every form.
         forms_valid = True
-        err = self.errors
+        # This triggers a full clean.
+        self.errors
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             if self.can_delete:
@@ -380,17 +381,17 @@ class BaseFormSet(object):
         # XXX: there is no semantic division between forms here, there
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
-        forms = ' '.join([form.as_table() for form in self])
+        forms = ' '.join(form.as_table() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
-        forms = ' '.join([form.as_p() for form in self])
+        forms = ' '.join(form.as_p() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
-        forms = ' '.join([form.as_ul() for form in self])
+        forms = ' '.join(form.as_ul() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,

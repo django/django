@@ -41,13 +41,13 @@ database.
 Migrations are covered in :doc:`their own documentation</topics/migrations>`,
 but a few of the key features are:
 
-* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry - 
+* ``syncdb`` has been deprecated and replaced by ``migrate``. Don't worry -
   calls to ``syncdb`` will still work as before.
 
 * A new ``makemigrations`` command provides an easy way to autodetect changes
   to your models and make migrations for them.
 
-* :data:`~django.db.models.signals.post_syncdb` and
+* :data:`~django.db.models.signals.pre_syncdb` and
   :data:`~django.db.models.signals.post_syncdb` have been renamed to
   :data:`~django.db.models.signals.pre_migrate` and
   :data:`~django.db.models.signals.post_migrate` respectively. The
@@ -108,31 +108,14 @@ will be interpreted.
 Minor features
 ~~~~~~~~~~~~~~
 
-* The new :attr:`UploadedFile.content_type_extra
-  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
-  contains extra parameters passed to the ``content-type`` header on a file
-  upload.
+:mod:`django.contrib.admin`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* The ``enter`` argument was added to the
-  :data:`~django.test.signals.setting_changed` signal.
-
-* The :meth:`QuerySet.update_or_create()
-  <django.db.models.query.QuerySet.update_or_create>` method was added.
-
-* :attr:`~django.db.models.Options.app_label` is no longer required for models
-  that are defined in a ``models`` package within an app.
-
-* The :meth:`Context.push() <django.template.Context.push>` method now returns
-  a context manager which automatically calls :meth:`pop()
-  <django.template.Context.pop>` upon exiting the ``with`` statement.
-  Additionally, :meth:`push() <django.template.Context.push>` now accepts
-  parameters that are passed to the ``dict`` constructor used to build the new
-  context level.
-
-* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
-  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
-  allowing the ``published`` element to be included in the feed (which
-  relies on ``pubdate``).
+* You can now implement :attr:`~django.contrib.admin.AdminSite.site_header`,
+  :attr:`~django.contrib.admin.AdminSite.site_title`, and
+  :attr:`~django.contrib.admin.AdminSite.index_title` attributes on a custom
+  :class:`~django.contrib.admin.AdminSite` in order to easily change the admin
+  site's page title and header text. No more needing to override templates!
 
 * Buttons in :mod:`django.contrib.admin` now use the ``border-radius`` CSS
   property for rounded corners rather than GIF background images.
@@ -144,27 +127,6 @@ Minor features
 * The admin changelist cells now have a ``field-<field_name>`` class in the
   HTML to enable style customizations.
 
-* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
-  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
-
-* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
-  disable the colorization of management command output.
-
-* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
-  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
-  header in the response. This makes it possible for the
-  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
-  conditional ``GET`` requests for sitemaps which set ``lastmod``.
-
-* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
-  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
-  to more easily customize the login policy.
-
-* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
-  customize the "empty choice" label by including a tuple with an empty string
-  or ``None`` for the key and the custom label as the value. The default blank
-  option ``"----------"`` will be omitted in this case.
-
 * The admin's search fields can now be customized per-request thanks to the new
   :meth:`django.contrib.admin.ModelAdmin.get_search_fields` method.
 
@@ -173,9 +135,87 @@ Minor features
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
 
+:mod:`django.contrib.auth`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Any ``**kwargs`` passed to
+  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
+  underlying :meth:`~django.core.mail.send_mail()` call.
+
+* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
+  take a list of permissions as well as a single permission.
+
+* You can override the new :meth:`AuthenticationForm.confirm_login_allowed()
+  <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
+  to more easily customize the login policy.
+
 * :func:`django.contrib.auth.views.password_reset` takes an optional
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
+
+:mod:`django.contrib.messages`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The backends for :mod:`django.contrib.messages` that use cookies, will now
+  follow the :setting:`SESSION_COOKIE_SECURE` and
+  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+
+:mod:`django.contrib.sessions`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The ``"django.contrib.sessions.backends.cached_db"`` session backend now
+  respects :setting:`SESSION_CACHE_ALIAS`. In previous versions, it always used
+  the `default` cache.
+
+:mod:`django.contrib.sitemaps`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :mod:`sitemap framework<django.contrib.sitemaps>` now makes use of
+  :attr:`~django.contrib.sitemaps.Sitemap.lastmod` to set a ``Last-Modified``
+  header in the response. This makes it possible for the
+  :class:`~django.middleware.http.ConditionalGetMiddleware` to handle
+  conditional ``GET`` requests for sitemaps which set ``lastmod``.
+
+:mod:`django.contrib.syndication`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The :class:`~django.utils.feedgenerator.Atom1Feed` syndication feed's
+  ``updated`` element now utilizes ``updateddate`` instead of ``pubdate``,
+  allowing the ``published`` element to be included in the feed (which
+  relies on ``pubdate``).
+
+Email
+^^^^^
+
+* :func:`~django.core.mail.send_mail` now accepts an ``html_message``
+  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+
+File Uploads
+^^^^^^^^^^^^
+
+* The new :attr:`UploadedFile.content_type_extra
+  <django.core.files.uploadedfile.UploadedFile.content_type_extra>` attribute
+  contains extra parameters passed to the ``content-type`` header on a file
+  upload.
+
+* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
+  the file system permissions of directories created during file upload, like
+  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+
+Forms
+^^^^^
+
+* The ``<label>`` and ``<input>`` tags rendered by
+  :class:`~django.forms.RadioSelect` and
+  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
+  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
+  Each radio button or checkbox includes an ``id_for_label`` attribute to
+  output the element's ID.
+
+* :attr:`Field.choices<django.db.models.Field.choices>` now allows you to
+  customize the "empty choice" label by including a tuple with an empty string
+  or ``None`` for the key and the custom label as the value. The default blank
+  option ``"----------"`` will be omitted in this case.
 
 * :class:`~django.forms.MultiValueField` allows optional subfields by setting
   the ``require_all_fields`` argument to ``False``. The ``required`` attribute
@@ -186,33 +226,77 @@ Minor features
   return ``self.cleaned_data``. If it does return a changed dictionary then
   that will still be used.
 
+* :attr:`SelectDateWidget.months
+  <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
+  customize the wording of the months displayed in the select widget.
+
+Management Commands
+^^^^^^^^^^^^^^^^^^^
+
+* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+  disable the colorization of management command output.
+
+Models
+^^^^^^
+
+* The :meth:`QuerySet.update_or_create()
+  <django.db.models.query.QuerySet.update_or_create>` method was added.
+
 * The new :attr:`~django.db.models.Options.default_permissions` model
   ``Meta`` option allows you to customize (or disable) creation of the default
   add, change, and delete permissions.
 
-* The :func:`~django.contrib.auth.decorators.permission_required` decorator can
-  take a list of permissions as well as a single permission.
-
-* The new :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` setting controls
-  the file system permissions of directories created during file upload, like
-  :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
+* :attr:`~django.db.models.Options.app_label` is no longer required for models
+  that are defined in a ``models`` package within an app.
 
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
 
-* The ``<label>`` and ``<input>`` tags rendered by
-  :class:`~django.forms.RadioSelect` and
-  :class:`~django.forms.CheckboxSelectMultiple` when looping over the radio
-  buttons or checkboxes now include ``for`` and ``id`` attributes, respectively.
-  Each radio button or checkbox includes an ``id_for_label`` attribute to
-  output the element's ID.
+Signals
+^^^^^^^
 
-* Any ``**kwargs`` passed to
-  :meth:`~django.contrib.auth.models.User.email_user()` are passed to the
-  underlying :meth:`~django.core.mail.send_mail()` call.
+* The ``enter`` argument was added to the
+  :data:`~django.test.signals.setting_changed` signal.
+
+Templates
+^^^^^^^^^
+
+* The :meth:`Context.push() <django.template.Context.push>` method now returns
+  a context manager which automatically calls :meth:`pop()
+  <django.template.Context.pop>` upon exiting the ``with`` statement.
+  Additionally, :meth:`push() <django.template.Context.push>` now accepts
+  parameters that are passed to the ``dict`` constructor used to build the new
+  context level.
 
 * The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
   the result in a variable.
+
+* The :ttag:`include` template tag will now also accept anything with a
+  ``render()`` method (such as a ``Template``) as an argument. String
+  arguments will be looked up using
+  :func:`~django.template.loader.get_template` as always.
+
+* It is now possible to :ttag:`include` templates recursively.
+
+* Template objects now have an origin attribute set when
+  :setting:`TEMPLATE_DEBUG` is ``True``. This allows template origins to be
+  inspected and logged outside of the ``django.template`` infrastructure.
+
+* ``TypeError`` exceptions are not longer silenced when raised during the
+  rendering of a template.
+
+Tests
+^^^^^
+
+* :class:`~django.test.runner.DiscoverRunner` has two new attributes,
+  :attr:`~django.test.runner.DiscoverRunner.test_suite` and
+  :attr:`~django.test.runner.DiscoverRunner.test_runner`, which facilitate
+  overriding the way tests are collected and run.
+
+* The ``fetch_redirect_response`` argument was added to
+  :meth:`~django.test.SimpleTestCase.assertRedirects`. Since the test
+  client can't fetch externals URLs, this allows you to use ``assertRedirects``
+  with redirects that aren't part of your Django app.
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -236,6 +320,16 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+pytz may be required
+~~~~~~~~~~~~~~~~~~~~
+
+If your project handles datetimes before 1970 or after 2037 and Django raises
+a :exc:`~exceptions.ValueError` when encountering them, you will have to
+install pytz_. You may be affected by this problem if you use Django's time
+zone-related date formats or :mod:`django.contrib.syndication`.
+
+.. _pytz: https://pypi.python.org/pypi/pytz/
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -269,10 +363,44 @@ Miscellaneous
 * The :meth:`django.db.models.Model.__eq__` method has changed such that
   two ``Model`` instances without primary key values won't be considered
   equal (unless they are the same instance).
-  
+
 * The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
+
+* :class:`~django.db.models.AutoField` columns in SQLite databases will now be
+  created using the ``AUTOINCREMENT`` option, which guarantees monotonic
+  increments. This will cause primary key numbering behavior to change on
+  SQLite, becoming consistent with most other SQL databases. This will only
+  apply to newly created tables. If you have a database created with an older
+  version of Django, you will need to migrate it to take advantage of this
+  feature. For example, you could do the following:
+
+  #) Use :djadmin:`dumpdata` to save your data.
+  #) Rename the existing database file (keep it as a backup).
+  #) Run :djadmin:`migrate` to create the updated schema.
+  #) Use :djadmin:`loaddata` to import the fixtures you exported in (1).
+
+* ``django.contrib.auth.models.AbstractUser`` no longer defines a
+  :meth:`~django.db.models.Model.get_absolute_url()` method. The old definition
+  returned  ``"/users/%s/" % urlquote(self.username)`` which was arbitrary
+  since applications may or may not define such a url in ``urlpatterns``.
+  Define a ``get_absolute_url()`` method on your own custom user object or use
+  :setting:`ABSOLUTE_URL_OVERRIDES` if you want a URL for your user.
+
+* The static asset-serving functionality of the
+  :class:`django.test.LiveServerTestCase` class has been simplified: Now it's
+  only able to serve content already present in :setting:`STATIC_ROOT` when
+  tests are run. The ability to transparently serve all the static assets
+  (similarly to what one gets with :setting:`DEBUG = True <DEBUG>` at
+  development-time) has been moved to a new class that lives in the
+  ``staticfiles`` application (the one actually in charge of such feature):
+  :class:`django.contrib.staticfiles.testing.StaticLiveServerCase`. In other
+  words, ``LiveServerTestCase`` itself is less powerful but at the same time
+  has less magic.
+
+  Rationale behind this is removal of dependency of non-contrib code on
+  contrib applications.
 
 Features deprecated in 1.7
 ==========================
@@ -283,6 +411,15 @@ Features deprecated in 1.7
 ``django.utils.dictconfig`` and ``django.utils.importlib`` were copies of
 respectively :mod:`logging.config` and :mod:`importlib` provided for Python
 versions prior to 2.7. They have been deprecated.
+
+``django.utils.tzinfo``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.tzinfo`` provided two :class:`~datetime.tzinfo` subclasses,
+``LocalTimezone`` and ``FixedOffset``. They've been deprecated in favor of
+more correct alternatives provided by :mod:`django.utils.timezone`,
+:func:`django.utils.timezone.get_default_timezone` and
+:func:`django.utils.timezone.get_fixed_timezone`.
 
 ``django.utils.unittest``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -323,3 +460,14 @@ a bug and has been addressed.
 The ``syncdb`` command has been deprecated in favour of the new ``migrate``
 command. ``migrate`` takes the same arguments as ``syncdb`` used to plus a few
 more, so it's safe to just change the name you're calling and nothing else.
+
+``util`` modules renamed to ``utils``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following instances of ``util.py`` in the Django codebase have been renamed
+to ``utils.py`` in an effort to unify all util and utils references:
+
+* ``django.contrib.admin.util``
+* ``django.contrib.gis.db.backends.util``
+* ``django.db.backends.util``
+* ``django.forms.util``

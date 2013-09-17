@@ -29,15 +29,15 @@ application, you might have the following views:
 
 In our poll application, we'll have the following four views:
 
-* Poll "index" page -- displays the latest few polls.
+* Question "index" page -- displays the latest few questions.
 
-* Poll "detail" page -- displays a poll question, with no results but
+* Question "detail" page -- displays a question text, with no results but
   with a form to vote.
 
-* Poll "results" page -- displays results for a particular poll.
+* Question "results" page -- displays results for a particular question.
 
 * Vote action -- handles voting for a particular choice in a particular
-  poll.
+  question.
 
 In Django, web pages and other content are delivered by views. Each view is
 represented by a simple Python function (or method, in the case of class-based
@@ -66,8 +66,9 @@ and put the following Python code in it::
 
     from django.http import HttpResponse
 
+
     def index(request):
-        return HttpResponse("Hello, world. You're at the poll index.")
+        return HttpResponse("Hello, world. You're at the polls index.")
 
 This is the simplest view possible in Django. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
@@ -109,7 +110,7 @@ with::
 
 You have now wired an ``index`` view into the URLconf. Go to
 http://localhost:8000/polls/ in your browser, and you should see the text
-"*Hello, world. You're at the poll index.*", which you defined in the
+"*Hello, world. You're at the polls index.*", which you defined in the
 ``index`` view.
 
 The :func:`~django.conf.urls.url` function is passed four arguments, two
@@ -173,14 +174,15 @@ Writing more views
 Now let's add a few more views to ``polls/views.py``. These views are
 slightly different, because they take an argument::
 
-    def detail(request, poll_id):
-        return HttpResponse("You're looking at poll %s." % poll_id)
+    def detail(request, question_id):
+        return HttpResponse("You're looking at question %s." % question_id)
 
-    def results(request, poll_id):
-        return HttpResponse("You're looking at the results of poll %s." % poll_id)
+    def results(request, question_id):
+        response = "You're looking at the results of question %s."
+        return HttpResponse(response % question_id)
 
-    def vote(request, poll_id):
-        return HttpResponse("You're voting on poll %s." % poll_id)
+    def vote(request, question_id):
+        return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
 :func:`~django.conf.urls.url` calls::
@@ -193,11 +195,11 @@ Wire these new views into the ``polls.urls`` module by adding the following
         # ex: /polls/
         url(r'^$', views.index, name='index'),
         # ex: /polls/5/
-        url(r'^(?P<poll_id>\d+)/$', views.detail, name='detail'),
+        url(r'^(?P<question_id>\d+)/$', views.detail, name='detail'),
         # ex: /polls/5/results/
-        url(r'^(?P<poll_id>\d+)/results/$', views.results, name='results'),
+        url(r'^(?P<question_id>\d+)/results/$', views.results, name='results'),
         # ex: /polls/5/vote/
-        url(r'^(?P<poll_id>\d+)/vote/$', views.vote, name='vote'),
+        url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
     )
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
@@ -229,14 +231,14 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Then, Django will strip off the matching text (``"polls/"``) and send the
   remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
-  further processing which matches ``r'^(?P<poll_id>\d+)/$'`` resulting in a
+  further processing which matches ``r'^(?P<question_id>\d+)/$'`` resulting in a
   call to the ``detail()`` view like so::
 
-    detail(request=<HttpRequest object>, poll_id='34')
+    detail(request=<HttpRequest object>, question_id='34')
 
-The ``poll_id='34'`` part comes from ``(?P<poll_id>\d+)``. Using parentheses
+The ``question_id='34'`` part comes from ``(?P<question_id>\d+)``. Using parentheses
 around a pattern "captures" the text matched by that pattern and sends it as an
-argument to the view function; ``?P<poll_id>`` defines the name that will
+argument to the view function; ``?P<question_id>`` defines the name that will
 be used to identify the matched pattern; and ``\d+`` is a regular expression to
 match a sequence of digits (i.e., a number).
 
@@ -271,11 +273,12 @@ commas, according to publication date::
 
     from django.http import HttpResponse
 
-    from polls.models import Poll
+    from polls.models import Question
+
 
     def index(request):
-        latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
-        output = ', '.join([p.question for p in latest_poll_list])
+        latest_question_list = Question.objects.order_by('-pub_date')[:5]
+        output = ', '.join([p.question_text for p in latest_question_list])
         return HttpResponse(output)
 
 There's a problem here, though: the page's design is hard-coded in the view. If
@@ -326,10 +329,10 @@ Put the following code in that template:
 
 .. code-block:: html+django
 
-    {% if latest_poll_list %}
+    {% if latest_question_list %}
         <ul>
-        {% for poll in latest_poll_list %}
-            <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a></li>
+        {% for question in latest_question_list %}
+            <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
         {% endfor %}
         </ul>
     {% else %}
@@ -341,13 +344,14 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template::
     from django.http import HttpResponse
     from django.template import RequestContext, loader
 
-    from polls.models import Poll
+    from polls.models import Question
+
 
     def index(request):
-        latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
+        latest_question_list = Question.objects.order_by('-pub_date')[:5]
         template = loader.get_template('polls/index.html')
         context = RequestContext(request, {
-            'latest_poll_list': latest_poll_list,
+            'latest_question_list': latest_question_list,
         })
         return HttpResponse(template.render(context))
 
@@ -356,8 +360,8 @@ context. The context is a dictionary mapping template variable names to Python
 objects.
 
 Load the page by pointing your browser at "/polls/", and you should see a
-bulleted-list containing the "What's up" poll from Tutorial 1. The link points
-to the poll's detail page.
+bulleted-list containing the "What's up" question from Tutorial 1. The link points
+to the question's detail page.
 
 A shortcut: :func:`~django.shortcuts.render`
 --------------------------------------------
@@ -369,11 +373,12 @@ rewritten::
 
     from django.shortcuts import render
 
-    from polls.models import Poll
+    from polls.models import Question
+
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
-        context = {'latest_poll_list': latest_poll_list}
+        latest_question_list = Question.objects.all().order_by('-pub_date')[:5]
+        context = {'latest_question_list': latest_question_list}
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
@@ -389,29 +394,29 @@ object of the given template rendered with the given context.
 Raising a 404 error
 ===================
 
-Now, let's tackle the poll detail view -- the page that displays the question
+Now, let's tackle the question detail view -- the page that displays the question text
 for a given poll. Here's the view::
 
     from django.http import Http404
     from django.shortcuts import render
 
-    from polls.models import Poll
+    from polls.models import Question
     # ...
-    def detail(request, poll_id):
+    def detail(request, question_id):
         try:
-            poll = Poll.objects.get(pk=poll_id)
-        except Poll.DoesNotExist:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
             raise Http404
-        return render(request, 'polls/detail.html', {'poll': poll})
+        return render(request, 'polls/detail.html', {'question': question})
 
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
-if a poll with the requested ID doesn't exist.
+if a question with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, a file
 containing just::
 
-    {{ poll }}
+    {{ question }}
 
 will get you started for now.
 
@@ -424,11 +429,11 @@ provides a shortcut. Here's the ``detail()`` view, rewritten::
 
     from django.shortcuts import render, get_object_or_404
 
-    from polls.models import Poll
+    from polls.models import Question
     # ...
-    def detail(request, poll_id):
-        poll = get_object_or_404(Poll, pk=poll_id)
-        return render(request, 'polls/detail.html', {'poll': poll})
+    def detail(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        return render(request, 'polls/detail.html', {'question': question})
 
 The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
 as its first argument and an arbitrary number of keyword arguments, which it
@@ -458,27 +463,27 @@ Use the template system
 =======================
 
 Back to the ``detail()`` view for our poll application. Given the context
-variable ``poll``, here's what the ``polls/detail.html`` template might look
+variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
 .. code-block:: html+django
 
-    <h1>{{ poll.question }}</h1>
+    <h1>{{ question.question_text }}</h1>
     <ul>
-    {% for choice in poll.choice_set.all %}
+    {% for choice in question.choice_set.all %}
         <li>{{ choice.choice_text }}</li>
     {% endfor %}
     </ul>
 
 The template system uses dot-lookup syntax to access variable attributes. In
-the example of ``{{ poll.question }}``, first Django does a dictionary lookup
-on the object ``poll``. Failing that, it tries an attribute lookup -- which
+the example of ``{{ question.question_text }}``, first Django does a dictionary lookup
+on the object ``question``. Failing that, it tries an attribute lookup -- which
 works, in this case. If attribute lookup had failed, it would've tried a
 list-index lookup.
 
 Method-calling happens in the :ttag:`{% for %}<for>` loop:
-``poll.choice_set.all`` is interpreted as the Python code
-``poll.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
+``question.choice_set.all`` is interpreted as the Python code
+``question.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
 suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
@@ -486,12 +491,12 @@ See the :doc:`template guide </topics/templates>` for more about templates.
 Removing hardcoded URLs in templates
 ====================================
 
-Remember, when we wrote the link to a poll in the ``polls/index.html``
+Remember, when we wrote the link to a question in the ``polls/index.html``
 template, the link was partially hardcoded like this:
 
 .. code-block:: html+django
 
-    <li><a href="/polls/{{ poll.id }}/">{{ poll.question }}</a></li>
+    <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
@@ -501,12 +506,12 @@ defined in your url configurations by using the ``{% url %}`` template tag:
 
 .. code-block:: html+django
 
-    <li><a href="{% url 'detail' poll.id %}">{{ poll.question }}</a></li>
+    <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 .. note::
 
-    If ``{% url 'detail' poll.id %}`` (with quotes) doesn't work, but
-    ``{% url detail poll.id %}`` (without quotes) does, that means you're
+    If ``{% url 'detail' question.id %}`` (with quotes) doesn't work, but
+    ``{% url detail question.id %}`` (without quotes) does, that means you're
     using a version of Django < 1.5. In this case, add the following
     declaration at the top of your template:
 
@@ -520,7 +525,7 @@ defined below::
 
     ...
     # the 'name' value as called by the {% url %} template tag
-    url(r'^(?P<poll_id>\d+)/$', views.detail, name='detail'),
+    url(r'^(?P<question_id>\d+)/$', views.detail, name='detail'),
     ...
 
 If you want to change the URL of the polls detail view to something else,
@@ -529,7 +534,7 @@ template (or templates) you would change it in ``polls/urls.py``::
 
     ...
     # added the word 'specifics'
-    url(r'^specifics/(?P<poll_id>\d+)/$', views.detail, name='detail'),
+    url(r'^specifics/(?P<question_id>\d+)/$', views.detail, name='detail'),
     ...
 
 Namespacing URL names
@@ -560,13 +565,13 @@ Now change your ``polls/index.html`` template from:
 
 .. code-block:: html+django
 
-    <li><a href="{% url 'detail' poll.id %}">{{ poll.question }}</a></li>
+    <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
 .. code-block:: html+django
 
-    <li><a href="{% url 'polls:detail' poll.id %}">{{ poll.question }}</a></li>
+    <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 
 When you're comfortable with writing views, read :doc:`part 4 of this tutorial
 </intro/tutorial04>` to learn about simple form processing and generic views.

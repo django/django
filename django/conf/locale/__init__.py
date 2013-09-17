@@ -468,7 +468,7 @@ LANG_INFO = {
         'name_local': 'Українська',
     },
     'ur': {
-        'bidi': False,
+        'bidi': True,
         'code': 'ur',
         'name': 'Urdu',
         'name_local': 'اردو',

@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 import os
 import sys
-from unittest import expectedFailure
+from unittest import expectedFailure, TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
@@ -68,3 +68,12 @@ class DiscoverRunnerTest(TestCase):
             ).countTestCases()
 
         self.assertEqual(count, 3)
+
+    def test_overrideable_test_suite(self):
+        self.assertEqual(DiscoverRunner().test_suite, TestSuite)
+
+    def test_overrideable_test_runner(self):
+        self.assertEqual(DiscoverRunner().test_runner, TextTestRunner)
+
+    def test_overrideable_test_loader(self):
+        self.assertEqual(DiscoverRunner().test_loader, defaultTestLoader)

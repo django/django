@@ -17,8 +17,8 @@ def luhn(candidate):
     if not isinstance(candidate, six.string_types):
         candidate = str(candidate)
     try:
-        evens = sum([int(c) for c in candidate[-1::-2]])
-        odds = sum([LUHN_ODD_LOOKUP[int(c)] for c in candidate[-2::-2]])
+        evens = sum(int(c) for c in candidate[-1::-2])
+        odds = sum(LUHN_ODD_LOOKUP[int(c)] for c in candidate[-2::-2])
         return ((evens + odds) % 10 == 0)
     except ValueError:  # Raised if an int conversion fails
         return False

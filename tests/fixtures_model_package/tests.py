@@ -30,12 +30,12 @@ class TestNoInitialDataLoading(TransactionTestCase):
 
     available_apps = ['fixtures_model_package']
 
-    def test_syncdb(self):
+    def test_migrate(self):
         with transaction.atomic():
             Book.objects.all().delete()
 
             management.call_command(
-                'syncdb',
+                'migrate',
                 verbosity=0,
                 load_initial_data=False
             )
@@ -64,7 +64,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
 class FixtureTestCase(TestCase):
     def test_initial_data(self):
         "Fixtures can load initial data into models defined in packages"
-        # syncdb introduces 1 initial data object from initial_data.json
+        # migrate introduces 1 initial data object from initial_data.json
         self.assertQuerysetEqual(
             Book.objects.all(), [
                 'Achieving self-awareness of Python programs'

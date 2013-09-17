@@ -159,12 +159,12 @@ class Polygon(GEOSGeometry):
     @property
     def tuple(self):
         "Gets the tuple for each ring in this Polygon."
-        return tuple([self[i].tuple for i in xrange(len(self))])
+        return tuple(self[i].tuple for i in xrange(len(self)))
     coords = tuple
 
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''.join(["<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
-                             for i in xrange(self.num_interior_rings)])
+        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
+                             for i in xrange(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

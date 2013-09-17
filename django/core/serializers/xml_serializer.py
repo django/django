@@ -300,7 +300,7 @@ def getInnerText(node):
         elif child.nodeType == child.ELEMENT_NODE:
             inner_text.extend(getInnerText(child))
         else:
-           pass
+            pass
     return "".join(inner_text)
 
 

@@ -46,6 +46,7 @@ class UploadedFile(File):
             # File names longer than 255 characters can cause problems on older OSes.
             if len(name) > 255:
                 name, ext = os.path.splitext(name)
+                ext = ext[:255]
                 name = name[:255 - len(ext)] + ext
 
         self._name = name

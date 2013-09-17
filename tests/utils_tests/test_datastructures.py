@@ -6,13 +6,15 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(SimpleTestCase):
+class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
+        super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
         self.d1[7] = 'seven'
         self.d1[1] = 'one'
@@ -49,7 +51,7 @@ class SortedDictTests(SimpleTestCase):
         self.d2[7] = 'lucky number 7'
         self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0, 7])
 
-    if not six.PY3:
+    if six.PY2:
         def test_change_keys(self):
             """
             Changing the keys won't do anything, it's only a copy of the

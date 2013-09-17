@@ -11,6 +11,7 @@ from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase
 from django.utils.six import StringIO
 
@@ -131,7 +132,6 @@ class FileStorageTests(TestCase):
             self.assertEqual(f.read(), b'content')
 
 
-
 class FileTests(unittest.TestCase):
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
@@ -141,6 +141,20 @@ class FileTests(unittest.TestCase):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
         self.assertTrue(orig_file.closed)
+
+    def test_namedtemporaryfile_closes(self):
+        """
+        The symbol django.core.files.NamedTemporaryFile is assigned as
+        a different class on different operating systems. In
+        any case, the result should minimally mock some of the API of
+        tempfile.NamedTemporaryFile from the Python standard library.
+        """
+        tempfile = NamedTemporaryFile()
+        self.assertTrue(hasattr(tempfile, "closed"))
+        self.assertFalse(tempfile.closed)
+
+        tempfile.close()
+        self.assertTrue(tempfile.closed)
 
     def test_file_mode(self):
         # Should not set mode to None if it is not present.

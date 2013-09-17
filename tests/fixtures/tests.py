@@ -24,6 +24,17 @@ class TestCaseFixtureLoadingTests(TestCase):
         ])
 
 
+class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
+    """
+    Make sure that subclasses can remove fixtures from parent class (#21089).
+    """
+    fixtures = []
+
+    def testClassFixtures(self):
+        "Check that there were no fixture objects installed"
+        self.assertEqual(Article.objects.count(), 0)
+
+
 class DumpDataAssertMixin(object):
 
     def _dumpdata_assert(self, args, output, format='json', natural_keys=False,
@@ -48,7 +59,7 @@ class DumpDataAssertMixin(object):
 class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_initial_data(self):
-        # syncdb introduces 1 initial data object from initial_data.json.
+        # migrate introduces 1 initial data object from initial_data.json.
         self.assertQuerysetEqual(Book.objects.all(), [
             '<Book: Achieving self-awareness of Python programs>'
         ])

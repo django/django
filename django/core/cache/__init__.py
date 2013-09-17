@@ -15,10 +15,6 @@ cache class.
 See docs/topics/cache.txt for information on the public API.
 """
 import importlib
-try:
-    from urllib.parse import parse_qsl
-except ImportError:     # Python 2
-    from urlparse import parse_qsl
 
 from django.conf import settings
 from django.core import signals
@@ -26,6 +22,7 @@ from django.core.cache.backends.base import (
     InvalidCacheBackendError, CacheKeyWarning, BaseCache)
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_by_path
+from django.utils.six.moves.urllib.parse import parse_qsl
 
 
 __all__ = [
@@ -88,7 +85,7 @@ def parse_backend_conf(backend, **kwargs):
     else:
         try:
             # Trying to import the given backend, in case it's a dotted path
-            backend_cls = import_by_path(backend)
+            import_by_path(backend)
         except ImproperlyConfigured as e:
             raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
                 backend, e))

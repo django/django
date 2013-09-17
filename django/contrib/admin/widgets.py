@@ -9,7 +9,7 @@ from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.forms.widgets import RadioFieldRenderer
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.utils.html import escape, format_html, format_html_join, smart_urlquote
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
@@ -119,7 +119,7 @@ def url_params_from_lookup_dict(lookups):
             if callable(v):
                 v = v()
             if isinstance(v, (tuple, list)):
-                v = ','.join([str(x) for x in v])
+                v = ','.join(str(x) for x in v)
             elif isinstance(v, bool):
                 # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
@@ -154,7 +154,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
+                url = '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
             else:
                 url = ''
             if "class" not in attrs:
@@ -199,7 +199,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
-            value = ','.join([force_text(v) for v in value])
+            value = ','.join(force_text(v) for v in value)
         else:
             value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
@@ -248,16 +248,18 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return self.widget.media
 
     def render(self, name, value, *args, **kwargs):
+        from django.contrib.admin.views.main import TO_FIELD_VAR
         rel_to = self.rel.to
         info = (rel_to._meta.app_label, rel_to._meta.model_name)
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:
             related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
+            url_params = '?%s=%s' % (TO_FIELD_VAR, self.rel.get_related_field().name)
             # TODO: "add_id_" is hard-coded here. This should instead use the
             # correct API to determine the ID dynamically.
-            output.append('<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '
-                          % (related_url, name))
+            output.append('<a href="%s%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '
+                          % (related_url, url_params, name))
             output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
                           % (static('admin/img/icon_addlink.gif'), _('Add Another')))
         return mark_safe(''.join(output))

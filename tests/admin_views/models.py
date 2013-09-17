@@ -495,7 +495,7 @@ class Topping(models.Model):
 
 class Pizza(models.Model):
     name = models.CharField(max_length=20)
-    toppings = models.ManyToManyField('Topping')
+    toppings = models.ManyToManyField('Topping', related_name='pizzas')
 
 
 class Album(models.Model):
@@ -693,3 +693,14 @@ class Simple(models.Model):
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
+
+class _Manager(models.Manager):
+    def get_queryset(self):
+        return super(_Manager, self).get_queryset().filter(pk__gt=1)
+
+class FilteredManager(models.Model):
+    def __str__(self):
+        return "PK=%d" % self.pk
+
+    pk_gt_1 = _Manager()
+    objects = models.Manager()
