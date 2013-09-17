@@ -462,7 +462,14 @@ these changes.
   ``get_backend_timeout()``.
 
 * ``BaseCommand.requires_model_validation`` will be removed in favour of
-  ``requires_system_checks``.
+  ``requires_system_checks``. Admin validators will be replaced by admin
+  checks.
+
+* ``ModelAdmin.validator`` will be removed in favour of new ``checks``
+  attribute.
+
+* ``django.db.backends.DatabaseValidation.validate_field`` will be removed in
+  favour of ``check_field`` method.
 
 2.0
 ---

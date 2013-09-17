@@ -103,10 +103,15 @@ New system check framework
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :doc:`System check framework </ref/checks>` is a set of static checks
+<<<<<<< HEAD
 validating mainly apps and models. It detects common problems and report
 them providing hints. The framework is extensible and it's possible to
 write custom checks.
 >>>>>>> deprecated BaseCommand.{requires_model_validation, validate}
+=======
+detecting common problems (like invalid models) and reporting them providing
+hints. The framework is extensible and it's possible to write custom checks.
+>>>>>>> improved docs
 
 To perform system checks, you need to run ``check`` command. ``validate``
 command is deprecated now.
@@ -598,16 +603,19 @@ The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
 ``get_backend_timeout()``. Despite being a private API, it will go through the
 normal deprecation.
 
+``validate``
+------------
+
+``validate`` command is deprecated in favour of ``check`` command.
+
 ``django.core.management.BaseCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``requires_model_validation`` is deprecated in favour of a new
-``requires_system_checks`` flag. If the latter flag is missing, then the former flag
-value is used. Defining both ``requires_system_checks`` and
+``requires_system_checks`` flag. If the latter flag is missing, then the
+former flag value is used. Defining both ``requires_system_checks`` and
 ``requires_model_validation`` results in an error.
 
-``check`` method's replaced old ``validate`` method.
-
-``validate`` command is deprecated in favour of ``check`` command.
+``check`` method has replaced old ``validate`` method.
 
 ``ModelAdmin.validator``
 ~~~~~~~~~~~~~~~~~~~~~~~~

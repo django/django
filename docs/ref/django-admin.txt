@@ -97,16 +97,15 @@ check <appname appname ...>
 .. versionadded:: 1.6
 
 Uses the :ref:`system check framework <system-check-framework>` to validate
-entire Django project and prints any messages (mostly errors and warnings) to
-standard error output. It's an extended version of old ``validate`` and
-``check`` commands.
+entire Django project and prints any messages (mostly errors and warnings).
+It's an extended version of old ``validate`` and ``check`` commands.
 
-System checks includes validating all installed models (according to the
-:setting:`INSTALLED_APPS` setting) and performs compatibility checks (is your
+System checks framework validate all installed models (according to the
+:setting:`INSTALLED_APPS` setting) and perform compatibility checks (is your
 setup and application code compatible with the current Django version?) as
 well as custom checks.
 
-You can validate some apps by listing them::
+You can check some apps by listing them::
 
     python manage.py auth admin myapp
 
@@ -114,10 +113,10 @@ If you do not specify any app, all apps will be checked.
 
 .. django-admin-option:: --tag <tagname>
 
-:ref:`System check framework <system-check-framework>` perform many different
-types of checks, e.g. model checks, security checks or compatibility checks.
-If you want to perform only a certain kind of checks, follow ``--tag``
-(``-t``) keyword argument with the name of the check group::
+:ref:`System check framework <system-check-framework>` performs many different
+types of checks, i.e. model checks and compatibility checks. If you want to
+perform only a certain kind of checks, follow ``--tag`` (``-t``) keyword
+argument with the name of the check group (``models`` or ``compatibility``)::
 
     python manage.py --tag security -t compatibility
 
@@ -784,9 +783,9 @@ The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
 
 When you start the server, and each time you change Python code while the
-server is running, the server will validate entire Django project (e.g.
-installed models). (See the ``check`` command below.) If the validator finds
-errors, it will print them to standard output, but it won't stop the server.
+server is running, the server will check entire Django project for errors (see
+the ``check`` command below). If there will be any error, it will be printed
+to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
