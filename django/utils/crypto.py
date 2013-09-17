@@ -122,9 +122,8 @@ def _fast_hmac(key, msg, digest):
     This function operates on bytes.
     """
     dig1, dig2 = digest(), digest()
-    if len(key) > dig1.block_size:
-        key = digest(key).digest()
-    key += b'\x00' * (dig1.block_size - len(key))
+    if len(key) != dig1.block_size:
+        raise ValueError('Key size needs to match the block_size of the digest.')
     dig1.update(key.translate(_trans_36))
     dig1.update(msg)
     dig2.update(key.translate(_trans_5c))
@@ -158,6 +157,11 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     r = dklen - (l - 1) * hlen
 
     hex_format_string = "%%0%ix" % (hlen * 2)
+
+    inner_digest_size = digest().block_size
+    if len(password) > inner_digest_size:
+        password = digest(password).digest()
+    password += b'\x00' * (inner_digest_size - len(password))
 
     def F(i):
         def U():
