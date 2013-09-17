@@ -1157,12 +1157,15 @@ class LiveServerTestCase(TransactionTestCase):
         # Wait for the live server to be ready
         cls.server_thread.is_ready.wait()
         if cls.server_thread.error:
+            # Clean up behind ourselves, since tearDownClass won't get called in
+            # case of errors.
+            cls._tearDownClassInternal()
             raise cls.server_thread.error
 
         super(LiveServerTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         # There may not be a 'server_thread' attribute if setUpClass() for some
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):
@@ -1175,4 +1178,7 @@ class LiveServerTestCase(TransactionTestCase):
                 and conn.settings_dict['NAME'] == ':memory:'):
                 conn.allow_thread_sharing = False
 
+    @classmethod
+    def tearDownClass(cls):
+        cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
