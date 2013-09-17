@@ -102,7 +102,7 @@ class Sitemap(object):
                 'priority':   str(priority if priority is not None else ''),
             }
             urls.append(url_info)
-        if all_items_lastmod:
+        if all_items_lastmod and latest_lastmod:
             self.latest_lastmod = latest_lastmod
         return urls
 

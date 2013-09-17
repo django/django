@@ -166,3 +166,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
         response = self.client.get('/simple/sitemap.xml')
         self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
+
+    def test_empty_sitemap(self):
+        response = self.client.get('/empty/sitemap.xml')
+        self.assertEqual(response.status_code, 200)

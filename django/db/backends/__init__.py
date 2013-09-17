@@ -122,29 +122,29 @@ class BaseDatabaseWrapper(object):
         Guarantees that a connection to the database is established.
         """
         if self.connection is None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 self.connect()
 
     ##### Backend-specific wrappers for PEP-249 connection methods #####
 
     def _cursor(self):
         self.ensure_connection()
-        with self.wrap_database_errors():
+        with self.wrap_database_errors:
             return self.create_cursor()
 
     def _commit(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.rollback()
 
     def _close(self):
         if self.connection is not None:
-            with self.wrap_database_errors():
+            with self.wrap_database_errors:
                 return self.connection.close()
 
     ##### Generic wrappers for PEP-249 connection methods #####
@@ -484,6 +484,7 @@ class BaseDatabaseWrapper(object):
 
     ##### Miscellaneous #####
 
+    @cached_property
     def wrap_database_errors(self):
         """
         Context manager and decorator that re-throws backend-specific database

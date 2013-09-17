@@ -22,22 +22,18 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
         if not os.environ.get('DJANGO_SELENIUM_TESTS', False):
             raise SkipTest('Selenium tests not requested')
         try:
-            webdriver_class = import_by_path(cls.webdriver_class)
-        except ImportError as e:
-            raise SkipTest('Selenium webdriver "%s" not installed: %s'
-                            % (cls.webdriver_class, str(e)))
-        super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
-        try:
-            cls.selenium = webdriver_class()
+            cls.selenium = import_by_path(cls.webdriver_class)()
         except Exception as e:
-            raise SkipTest('Selenium webdriver "%s" not operational: %s'
-                           % (cls.webdriver_class, str(e)))
+            raise SkipTest('Selenium webdriver "%s" not installed or not '
+                           'operational: %s' % (cls.webdriver_class, str(e)))
+        # This has to be last to ensure that resources are cleaned up properly!
+        super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
+        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
-        super(AdminSeleniumWebDriverTestCase, cls).tearDownClass()
 
     def wait_until(self, callback, timeout=10):
         """
