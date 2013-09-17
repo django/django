@@ -173,6 +173,15 @@ class CreateViewTests(TestCase):
         # but with a warning:
         self.assertEqual(w[0].category, DeprecationWarning)
 
+    def test_createview_passes_arguments_to_context(self):
+        """
+        Regression text for #17795
+        """
+        factory = RequestFactory()
+        request = factory.get('/edit/authors/create/')
+        res = views.AuthorCreate.as_view()(request, foo='bar')
+        self.assertEqual(res.context_data.get('foo'), 'bar')
+
 
 class UpdateViewTests(TestCase):
     urls = 'generic_views.urls'

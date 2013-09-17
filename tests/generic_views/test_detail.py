@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.views.generic.base import View
+from django.test.client import RequestFactory
 
 from .models import Artist, Author, Page
-
+from . import views
 
 class DetailViewTest(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -99,3 +100,9 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/nonmodel/1/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'].id, "non_model_1")
+
+    def test_detailview_regression_t17795(self):
+        factory = RequestFactory()
+        request = factory.get('/detail/author/1/')
+        res = views.AuthorDetail.as_view()(request, pk='1', foo='bar')
+        self.assertEqual(res.context_data.get('foo'), 'bar')

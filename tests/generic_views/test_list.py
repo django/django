@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 from django.views.generic.base import View
 from django.utils.encoding import force_str
 
 from .models import Author, Artist
-
+from . import views
 
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -215,3 +216,12 @@ class ListViewTests(TestCase):
         Author.objects.all().delete()
         for i in range(n):
             Author.objects.create(name='Author %02i' % i, slug='a%s' % i)
+
+    def test_listview_passes_arguments_to_context(self):
+        """
+        Regression test for #17795
+        """
+        factory = RequestFactory()
+        request = factory.get('/list/authors/')
+        res = views.AuthorList.as_view()(request, foo='bar')
+        self.assertEqual(res.context_data.get('foo'), 'bar')
