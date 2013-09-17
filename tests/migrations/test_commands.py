@@ -49,6 +49,28 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_book")
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_migrate_list(self):
+        """
+        Tests --list output of migrate command
+        """
+        stdout = six.StringIO()
+        call_command("migrate", list=True, stdout=stdout, verbosity=0)
+        self.assertIn("migrations", stdout.getvalue().lower())
+        self.assertIn("[ ] 0001_initial", stdout.getvalue().lower())
+        self.assertIn("[ ] 0002_second", stdout.getvalue().lower())
+
+        call_command("migrate", "migrations", "0001", verbosity=0)
+
+        stdout = six.StringIO()
+        # Giving the explicit app_label tests for selective `show_migration_list` in the command
+        call_command("migrate", "migrations", list=True, stdout=stdout, verbosity=0)
+        self.assertIn("migrations", stdout.getvalue().lower())
+        self.assertIn("[x] 0001_initial", stdout.getvalue().lower())
+        self.assertIn("[ ] 0002_second", stdout.getvalue().lower())
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
         Makes sure that sqlmigrate does something.
