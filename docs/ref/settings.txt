@@ -281,6 +281,7 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY
 Default: ``False``
 
 .. deprecated:: 1.6
+
     This setting was largely ineffective because of using cookies for sessions
     and CSRF. See the :doc:`Django 1.6 release notes</releases/1.6>` for more
     information.
@@ -2029,6 +2030,7 @@ TRANSACTIONS_MANAGED
 --------------------
 
 .. deprecated:: 1.6
+
     This setting was deprecated because its name is very misleading. Use the
     :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
     entries instead.
