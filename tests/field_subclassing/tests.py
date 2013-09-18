@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import inspect
+
 from django.core import serializers
 from django.test import TestCase
 
@@ -74,7 +76,7 @@ class CustomField(TestCase):
         m.delete()
 
         m1 = MyModel.objects.create(name="1", data=Small(1, 2))
-        m2 = MyModel.objects.create(name="2", data=Small(2, 3))
+        MyModel.objects.create(name="2", data=Small(2, 3))
 
         self.assertQuerysetEqual(
             MyModel.objects.all(), [
@@ -90,3 +92,15 @@ class CustomField(TestCase):
         o = OtherModel.objects.get()
         self.assertEqual(o.data.first, "a")
         self.assertEqual(o.data.second, "b")
+
+    def test_subfieldbase_plays_nice_with_module_inspect(self):
+        """
+        Custom fields should play nice with python standard module inspect.
+
+        http://users.rcn.com/python/download/Descriptor.htm#properties
+        """
+        # Even when looking for totally different properties, SubfieldBase's
+        # non property like behaviour made inspect crash. Refs #12568.
+        data = dict(inspect.getmembers(MyModel))
+        self.assertIn('__module__', data)
+        self.assertEqual(data['__module__'], 'field_subclassing.models')
