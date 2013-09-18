@@ -164,15 +164,6 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertTrue(lazy1 != lazy3)
         self.assertFalse(lazy1 != lazy2)
 
-    def test_list_set(self):
-        lazy_list = SimpleLazyObject(lambda: [1, 2, 3, 4, 5])
-        lazy_set = SimpleLazyObject(lambda: set([1, 2, 3, 4]))
-        self.assertTrue(1 in lazy_list)
-        self.assertTrue(1 in lazy_set)
-        self.assertFalse(6 in lazy_list)
-        self.assertFalse(6 in lazy_set)
-        self.assertEqual(len(lazy_list), 5)
-        self.assertEqual(len(lazy_set), 4)
 
 class TestUtilsSimpleLazyObjectDjangoTestCase(DjangoTestCase):
 
