@@ -86,6 +86,15 @@ class FormsFormsetTestCase(TestCase):
 
         return formset_class(data, **kwargs)
 
+
+    # Assert that the formset has the expected number of forms, and that each form within
+    # the formset has the proper prefix
+    def validate_formset_number_of_forms(self, formset, number_of_forms, prefix='form'):
+        self.assertEqual(number_of_forms, len(formset.forms))
+        for index in range(number_of_forms):
+            self.assertEquals('{0}-{1}'.format(prefix, index), formset.forms[index].prefix)
+
+
     def test_basic_formset(self):
         # A FormSet constructor takes the same arguments as Form. Let's create a FormSet
         # for adding data. By default, it displays 1 blank form. It can display more,
@@ -780,6 +789,75 @@ class FormsFormsetTestCase(TestCase):
 
         self.assertHTMLEqual('\n'.join(form_output), """<tr><th><label for="id_form-0-name">Name:</label></th><td><input type="text" name="form-0-name" value="Gin Tonic" id="id_form-0-name" /></td></tr>
 <tr><th><label for="id_form-1-name">Name:</label></th><td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>""")
+
+    def test_default_absolute_max(self):
+        # The default absolute max is 2*formsets.DEFAULT_MAX_NUM
+        data = {
+            'form-TOTAL_FORMS': '2505',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+            }
+
+        # The default absolute_max is max_num + DEFAULT_MAX_NUM (which is
+        # 2*DEFAULT_MAX_NUM if max_num isn't specified)
+        formset = FavoriteDrinksFormSet(data=data)
+        self.assertFalse(formset.is_valid())
+        self.validate_formset_number_of_forms(formset,
+                                              2*formsets.DEFAULT_MAX_NUM)
+
+    def test_explicit_absolute_max_higher_than_default(self):
+        # absolute_max can now be explicitly specified via kwarg to
+        # formset_factory.
+        # This behavior was changed from absolute_max always being max_num +
+        # 1000 in the patch for #20347
+        data = {
+            'form-TOTAL_FORMS': '2505',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+            }
+
+        # absolute_max can now be explicitly set, not being affected by
+        # max_num
+        # or DEFAULT_MAX_NUM at all
+        HigherLimitFavoriteDrinksFormSet = formset_factory(
+            FavoriteDrinkForm, max_num=1, absolute_max=3000)
+        formset = HigherLimitFavoriteDrinksFormSet(data=data)
+        self.assertTrue(formset.is_valid())
+        self.validate_formset_number_of_forms(formset, 2505)
+
+        # verify that absolute_max still does provide a hard limit
+        data['form-TOTAL_FORMS'] = '3505'
+        HigherLimitFavoriteDrinksFormSet = formset_factory(
+            FavoriteDrinkForm, max_num=1, absolute_max=3000)
+        formset = HigherLimitFavoriteDrinksFormSet(data=data)
+        self.assertFalse(formset.is_valid())
+        self.validate_formset_number_of_forms(formset, 3000)
+
+    def test_explicit_absolute_max_lower_than_default_with_max_num(self):
+        data = {
+            'form-TOTAL_FORMS': '1000',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+            }
+
+        LowerLimitFavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm,
+                                                          max_num=30,
+                                                          absolute_max=30)
+        formset = LowerLimitFavoriteDrinksFormSet(data=data)
+        self.assertFalse(formset.is_valid())
+        self.validate_formset_number_of_forms(formset, 30)
+
+
+    def test_explicit_absolute_max_lower_than_default_no_max_num(self):
+        with self.assertRaises(ValueError):
+            formset_factory(FavoriteDrinkForm, absolute_max=30)
+
+
+    def test_max_num_greater_than_absolute_max(self):
+        with self.assertRaises(ValueError):
+            formset_factory(FavoriteDrinkForm, max_num=100, absolute_max=30)
+
+
 
     def test_regression_6926(self):
         # Regression test for #6926 ##################################################
