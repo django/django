@@ -92,6 +92,12 @@ The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
 class method has been added to :ref:`create Manager with QuerySet methods
 <create-manager-with-queryset-methods>`.
 
+Using a custom manager when traversing reverse relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is now possible to :ref:`specify a custom manager
+<using-custom-reverse-manager>` when traversing a reverse relationship.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
