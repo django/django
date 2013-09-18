@@ -8,7 +8,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import (unquote, flatten_fieldsets, get_deleted_objects,
+from django.contrib.admin.utils import (unquote, flatten_fieldsets, get_deleted_objects,
     model_format_dict, NestedObjects, lookup_needs_distinct)
 from django.contrib.admin import validation
 from django.contrib.admin.templatetags.admin_static import static

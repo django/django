@@ -1,7 +1,7 @@
 import datetime
 
 from django.conf import settings
-from django.db.backends.util import truncate_name, typecast_date, typecast_timestamp
+from django.db.backends.utils import truncate_name, typecast_date, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six

@@ -7,7 +7,7 @@ circular import difficulties.
 """
 from __future__ import unicode_literals
 
-from django.db.backends import util
+from django.db.backends import utils
 from django.utils import six
 from django.utils import tree
 
@@ -194,7 +194,7 @@ def deferred_class_factory(model, attrs):
     # name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
-    name = util.truncate_name(name, 80, 32)
+    name = utils.truncate_name(name, 80, 32)
 
     overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
     overrides["Meta"] = Meta

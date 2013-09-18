@@ -1143,6 +1143,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1163,6 +1164,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1183,6 +1185,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):

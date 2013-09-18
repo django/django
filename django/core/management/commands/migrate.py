@@ -264,7 +264,7 @@ class Command(BaseCommand):
         if apps:
             invalid_apps = []
             for app in apps:
-                if app_label not in loader.migrated_apps:
+                if app not in loader.migrated_apps:
                     invalid_apps.append(app)
             if invalid_apps:
                 raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))

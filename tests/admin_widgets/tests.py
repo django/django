@@ -1055,9 +1055,10 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to_window(main_window)
-        user_select = self.selenium.find_element_by_id('id_user')
-        new_option = user_select.find_elements_by_tag_name('option')[-1]
-        self.assertEqual(username_value, new_option.get_attribute('value'))
+        # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
+        self.selenium.implicitly_wait(2)
+        self.selenium.find_element_by_css_selector('#id_user option[value=newuser]')
+        self.selenium.implicitly_wait(0)
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()

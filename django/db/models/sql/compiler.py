@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import FieldError
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
@@ -1049,7 +1049,7 @@ class SQLDateCompiler(SQLCompiler):
             from django.db.models.fields import DateField
             fields = [DateField()]
         else:
-            from django.db.backends.util import typecast_date
+            from django.db.backends.utils import typecast_date
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
         offset = len(self.query.extra_select)
@@ -1075,7 +1075,7 @@ class SQLDateTimeCompiler(SQLCompiler):
             from django.db.models.fields import DateTimeField
             fields = [DateTimeField()]
         else:
-            from django.db.backends.util import typecast_timestamp
+            from django.db.backends.utils import typecast_timestamp
             needs_string_cast = self.connection.features.needs_datetime_string_cast
 
         offset = len(self.query.extra_select)

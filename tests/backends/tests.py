@@ -15,7 +15,7 @@ from django.db import (connection, connections, DEFAULT_DB_ALIAS,
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.util import format_number
+from django.db.backends.utils import format_number
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)

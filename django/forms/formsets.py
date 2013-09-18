@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property

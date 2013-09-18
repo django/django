@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from django.db import connection, connections, router
-from django.db.backends import util
+from django.db.backends import utils
 from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
     PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
@@ -1440,7 +1440,7 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            return util.truncate_name('%s_%s' % (opts.db_table, self.name),
+            return utils.truncate_name('%s_%s' % (opts.db_table, self.name),
                                       connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):

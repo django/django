@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import BaseModelForm, BaseModelFormSet, _get_foreign_key
-from django.contrib.admin.util import get_fields_from_path, NotRelationField
+from django.contrib.admin.utils import get_fields_from_path, NotRelationField
 
 """
 Does basic ModelAdmin option validation. Calls custom validation

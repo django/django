@@ -106,7 +106,8 @@ class MigrationAutodetector(object):
                     )
                 )
                 for field_name, other_app_label, other_model_name in related_fields:
-                    self.add_dependency(app_label, other_app_label)
+                    if app_label != other_app_label:
+                        self.add_dependency(app_label, other_app_label)
                 del pending_add[app_label, model_name]
             # Ah well, we'll need to split one. Pick deterministically.
             else:
@@ -140,7 +141,8 @@ class MigrationAutodetector(object):
                 ),
                 new = True,
             )
-            self.add_dependency(app_label, other_app_label)
+            if app_label != other_app_label:
+                self.add_dependency(app_label, other_app_label)
         # Removing models
         removed_models = set(old_model_keys) - set(new_model_keys)
         for app_label, model_name in removed_models:

@@ -433,12 +433,12 @@ statements for the polls app):
 
     BEGIN;
     CREATE TABLE "polls_question" (
-        "id" integer NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
         "question_text" varchar(200) NOT NULL,
         "pub_date" datetime NOT NULL
     );
     CREATE TABLE "polls_choice" (
-        "id" integer NOT NULL PRIMARY KEY,
+        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
         "question_id" integer NOT NULL REFERENCES "polls_poll" ("id"),
         "choice_text" varchar(200) NOT NULL,
         "votes" integer NOT NULL
@@ -462,9 +462,9 @@ Note the following:
 * The foreign key relationship is made explicit by a ``REFERENCES``
   statement.
 
-* It's tailored to the database you're using, so database-specific field
-  types such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or
-  ``integer primary key`` (SQLite) are handled for you automatically. Same
+* It's tailored to the database you're using, so database-specific field types
+  such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
+  primary key autoincrement`` (SQLite) are handled for you automatically. Same
   goes for quoting of field names -- e.g., using double quotes or single
   quotes.
 
