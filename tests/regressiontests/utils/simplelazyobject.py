@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import copy
 import pickle
 
+from django.contrib.auth.models import User
+from django.test import TestCase as DjangoTestCase
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.unittest import TestCase
@@ -122,9 +124,10 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertEqual(six.text_type(unpickled), six.text_type(x))
         self.assertEqual(unpickled.name, x.name)
 
-    def test_pickle_py2_regression(self):
-        from django.contrib.auth.models import User
 
+class TestUtilsSimpleLazyObjectDjangoTestCase(DjangoTestCase):
+
+    def test_pickle_py2_regression(self):
         # See ticket #20212
         user = User.objects.create_user('johndoe', 'john@example.com', 'pass')
         x = SimpleLazyObject(lambda: user)
