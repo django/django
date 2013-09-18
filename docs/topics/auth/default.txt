@@ -70,7 +70,7 @@ first time you run it with ``'django.contrib.auth'`` in your
 :setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
 you can use a command line utility::
 
-    manage.py createsuperuser --username=joe --email=joe@example.com
+    $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
 You will be prompted for a password. After you enter one, the user will be
 created immediately. If you leave off the :djadminopt:`--username` or the

@@ -162,7 +162,7 @@ Database caching
 To use a database table as your cache backend, first create a cache table in
 your database by running this command::
 
-    python manage.py createcachetable [cache_table_name]
+    $ python manage.py createcachetable [cache_table_name]
 
 ...where ``[cache_table_name]`` is the name of the database table to create.
 (This name can be whatever you want, as long as it's a valid table name that's
