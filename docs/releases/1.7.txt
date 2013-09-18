@@ -415,6 +415,14 @@ Email
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
   :attr:`~django.core.mail.backends.smtp.EmailBackend.timeout` parameter.
 
+File Storage
+^^^^^^^^^^^^
+
+* File locking on Windows previously depended on the PyWin32 package; if it
+  wasn't installed, file locking failed silently. That dependency has been
+  removed, and file locking is now implemented natively on both Windows
+  and Unix.
+
 File Uploads
 ^^^^^^^^^^^^
 
