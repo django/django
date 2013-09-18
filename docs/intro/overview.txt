@@ -53,7 +53,7 @@ automatically:
 
 .. code-block:: bash
 
-    manage.py migrate
+    $ python manage.py migrate
 
 The :djadmin:`migrate` command looks at all your available models and creates
 tables in your database for whichever tables don't already exist, as well as

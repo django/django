@@ -190,7 +190,7 @@ Running tests
 
 In the terminal, we can run our test::
 
-    python manage.py test polls
+    $ python manage.py test polls
 
 and you'll see something like::
 

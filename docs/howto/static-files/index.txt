@@ -174,7 +174,7 @@ for gathering static files in a single directory so you can serve them easily.
 
 2. Run the :djadmin:`collectstatic` management command::
 
-       ./manage.py collectstatic
+       $ python manage.py collectstatic
 
    This will copy all files from your static folders into the
    :setting:`STATIC_ROOT` directory.

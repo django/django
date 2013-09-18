@@ -169,7 +169,7 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 8080
+        $ python manage.py runserver 8080
 
     If you want to change the server's IP, pass it along with the port. So to
     listen on all public IPs (useful if you want to show off your work on other
@@ -177,7 +177,7 @@ It worked!
 
     .. code-block:: bash
 
-        python manage.py runserver 0.0.0.0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
@@ -256,7 +256,7 @@ that, run the following command:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
@@ -308,7 +308,7 @@ and type this command:
 
 .. code-block:: bash
 
-    python manage.py startapp polls
+    $ python manage.py startapp polls
 
 That'll create a directory :file:`polls`, which is laid out like this::
 
@@ -424,7 +424,7 @@ Now Django knows to include the ``polls`` app. Let's run another command:
 
 .. code-block:: bash
 
-    python manage.py sql polls
+    $ python manage.py sql polls
 
 You should see something similar to the following (the ``CREATE TABLE`` SQL
 statements for the polls app):
@@ -501,7 +501,7 @@ Now, run :djadmin:`syncdb` again to create those model tables in your database:
 
 .. code-block:: bash
 
-    python manage.py syncdb
+    $ python manage.py syncdb
 
 The :djadmin:`syncdb` command runs the SQL from :djadmin:`sqlall` on your
 database for all apps in :setting:`INSTALLED_APPS` that don't already exist in
@@ -521,7 +521,7 @@ API Django gives you. To invoke the Python shell, use this command:
 
 .. code-block:: bash
 
-    python manage.py shell
+    $ python manage.py shell
 
 We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
