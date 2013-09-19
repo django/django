@@ -774,6 +774,9 @@ class SQLCompiler(object):
             transaction.set_dirty(self.using)
         for rows in self.execute_sql(MULTI):
             for row in rows:
+                if has_aggregate_select:
+                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
+                    aggregate_end = aggregate_start + len(self.query.aggregate_select)
                 if resolve_columns:
                     if fields is None:
                         # We only set this up here because
@@ -800,11 +803,14 @@ class SQLCompiler(object):
                             db_table = self.query.model._meta.db_table
                             fields = [f for f in fields if db_table in only_load and
                                       f.column in only_load[db_table]]
+                        if has_aggregate_select:
+                            # pad None in to fields for aggregates
+                            fields = fields[:aggregate_start] + [
+                                None for x in range(0, aggregate_end - aggregate_start)
+                            ] + fields[aggregate_start:]
                     row = self.resolve_columns(row, fields)
 
                 if has_aggregate_select:
-                    aggregate_start = len(self.query.extra_select) + len(self.query.select)
-                    aggregate_end = aggregate_start + len(self.query.aggregate_select)
                     row = tuple(row[:aggregate_start]) + tuple([
                         self.query.resolve_aggregate(value, aggregate, self.connection)
                         for (alias, aggregate), value
