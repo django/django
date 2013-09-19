@@ -146,8 +146,8 @@ def setup(verbosity, test_labels):
             module_found_in_labels = True
         else:
             match = lambda label: (
-                module_label == label or # exact match
-                module_label.startswith(label + '.') # ancestor match
+                module_label == label or  # exact match
+                module_label.startswith(label + '.')  # ancestor match
                 )
 
             module_found_in_labels = any(match(l) for l in test_labels_set)
@@ -162,16 +162,23 @@ def setup(verbosity, test_labels):
 
     return state
 
+
 def teardown(state):
     from django.conf import settings
-    # Removing the temporary TEMP_DIR. Ensure we pass in unicode
-    # so that it will successfully remove temp trees containing
-    # non-ASCII filenames on Windows. (We're assuming the temp dir
-    # name itself does not contain non-ASCII characters.)
-    shutil.rmtree(six.text_type(TEMP_DIR))
+
+    try:
+        # Removing the temporary TEMP_DIR. Ensure we pass in unicode
+        # so that it will successfully remove temp trees containing
+        # non-ASCII filenames on Windows. (We're assuming the temp dir
+        # name itself does not contain non-ASCII characters.)
+        shutil.rmtree(six.text_type(TEMP_DIR))
+    except OSError:
+        print('Failed to remove temp directory: %s' % TEMP_DIR)
+
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
+
 
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
@@ -253,6 +260,7 @@ def bisect_tests(bisection_label, options, test_labels):
         print("***** Source of error: %s" % test_labels[0])
     teardown(state)
 
+
 def paired_tests(paired_test, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
@@ -287,6 +295,7 @@ def paired_tests(paired_test, options, test_labels):
 
     print('***** No problem pair found')
     teardown(state)
+
 
 if __name__ == "__main__":
     from optparse import OptionParser
