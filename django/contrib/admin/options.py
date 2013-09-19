@@ -417,7 +417,6 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
 
     @classmethod
     def check(cls, model, **kwargs):
-        errors = []
         if hasattr(cls, 'validator'):
             warnings.warn(
                 'ModelAdmin.validator is deprecated. Use "checks" instead.',
@@ -426,15 +425,17 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
             try:
                 validator.validate(cls, model)
             except ImproperlyConfigured as e:
-                errors.append(
+                return [
                     checks.Error(
                         e.args[0],
                         hint=None,
                         obj=cls,
                     )
-                )
-        errors.extend(cls.checks().check(cls, model, **kwargs))
-        return errors
+                ]
+            else:
+                return []
+        else:
+            return cls.checks().check(cls, model, **kwargs)
 
 
 @python_2_unicode_compatible
