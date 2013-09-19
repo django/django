@@ -434,7 +434,7 @@ February 19, 2013
 
     * Django 1.4
 
-* Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`_
+* `Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`_
 
 * **Patches:**
 
@@ -470,7 +470,7 @@ August 13, 2013
 
     * Django 1.5
 
-* Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`_
+* `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`_
 
 * **Patches:**
 
