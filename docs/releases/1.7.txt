@@ -161,8 +161,8 @@ Minor features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * The backends for :mod:`django.contrib.messages` that use cookies, will now
-  follow the :setting:`SESSION_COOKIE_SECURE` and
-  :setting:`SESSION_COOKIE_HTTPONLY` settings.
+  follow the :setting:`SESSION_COOKIE-SECURE` and
+  :setting:`SESSION_COOKIE-HTTPONLY` settings.
 
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -487,3 +487,28 @@ to ``utils.py`` in an effort to unify all util and utils references:
 * ``django.contrib.gis.db.backends.util``
 * ``django.db.backends.util``
 * ``django.forms.util``
+
+Standalone session-, CSRF protection- and language-related cookie settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The settings that control attributes of the cookies used for:
+
+* Sessions -- ``SESSION_COOKIE_NAME``, ``SESSION_COOKIE_AGE``,
+  ``SESSION_COOKIE_DOMAIN``, ``SESSION_COOKIE_SECURE``, ``SESSION_COOKIE_PATH``,
+  ``SESSION_COOKIE_HTTPONLY``
+* Protection against CSRF-type attacks -- ``CSRF_COOKIE_NAME``,
+  ``CSRF_COOKIE_DOMAIN``, ``CSRF_COOKIE_SECURE``, ``CSRF_COOKIE_PATH``,
+  ``CSRF_COOKIE_HTTPONLY``
+* and language preference -- ``LANGUAGE_COOKIE_NAME``
+
+have been deprecated and replaced by settings with dictionary values that
+group them and use similarly named keys for each of the configurable cookie
+attributes:
+
+* :setting:`SESSION_COOKIE`
+* :setting:`CSRF_COOKIE`
+* :setting:`LANGUAGE_COOKIE`
+
+The old settings still are respected but will generate deprecation warnings
+when specified in a settings file and will be completely removed and ignored
+in Django 1.9.

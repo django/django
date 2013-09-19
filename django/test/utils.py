@@ -22,6 +22,7 @@ from django.utils.translation import deactivate
 __all__ = (
     'Approximate', 'ContextList',  'get_runner', 'override_settings',
     'setup_test_environment', 'teardown_test_environment',
+    'dict_setting',
 )
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
@@ -237,6 +238,41 @@ class override_settings(object):
             new_value = getattr(settings, key, None)
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value, enter=False)
+
+
+class dict_setting(override_settings):
+    """
+    A specialized version of override_settings() capable of overriding a dict setting with
+    another dict provided by the user. E.g.::
+
+        with dict_setting(A_DICT_SETTING, {'a_key': 'its value', 'another_key': 42}):
+            # settings.A_DICT_SETTING has 'a_key' -> 'its value' and 'another_key' -> 42
+            # inside this block
+            ...
+    """
+
+    def __init__(self, setting, update_value):
+        self.setting = setting
+        self.update_value = update_value
+
+    def enable(self):
+        setting = self.setting
+        override = UserSettingsHolder(settings._wrapped)
+        new_value = getattr(override, setting, None)
+        new_value.update(self.update_value)
+        setattr(override, setting, new_value)
+        self.wrapped = settings._wrapped
+        settings._wrapped = override
+        setting_changed.send(sender=settings._wrapped.__class__,
+                             setting=setting, value=new_value, enter=True)
+
+    def disable(self):
+        settings._wrapped = self.wrapped
+        del self.wrapped
+        orig_value = getattr(settings, self.setting, None)
+        setting_changed.send(sender=settings._wrapped.__class__,
+                             setting=self.setting, value=orig_value,
+                             enter=False)
 
 
 def compare_xml(want, got):

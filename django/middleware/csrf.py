@@ -105,7 +105,7 @@ class CsrfViewMiddleware(object):
 
         try:
             csrf_token = _sanitize_token(
-                request.COOKIES[settings.CSRF_COOKIE_NAME])
+                request.COOKIES[settings.CSRF_COOKIE['NAME']])
             # Use same token next time
             request.META['CSRF_COOKIE'] = csrf_token
         except KeyError:
@@ -191,13 +191,13 @@ class CsrfViewMiddleware(object):
 
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
-        response.set_cookie(settings.CSRF_COOKIE_NAME,
+        response.set_cookie(settings.CSRF_COOKIE['NAME'],
                             request.META["CSRF_COOKIE"],
                             max_age = 60 * 60 * 24 * 7 * 52,
-                            domain=settings.CSRF_COOKIE_DOMAIN,
-                            path=settings.CSRF_COOKIE_PATH,
-                            secure=settings.CSRF_COOKIE_SECURE,
-                            httponly=settings.CSRF_COOKIE_HTTPONLY
+                            domain=settings.CSRF_COOKIE['DOMAIN'],
+                            path=settings.CSRF_COOKIE['PATH'],
+                            secure=settings.CSRF_COOKIE['SECURE'],
+                            httponly=settings.CSRF_COOKIE['HTTPONLY']
                             )
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))

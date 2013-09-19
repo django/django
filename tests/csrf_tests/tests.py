@@ -58,7 +58,7 @@ class CsrfViewMiddlewareTest(TestCase):
 
     def _get_GET_csrf_cookie_request(self):
         req = TestingHttpRequest()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = self._csrf_id_cookie
+        req.COOKIES[settings.CSRF_COOKIE['NAME']] = self._csrf_id_cookie
         return req
 
     def _get_POST_csrf_cookie_request(self):
@@ -85,11 +85,11 @@ class CsrfViewMiddlewareTest(TestCase):
         a new token is created.
         """
         req = self._get_GET_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000
+        req.COOKIES[settings.CSRF_COOKIE['NAME']] = 'x' * 10000000
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE['NAME'], False)
         self.assertEqual(len(csrf_cookie.value), CSRF_KEY_LENGTH)
 
     def test_process_response_get_token_used(self):
@@ -99,12 +99,13 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
 
-        # Put tests for CSRF_COOKIE_* settings here
-        with self.settings(CSRF_COOKIE_NAME='myname',
-                           CSRF_COOKIE_DOMAIN='.example.com',
-                           CSRF_COOKIE_PATH='/test/',
-                           CSRF_COOKIE_SECURE=True,
-                           CSRF_COOKIE_HTTPONLY=True):
+        # Put tests for CSRF_COOKIE[*] settings here
+        with self.settings(CSRF_COOKIE={
+                'NAME': 'myname',
+                'DOMAIN': '.example.com',
+                'PATH': '/test/',
+                'SECURE': True,
+                'HTTPONLY': True}):
             # token_view calls get_token() indirectly
             CsrfViewMiddleware().process_view(req, token_view, (), {})
             resp = token_view(req)
@@ -134,7 +135,7 @@ class CsrfViewMiddlewareTest(TestCase):
         resp = non_token_view_using_request_processor(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
 
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE['NAME'], False)
         self.assertEqual(csrf_cookie, False)
 
     # Check the request processing
@@ -227,7 +228,7 @@ class CsrfViewMiddlewareTest(TestCase):
         Check that we get a new token if the csrf_cookie is the empty string
         """
         req = self._get_GET_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = b""
+        req.COOKIES[settings.CSRF_COOKIE['NAME']] = b""
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
 
@@ -268,7 +269,7 @@ class CsrfViewMiddlewareTest(TestCase):
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies[settings.CSRF_COOKIE_NAME]
+        csrf_cookie = resp2.cookies[settings.CSRF_COOKIE['NAME']]
         self._check_token_present(resp, csrf_id=csrf_cookie.value)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
@@ -335,7 +336,7 @@ class CsrfViewMiddlewareTest(TestCase):
 
         req = self._get_GET_no_csrf_cookie_request()
         resp = view(req)
-        self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE['NAME'], False))
         self.assertTrue('Cookie' in resp.get('Vary',''))
 
     def test_ensures_csrf_cookie_with_middleware(self):
@@ -352,7 +353,7 @@ class CsrfViewMiddlewareTest(TestCase):
         CsrfViewMiddleware().process_view(req, view, (), {})
         resp = view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
-        self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE['NAME'], False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
 
     def test_ensures_csrf_cookie_no_logging(self):

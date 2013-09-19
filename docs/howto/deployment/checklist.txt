@@ -148,7 +148,7 @@ Once you've set up HTTPS, enable the following settings.
 Set this to ``True`` to avoid transmitting the CSRF cookie over HTTP
 accidentally.
 
-:setting:`SESSION_COOKIE_SECURE`
+:setting:`SESSION_COOKIE-SECURE`
 --------------------------------
 
 Set this to ``True`` to avoid transmitting the session cookie over HTTP

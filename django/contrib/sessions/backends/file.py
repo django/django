@@ -19,7 +19,7 @@ class SessionStore(SessionBase):
     """
     def __init__(self, session_key=None):
         self.storage_path = type(self)._get_storage_path()
-        self.file_prefix = settings.SESSION_COOKIE_NAME
+        self.file_prefix = settings.SESSION_COOKIE['NAME']
         super(SessionStore, self).__init__(session_key)
 
     @classmethod
@@ -188,7 +188,7 @@ class SessionStore(SessionBase):
     @classmethod
     def clear_expired(cls):
         storage_path = cls._get_storage_path()
-        file_prefix = settings.SESSION_COOKIE_NAME
+        file_prefix = settings.SESSION_COOKIE['NAME']
 
         for session_file in os.listdir(storage_path):
             if not session_file.startswith(file_prefix):

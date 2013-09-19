@@ -1,12 +1,13 @@
 import json
 
+from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, dict_setting
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -41,7 +42,7 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-@override_settings(SESSION_COOKIE_DOMAIN='.example.com', SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True)
+@dict_setting('SESSION_COOKIE', {'DOMAIN': '.example.com', 'SECURE': True, 'HTTPONLY': True})
 class CookieTest(BaseTests, TestCase):
     storage_class = CookieStorage
 
@@ -58,7 +59,7 @@ class CookieTest(BaseTests, TestCase):
 
     def test_cookie_setings(self):
         """
-        Ensure that CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE and SESSION_COOKIE_HTTPONLY
+        Ensure that CookieStorage honors SESSION_COOKIE['DOMAIN'], SESSION_COOKIE['SECURE'] and SESSION_COOKIE['HTTPONLY']
         Refs #15618 and #20972.
         """
         # Test before the messages have been consumed

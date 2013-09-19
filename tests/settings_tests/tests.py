@@ -359,3 +359,55 @@ class SecureProxySslHeaderTest(TestCase):
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)
+
+
+class CookieSettingsDeprecationTests(TestCase):
+    """
+    Tests for proper warnings when using deprecated cookie settings.
+    """
+    settings_module = settings
+
+    def setUp(self):
+        # Make sure we don't leak a modified SESSION_COOKIE setting to other
+        # tests
+        self._orig = dict(self.settings_module.SESSION_COOKIE)
+
+    def tearDown(self):
+        self.settings_module.SESSION_COOKIE = self._orig
+
+    def test_old_setting_fallback_value(self):
+        expected_value = settings.SESSION_COOKIE['AGE']
+        self.assertEqual(expected_value, settings.SESSION_COOKIE_AGE)
+
+    def test_old_setting_spec(self):
+        """If user specifies a deprecated setting, a deprecation warning is generated"""
+        with warnings.catch_warnings(record=True) as w:
+            # simulate -Wall
+            warnings.simplefilter("always")
+            # simulate user settings module with a custom value for SESSION_COOKIE_AGE
+            with self.settings(SESSION_COOKIE_AGE=3600):
+                pass
+            # verify that PendingDeprecationWarning has been raised
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+
+    def test_old_setting_set_and_read(self):
+        """If user specifies a deprecated setting, it still works"""
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            with self.settings(SESSION_COOKIE_AGE=3600):
+                # Verify value of the effective setting
+                self.assertEqual(3600, settings.SESSION_COOKIE_AGE)
+
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+
+    def test_manual_old_setting_precedence(self):
+        """If user specifies a deprecated setting, its value gets propagated to the new setting"""
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            with self.settings(SESSION_COOKIE_AGE=3600):
+                self.assertEqual(3600, settings.SESSION_COOKIE['AGE'])
+
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))

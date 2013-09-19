@@ -376,7 +376,7 @@ class Client(RequestFactory):
         """
         if 'django.contrib.sessions' in settings.INSTALLED_APPS:
             engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
+            cookie = self.cookies.get(settings.SESSION_COOKIE['NAME'], None)
             if cookie:
                 return engine.SessionStore(cookie.value)
         return {}
@@ -540,13 +540,13 @@ class Client(RequestFactory):
             request.session.save()
 
             # Set the cookie to represent the session.
-            session_cookie = settings.SESSION_COOKIE_NAME
+            session_cookie = settings.SESSION_COOKIE['NAME']
             self.cookies[session_cookie] = request.session.session_key
             cookie_data = {
                 'max-age': None,
                 'path': '/',
-                'domain': settings.SESSION_COOKIE_DOMAIN,
-                'secure': settings.SESSION_COOKIE_SECURE or None,
+                'domain': settings.SESSION_COOKIE['DOMAIN'],
+                'secure': settings.SESSION_COOKIE['SECURE'] or None,
                 'expires': None,
             }
             self.cookies[session_cookie].update(cookie_data)

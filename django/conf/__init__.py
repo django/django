@@ -97,6 +97,17 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
+# Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9.
+_DEPRECATED_COOKIE_SETTINGS = ('LANGUAGE_COOKIE_NAME',
+
+    'SESSION_COOKIE_NAME', 'SESSION_COOKIE_AGE',
+    'SESSION_COOKIE_DOMAIN', 'SESSION_COOKIE_SECURE', 'SESSION_COOKIE_PATH',
+    'SESSION_COOKIE_HTTPONLY',
+
+    'CSRF_COOKIE_NAME', 'CSRF_COOKIE_DOMAIN', 'CSRF_COOKIE_SECURE',
+    'CSRF_COOKIE_PATH', 'CSRF_COOKIE_HTTPONLY')
+
+
 class BaseSettings(object):
     """
     Common logic for settings whether set by a module or by the user.
@@ -161,6 +172,30 @@ class Settings(BaseSettings):
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
+        # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
+        self.handle_cookie_settings(mod)
+
+    def handle_cookie_settings(self, mod):
+        """Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9"""
+        for setting in _DEPRECATED_COOKIE_SETTINGS:
+            prefix, _, attrib = setting.split('_', 2)
+            new_setting = '%s_COOKIE' % prefix
+            if setting in dir(mod):
+                warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
+                            % {'old': setting, 'new': new_setting}, PendingDeprecationWarning, stacklevel=2)
+                if new_setting not in dir(mod):
+                    # new-style setting not specified in settings module, port
+                    setting_value = getattr(self, setting)
+                    temp = getattr(self, new_setting)
+                    temp[attrib] = setting_value
+                    setattr(self, new_setting, temp)
+            if new_setting in dir(mod):
+                # new-style setting specified in settings module, override
+                # old-style values
+                temp = getattr(self, new_setting)
+                setting_value = temp[attrib]
+                setattr(self, setting, setting_value)
+
 
 class UserSettingsHolder(BaseSettings):
     """
@@ -185,6 +220,8 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        # Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9
+        self.check_and_port_cookie_settings(name, value)
         return super(UserSettingsHolder, self).__setattr__(name, value)
 
     def __delattr__(self, name):
@@ -193,5 +230,17 @@ class UserSettingsHolder(BaseSettings):
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
+    def check_and_port_cookie_settings(self, setting, setting_value):
+        """Deprecation of *_COOKIE_* settings in Django 1.7. Remove in 1.9"""
+        if setting in _DEPRECATED_COOKIE_SETTINGS:
+            prefix, _, attrib = setting.split('_', 2)
+            new_setting = '%s_COOKIE' % prefix
+            warnings.warn("The %(old)s setting is deprecated. Use the new %(new)s dict setting instead."
+                        % {'old': setting, 'new': new_setting}, PendingDeprecationWarning, stacklevel=2)
+            # port value to new-style setting
+            temp = getattr(self, new_setting)
+            temp[attrib] = setting_value
+            setattr(self, new_setting, temp)
 
 settings = LazySettings()

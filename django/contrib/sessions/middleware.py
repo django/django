@@ -11,7 +11,7 @@ class SessionMiddleware(object):
         self.SessionStore = engine.SessionStore
 
     def process_request(self, request):
-        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
+        session_key = request.COOKIES.get(settings.SESSION_COOKIE['NAME'], None)
         request.session = self.SessionStore(session_key)
 
     def process_response(self, request, response):
@@ -39,10 +39,10 @@ class SessionMiddleware(object):
                 # Skip session save for 500 responses, refs #3881.
                 if response.status_code != 500:
                     request.session.save()
-                    response.set_cookie(settings.SESSION_COOKIE_NAME,
+                    response.set_cookie(settings.SESSION_COOKIE['NAME'],
                             request.session.session_key, max_age=max_age,
-                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                            path=settings.SESSION_COOKIE_PATH,
-                            secure=settings.SESSION_COOKIE_SECURE or None,
-                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                            expires=expires, domain=settings.SESSION_COOKIE['DOMAIN'],
+                            path=settings.SESSION_COOKIE['PATH'],
+                            secure=settings.SESSION_COOKIE['SECURE'] or None,
+                            httponly=settings.SESSION_COOKIE['HTTPONLY'] or None)
         return response

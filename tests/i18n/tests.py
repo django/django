@@ -890,15 +890,15 @@ class MiscTests(TransRealMixin, TestCase):
         """
         g = get_language_from_request
         r = self.rf.get('/')
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt-br'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE['NAME']: 'pt-br'}
         r.META = {}
         self.assertEqual('pt-br', g(r))
 
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE['NAME']: 'pt'}
         r.META = {}
         self.assertEqual('pt', g(r))
 
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE['NAME']: 'es'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual('es', g(r))
 
@@ -906,7 +906,7 @@ class MiscTests(TransRealMixin, TestCase):
         # variation of the Spanish language, a safe assumption. When the
         # user sets it as the preferred language, the main 'es'
         # translation should be selected instead.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es-us'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE['NAME']: 'es-us'}
         r.META = {}
         self.assertEqual(g(r), 'es')
 
@@ -914,7 +914,7 @@ class MiscTests(TransRealMixin, TestCase):
         # translation of Django but there is a translation to variation (zh_CN)
         # the user sets zh-cn as the preferred language, it should be selected
         # by Django without falling back nor ignoring it.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
+        r.COOKIES = {settings.LANGUAGE_COOKIE['NAME']: 'zh-cn'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-cn')
 
@@ -1195,7 +1195,7 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore()
         session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE['NAME']] = session.session_key
 
         # Clear the session data before request
         session.save()
