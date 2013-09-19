@@ -303,8 +303,6 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-            if not (isinstance(field, models.ForeignKey) or field.choices):
-                raise ValueError
         except models.FieldDoesNotExist:
             return [
                 checks.Error(
@@ -315,18 +313,19 @@ class BaseModelAdminChecks(object):
                     id='admin.E022',
                 )
             ]
-        except ValueError:
-            return [
-                checks.Error(
-                    '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.'
-                        % (label, field_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E023',
-                )
-            ]
         else:
-            return []
+            if not (isinstance(field, models.ForeignKey) or field.choices):
+                return [
+                    checks.Error(
+                        '"%s" refers to "%s", which is neither an instance of ForeignKey nor does have choices set.'
+                            % (label, field_name),
+                        hint=None,
+                        obj=cls,
+                        id='admin.E023',
+                    )
+                ]
+            else:
+                return []
 
     def _check_radio_fields_value(self, cls, model, val, label):
         """ Check type of a value of `radio_fields` dictionary. """
