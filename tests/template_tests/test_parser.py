@@ -87,6 +87,10 @@ class ParserTests(TestCase):
             Variable, "article._hidden"
         )
 
+        # Variables should raise on non string type
+        with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+            Variable({})
+
     @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_compile_filter_error(self):
         # regression test for #19819

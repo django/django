@@ -675,6 +675,9 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
+        if not isinstance(var, six.string_types):
+            raise TypeError(
+                "Variable must be a string or number, got %s" % type(var))
         try:
             # First try to treat this variable as a number.
             #
