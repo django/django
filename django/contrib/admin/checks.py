@@ -62,15 +62,8 @@ class BaseModelAdminChecks(object):
         try:
             field = model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to field "%s", which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model.__name__),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E002',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E002')
         else:
             if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
                 return must_be('a ForeignKey or ManyToManyField',
@@ -224,14 +217,8 @@ class BaseModelAdminChecks(object):
         """ Check that form subclasses BaseModelForm. """
 
         if hasattr(cls, 'form') and not issubclass(cls.form, BaseModelForm):
-            return [
-                checks.Error(
-                    '"form" must inherit from BaseModelForm.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E016',
-                )
-            ]
+            return must_inherit_from(parent='BaseModelForm', option='form',
+                                     obj=cls, id='admin.E016')
         else:
             return []
 
@@ -268,15 +255,8 @@ class BaseModelAdminChecks(object):
         try:
             field = model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to field "%s", which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model._meta.object_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E019',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E019')
         else:
             if not isinstance(field, models.ManyToManyField):
                 return must_be('a ManyToManyField', option=label, obj=cls, id='admin.E020')
@@ -417,15 +397,8 @@ class BaseModelAdminChecks(object):
         try:
             model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to field "%s", which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model._meta.object_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E029',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E029')
         else:
             return []
 
@@ -469,15 +442,8 @@ class BaseModelAdminChecks(object):
             try:
                 model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
-                return [
-                    checks.Error(
-                        '"%s" refers to field "%s", which is missing from model %s.%s.'
-                            % (label, field_name, model._meta.app_label, model._meta.object_name),
-                        hint=None,
-                        obj=cls,
-                        id='admin.E032',
-                    )
-                ]
+                return refer_to_missing_field(field=field_name, option=label,
+                                              model=model, obj=cls, id='admin.E032')
             else:
                 return []
 
@@ -583,14 +549,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         from django.contrib.admin.options import BaseModelAdmin
 
         if not issubclass(inline, BaseModelAdmin):
-            return [
-                checks.Error(
-                    '"%s" must inherit from BaseModelAdmin.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E104',
-                )
-            ]
+            return must_inherit_from(parent='BaseModelAdmin', option=label,
+                                     obj=cls, id='admin.E104')
         elif not inline.model:
             return [
                 checks.Error(
@@ -725,14 +685,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...
             if not issubclass(item, ListFilter):
-                return [
-                    checks.Error(
-                        '"%s" must inherit from ListFilter.' % label,
-                        hint=None,
-                        obj=cls,
-                        id='admin.E114',
-                    )
-                ]
+                return must_inherit_from(parent='ListFilter', option=label,
+                                         obj=cls, id='admin.E114')
             # ...  but not a FieldListFilter.
             elif issubclass(item, FieldListFilter):
                 return [
@@ -749,14 +703,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             # item is option #2
             field, list_filter_class = item
             if not issubclass(list_filter_class, FieldListFilter):
-                return [
-                    checks.Error(
-                        '"%s[1]" must inherit from FieldListFilter.' % label,
-                        hint=None,
-                        obj=cls,
-                        id='admin.E116',
-                    )
-                ]
+                return must_inherit_from(parent='FieldListFilter', option='%s[1]' % label,
+                                         obj=cls, id='admin.E116')
             else:
                 return []
         else:
@@ -825,26 +773,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
         try:
             field = model._meta.get_field_by_name(field_name)[0]
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to field "%s", which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model._meta.object_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E122',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E122')
         else:
             if field_name not in cls.list_display:
-                return [
-                    checks.Error(
-                        '"%s" refers to field "%s", which is not defined in "list_display".'
-                            % (label, field_name),
-                        hint=None,
-                        obj=cls,
-                        id='admin.E123',
-                    )
-                ]
+                return refer_to_missing_field(field=field_name, option=label,
+                                              model=model, obj=cls, id='admin.E123')
             elif field_name in cls.list_display_links:
                 return [
                     checks.Error(
@@ -896,15 +830,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 if not isinstance(field, (models.DateField, models.DateTimeField)):
                     raise ValueError
             except models.FieldDoesNotExist:
-                return [
-                    checks.Error(
-                        '"date_hierarchy" refers to field "%s", which is missing from model %s.%s.'
-                            % (cls.date_hierarchy, model._meta.app_label, model._meta.object_name),
-                        hint=None,
-                        obj=cls,
-                        id='admin.E128',
-                    )
-                ]
+                return refer_to_missing_field(option='date_hierarchy',
+                                              field=cls.date_hierarchy,
+                                              model=model, obj=cls, id='admin.E128')
             except ValueError:
                 return [
                     checks.Error(
@@ -962,14 +890,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         try:
             _get_foreign_key(parent_model, cls.model, fk_name=cls.fk_name)
         except ValueError as e:
-            return [
-                checks.Error(
-                    e.args[0],
-                    hint=None,
-                    obj=cls,
-                    id='admin.E202',
-                )
-            ]
+            return [checks.Error(e.args[0], hint=None, obj=cls, id='admin.E202')]
         else:
             return []
 
@@ -995,55 +916,39 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         """ Check formset is a subclass of BaseModelFormSet. """
 
         if not issubclass(cls.formset, BaseModelFormSet):
-            return [
-                checks.Error(
-                    '"formset" must inherit from BaseModelFormSet.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E205',
-                )
-            ]
+            return must_inherit_from(parent='BaseModelFormSet', option='formset',
+                                     obj=cls, id='admin.E205')
         else:
             return []
-
-
-def must_be_sequence(option, obj, id):
-    return [
-        checks.Error(
-            '"%s" must be a list or tuple.' % option,
-            hint=None,
-            obj=obj,
-            id=id,
-        ),
-    ]
-
-
-def must_be_integer(option, obj, id):
-    return [
-        checks.Error(
-            '"%s" must be an integer.' % option,
-            hint=None,
-            obj=obj,
-            id=id,
-        ),
-    ]
-
-
-def must_be_dictionary(option, obj, id):
-    return [
-        checks.Error(
-            '"%s" must be a dictionary.' % option,
-            hint=None,
-            obj=obj,
-            id=id,
-        ),
-    ]
 
 
 def must_be(type, option, obj, id):
     return [
         checks.Error(
             '"%s" must be %s.' % (option, type),
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
+
+
+def must_inherit_from(parent, option, obj, id):
+    return [
+        checks.Error(
+            '"%s" must inherit from %s.' % (option, parent),
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
+
+
+def refer_to_missing_field(field, option, model, obj, id):
+    return [
+        checks.Error(
+            '"%s" refers to field "%s", which is missing from model %s.%s.'
+                % (option, field, model._meta.app_label, model._meta.object_name),
             hint=None,
             obj=obj,
             id=id,
