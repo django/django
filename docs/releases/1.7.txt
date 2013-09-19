@@ -414,6 +414,8 @@ Miscellaneous
   Rationale behind this is removal of dependency of non-contrib code on
   contrib applications.
 
+* The old cache URI syntax is no longer supported.
+
 Features deprecated in 1.7
 ==========================
 

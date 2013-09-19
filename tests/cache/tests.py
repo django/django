@@ -857,10 +857,6 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.cache = get_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
         self.perform_cull_test(50, 18)
 
-    def test_old_initialization(self):
-        self.cache = get_cache('db://%s?max_entries=30&cull_frequency=0' % self._table_name)
-        self.perform_cull_test(50, 18)
-
     def test_second_call_doesnt_crash(self):
         with six.assertRaisesRegex(self, management.CommandError,
                 "Cache table 'test cache table' could not be created"):
@@ -954,10 +950,6 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 
     def test_zero_cull(self):
         self.cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
-        self.perform_cull_test(50, 19)
-
-    def test_old_initialization(self):
-        self.cache = get_cache('locmem://?max_entries=30&cull_frequency=0')
         self.perform_cull_test(50, 19)
 
     def test_multiple_caches(self):
@@ -1075,10 +1067,6 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     def test_cull(self):
         self.perform_cull_test(50, 29)
 
-    def test_old_initialization(self):
-        self.cache = get_cache('file://%s?max_entries=30' % self.dirname)
-        self.perform_cull_test(50, 29)
-
 
 class CustomCacheKeyValidationTests(unittest.TestCase):
     """
@@ -1088,7 +1076,7 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 
     """
     def test_custom_key_validation(self):
-        cache = get_cache('cache.liberal_backend://')
+        cache = get_cache('cache.liberal_backend.CacheClass')
 
         # this key is both longer than 250 characters, and has spaces
         key = 'some key with spaces' * 15
@@ -1100,10 +1088,6 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 class GetCacheTests(unittest.TestCase):
 
     def test_simple(self):
-        cache = get_cache('locmem://')
-        from django.core.cache.backends.locmem import LocMemCache
-        self.assertIsInstance(cache, LocMemCache)
-
         from django.core.cache import cache
         self.assertIsInstance(cache, get_cache('default').__class__)
 
