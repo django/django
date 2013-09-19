@@ -1,3 +1,5 @@
+.. _internals-security:
+
 ==========================
 Django's security policies
 ==========================
@@ -123,6 +125,10 @@ us affects other frameworks or tools in the Python/web ecosystem, we
 may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
+
+The Django team also maintains an :doc:`archive of security issues
+disclosed in Django</releases/security>`.
+
 
 .. _security-notifications:
 
