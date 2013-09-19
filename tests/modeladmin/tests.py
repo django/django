@@ -889,7 +889,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            '"prepopulated_fields" refers to "non_existent_field" field, '
+            '"prepopulated_fields" refers to field "non_existent_field", '
                 'which is missing from model modeladmin.ValidationTestModel.',
             'admin.E026')
 

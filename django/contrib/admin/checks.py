@@ -355,15 +355,8 @@ class BaseModelAdminChecks(object):
             if isinstance(field, forbidden_field_types):
                 raise ValueError
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to "%s" field, which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model._meta.object_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E026',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E026')
         except ValueError:
             return [
                 checks.Error(
@@ -506,14 +499,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check save_as is a boolean. """
 
         if not isinstance(cls.save_as, bool):
-            return [
-                checks.Error(
-                    '"save_as" must be a boolean.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E101',
-                )
-            ]
+            return must_be('a boolean', option='save_as',
+                           obj=cls, id='admin.E101')
         else:
             return []
 
@@ -521,14 +508,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check save_on_top is a boolean. """
 
         if not isinstance(cls.save_on_top, bool):
-            return [
-                checks.Error(
-                    '"save_on_top" must be a boolean.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E102',
-                )
-            ]
+            return must_be('a boolean', option='save_on_top',
+                           obj=cls, id='admin.E102')
         else:
             return []
 
@@ -561,14 +542,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 )
             ]
         elif not issubclass(inline.model, models.Model):
-            return [
-                checks.Error(
-                    '"%s.model" must be a Model.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E106',
-                )
-            ]
+            return must_be('a Model', option='%s.model' % label,
+                           obj=cls, id='admin.E106')
         else:
             return inline.check(model)
 
@@ -730,14 +705,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_select_related is a boolean, a list or a tuple. """
 
         if not isinstance(cls.list_select_related, (bool, list, tuple)):
-            return [
-                checks.Error(
-                    '"list_select_related" must be a boolean, tuple or list.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E118',
-                )
-            ]
+            return must_be('a boolean, tuple or list', option='list_select_related',
+                           obj=cls, id='admin.E118')
         else:
             return []
 
@@ -833,14 +802,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                                               model=model, obj=cls, id='admin.E128')
             else:
                 if not isinstance(field, (models.DateField, models.DateTimeField)):
-                    return [
-                        checks.Error(
-                            '"date_hierarchy" must be a DateField or DateTimeField.',
-                            hint=None,
-                            obj=cls,
-                            id='admin.E129',
-                        )
-                    ]
+                    return must_be('a DateField or DateTimeField', option='date_hierarchy',
+                                   obj=cls, id='admin.E129')
                 else:
                     return []
 
