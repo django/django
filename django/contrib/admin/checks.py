@@ -47,14 +47,7 @@ class BaseModelAdminChecks(object):
         on the model. """
 
         if not isinstance(cls.raw_id_fields, (list, tuple)):
-            return [
-                checks.Error(
-                    '"raw_id_fields" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E001',
-                ),
-            ]
+            return must_be('a list or tuple', option='raw_id_fields', obj=cls, id='admin.E001')
         else:
             return list(chain(*[
                 self._check_raw_id_fields_item(cls, model, field_name, 'raw_id_fields[%d]' % index)
@@ -80,14 +73,8 @@ class BaseModelAdminChecks(object):
             ]
         else:
             if not isinstance(field, (models.ForeignKey, models.ManyToManyField)):
-                return [
-                    checks.Error(
-                        '"%s" must be a ForeignKey or ManyToManyField.' % label,
-                        hint=None,
-                        obj=cls,
-                        id='admin.E003',
-                    )
-                ]
+                return must_be('a ForeignKey or ManyToManyField',
+                               option=label, obj=cls, id='admin.E003')
             else:
                 return []
 
@@ -99,14 +86,7 @@ class BaseModelAdminChecks(object):
         if cls.fields is None:
             return []
         elif not isinstance(cls.fields, (list, tuple)):
-            return [
-                checks.Error(
-                    '"fields" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E004',
-                )
-            ]
+            return must_be('a list or tuple', option='fields', obj=cls, id='admin.E004')
         elif cls.fieldsets:
             return [
                 checks.Error(
@@ -138,14 +118,7 @@ class BaseModelAdminChecks(object):
         if cls.fieldsets is None:
             return []
         elif not isinstance(cls.fieldsets, (list, tuple)):
-            return [
-                checks.Error(
-                    '"fieldsets" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E007',
-                )
-            ]
+            return must_be('a list or tuple', option='fieldsets', obj=cls, id='admin.E007')
         else:
             return list(chain(*[
                 self._check_fieldsets_item(cls, model, fieldset, 'fieldsets[%d]' % index)
@@ -157,32 +130,11 @@ class BaseModelAdminChecks(object):
         set name and a dictionary containing "fields" key. """
 
         if not isinstance(fieldset, (list, tuple)):
-            return [
-                checks.Error(
-                    '"%s" must be a list or tuple.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E008',
-                )
-            ]
+            return must_be('a list or tuple', option=label, obj=cls, id='admin.E008')
         elif len(fieldset) != 2:
-            return [
-                checks.Error(
-                    '"%s" must be a pair.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E009',
-                )
-            ]
+            return must_be('a pair', option=label, obj=cls, id='admin.E009')
         elif not isinstance(fieldset[1], dict):
-            return [
-                checks.Error(
-                    '"%s[1]" must be a dictionary.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E010',
-                )
-            ]
+            return must_be('a dictionary', option='%s[1]' % label, obj=cls, id='admin.E010')
         elif 'fields' not in fieldset[1]:
             return [
                 checks.Error(
@@ -255,14 +207,7 @@ class BaseModelAdminChecks(object):
         if cls.exclude is None:  # default value is None
             return []
         elif not isinstance(cls.exclude, (list, tuple)):
-            return [
-                checks.Error(
-                    '"exclude" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E014',
-                )
-            ]
+            return must_be('a list or tuple', option='exclude', obj=cls, id='admin.E014')
         elif len(cls.exclude) > len(set(cls.exclude)):
             return [
                 checks.Error(
@@ -296,14 +241,7 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'filter_vertical'):
             return []
         elif not isinstance(cls.filter_vertical, (list, tuple)):
-            return [
-                checks.Error(
-                    '"filter_vertical" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E017',
-                )
-            ]
+            return must_be('a list or tuple', option='filter_vertical', obj=cls, id='admin.E017')
         else:
             return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_vertical[%d]" % index)
@@ -316,14 +254,7 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'filter_horizontal'):
             return []
         elif not isinstance(cls.filter_horizontal, (list, tuple)):
-            return [
-                checks.Error(
-                    '"filter_horizontal" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E018',
-                )
-            ]
+            return must_be('a list or tuple', option='filter_horizontal', obj=cls, id='admin.E018')
         else:
             return list(chain(*[
                 self._check_filter_item(cls, model, field_name, "filter_horizontal[%d]" % index)
@@ -348,14 +279,7 @@ class BaseModelAdminChecks(object):
             ]
         else:
             if not isinstance(field, models.ManyToManyField):
-                return [
-                    checks.Error(
-                        '"%s" must be a ManyToManyField.' % label,
-                        hint=None,
-                        obj=cls,
-                        id='admin.E020',
-                    )
-                ]
+                return must_be('a ManyToManyField', option=label, obj=cls, id='admin.E020')
             else:
                 return []
 
@@ -365,14 +289,7 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'radio_fields'):
             return []
         elif not isinstance(cls.radio_fields, dict):
-            return [
-                checks.Error(
-                    '"radio_fields" must be a dictionary.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E021',
-                )
-            ]
+            return must_be('a dictionary', option='radio_fields', obj=cls, id='admin.E021')
         else:
             return list(chain(*[
                 self._check_radio_fields_key(cls, model, field_name, 'radio_fields') +
@@ -435,14 +352,7 @@ class BaseModelAdminChecks(object):
         if not hasattr(cls, 'prepopulated_fields'):
             return []
         elif not isinstance(cls.prepopulated_fields, dict):
-            return [
-                checks.Error(
-                    '"prepopulated_fields" must be a dictionary.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E025',
-                )
-            ]
+            return must_be('a dictionary', option='prepopulated_fields', obj=cls, id='admin.E025')
         else:
             return list(chain(*[
                 self._check_prepopulated_fields_key(cls, model, field_name, 'prepopulated_fields') +
@@ -494,14 +404,7 @@ class BaseModelAdminChecks(object):
         iterable of existing fields. """
 
         if not isinstance(val, (list, tuple)):
-            return [
-                checks.Error(
-                    '"%s" must be a list or tuple.' % label,
-                    hint=None,
-                    obj=cls,
-                    id='admin.E028',
-                )
-            ]
+            return must_be('a list or tuple', option=label, obj=cls, id='admin.E028')
         else:
             return list(chain(*[
                 self._check_prepopulated_fields_value_item(cls, model, subfield_name, "%s[%r]" % (label, index))
@@ -534,14 +437,7 @@ class BaseModelAdminChecks(object):
         if cls.ordering is None:  # The default value is None
             return []
         elif not isinstance(cls.ordering, (list, tuple)):
-            return [
-                checks.Error(
-                    '"ordering" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E030',
-                )
-            ]
+            return must_be('a list or tuple', option='ordering', obj=cls, id='admin.E030')
         else:
             return list(chain(*[
                 self._check_ordering_item(cls, model, field_name, 'ordering[%d]' % index)
@@ -592,14 +488,7 @@ class BaseModelAdminChecks(object):
         if cls.readonly_fields == ():
             return []
         elif not isinstance(cls.readonly_fields, (list, tuple)):
-            return [
-                checks.Error(
-                    '"readonly_fields" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E033',
-                )
-            ]
+            return must_be('a list or tuple', option='readonly_fields', obj=cls, id='admin.E033')
         else:
             return list(chain(*[
                 self._check_readonly_fields_item(cls, model, field_name, "readonly_fields[%d]" % index)
@@ -682,14 +571,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check all inline model admin classes. """
 
         if not isinstance(cls.inlines, (list, tuple)):
-            return [
-                checks.Error(
-                    '"inlines" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E103',
-                )
-            ]
+            return must_be('a list or tuple', option='inlines', obj=cls, id='admin.E103')
         else:
             return list(chain(*[
                 self._check_inlines_item(cls, model, item, "inlines[%d]" % index)
@@ -736,14 +618,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """
 
         if not isinstance(cls.list_display, (list, tuple)):
-            return [
-                checks.Error(
-                    '"list_display" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E107',
-                )
-            ]
+            return must_be('a list or tuple', option='list_display', obj=cls, id='admin.E107')
         else:
             return list(chain(*[
                 self._check_list_display_item(cls, model, item, "list_display[%d]" % index)
@@ -807,14 +682,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """
 
         if not isinstance(cls.list_display_links, (list, tuple)):
-            return [
-                checks.Error(
-                    '"list_display_links" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E111',
-                )
-            ]
+            return must_be('a list or tuple', option='list_display_links', obj=cls, id='admin.E111')
         else:
             return list(chain(*[
                 self._check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)
@@ -837,14 +705,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_list_filter(self, cls, model):
         if not isinstance(cls.list_filter, (list, tuple)):
-            return [
-                checks.Error(
-                    '"list_filter" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E113',
-                )
-            ]
+            return must_be('a list or tuple', option='list_filter', obj=cls, id='admin.E113')
         else:
             return list(chain(*[
                 self._check_list_filter_item(cls, model, item, "list_filter[%d]" % index)
@@ -937,14 +798,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_per_page is an integer. """
 
         if not isinstance(cls.list_per_page, int):
-            return [
-                checks.Error(
-                    '"list_per_page" must be an integer.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E119',
-                )
-            ]
+            return must_be('an integer', option='list_per_page', obj=cls, id='admin.E119')
         else:
             return []
 
@@ -952,14 +806,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_max_show_all is an integer. """
 
         if not isinstance(cls.list_max_show_all, int):
-            return [
-                checks.Error(
-                    '"list_max_show_all" must be an integer.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E120',
-                )
-            ]
+            return must_be('an integer', option='list_max_show_all', obj=cls, id='admin.E120')
         else:
             return []
 
@@ -968,14 +815,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         list_display without first element. """
 
         if not isinstance(cls.list_editable, (list, tuple)):
-            return [
-                checks.Error(
-                    '"list_editable" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E121',
-                )
-            ]
+            return must_be('a list or tuple', option='list_editable', obj=cls, id='admin.E121')
         else:
             return list(chain(*[
                 self._check_list_editable_item(cls, model, item, "list_editable[%d]" % index)
@@ -1042,14 +882,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check search_fields is a sequence. """
 
         if not isinstance(cls.search_fields, (list, tuple)):
-            return [
-                checks.Error(
-                    '"search_fields" must be a list or tuple.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E127',
-                )
-            ]
+            return must_be('a list or tuple', option='search_fields', obj=cls, id='admin.E127')
         else:
             return []
 
@@ -1145,14 +978,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         """ Check that extra is an integer. """
 
         if not isinstance(cls.extra, int):
-            return [
-                checks.Error(
-                    '"extra" must be an integer.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E203',
-                )
-            ]
+            return must_be('an integer', option='extra', obj=cls, id='admin.E203')
         else:
             return []
 
@@ -1162,14 +988,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
         if cls.max_num is None:
             return []
         elif not isinstance(cls.max_num, int):
-            return [
-                checks.Error(
-                    '"max_num" must be an integer.',
-                    hint=None,
-                    obj=cls,
-                    id='admin.E204',
-                )
-            ]
+            return must_be('an integer', option='max_num', obj=cls, id='admin.E204')
         else:
             return []
 
@@ -1187,3 +1006,47 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             ]
         else:
             return []
+
+
+def must_be_sequence(option, obj, id):
+    return [
+        checks.Error(
+            '"%s" must be a list or tuple.' % option,
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
+
+
+def must_be_integer(option, obj, id):
+    return [
+        checks.Error(
+            '"%s" must be an integer.' % option,
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
+
+
+def must_be_dictionary(option, obj, id):
+    return [
+        checks.Error(
+            '"%s" must be a dictionary.' % option,
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
+
+
+def must_be(type, option, obj, id):
+    return [
+        checks.Error(
+            '"%s" must be %s.' % (option, type),
+            hint=None,
+            obj=obj,
+            id=id,
+        ),
+    ]
