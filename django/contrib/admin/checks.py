@@ -657,7 +657,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"save_as" must be a boolean.',
                     hint=None,
                     obj=cls,
-                    id='admin.E035',
+                    id='admin.E101',
                 )
             ]
         else:
@@ -672,7 +672,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"save_on_top" must be a boolean.',
                     hint=None,
                     obj=cls,
-                    id='admin.E036',
+                    id='admin.E102',
                 )
             ]
         else:
@@ -687,7 +687,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"inlines" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E037',
+                    id='admin.E103',
                 )
             ]
         else:
@@ -707,7 +707,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"%s" must inherit from BaseModelAdmin.' % label,
                     hint=None,
                     obj=cls,
-                    id='admin.E038',
+                    id='admin.E104',
                 )
             ]
         elif not inline.model:
@@ -716,7 +716,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"model" is a required attribute of "%s".' % label,
                     hint=None,
                     obj=cls,
-                    id='admin.E039',
+                    id='admin.E105',
                 )
             ]
         elif not issubclass(inline.model, models.Model):
@@ -725,7 +725,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"%s.model" must be a Model.' % label,
                     hint=None,
                     obj=cls,
-                    id='admin.E040',
+                    id='admin.E106',
                 )
             ]
         else:
@@ -741,7 +741,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_display" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E041',
+                    id='admin.E107',
                 )
             ]
         else:
@@ -772,7 +772,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % label, item, model._meta.app_label, model._meta.object_name,
                         hint=None,
                         obj=cls,
-                        id='admin.E042',
+                        id='admin.E108',
                     )
                 ]
             elif isinstance(field, models.ManyToManyField):
@@ -781,7 +781,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"%s" must not be a ManyToManyField.' % label,
                         hint=None,
                         obj=cls,
-                        id='admin.E043',
+                        id='admin.E109',
                     )
                 ]
             else:
@@ -796,7 +796,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (label, cls.__name__, model._meta.app_label, model._meta.object_name),
                         hint=None,
                         obj=cls,
-                        id='admin.E044',
+                        id='admin.E110',
                     )
                 ]
             else:
@@ -812,7 +812,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_display_links" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E045',
+                    id='admin.E111',
                 )
             ]
         else:
@@ -829,7 +829,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         % (label, field_name),
                     hint=None,
                     obj=cls,
-                    id='admin.E046',
+                    id='admin.E112',
                 )
             ]
         else:
@@ -842,7 +842,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_filter" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E047',
+                    id='admin.E113',
                 )
             ]
         else:
@@ -870,7 +870,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"%s" must inherit from ListFilter.' % label,
                         hint=None,
                         obj=cls,
-                        id='admin.E048',
+                        id='admin.E114',
                     )
                 ]
             # ...  but not a FieldListFilter.
@@ -880,7 +880,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"%s" must not inherit from FieldListFilter.' % label,
                         hint=None,
                         obj=cls,
-                        id='admin.E049',
+                        id='admin.E115',
                     )
                 ]
             else:
@@ -894,7 +894,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"%s[1]" must inherit from FieldListFilter.' % label,
                         hint=None,
                         obj=cls,
-                        id='admin.E050',
+                        id='admin.E116',
                     )
                 ]
             else:
@@ -912,7 +912,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"%s" refers to "%s", which does not refer to a Field.' % (label, field),
                         hint=None,
                         obj=cls,
-                        id='admin.E051',
+                        id='admin.E117',
                     )
                 ]
             else:
@@ -927,7 +927,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_select_related" must be a boolean, tuple or list.',
                     hint=None,
                     obj=cls,
-                    id='admin.E052',
+                    id='admin.E118',
                 )
             ]
         else:
@@ -942,7 +942,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_per_page" must be an integer.',
                     hint=None,
                     obj=cls,
-                    id='admin.E053',
+                    id='admin.E119',
                 )
             ]
         else:
@@ -957,7 +957,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_max_show_all" must be an integer.',
                     hint=None,
                     obj=cls,
-                    id='admin.E054',
+                    id='admin.E120',
                 )
             ]
         else:
@@ -973,7 +973,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"list_editable" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E055',
+                    id='admin.E121',
                 )
             ]
         else:
@@ -992,7 +992,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         % (label, field_name, model._meta.app_label, model._meta.object_name),
                     hint=None,
                     obj=cls,
-                    id='admin.E056',
+                    id='admin.E122',
                 )
             ]
         else:
@@ -1003,7 +1003,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (label, field_name),
                         hint=None,
                         obj=cls,
-                        id='admin.E057',
+                        id='admin.E123',
                     )
                 ]
             elif field_name in cls.list_display_links:
@@ -1013,7 +1013,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % field_name,
                         hint=None,
                         obj=cls,
-                        id='admin.E058',
+                        id='admin.E124',
                     )
                 ]
             elif not cls.list_display_links and cls.list_display[0] in cls.list_editable:
@@ -1024,7 +1024,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (label, cls.list_display[0]),
                         hint=None,
                         obj=cls,
-                        id='admin.E059',
+                        id='admin.E125',
                     )
                 ]
             elif not field.editable:
@@ -1034,7 +1034,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (label, field_name),
                         hint=None,
                         obj=cls,
-                        id='admin.E060',
+                        id='admin.E126',
                     )
                 ]
 
@@ -1047,7 +1047,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     '"search_fields" must be a list or tuple.',
                     hint=None,
                     obj=cls,
-                    id='admin.E061',
+                    id='admin.E127',
                 )
             ]
         else:
@@ -1070,7 +1070,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (cls.date_hierarchy, model._meta.app_label, model._meta.object_name),
                         hint=None,
                         obj=cls,
-                        id='admin.E062',
+                        id='admin.E128',
                     )
                 ]
             except ValueError:
@@ -1079,7 +1079,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         '"date_hierarchy" must be a DateField or DateTimeField.',
                         hint=None,
                         obj=cls,
-                        id='admin.E063',
+                        id='admin.E129',
                     )
                 ]
             else:

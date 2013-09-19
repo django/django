@@ -930,7 +930,7 @@ class ListDisplayTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display" must be a list or tuple.',
-            'admin.E041')
+            'admin.E107')
 
     def test_missing_field(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -940,7 +940,7 @@ class ListDisplayTests(CheckTestCase):
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display[0]" is neither a callable nor an attribute '
                 'of "ValidationTestModelAdmin" nor found in model modeladmin.ValidationTestModel.',
-            'admin.E044')
+            'admin.E110')
 
     def test_invalid_field_type(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -949,7 +949,7 @@ class ListDisplayTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display[0]" must not be a ManyToManyField.',
-            'admin.E043')
+            'admin.E109')
 
     def test_valid_case(self):
         def a_callable(obj):
@@ -972,7 +972,7 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display_links" must be a list or tuple.',
-            'admin.E045')
+            'admin.E111')
 
     def test_missing_field(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -981,7 +981,7 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display_links[0]" refers to "non_existent_field", which is not defined in "list_display".',
-            'admin.E046')
+            'admin.E112')
 
     def test_missing_in_list_display(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -990,7 +990,7 @@ class ListDisplayLinksCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_display_links[0]" refers to "name", which is not defined in "list_display".',
-            'admin.E046')
+            'admin.E112')
 
     def test_valid_case(self):
         def a_callable(obj):
@@ -1020,7 +1020,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter" must be a list or tuple.',
-            'admin.E047')
+            'admin.E113')
 
     def test_missing_field(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1029,7 +1029,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter[0]" refers to "non_existent_field", which does not refer to a Field.',
-            'admin.E051')
+            'admin.E117')
 
     def test_not_filter(self):
         class RandomClass(object):
@@ -1041,7 +1041,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter[0]" must inherit from ListFilter.',
-            'admin.E048')
+            'admin.E114')
 
     def test_not_filter_again(self):
         class RandomClass(object):
@@ -1053,7 +1053,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter[0][1]" must inherit from FieldListFilter.',
-            'admin.E050')
+            'admin.E116')
 
     def test_not_filter_again_again(self):
         class AwesomeFilter(SimpleListFilter):
@@ -1070,7 +1070,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter[0][1]" must inherit from FieldListFilter.',
-            'admin.E050')
+            'admin.E116')
 
     def test_not_associated_with_field_name(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1079,7 +1079,7 @@ class ListFilterTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_filter[0]" must not inherit from FieldListFilter.',
-            'admin.E049')
+            'admin.E115')
 
     def test_valid_case(self):
         class AwesomeFilter(SimpleListFilter):
@@ -1105,7 +1105,7 @@ class ListPerPageCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_per_page" must be an integer.',
-            'admin.E053')
+            'admin.E119')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1123,7 +1123,7 @@ class ListMaxShowAllCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"list_max_show_all" must be an integer.',
-            'admin.E054')
+            'admin.E120')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1142,7 +1142,7 @@ class SearchFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"search_fields" must be a list or tuple.',
-            'admin.E061')
+            'admin.E127')
 
 
 class DateHierarchyCheckTests(CheckTestCase):
@@ -1156,7 +1156,7 @@ class DateHierarchyCheckTests(CheckTestCase):
             ValidationTestModelAdmin, ValidationTestModel,
             '"date_hierarchy" refers to field "non_existent_field", which '
                 'is missing from model modeladmin.ValidationTestModel.',
-            'admin.E062')
+            'admin.E128')
 
     def test_invalid_field_type(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1165,7 +1165,7 @@ class DateHierarchyCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"date_hierarchy" must be a DateField or DateTimeField.',
-            'admin.E063')
+            'admin.E129')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1233,7 +1233,7 @@ class ListSelectRelatedCheckTests(CheckTestCase):
 
         self.assertIsInvalid(ValidationTestModelAdmin, ValidationTestModel,
             '"list_select_related" must be a boolean, tuple or list.',
-            'admin.E052')
+            'admin.E118')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1251,7 +1251,7 @@ class SaveAsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"save_as" must be a boolean.',
-            'admin.E035')
+            'admin.E101')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1269,7 +1269,7 @@ class SaveOnTopCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"save_on_top" must be a boolean.',
-            'admin.E036')
+            'admin.E102')
 
     def test_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1287,7 +1287,7 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"inlines" must be a list or tuple.',
-            'admin.E037')
+            'admin.E103')
 
     def test_not_model_admin(self):
         class ValidationTestInline(object):
@@ -1299,7 +1299,7 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"inlines[0]" must inherit from BaseModelAdmin.',
-            'admin.E038')
+            'admin.E104')
 
     def test_missing_model_field(self):
         class ValidationTestInline(TabularInline):
@@ -1311,7 +1311,7 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"model" is a required attribute of "inlines[0]".',
-            'admin.E039')
+            'admin.E105')
 
     def test_invalid_model_type(self):
         """ Test if `model` attribute on inline model admin is a models.Model.
@@ -1329,7 +1329,7 @@ class InlinesCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"inlines[0].model" must be a Model.',
-            'admin.E040')
+            'admin.E106')
 
     def test_valid_case(self):
         class ValidationTestInline(TabularInline):
