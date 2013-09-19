@@ -841,7 +841,7 @@ class RadioFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            '"radio_fields" refers to "non_existent_field" field, '
+            '"radio_fields" refers to field "non_existent_field", '
                 'which is missing from model modeladmin.ValidationTestModel.',
             'admin.E022')
 

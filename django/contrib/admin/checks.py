@@ -284,15 +284,8 @@ class BaseModelAdminChecks(object):
         try:
             field = model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
-            return [
-                checks.Error(
-                    '"%s" refers to "%s" field, which is missing from model %s.%s.'
-                        % (label, field_name, model._meta.app_label, model._meta.object_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E022',
-                )
-            ]
+            return refer_to_missing_field(field=field_name, option=label,
+                                          model=model, obj=cls, id='admin.E022')
         else:
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 return [
