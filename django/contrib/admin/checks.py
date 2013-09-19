@@ -352,24 +352,23 @@ class BaseModelAdminChecks(object):
 
         try:
             field = model._meta.get_field(field_name)
-            if isinstance(field, forbidden_field_types):
-                raise ValueError
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E026')
-        except ValueError:
-            return [
-                checks.Error(
-                    '"%s" refers to "%s", which must not be a DateTimeField, '
-                        'ForeignKey or ManyToManyField.'
-                        % (label, field_name),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E027',
-                )
-            ]
         else:
-            return []
+            if isinstance(field, forbidden_field_types):
+                return [
+                    checks.Error(
+                        '"%s" refers to "%s", which must not be a DateTimeField, '
+                            'ForeignKey or ManyToManyField.'
+                            % (label, field_name),
+                        hint=None,
+                        obj=cls,
+                        id='admin.E027',
+                    )
+                ]
+            else:
+                return []
 
     def _check_prepopulated_fields_value(self, cls, model, val, label):
         """ Check a value of `prepopulated_fields` dictionary, i.e. it's an
