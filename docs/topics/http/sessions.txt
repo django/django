@@ -75,7 +75,7 @@ the cache:
 
 * Set :setting:`SESSION_ENGINE` to
   ``"django.contrib.sessions.backends.cache"`` for a simple caching session
-  store. Session data will be stored directly your cache. However, session
+  store. Session data will be stored directly in your cache. However, session
   data may not be persistent: cached data can be evicted if the cache fills
   up or if the cache server is restarted.
 
