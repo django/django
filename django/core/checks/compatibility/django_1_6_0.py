@@ -26,11 +26,11 @@ def _check_test_runner(apps=None, **kwargs):
         return [
             Warning(
                 'You have not explicitly set "TEST_RUNNER". In Django 1.6, '
-                'there is a new test runner ("django.test.runner.DiscoverRunner") '
-                'by default. You should ensure your tests are still all '
-                'running & behaving as expected. See '
-                'https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module '
-                'for more information.',
+                    'there is a new test runner ("django.test.runner.DiscoverRunner") '
+                    'by default. You should ensure your tests are still all '
+                    'running & behaving as expected. See '
+                    'https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module '
+                    'for more information.',
                 hint=None,
                 obj=None,
                 id='W047',
