@@ -370,7 +370,7 @@ October 17, 2012
 
 * **Issues:**
 
-    * ``Host`` header poisoning: `CVE-2012-4520 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4520&cid=2`_
+    * ``Host`` header poisoning: `CVE-2012-4520 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4520&cid=2>`_
 
 * **Versions affected:**
 
