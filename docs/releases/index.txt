@@ -115,12 +115,12 @@ Pre-1.0 releases
 Security releases
 =================
 
-Whenever a security issue is disclosed via :ref:`Django's security
-policies <internals-security>`, appropriate release notes are now
+Whenever a security issue is disclosed via :doc:`Django's security
+policies </internals/security>`, appropriate release notes are now
 added to all affected release series.
 
-Additionally, :ref:`an archive of disclosed security issues
-<security-releases>` is maintained.
+Additionally, :doc:`an archive of disclosed security issues
+</releases/security>` is maintained.
 
 Development releases
 ====================
@@ -132,6 +132,7 @@ notes.
 .. toctree::
    :maxdepth: 1
 
+   security
    1.5-beta-1
    1.5-alpha-1
    1.4-beta-1

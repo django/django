@@ -128,8 +128,8 @@ may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
 
-The Django team also maintains an :ref:`archive of security issues
-disclosed in Django <security-releases>`.
+The Django team also maintains an :doc:`archive of security issues
+disclosed in Django</releases/security>`.
 
 
 .. _security-notifications:
