@@ -827,23 +827,22 @@ class ModelAdminChecks(BaseModelAdminChecks):
         else:
             try:
                 field = model._meta.get_field(cls.date_hierarchy)
-                if not isinstance(field, (models.DateField, models.DateTimeField)):
-                    raise ValueError
             except models.FieldDoesNotExist:
                 return refer_to_missing_field(option='date_hierarchy',
                                               field=cls.date_hierarchy,
                                               model=model, obj=cls, id='admin.E128')
-            except ValueError:
-                return [
-                    checks.Error(
-                        '"date_hierarchy" must be a DateField or DateTimeField.',
-                        hint=None,
-                        obj=cls,
-                        id='admin.E129',
-                    )
-                ]
             else:
-                return []
+                if not isinstance(field, (models.DateField, models.DateTimeField)):
+                    return [
+                        checks.Error(
+                            '"date_hierarchy" must be a DateField or DateTimeField.',
+                            hint=None,
+                            obj=cls,
+                            id='admin.E129',
+                        )
+                    ]
+                else:
+                    return []
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):
