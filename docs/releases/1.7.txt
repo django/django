@@ -414,6 +414,10 @@ Miscellaneous
   Rationale behind this is removal of dependency of non-contrib code on
   contrib applications.
 
+* The old cache URI syntax (e.g. ``"locmem://"``) is no longer supported. It
+  still worked, even though it was not documented or officially supported. If
+  you're still using it, please update to the current :setting:`CACHES` syntax.
+
 Features deprecated in 1.7
 ==========================
 
