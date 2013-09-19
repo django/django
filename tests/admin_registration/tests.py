@@ -115,7 +115,7 @@ class TestRegistrationDecorator(TestCase):
         )
 
     def test_wrapped_class_not_a_model_admin(self):
-        self.assertRaisesMessage(ValueError, 'Wrapped class must sublcass ModelAdmin.',
+        self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.',
             register(Person), CustomSite)
 
     def test_custom_site_not_an_admin_site(self):

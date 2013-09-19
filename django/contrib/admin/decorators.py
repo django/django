@@ -20,7 +20,7 @@ def register(*models, **kwargs):
             raise ValueError('site must subclass AdminSite')
 
         if not issubclass(admin_class, ModelAdmin):
-            raise ValueError('Wrapped class must sublcass ModelAdmin.')
+            raise ValueError('Wrapped class must subclass ModelAdmin.')
 
         admin_site.register(models, admin_class=admin_class)
 
