@@ -8,7 +8,7 @@ the abstract BaseCache class in django.core.cache.backends.base.
 
 Client code should not access a cache backend directly; instead it should
 either use the "cache" variable made available here, or it should use the
-``get_cache()`` function made available here. get_cache() takes a CACHES alias
+``get_cache()`` function made available here. ``get_cache()`` takes a CACHES alias
 or a backend path and config parameters, and returns an instance of a backend
 cache class.
 
