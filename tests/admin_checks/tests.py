@@ -153,7 +153,7 @@ class SystemChecksTestCase(TestCase):
                     'to the parent model admin_checks.Album.',
                 hint=None,
                 obj=SongInline,
-                id='admin.E064',
+                id='admin.E201',
             )
         ]
         self.assertEqual(errors, expected)
@@ -211,7 +211,7 @@ class SystemChecksTestCase(TestCase):
                     'ForeignKey to admin_checks.Album.',
                 hint=None,
                 obj=TwoAlbumFKAndAnEInline,
-                id='admin.E065',
+                id='admin.E202',
             )
         ]
         self.assertEqual(errors, expected)

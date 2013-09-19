@@ -1355,7 +1355,7 @@ class FkNameCheckTests(CheckTestCase):
             ValidationTestModelAdmin, ValidationTestModel,
             '"fk_name" refers to "non_existent_field" field, which '
                 'is missing from model modeladmin.ValidationTestInlineModel.',
-            'admin.E065',
+            'admin.E202',
             invalid_obj=ValidationTestInline)
 
     def test_valid_case(self):
@@ -1382,7 +1382,7 @@ class ExtraCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"extra" must be an integer.',
-            'admin.E066',
+            'admin.E203',
             invalid_obj=ValidationTestInline)
 
     def test_valid_case(self):
@@ -1409,7 +1409,7 @@ class MaxNumCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"max_num" must be an integer.',
-            'admin.E067',
+            'admin.E204',
             invalid_obj=ValidationTestInline)
 
     def test_valid_case(self):
@@ -1440,7 +1440,7 @@ class FormsetCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             '"formset" must inherit from BaseModelFormSet.',
-            'admin.E068',
+            'admin.E205',
             invalid_obj=ValidationTestInline)
 
     def test_valid_case(self):

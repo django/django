@@ -1120,7 +1120,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
                         % (fk.name, parent_model._meta.app_label, parent_model._meta.object_name),
                     hint=None,
                     obj=cls,
-                    id='admin.E064',
+                    id='admin.E201',
                 )
             ]
         else:
@@ -1135,7 +1135,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
                     e.args[0],
                     hint=None,
                     obj=cls,
-                    id='admin.E065',
+                    id='admin.E202',
                 )
             ]
         else:
@@ -1150,7 +1150,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
                     '"extra" must be an integer.',
                     hint=None,
                     obj=cls,
-                    id='admin.E066',
+                    id='admin.E203',
                 )
             ]
         else:
@@ -1167,7 +1167,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
                     '"max_num" must be an integer.',
                     hint=None,
                     obj=cls,
-                    id='admin.E067',
+                    id='admin.E204',
                 )
             ]
         else:
@@ -1182,7 +1182,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
                     '"formset" must inherit from BaseModelFormSet.',
                     hint=None,
                     obj=cls,
-                    id='admin.E068',
+                    id='admin.E205',
                 )
             ]
         else:
