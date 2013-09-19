@@ -95,6 +95,12 @@ LANG_INFO = {
         'name': 'English',
         'name_local': 'English',
     },
+    'en-au': {
+        'bidi': False,
+        'code': 'en-au',
+        'name': 'Australian English',
+        'name_local': 'Australian English',
+    },
     'en-gb': {
         'bidi': False,
         'code': 'en-gb',
