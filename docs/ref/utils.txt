@@ -495,8 +495,8 @@ Atom1Feed
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
-    translation as the first argument, the function evaluation is delayed until it
-    needs to be converted to a string.
+    translation as one of its arguments, the function evaluation is delayed
+    until it needs to be converted to a string.
 
     For example::
 
