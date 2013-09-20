@@ -1162,22 +1162,6 @@ Example::
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 
-Other optimizations
-===================
-
-Django comes with a few other pieces of middleware that can help optimize your
-site's performance:
-
-* ``django.middleware.http.ConditionalGetMiddleware`` adds support for
-  modern browsers to conditionally GET responses based on the ``ETag``
-  and ``Last-Modified`` headers.
-
-* :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
-  modern browsers, saving bandwidth and transfer time. Be warned, however,
-  that compression techniques like ``GZipMiddleware`` are subject to attacks.
-  See the warning in :class:`~django.middleware.gzip.GZipMiddleware` for
-  details.
-
 Order of MIDDLEWARE_CLASSES
 ===========================
 

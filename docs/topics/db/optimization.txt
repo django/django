@@ -88,7 +88,8 @@ of parentheses, but will call callables automatically, hiding the above
 distinction.
 
 Be careful with your own custom properties - it is up to you to implement
-caching.
+caching when required, for example using the
+:class:`~django.utils.functional.cached_property` decorator.
 
 Use the ``with`` template tag
 -----------------------------
@@ -111,10 +112,11 @@ For instance:
 * At the most basic level, use :ref:`filter and exclude <queryset-api>` to do
   filtering in the database.
 
-* Use :class:`F expressions <django.db.models.F>` to do filtering
-  against other fields within the same model.
+* Use :class:`F expressions <django.db.models.F>` to filter
+  based on other fields within the same model.
 
-* Use :doc:`annotate to do aggregation in the database </topics/db/aggregation>`.
+* Use :doc:`annotate to do aggregation in the database
+  </topics/db/aggregation>`.
 
 If these aren't enough to generate the SQL you need:
 
@@ -232,6 +234,8 @@ Use QuerySet.exists()
 queryset``.
 
 But:
+
+.. _overuse_of_count_and_exists:
 
 Don't overuse ``count()`` and ``exists()``
 ------------------------------------------
