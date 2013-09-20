@@ -70,7 +70,6 @@ Constructor arguments are:
     reporting all messages and its result precedes the message.
 
 ``id``
-
     Optional string. Short and unique name of an issue. Follow "applabel.X001"
     style, where ``X`` is one of ``CEWID`` letters depending on the message
     level (``C`` for criticals, ``E`` for errors and so on), i.e. a warning
