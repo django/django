@@ -43,17 +43,17 @@ class ModelAdminTests(TestCase):
         )
         self.site = AdminSite()
 
-    def test_str_on_model_admin(self):
-        got = force_text(ModelAdmin(Band, self.site))
-        expected = "modeladmin.ModelAdmin"
+    def test_str_on_model_admin_class(self):
+        got = force_text(ModelAdmin)
+        expected = "django.contrib.admin.options.ModelAdmin"
         self.assertEqual(got, expected)
 
-    def test_str_on_inline_model_admin(self):
+    def test_str_on_inline_model_admin_class(self):
         class MyInline(TabularInline):
             model = ValidationTestInlineModel
 
-        got = force_text(MyInline(ValidationTestModel, self.site))
-        expected = "modeladmin.MyInline"
+        got = force_text(MyInline)
+        expected = "modeladmin.tests.MyInline"
         self.assertEqual(got, expected)
 
     # form/fields/fieldsets interaction ##############################

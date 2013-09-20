@@ -81,10 +81,14 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
+@python_2_unicode_compatible
 class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
     renamed_methods = (
         ('queryset', 'get_queryset', DeprecationWarning),
     )
+
+    def __str__(cls):
+        return '%s.%s' % (cls.__module__, cls.__name__)
 
 
 class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods),
@@ -1667,6 +1671,7 @@ class ModelAdmin(BaseModelAdmin):
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
+
 @python_2_unicode_compatible
 class InlineModelAdmin(BaseModelAdmin):
     """
@@ -1831,9 +1836,6 @@ class InlineModelAdmin(BaseModelAdmin):
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
         return super(InlineModelAdmin, self).has_delete_permission(request, obj)
-
-    def __str__(self):
-        return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
 
 
 class StackedInline(InlineModelAdmin):
