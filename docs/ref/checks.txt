@@ -160,7 +160,7 @@ you can implement this check::
             self.max = max
 
         def check(self, **kwargs):
-            errors = super(MyField, self).check(**kwargs) # (1) call the superclass
+            errors = super(RangedIntegerField, self).check(**kwargs) # (1) call the superclass
             # (2) Do some custom checks and add messages to `errors`:
             errors.extend(self._check_min_max_values(**kwargs))
             return errors # (3) return all errors and warnings
