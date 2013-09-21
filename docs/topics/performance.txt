@@ -150,8 +150,8 @@ so there can be huge benefit in saving the value to a quickly accessible cache,
 ready for the next time it's required.
 
 It's a sufficiently significant and powerful technique that Django includes a
-comprehensive caching framework, as well as numerous other opportunities to
-make use of caching.
+comprehensive caching framework, as well as other smaller pieces of caching
+functionality
 
 :doc:`The caching framework </topics/cache>`
 --------------------------------------------
@@ -168,14 +168,8 @@ Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
 final steps towards producing well-performing code, not a shortcut.
 
-Other opportunities for caching
--------------------------------
-
-Beyond the caching framework, Django offers other smaller pieces of caching
-functionality.
-
 :class:`~django.utils.functional.cached_property`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------------
 
 It's common to have to call a class instances's method more than once. If
 that function is expensive, then doing so can be wasteful.
@@ -185,15 +179,6 @@ property; the next time the function is called on that instance, it will return
 the saved value rather than re-computing it. Note that this only works on
 methods that take ``self`` as their only argument and that it changes the
 method to a property.
-
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` appends a
-content-dependent tag to the filenames of :doc:`static files
-</ref/contrib/staticfiles>` to make it safe for browsers to cache them
-long-term without missing future changes - when a file changes, so will the
-tag, so browsers will reload the asset automatically.
 
 Understanding laziness
 ======================
@@ -284,11 +269,24 @@ time. Note that GZipMiddleware is currently considered a security risk, and is
 vulnerable to attacks that nullify the protection provided by TLS/SSL. See the
 warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
 
-Third-party HTTP tools
-----------------------
+Static files
+------------
 
-There are numerous third-party Django tools and packages available, notably
-ones that are able to "minify" and compress HTML, CSS and JavaScript.
+Since they aren't dynamic by definition, static files are a easy target for
+caching. By leveraging browser-side caching, you can eliminate network hits
+entirely for a given file after the initial download.
+
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` appends a
+content-dependent tag to the filenames of :doc:`static files
+</ref/contrib/staticfiles>` to make it safe for browsers to cache them
+long-term without missing future changes - when a file changes, so will the
+tag, so browsers will reload the asset automatically.
+
+For further performance improvoments, several third-party Django tools and
+packages provide the ability to "minify" CSS and JavaScript.
 
 Template performance
 ====================
@@ -313,13 +311,19 @@ Using different versions of available software
 It can sometimes be worth checking whether different and better-performing
 versions of the software that you're using are available.
 
-This may be helpful, but is unlikely to solve a serious performance problem.
-You won't usually gain performance advantages that are better than marginal.
+These techniques are targeted at advanced users who want to push the
+boundaries of performance of an already well-optimized Django site.
+
+However, they aren't a silver bullet, and they're unlikely to bring better
+than marginal performance improvements if your site doesn't use the cache and
+the database efficiently.
 
 .. note::
 
     It's worth repeating: **reaching for alternatives to software you're
-    already using is very rarely the answer to performance problems**.
+    already using is never the first answer to performance problems**. When
+    you reach this level of optimization, you need a formal benchmarking
+    solution.
 
 Newer is often - but not always - better
 ----------------------------------------
@@ -369,16 +373,18 @@ templating language.
 Alternative software implementations
 ------------------------------------
 
-It *may* be worth checking whether Python software you're using has been
+It may be worth checking whether Python software you're using has been
 provided in a different implementation that can execute the same code faster.
 
-However, most Django performance problems in well-written code are typically
-not to be found at the Python execution level, but rather in inefficient
-database querying, caching, and templates (and if you're relying on
-poorly-written Python code, your performance problems are very unlikely to be
-solved by having it execute faster).
+Before using an alternative Python implementation like `PyPy
+<http://pypy.org/>`_ or C implementations of Python libraries, make sure they
+provide sufficient performance gains for your application to outweight the
+compatibility, deployment and maintenance concerns.
 
-Avoid using C implementations of Python libraries or non-standard Python
-implementations like `PyPy <http://pypy.org/>`_ in search of performance gains,
-unless you are sure they are appropriate for your application. Any gains are
-likely to be small, and compatibility issues are common.
+.. note::
+
+    Most performance problems in well-written, small to medium-size Django
+    sites aren't at the Python execution level, but rather in inefficient
+    database querying, caching, and templates. If you're relying on poorly-
+    written Python code, your performance problems are unlikely to be solved
+    by having it execute faster.
