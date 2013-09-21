@@ -96,6 +96,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    atomic_transactions = False
     supports_combined_alters = False
     max_index_name_length = 30
     nulls_order_largest = True

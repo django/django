@@ -170,7 +170,9 @@ Django provides a single API to control database transactions.
         hide from Django the fact that an error has occurred and that the
         transaction is broken. At this point, Django's behavior is unspecified
         and database-dependent. It will usually result in a rollback, which
-        may break your expectations, since you caught the exception.
+        may break your expectations, since you caught the exception. If you
+        run database queries in a broken transaction, Django will raise a
+        :class:`~django.db.transaction.TransactionManagementError`.
 
         The correct way to catch database errors is around an ``atomic`` block
         as shown above. If necessary, add an extra ``atomic`` block for this
