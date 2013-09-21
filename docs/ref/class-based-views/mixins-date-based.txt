@@ -4,6 +4,11 @@ Date-based mixins
 
 .. currentmodule:: django.views.generic.dates
 
+.. note::
+    All the date formatting attributes in these mixins use
+    :func:`~time.strftime` format characters. Do not try to use the format
+    characters from the :ttag:`now` template tag as they are not compatible.
+
 YearMixin
 ---------
 
