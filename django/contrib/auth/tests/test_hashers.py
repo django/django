@@ -5,12 +5,9 @@ import unittest
 from unittest import skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS as default_hashers
-from django.contrib.auth.hashers import (
-    is_password_usable, BasePasswordHasher, check_password, make_password,
-    PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher, get_hasher,
-    identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH,
-    MAXIMUM_PASSWORD_LENGTH, password_max_length
-)
+from django.contrib.auth.hashers import (is_password_usable, BasePasswordHasher,
+    check_password, make_password, PBKDF2PasswordHasher, load_hashers, PBKDF2SHA1PasswordHasher,
+    get_hasher, identify_hasher, UNUSABLE_PASSWORD_PREFIX, UNUSABLE_PASSWORD_SUFFIX_LENGTH)
 from django.utils import six
 
 
@@ -42,12 +39,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-        )
 
     def test_pkbdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
@@ -63,14 +54,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "seasalt",
-            "pbkdf2_sha256",
-        )
 
     def test_sha1(self):
         encoded = make_password('lètmein', 'seasalt', 'sha1')
@@ -86,14 +69,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "seasalt",
-            "sha1",
-        )
 
     def test_md5(self):
         encoded = make_password('lètmein', 'seasalt', 'md5')
@@ -109,14 +84,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "seasalt",
-            "md5",
-        )
 
     def test_unsalted_md5(self):
         encoded = make_password('lètmein', '', 'unsalted_md5')
@@ -135,14 +102,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "",
-            "unsalted_md5",
-        )
 
     def test_unsalted_sha1(self):
         encoded = make_password('lètmein', '', 'unsalted_sha1')
@@ -160,14 +119,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "",
-            "unslated_sha1",
-        )
 
     @skipUnless(crypt, "no crypt module to generate password.")
     def test_crypt(self):
@@ -183,14 +134,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            "seasalt",
-            "crypt",
-        )
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
@@ -213,13 +156,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            hasher="bcrypt_sha256",
-        )
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt(self):
@@ -235,13 +171,6 @@ class TestUtilsHashPass(unittest.TestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
-        # Long password
-        self.assertRaises(
-            ValueError,
-            make_password,
-            b"1" * (MAXIMUM_PASSWORD_LENGTH + 1),
-            hasher="bcrypt",
-        )
 
     def test_unusable(self):
         encoded = make_password(None)
@@ -273,14 +202,6 @@ class TestUtilsHashPass(unittest.TestCase):
     def test_bad_encoded(self):
         self.assertFalse(is_password_usable('lètmein_badencoded'))
         self.assertFalse(is_password_usable(''))
-
-    def test_max_password_length_decorator(self):
-        @password_max_length(10)
-        def encode(s, password, salt):
-            return True
-
-        self.assertTrue(encode(None, b"1234", b"1234"))
-        self.assertRaises(ValueError, encode, None, b"1234567890A", b"1234")
 
     def test_low_level_pkbdf2(self):
         hasher = PBKDF2PasswordHasher()
