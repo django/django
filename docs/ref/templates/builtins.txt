@@ -1251,6 +1251,10 @@ Formats a date according to the given format.
 Uses a similar format as PHP's ``date()`` function (http://php.net/date)
 with some differences.
 
+.. note::
+    These format characters are not used in Django outside of templates. They
+    were designed to be compatible with PHP to ease transitioning for designers.
+
 Available format strings:
 
 ================  ========================================  =====================
