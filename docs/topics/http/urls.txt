@@ -365,6 +365,32 @@ instead. For example, consider this URLconf::
 In this example, the ``/credit/reports/`` URL will be handled by the
 ``credit.views.report()`` Django view.
 
+This can be used to remove redundancy from URLconfs where a single pattern
+prefix is used repeatedly. For example, consider this URLconf::
+
+    from django.conf.urls import patterns, url
+
+    urlpatterns = patterns('wiki.views',
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/history/$', 'history'),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/edit/$', 'edit'),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/discuss/$', 'discuss'),
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/permissions/$', 'permissions'),
+    )
+
+We can improve this by stating the common path prefix only once and grouping
+the suffixes that differ::
+
+    from django.conf.urls import include, patterns, url
+
+    urlpatterns = patterns('wiki.views',
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include(patterns('',
+            url(r'^history/$', 'history'),
+            url(r'^edit/$', 'edit'),
+            url(r'^discuss/$', 'discuss'),
+            url(r'^permissions/$', 'permissions'),
+        ))),
+    )
+
 .. _`Django Web site`: https://www.djangoproject.com/
 
 Captured parameters
