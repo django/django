@@ -32,6 +32,7 @@ For example, if your custom tags/filters are in a file called
 ``poll_extras.py``, your app layout might look like this::
 
     polls/
+        __init__.py
         models.py
         templatetags/
             __init__.py
