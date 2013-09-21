@@ -1011,6 +1011,11 @@ class NewFormsTests(TestCase):
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
+    def test_form_with_explicit_timezone(self):
+        form = EventForm({'dt': '2011-09-01 17:20:30+07:00'})
+        # Datetime inputs formats don't allow providing a time zone.
+        self.assertFalse(form.is_valid())
+
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_non_existent_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
