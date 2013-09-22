@@ -67,10 +67,6 @@ def get_internal_wsgi_application():
     return app
 
 
-class WSGIServerException(Exception):
-    pass
-
-
 class ServerHandler(simple_server.ServerHandler, object):
     error_status = str("500 INTERNAL SERVER ERROR")
 
@@ -131,10 +127,7 @@ class WSGIServer(simple_server.WSGIServer, object):
 
     def server_bind(self):
         """Override server_bind to store the server name."""
-        try:
-            super(WSGIServer, self).server_bind()
-        except Exception as e:
-            raise WSGIServerException(e)
+        super(WSGIServer, self).server_bind()
         self.setup_environ()
 
 

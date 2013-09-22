@@ -1,12 +1,13 @@
 from optparse import make_option
 from datetime import datetime
+import errno
 import os
 import re
 import sys
 import socket
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import run, WSGIServerException, get_internal_wsgi_application
+from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.utils import autoreload
 
 naiveip_re = re.compile(r"""^(?:
@@ -112,16 +113,16 @@ class Command(BaseCommand):
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
                 ipv6=self.use_ipv6, threading=threading)
-        except WSGIServerException as e:
+        except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
-                13: "You don't have permission to access that port.",
-                98: "That port is already in use.",
-                99: "That IP address can't be assigned-to.",
+                errno.EACCES: "You don't have permission to access that port.",
+                errno.EADDRINUSE: "That port is already in use.",
+                errno.EADDRNOTAVAIL: "That IP address can't be assigned-to.",
             }
             try:
-                error_text = ERRORS[e.args[0].args[0]]
-            except (AttributeError, KeyError):
+                error_text = ERRORS[e.errno]
+            except KeyError:
                 error_text = str(e)
             self.stderr.write("Error: %s" % error_text)
             # Need to use an OS exit because sys.exit doesn't work in a thread
