@@ -111,7 +111,7 @@ pygments_style = 'trac'
 # branch, which is located at this URL.
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
-    'sphinx': ('http://sphinx.pocoo.org/', None),
+    'sphinx': ('http://sphinx-doc.org/', None),
     'six': ('http://pythonhosted.org/six/', None),
     'simplejson': ('http://simplejson.readthedocs.org/en/latest/', None),
 }
