@@ -83,7 +83,7 @@ def _get_queryset(klass):
     elif isinstance(klass, ModelBase):
         manager = klass._default_manager
     else:
-        if isinstance(klass, type)
+        if isinstance(klass, type):
             klass__name = klass.__name__
         else:
             klass__name = klass.__class__.__name__
