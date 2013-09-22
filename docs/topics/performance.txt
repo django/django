@@ -272,6 +272,17 @@ time. Note that GZipMiddleware is currently considered a security risk, and is
 vulnerable to attacks that nullify the protection provided by TLS/SSL. See the
 warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
 
+Sessions
+--------
+
+:ref:`Using cached sessions <cached-sessions-backend>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:ref:`Using cached sessions <cached-sessions-backend>` may be a way to increase
+performance by eliminating the need to load session data from a slower storage
+source like the database and instead storing frequently used session data in
+memory.
+
 Static files
 ------------
 
