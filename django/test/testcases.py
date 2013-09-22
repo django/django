@@ -7,6 +7,7 @@ from functools import wraps
 import json
 import os
 import re
+import socket
 import sys
 import select
 import socket
@@ -21,8 +22,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
-from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
-    WSGIServerException)
+from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.db.models.loading import cache
@@ -1089,10 +1089,9 @@ class LiveServerThread(threading.Thread):
                 try:
                     self.httpd = StoppableWSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
-                except WSGIServerException as e:
+                except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        hasattr(e.args[0], 'errno') and
-                        e.args[0].errno == errno.EADDRINUSE):
+                        e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue
