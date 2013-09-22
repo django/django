@@ -265,7 +265,7 @@ class AtomicMergeTests(TransactionTestCase):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
                 with six.assertRaisesRegex(self, Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
-                        Reporter.objects.create(first_name="Tournesol")
+                        Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
                 # It wasn't possible to roll back
                 self.assertEqual(Reporter.objects.count(), 3)
@@ -281,7 +281,7 @@ class AtomicMergeTests(TransactionTestCase):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
                 with six.assertRaisesRegex(self, Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
-                        Reporter.objects.create(first_name="Tournesol")
+                        Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
                 # It wasn't possible to roll back
                 self.assertEqual(Reporter.objects.count(), 3)
