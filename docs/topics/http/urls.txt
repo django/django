@@ -231,7 +231,7 @@ Error handling
 When Django can't find a regex matching the requested URL, or when an
 exception is raised, Django will invoke an error-handling view.
 
-The views to use for these cases are specified by three variables. Their
+The views to use for these cases are specified by four variables. Their
 default values should suffice for most projects, but further customization is
 possible by assigning values to them.
 
@@ -249,6 +249,7 @@ The variables are:
 * ``handler404`` -- See :data:`django.conf.urls.handler404`.
 * ``handler500`` -- See :data:`django.conf.urls.handler500`.
 * ``handler403`` -- See :data:`django.conf.urls.handler403`.
+* ``handler400`` -- See :data:`django.conf.urls.handler400`.
 
 .. _urlpatterns-view-prefix:
 
