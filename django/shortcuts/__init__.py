@@ -83,8 +83,10 @@ def _get_queryset(klass):
     elif isinstance(klass, ModelBase):
         manager = klass._default_manager
     else:
-        klass__name = klass.__name__ if isinstance(klass, type) \
-                      else klass.__class__.__name__
+        if isinstance(klass, type)
+            klass__name = klass.__name__
+        else:
+            klass__name = klass.__class__.__name__
         raise ValueError("Object is of type '%s', but must be a Django Model, "
                          "Manager, or QuerySet" % klass__name)
     return manager.all()

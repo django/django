@@ -111,8 +111,7 @@ class SQLEvaluator(object):
         timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
 
-        if timedelta.days == 0 and timedelta.seconds == 0 and \
-                timedelta.microseconds == 0:
+        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
             return sql, params
 
         return connection.ops.date_interval_sql(sql, node.connector, timedelta), params

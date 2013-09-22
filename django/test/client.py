@@ -524,8 +524,8 @@ class Client(RequestFactory):
         not available.
         """
         user = authenticate(**credentials)
-        if user and user.is_active \
-                and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if (user and user.is_active and
+                'django.contrib.sessions' in settings.INSTALLED_APPS):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request to store login details.

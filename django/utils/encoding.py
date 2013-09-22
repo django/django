@@ -152,13 +152,13 @@ else:
     smart_unicode = smart_text
     force_unicode = force_text
 
-smart_str.__doc__ = """\
+smart_str.__doc__ = """
 Apply smart_text in Python 3 and smart_bytes in Python 2.
 
 This is suitable for writing to sys.stdout (for instance).
 """
 
-force_str.__doc__ = """\
+force_str.__doc__ = """
 Apply force_text in Python 3 and force_bytes in Python 2.
 """
 

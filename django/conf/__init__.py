@@ -139,8 +139,8 @@ class Settings(BaseSettings):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
 
-                if setting in tuple_settings and \
-                        isinstance(setting_value, six.string_types):
+                if (setting in tuple_settings and
+                        isinstance(setting_value, six.string_types)):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
 

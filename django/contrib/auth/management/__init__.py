@@ -167,8 +167,9 @@ def get_default_username(check_db=True):
 
     default_username = get_system_username()
     try:
-        default_username = unicodedata.normalize('NFKD', default_username)\
-            .encode('ascii', 'ignore').decode('ascii').replace(' ', '').lower()
+        default_username = (unicodedata.normalize('NFKD', default_username)
+                .encode('ascii', 'ignore').decode('ascii')
+                .replace(' ', '').lower())
     except UnicodeDecodeError:
         return ''
 
