@@ -5,7 +5,7 @@ from django.db import (connection, connections, transaction, DEFAULT_DB_ALIAS, D
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import override_settings, IgnorePendingDeprecationWarningsMixin
-from django.utils.unittest import skipIf, skipUnless
+from django.utils.unittest import skipIf, skipUnless, SkipTest
 
 from .models import Mod, M2mA, M2mB, SubMod
 
@@ -366,11 +366,13 @@ class SavepointTest(IgnorePendingDeprecationWarningsMixin, TransactionTestCase):
 
     @skipIf(connection.vendor == 'sqlite',
             "SQLite doesn't support savepoints in managed mode")
-    @skipIf(connection.vendor == 'mysql' and
-            connection.features._mysql_storage_engine == 'MyISAM',
-            "MyISAM MySQL storage engine doesn't support savepoints")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_rollback(self):
+        # _mysql_storage_engine issues a query and as such can't be applied in
+        # a skipIf decorator since that would execute the query on module load.
+        if (connection.vendor == 'mysql' and
+            connection.features._mysql_storage_engine == 'MyISAM'):
+            raise SkipTest("MyISAM MySQL storage engine doesn't support savepoints")
         @commit_manually
         def work():
             mod = Mod.objects.create(fld=1)
