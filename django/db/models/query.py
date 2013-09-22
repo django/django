@@ -436,14 +436,9 @@ class QuerySet(object):
         for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
 
-        sid = transaction.savepoint(using=self.db)
-        try:
+        with transaction.atomic(using=self.db):
             obj.save(using=self.db)
-            transaction.savepoint_commit(sid, using=self.db)
-            return obj, False
-        except DatabaseError:
-            transaction.savepoint_rollback(sid, using=self.db)
-            six.reraise(*sys.exc_info())
+        return obj, False
 
     def _create_object_from_params(self, lookup, params):
         """
@@ -451,19 +446,16 @@ class QuerySet(object):
         Used by get_or_create and update_or_create
         """
         obj = self.model(**params)
-        sid = transaction.savepoint(using=self.db)
         try:
-            obj.save(force_insert=True, using=self.db)
-            transaction.savepoint_commit(sid, using=self.db)
+            with transaction.atomic(using=self.db):
+                obj.save(force_insert=True, using=self.db)
             return obj, True
-        except DatabaseError as e:
-            transaction.savepoint_rollback(sid, using=self.db)
+        except IntegrityError:
             exc_info = sys.exc_info()
-            if isinstance(e, IntegrityError):
-                try:
-                    return self.get(**lookup), False
-                except self.model.DoesNotExist:
-                    pass
+            try:
+                return self.get(**lookup), False
+            except self.model.DoesNotExist:
+                pass
             six.reraise(*exc_info)
 
     def _extract_model_params(self, defaults, **kwargs):
