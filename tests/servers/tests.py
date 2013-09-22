@@ -5,10 +5,10 @@ Tests for django.core.servers.
 from __future__ import unicode_literals
 
 import os
+import socket
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase
-from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.error import HTTPError
@@ -71,7 +71,7 @@ class LiveServerAddress(LiveServerBase):
         cls.raises_exception('localhost', ImproperlyConfigured)
 
         # The host must be valid
-        cls.raises_exception('blahblahblah:8081', WSGIServerException)
+        cls.raises_exception('blahblahblah:8081', socket.error)
 
         # The list of ports must be in a valid format
         cls.raises_exception('localhost:8081,', ImproperlyConfigured)
