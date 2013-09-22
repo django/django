@@ -112,6 +112,23 @@ include()
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
+handler400
+----------
+
+.. data:: handler400
+
+.. versionadded:: 1.6
+
+A callable, or a string representing the full Python import path to the view
+that should be called if the HTTP client has sent a request that caused an error
+condition and a response with a status code of 400.
+
+By default, this is ``'django.views.defaults.permission_denied'``. That default
+value should suffice.
+
+See the documentation about :ref:`the 400 (bad request) view
+<http_bad_request_view>` for more information.
+
 handler403
 ----------
 
