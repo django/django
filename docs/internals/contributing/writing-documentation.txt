@@ -42,7 +42,7 @@ Django's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
-__ http://sphinx.pocoo.org/
+__ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
@@ -141,7 +141,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx.pocoo.org/markup/desc.html
+__ http://sphinx-doc.org/markup/desc.html
 
 * Settings::
 
@@ -305,7 +305,7 @@ look better:
 
 * Add `info field lists`__ where appropriate.
 
-  __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
+  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
 
 * Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead
   of ````ADMIN_FOR````.
