@@ -301,6 +301,12 @@ Templates
   * :func:`django.shortcuts.render()`
   * :func:`django.shortcuts.render_to_response()`
 
+* The :tfilter:`time` filter now accepts timzone-related :ref:`format
+  specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``
+  and ``'Z'`` and is able to digest :ref:`time-zone-aware
+  <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
+  rendering.
+
 Tests
 ^^^^^
 

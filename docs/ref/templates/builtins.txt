@@ -1255,6 +1255,8 @@ with some differences.
     These format characters are not used in Django outside of templates. They
     were designed to be compatible with PHP to ease transitioning for designers.
 
+.. _date-and-time-formatting-specifiers:
+
 Available format strings:
 
 ================  ========================================  =====================
@@ -1338,7 +1340,7 @@ For example::
 
     {{ value|date:"D d M Y" }}
 
-If ``value`` is a ``datetime`` object (e.g., the result of
+If ``value`` is a :py:class:`~datetime.datetime` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
@@ -1362,6 +1364,11 @@ When used without a format string::
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
 used, without applying any localization.
+
+You can combine ``date`` with the :tfilter:`time` filter to render a full
+representation of a ``datetime`` value. E.g.::
+
+    {{ value|date:"D d M Y" }} {{ value|time:"H:i" }}
 
 .. templatefilter:: default
 
@@ -2023,10 +2030,6 @@ Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
 format, same as the :tfilter:`date` filter. Note that the predefined format
 is locale-dependant.
 
-The time filter will only accept parameters in the format string that relate
-to the time of day, not the date (for obvious reasons). If you need to
-format a date, use the :tfilter:`date` filter.
-
 For example::
 
     {{ value|time:"H:i" }}
@@ -2044,12 +2047,28 @@ for example, ``"de"``, then for::
 the output will be the string ``"01:23:00"`` (The ``"TIME_FORMAT"`` format
 specifier for the ``de`` locale as shipped with Django is ``"H:i:s"``).
 
+The ``time`` filter will only accept parameters in the format string that
+relate to the time of day, not the date (for obvious reasons). If you need to
+format a ``date`` value, use the :tfilter:`date` filter instead (or along
+``time`` if you need to render a full :py:class:`~datetime.datetime` value).
+
+There is one exception the above rule: When passed a ``datetime`` value with
+attached timezone information (a :ref:`time-zone-aware
+<naive_vs_aware_datetimes>` ``datetime`` instance) the ``time`` filter will
+accept the timezone-related :ref:`format specifiers
+<date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'`` and ``'Z'``.
+
 When used without a format string::
 
     {{ value|time }}
 
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
 used, without applying any localization.
+
+.. versionchanged:: 1.7
+
+    The ability to receive and act on values with attached timezone
+    information was added in Django 1.7.
 
 .. templatefilter:: timesince
 
