@@ -288,7 +288,7 @@ and then did something like this::
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
-the arguments sent to a :data:`m2m_changed` handler (``topppings_changed`` in
+the arguments sent to a :data:`m2m_changed` handler (``toppings_changed`` in
 the example above) would be:
 
 ==============  ============================================================
