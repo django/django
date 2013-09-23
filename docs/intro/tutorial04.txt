@@ -272,7 +272,7 @@ two views abstract the concepts of "display a list of objects" and
 
 By default, the :class:`~django.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html`` in the
-tepmlate folders configured in settings.
+template folders configured in settings.
 
 In our case, it'll use the template
 ``"polls/templates/polls/question_detail.html"``. The ``template_name``

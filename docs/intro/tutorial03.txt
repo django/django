@@ -184,8 +184,9 @@ slightly different, because they take an argument::
     def vote(request, question_id):
         return HttpResponse("You're voting on question %s." % question_id)
 
-Wire these new views into the ``polls.urls`` module (that is, ``polls/urls.py``
-file) by adding the following :func:`~django.conf.urls.url` calls::
+Wire these new views into the ``polls.urls`` module (that is, the
+``polls/urls.py`` file) by adding the following :func:`~django.conf.urls.url`
+calls::
 
     from django.conf.urls import patterns, url
 
@@ -422,10 +423,11 @@ will get you started for now.
 
 .. note::
 
-    Html templates are generally put into the apps ``templates`` folder. In
-    this tutorial we place all polls templates in the ``polls/templates/polls``
-    folder. Therefore when a template is referenced by ``polls/tmpl1.html``, it
-    refers to the ``polls/templates/poll/tmpl1.html`` file.
+    HTML templates are generally put into the apps ``templates`` folder. In
+    this tutorial we place all polls' templates in the
+    ``polls/templates/polls`` folder. Our template in the
+    ``polls/templates/polls/example.html`` can be referred to as
+    ``polls/example.html``.
 
 A shortcut: :func:`~django.shortcuts.get_object_or_404`
 -------------------------------------------------------
