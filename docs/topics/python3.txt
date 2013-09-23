@@ -26,10 +26,10 @@ to stay compatible with Python 2. But authors of pluggable applications are
 encouraged to use the same porting strategy as Django itself.
 
 Writing compatible code is much easier if you target Python ≥ 2.6. Django 1.5
-introduces compatibility tools such as :mod:`django.utils.six`. For
-convenience, forwards-compatible aliases were introduced in Django 1.4.2. If
-your application takes advantage of these tools, it will require Django ≥
-1.4.2.
+introduces compatibility tools such as :mod:`django.utils.six`, which is a
+customized version of the :mod:`six module <six>`. For convenience,
+forwards-compatible aliases were introduced in Django 1.4.2. If your
+application takes advantage of these tools, it will require Django ≥ 1.4.2.
 
 Obviously, writing compatible source code adds some overhead, and that can
 cause frustration. Django's developers have found that attempting to write
@@ -328,8 +328,8 @@ Writing compatible code with six
 six_ is the canonical compatibility library for supporting Python 2 and 3 in
 a single codebase. Read its documentation!
 
-:mod:`six` is bundled with Django as of version 1.4.2. You can import it as
-:mod:`django.utils.six`.
+A :mod:`customized version of six <django.utils.six>` is bundled with Django
+as of version 1.4.2. You can import it as ``django.utils.six``.
 
 Here are the most common changes required to write compatible code.
 
@@ -364,8 +364,9 @@ Import ``six.moves.xrange`` wherever you use ``xrange``.
 Moved modules
 ~~~~~~~~~~~~~
 
-Some modules were renamed in Python 3. The :mod:`django.utils.six.moves
-<six.moves>` module provides a compatible location to import them.
+Some modules were renamed in Python 3. The ``django.utils.six.moves``
+module (based on the :mod:`Python six.moves module <six.moves>`) provides a
+compatible location to import them.
 
 PY2
 ~~~
@@ -380,10 +381,11 @@ function.
 
 .. module:: django.utils.six
 
-Customizations of six
----------------------
+Django customized version of six
+--------------------------------
 
-The version of six bundled with Django includes a few extras.
+The version of six bundled with Django (``django.utils.six``) includes a few
+extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
 
