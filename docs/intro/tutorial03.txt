@@ -412,13 +412,20 @@ question text for a given poll. Here's the view (in ``polls/views.py`` file)::
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a question with the requested ID doesn't exist.
 
-We'll discuss what you could put in that ``polls/templtes/polls/detail.html``
+We'll discuss what you could put in that ``polls/templates/polls/detail.html``
 template a bit later, but if you'd like to quickly get the above example
 working, a file containing just::
 
     {{ question }}
 
 will get you started for now.
+
+.. note::
+
+    Html templates are generally put into the apps ``templates`` folder. In
+    this tutorial we place all polls templates in the ``polls/templates/polls``
+    folder. Therefore when a template is referenced by ``polls/tmpl1.html``, it
+    refers to the ``polls/templates/poll/tmpl1.html`` file.
 
 A shortcut: :func:`~django.shortcuts.get_object_or_404`
 -------------------------------------------------------
