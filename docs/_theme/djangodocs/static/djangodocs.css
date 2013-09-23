@@ -64,6 +64,8 @@ ul { padding-left:30px; }
 ol { padding-left:30px; }
 ol.arabic li { list-style-type: decimal; }
 ul li { list-style-type:square; margin-bottom:.4em; }
+ul ul li { list-style-type:disc; }
+ul ul ul li { list-style-type:circle; }
 ol li { margin-bottom: .4em; }
 ul ul { padding-left:1.2em; }
 ul ul ul { padding-left:1em; }
