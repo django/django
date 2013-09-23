@@ -5,11 +5,15 @@ import json
 import os
 import re
 
+from docutils import nodes
+from docutils.parsers.rst import directives
+
 from sphinx import addnodes, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
 from sphinx.util.compat import Directive
+from sphinx.util.nodes import set_source_info
 
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
@@ -52,6 +56,60 @@ def setup(app):
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
     app.add_builder(DjangoStandaloneHTMLBuilder)
+    app.add_node(snippet_with_filename, html=(visit_snippet, depart_snippet))
+    app.add_directive('snippet', SnippetWithFilename)
+
+
+class snippet_with_filename(nodes.literal_block):
+    pass
+
+
+def visit_snippet(self, node):
+    lang = self.highlightlang
+    linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
+    fname = node['filename']
+    highlight_args = node.get('highlight_args', {})
+    if node.has_key('language'):
+        # code-block directives
+        lang = node['language']
+        highlight_args['force'] = True
+    if node.has_key('linenos'):
+        linenos = node['linenos']
+
+    def warner(msg):
+        self.builder.warn(msg, (self.builder.current_docname, node.line))
+
+    highlighted = self.highlighter.highlight_block(node.rawsource, lang,
+                                                   warn=warner,
+                                                   linenos=linenos,
+                                                   **highlight_args)
+    starttag = self.starttag(node, 'div', suffix='',
+                             CLASS='highlight-%s' % lang)
+    self.body.append(starttag)
+    self.body.append('<div class="snippet-filename">%s</div>\n''' % (fname,))
+    self.body.append(highlighted)
+    self.body.append('</div>\n')
+    raise nodes.SkipNode
+
+
+def depart_snippet(self, node):
+    self.depart_literal_block(node)
+
+
+class SnippetWithFilename(Directive):
+    has_content = True
+    optional_arguments = 1
+    option_spec = {'filename': directives.unchanged_required}
+
+    def run(self):
+        code = u'\n'.join(self.content)
+
+        literal = snippet_with_filename(code, code)
+        if self.arguments:
+            literal['language'] = self.arguments[0]
+        literal['filename'] = self.options['filename']
+        set_source_info(self, literal)
+        return [literal]
 
 
 class VersionDirective(Directive):
