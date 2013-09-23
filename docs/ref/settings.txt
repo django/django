@@ -419,12 +419,28 @@ SQLite. This can be configured using the following::
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'mydatabase'
+            'NAME': 'mydatabase',
         }
     }
 
-For other database backends, or more complex SQLite configurations, other options
-will be required. The following inner options are available.
+When connecting to other database backends, such as MySQL, Oracle, or
+PostgreSQL, additional connection parameters will be required. See
+the :setting:`ENGINE <DATABASE-ENGINE>` setting below on how to specify
+other database types. This example is for PostgreSQL::
+
+    DATABASES = {
+        'default': {
+            'ENGINE':'django.db.backends.postgresql_psycopg2',
+            'NAME': 'mydatabase',
+            'USER': 'mydatabaseuser',
+            'PASSWORD': 'mypassword',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+        }
+    }
+
+The following inner options that may be required for more complex
+configurations are available:
 
 .. setting:: DATABASE-ATOMIC_REQUESTS
 
