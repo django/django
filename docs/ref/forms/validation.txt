@@ -176,9 +176,12 @@ Using validators
 ~~~~~~~~~~~~~~~~
 
 Django's form (and model) fields support use of simple utility functions and
-classes known as validators. These can be passed to a field's constructor, via
-the field's ``validators`` argument, or defined on the Field class itself with
-the ``default_validators`` attribute.
+classes known as validators. A validator is merely a callable object or
+function that takes a value and simply returns nothing if the value is valid or
+raises a :exc:`~django.core.exceptions.ValidationError` if not. These can be
+passed to a field's constructor, via the field's ``validators`` argument, or
+defined on the :class:`~django.forms.Field` class itself with the
+``default_validators`` attribute.
 
 Simple validators can be used to validate values inside the field, let's have
 a look at Django's ``EmailField``::
@@ -200,6 +203,13 @@ is equivalent to::
     email = forms.CharField(validators=[validators.validate_email],
             error_messages={'invalid': _('Enter a valid email address.')})
 
+Common cases such as validating against an email or a regular expression can be
+handled using existing validator classes available in Django. For example,
+``validators.validate_slug`` is an instance of
+a :class:`~django.core.validators.RegexValidator` constructed with the first
+argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
+:doc:`writing validators </ref/validators>` to see a list of what is already
+available and for an example of how to write a validator.
 
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
