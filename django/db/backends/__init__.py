@@ -895,7 +895,7 @@ class BaseDatabaseOperations(object):
         Coerce the value returned by the database backend into a consistent type
         that is compatible with the field type.
         """
-        if value is None:
+        if value is None or field is None:
             return value
         internal_type = field.get_internal_type()
         if internal_type == 'FloatField':
