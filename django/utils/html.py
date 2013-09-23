@@ -15,8 +15,8 @@ from .html_parser import HTMLParser, HTMLParseError
 
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'']
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
