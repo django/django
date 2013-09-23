@@ -36,7 +36,7 @@ class BaseMemcachedCache(BaseCache):
 
         return self._client
 
-    def _get_memcache_timeout(self, timeout=DEFAULT_TIMEOUT):
+    def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
         Memcached deals with long (> 30 days) timeouts in a special
         way. Call this function to obtain a safe value for your timeout.
@@ -68,7 +68,7 @@ class BaseMemcachedCache(BaseCache):
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
-        return self._cache.add(key, value, self._get_memcache_timeout(timeout))
+        return self._cache.add(key, value, self.get_backend_timeout(timeout))
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
@@ -79,7 +79,7 @@ class BaseMemcachedCache(BaseCache):
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
-        self._cache.set(key, value, self._get_memcache_timeout(timeout))
+        self._cache.set(key, value, self.get_backend_timeout(timeout))
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -140,7 +140,7 @@ class BaseMemcachedCache(BaseCache):
         for key, value in data.items():
             key = self.make_key(key, version=version)
             safe_data[key] = value
-        self._cache.set_multi(safe_data, self._get_memcache_timeout(timeout))
+        self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
 
     def delete_many(self, keys, version=None):
         l = lambda x: self.make_key(x, version=version)

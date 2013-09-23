@@ -63,11 +63,8 @@ class LocMemCache(BaseCache):
     def _set(self, key, value, timeout=DEFAULT_TIMEOUT):
         if len(self._cache) >= self._max_entries:
             self._cull()
-        if timeout == DEFAULT_TIMEOUT:
-            timeout = self.default_timeout
-        expiry = None if timeout is None else time.time() + timeout
         self._cache[key] = value
-        self._expire_info[key] = expiry
+        self._expire_info[key] = self.get_backend_timeout(timeout)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
