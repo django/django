@@ -965,37 +965,37 @@ class BackendUtilTests(TestCase):
               '0')
 
 class TestMixedCaseEntityNames(TestCase):
-    '''
+    """
     Test for mixed case entity names. Will test particulary PostgreSQL,
     but other RDBMSs should handle this test equally well
-    '''
+    """
 
     def _build_records(self):
-        rec = models.Mixed_Case_Table(id=1, sum_Field=2)
+        rec = models.MixedCaseTable(id=1, sum_Field=2)
         rec.save()
-        rec = models.Mixed_Case_Table(id=2, sum_Field=3)
+        rec = models.MixedCaseTable(id=2, sum_Field=3)
         rec.save()
         
     def test_mixed_case_table_create(self):
         # Note that the table is already created, so we just insert the records
-        statements = connection.creation.sql_create_model(models.Mixed_Case_Table,
+        statements = connection.creation.sql_create_model(models.MixedCaseTable,
             style=no_style())
         self._build_records()
         
     def test_mixed_case_table_select(self):
         self._build_records()
-        res = models.Mixed_Case_Table.objects.all()
+        res = models.MixedCaseTable.objects.all()
         self.assertEqual(len(res), 2)
 
     def test_mixed_case_table_select_aggregate(self):
         self._build_records()
-        res = models.Mixed_Case_Table.objects.all().aggregate(Sum('sum_Field'))
+        res = models.MixedCaseTable.objects.all().aggregate(Sum('sum_Field'))
         self.assertEqual(res.values()[0], 5)
 
     def test_mixed_case_table_select_manual(self):
-        '''Manual check because if nothing is quoted, everything works, otherwise, it all fails'''
+        # Manual check because if nothing is quoted, everything works, otherwise, it all fails
         c = connection.cursor()
-        c.execute('select "sum_Field" from "Mixed_Case_Table"')
+        c.execute('select "sum_Field" from "MixedCaseTable"')
         c.close()
 
 
