@@ -184,8 +184,8 @@ slightly different, because they take an argument::
     def vote(request, question_id):
         return HttpResponse("You're voting on question %s." % question_id)
 
-Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.conf.urls.url` calls::
+Wire these new views into the ``polls.urls`` module (that is, ``polls/urls.py``
+file) by adding the following :func:`~django.conf.urls.url` calls::
 
     from django.conf.urls import patterns, url
 
@@ -268,8 +268,8 @@ All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
 
 Because it's convenient, let's use Django's own database API, which we covered
 in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
-view, which displays the latest 5 poll questions in the system, separated by
-commas, according to publication date::
+view (in ``polls/views.py`` file), which displays the latest 5 poll questions
+in the system, separated by commas, according to publication date::
 
     from django.http import HttpResponse
 
@@ -394,8 +394,8 @@ object of the given template rendered with the given context.
 Raising a 404 error
 ===================
 
-Now, let's tackle the question detail view -- the page that displays the question text
-for a given poll. Here's the view::
+Now, let's tackle the question detail view -- the page that displays the
+question text for a given poll. Here's the view (in ``polls/views.py`` file)::
 
     from django.http import Http404
     from django.shortcuts import render
@@ -412,9 +412,9 @@ for a given poll. Here's the view::
 The new concept here: The view raises the :exc:`~django.http.Http404` exception
 if a question with the requested ID doesn't exist.
 
-We'll discuss what you could put in that ``polls/detail.html`` template a bit
-later, but if you'd like to quickly get the above example working, a file
-containing just::
+We'll discuss what you could put in that ``polls/templtes/polls/detail.html``
+template a bit later, but if you'd like to quickly get the above example
+working, a file containing just::
 
     {{ question }}
 
@@ -463,8 +463,8 @@ Use the template system
 =======================
 
 Back to the ``detail()`` view for our poll application. Given the context
-variable ``question``, here's what the ``polls/detail.html`` template might look
-like:
+variable ``question``, here's what the ``polls/templates/polls/detail.html``
+template might look like:
 
 .. code-block:: html+django
 
