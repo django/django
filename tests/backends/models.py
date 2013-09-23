@@ -110,3 +110,18 @@ class ObjectReference(models.Model):
 
     def __str__(self):
         return str(self.obj_id)
+
+@python_2_unicode_compatible
+class Mixed_Case_Table(models.Model):
+    '''
+    Testing mixed case entity names, Pay attention to attribute names: 
+      some characters are intentionally uppercase to see how your DB of choice handles them
+    '''
+    id = models.IntegerField(primary_key=True)
+    sum_Field = models.IntegerField()
+
+    class Meta:
+        db_table = "Mixed_Case_Table"
+
+    def __str__(self):
+        return '%d %d' % (self.id, self.sum_Field)

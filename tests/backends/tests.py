@@ -11,7 +11,7 @@ import unittest
 from django.conf import settings
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, transaction)
+    DatabaseError, IntegrityError, transaction, migrations)
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
@@ -963,6 +963,41 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+class TestMixedCaseEntityNames(TestCase):
+    '''
+    Test for mixed case entity names. Will test particulary PostgreSQL,
+    but other RDBMSs should handle this test equally well
+    '''
+
+    def _build_records(self):
+        rec = models.Mixed_Case_Table(id=1, sum_Field=2)
+        rec.save()
+        rec = models.Mixed_Case_Table(id=2, sum_Field=3)
+        rec.save()
+        
+    def test_mixed_case_table_create(self):
+        # Note that the table is already created, so we just insert the records
+        statements = connection.creation.sql_create_model(models.Mixed_Case_Table,
+            style=no_style())
+        self._build_records()
+        
+    def test_mixed_case_table_select(self):
+        self._build_records()
+        res = models.Mixed_Case_Table.objects.all()
+        self.assertEqual(len(res), 2)
+
+    def test_mixed_case_table_select_aggregate(self):
+        self._build_records()
+        res = models.Mixed_Case_Table.objects.all().aggregate(Sum('sum_Field'))
+        self.assertEqual(res.values()[0], 5)
+
+    def test_mixed_case_table_select_manual(self):
+        '''Manual check because if nothing is quoted, everything works, otherwise, it all fails'''
+        c = connection.cursor()
+        c.execute('select "sum_Field" from "Mixed_Case_Table"')
+        c.close()
+
 
 @unittest.skipUnless(
     connection.vendor == 'postgresql',
