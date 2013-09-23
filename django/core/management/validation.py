@@ -1,8 +1,10 @@
 import collections
 import sys
+from types import NoneType
 
 from django.conf import settings
 from django.core.management.color import color_style
+from django.db import router
 from django.utils.encoding import force_str
 from django.utils.itercompat import is_iterable
 from django.utils import six
@@ -126,8 +128,16 @@ def get_validation_errors(outfile, app=None):
                     for c in f.choices:
                         if isinstance(c, six.string_types) or not is_iterable(c) or len(c) != 2:
                             e.add(opts, '"%s": "choices" should be a sequence of two-item iterables (e.g. list of 2 item tuples).' % f.name)
-            if f.db_index not in (None, True, False):
-                e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
+            if not isinstance(f.db_index, (NoneType, bool, basestring)):
+                e.add(opts, '"%s": "db_index" should be either None, True, False, or a string.' % f.name)
+
+            if isinstance(f.db_index, basestring):
+                db_engine = settings.DATABASES[router.db_for_write(cls)]['ENGINE']
+                if "postgresql" in db_engine:
+                    if f.db_index.lower() not in ("btree", "hash", "gist", "gin"):
+                        e.add(opts, '"%s": "db_index" is a string, but the index type "%s" is unknown for this model\'s database engine: %s.' % (f.name, f.db_index, db_engine))
+                else:
+                    e.add(opts, '"%s": Specifying the index type using "db_index" is not supported for this model\'s database engine: %s.' % (f.name, db_engine))
 
             # Perform any backend-specific field validation.
             connection.validation.validate_field(e, opts, f)

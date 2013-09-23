@@ -47,6 +47,11 @@ class DatabaseCreation(BaseDatabaseCreation):
     def sql_indexes_for_field(self, model, f, style):
         output = []
         if f.db_index or f.unique:
+            if isinstance(f.db_index, basestring):
+                index_type = f.db_index
+            else:
+                index_type = None
+
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -62,6 +67,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + ' ' +
                         style.SQL_KEYWORD('ON') + ' ' +
                         style.SQL_TABLE(qn(db_table)) + ' ' +
+                        (style.SQL_KEYWORD('USING %s' % (index_type,)) if index_type is not None else '') +
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
                         "%s;" % tablespace_sql)
 
