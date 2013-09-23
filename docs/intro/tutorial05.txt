@@ -160,7 +160,10 @@ A conventional place for an application's tests is in the application's
 ``tests.py`` file; the testing system will automatically find tests in any file
 whose name begins with ``test``.
 
-Put the following in the ``tests.py`` file in the ``polls`` application::
+Put the following in the ``tests.py`` file in the ``polls`` application:
+
+.. snippet::
+    :filename: polls/tests.py
 
     import datetime
 
@@ -236,7 +239,10 @@ Fixing the bug
 We already know what the problem is: ``Question.was_published_recently()`` should
 return ``False`` if its ``pub_date`` is in the future. Amend the method in
 ``models.py``, so that it will only return ``True`` if the date is also in the
-past::
+past:
+
+.. snippet::
+    :filename: polls/models.py
 
     def was_published_recently(self):
         now = timezone.now()
@@ -268,7 +274,10 @@ method; in fact, it would be positively embarrassing if in fixing one bug we had
 introduced another.
 
 Add two more test methods to the same class, to test the behavior of the method
-more comprehensively::
+more comprehensively:
+
+.. snippet::
+    :filename: polls/tests.py
 
     def test_was_published_recently_with_old_question(self):
         """
@@ -382,7 +391,10 @@ The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
 In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
-based on :class:`~django.views.generic.list.ListView`::
+based on :class:`~django.views.generic.list.ListView`:
+
+.. snippet::
+    :filename: polls/views.py
 
     class IndexView(generic.ListView):
         template_name = 'polls/index.html'
@@ -397,11 +409,17 @@ places into the context.
 
 We need to amend the ``get_queryset`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
-an import::
+an import:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.utils import timezone
 
-and then we must amend the ``get_queryset`` method like so::
+and then we must amend the ``get_queryset`` method like so:
+
+.. snippet::
+    :filename: polls/views.py
 
     def get_queryset(self):
         """
@@ -426,12 +444,18 @@ are listed.  You don't want to have to do that *every single time you make any
 change that might affect this* - so let's also create a test, based on our
 :djadmin:`shell` session above.
 
-Add the following to ``polls/tests.py``::
+Add the following to ``polls/tests.py``:
+
+.. snippet::
+    :filename: polls/tests.py
 
     from django.core.urlresolvers import reverse
 
 and we'll create a factory method to create questions as well as a new test
-class::
+class:
+
+.. snippet::
+    :filename: polls/tests.py
 
     def create_question(question_text, days):
         """
@@ -532,8 +556,10 @@ Testing the ``DetailView``
 
 What we have works well; however, even though future questions don't appear in
 the *index*, users can still reach them if they know or guess the right URL. So
-we need to add a similar  constraint to ``DetailView``::
+we need to add a similar  constraint to ``DetailView``:
 
+.. snippet::
+    :filename: polls/views.py
 
     class DetailView(generic.DetailView):
         ...
@@ -545,7 +571,10 @@ we need to add a similar  constraint to ``DetailView``::
 
 And of course, we will add some tests, to check that a ``Question`` whose
 ``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
-in the future is not::
+in the future is not:
+
+.. snippet::
+    :filename: polls/tests.py
 
     class QuestionIndexDetailTests(TestCase):
         def test_detail_view_with_a_future_question(self):

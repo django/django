@@ -84,7 +84,10 @@ Your app directory should now look like::
         urls.py
         views.py
 
-In the ``polls/urls.py`` file include the following code::
+In the ``polls/urls.py`` file include the following code:
+
+.. snippet::
+    :filename: polls/urls.py
 
     from django.conf.urls import patterns, url
 
@@ -96,7 +99,10 @@ In the ``polls/urls.py`` file include the following code::
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
 ``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
-with::
+with:
+
+.. snippet::
+    :filename: mysite/urls.py
 
     from django.conf.urls import patterns, include, url
 
@@ -172,7 +178,10 @@ Writing more views
 ==================
 
 Now let's add a few more views to ``polls/views.py``. These views are
-slightly different, because they take an argument::
+slightly different, because they take an argument:
+
+.. snippet::
+    :filename: polls/views.py
 
     def detail(request, question_id):
         return HttpResponse("You're looking at question %s." % question_id)
@@ -185,7 +194,10 @@ slightly different, because they take an argument::
         return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.conf.urls.url` calls::
+:func:`~django.conf.urls.url` calls:
+
+.. snippet::
+    :filename: polls/urls.py
 
     from django.conf.urls import patterns, url
 
@@ -269,7 +281,10 @@ All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
 Because it's convenient, let's use Django's own database API, which we covered
 in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
-commas, according to publication date::
+commas, according to publication date:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.http import HttpResponse
 
@@ -327,7 +342,8 @@ Django simply as ``polls/index.html``.
 
 Put the following code in that template:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: polls/templates/polls/index.html
 
     {% if latest_question_list %}
         <ul>
@@ -339,7 +355,10 @@ Put the following code in that template:
         <p>No polls are available.</p>
     {% endif %}
 
-Now let's update our ``index`` view in ``polls/views.py`` to use the template::
+Now let's update our ``index`` view in ``polls/views.py`` to use the template:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.http import HttpResponse
     from django.template import RequestContext, loader
@@ -369,7 +388,10 @@ A shortcut: :func:`~django.shortcuts.render`
 It's a very common idiom to load a template, fill a context and return an
 :class:`~django.http.HttpResponse` object with the result of the rendered
 template. Django provides a shortcut. Here's the full ``index()`` view,
-rewritten::
+rewritten:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.shortcuts import render
 
@@ -395,7 +417,10 @@ Raising a 404 error
 ===================
 
 Now, let's tackle the question detail view -- the page that displays the question text
-for a given poll. Here's the view::
+for a given poll. Here's the view:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.http import Http404
     from django.shortcuts import render
@@ -414,7 +439,10 @@ if a question with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, a file
-containing just::
+containing just:
+
+.. snippet:: html+django
+    :filename: polls/templates/polls/detail.html
 
     {{ question }}
 
@@ -425,7 +453,10 @@ A shortcut: :func:`~django.shortcuts.get_object_or_404`
 
 It's a very common idiom to use :meth:`~django.db.models.query.QuerySet.get`
 and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
-provides a shortcut. Here's the ``detail()`` view, rewritten::
+provides a shortcut. Here's the ``detail()`` view, rewritten:
+
+.. snippet::
+    :filename: polls/views.py
 
     from django.shortcuts import render, get_object_or_404
 
@@ -466,7 +497,8 @@ Back to the ``detail()`` view for our poll application. Given the context
 variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
     <ul>
@@ -549,7 +581,10 @@ make it so that Django knows which app view to create for a url when using the
 
 The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
 file (the project's ``urls.py``, not the application's), go ahead and change
-it to include namespacing::
+it to include namespacing:
+
+.. snippet::
+    :filename: mysite/urls.py
 
     from django.conf.urls import patterns, include, url
 
@@ -563,13 +598,15 @@ it to include namespacing::
 
 Now change your ``polls/index.html`` template from:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: polls/templates/polls/index.html
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: polls/templates/polls/index.html
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 
