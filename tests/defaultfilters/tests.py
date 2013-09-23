@@ -324,6 +324,24 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('http://[2001:db8:cafe::2]/api/9'),
             '<a href="http://[2001:db8:cafe::2]/api/9" rel="nofollow">http://[2001:db8:cafe::2]/api/9</a>')
 
+        # Check urlize correctly include quotation marks in links - #20364
+        self.assertEqual(urlize('before "hi@example.com" afterwards'),
+                         u'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
+        self.assertEqual(urlize('before hi@example.com" afterwards'),
+                         u'before <a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
+        self.assertEqual(urlize('before "hi@example.com afterwards'),
+                         u'before "<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
+        self.assertEqual(urlize('before \'hi@example.com\' afterwards'),
+                         u'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
+        self.assertEqual(urlize('before hi@example.com\' afterwards'),
+                         u'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
+        self.assertEqual(urlize('before \'hi@example.com afterwards'),
+                         u'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
+
+        # Check urlize copes with commas following URLs in quotes - see #20364 
+        self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
+            'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount('oneword'), 1)
