@@ -1,6 +1,7 @@
 "Base Cache class."
 from __future__ import unicode_literals
 
+import time
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
@@ -73,6 +74,18 @@ class BaseCache(object):
         self.key_prefix = params.get('KEY_PREFIX', '')
         self.version = params.get('VERSION', 1)
         self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
+
+    def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
+        """
+        Returns the timeout value usable by this backend based upon the provided
+        timeout.
+        """
+        if timeout == DEFAULT_TIMEOUT:
+            timeout = self.default_timeout
+        elif timeout == 0:
+            # ticket 21147 - avoid time.time() related precision issues
+            timeout = -1
+        return None if timeout is None else time.time() + timeout
 
     def make_key(self, key, version=None):
         """Constructs the key used by all other methods. By default it

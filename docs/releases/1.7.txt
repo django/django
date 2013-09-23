@@ -552,3 +552,9 @@ The :class:`django.db.models.IPAddressField` and
 :class:`django.db.models.GenericIPAddressField` and
 :class:`django.forms.GenericIPAddressField`.
 
+``BaseMemcachedCache._get_memcache_timeout`` method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
+``get_backend_timeout()``. Despite being a private API, it will go through the
+normal deprecation.

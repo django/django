@@ -457,6 +457,10 @@ these changes.
 
 * ``ModelAdmin.get_formsets`` will be removed.
 
+* Remove the backward compatible shims introduced to rename the
+  ``BaseMemcachedCache._get_memcache_timeout()`` method to
+  ``get_backend_timeout()``.
+
 2.0
 ---
 
