@@ -365,7 +365,7 @@ Moved modules
 ~~~~~~~~~~~~~
 
 Some modules were renamed in Python 3. The ``django.utils.six.moves``
-module (based on the :mod:`Python six.moves module <six.moves>`) provides a
+module (based on the :mod:`six.moves module <six.moves>`) provides a
 compatible location to import them.
 
 PY2
