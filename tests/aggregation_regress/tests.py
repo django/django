@@ -12,9 +12,8 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 
-from .models import (
-    Author, Book, Publisher, Clues, Entries, HardbackBook, ItemTag,
-    WithManualPK, Alfa, Bravo, Charlie)
+from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
+        ItemTag, WithManualPK, Alfa, Bravo, Charlie)
 
 
 class AggregationTests(TestCase):
@@ -1137,6 +1136,8 @@ class AggregationTests(TestCase):
             'select__avg': Approximate(1.666, places=2),
         })
 
+
+class JoinPromotionTests(TestCase):
     def test_ticket_21150(self):
         b = Bravo.objects.create()
         c = Charlie.objects.create(bravo=b)
@@ -1152,3 +1153,19 @@ class AggregationTests(TestCase):
         self.assertQuerysetEqual(
             qs, [c], lambda x: x)
         self.assertEqual(qs[0].alfa, a)
+
+    def test_existing_join_not_promoted(self):
+        # No promotion for existing joins
+        qs = Charlie.objects.filter(alfa__name__isnull=False).annotate(Count('alfa__name'))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        # Also, the existing join is unpromoted when doing filtering for already
+        # promoted join.
+        qs = Charlie.objects.annotate(Count('alfa__name')).filter(alfa__name__isnull=False)
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        # But, as the join is nullable first use by annotate will be LOUTER
+        qs = Charlie.objects.annotate(Count('alfa__name'))
+        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+
+    def test_non_nullable_fk_not_promoted(self):
+        qs = Book.objects.annotate(Count('contact__name'))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
