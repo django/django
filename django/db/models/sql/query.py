@@ -1525,7 +1525,7 @@ class Query(object):
             for name in field_names:
                 field, targets, u2, joins, path = self.setup_joins(
                         name.split(LOOKUP_SEP), opts, alias, None, allow_m2m,
-                        True)
+                        allow_explicit_fk=True, outer_if_first=True)
 
                 # Trim last join if possible
                 targets, final_alias, remaining_joins = self.trim_joins(targets, joins[-2:], path)

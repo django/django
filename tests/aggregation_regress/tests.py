@@ -12,8 +12,9 @@ from django.test import TestCase, Approximate, skipUnlessDBFeature
 from django.utils import six
 from django.utils.unittest import expectedFailure
 
-from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
-        ItemTag, WithManualPK)
+from .models import (
+    Author, Book, Publisher, Clues, Entries, HardbackBook, ItemTag,
+    WithManualPK, Alfa, Bravo, Charlie)
 
 
 class AggregationTests(TestCase):
@@ -1107,3 +1108,19 @@ class AggregationTests(TestCase):
         self.assertQuerysetEqual(
             qs, ['Sams Teach Yourself Django in 24 Hours'],
             lambda b: b.name)
+
+    def test_ticket_21150(self):
+        b = Bravo.objects.create()
+        c = Charlie.objects.create(bravo=b)
+        qs = Charlie.objects.select_related('alfa').annotate(Count('bravo__charlie'))
+        self.assertQuerysetEqual(
+            qs, [c], lambda x: x)
+        self.assertIs(qs[0].alfa, None)
+        a = Alfa.objects.create()
+        c.alfa = a
+        c.save()
+        # Force re-evaluation
+        qs = qs.all()
+        self.assertQuerysetEqual(
+            qs, [c], lambda x: x)
+        self.assertEqual(qs[0].alfa, a)
