@@ -56,12 +56,25 @@ def setup(app):
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
     app.add_builder(DjangoStandaloneHTMLBuilder)
-    app.add_node(snippet_with_filename, html=(visit_snippet, depart_snippet))
+    app.add_node(snippet_with_filename,
+                 html=(visit_snippet, depart_snippet_literal),
+                 latex=(visit_snippet_latex, depart_snippet_latex),
+                 man=(visit_snippet_literal, depart_snippet_literal),
+                 text=(visit_snippet_literal, depart_snippet_literal),
+                 texinfo=(visit_snippet_literal, depart_snippet_literal))
     app.add_directive('snippet', SnippetWithFilename)
 
 
 class snippet_with_filename(nodes.literal_block):
     pass
+
+
+def visit_snippet_literal(self, node):
+    self.visit_literal_block(node)
+
+
+def depart_snippet_literal(self, node):
+    self.depart_literal_block(node)
 
 
 def visit_snippet(self, node):
@@ -92,8 +105,44 @@ def visit_snippet(self, node):
     raise nodes.SkipNode
 
 
-def depart_snippet(self, node):
-    self.depart_literal_block(node)
+def visit_snippet_latex(self, node):
+    self.verbatim = ''
+
+
+def depart_snippet_latex(self, node):
+    code = self.verbatim.rstrip('\n')
+    lang = self.hlsettingstack[-1][0]
+    linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
+    fname = node['filename']
+    highlight_args = node.get('highlight_args', {})
+    if 'language' in node:
+        # code-block directives
+        lang = node['language']
+        highlight_args['force'] = True
+    if 'linenos' in node:
+        linenos = node['linenos']
+
+    def warner(msg):
+        self.builder.warn(msg, (self.curfilestack[-1], node.line))
+
+    hlcode = self.highlighter.highlight_block(code, lang, warn=warner,
+                                              linenos=linenos,
+                                              **highlight_args)
+
+    self.body.append('\n{\\colorbox[rgb]{0.9,0.9,0.9}'
+                     '{\\makebox[\\textwidth][l]{%s}}}\n' % (fname,))
+
+    if self.table:
+        hlcode = hlcode.replace('\\begin{Verbatim}',
+                                '\\begin{OriginalVerbatim}')
+        self.table.has_problematic = True
+        self.table.has_verbatim = True
+
+    hlcode = hlcode.rstrip()[:-14]  # strip \end{Verbatim}
+    hlcode = hlcode.rstrip() + '\n'
+    self.body.append('\n' + hlcode + '\\end{%sVerbatim}\n' %
+                     (self.table and 'Original' or ''))
+    self.verbatim = None
 
 
 class SnippetWithFilename(Directive):
