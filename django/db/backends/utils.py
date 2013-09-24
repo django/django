@@ -36,6 +36,14 @@ class CursorWrapper(object):
     def __iter__(self):
         return iter(self.cursor)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        # Ticket #17671 - Close instead of passing thru to avoid backend
+        # specific behavior.
+        self.close()
+
 
 class CursorDebugWrapper(CursorWrapper):
 

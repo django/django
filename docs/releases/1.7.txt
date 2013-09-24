@@ -111,6 +111,25 @@ In addition, the widgets now display a help message when the browser and
 server time zone are different, to clarify how the value inserted in the field
 will be interpreted.
 
+Using database cursors as context managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Python 2.7, database cursors could be used as a context manager. The
+specific backend's cursor defined the behavior of the context manager. The
+behavior of magic method lookups was changed with Python 2.7 and cursors were
+no longer usable as context managers.
+
+Django 1.7 allows a cursor to be used as a context manager that is a shortcut
+for the following, instead of backend specific behavior.
+
+.. code-block:: python
+
+    c = connection.cursor()
+    try:
+        c.execute(...)
+    finally:
+        c.close()
+
 Minor features
 ~~~~~~~~~~~~~~
 

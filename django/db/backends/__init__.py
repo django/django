@@ -1,7 +1,7 @@
 import datetime
 import time
 
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, ProgrammingError
 
 try:
     from django.utils.six.moves import _thread as thread
@@ -663,6 +663,9 @@ class BaseDatabaseFeatures(object):
 
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
+
+    # What kind of error does the backend throw when accessing closed cursor?
+    closed_cursor_error_class = ProgrammingError
 
     def __init__(self, connection):
         self.connection = connection
