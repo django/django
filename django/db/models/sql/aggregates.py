@@ -79,7 +79,7 @@ class Aggregate(object):
         elif isinstance(self.col, (list, tuple)):
             field_name = '.'.join(qn(c) for c in self.col)
         else:
-            field_name = self.col
+            field_name = qn(self.col)
 
         substitutions = {
             'function': self.sql_function,
