@@ -15,9 +15,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import (
-    MAXIMUM_PASSWORD_LENGTH, UNUSABLE_PASSWORD_PREFIX, identify_hasher,
-)
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -83,10 +81,9 @@ class UserCreationForm(forms.ModelForm):
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
     password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput, max_length=MAXIMUM_PASSWORD_LENGTH)
+        widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
         widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
         help_text=_("Enter the same password as above, for verification."))
 
     class Meta:
@@ -160,11 +157,7 @@ class AuthenticationForm(forms.Form):
     username/password logins.
     """
     username = forms.CharField(max_length=254)
-    password = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
+    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
         'invalid_login': _("Please enter a correct %(username)s and password. "
@@ -271,16 +264,10 @@ class SetPasswordForm(forms.Form):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
-    new_password1 = forms.CharField(
-        label=_("New password"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
-    new_password2 = forms.CharField(
-        label=_("New password confirmation"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
+    new_password1 = forms.CharField(label=_("New password"),
+                                    widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label=_("New password confirmation"),
+                                    widget=forms.PasswordInput)
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -313,11 +300,8 @@ class PasswordChangeForm(SetPasswordForm):
         'password_incorrect': _("Your old password was entered incorrectly. "
                                 "Please enter it again."),
     })
-    old_password = forms.CharField(
-        label=_("Old password"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
+    old_password = forms.CharField(label=_("Old password"),
+                                   widget=forms.PasswordInput)
 
     def clean_old_password(self):
         """
@@ -344,16 +328,10 @@ class AdminPasswordChangeForm(forms.Form):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
-    password1 = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
-    password2 = forms.CharField(
-        label=_("Password (again)"),
-        widget=forms.PasswordInput,
-        max_length=MAXIMUM_PASSWORD_LENGTH,
-    )
+    password1 = forms.CharField(label=_("Password"),
+                                widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password (again)"),
+                                widget=forms.PasswordInput)
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
