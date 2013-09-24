@@ -62,7 +62,7 @@ class DeleteQuery(Query):
                               if innerq.alias_refcount[t]]
         if ((not innerq_used_tables or innerq_used_tables == self.tables)
             and not len(innerq.having)):
-            # There is only the base table in use in the query, and there are
+            # There is only the base table in use in the query, and there is
             # no aggregate filtering going on.
             self.where = innerq.where
         else:
