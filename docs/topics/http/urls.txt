@@ -383,8 +383,8 @@ the suffixes that differ::
 
     from django.conf.urls import include, patterns, url
 
-    urlpatterns = patterns('wiki.views',
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include(patterns('',
+    urlpatterns = patterns('',
+        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include(patterns('wiki.views',
             url(r'^history/$', 'history'),
             url(r'^edit/$', 'edit'),
             url(r'^discuss/$', 'discuss'),
