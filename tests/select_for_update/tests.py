@@ -10,7 +10,7 @@ from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 
-from multiple_database.tests import TestRouter
+from multiple_database.routers import TestRouter
 
 from .models import Person
 
