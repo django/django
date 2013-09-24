@@ -613,6 +613,13 @@ class BackendTestCase(TestCase):
         with self.assertRaises(DatabaseError):
             cursor.execute(query)
 
+    def test_cursor_contextmanager(self):
+        """
+        Test that cursors can be used as a context manager
+        """
+        with connection.cursor() as cursor:
+            from django.db.backends.util import CursorWrapper
+            self.assertTrue(isinstance(cursor, CursorWrapper))
 
 # We don't make these tests conditional because that means we would need to
 # check and differentiate between:
