@@ -21,7 +21,7 @@ class SQLCompiler(object):
         self.query = query
         self.connection = connection
         self.using = using
-        self.quote_cache = {}
+        self.quote_cache = {'*': '*'}
         # When ordering a queryset with distinct on a column not part of the
         # select set, the ordering column needs to be added to the select
         # clause. This information is needed both in SQL construction and
