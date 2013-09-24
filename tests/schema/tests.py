@@ -307,6 +307,9 @@ class SchemaTests(TransactionTestCase):
                 else:
                     self.fail("No FK constraint for uniquetest_id found")
         finally:
+            # Cleanup through table separately
+            with connection.schema_editor() as editor:
+                editor.remove_field(BookWithM2M, BookWithM2M._meta.get_field_by_name("uniques")[0])
             # Cleanup model states
             BookWithM2M._meta.local_many_to_many.remove(new_field)
             del BookWithM2M._meta._m2m_cache
