@@ -901,15 +901,15 @@ class Query(object):
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
             join_type = None
-        elif outer_if_first or self.alias_map[lhs].join_type == self.LOUTER:
-            # We need to use LOUTER join if asked by outer_if_first or if the
-            # LHS table is left-joined in the query.
+        elif self.alias_map[lhs].join_type == self.LOUTER:
             join_type = self.LOUTER
         else:
             join_type = self.INNER
         join = JoinInfo(table, alias, join_type, lhs, join_cols or ((None, None),), nullable,
                         join_field)
         self.alias_map[alias] = join
+        if outer_if_first:
+            self.promote_joins([alias])
         if connection in self.join_map:
             self.join_map[connection] += (alias,)
         else:
@@ -1004,16 +1004,13 @@ class Query(object):
             #   - this is an annotation over a model field
             # then we need to explore the joins that are required.
 
+            # Join promotion note - we must not remove any rows here, so use
+            # outer join if there isn't any existing join.
             field, sources, opts, join_list, path = self.setup_joins(
-                field_list, opts, self.get_initial_alias())
+                field_list, opts, self.get_initial_alias(), outer_if_first=True)
 
             # Process the join chain to see if it can be trimmed
             targets, _, join_list = self.trim_joins(sources, join_list, path)
-
-            # If the aggregate references a model or field that requires a join,
-            # those joins must be LEFT OUTER - empty join rows must be returned
-            # in order for zeros to be returned for those aggregates.
-            self.promote_joins(join_list)
 
             col = targets[0].column
             source = sources[0]
@@ -1089,8 +1086,69 @@ class Query(object):
                         break
         return lookup_type, lookup_parts
 
+    def promote_filter_joins(self, join_list, can_reuse, lookup_type, value,
+                             current_negated, connector):
+        # If the comparison is against NULL, we may need to use some left
+        # outer joins when creating the join chain.
+        #
+        # The logic here is that every isnull lookup in non-negated case is
+        # promoted when the connector is OR. In the AND case we do this only
+        # for first creation of the join. Join demotion happens reverse to
+        # this - demote always in AND case, first use only in OR case.
+        #
+        # In the OR case, a null row for the join can yield results for isnull
+        # lookup. But in the AND case that can't happen (assuming the other
+        # joins require non-null values) - if the join produces null row, then
+        # the ANDed condition that requires non-null value will not match, and
+        # hence the whole condition will not match.
+        #
+        # Consider case: (a__something & a__isnull=True)
+        #
+        # If a is null here, then a__something can't match anything (unless
+        # it also requires outer join), and thus the join doesn't need to be
+        # promoted by a__isnull.
+        #
+        # The connector isn't the only condition for removing join promotion.
+        # The already created joins also play a role here. Above, in the
+        # AND case, we don't want to promote the isnull lookup. But if we have
+        # only (a__isnull), then we must promote it. To see if a join needs
+        # to be promoted we use the seen joins inside this filter clause. That
+        # is contained in can_reuse - those are actually joins that have been
+        # built by this filter clause.
+        #
+        # Similar reasoning applies for join demotion, exception we demote
+        # joins in the AND case always, and never demote them in the OR case.
+        #
+        # Some examples: (a__name__isnull=True | a__type=1)
+        # When a__name__isnull is seen it is promoted (it is first creation of
+        # that join). a__type will not demote the join as it isn't first
+        # "a" join in the filter condition, and this is ORed query.
+        #                (a__name__isnull=True & a__type=1)
+        # Here again a__name__isnull will create an outer join, but now a__type
+        # will demote the join back to inner join as the connector is AND.
+        #                (a__type=1 & a__name__isnull=True)
+        # a__type will create inner join, a__name__isnull will not promote it
+        # to outer join as this is AND case and this isn't first use of the
+        # join. For completeness:
+        #                (a__type=1 | a__name__isnull=True)
+        # The join for a__type is created as inner join. The join is promoted
+        # by a__name__isnull (ORed query => always promote isnull=True joins)
+
+        if lookup_type == 'isnull' and value is True and not current_negated:
+            promotable_joins = join_list if connector == OR else ()
+            if connector == AND and can_reuse is not None:
+                promotable_joins = (j for j in join_list if j not in can_reuse)
+            self.promote_joins(promotable_joins)
+        else:
+            demotable_joins = () if connector == OR else set(join_list)
+            if connector == OR and can_reuse is not None:
+                demotable_joins = set(j for j in join_list if j not in can_reuse)
+            for j in join_list:
+                if self.alias_map[j].join_type == self.LOUTER and j in demotable_joins:
+                    self.alias_map[j] = self.alias_map[j]._replace(join_type=self.INNER)
+
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None):
+                     can_reuse=None, connector=AND):
         """
         Builds a WhereNode for a single filter clause, but doesn't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1139,18 +1197,14 @@ class Query(object):
         try:
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse, allow_many,)
-            if can_reuse is not None:
-                can_reuse.update(join_list)
         except MultiJoin as e:
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
 
-        if (lookup_type == 'isnull' and value is True and not current_negated and
-                len(join_list) > 1):
-            # If the comparison is against NULL, we may need to use some left
-            # outer joins when creating the join chain. This is only done when
-            # needed, as it's less efficient at the database level.
-            self.promote_joins(join_list)
+        self.promote_filter_joins(join_list, can_reuse, lookup_type, value,
+                                  current_negated, connector)
+        if can_reuse is not None:
+            can_reuse.update(join_list)
 
         # Process the join list to see if we can remove any inner joins from
         # the far end (fewer tables in a query is better). Note that join
@@ -1182,7 +1236,7 @@ class Query(object):
         return clause
 
     def add_filter(self, filter_clause):
-        self.where.add(self.build_filter(filter_clause), 'AND')
+        self.where.add(self.build_filter(filter_clause, can_reuse=self.used_aliases), 'AND')
 
     def need_having(self, obj):
         """
@@ -1237,14 +1291,11 @@ class Query(object):
         else:
             where_part, having_parts = self.split_having_parts(
                 q_object.clone(), q_object.negated)
-        used_aliases = self.used_aliases
-        clause = self._add_q(where_part, used_aliases)
+        clause = self._add_q(where_part, self.used_aliases)
         self.where.add(clause, AND)
         for hp in having_parts:
-            clause = self._add_q(hp, used_aliases)
+            clause = self._add_q(hp, self.used_aliases)
             self.having.add(clause, AND)
-        if self.filter_is_sticky:
-            self.used_aliases = used_aliases
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
                current_negated=False):
@@ -1272,7 +1323,7 @@ class Query(object):
             else:
                 child_clause = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated)
+                    current_negated=current_negated, connector=connector)
             target_clause.add(child_clause, connector)
             if connector == OR:
                 used = alias_diff(refcounts_before, self.alias_refcount)
@@ -1445,7 +1496,7 @@ class Query(object):
         """
         # Generate the inner query.
         query = Query(self.model)
-        query.where.add(query.build_filter(filter_expr), AND)
+        query.add_filter(filter_expr)
         query.clear_ordering(True)
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
@@ -1553,15 +1604,12 @@ class Query(object):
 
         try:
             for name in field_names:
+                # Join promotion note - we must not remove any rows here, so
+                # if there is no existing joins, use outer join.
                 field, targets, u2, joins, path = self.setup_joins(
-                        name.split(LOOKUP_SEP), opts, alias, None, allow_m2m,
-                        True)
-
-                # Trim last join if possible
-                targets, final_alias, remaining_joins = self.trim_joins(targets, joins[-2:], path)
-                joins = joins[:-2] + remaining_joins
-
-                self.promote_joins(joins[1:])
+                    name.split(LOOKUP_SEP), opts, alias, can_reuse=None,
+                    allow_many=allow_m2m, outer_if_first=True)
+                targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
                     self.select.append(SelectInfo((final_alias, target.column), target))
         except MultiJoin:

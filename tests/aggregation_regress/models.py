@@ -90,7 +90,7 @@ class HardbackBook(Book):
 
 # Models for ticket #21150
 class Alfa(models.Model):
-    pass
+    name = models.CharField(max_length=10, null=True)
 
 class Bravo(models.Model):
     pass
