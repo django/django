@@ -175,3 +175,43 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(F))
         with self.assertRaises(InvalidBasesError):
             project_state.render()
+
+    def test_equality(self):
+        """
+        Tests that == and != are implemented correctly.
+        """
+
+        # Test two things that should be equal
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState(
+            "migrations",
+            "Tag",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=100)),
+                ("hidden", models.BooleanField()),
+            ],
+            {},
+            None,
+        ))
+        other_state = project_state.clone()
+        self.assertEqual(project_state, project_state)
+        self.assertEqual(project_state, other_state)
+        self.assertEqual(project_state != project_state, False)
+        self.assertEqual(project_state != other_state, False)
+
+        # Make a very small change (max_len 99) and see if that affects it
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState(
+            "migrations",
+            "Tag",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=99)),
+                ("hidden", models.BooleanField()),
+            ],
+            {},
+            None,
+        ))
+        self.assertNotEqual(project_state, other_state)
+        self.assertEqual(project_state == other_state, False)

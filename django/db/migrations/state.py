@@ -59,6 +59,14 @@ class ProjectState(object):
             models[(model_state.app_label, model_state.name.lower())] = model_state
         return cls(models)
 
+    def __eq__(self, other):
+        if set(self.models.keys()) != set(other.models.keys()):
+            return False
+        return all(model == other.models[key] for key, model in self.models.items())
+
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class ModelState(object):
     """
@@ -167,3 +175,16 @@ class ModelState(object):
             if fname == name:
                 return field
         raise ValueError("No field called %s on model %s" % (name, self.name))
+
+    def __eq__(self, other):
+        return (
+            (self.app_label == other.app_label) and
+            (self.name == other.name) and
+            (len(self.fields) == len(other.fields)) and
+            all((k1 == k2 and (f1.deconstruct()[1:] == f2.deconstruct()[1:])) for (k1, f1), (k2, f2) in zip(self.fields, other.fields)) and
+            (self.options == other.options) and
+            (self.bases == other.bases)
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
