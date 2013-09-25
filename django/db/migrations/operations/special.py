@@ -1,5 +1,5 @@
 import re
-
+import textwrap
 from .base import Operation
 
 
@@ -59,6 +59,10 @@ class RunSQL(Operation):
         self.state_operations = state_operations or []
         self.multiple = multiple
 
+    @property
+    def reversible(self):
+        return self.reverse_sql is not None
+
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
@@ -92,3 +96,39 @@ class RunSQL(Operation):
 
     def describe(self):
         return "Raw SQL operation"
+
+
+class RunPython(Operation):
+    """
+    Runs Python code in a context suitable for doing versioned ORM operations.
+    """
+
+    reduces_to_sql = False
+    reversible = False
+
+    def __init__(self, code):
+        # Trim any leading whitespace that is at the start of all code lines
+        # so users can nicely indent code in migration files
+        code = textwrap.dedent(code)
+        # Run the code through a parser first to make sure it's at least
+        # syntactically correct
+        self.code = compile(code, "<string>", "exec")
+
+    def state_forwards(self, app_label, state):
+        # RunPython objects have no state effect. To add some, combine this
+        # with SeparateDatabaseAndState.
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # We now execute the Python code in a context that contains a 'models'
+        # object, representing the versioned models as an AppCache.
+        # We could try to override the global cache, but then people will still
+        # use direct imports, so we go with a documentation approach instead.
+        context = {
+            "models": from_state.render(),
+            "schema_editor": schema_editor,
+        }
+        eval(self.code, context)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        raise NotImplementedError("You cannot reverse this operation")

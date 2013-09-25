@@ -15,6 +15,9 @@ class Operation(object):
     # Some operations are impossible to reverse, like deleting data.
     reversible = True
 
+    # Can this migration be represented as SQL? (things like RunPython cannot)
+    reduces_to_sql = True
+
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
         self = object.__new__(cls)

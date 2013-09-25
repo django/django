@@ -32,6 +32,10 @@ class Migration(object):
     # are not applied.
     replaces = []
 
+    # Error class which is raised when a migration is irreversible
+    class IrreversibleError(RuntimeError):
+        pass
+
     def __init__(self, name, app_label):
         self.name = name
         self.app_label = app_label
@@ -91,6 +95,8 @@ class Migration(object):
         # We need to pre-calculate the stack of project states
         to_run = []
         for operation in self.operations:
+            if not operation.reversible:
+                raise Migration.IrreversibleError("Operation %s in %s is not reversible" % (operation, sekf))
             new_state = project_state.clone()
             operation.state_forwards(self.app_label, new_state)
             to_run.append((operation, project_state, new_state))
