@@ -308,10 +308,16 @@ You can edit it multiple times.
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's Web browser is closed.
 
-    .. method:: SessionBase.clear_expired
+    .. method:: clear_expired
 
       Removes expired sessions from the session store. This class method is
       called by :djadmin:`clearsessions`.
+
+    .. method:: cycle_key
+
+      Creates a new session key while retaining the current session data.
+      :func:`django.contrib.auth.login()` calls this method to mitigate against
+      session fixation.
 
 .. _session_serialization:
 
@@ -503,7 +509,7 @@ An API is available to manipulate session data outside of a view::
     >>> s['last_login']
     1376587691
 
-In order to prevent session fixation attacks, sessions keys that don't exist
+In order to mitigate session fixation attacks, sessions keys that don't exist
 are regenerated::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
@@ -643,6 +649,26 @@ behavior:
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
+
+.. _topics-session-security:
+
+Session security
+================
+
+Subdomains within a site are able to set cookies on the client for the whole
+domain. This makes session fixation possible if all subdomains are not
+controlled by trusted users (or, are at least unable to set cookies).
+
+For example, an attacker could log into ``good.example.com`` and get a valid
+session for his account. If the attacker has control over ``bad.example.com``,
+he can use it to send his session key to you since a subdomain is permitted
+to set cookies on `*.example.com``. When you visit ``good.example.com``,
+you'll be logged in as the attacker and might inadvertently enter your
+sensitive personal data (e.g. credit card info) into the attackers account.
+
+Another possible attack would be if ``good.example.com`` sets its
+:setting:`SESSION_COOKIE_DOMAIN` to ``".example.com"`` which would cause
+session cookies from that site to be sent to ``bad.example.com``.
 
 Technical details
 =================
