@@ -14,12 +14,12 @@ up to and including the new version.
 Final releases
 ==============
 
-
 1.4 release
 -----------
 .. toctree::
    :maxdepth: 1
 
+   1.4.9
    1.4.8
    1.4.7
    1.4.6
