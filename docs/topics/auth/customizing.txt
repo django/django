@@ -37,7 +37,7 @@ plug in other authentication sources. You can override Django's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
-See the `authentication backend reference
+See the :ref:`authentication backend reference
 <authentication-backends-reference>` for information on the authentication
 backends included with Django.
 
@@ -275,7 +275,7 @@ can or cannot do with Task instances, specific to your application::
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
+:djadmin:`manage.py migrate <migrate>`. Your code is in charge of checking the
 value of these permissions when an user is trying to access the functionality
 provided by the application (viewing tasks, changing the status of tasks,
 closing tasks.) Continuing the above example, the following checks if a user may
@@ -354,46 +354,10 @@ model and adding the related fields may be your better option.  However
 existing links to the default User model within your project's apps may justify
 the extra database load.
 
-.. _auth-profiles:
-
-.. deprecated:: 1.5
-    With the introduction of :ref:`custom User models <auth-custom-user>`,
-    the use of :setting:`AUTH_PROFILE_MODULE` to define a single profile
-    model is no longer supported. See the
-    :doc:`Django 1.5 release notes</releases/1.5>` for more information.
-
-Prior to 1.5, a single profile model could be specified site-wide with the
-setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
-following items, separated by a dot:
-
-1. The name of the application (case sensitive) in which the user
-   profile model is defined (in other words, the
-   name which was passed to :djadmin:`manage.py startapp <startapp>` to create
-   the application).
-
-2. The name of the model (not case sensitive) class.
-
-For example, if the profile model was a class named ``UserProfile`` and was
-defined inside an application named ``accounts``, the appropriate setting would
-be::
-
-    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
-
-When a user profile model has been defined and specified in this manner, each
-:class:`~django.contrib.auth.models.User` object will have a method --
-:class:`~django.contrib.auth.models.User.get_profile()` -- which returns the
-instance of the user profile model associated with that
-:class:`~django.contrib.auth.models.User`.
-
-The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create a profile if one does not exist.
-
 .. _auth-custom-user:
 
 Substituting a custom User model
 ================================
-
-.. versionadded:: 1.5
 
 Some kinds of projects may have authentication requirements for which Django's
 built-in :class:`~django.contrib.auth.models.User` model is not always
@@ -414,14 +378,12 @@ use as your User model.
    Changing :setting:`AUTH_USER_MODEL` has a big effect on your database
    structure. It changes the tables that are available, and it will affect the
    construction of foreign keys and many-to-many relationships. If you intend
-   to set :setting:`AUTH_USER_MODEL`, you should set it before running
-   ``manage.py syncdb`` for the first time.
+   to set :setting:`AUTH_USER_MODEL`, you should set it before creating
+   any migrations or running ``manage.py migrate`` for the first time.
 
-   If you have an existing project and you want to migrate to using a custom
-   User model, you may need to look into using a migration tool like South_
-   to ease the transition.
-
-.. _South: http://south.aeracode.org
+   Changing this setting after you have tables created is not supported
+   by :djadmin:`makemigrations` and will result in you having to manually
+   write a set of migrations to fix your schema.
 
 Referencing the User model
 --------------------------
@@ -508,13 +470,15 @@ password resets. You must then provide some key implementation details:
 
     .. attribute:: REQUIRED_FIELDS
 
-        A list of the field names that *must* be provided when creating a user
-        via the :djadmin:`createsuperuser` management command. The user will be
-        prompted to supply a value for each of these fields. It should include
-        any field for which :attr:`~django.db.models.Field.blank` is ``False``
-        or undefined, but may include additional fields you want prompted for
-        when a user is created interactively. However, it will not work for
-        :class:`~django.db.models.ForeignKey` fields.
+        A list of the field names that will be prompted for when creating a
+        user via the :djadmin:`createsuperuser` management command. The user
+        will be prompted to supply a value for each of these fields. It must
+        include any field for which :attr:`~django.db.models.Field.blank` is
+        ``False`` or undefined and may include additional fields you want
+        prompted for when a user is created interactively. However, it will not
+        work for :class:`~django.db.models.ForeignKey` fields.
+        ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
+        creating a user in the admin.
 
         For example, here is the partial definition for a ``User`` model that
         defines two required fields - a date of birth and height::
@@ -583,11 +547,27 @@ The following methods are available on any subclass of
         password hashing. Doesn't save the
         :class:`~django.contrib.auth.models.AbstractBaseUser` object.
 
+        When the raw_password is ``None``, the password will be set to an
+        unusable password, as if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
+        were used.
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally stored
+            as an unsable password as well.
+
     .. method:: models.AbstractBaseUser.check_password(raw_password)
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
+
+        .. versionchanged:: 1.6
+
+            In Django 1.4 and 1.5, a blank string was unintentionally
+            considered to be an unusable password, resulting in this method
+            returning ``False`` for such a password.
 
     .. method:: models.AbstractBaseUser.set_unusable_password()
 
@@ -607,8 +587,9 @@ The following methods are available on any subclass of
         been called for this user.
 
 You should also define a custom manager for your ``User`` model. If your
-``User`` model defines ``username`` and ``email`` fields the same as Django's
-default ``User``, you can just install Django's
+``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
+``is_superuser``, ``last_login``, and ``date_joined`` fields the same as
+Django's default ``User``, you can just install Django's
 :class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
 model defines different fields, you will need to define a custom manager that
 extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
@@ -703,13 +684,13 @@ auth views.
 * :class:`~django.contrib.auth.forms.AuthenticationForm`
 
   Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
-  and will adapt to use the field defined in `USERNAME_FIELD`.
+  and will adapt to use the field defined in ``USERNAME_FIELD``.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`
 
   Assumes that the user model has an integer primary key, has a field named
   ``email`` that can be used to identify the user, and a boolean field
-  named `is_active` to prevent password resets for inactive users.
+  named ``is_active`` to prevent password resets for inactive users.
 
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 
@@ -888,8 +869,7 @@ would test three possible User models -- the default, plus the two User
 models provided by ``auth`` app::
 
     from django.contrib.auth.tests.utils import skipIfCustomUser
-    from django.test import TestCase
-    from django.test.utils import override_settings
+    from django.test import TestCase, override_settings
 
 
     class ApplicationTestCase(TestCase):
@@ -939,7 +919,7 @@ authentication app::
                 raise ValueError('Users must have an email address')
 
             user = self.model(
-                email=MyUserManager.normalize_email(email),
+                email=self.normalize_email(email),
                 date_of_birth=date_of_birth,
             )
 
@@ -985,6 +965,7 @@ authentication app::
             # The user is identified by their email address
             return self.email
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.email
 
@@ -1075,8 +1056,9 @@ code would be required in the app's ``admin.py`` file::
             (None, {'fields': ('email', 'password')}),
             ('Personal info', {'fields': ('date_of_birth',)}),
             ('Permissions', {'fields': ('is_admin',)}),
-            ('Important dates', {'fields': ('last_login',)}),
         )
+        # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
+        # overrides get_fieldsets to use this attribute when creating a user.
         add_fieldsets = (
             (None, {
                 'classes': ('wide',),
@@ -1092,3 +1074,8 @@ code would be required in the app's ``admin.py`` file::
     # ... and, since we're not using Django's builtin permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
+
+Finally, specify the custom model as the default user model for your project
+using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
+
+    AUTH_USER_MODEL = 'customauth.MyUser'

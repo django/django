@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
+
+import unittest
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils import unittest
 
 from .models import Reporter, Article
 
@@ -65,8 +66,9 @@ class IntrospectionTests(TestCase):
         # field type on MySQL
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
-            ['IntegerField', 'CharField', 'CharField', 'CharField',
-             'BigIntegerField', 'BinaryField' if connection.vendor != 'mysql' else 'TextField']
+            ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
+             'CharField', 'CharField', 'CharField', 'BigIntegerField',
+             'BinaryField' if connection.vendor != 'mysql' else 'TextField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly

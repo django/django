@@ -1,6 +1,7 @@
+import unittest
+from unittest import skipUnless
+
 from django.contrib.gis.gdal import HAS_GDAL
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import SpatialReference, CoordTransform, OGRException, SRSException
@@ -57,7 +58,7 @@ class SpatialRefTest(unittest.TestCase):
     def test01_wkt(self):
         "Testing initialization on valid OGC WKT."
         for s in srlist:
-            srs = SpatialReference(s.wkt)
+            SpatialReference(s.wkt)
 
     def test02_bad_wkt(self):
         "Testing initialization on invalid WKT."
@@ -149,7 +150,7 @@ class SpatialRefTest(unittest.TestCase):
         target = SpatialReference('WGS84')
         for s in srlist:
             if s.proj:
-                ct = CoordTransform(SpatialReference(s.wkt), target)
+                CoordTransform(SpatialReference(s.wkt), target)
 
     def test13_attr_value(self):
         "Testing the attr_value() method."

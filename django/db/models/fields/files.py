@@ -11,6 +11,7 @@ from django.utils.encoding import force_str, force_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
+
 class FieldFile(File):
     def __init__(self, instance, field, name):
         super(FieldFile, self).__init__(None, name)
@@ -96,6 +97,8 @@ class FieldFile(File):
     save.alters_data = True
 
     def delete(self, save=True):
+        if not self:
+            return
         # Only close the file if it's already open, which we know by the
         # presence of self._file
         if hasattr(self, '_file'):
@@ -132,6 +135,7 @@ class FieldFile(File):
         # data to be pickled is the file's name itself. Everything else will
         # be restored later, by FileDescriptor below.
         return {'name': self.name, 'closed': False, '_committed': True, '_file': None}
+
 
 class FileDescriptor(object):
     """
@@ -203,6 +207,7 @@ class FileDescriptor(object):
     def __set__(self, instance, value):
         instance.__dict__[self.field.name] = value
 
+
 class FileField(Field):
 
     # The class to wrap instance attributes in. Accessing the file object off
@@ -227,6 +232,17 @@ class FileField(Field):
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(FileField, self).deconstruct()
+        if kwargs.get("max_length", None) != 100:
+            kwargs["max_length"] = 100
+        else:
+            del kwargs["max_length"]
+        kwargs['upload_to'] = self.upload_to
+        if self.storage is not default_storage:
+            kwargs['storage'] = self.storage
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "FileField"
 
@@ -237,6 +253,7 @@ class FileField(Field):
 
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
+        value = super(FileField, self).get_prep_value(value)
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
             return None
@@ -287,6 +304,7 @@ class FileField(Field):
         defaults.update(kwargs)
         return super(FileField, self).formfield(**defaults)
 
+
 class ImageFileDescriptor(FileDescriptor):
     """
     Just like the FileDescriptor, but for ImageFields. The only difference is
@@ -308,13 +326,14 @@ class ImageFileDescriptor(FileDescriptor):
         if previous_file is not None:
             self.field.update_dimension_fields(instance, force=True)
 
-class ImageFieldFile(ImageFile, FieldFile):
 
+class ImageFieldFile(ImageFile, FieldFile):
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, '_dimensions_cache'):
             del self._dimensions_cache
         super(ImageFieldFile, self).delete(save)
+
 
 class ImageField(FileField):
     attr_class = ImageFieldFile
@@ -325,6 +344,14 @@ class ImageField(FileField):
             height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
         super(ImageField, self).__init__(verbose_name, name, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(ImageField, self).deconstruct()
+        if self.width_field:
+            kwargs['width_field'] = self.width_field
+        if self.height_field:
+            kwargs['height_field'] = self.height_field
+        return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name):
         super(ImageField, self).contribute_to_class(cls, name)

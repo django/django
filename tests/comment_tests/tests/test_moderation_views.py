@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.contrib.auth.models import User, Permission
 from django.contrib.comments import signals
@@ -269,13 +269,13 @@ class AdminActionsTests(CommentTestCase):
         u.save()
 
     def testActionsNonModerator(self):
-        comments = self.createSomeComments()
+        self.createSomeComments()
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
         self.assertNotContains(response, "approve_comments")
 
     def testActionsModerator(self):
-        comments = self.createSomeComments()
+        self.createSomeComments()
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
@@ -283,7 +283,7 @@ class AdminActionsTests(CommentTestCase):
 
     def testActionsDisabledDelete(self):
         "Tests a CommentAdmin where 'delete_selected' has been disabled."
-        comments = self.createSomeComments()
+        self.createSomeComments()
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get('/admin2/comments/comment/')
         self.assertEqual(response.status_code, 200)

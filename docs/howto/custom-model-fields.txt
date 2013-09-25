@@ -31,7 +31,7 @@ Our example object
 Creating custom fields requires a bit of attention to detail. To make things
 easier to follow, we'll use a consistent example throughout this document:
 wrapping a Python object representing the deal of cards in a hand of Bridge_.
-Don't worry, you don't have know how to play Bridge to follow this example.
+Don't worry, you don't have to know how to play Bridge to follow this example.
 You only need to know that 52 cards are dealt out equally to four players, who
 are traditionally called *north*, *east*, *south* and *west*.  Our class looks
 something like this::
@@ -249,7 +249,7 @@ appropriate Python object. The details of how this happens internally are a
 little complex, but the code you need to write in your ``Field`` class is
 simple: make sure your field subclass uses a special metaclass:
 
-For example::
+For example, on Python 2::
 
     class HandField(models.Field):
 
@@ -258,7 +258,21 @@ For example::
         __metaclass__ = models.SubfieldBase
 
         def __init__(self, *args, **kwargs):
-            # ...
+            ...
+
+On Python 3, in lieu of setting the ``__metaclass__`` attribute, add
+``metaclass`` to the class definition::
+
+    class HandField(models.Field, metaclass=models.SubfieldBase):
+        ...
+
+If you want your code to work on Python 2 & 3, you can use
+:func:`six.with_metaclass`::
+
+    from django.utils.six import with_metaclass
+
+    class HandField(with_metaclass(models.SubfieldBase, models.Field)):
+        ...
 
 This ensures that the :meth:`.to_python` method, documented below, will always
 be called when the attribute is initialized.
@@ -281,9 +295,9 @@ validation process will break.
 Therefore, you must ensure that the form field used to represent your
 custom field performs whatever input validation and data cleaning is
 necessary to convert user-provided form input into a
-`to_python()`-compatible model field value. This may require writing a
+``to_python()``-compatible model field value. This may require writing a
 custom form field, and/or implementing the :meth:`.formfield` method on
-your field to return a form field class whose `to_python()` returns the
+your field to return a form field class whose ``to_python()`` returns the
 correct datatype.
 
 Documenting your custom field
@@ -299,6 +313,13 @@ field type via the :doc:`django.contrib.admindocs
 descriptive text in a ``description`` class attribute of your custom field. In
 the above example, the description displayed by the ``admindocs``
 application for a ``HandField`` will be 'A hand of cards (bridge style)'.
+
+In the :mod:`django.contrib.admindocs` display, the field description is
+interpolated with ``field.__dict__`` which allows the description to
+incorporate arguments of the field. For example, the description for
+:class:`~django.db.models.CharField` is::
+
+    description = _("String (up to %(max_length)s)")
 
 Useful methods
 --------------
@@ -596,17 +617,23 @@ prepared with :meth:`.get_prep_lookup`.
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.formfield(self, form_class=forms.CharField, **kwargs)
+.. method:: Field.formfield(self, form_class=None, choices_form_class=None, **kwargs)
 
-Returns the default form field to use when this field is displayed in a model.
-This method is called by the :class:`~django.forms.ModelForm` helper.
+Returns the default form field to use when this model field is displayed in a
+form.  This method is called by the :class:`~django.forms.ModelForm` helper.
+
+The form field class can be specified via the ``form_class`` and
+``choices_form_class`` arguments; the latter is used if the field has choices
+specified, the former otherwise. If these arguments are not provided,
+:class:`~django.forms.CharField` or :class:`~django.forms.TypedChoiceField`
+will be used.
 
 All of the ``kwargs`` dictionary is passed directly to the form field's
 ``__init__()`` method. Normally, all you need to do is set up a good default
-for the ``form_class`` argument and then delegate further handling to the
-parent class. This might require you to write a custom form field (and even a
-form widget). See the :doc:`forms documentation </topics/forms/index>` for
-information about this.
+for the ``form_class`` (and maybe ``choices_form_class``) argument and then
+delegate further handling to the parent class. This might require you to write
+a custom form field (and even a form widget). See the :doc:`forms documentation
+</topics/forms/index>` for information about this.
 
 Continuing our ongoing example, we can write the :meth:`.formfield` method as::
 
@@ -696,9 +723,9 @@ smoothly:
    behavior of the field code is to call
    :func:`~django.utils.encoding.force_text` on the value. (In our
    examples in this document, ``value`` would be a ``Hand`` instance, not a
-   ``HandField``). So if your ``__unicode__()`` method automatically
-   converts to the string form of your Python object, you can save yourself
-   a lot of work.
+   ``HandField``). So if your ``__unicode__()`` method (``__str__()`` on
+   Python 3) automatically converts to the string form of your Python object,
+   you can save yourself a lot of work.
 
 
 Writing a ``FileField`` subclass

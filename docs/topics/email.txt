@@ -27,7 +27,8 @@ Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
 :setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
 set, are used to authenticate to the SMTP server, and the
-:setting:`EMAIL_USE_TLS` setting controls whether a secure connection is used.
+:setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
+a secure connection is used.
 
 .. note::
 
@@ -37,7 +38,7 @@ set, are used to authenticate to the SMTP server, and the
 send_mail()
 ===========
 
-.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
 The simplest way to send email is using
 ``django.core.mail.send_mail()``.
@@ -65,6 +66,14 @@ are required.
   If unspecified, an instance of the default backend will be used.
   See the documentation on :ref:`Email backends <topic-email-backends>`
   for more details.
+* ``html_message``: If ``html_message`` is provided, the resulting email will be a
+  :mimetype:`multipart/alternative` email with ``message`` as the
+  :mimetype:`text/plain` content type and ``html_message`` as the
+  :mimetype:`text/html` content type.
+
+.. versionadded:: 1.7
+
+    The ``html_message`` parameter was added.
 
 send_mass_mail()
 ================
@@ -310,14 +319,24 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
 
+    .. versionchanged:: 1.7
+
+      If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
+      :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+
+      In addition, ``message/rfc822`` attachments will no longer be
+      base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
+      issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
+
+      __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
+      __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
+
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
   the MIME type to use for the attachment. If the MIME type is omitted, it
   will be guessed from the filename. The simplest use would be::
 
     message.attach_file('/images/weather_map.png')
-
-.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -408,8 +427,8 @@ SMTP backend
 This is the default backend. Email will be sent through a SMTP server.
 The server address and authentication credentials are set in the
 :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-:setting:`EMAIL_HOST_PASSWORD` and :setting:`EMAIL_USE_TLS` settings in your
-settings file.
+:setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
+:setting:`EMAIL_USE_SSL` settings in your settings file.
 
 The SMTP backend is the default configuration inherited by Django. If you
 want to specify it explicitly, put the following in your settings::

@@ -18,7 +18,8 @@ free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
 
 #### GeoIP classes ####
-class GeoIPException(Exception): pass
+class GeoIPException(Exception):
+    pass
 
 class GeoIP(object):
     # The flags for GeoIP memory caching.

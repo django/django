@@ -92,7 +92,7 @@ class GeckoManager(models.Manager):
         return super(GeckoManager, self).get_queryset().filter(has_tail=True)
 
 class Gecko(models.Model):
-    has_tail = models.BooleanField()
+    has_tail = models.BooleanField(default=False)
     objects = GeckoManager()
 
 # To test fix for #11263
@@ -102,3 +102,22 @@ class Rock(Mineral):
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
     tags = generic.GenericRelation(TaggedItem)
+
+
+class ForProxyModelModel(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    obj = generic.GenericForeignKey(for_concrete_model=False)
+    title = models.CharField(max_length=255, null=True)
+
+class ForConcreteModelModel(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    obj = generic.GenericForeignKey()
+
+class ConcreteRelatedModel(models.Model):
+    bases = generic.GenericRelation(ForProxyModelModel, for_concrete_model=False)
+
+class ProxyRelatedModel(ConcreteRelatedModel):
+    class Meta:
+        proxy = True

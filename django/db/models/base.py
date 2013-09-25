@@ -19,7 +19,7 @@ from django.db.models.query_utils import DeferredAttribute, deferred_class_facto
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
 from django.db.models import signals
-from django.db.models.loading import register_models, get_model
+from django.db.models.loading import register_models, get_model, MODELS_MODULE_NAME
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import force_str, force_text
@@ -86,10 +86,22 @@ class ModelBase(type):
         base_meta = getattr(new_class, '_meta', None)
 
         if getattr(meta, 'app_label', None) is None:
-            # Figure out the app_label by looking one level up.
+            # Figure out the app_label by looking one level up from the package
+            # or module named 'models'. If no such package or module exists,
+            # fall back to looking one level up from the module this model is
+            # defined in.
+
             # For 'django.contrib.sites.models', this would be 'sites'.
+            # For 'geo.models.places' this would be 'geo'.
+
             model_module = sys.modules[new_class.__module__]
-            kwargs = {"app_label": model_module.__name__.split('.')[-2]}
+            package_components = model_module.__name__.split('.')
+            package_components.reverse()  # find the last occurrence of 'models'
+            try:
+                app_label_index = package_components.index(MODELS_MODULE_NAME) + 1
+            except ValueError:
+                app_label_index = 1
+            kwargs = {"app_label": package_components[app_label_index]}
         else:
             kwargs = {}
 
@@ -134,7 +146,7 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name,
+        m = new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                       seed_cache=False, only_installed=False)
         if m is not None:
             return m
@@ -147,7 +159,7 @@ class ModelBase(type):
         new_fields = new_class._meta.local_fields + \
                      new_class._meta.local_many_to_many + \
                      new_class._meta.virtual_fields
-        field_names = set([f.name for f in new_fields])
+        field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -172,10 +184,21 @@ class ModelBase(type):
         else:
             new_class._meta.concrete_model = new_class
 
-        # Do the appropriate setup for any model parents.
-        o2o_map = dict([(f.rel.to, f) for f in new_class._meta.local_fields
-                if isinstance(f, OneToOneField)])
+        # Collect the parent links for multi-table inheritance.
+        parent_links = {}
+        for base in reversed([new_class] + parents):
+            # Conceptually equivalent to `if base is Model`.
+            if not hasattr(base, '_meta'):
+                continue
+            # Skip concrete parent classes.
+            if base != new_class and not base._meta.abstract:
+                continue
+            # Locate OneToOneField instances.
+            for field in base._meta.local_fields:
+                if isinstance(field, OneToOneField):
+                    parent_links[field.rel.to] = field
 
+        # Do the appropriate setup for any model parents.
         for base in parents:
             original_base = base
             if not hasattr(base, '_meta'):
@@ -196,8 +219,8 @@ class ModelBase(type):
             if not base._meta.abstract:
                 # Concrete classes...
                 base = base._meta.concrete_model
-                if base in o2o_map:
-                    field = o2o_map[base]
+                if base in parent_links:
+                    field = parent_links[base]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
                     field = OneToOneField(base, name=attr_name,
@@ -226,9 +249,9 @@ class ModelBase(type):
             # class
             for field in base._meta.virtual_fields:
                 if base._meta.abstract and field.name in field_names:
-                    raise FieldError('Local field %r in class %r clashes '\
-                                     'with field of similar name from '\
-                                     'abstract base class %r' % \
+                    raise FieldError('Local field %r in class %r clashes '
+                                     'with field of similar name from '
+                                     'abstract base class %r' %
                                         (field.name, name, base.__name__))
                 new_class.add_to_class(field.name, copy.deepcopy(field))
 
@@ -241,13 +264,13 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
-        register_models(new_class._meta.app_label, new_class)
 
+        new_class._meta.app_cache.register_models(new_class._meta.app_label, new_class)
         # Because of the way imports happen (recursively), we may or may not be
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name,
+        return new_class._meta.app_cache.get_model(new_class._meta.app_label, name,
                          seed_cache=False, only_installed=False)
 
     def copy_managers(cls, base_managers):
@@ -298,7 +321,7 @@ class ModelBase(type):
 
         # Give the class a docstring -- its definition.
         if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
 
         if hasattr(cls, 'get_absolute_url'):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
@@ -426,7 +449,7 @@ class Model(six.with_metaclass(ModelBase)):
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if not six.PY3 and hasattr(self, '__unicode__'):
+        if six.PY2 and hasattr(self, '__unicode__'):
             if type(self).__unicode__ == Model.__str__:
                 klass_name = type(self).__name__
                 raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"
@@ -436,12 +459,21 @@ class Model(six.with_metaclass(ModelBase)):
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self._get_pk_val() == other._get_pk_val()
+        if not isinstance(other, Model):
+            return False
+        if self._meta.concrete_model != other._meta.concrete_model:
+            return False
+        my_pk = self._get_pk_val()
+        if my_pk is None:
+            return self is other
+        return my_pk == other._get_pk_val()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
+        if self._get_pk_val() is None:
+            raise TypeError("Model instances without primary key value are unhashable")
         return hash(self._get_pk_val())
 
     def __reduce__(self):
@@ -451,16 +483,18 @@ class Model(six.with_metaclass(ModelBase)):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
-        if not self._deferred:
-            return super(Model, self).__reduce__()
         data = self.__dict__
+        if not self._deferred:
+            class_id = self._meta.app_label, self._meta.object_name
+            return model_unpickle, (class_id, [], simple_class_factory), data
         defers = []
         for field in self._meta.fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
-                    DeferredAttribute):
+                          DeferredAttribute):
                 defers.append(field.attname)
         model = self._meta.proxy_for_model
-        return (model_unpickle, (model, defers), data)
+        class_id = model._meta.app_label, model._meta.object_name
+        return (model_unpickle, (class_id, defers, deferred_class_factory), data)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -633,15 +667,9 @@ class Model(six.with_metaclass(ModelBase)):
             base_qs = cls._base_manager.using(using)
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
-            if not values:
-                # We can end up here when saving a model in inheritance chain where
-                # update_fields doesn't target any field in current model. In that
-                # case we just say the update succeeded. Another case ending up here
-                # is a model with just PK - in that case check that the PK still
-                # exists.
-                updated = update_fields is not None or base_qs.filter(pk=pk_val).exists()
-            else:
-                updated = self._do_update(base_qs, using, pk_val, values)
+            forced_update = update_fields or force_update
+            updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+                                      forced_update)
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
@@ -665,13 +693,27 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, meta.pk.attname, result)
         return updated
 
-    def _do_update(self, base_qs, using, pk_val, values):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """
         This method will try to update the model. If the model was updated (in
         the sense that an update query was done and a matching row was found
         from the DB) the method will return True.
         """
-        return base_qs.filter(pk=pk_val)._update(values) > 0
+        filtered = base_qs.filter(pk=pk_val)
+        if not values:
+            # We can end up here when saving a model in inheritance chain where
+            # update_fields doesn't target any field in current model. In that
+            # case we just say the update succeeded. Another case ending up here
+            # is a model with just PK - in that case check that the PK still
+            # exists.
+            return update_fields is not None or filtered.exists()
+        if self._meta.select_on_save and not forced_update:
+            if filtered.exists():
+                filtered._update(values)
+                return True
+            else:
+                return False
+        return filtered._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
         """
@@ -726,6 +768,8 @@ class Model(six.with_metaclass(ModelBase)):
         return getattr(self, cachename)
 
     def prepare_database_save(self, unused):
+        if self.pk is None:
+            raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
         return self.pk
 
     def clean(self):
@@ -908,7 +952,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'field_label': six.text_type(field_labels)
             }
 
-    def full_clean(self, exclude=None):
+    def full_clean(self, exclude=None, validate_unique=True):
         """
         Calls clean_fields, clean, and validate_unique, on the model,
         and raises a ``ValidationError`` for any errors that occurred.
@@ -930,13 +974,14 @@ class Model(six.with_metaclass(ModelBase)):
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
-        for name in errors.keys():
-            if name != NON_FIELD_ERRORS and name not in exclude:
-                exclude.append(name)
-        try:
-            self.validate_unique(exclude=exclude)
-        except ValidationError as e:
-            errors = e.update_error_dict(errors)
+        if validate_unique:
+            for name in errors.keys():
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.append(name)
+            try:
+                self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
 
         if errors:
             raise ValidationError(errors)
@@ -961,7 +1006,7 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
             except ValidationError as e:
-                errors[f.name] = e.messages
+                errors[f.name] = e.error_list
 
         if errors:
             raise ValidationError(errors)
@@ -1005,15 +1050,24 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 # MISC #
 ########
 
-class Empty(object):
-    pass
+
+def simple_class_factory(model, attrs):
+    """
+    Needed for dynamic classes.
+    """
+    return model
 
 
-def model_unpickle(model, attrs):
+def model_unpickle(model_id, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
-    cls = deferred_class_factory(model, attrs)
+    if isinstance(model_id, tuple):
+        model = get_model(*model_id)
+    else:
+        # Backwards compat - the model was cached directly in earlier versions.
+        model = model_id
+    cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 

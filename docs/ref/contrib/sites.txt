@@ -264,10 +264,10 @@ To enable the sites framework, follow these steps:
 
     SITE_ID = 1
 
-3. Run :djadmin:`syncdb`.
+3. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
-:data:`~django.db.models.signals.post_syncdb` signal handler which creates a
+:data:`~django.db.models.signals.post_migrate` signal handler which creates a
 default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use an :doc:`initial data
@@ -417,9 +417,10 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
-* The shortcut view (``django.views.defaults.shortcut``) uses the domain
-  of the current :class:`~django.contrib.sites.models.Site` object when
-  calculating an object's URL.
+* The shortcut view (``django.contrib.contenttypes.views.shortcut``)
+  uses the domain of the current
+  :class:`~django.contrib.sites.models.Site` object when calculating
+  an object's URL.
 
 * In the admin framework, the "view on site" link uses the current
   :class:`~django.contrib.sites.models.Site` to work out the domain for the

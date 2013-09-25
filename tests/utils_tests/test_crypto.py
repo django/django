@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 import binascii
+import hashlib
 import math
 import timeit
-import hashlib
+import unittest
 
-from django.utils import unittest
 from django.utils.crypto import constant_time_compare, pbkdf2
 
 

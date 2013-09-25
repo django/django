@@ -117,9 +117,9 @@ these changes.
 * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
   handler should be used instead.
 
-* The ``template`` attribute on :class:`~django.test.client.Response`
+* The ``template`` attribute on :class:`~django.test.Response`
   objects returned by the :ref:`test client <test-client>` will be removed.
-  The :attr:`~django.test.client.Response.templates` attribute should be
+  The :attr:`~django.test.Response.templates` attribute should be
   used instead.
 
 * The ``django.test.simple.DjangoTestRunner`` will be removed.
@@ -295,7 +295,7 @@ these changes.
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
   :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemamp views, :func:`~django.contrib.sitemaps.views.index` and
+  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
@@ -325,6 +325,14 @@ these changes.
   following an accelerated deprecation. Users subclassing this form should
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
+
+* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+  supports base36 encoded user IDs
+  (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
+  removed. If your site has been running Django 1.6 for more than
+  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
+  not, then any password reset links generated before you upgrade to Django 1.7
+  won't work after the upgrade.
 
 1.8
 ---
@@ -362,8 +370,11 @@ these changes.
 * Remove the backward compatible shims introduced to rename the attributes
   ``ChangeList.root_query_set`` and ``ChangeList.query_set``.
 
-* ``django.conf.urls.shortcut`` and ``django.views.defaults.shortcut`` will be
-  removed.
+* ``django.views.defaults.shortcut`` will be removed, as part of the
+  goal of removing all ``django.contrib`` references from the core
+  Django codebase. Instead use
+  ``django.contrib.contenttypes.views.shortcut``. ``django.conf.urls.shortcut``
+  will also be removed.
 
 * Support for the Python Imaging Library (PIL) module will be removed, as it
   no longer appears to be actively maintained & does not work on Python 3.
@@ -373,6 +384,7 @@ these changes.
 
 * The following private APIs will be removed:
 
+  - ``django.db.backend``
   - ``django.db.close_connection()``
   - ``django.db.backends.creation.BaseDatabaseCreation.set_autocommit()``
   - ``django.db.transaction.is_managed()``
@@ -385,19 +397,66 @@ these changes.
   ``django.test.simple.DjangoTestSuiteRunner`` will be removed. Instead use
   ``django.test.runner.DiscoverRunner``.
 
-* The module ``django.test._doctest`` and the classes
-  ``django.test.testcases.DocTestRunner`` and
-  ``django.test.testcases.OutputChecker`` will be removed. Instead use the
-  doctest module from the Python standard library.
+* The module ``django.test._doctest`` will be removed. Instead use the doctest
+  module from the Python standard library.
+
+* The ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting will be removed.
+
+* Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
+  more than one.* string to override or append to user-provided ``help_text`` in
+  forms for ManyToMany model fields will not be performed by Django anymore
+  either at the model or forms layer.
+
+* The ``Model._meta.get_(add|change|delete)_permission`` methods will
+  be removed.
+
+1.9
+---
+
+* ``django.utils.dictconfig`` will be removed.
+
+* ``django.utils.importlib`` will be removed.
+
+* ``django.utils.tzinfo`` will be removed.
+
+* ``django.utils.unittest`` will be removed.
+
+* The ``syncdb`` command will be removed.
+
+* ``django.db.models.signals.pre_syncdb`` and
+  ``django.db.models.signals.post_syncdb`` will be removed, and
+  ``django.db.models.signals.pre_migrate`` and
+  ``django.db.models.signals.post_migrate`` will lose their
+  ``create_models`` and ``created_models`` arguments.
+
+* ``allow_syncdb`` on database routers will no longer automatically become
+  ``allow_migrate``.
+
+* If models are organized in a package, Django will no longer look for
+  :ref:`initial SQL data<initial-sql>` in ``myapp/models/sql/``. Move your
+  custom SQL files to ``myapp/sql/``.
+
+* FastCGI support via the ``runfcgi`` management command will be
+  removed. Please deploy your project using WSGI.
+
+* ``django.utils.datastructures.SortedDict`` will be removed. Use
+  :class:`collections.OrderedDict` from the Python standard library instead.
+
+* ``ModelAdmin.declared_fieldsets`` will be removed.
+
+* Instances of ``util.py`` in the Django codebase have been renamed to
+  ``utils.py`` in an effort to unify all util and utils references.
+  The modules that provided backwards compatability will be removed:
+
+  * ``django.contrib.admin.util``
+  * ``django.contrib.gis.db.backends.util``
+  * ``django.db.backends.util``
+  * ``django.forms.util``
+
+* ``ModelAdmin.get_formsets`` will be removed.
 
 2.0
 ---
-
-* ``django.views.defaults.shortcut()``. This function has been moved
-  to ``django.contrib.contenttypes.views.shortcut()`` as part of the
-  goal of removing all ``django.contrib`` references from the core
-  Django codebase. The old shortcut will be removed in the 2.0
-  release.
 
 * ``ssi`` and ``url`` template tags will be removed from the ``future`` template
   tag library (used during the 1.3/1.4 deprecation period).

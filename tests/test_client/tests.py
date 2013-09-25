@@ -20,7 +20,7 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core import mail
@@ -404,6 +404,10 @@ class ClientTest(TestCase):
         self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_method_view/')
 
         # TODO: Log in with right permissions and request the page again
+
+    def test_external_redirect(self):
+        response = self.client.get('/test_client/django_project_redirect/')
+        self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"

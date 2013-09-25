@@ -3,7 +3,6 @@ Module for abstract serializer/unserializer base classes.
 """
 
 from django.db import models
-from django.utils.encoding import smart_text
 from django.utils import six
 
 class SerializerDoesNotExist(KeyError):
@@ -66,7 +65,7 @@ class Serializer(object):
         """
         Called when serializing of the queryset starts.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Serializer must provide a start_serialization() method')
 
     def end_serialization(self):
         """
@@ -78,7 +77,7 @@ class Serializer(object):
         """
         Called when serializing of an object starts.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Serializer must provide a start_object() method')
 
     def end_object(self, obj):
         """
@@ -90,19 +89,19 @@ class Serializer(object):
         """
         Called to handle each individual (non-relational) field on an object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Serializer must provide an handle_field() method')
 
     def handle_fk_field(self, obj, field):
         """
         Called to handle a ForeignKey field.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Serializer must provide an handle_fk_field() method')
 
     def handle_m2m_field(self, obj, field):
         """
         Called to handle a ManyToManyField.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Serializer must provide an handle_m2m_field() method')
 
     def getvalue(self):
         """
@@ -136,7 +135,7 @@ class Deserializer(six.Iterator):
 
     def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
 
 class DeserializedObject(object):
     """

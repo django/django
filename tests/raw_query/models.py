@@ -18,7 +18,7 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(Author)
-    paperback = models.BooleanField()
+    paperback = models.BooleanField(default=False)
     opening_line = models.TextField()
 
 class Coffee(models.Model):

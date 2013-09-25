@@ -5,7 +5,7 @@ Built-in, globally-available admin actions.
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.contrib.admin.util import get_deleted_objects, model_ngettext
+from django.contrib.admin.utils import get_deleted_objects, model_ngettext
 from django.db import router
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
@@ -19,7 +19,7 @@ def delete_selected(modeladmin, request, queryset):
     deleteable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 
-    Next, it delets all selected objects and redirects back to the change list.
+    Next, it deletes all selected objects and redirects back to the change list.
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label

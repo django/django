@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import os
 from decimal import Decimal
+from unittest import skipUnless
 import warnings
 
 from django import forms
@@ -13,18 +14,15 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import model_to_dict
 from django.utils._os import upath
-from django.utils.unittest import skipUnless
 from django.test import TestCase
 from django.utils import six
 
-from shared_models.models import Author, Book
-
-from .models import (Article, ArticleStatus, BetterAuthor, BigInt,
+from .models import (Article, ArticleStatus, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFieldForExclusionModel, DerivedBook,
     DerivedPost, ExplicitPK, FlexibleDatePost, ImprovedArticle,
     ImprovedArticleWithParentLink, Inventory, Post, Price,
-    Product, TextFile, AuthorProfile, Colour, ColourfulItem,
-    test_images)
+    Product, TextFile, Writer, WriterProfile, Colour, ColourfulItem,
+    ArticleStatusNote, DateTimePost, CustomErrorMessage, test_images)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -54,14 +52,15 @@ class PriceForm(forms.ModelForm):
 
 class BookForm(forms.ModelForm):
     class Meta:
-        fields = ['title', 'author', 'pubdate']
         model = Book
+        fields = '__all__'
 
 
 class DerivedBookForm(forms.ModelForm):
     class Meta:
-        fields = ['title', 'author', 'isbn', 'suffix1', 'suffix2']
         model = DerivedBook
+        fields = '__all__'
+
 
 
 class ExplicitPKForm(forms.ModelForm):
@@ -76,18 +75,24 @@ class PostForm(forms.ModelForm):
         fields = '__all__'
 
 
+class DateTimePostForm(forms.ModelForm):
+    class Meta:
+        model = DateTimePost
+        fields = '__all__'
+
+
 class DerivedPostForm(forms.ModelForm):
     class Meta:
         model = DerivedPost
         fields = '__all__'
 
 
-class CustomAuthorForm(forms.ModelForm):
-   name = forms.CharField(required=False)
+class CustomWriterForm(forms.ModelForm):
+    name = forms.CharField(required=False)
 
-   class Meta:
-       model = Author
-       fields = '__all__'
+    class Meta:
+        model = Writer
+        fields = '__all__'
 
 
 class FlexDatePostForm(forms.ModelForm):
@@ -108,12 +113,6 @@ class ArticleForm(forms.ModelForm):
         fields = '__all__'
 
 
-class ArticleForm(forms.ModelForm):
-    class Meta:
-        model = Article
-        fields = '__all__'
-
-
 class PartialArticleForm(forms.ModelForm):
     class Meta:
         model = Article
@@ -122,7 +121,7 @@ class PartialArticleForm(forms.ModelForm):
 
 class RoykoForm(forms.ModelForm):
     class Meta:
-        model = Author
+        model = Writer
         fields = '__all__'
 
 
@@ -182,15 +181,14 @@ class ImprovedArticleWithParentLinkForm(forms.ModelForm):
         fields = '__all__'
 
 
-class BetterAuthorForm(forms.ModelForm):
+class BetterWriterForm(forms.ModelForm):
     class Meta:
-        model = BetterAuthor
+        model = BetterWriter
         fields = '__all__'
 
-
-class AuthorProfileForm(forms.ModelForm):
+class WriterProfileForm(forms.ModelForm):
     class Meta:
-        model = AuthorProfile
+        model = WriterProfile
         fields = '__all__'
 
 
@@ -234,6 +232,28 @@ class ColourfulItemForm(forms.ModelForm):
         model = ColourfulItem
         fields = '__all__'
 
+# model forms for testing work on #9321:
+
+class StatusNoteForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+
+
+class StatusNoteCBM2mForm(forms.ModelForm):
+    class Meta:
+        model = ArticleStatusNote
+        fields = '__all__'
+        widgets = {'status': forms.CheckboxSelectMultiple}
+
+
+class CustomErrorMessageForm(forms.ModelForm):
+    name1 = forms.CharField(error_messages={'invalid': 'Form custom error message.'})
+
+    class Meta:
+        fields = '__all__'
+        model = CustomErrorMessage
+
 
 class ModelFormBaseTest(TestCase):
     def test_base_form(self):
@@ -242,7 +262,7 @@ class ModelFormBaseTest(TestCase):
 
     def test_missing_fields_attribute(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", PendingDeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
 
             class MissingFieldsForm(forms.ModelForm):
                 class Meta:
@@ -252,7 +272,7 @@ class ModelFormBaseTest(TestCase):
         # if a warning has been seen already, the catch_warnings won't
         # have recorded it. The following line therefore will not work reliably:
 
-        # self.assertEqual(w[0].category, PendingDeprecationWarning)
+        # self.assertEqual(w[0].category, DeprecationWarning)
 
         # Until end of the deprecation cycle, should still create the
         # form as before:
@@ -274,8 +294,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = '__all__'
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_2(self):
         # Should have the same result as before,
@@ -287,8 +307,8 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = ['url']
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_replace_field_variant_3(self):
         # Should have the same result as before,
@@ -300,18 +320,18 @@ class ModelFormBaseTest(TestCase):
                 model = Category
                 fields = [] # url will still appear, since it is explicit above
 
-        self.assertTrue(isinstance(ReplaceField.base_fields['url'],
-                                     forms.fields.BooleanField))
+        self.assertIsInstance(ReplaceField.base_fields['url'],
+                                     forms.fields.BooleanField)
 
     def test_override_field(self):
-        class AuthorForm(forms.ModelForm):
+        class WriterForm(forms.ModelForm):
             book = forms.CharField(required=False)
 
             class Meta:
-                model = Author
+                model = Writer
                 fields = '__all__'
 
-        wf = AuthorForm({'name': 'Richard Lockridge'})
+        wf = WriterForm({'name': 'Richard Lockridge'})
         self.assertTrue(wf.is_valid())
 
     def test_limit_nonexistent_field(self):
@@ -430,11 +450,11 @@ class ModelFormBaseTest(TestCase):
 
     def test_subclassmeta_form(self):
         class SomeCategoryForm(forms.ModelForm):
-             checkbox = forms.BooleanField()
+            checkbox = forms.BooleanField()
 
-             class Meta:
-                 model = Category
-                 fields = '__all__'
+            class Meta:
+                model = Category
+                fields = '__all__'
 
         class SubclassMeta(SomeCategoryForm):
             """ We can also subclass the Meta inner class to change the fields
@@ -475,7 +495,7 @@ class ModelFormBaseTest(TestCase):
                          ['slug', 'name'])
 
 
-class TestWidgetForm(forms.ModelForm):
+class FieldOverridesTroughFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'url', 'slug']
@@ -483,24 +503,73 @@ class TestWidgetForm(forms.ModelForm):
             'name': forms.Textarea,
             'url': forms.TextInput(attrs={'class': 'url'})
         }
+        labels = {
+            'name': 'Title',
+        }
+        help_texts = {
+            'slug': 'Watch out! Letters, numbers, underscores and hyphens only.',
+        }
+        error_messages = {
+            'slug': {
+                'invalid': (
+                    "Didn't you read the help text? "
+                    "We said letters, numbers, underscores and hyphens only!"
+                )
+            }
+        }
 
 
+class TestFieldOverridesTroughFormMeta(TestCase):
+    def test_widget_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
+        self.assertHTMLEqual(
+            str(form['name']),
+            '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>',
+        )
+        self.assertHTMLEqual(
+            str(form['url']),
+            '<input id="id_url" type="text" class="url" name="url" maxlength="40" />',
+        )
+        self.assertHTMLEqual(
+            str(form['slug']),
+            '<input id="id_slug" type="text" name="slug" maxlength="20" />',
+        )
 
-class TestWidgets(TestCase):
-    def test_base_widgets(self):
-        frm = TestWidgetForm()
+    def test_label_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
         self.assertHTMLEqual(
-            str(frm['name']),
-            '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>'
+            str(form['name'].label_tag()),
+            '<label for="id_name">Title:</label>',
         )
         self.assertHTMLEqual(
-            str(frm['url']),
-            '<input id="id_url" type="text" class="url" name="url" maxlength="40" />'
+            str(form['url'].label_tag()),
+            '<label for="id_url">The URL:</label>',
         )
         self.assertHTMLEqual(
-            str(frm['slug']),
-            '<input id="id_slug" type="text" name="slug" maxlength="20" />'
+            str(form['slug'].label_tag()),
+            '<label for="id_slug">Slug:</label>',
         )
+
+    def test_help_text_overrides(self):
+        form = FieldOverridesTroughFormMetaForm()
+        self.assertEqual(
+            form['slug'].help_text,
+            'Watch out! Letters, numbers, underscores and hyphens only.',
+        )
+
+    def test_error_messages_overrides(self):
+        form = FieldOverridesTroughFormMetaForm(data={
+            'name': 'Category',
+            'url': '/category/',
+            'slug': '!%#*@',
+        })
+        form.full_clean()
+
+        error = [
+            "Didn't you read the help text? "
+            "We said letters, numbers, underscores and hyphens only!",
+        ]
+        self.assertEqual(form.errors, {'slug': error})
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):
@@ -536,7 +605,7 @@ class ValidationTest(TestCase):
         assert form.is_valid()
 
     def test_notrequired_overrides_notblank(self):
-        form = CustomAuthorForm({})
+        form = CustomWriterForm({})
         assert form.is_valid()
 
 
@@ -545,7 +614,7 @@ class ValidationTest(TestCase):
 # unique/unique_together validation
 class UniqueTest(TestCase):
     def setUp(self):
-        self.author = Author.objects.create(name='Mike Royko')
+        self.writer = Writer.objects.create(name='Mike Royko')
 
     def test_simple_unique(self):
         form = ProductForm({'slug': 'teddy-bear-blue'})
@@ -569,31 +638,33 @@ class UniqueTest(TestCase):
 
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
-        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
+        form = BookForm({'title': title, 'author': self.writer.pk})
         self.assertTrue(form.is_valid())
         form.save()
-        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
+        form = BookForm({'title': title, 'author': self.writer.pk})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
-        form = BookForm({'title': title, 'pubdate': '2012-12-12 00:00:00'})
+        form = BookForm({'title': title})
         self.assertTrue(form.is_valid())
         form.save()
-        form = BookForm({'title': title, 'pubdate': '2012-12-12 00:00:00'})
+        form = BookForm({'title': title})
         self.assertTrue(form.is_valid())
 
     def test_inherited_unique(self):
-        form = BetterAuthorForm({'name': 'Mike Royko', 'score': 3})
+        title = 'Boss'
+        Book.objects.create(title=title, author=self.writer, special_id=1)
+        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'special_id': '1', 'isbn': '12345'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        self.assertEqual(form.errors['name'], ['Author with this Name already exists.'])
+        self.assertEqual(form.errors['special_id'], ['Book with this Special id already exists.'])
 
     def test_inherited_unique_together(self):
         title = 'Boss'
-        form = BookForm({'title': title, 'author': self.author.pk, 'pubdate': '2012-12-12 00:00:00'})
+        form = BookForm({'title': title, 'author': self.writer.pk})
         self.assertTrue(form.is_valid())
         form.save()
-        form = DerivedBookForm({'title': title, 'author': self.author.pk, 'isbn': '12345'})
+        form = DerivedBookForm({'title': title, 'author': self.writer.pk, 'isbn': '12345'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
@@ -601,9 +672,8 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
-            pubdate='2012-12-12 00:00')
-        form = DerivedBookForm({'title': 'Other', 'author': self.author.pk, 'isbn': isbn})
+        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
+        form = DerivedBookForm({'title': 'Other', 'author': self.writer.pk, 'isbn': isbn})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['isbn'], ['Derived book with this Isbn already exists.'])
@@ -611,11 +681,10 @@ class UniqueTest(TestCase):
     def test_abstract_inherited_unique_together(self):
         title = 'Boss'
         isbn = '12345'
-        dbook = DerivedBook.objects.create(title=title, author=self.author, isbn=isbn,
-            pubdate='2012-12-12 00:00')
+        dbook = DerivedBook.objects.create(title=title, author=self.writer, isbn=isbn)
         form = DerivedBookForm({
                     'title': 'Other',
-                    'author': self.author.pk,
+                    'author': self.writer.pk,
                     'isbn': '9876',
                     'suffix1': '0',
                     'suffix2': '0'
@@ -668,6 +737,23 @@ class UniqueTest(TestCase):
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
 
+    def test_unique_for_date_in_exclude(self):
+        """If the date for unique_for_* constraints is excluded from the
+        ModelForm (in this case 'posted' has editable=False, then the
+        constraint should be ignored."""
+        p = DateTimePost.objects.create(title="Django 1.0 is released",
+            slug="Django 1.0", subtitle="Finally",
+            posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
+        # 'title' has unique_for_date='posted'
+        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        self.assertTrue(form.is_valid())
+        # 'slug' has unique_for_year='posted'
+        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        self.assertTrue(form.is_valid())
+        # 'subtitle' has unique_for_month='posted'
+        form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
+        self.assertTrue(form.is_valid())
+
     def test_inherited_unique_for_date(self):
         p = Post.objects.create(title="Django 1.0 is released",
             slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
@@ -716,7 +802,7 @@ class ModelToDictTests(TestCase):
         ]
         for c in categories:
             c.save()
-        writer = Author(name='Test writer')
+        writer = Writer(name='Test writer')
         writer.save()
 
         art = Article(
@@ -825,10 +911,10 @@ class OldFormForXTests(TestCase):
         with self.assertRaises(ValueError):
             f.save()
 
-        # Create a couple of Authors.
-        w_royko = Author(name='Mike Royko')
+        # Create a couple of Writers.
+        w_royko = Writer(name='Mike Royko')
         w_royko.save()
-        w_woodward = Author(name='Bob Woodward')
+        w_woodward = Writer(name='Bob Woodward')
         w_woodward.save()
         # ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
         # fields with the 'choices' attribute are represented by a ChoiceField.
@@ -866,9 +952,9 @@ class OldFormForXTests(TestCase):
 
         # When the ModelForm is passed an instance, that instance's current values are
         # inserted as 'initial' data in each Field.
-        w = Author.objects.get(name='Mike Royko')
+        w = Writer.objects.get(name='Mike Royko')
         f = RoykoForm(auto_id=False, instance=w)
-        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="100" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
+        self.assertHTMLEqual(six.text_type(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
                     headline='Test article',
@@ -1080,7 +1166,7 @@ class OldFormForXTests(TestCase):
 
         c4 = Category.objects.create(name='Fourth', url='4th')
         self.assertEqual(c4.name, 'Fourth')
-        w_bernstein = Author.objects.create(name='Carl Bernstein')
+        w_bernstein = Writer.objects.create(name='Carl Bernstein')
         self.assertEqual(w_bernstein.name, 'Carl Bernstein')
         self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
@@ -1257,17 +1343,17 @@ class OldFormForXTests(TestCase):
 
         self.assertEqual(list(ImprovedArticleWithParentLinkForm.base_fields), [])
 
-        bw = BetterAuthor(name='Joe Better', score=10)
+        bw = BetterWriter(name='Joe Better', score=10)
         bw.save()
         self.assertEqual(sorted(model_to_dict(bw)),
-                         ['author_ptr', 'id', 'name', 'score'])
+                         ['id', 'name', 'score', 'writer_ptr'])
 
-        form = BetterAuthorForm({'name': 'Some Name', 'score': 12})
+        form = BetterWriterForm({'name': 'Some Name', 'score': 12})
         self.assertEqual(form.is_valid(), True)
         bw2 = form.save()
         bw2.delete()
 
-        form = AuthorProfileForm()
+        form = WriterProfileForm()
         self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1281,11 +1367,11 @@ class OldFormForXTests(TestCase):
             'writer': six.text_type(w_woodward.pk),
             'age': '65',
         }
-        form = AuthorProfileForm(data)
+        form = WriterProfileForm(data)
         instance = form.save()
         self.assertEqual(six.text_type(instance), 'Bob Woodward is 65')
 
-        form = AuthorProfileForm(instance=instance)
+        form = WriterProfileForm(instance=instance)
         self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
 <option value="%s" selected="selected">Bob Woodward</option>
@@ -1677,3 +1763,42 @@ class OldFormForXTests(TestCase):
         <option value="%(blue_pk)s">Blue</option>
         </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>"""
             % {'blue_pk': colour.pk})
+
+    def test_custom_error_messages(self) :
+        data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(
+            str(errors['name1']),
+            '<ul class="errorlist"><li>Form custom error message.</li></ul>'
+        )
+        self.assertHTMLEqual(
+            str(errors['name2']),
+            '<ul class="errorlist"><li>Model custom error message.</li></ul>'
+        )
+
+    def test_model_clean_error_messages(self) :
+        data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}
+        errors = CustomErrorMessageForm(data).errors
+        self.assertHTMLEqual(
+            str(errors['name1']),
+            '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>'
+        )
+
+
+class M2mHelpTextTest(TestCase):
+    """Tests for ticket #9321."""
+    def test_multiple_widgets(self):
+        """Help text of different widgets for ManyToManyFields model fields"""
+        dreaded_help_text = '<span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span>'
+
+        # Default widget (SelectMultiple):
+        std_form = StatusNoteForm()
+        self.assertInHTML(dreaded_help_text, std_form.as_p())
+
+        # Overridden widget (CheckboxSelectMultiple, a subclass of
+        # SelectMultiple but with a UI that doesn't involve Control/Command
+        # keystrokes to extend selection):
+        form = StatusNoteCBM2mForm()
+        html = form.as_p()
+        self.assertInHTML('<ul id="id_status">', html)
+        self.assertInHTML(dreaded_help_text, html, count=0)

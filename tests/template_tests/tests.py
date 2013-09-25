@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.conf import settings
 
@@ -8,15 +8,11 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import date, datetime, timedelta
-import time
+from datetime import date, datetime
 import os
 import sys
 import traceback
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
+import unittest
 import warnings
 
 from django import template
@@ -27,23 +23,15 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings)
-from django.utils import unittest
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
-from django.utils.translation import activate, deactivate, ugettext as _
+from django.utils.translation import activate, deactivate
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.tzinfo import LocalTimezone
+from django.utils.six.moves.urllib.parse import urljoin
 
-
-try:
-    from .loaders import RenderToStringTest, EggLoaderTest
-except ImportError as e:
-    if "pkg_resources" in e.args[0]:
-        pass # If setuptools isn't installed, that's fine. Just move on.
-    else:
-        raise
+from i18n import TransRealMixin
 
 # NumPy installed?
 try:
@@ -110,6 +98,9 @@ class SomeClass:
     def method4(self):
         raise SomeOtherException
 
+    def method5(self):
+        raise TypeError
+
     def __getitem__(self, key):
         if key == 'silent_fail_key':
             raise SomeException
@@ -154,8 +145,8 @@ class UTF8Class:
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
-@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
-class Templates(TestCase):
+
+class TemplateLoaderTests(TestCase):
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
@@ -248,6 +239,19 @@ class Templates(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_loader_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = loader.get_template('login.html')
+            self.assertEqual(template.origin.loadname, 'login.html')
+
+    def test_string_origin(self):
+        with self.settings(TEMPLATE_DEBUG=True):
+            template = Template('string template')
+            self.assertEqual(template.origin.source, 'string template')
+
+    def test_debug_false_origin(self):
+        template = loader.get_template('login.html')
+        self.assertEqual(template.origin, None)
 
     def test_include_missing_template(self):
         """
@@ -347,6 +351,54 @@ class Templates(TestCase):
             loader.template_source_loaders = old_loaders
             settings.TEMPLATE_DEBUG = old_td
 
+    def test_include_template_argument(self):
+        """
+        Support any render() supporting object
+        """
+        ctx = Context({
+            'tmpl': Template('This worked!'),
+        })
+        outer_tmpl = Template('{% include tmpl %}')
+        output = outer_tmpl.render(ctx)
+        self.assertEqual(output, 'This worked!')
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_immediate_missing(self):
+        """
+        Regression test for #16417 -- {% include %} tag raises TemplateDoesNotExist at compile time if TEMPLATE_DEBUG is True
+
+        Test that an {% include %} tag with a literal string referencing a
+        template that does not exist does not raise an exception at parse
+        time.
+        """
+        ctx = Context()
+        tmpl = Template('{% include "this_does_not_exist.html" %}')
+        self.assertIsInstance(tmpl, Template)
+
+    @override_settings(TEMPLATE_DEBUG=True)
+    def test_include_recursive(self):
+        comments = [
+            {
+                'comment': 'A1',
+                'children': [
+                    {'comment': 'B1', 'children': []},
+                    {'comment': 'B2', 'children': []},
+                    {'comment': 'B3', 'children': [
+                        {'comment': 'C1', 'children': []}
+                    ]},
+                ]
+            }
+        ]
+
+        t = loader.get_template('recursive_include.html')
+        self.assertEqual(
+            "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
+            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
+        )
+
+
+class TemplateRegressionTests(TestCase):
+
     def test_token_smart_split(self):
         # Regression test for #7027
         token = template.Token(template.TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
@@ -444,6 +496,18 @@ class Templates(TestCase):
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
+    def test_super_errors(self):
+        """
+        Test behavior of the raise errors into included blocks.
+        See #18169
+        """
+        t = loader.get_template('included_content.html')
+        with self.assertRaises(urlresolvers.NoReverseMatch):
+            t.render(Context({}))
+
+
+@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
+class TemplateTests(TransRealMixin, TestCase):
     def test_templates(self):
         template_tests = self.get_template_tests()
         filter_tests = filters.get_filter_tests()
@@ -456,7 +520,7 @@ class Templates(TestCase):
         template_tests.update(filter_tests)
 
         cache_loader = setup_test_template_loader(
-            dict([(name, t[0]) for name, t in six.iteritems(template_tests)]),
+            dict((name, t[0]) for name, t in six.iteritems(template_tests)),
             use_cached_loader=True,
         )
 
@@ -518,7 +582,7 @@ class Templates(TestCase):
                         try:
                             with warnings.catch_warnings():
                                 # Ignore pending deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                warnings.filterwarnings("ignore", category=PendingDeprecationWarning, module='django.template.base')
+                                warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.base')
                                 test_template = loader.get_template(name)
                         except ShouldNotExecuteException:
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -618,6 +682,9 @@ class Templates(TestCase):
 
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
+
+            # Don't silence a TypeError if it was raised inside a callable
+            'basic-syntax20b': ("{{ var.method5 }}", {"var": SomeClass()}, TypeError),
 
             # Don't get confused when parsing something that is almost, but not
             # quite, a template tag.
@@ -838,6 +905,10 @@ class Templates(TestCase):
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
             'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
+            'filter05': ('{% filter safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter05bis': ('{% filter upper|safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06': ('{% filter escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
+            'filter06bis': ('{% filter upper|escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
@@ -1565,6 +1636,13 @@ class Templates(TestCase):
             # Test whitespace in filter argument
             'widthratio15': ('{% load custom %}{% widthratio a|noop:"x y" b 0 %}', {'a':50,'b':100}, '0'),
 
+            # Widthratio with variable assignment
+            'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
+            'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
+
+            'widthratio18': ('{% widthratio a b 100 as %}', { }, template.TemplateSyntaxError),
+            'widthratio19': ('{% widthratio a b 100 not_as variable %}', { }, template.TemplateSyntaxError),
+
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
             'legacywith01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1815,3 +1893,43 @@ class RequestContextTests(unittest.TestCase):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
+
+    def test_stack_size(self):
+        """
+        Regression test for #7116, Optimize RequetsContext construction
+        """
+        ctx = RequestContext(self.fake_request, {})
+        # The stack should now contain 3 items:
+        # [builtins, supplied context, context processor]
+        self.assertEqual(len(ctx.dicts), 3)
+
+
+class SSITests(TestCase):
+    def setUp(self):
+        self.this_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+        self.ssi_dir = os.path.join(self.this_dir, "templates", "first")
+
+    def render_ssi(self, path):
+        # the path must exist for the test to be reliable
+        self.assertTrue(os.path.exists(path))
+        return template.Template('{%% ssi "%s" %%}' % path).render(Context())
+
+    def test_allowed_paths(self):
+        acceptable_path = os.path.join(self.ssi_dir, "..", "first", "test.html")
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            self.assertEqual(self.render_ssi(acceptable_path), 'First template\n')
+
+    def test_relative_include_exploit(self):
+        """
+        May not bypass ALLOWED_INCLUDE_ROOTS with relative paths
+
+        e.g. if ALLOWED_INCLUDE_ROOTS = ("/var/www",), it should not be
+        possible to do {% ssi "/var/www/../../etc/passwd" %}
+        """
+        disallowed_paths = [
+            os.path.join(self.ssi_dir, "..", "ssi_include.html"),
+            os.path.join(self.ssi_dir, "..", "second", "test.html"),
+        ]
+        with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
+            for path in disallowed_paths:
+                self.assertEqual(self.render_ssi(path), '')

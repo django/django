@@ -1,13 +1,10 @@
-try:
-    from urllib.parse import urlparse
-except ImportError:     # Python 2
-    from urlparse import urlparse
 from functools import wraps
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
+from django.utils.six.moves.urllib.parse import urlparse
 from django.shortcuts import resolve_url
 
 
@@ -64,8 +61,12 @@ def permission_required(perm, login_url=None, raise_exception=False):
     is raised.
     """
     def check_perms(user):
+        if not isinstance(perm, (list, tuple)):
+            perms = (perm, )
+        else:
+            perms = perm
         # First check if the user has the permission (even anon users)
-        if user.has_perm(perm):
+        if user.has_perms(perms):
             return True
         # In case the 403 handler should be called raise the exception
         if raise_exception:

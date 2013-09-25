@@ -12,6 +12,17 @@ from django.contrib.auth import authenticate, get_user
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.contrib.auth.hashers import MD5PasswordHasher
+
+
+class CountingMD5PasswordHasher(MD5PasswordHasher):
+    """Hasher that counts how many times it computes a hash."""
+
+    calls = 0
+
+    def encode(self, *args, **kwargs):
+        type(self).calls += 1
+        return super(CountingMD5PasswordHasher, self).encode(*args, **kwargs)
 
 
 class BaseModelBackendTest(object):
@@ -107,9 +118,25 @@ class BaseModelBackendTest(object):
         self.assertEqual(user.get_all_permissions(), set(['auth.test']))
 
     def test_get_all_superuser_permissions(self):
-        "A superuser has all permissions. Refs #14795"
+        """A superuser has all permissions. Refs #14795."""
         user = self.UserModel._default_manager.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
+
+    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.tests.test_auth_backends.CountingMD5PasswordHasher',))
+    def test_authentication_timing(self):
+        """Hasher is run once regardless of whether the user exists. Refs #20760."""
+        # Re-set the password, because this tests overrides PASSWORD_HASHERS
+        self.user.set_password('test')
+        self.user.save()
+
+        CountingMD5PasswordHasher.calls = 0
+        username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+        authenticate(username=username, password='test')
+        self.assertEqual(CountingMD5PasswordHasher.calls, 1)
+
+        CountingMD5PasswordHasher.calls = 0
+        authenticate(username='no_such_user', password='test')
+        self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
 
 @skipIfCustomUser
@@ -453,3 +480,32 @@ class ChangedBackendSettingsTest(TestCase):
             # anonymous as the backend is not longer available.
             self.assertIsNotNone(user)
             self.assertTrue(user.is_anonymous())
+
+
+class TypeErrorBackend(object):
+    """
+    Always raises TypeError.
+    """
+    supports_object_permissions = True
+    supports_anonymous_user = True
+    supports_inactive_user = True
+
+    def authenticate(self, username=None, password=None):
+        raise TypeError
+
+
+@skipIfCustomUser
+class TypeErrorBackendTest(TestCase):
+    """
+    Tests that a TypeError within a backend is propagated properly.
+
+    Regression test for ticket #18171
+    """
+    backend = 'django.contrib.auth.tests.test_auth_backends.TypeErrorBackend'
+
+    def setUp(self):
+        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ))
+    def test_type_error_raised(self):
+        self.assertRaises(TypeError, authenticate, username='test', password='test')

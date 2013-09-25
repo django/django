@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
@@ -6,7 +6,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-    Vegetable, Mineral, Gecko, Rock, ManualPK)
+                     Vegetable, Mineral, Gecko, Rock, ManualPK,
+                     ForProxyModelModel, ForConcreteModelModel,
+                     ProxyRelatedModel, ConcreteRelatedModel)
 
 
 class GenericRelationsTests(TestCase):
@@ -245,6 +247,45 @@ class GenericRelationsTests(TestCase):
         TaggedItem.objects.create(content_object=granite, tag="countertop")
         self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
 
+    def test_generic_inline_formsets_initial(self):
+        """
+        Test for #17927 Initial values support for BaseGenericInlineFormSet.
+        """
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+
+        GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)
+        ctype = ContentType.objects.get_for_model(quartz)
+        initial_data = [{
+            'tag': 'lizard',
+            'content_type': ctype.pk,
+            'object_id': quartz.pk,
+        }]
+        formset = GenericFormSet(initial=initial_data)
+        self.assertEqual(formset.forms[0].initial, initial_data[0])
+
+    def test_get_or_create(self):
+        # get_or_create should work with virtual fields (content_object)
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        tag, created = TaggedItem.objects.get_or_create(tag="shiny",
+            defaults={'content_object': quartz})
+        self.assertTrue(created)
+        self.assertEqual(tag.tag, "shiny")
+        self.assertEqual(tag.content_object.id, quartz.id)
+
+    def test_update_or_create_defaults(self):
+        # update_or_create should work with virtual fields (content_object)
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        diamond = Mineral.objects.create(name="Diamond", hardness=7)
+        tag, created = TaggedItem.objects.update_or_create(tag="shiny",
+            defaults={'content_object': quartz})
+        self.assertTrue(created)
+        self.assertEqual(tag.content_object.id, quartz.id)
+
+        tag, created = TaggedItem.objects.update_or_create(tag="shiny",
+            defaults={'content_object': diamond})
+        self.assertFalse(created)
+        self.assertEqual(tag.content_object.id, diamond.id)
+
 
 class CustomWidget(forms.TextInput):
     pass
@@ -256,12 +297,146 @@ class TaggedItemForm(forms.ModelForm):
         widgets = {'tag': CustomWidget}
 
 class GenericInlineFormsetTest(TestCase):
-    """
-    Regression for #14572: Using base forms with widgets
-    defined in Meta should not raise errors.
-    """
-
     def test_generic_inlineformset_factory(self):
+        """
+        Regression for #14572: Using base forms with widgets
+        defined in Meta should not raise errors.
+        """
         Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
         form = Formset().forms[0]
-        self.assertTrue(isinstance(form['tag'].field.widget, CustomWidget))
+        self.assertIsInstance(form['tag'].field.widget, CustomWidget)
+
+    def test_save_new_uses_form_save(self):
+        """
+        Regression for #16260: save_new should call form.save()
+        """
+        class SaveTestForm(forms.ModelForm):
+            def save(self, *args, **kwargs):
+                self.instance.saved_by = "custom method"
+                return super(SaveTestForm, self).save(*args, **kwargs)
+
+        Formset = generic_inlineformset_factory(
+            ForProxyModelModel, fields='__all__', form=SaveTestForm)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+        new_obj = formset.save()[0]
+        self.assertEqual(new_obj.saved_by, "custom method")
+
+    def test_save_new_for_proxy(self):
+        Formset = generic_inlineformset_factory(ForProxyModelModel,
+            fields='__all__', for_concrete_model=False)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+
+        new_obj, = formset.save()
+        self.assertEqual(new_obj.obj, instance)
+
+    def test_save_new_for_concrete(self):
+        Formset = generic_inlineformset_factory(ForProxyModelModel,
+            fields='__all__', for_concrete_model=True)
+
+        instance = ProxyRelatedModel.objects.create()
+
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-title': 'foo',
+        }
+
+        formset = Formset(data, instance=instance, prefix='form')
+        self.assertTrue(formset.is_valid())
+
+        new_obj, = formset.save()
+        self.assertNotIsInstance(new_obj.obj, ProxyRelatedModel)
+
+
+class ProxyRelatedModelTest(TestCase):
+    def test_default_behavior(self):
+        """
+        The default for for_concrete_model should be True
+        """
+        base = ForConcreteModelModel()
+        base.obj = rel = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForConcreteModelModel.objects.get(pk=base.pk)
+        rel = ConcreteRelatedModel.objects.get(pk=rel.pk)
+        self.assertEqual(base.obj, rel)
+
+    def test_works_normally(self):
+        """
+        When for_concrete_model is False, we should still be able to get
+        an instance of the concrete class.
+        """
+        base = ForProxyModelModel()
+        base.obj = rel = ConcreteRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        self.assertEqual(base.obj, rel)
+
+    def test_proxy_is_returned(self):
+        """
+        Instances of the proxy should be returned when
+        for_concrete_model is False.
+        """
+        base = ForProxyModelModel()
+        base.obj = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        self.assertIsInstance(base.obj, ProxyRelatedModel)
+
+    def test_query(self):
+        base = ForProxyModelModel()
+        base.obj = rel = ConcreteRelatedModel.objects.create()
+        base.save()
+
+        self.assertEqual(rel, ConcreteRelatedModel.objects.get(bases__id=base.id))
+
+    def test_query_proxy(self):
+        base = ForProxyModelModel()
+        base.obj = rel = ProxyRelatedModel.objects.create()
+        base.save()
+
+        self.assertEqual(rel, ProxyRelatedModel.objects.get(bases__id=base.id))
+
+    def test_generic_relation(self):
+        base = ForProxyModelModel()
+        base.obj = ProxyRelatedModel.objects.create()
+        base.save()
+
+        base = ForProxyModelModel.objects.get(pk=base.pk)
+        rel = ProxyRelatedModel.objects.get(pk=base.obj.pk)
+        self.assertEqual(base, rel.bases.get())
+
+    def test_generic_relation_set(self):
+        base = ForProxyModelModel()
+        base.obj = ConcreteRelatedModel.objects.create()
+        base.save()
+        newrel = ConcreteRelatedModel.objects.create()
+
+        newrel.bases = [base]
+        newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
+        self.assertEqual(base, newrel.bases.get())

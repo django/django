@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
+import unittest
+from unittest import skipUnless
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 
@@ -14,8 +16,6 @@ from django.contrib.gis.geometry.test_data import TestDataMixin
 from django.utils.encoding import force_bytes
 from django.utils import six
 from django.utils.six.moves import xrange
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 
 from .. import HAS_GEOS
 
@@ -124,24 +124,16 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(hexewkb_3d, pnt_3d.hexewkb)
             self.assertEqual(True, GEOSGeometry(hexewkb_3d).hasz)
         else:
-            try:
-                hexewkb = pnt_3d.hexewkb
-            except GEOSException:
-                pass
-            else:
-                self.fail('Should have raised GEOSException.')
+            with self.assertRaises(GEOSException):
+                pnt_3d.hexewkb
 
         # Same for EWKB.
         self.assertEqual(memoryview(a2b_hex(hexewkb_2d)), pnt_2d.ewkb)
         if GEOS_PREPARE:
             self.assertEqual(memoryview(a2b_hex(hexewkb_3d)), pnt_3d.ewkb)
         else:
-            try:
-                ewkb = pnt_3d.ewkb
-            except GEOSException:
-                pass
-            else:
-                self.fail('Should have raised GEOSException')
+            with self.assertRaises(GEOSException):
+                pnt_3d.ewkb
 
         # Redundant sanity check.
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
@@ -158,7 +150,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # string-based
         for err in self.geometries.errors:
             with self.assertRaises((GEOSException, ValueError)):
-                _ = fromstr(err.wkt)
+                fromstr(err.wkt)
 
         # Bad WKB
         self.assertRaises(GEOSException, GEOSGeometry, memoryview(b'0'))
@@ -477,7 +469,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
-        prev = fromstr('POINT (0 0)')
+        fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
             self.assertEqual(mpoly.geom_type, 'MultiPolygon')
@@ -704,7 +696,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Assigning polygon's exterior ring w/the new shell
             poly.exterior_ring = new_shell
-            s = str(new_shell) # new shell is still accessible
+            str(new_shell) # new shell is still accessible
             self.assertEqual(poly.exterior_ring, new_shell)
             self.assertEqual(poly[0], new_shell)
 
@@ -717,7 +709,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 new = Point(random.randint(21, 100), random.randint(21, 100))
                 # Testing the assignment
                 mp[i] = new
-                s = str(new) # what was used for the assignment is still accessible
+                str(new) # what was used for the assignment is still accessible
                 self.assertEqual(mp[i], new)
                 self.assertEqual(mp[i].wkt, new.wkt)
                 self.assertNotEqual(pnt, mp[i])
@@ -738,7 +730,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertNotEqual(mpoly[i], poly)
                 # Testing the assignment
                 mpoly[i] = poly
-                s = str(poly) # Still accessible
+                str(poly) # Still accessible
                 self.assertEqual(mpoly[i], poly)
                 self.assertNotEqual(mpoly[i], old_poly)
 
@@ -846,9 +838,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Creating a GeometryCollection WKT string composed of other
         # collections and polygons.
         coll = [mp.wkt for mp in self.geometries.multipolygons if mp.valid]
-        coll.extend([mls.wkt for mls in self.geometries.multilinestrings])
-        coll.extend([p.wkt for p in self.geometries.polygons])
-        coll.extend([mp.wkt for mp in self.geometries.multipoints])
+        coll.extend(mls.wkt for mls in self.geometries.multilinestrings)
+        coll.extend(p.wkt for p in self.geometries.polygons)
+        coll.extend(mp.wkt for mp in self.geometries.multipoints)
         gc_wkt = 'GEOMETRYCOLLECTION(%s)' % ','.join(coll)
 
         # Should construct ok from WKT

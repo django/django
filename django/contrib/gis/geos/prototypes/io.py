@@ -252,10 +252,10 @@ def wkb_r():
     return thread_context.wkb_r
 
 def wkb_w(dim=2):
-   if not thread_context.wkb_w:
-       thread_context.wkb_w = WKBWriter()
-   thread_context.wkb_w.outdim = dim
-   return thread_context.wkb_w
+    if not thread_context.wkb_w:
+        thread_context.wkb_w = WKBWriter()
+    thread_context.wkb_w.outdim = dim
+    return thread_context.wkb_w
 
 def ewkb_w(dim=2):
     if not thread_context.ewkb_w:

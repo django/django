@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.conf.urls import patterns
 from django.views.generic import RedirectView
 
@@ -21,6 +19,7 @@ urlpatterns = patterns('',
     (r'^bad_view/$', views.bad_view),
     (r'^form_view/$', views.form_view),
     (r'^form_view_with_template/$', views.form_view_with_template),
+    (r'^formset_view/$', views.formset_view),
     (r'^login_protected_view/$', views.login_protected_view),
     (r'^login_protected_method_view/$', views.login_protected_method_view),
     (r'^login_protected_view_custom_redirect/$', views.login_protected_view_changed_redirect),
@@ -30,5 +29,6 @@ urlpatterns = patterns('',
     (r'^session_view/$', views.session_view),
     (r'^broken_view/$', views.broken_view),
     (r'^mail_sending_view/$', views.mail_sending_view),
-    (r'^mass_mail_sending_view/$', views.mass_mail_sending_view)
+    (r'^mass_mail_sending_view/$', views.mass_mail_sending_view),
+    (r'^django_project_redirect/$', views.django_project_redirect),
 )

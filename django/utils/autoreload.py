@@ -57,7 +57,7 @@ _error_files = []
 def code_changed():
     global _mtimes, _win
     filenames = []
-    for m in sys.modules.values():
+    for m in list(sys.modules.values()):
         try:
             filenames.append(m.__file__)
         except AttributeError:

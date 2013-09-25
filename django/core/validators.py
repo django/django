@@ -1,16 +1,14 @@
 from __future__ import unicode_literals
 
 import re
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -76,7 +74,7 @@ def validate_integer(value):
     try:
         int(value)
     except (ValueError, TypeError):
-        raise ValidationError('')
+        raise ValidationError(_('Enter a valid integer.'), code='invalid')
 
 
 class EmailValidator(object):
@@ -87,7 +85,7 @@ class EmailValidator(object):
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)', # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?$)'  # domain
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})\.?$'  # domain
         # literal form, ipv4 address (SMTP 4.1.3)
         r'|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$',
         re.IGNORECASE)
@@ -188,11 +186,7 @@ class BaseValidator(object):
         cleaned = self.clean(value)
         params = {'limit_value': self.limit_value, 'show_value': cleaned}
         if self.compare(cleaned, self.limit_value):
-            raise ValidationError(
-                self.message % params,
-                code=self.code,
-                params=params,
-            )
+            raise ValidationError(self.message, code=self.code, params=params)
 
 
 class MaxValueValidator(BaseValidator):

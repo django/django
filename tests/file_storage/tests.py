@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import errno
 import os
@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
 import zlib
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -22,12 +23,11 @@ from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
-from django.test import SimpleTestCase
-from django.utils import six
-from django.utils import unittest
-from django.utils._os import upath
+from django.test import LiveServerTestCase, SimpleTestCase
 from django.test.utils import override_settings
-from servers.tests import LiveServerBase
+from django.utils import six
+from django.utils.six.moves.urllib.request import urlopen
+from django.utils._os import upath
 
 try:
     from django.utils.image import Image
@@ -361,6 +361,14 @@ class FileStorageTests(unittest.TestCase):
         with self.assertRaises(IOError):
             self.storage.save('error.file', f1)
 
+    def test_delete_no_name(self):
+        """
+        Calling delete with an empty name should not try to remove the base
+        storage directory, but fail loudly (#20660).
+        """
+        with self.assertRaises(AssertionError):
+            self.storage.delete('')
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):
@@ -450,6 +458,18 @@ class FileStoragePermissions(unittest.TestCase):
         fname = self.storage.save("some_file", ContentFile("data"))
         mode = os.stat(self.storage.path(fname))[0] & 0o777
         self.assertEqual(mode, 0o666 & ~self.umask)
+
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765)
+    def test_file_upload_directory_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o765)
+
+    @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
+    def test_file_upload_directory_default_permissions(self):
+        name = self.storage.save("the_directory/the_file", ContentFile("data"))
+        dir_mode = os.stat(os.path.dirname(self.storage.path(name)))[0] & 0o777
+        self.assertEqual(dir_mode, 0o777 & ~self.umask)
 
 class FileStoragePathParsing(unittest.TestCase):
     def setUp(self):
@@ -544,9 +564,10 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         from django.core.files.images import ImageFile
 
         img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
-        image = ImageFile(open(img_path, 'rb'))
-        image_pil = Image.open(img_path)
-        size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
+        with open(img_path, 'rb') as file:
+            image = ImageFile(file)
+            image_pil = Image.open(img_path)
+            size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
@@ -588,11 +609,11 @@ class ContentFileTestCase(unittest.TestCase):
         Test that ContentFile can accept both bytes and unicode and that the
         retrieved content is of the same type.
         """
-        self.assertTrue(isinstance(ContentFile(b"content").read(), bytes))
+        self.assertIsInstance(ContentFile(b"content").read(), bytes)
         if six.PY3:
-            self.assertTrue(isinstance(ContentFile("español").read(), six.text_type))
+            self.assertIsInstance(ContentFile("español").read(), six.text_type)
         else:
-            self.assertTrue(isinstance(ContentFile("español").read(), bytes))
+            self.assertIsInstance(ContentFile("español").read(), bytes)
 
     def test_content_saving(self):
         """
@@ -613,10 +634,15 @@ class NoNameFileTestCase(unittest.TestCase):
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
 
-class FileLikeObjectTestCase(LiveServerBase):
+
+class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
+
+    available_apps = []
+    urls = 'file_storage.urls'
+
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
         self.storage = FileSystemStorage(location=self.temp_dir)
@@ -628,12 +654,10 @@ class FileLikeObjectTestCase(LiveServerBase):
         """
         Test the File storage API with a file like object coming from urllib2.urlopen()
         """
-
-        file_like_object = self.urlopen('/example_view/')
+        file_like_object = urlopen(self.live_server_url + '/')
         f = File(file_like_object)
         stored_filename = self.storage.save("remote_file.html", f)
 
-        remote_file = self.urlopen('/example_view/')
-
+        remote_file = urlopen(self.live_server_url + '/')
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())

@@ -117,7 +117,7 @@ class OwnerProfile(models.Model):
 
 @python_2_unicode_compatible
 class Restaurant(Place):
-    serves_pizza = models.BooleanField()
+    serves_pizza = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -141,11 +141,11 @@ class Price(models.Model):
         unique_together = (('price', 'quantity'),)
 
 class MexicanRestaurant(Restaurant):
-    serves_tacos = models.BooleanField()
+    serves_tacos = models.BooleanField(default=False)
 
 class ClassyMexicanRestaurant(MexicanRestaurant):
     restaurant = models.OneToOneField(MexicanRestaurant, parent_link=True, primary_key=True)
-    tacos_are_yummy = models.BooleanField()
+    tacos_are_yummy = models.BooleanField(default=False)
 
 # models for testing unique_together validation when a fk is involved and
 # using inlineformset_factory.

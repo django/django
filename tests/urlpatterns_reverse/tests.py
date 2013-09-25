@@ -1,18 +1,20 @@
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
+
+import unittest
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, resolve, get_callable,
+from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
-from django.utils import unittest, six
+from django.utils import six
 
 from . import urlconf_outer, middleware, views
 
@@ -156,7 +158,7 @@ class NoURLPatternsTests(TestCase):
         resolver = RegexURLResolver(r'^$', self.urls)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf urlpatterns_reverse.no_urls "\
+            "The included urlconf urlpatterns_reverse.no_urls "
             "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
 
 class URLPatternReverse(TestCase):
@@ -192,6 +194,20 @@ class URLPatternReverse(TestCase):
         self.assertEqual('/%7Eme/places/1/',
                 reverse('places', args=[1], prefix='/~me/'))
 
+    def test_patterns_reported(self):
+        # Regression for #17076
+        try:
+            # this url exists, but requires an argument
+            reverse("people", args=[])
+        except NoReverseMatch as e:
+            pattern_description = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+            self.assertIn(pattern_description, str(e))
+        else:
+            # we can't use .assertRaises, since we want to inspect the
+            # exception
+            self.fail("Expected a NoReverseMatch, but none occurred.")
+
+
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
         """
@@ -202,6 +218,19 @@ class ResolverTests(unittest.TestCase):
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
         self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+
+    def test_reverse_lazy_object_coercion_by_resolve(self):
+        """
+        Verifies lazy object returned by reverse_lazy is coerced to
+        text by resolve(). Previous to #21043, this would raise a TypeError.
+        """
+        urls = 'urlpatterns_reverse.named_urls'
+        proxy_url = reverse_lazy('named-url1', urlconf=urls)
+        resolver = get_resolver(urls)
+        try:
+            match = resolver.resolve(proxy_url)
+        except TypeError:
+            self.fail('Failed to coerce lazy object to text')
 
     def test_non_regex(self):
         """
@@ -246,7 +275,7 @@ class ResolverTests(unittest.TestCase):
             self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
             for tried, expected in zip(e.args[0]['tried'], url_types_names):
                 for t, e in zip(tried, expected):
-                    self.assertTrue(isinstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type']))
+                    self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
                         if not e['name']:
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
@@ -278,11 +307,11 @@ class ReverseShortcutTests(TestCase):
                 return "/hi-there/"
 
         res = redirect(FakeObj())
-        self.assertTrue(isinstance(res, HttpResponseRedirect))
+        self.assertIsInstance(res, HttpResponseRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
         res = redirect(FakeObj(), permanent=True)
-        self.assertTrue(isinstance(res, HttpResponsePermanentRedirect))
+        self.assertIsInstance(res, HttpResponsePermanentRedirect)
         self.assertEqual(res.url, '/hi-there/')
 
     def test_redirect_to_view_name(self):
@@ -516,7 +545,7 @@ class RequestURLconfTests(TestCase):
             b''.join(self.client.get('/second_test/'))
 
 class ErrorHandlerResolutionTests(TestCase):
-    """Tests for handler404 and handler500"""
+    """Tests for handler400, handler404 and handler500"""
 
     def setUp(self):
         from django.core.urlresolvers import RegexURLResolver
@@ -528,12 +557,14 @@ class ErrorHandlerResolutionTests(TestCase):
     def test_named_handlers(self):
         from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.resolver.resolve400(), handler)
         self.assertEqual(self.resolver.resolve404(), handler)
         self.assertEqual(self.resolver.resolve500(), handler)
 
     def test_callable_handers(self):
         from .views import empty_view
         handler = (empty_view, {})
+        self.assertEqual(self.callable_resolver.resolve400(), handler)
         self.assertEqual(self.callable_resolver.resolve404(), handler)
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 

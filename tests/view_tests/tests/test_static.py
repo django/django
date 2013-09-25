@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import mimetypes
 from os import path
@@ -6,7 +6,7 @@ import unittest
 
 from django.conf.urls.static import static
 from django.http import HttpResponseNotModified
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.http import http_date
 from django.views.static import was_modified_since
@@ -16,7 +16,7 @@ from ..urls import media_dir
 
 
 @override_settings(DEBUG=True)
-class StaticTests(TestCase):
+class StaticTests(SimpleTestCase):
     """Tests django views in django/views/static.py"""
 
     prefix = 'site_media'
@@ -60,7 +60,7 @@ class StaticTests(TestCase):
             # This is 24h before max Unix time. Remember to fix Django and
             # update this test well before 2038 :)
             )
-        self.assertTrue(isinstance(response, HttpResponseNotModified))
+        self.assertIsInstance(response, HttpResponseNotModified)
 
     def test_invalid_if_modified_since(self):
         """Handle bogus If-Modified-Since values gracefully
@@ -93,6 +93,10 @@ class StaticTests(TestCase):
             self.assertEqual(fp.read(), response_content)
         self.assertEqual(len(response_content),
                           int(response['Content-Length']))
+
+    def test_404(self):
+        response = self.client.get('/views/%s/non_existing_resource' % self.prefix)
+        self.assertEqual(404, response.status_code)
 
 
 class StaticHelperTest(StaticTests):

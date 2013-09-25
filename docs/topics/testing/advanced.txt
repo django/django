@@ -5,18 +5,18 @@ Advanced testing topics
 The request factory
 ===================
 
-.. module:: django.test.client
+.. currentmodule:: django.test
 
 .. class:: RequestFactory
 
-The :class:`~django.test.client.RequestFactory` shares the same API as
+The :class:`~django.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
 view function the same way as you would test any other function -- as
 a black box, with exactly known inputs, testing for specific outputs.
 
-The API for the :class:`~django.test.client.RequestFactory` is a slightly
+The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
@@ -37,17 +37,23 @@ Example
 
 The following is a simple unit test using the request factory::
 
-    from django.utils import unittest
-    from django.test.client import RequestFactory
+    from django.contrib.auth.models import User
+    from django.test import TestCase, RequestFactory
 
-    class SimpleTest(unittest.TestCase):
+    class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
+            self.user = User.objects.create_user(
+                first_name='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
+
+            # Recall that middleware are not suported. You can simulate a
+            # logged-in user by setting request.user manually.
+            request.user = self.user
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
@@ -113,7 +119,8 @@ two databases.
 Controlling creation order for test databases
 ---------------------------------------------
 
-By default, Django will always create the ``default`` database first.
+By default, Django will assume all databases depend on the ``default``
+database and therefore always create the ``default`` database first.
 However, no guarantees are made on the creation order of any other
 databases in your test setup.
 
@@ -129,6 +136,7 @@ can specify the dependencies that exist using the
         },
         'diamonds': {
             # ... db settings
+             'TEST_DEPENDENCIES': []
         },
         'clubs': {
             # ... db settings
@@ -152,6 +160,76 @@ pair is not guaranteed); then ``hearts``; and finally ``spades``.
 If there are any circular dependencies in the
 :setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
 exception will be raised.
+
+Advanced features of ``TransactionTestCase``
+============================================
+
+.. attribute:: TransactionTestCase.available_apps
+
+    .. versionadded:: 1.6
+
+    .. warning::
+
+        This attribute is a private API. It may be changed or removed without
+        a deprecation period in the future, for instance to accommodate changes
+        in application loading.
+
+        It's used to optimize Django's own test suite, which contains hundreds
+        of models but no relations between models in different applications.
+
+    By default, ``available_apps`` is set to ``None``. After each test, Django
+    calls :djadmin:`flush` to reset the database state. This empties all tables
+    and emits the :data:`~django.db.models.signals.post_migrate` signal, which
+    re-creates one content type and three permissions for each model. This
+    operation gets expensive proportionally to the number of models.
+
+    Setting ``available_apps`` to a list of applications instructs Django to
+    behave as if only the models from these applications were available. The
+    behavior of ``TransactionTestCase`` changes as follows:
+
+    - :data:`~django.db.models.signals.post_migrate` is fired before each
+      test to create the content types and permissions for each model in
+      available apps, in case they're missing.
+    - After each test, Django empties only tables corresponding to models in
+      available apps. However, at the database level, truncation may cascade to
+      related models in unavailable apps. Furthermore
+      :data:`~django.db.models.signals.post_migrate` isn't fired; it will be
+      fired by the next ``TransactionTestCase``, after the correct set of
+      applications is selected.
+
+    Since the database isn't fully flushed, if a test creates instances of
+    models not included in ``available_apps``, they will leak and they may
+    cause unrelated tests to fail. Be careful with tests that use sessions;
+    the default session engine stores them in the database.
+
+    Since :data:`~django.db.models.signals.post_migrate` isn't emitted after
+    flushing the database, its state after a ``TransactionTestCase`` isn't the
+    same as after a ``TestCase``: it's missing the rows created by listeners
+    to :data:`~django.db.models.signals.post_migrate`. Considering the
+    :ref:`order in which tests are executed <order-of-tests>`, this isn't an
+    issue, provided either all ``TransactionTestCase`` in a given test suite
+    declare ``available_apps``, or none of them.
+
+    ``available_apps`` is mandatory in Django's own test suite.
+
+.. attribute:: TransactionTestCase.reset_sequences
+
+    Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
+    sure sequences are always reset before the test run::
+
+        class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
+            reset_sequences = True
+
+            def test_animal_pk(self):
+                lion = Animal.objects.create(name="lion", sound="roar")
+                # lion.pk is guaranteed to always be 1
+                self.assertEqual(lion.pk, 1)
+
+    Unless you are explicitly testing primary keys sequence numbers, it is
+    recommended that you do not hard code primary key values in tests.
+
+    Using ``reset_sequences = True`` will slow down the test, since the primary
+    key reset is an relatively expensive database operation.
 
 Running tests outside the test runner
 =====================================
@@ -195,7 +273,7 @@ testing behavior. This behavior involves:
 
 #. Creating the test databases.
 
-#. Running ``syncdb`` to install models and initial data into the test
+#. Running ``migrate`` to install models and initial data into the test
    databases.
 
 #. Running the tests that were found.
@@ -217,11 +295,13 @@ Defining a test runner
 
 .. currentmodule:: django.test.runner
 
+.. versionadded:: 1.6
+
 A test runner is a class defining a ``run_tests()`` method. Django ships
-with a ``DiscoverRunner`` class that defines the default Django
-testing behavior. This class defines the ``run_tests()`` entry point,
-plus a selection of other methods that are used to by ``run_tests()`` to
-set up, execute and tear down the test suite.
+with a ``DiscoverRunner`` class that defines the default Django testing
+behavior. This class defines the ``run_tests()`` entry point, plus a
+selection of other methods that are used to by ``run_tests()`` to set up,
+execute and tear down the test suite.
 
 .. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=True, **kwargs)
 
@@ -257,6 +337,32 @@ set up, execute and tear down the test suite.
 
 Attributes
 ~~~~~~~~~~
+
+.. attribute:: DiscoverRunner.test_suite
+
+    .. versionadded:: 1.7
+
+    The class used to build the test suite. By default it is set to
+    ``unittest.TestSuite``. This can be overridden if you wish to implement
+    different logic for collecting tests.
+
+.. attribute:: DiscoverRunner.test_runner
+
+    .. versionadded:: 1.7
+
+    This is the class of the low-level test runner which is used to execute
+    the individual tests and format the results. By default it is set to
+    ``unittest.TextTestRunner``. Despite the unfortunate similarity in
+    naming conventions, this is not the same type of class as
+    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    can override this attribute to modify the way tests are run and reported.
+
+.. attribute:: DiscoverRunner.test_loader
+
+    This is the class that loads tests, whether from TestCases or modules or
+    otherwise and bundles them into test suites for the runner to execute.
+    By default it is set to ``unittest.defaultTestLoader``. You can override
+    this attribute if your tests are going to be loaded in unusual ways.
 
 .. attribute:: DiscoverRunner.option_list
 
@@ -386,7 +492,7 @@ can be useful during testing.
 
 .. function:: create_test_db([verbosity=1, autoclobber=False])
 
-    Creates a new test database and runs ``syncdb`` against it.
+    Creates a new test database and runs ``migrate`` against it.
 
     ``verbosity`` has the same behavior as in ``run_tests()``.
 

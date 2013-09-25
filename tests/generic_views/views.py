@@ -1,7 +1,6 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -91,6 +90,14 @@ class ArtistCreate(generic.CreateView):
 class NaiveAuthorCreate(generic.CreateView):
     queryset = Author.objects.all()
     fields = '__all__'
+
+
+class TemplateResponseWithoutTemplate(generic.detail.SingleObjectTemplateResponseMixin, generic.View):
+    # we don't define the usual template_name here
+
+    def __init__(self):
+        # Dummy object, but attr is required by get_template_name()
+        self.object = None
 
 
 class AuthorCreate(generic.CreateView):
@@ -226,6 +233,10 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
 
     def get_context_object_name(self, obj):
         return "test_name"
+
+class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
+    model = Book
+    object = Book(name="dummy")
 
 class BookSigningConfig(object):
     model = BookSigning

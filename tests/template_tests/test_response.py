@@ -95,7 +95,7 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertEqual(response.content, b'foo')
 
     def test_set_content(self):
-        # content can be overriden
+        # content can be overridden
         response = self._response()
         self.assertFalse(response.is_rendered)
         response.content = 'spam'

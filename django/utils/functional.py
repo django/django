@@ -4,6 +4,7 @@ from functools import wraps
 import sys
 
 from django.utils import six
+from django.utils.six.moves import copyreg
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -147,6 +148,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __ne__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() != other
+
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
@@ -161,7 +167,7 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and not six.PY3:
+            if self._delegate_bytes and six.PY2:
                 return bytes(self) % rhs
             elif self._delegate_text:
                 return six.text_type(self) % rhs
@@ -251,23 +257,18 @@ class LazyObject(object):
         """
         Must be implemented by subclasses to initialise the wrapped object.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
 
     # Dictionary methods support
-    @new_method_proxy
-    def __getitem__(self, key):
-        return self[key]
+    __getitem__ = new_method_proxy(operator.getitem)
+    __setitem__ = new_method_proxy(operator.setitem)
+    __delitem__ = new_method_proxy(operator.delitem)
 
-    @new_method_proxy
-    def __setitem__(self, key, value):
-        self[key] = value
-
-    @new_method_proxy
-    def __delitem__(self, key):
-        del self[key]
+    __len__ = new_method_proxy(len)
+    __contains__ = new_method_proxy(operator.contains)
 
 
 # Workaround for http://bugs.python.org/issue12370
@@ -323,15 +324,23 @@ class SimpleLazyObject(LazyObject):
             self._setup()
         return self._wrapped.__dict__
 
-    # Python 3.3 will call __reduce__ when pickling; these methods are needed
-    # to serialize and deserialize correctly. They are not called in earlier
-    # versions of Python.
+    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # to serialize and deserialize correctly.
     @classmethod
     def __newobj__(cls, *args):
         return cls.__new__(cls, *args)
 
-    def __reduce__(self):
-        return (self.__newobj__, (self.__class__,), self.__getstate__())
+    def __reduce_ex__(self, proto):
+        if proto >= 2:
+            # On Py3, since the default protocol is 3, pickle uses the
+            # ``__newobj__`` method (& more efficient opcodes) for writing.
+            return (self.__newobj__, (self.__class__,), self.__getstate__())
+        else:
+            # On Py2, the default protocol is 0 (for back-compat) & the above
+            # code fails miserably (see regression test). Instead, we return
+            # exactly what's returned if there's no ``__reduce__`` method at
+            # all.
+            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
 
     # Return a meaningful representation of the lazy object for debugging
     # without evaluating the wrapped object.
@@ -389,9 +398,8 @@ def partition(predicate, values):
 if sys.version_info >= (2, 7, 2):
     from functools import total_ordering
 else:
-    # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
-    # total_ordering in 2.7 versions prior to 2.7.2 is buggy. See
-    # http://bugs.python.org/issue10042 for details. For these versions use
+    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
+    # See http://bugs.python.org/issue10042 for details. For these versions use
     # code borrowed from Python 2.7.3.
     def total_ordering(cls):
         """Class decorator that fills in missing ordering methods"""

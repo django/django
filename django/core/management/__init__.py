@@ -1,15 +1,13 @@
 import collections
+import imp
+from importlib import import_module
+from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
-from optparse import OptionParser, NO_DEFAULT
-import imp
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.core.management.color import color_style
-from django.utils.importlib import import_module
-from django.utils._os import upath
 from django.utils import six
 
 # For backwards compatibility: get_version() used to be in this module.
@@ -101,7 +99,7 @@ def get_commands():
     """
     global _commands
     if _commands is None:
-        _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
+        _commands = dict((name, 'django.core') for name in find_commands(__path__[0]))
 
         # Find the installed apps
         from django.conf import settings
@@ -116,8 +114,8 @@ def get_commands():
         for app_name in apps:
             try:
                 path = find_management_module(app_name)
-                _commands.update(dict([(name, app_name)
-                                       for name in find_commands(path)]))
+                _commands.update(dict((name, app_name)
+                                       for name in find_commands(path)))
             except ImportError:
                 pass # No management module - ignore this app
 
@@ -148,7 +146,7 @@ def call_command(name, *args, **options):
 
     # Grab out a list of defaults from the options. optparse does this for us
     # when the script runs from the command line, but since call_command can
-    # be called programatically, we need to simulate the loading and handling
+    # be called programmatically, we need to simulate the loading and handling
     # of defaults (see #10080 for details).
     defaults = {}
     for opt in klass.option_list:
@@ -338,7 +336,7 @@ class ManagementUtility(object):
             options = [opt for opt in options if opt[0] not in prev_opts]
 
             # filter options by current input
-            options = sorted([(k, v) for k, v in options if k.startswith(curr)])
+            options = sorted((k, v) for k, v in options if k.startswith(curr))
             for option in options:
                 opt_label = option[0]
                 # append '=' to options which require args

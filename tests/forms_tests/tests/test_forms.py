@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import copy
 import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.validators import RegexValidator
 from django.forms import *
 from django.http import QueryDict
 from django.template import Template, Context
@@ -436,11 +438,11 @@ class FormsTestCase(TestCase):
             name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
 
         f = BeatleForm(auto_id=False)
-        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), """<label><input type="radio" name="name" value="john" /> John</label>
+        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), """<label><input type="radio" name="name" value="john" /> John</label>
 <label><input type="radio" name="name" value="paul" /> Paul</label>
 <label><input type="radio" name="name" value="george" /> George</label>
 <label><input type="radio" name="name" value="ringo" /> Ringo</label>""")
-        self.assertHTMLEqual('\n'.join(['<div>%s</div>' % bf for bf in f['name']]), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
+        self.assertHTMLEqual('\n'.join('<div>%s</div>' % bf for bf in f['name']), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
 <div><label><input type="radio" name="name" value="paul" /> Paul</label></div>
 <div><label><input type="radio" name="name" value="george" /> George</label></div>
 <div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>""")
@@ -451,7 +453,7 @@ class FormsTestCase(TestCase):
             name = CharField()
 
         f = BeatleForm(auto_id=False)
-        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), '<input type="text" name="name" />')
+        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), '<input type="text" name="name" />')
 
     def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:
@@ -1172,9 +1174,9 @@ class FormsTestCase(TestCase):
         # If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
         # then the latter will get precedence.
         class UserRegistration(Form):
-           username = CharField(max_length=10, initial=initial_django)
-           password = CharField(widget=PasswordInput)
-           options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
+            username = CharField(max_length=10, initial=initial_django)
+            password = CharField(widget=PasswordInput)
+            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
 
         p = UserRegistration(auto_id=False)
         self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
@@ -1398,7 +1400,7 @@ class FormsTestCase(TestCase):
             birthday = DateField()
 
             def add_prefix(self, field_name):
-                return self.prefix and '%s-prefix-%s' % (self.prefix, field_name) or field_name
+                return '%s-prefix-%s' % (self.prefix, field_name) if self.prefix else field_name
 
         p = Person(prefix='foo')
         self.assertHTMLEqual(p.as_ul(), """<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
@@ -1589,9 +1591,9 @@ class FormsTestCase(TestCase):
         # Recall from above that passing the "auto_id" argument to a Form gives each
         # field an "id" attribute.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1601,18 +1603,18 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
-<p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
-<p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
-<p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
+<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
+<p><label for="id_password1">Password1:</label> <input type="password" name="password1" id="id_password1" /></p>
+<p><label for="id_password2">Password2:</label> <input type="password" name="password2" id="id_password2" /></p>
 <input type="submit" />
 </form>""")
 
         # User form.[field].help_text to output a field's help text. If the given field
         # does not have help text, nothing will be output.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}<br />{{ form.username.help_text }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1792,6 +1794,95 @@ class FormsTestCase(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name' : 'fname lname'})
 
+    def test_multivalue_deep_copy(self):
+        """
+        #19298 -- MultiValueField needs to override the default as it needs
+        to deep-copy subfields:
+        """
+        class ChoicesField(MultiValueField):
+            def __init__(self, fields=(), *args, **kwargs):
+                fields = (ChoiceField(label='Rank',
+                           choices=((1,1),(2,2))),
+                          CharField(label='Name', max_length=10))
+                super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
+
+
+        field = ChoicesField()
+        field2 = copy.deepcopy(field)
+        self.assertTrue(isinstance(field2, ChoicesField))
+        self.assertFalse(id(field2.fields) == id(field.fields))
+        self.assertFalse(id(field2.fields[0].choices) ==
+                         id(field.fields[0].choices))
+
+    def test_multivalue_optional_subfields(self):
+        class PhoneField(MultiValueField):
+            def __init__(self, *args, **kwargs):
+                fields = (
+                    CharField(label='Country Code', validators=[
+                        RegexValidator(r'^\+\d{1,2}$', message='Enter a valid country code.')]),
+                    CharField(label='Phone Number'),
+                    CharField(label='Extension', error_messages={'incomplete': 'Enter an extension.'}),
+                    CharField(label='Label', required=False, help_text='E.g. home, work.'),
+                )
+                super(PhoneField, self).__init__(fields, *args, **kwargs)
+
+            def compress(self, data_list):
+                if data_list:
+                    return '%s.%s ext. %s (label: %s)' % tuple(data_list)
+                return None
+
+        # An empty value for any field will raise a `required` error on a
+        # required `MultiValueField`.
+        f = PhoneField()
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61'])
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['+61', '287654321', '123'])
+        self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # Empty values for fields will NOT raise a `required` error on an
+        # optional `MultiValueField`
+        f = PhoneField(required=False)
+        self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(None))
+        self.assertEqual(None, f.clean([]))
+        self.assertEqual('+61. ext.  (label: )', f.clean(['+61']))
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # For a required `MultiValueField` with `require_all_fields=False`, a
+        # `required` error will only be raised if all fields are empty. Fields
+        # can individually be required or optional. An empty value for any
+        # required field will raise an `incomplete` error.
+        f = PhoneField(require_all_fields=False)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        six.assertRaisesRegex(self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
+        # For an optional `MultiValueField` with `require_all_fields=False`, we
+        # don't get any `required` error but we still get `incomplete` errors.
+        f = PhoneField(required=False, require_all_fields=False)
+        self.assertEqual(None, f.clean(''))
+        self.assertEqual(None, f.clean(None))
+        self.assertEqual(None, f.clean([]))
+        self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
+        self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
+        six.assertRaisesRegex(self, ValidationError,
+            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home'])
+        self.assertRaisesMessage(ValidationError,
+            "'Enter a valid country code.'", f.clean, ['61', '287654321', '123', 'Home'])
+
     def test_custom_empty_values(self):
         """
         Test that form fields can customize what is considered as an empty value
@@ -1819,17 +1910,17 @@ class FormsTestCase(TestCase):
 
         testcases = [  # (args, kwargs, expected)
             # without anything: just print the <label>
-            ((), {}, '<label for="id_field">Field</label>'),
+            ((), {}, '<label for="id_field">Field:</label>'),
 
             # passing just one argument: overrides the field's label
-            (('custom',), {}, '<label for="id_field">custom</label>'),
+            (('custom',), {}, '<label for="id_field">custom:</label>'),
 
-            # the overriden label is escaped
-            (('custom&',), {}, '<label for="id_field">custom&amp;</label>'),
-            ((mark_safe('custom&'),), {}, '<label for="id_field">custom&</label>'),
+            # the overridden label is escaped
+            (('custom&',), {}, '<label for="id_field">custom&amp;:</label>'),
+            ((mark_safe('custom&'),), {}, '<label for="id_field">custom&:</label>'),
 
             # Passing attrs to add extra attributes on the <label>
-            ((), {'attrs': {'class': 'pretty'}}, '<label for="id_field" class="pretty">Field</label>')
+            ((), {'attrs': {'class': 'pretty'}}, '<label for="id_field" class="pretty">Field:</label>')
         ]
 
         for args, kwargs, expected in testcases:
@@ -1844,5 +1935,50 @@ class FormsTestCase(TestCase):
             field = CharField()
         boundfield = SomeForm(auto_id='')['field']
 
-        self.assertHTMLEqual(boundfield.label_tag(), 'Field')
-        self.assertHTMLEqual(boundfield.label_tag('Custom&'), 'Custom&amp;')
+        self.assertHTMLEqual(boundfield.label_tag(), 'Field:')
+        self.assertHTMLEqual(boundfield.label_tag('Custom&'), 'Custom&amp;:')
+
+    def test_boundfield_label_tag_custom_widget_id_for_label(self):
+        class CustomIdForLabelTextInput(TextInput):
+            def id_for_label(self, id):
+                return 'custom_' + id
+
+        class EmptyIdForLabelTextInput(TextInput):
+            def id_for_label(self, id):
+                return None
+
+        class SomeForm(Form):
+            custom = CharField(widget=CustomIdForLabelTextInput)
+            empty = CharField(widget=EmptyIdForLabelTextInput)
+
+        form = SomeForm()
+        self.assertHTMLEqual(form['custom'].label_tag(), '<label for="custom_id_custom">Custom:</label>')
+        self.assertHTMLEqual(form['empty'].label_tag(), '<label>Empty:</label>')
+
+    def test_boundfield_empty_label(self):
+        class SomeForm(Form):
+            field = CharField(label='')
+        boundfield = SomeForm()['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')
+
+    def test_label_tag_override(self):
+        """
+        BoundField label_suffix (if provided) overrides Form label_suffix
+        """
+        class SomeForm(Form):
+            field = CharField()
+        boundfield = SomeForm(label_suffix='!')['field']
+
+        self.assertHTMLEqual(boundfield.label_tag(label_suffix='$'), '<label for="id_field">Field$</label>')
+
+    def test_field_name(self):
+        """#5749 - `field_name` may be used as a key in _html_output()."""
+        class SomeForm(Form):
+            some_field = CharField()
+
+            def as_p(self):
+                return self._html_output('<p id="p_%(field_name)s"></p>', '%s', '</p>', ' %s', True)
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')

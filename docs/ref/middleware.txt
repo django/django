@@ -37,7 +37,7 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 Adds a few conveniences for perfectionists:
 
 * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
-  setting, which should be a list of strings.
+  setting, which should be a list of compiled regular expression objects.
 
 * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
   :setting:`PREPEND_WWW` settings.
@@ -71,19 +71,6 @@ Adds a few conveniences for perfectionists:
 * Sends broken link notification emails to :setting:`MANAGERS` (see
   :doc:`/howto/error-reporting`).
 
-View metadata middleware
-------------------------
-
-.. module:: django.middleware.doc
-   :synopsis: Middleware to help your app self-document.
-
-.. class:: XViewMiddleware
-
-Sends custom ``X-View`` HTTP headers to HEAD requests that come from IP
-addresses defined in the :setting:`INTERNAL_IPS` setting. This is used by
-Django's :doc:`automatic documentation system </ref/contrib/admin/admindocs>`.
-Depends on :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`.
-
 GZip middleware
 ---------------
 
@@ -91,6 +78,20 @@ GZip middleware
    :synopsis: Middleware to serve GZipped content for performance.
 
 .. class:: GZipMiddleware
+
+.. warning::
+
+    Security researchers recently revealed that when compression techniques
+    (including ``GZipMiddleware``) are used on a website, the site becomes
+    exposed to a number of possible attacks. These approaches can be used to
+    compromise, amongst other things, Django's CSRF protection. Before using
+    ``GZipMiddleware`` on your site, you should consider very carefully whether
+    you are subject to these attacks. If you're in *any* doubt about whether
+    you're affected, you should avoid using ``GZipMiddleware``. For more
+    details, see the `the BREACH paper (PDF)`_ and `breachattack.com`_.
+
+    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: http://breachattack.com
 
 Compresses content for browsers that understand GZip compression (all modern
 browsers).

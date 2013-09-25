@@ -166,7 +166,9 @@ setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
 local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting.
+in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
+``--insecure`` doesn't work with
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
 
 Example usage::
 
@@ -226,7 +228,7 @@ CachedStaticFilesStorage
 
     would be replaced by calling the
     :meth:`~django.core.files.storage.Storage.url`
-    method of the ``CachedStaticFilesStorage`` storage backend, ultimatively
+    method of the ``CachedStaticFilesStorage`` storage backend, ultimately
     saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
     content:
 
@@ -254,8 +256,6 @@ CachedStaticFilesStorage
     the ``'default'`` cache backend.
 
     .. method:: file_hash(name, content=None)
-
-    .. versionadded:: 1.5
 
     The method that is used when creating the hashed name of a file.
     Needs to return a hash for the given file name and content.
@@ -289,8 +289,6 @@ The previous example is equal to calling the ``url`` method of an instance of
 :setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
 useful when using a non-local storage backend to deploy files as documented
 in :ref:`staticfiles-from-cdn`.
-
-.. versionadded:: 1.5
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
@@ -350,6 +348,12 @@ This view function serves static files in development.
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
 
+.. versionchanged:: 1.7
+
+    This view will now raise an :exc:`~django.http.Http404` exception instead
+    of :exc:`~django.core.exceptions.ImproperlyConfigured` when
+    :setting:`DEBUG` is ``False``.
+
 .. note::
 
     To guess the served files' content types, this view relies on the
@@ -404,3 +408,26 @@ files in app directories.
     That's because this view is **grossly inefficient** and probably
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
+
+Specialized test case to support 'live testing'
+-----------------------------------------------
+
+.. class:: testing.StaticLiveServerCase
+
+This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
+
+Just like its parent, you can use it to write tests that involve running the
+code under test and consuming it with testing tools through HTTP (e.g. Selenium,
+PhantomJS, etc.), because of which it's needed that the static assets are also
+published.
+
+But given the fact that it makes use of the
+:func:`django.contrib.staticfiles.views.serve` view described above, it can
+transparently overlay at test execution-time the assets provided by the
+``staticfiles`` finders. This means you don't need to run
+:djadmin:`collectstatic` before or as a part of your tests setup.
+
+.. versionadded:: 1.7
+
+    ``StaticLiveServerCase`` is new in Django 1.7. Previously its functionality
+    was provided by :class:`django.test.LiveServerTestCase`.

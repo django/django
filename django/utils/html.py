@@ -3,18 +3,16 @@
 from __future__ import unicode_literals
 
 import re
-import string
-try:
-    from urllib.parse import quote, urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urllib import quote
-    from urlparse import urlsplit, urlunsplit
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
+
+from .html_parser import HTMLParser, HTMLParseError
+
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
@@ -24,16 +22,14 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;')]
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
+hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
-strip_tags_re = re.compile(r'</?\S([^=>]*=(\s*"[^"]*"|\s*\'[^\']*\'|\S*)|[^>])*?>', re.IGNORECASE)
 
 
 def escape(text):
@@ -81,8 +77,8 @@ def format_html(format_string, *args, **kwargs):
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs)])
+    kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
+                        six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 def format_html_join(sep, format_string, args_generator):
@@ -116,9 +112,31 @@ def linebreaks(value, autoescape=False):
     return '\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, six.text_type)
 
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def handle_entityref(self, name):
+        self.fed.append('&%s;' % name)
+    def handle_charref(self, name):
+        self.fed.append('&#%s;' % name)
+    def get_data(self):
+        return ''.join(self.fed)
+
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
-    return strip_tags_re.sub('', force_text(value))
+    s = MLStripper()
+    try:
+        s.feed(value)
+        s.close()
+    except HTMLParseError:
+        return value
+    else:
+        return s.get_data()
 strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
@@ -162,11 +180,9 @@ def smart_urlquote(url):
         # invalid IPv6 URL (normally square brackets in hostname part).
         pass
 
-    # An URL is considered unquoted if it contains no % characters or
-    # contains a % not followed by two hexadecimal digits. See #9655.
-    if '%' not in url or unquoted_percents_re.search(url):
-        # See http://bugs.python.org/issue2637
-        url = quote(force_bytes(url), safe=b'!*\'();:@&=+$,/?#[]~')
+    url = unquote(force_str(url))
+    # See http://bugs.python.org/issue2637
+    url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_text(url)
 
@@ -194,7 +210,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
-        match = None
         if '.' in word or '@' in word or ':' in word:
             # Deal with punctuation.
             lead, middle, trail = '', word, ''
@@ -281,3 +296,10 @@ def clean_html(text):
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, six.text_type)
+
+def avoid_wrapping(value):
+    """
+    Avoid text wrapping in the middle of a phrase by adding non-breaking
+    spaces where there previously were normal spaces.
+    """
+    return value.replace(" ", "\xa0")

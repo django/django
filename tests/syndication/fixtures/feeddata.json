@@ -4,7 +4,8 @@
     "pk": 1,
     "fields": {
       "title": "My first entry",
-      "date": "1850-01-01 12:30:00"
+      "updated": "1850-01-01 12:30:00",
+      "published": "1066-09-25 20:15:00"
     }
   },
   {
@@ -12,7 +13,8 @@
     "pk": 2,
     "fields": {
       "title": "My second entry",
-      "date": "2008-01-02 12:30:00"
+      "updated": "2008-01-02 12:30:00",
+      "published": "2006-03-17 18:00:00"
     }
   },
   {
@@ -20,7 +22,8 @@
     "pk": 3,
     "fields": {
       "title": "My third entry",
-      "date": "2008-01-02 13:30:00"
+      "updated": "2008-01-02 13:30:00",
+      "published": "2005-06-14 10:45:00"
     }
   },
   {
@@ -28,7 +31,17 @@
     "pk": 4,
     "fields": {
       "title": "A & B < C > D",
-      "date": "2008-01-03 13:30:00"
+      "updated": "2008-01-03 13:30:00",
+      "published": "2005-11-25 12:11:23"
+    }
+  },
+  {
+    "model": "syndication.entry",
+    "pk": 5,
+    "fields": {
+      "title": "My last entry",
+      "updated": "2013-01-20 00:00:00",
+      "published": "2013-03-25 20:00:00"
     }
   },
   {

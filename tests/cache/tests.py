@@ -2,17 +2,18 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import hashlib
 import os
+import pickle
 import random
 import re
 import string
 import tempfile
 import time
+import unittest
 import warnings
-import pickle
 
 from django.conf import settings
 from django.core import management
@@ -28,8 +29,10 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import override_settings, six
-from django.utils import timezone, translation, unittest
+from django.test.utils import override_settings, IgnoreDeprecationWarningsMixin
+from django.utils import six
+from django.utils import timezone
+from django.utils import translation
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.utils.encoding import force_text
@@ -307,7 +310,7 @@ class BaseCacheTests(object):
         # Don't want fields with callable as default to be called on cache write
         expensive_calculation.num_runs = 0
         Poll.objects.all().delete()
-        my_poll = Poll.objects.create(question="What?")
+        Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
         defer_qs = Poll.objects.all().defer('question')
         self.assertEqual(defer_qs.count(), 1)
@@ -320,14 +323,14 @@ class BaseCacheTests(object):
         # Don't want fields with callable as default to be called on cache read
         expensive_calculation.num_runs = 0
         Poll.objects.all().delete()
-        my_poll = Poll.objects.create(question="What?")
+        Poll.objects.create(question="What?")
         self.assertEqual(expensive_calculation.num_runs, 1)
         defer_qs = Poll.objects.all().defer('question')
         self.assertEqual(defer_qs.count(), 1)
         self.cache.set('deferred_queryset', defer_qs)
         self.assertEqual(expensive_calculation.num_runs, 1)
         runs_before_cache_read = expensive_calculation.num_runs
-        cached_polls = self.cache.get('deferred_queryset')
+        self.cache.get('deferred_queryset')
         # We only want the default expensive calculation run on creation and set
         self.assertEqual(expensive_calculation.num_runs, runs_before_cache_read)
 
@@ -510,13 +513,13 @@ class BaseCacheTests(object):
                 # memcached does not allow whitespace or control characters in keys
                 self.cache.set('key with spaces', 'value')
                 self.assertEqual(len(w), 2)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 # memcached limits key length to 250
                 self.cache.set('a' * 251, 'value')
                 self.assertEqual(len(w), 1)
-                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+                self.assertIsInstance(w[0].message, CacheKeyWarning)
         finally:
             self.cache.key_func = old_func
 
@@ -827,6 +830,8 @@ def custom_key_func(key, key_prefix, version):
 
 
 class DBCacheTests(BaseCacheTests, TransactionTestCase):
+
+    available_apps = ['cache']
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
@@ -850,10 +855,6 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def test_zero_cull(self):
         self.cache = get_cache(self.backend_name, LOCATION=self._table_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
-        self.perform_cull_test(50, 18)
-
-    def test_old_initialization(self):
-        self.cache = get_cache('db://%s?max_entries=30&cull_frequency=0' % self._table_name)
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
@@ -890,7 +891,7 @@ class DBCacheRouter(object):
         if model._meta.app_label == 'django_cache':
             return 'other'
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         if model._meta.app_label == 'django_cache':
             return db == 'other'
 
@@ -949,10 +950,6 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
 
     def test_zero_cull(self):
         self.cache = get_cache(self.backend_name, OPTIONS={'MAX_ENTRIES': 30, 'CULL_FREQUENCY': 0})
-        self.perform_cull_test(50, 19)
-
-    def test_old_initialization(self):
-        self.cache = get_cache('locmem://?max_entries=30&cull_frequency=0')
         self.perform_cull_test(50, 19)
 
     def test_multiple_caches(self):
@@ -1070,10 +1067,6 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
     def test_cull(self):
         self.perform_cull_test(50, 29)
 
-    def test_old_initialization(self):
-        self.cache = get_cache('file://%s?max_entries=30' % self.dirname)
-        self.perform_cull_test(50, 29)
-
 
 class CustomCacheKeyValidationTests(unittest.TestCase):
     """
@@ -1083,7 +1076,7 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 
     """
     def test_custom_key_validation(self):
-        cache = get_cache('cache.liberal_backend://')
+        cache = get_cache('cache.liberal_backend.CacheClass')
 
         # this key is both longer than 250 characters, and has spaces
         key = 'some key with spaces' * 15
@@ -1095,12 +1088,8 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
 class GetCacheTests(unittest.TestCase):
 
     def test_simple(self):
-        cache = get_cache('locmem://')
-        from django.core.cache.backends.locmem import LocMemCache
-        self.assertTrue(isinstance(cache, LocMemCache))
-
         from django.core.cache import cache
-        self.assertTrue(isinstance(cache, get_cache('default').__class__))
+        self.assertIsInstance(cache, get_cache('default').__class__)
 
         cache = get_cache(
             'django.core.cache.backends.dummy.DummyCache', **{'TIMEOUT': 120})
@@ -1592,9 +1581,10 @@ def hello_world_view(request, value):
             },
         },
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
 
     def setUp(self):
+        super(CacheMiddlewareTest, self).setUp()
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
@@ -1602,6 +1592,7 @@ class CacheMiddlewareTest(TestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
+        super(CacheMiddlewareTest, self).tearDown()
 
     def test_constructor(self):
         """
@@ -1769,7 +1760,7 @@ class CacheMiddlewareTest(TestCase):
         time.sleep(2)
 
         # ... the default cache will still hit
-        cache = get_cache('default')
+        get_cache('default')
         response = default_view(request, '11')
         self.assertEqual(response.content, b'Hello World 1')
 

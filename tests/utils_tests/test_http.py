@@ -1,12 +1,12 @@
 from datetime import datetime
 import sys
+import unittest
 
 from django.http import HttpResponse, utils
 from django.test import RequestFactory
 from django.utils.datastructures import MultiValueDict
 from django.utils import http
 from django.utils import six
-from django.utils import unittest
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -115,12 +115,12 @@ class TestUtilsHttp(unittest.TestCase):
         # reciprocity works
         for n in [0, 1, 1000, 1000000]:
             self.assertEqual(n, http.base36_to_int(http.int_to_base36(n)))
-        if not six.PY3:
+        if six.PY2:
             self.assertEqual(sys.maxint, http.base36_to_int(http.int_to_base36(sys.maxint)))
 
         # bad input
         self.assertRaises(ValueError, http.int_to_base36, -1)
-        if not six.PY3:
+        if six.PY2:
             self.assertRaises(ValueError, http.int_to_base36, sys.maxint + 1)
         for n in ['1', 'foo', {1: 2}, (1, 2, 3), 3.141]:
             self.assertRaises(TypeError, http.int_to_base36, n)

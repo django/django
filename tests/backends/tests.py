@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+import re
 import threading
+import unittest
 
 from django.conf import settings
 from django.core.management.color import no_style
-from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
+from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
+from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.util import format_number
+from django.db.backends.utils import format_number
 from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.models.fields import (AutoField, DateField, DateTimeField,
+    DecimalField, IntegerField, TimeField)
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
     TransactionTestCase)
 from django.test.utils import override_settings, str_prefix
-from django.utils import six, unittest
+from django.utils import six
 from django.utils.six.moves import xrange
 
 from . import models
@@ -50,7 +55,8 @@ class OracleChecks(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        convert_unicode = backend.convert_unicode
+        from django.db.backends.oracle.base import convert_unicode
+
         cursor = connection.cursor()
         cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
                         [convert_unicode('_django_testing!')])
@@ -60,8 +66,10 @@ class OracleChecks(unittest.TestCase):
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables
         # as query parameters.
+        from django.db.backends.oracle.base import Database
+
         cursor = connection.cursor()
-        var = cursor.var(backend.Database.STRING)
+        var = cursor.var(Database.STRING)
         cursor.execute("BEGIN %s := 'X'; END; ", [var])
         self.assertEqual(var.getvalue(), 'X')
 
@@ -72,7 +80,7 @@ class OracleChecks(unittest.TestCase):
         # than 4000 chars and read it properly
         c = connection.cursor()
         c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join([six.text_type(x) for x in xrange(4000)])
+        long_str = ''.join(six.text_type(x) for x in xrange(4000))
         c.execute('INSERT INTO ltext VALUES (%s)', [long_str])
         c.execute('SELECT text FROM ltext')
         row = c.fetchone()
@@ -99,6 +107,25 @@ class OracleChecks(unittest.TestCase):
         # wasn't the case.
         c.execute(query)
         self.assertEqual(c.fetchone()[0], 1)
+
+
+class SQLiteTests(TestCase):
+    longMessage = True
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                        "Test valid only for SQLite")
+    def test_autoincrement(self):
+        """
+        Check that auto_increment fields are created with the AUTOINCREMENT
+        keyword in order to be monotonically increasing. Refs #10164.
+        """
+        statements = connection.creation.sql_create_model(models.Square,
+            style=no_style())
+        match = re.search('"id" ([^,]+),', statements[0][0])
+        self.assertIsNotNone(match)
+        self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1), "Wrong SQL used to create an auto-increment "
+            "column on SQLite")
 
 
 class MySQLTests(TestCase):
@@ -158,6 +185,17 @@ class DateQuotingTest(TestCase):
 @override_settings(DEBUG=True)
 class LastExecutedQueryTest(TestCase):
 
+    def test_last_executed_query(self):
+        """
+        last_executed_query should not raise an exception even if no previous
+        query has been run.
+        """
+        cursor = connection.cursor()
+        try:
+            connection.ops.last_executed_query(cursor, '', ())
+        except Exception:
+            self.fail("'last_executed_query' should not raise an exception.")
+
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]['sql'].lower()
@@ -172,7 +210,7 @@ class LastExecutedQueryTest(TestCase):
         sql, params = persons.query.sql_with_params()
         cursor = persons.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertTrue(isinstance(last_sql, six.text_type))
+        self.assertIsInstance(last_sql, six.text_type)
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")
@@ -342,6 +380,8 @@ class PostgresNewConnectionTest(TestCase):
 # connection would implicitly rollback and cause problems during teardown.
 class ConnectionCreatedSignalTest(TransactionTestCase):
 
+    available_apps = []
+
     # Unfortunately with sqlite3 the in-memory test database cannot be closed,
     # and so it cannot be re-opened during testing.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
@@ -383,7 +423,7 @@ class EscapingChecks(TestCase):
         self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
-                         "This is a sqlite-specific issue")
+                         "This is an sqlite-specific issue")
     def test_sqlite_parameter_escaping(self):
         #13648: '%s' escaping support for sqlite3
         cursor = connection.cursor()
@@ -397,7 +437,7 @@ class EscapingChecksDebug(EscapingChecks):
     pass
 
 
-class SqlliteAggregationTests(TestCase):
+class SqliteAggregationTests(TestCase):
     """
     #19360: Raise NotImplementedError when aggregating on date/time fields.
     """
@@ -413,16 +453,59 @@ class SqlliteAggregationTests(TestCase):
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
 
 
+class SqliteChecks(TestCase):
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "No need to do SQLite checks")
+    def test_convert_values_to_handle_null_value(self):
+        database_operations = DatabaseOperations(connection)
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, AutoField(primary_key=True))
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DateTimeField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, DecimalField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, IntegerField())
+        )
+        self.assertEqual(
+            None,
+            database_operations.convert_values(None, TimeField())
+        )
+
+
 class BackendTestCase(TestCase):
 
     def create_squares_with_executemany(self, args):
+        self.create_squares(args, 'format', True)
+
+    def create_squares(self, args, paramstyle, multiple):
         cursor = connection.cursor()
         opts = models.Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
-        query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
-        cursor.executemany(query, args)
+        if paramstyle=='format':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+        elif paramstyle=='pyformat':
+            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+        else:
+            raise ValueError("unsupported paramstyle in test")
+        if multiple:
+            cursor.executemany(query, args)
+        else:
+            cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
@@ -449,6 +532,35 @@ class BackendTestCase(TestCase):
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
+        self.assertEqual(models.Square.objects.count(), 9)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_execute_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = {'root': 3, 'square': 9}
+        self.create_squares(args, 'pyformat', multiple=False)
+        self.assertEqual(models.Square.objects.count(), 1)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat(self):
+        #10070: Support pyformat style passing of paramters
+        args = [{'root': i, 'square': i**2} for i in range(-5, 6)]
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 11)
+        for i in range(-5, 6):
+            square = models.Square.objects.get(root=i)
+            self.assertEqual(square.square, i**2)
+
+    @skipUnlessDBFeature('supports_paramstyle_pyformat')
+    def test_cursor_executemany_with_pyformat_iterator(self):
+        args = iter({'root': i, 'square': i**2} for i in range(-3, 2))
+        self.create_squares(args, 'pyformat', multiple=True)
+        self.assertEqual(models.Square.objects.count(), 5)
+
+        args = iter({'root': i, 'square': i**2} for i in range(3, 7))
+        with override_settings(DEBUG=True):
+            # same test for DebugCursorWrapper
+            self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
@@ -511,6 +623,8 @@ class BackendTestCase(TestCase):
 # verify if its type is django.database.db.IntegrityError.
 class FkConstraintsTests(TransactionTestCase):
 
+    available_apps = ['backends']
+
     def setUp(self):
         # Create a Reporter.
         self.r = models.Reporter.objects.create(first_name='John', last_name='Smith')
@@ -520,12 +634,19 @@ class FkConstraintsTests(TransactionTestCase):
         Try to create a model instance that violates a FK constraint. If it
         fails it should fail with IntegrityError.
         """
-        a = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
+        a1 = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
         try:
-            a.save()
+            a1.save()
         except IntegrityError:
-            return
-        self.skipTest("This backend does not support integrity checks.")
+            pass
+        else:
+            self.skipTest("This backend does not support integrity checks.")
+        # Now that we know this backend supports integrity checks we make sure
+        # constraints are also enforced for proxy models. Refs #17519
+        a2 = models.Article(headline='This is another test', reporter=self.r,
+                            pub_date=datetime.datetime(2012, 8, 3),
+                            reporter_proxy_id=30)
+        self.assertRaises(IntegrityError, a2.save)
 
     def test_integrity_checks_on_update(self):
         """
@@ -534,21 +655,32 @@ class FkConstraintsTests(TransactionTestCase):
         """
         # Create an Article.
         models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
-        # Retrive it from the DB
-        a = models.Article.objects.get(headline="Test article")
-        a.reporter_id = 30
+        # Retrieve it from the DB
+        a1 = models.Article.objects.get(headline="Test article")
+        a1.reporter_id = 30
         try:
-            a.save()
+            a1.save()
         except IntegrityError:
-            return
-        self.skipTest("This backend does not support integrity checks.")
+            pass
+        else:
+            self.skipTest("This backend does not support integrity checks.")
+        # Now that we know this backend supports integrity checks we make sure
+        # constraints are also enforced for proxy models. Refs #17519
+        # Create another article
+        r_proxy = models.ReporterProxy.objects.get(pk=self.r.pk)
+        models.Article.objects.create(headline='Another article',
+                                      pub_date=datetime.datetime(1988, 5, 15),
+                                      reporter=self.r, reporter_proxy=r_proxy)
+        # Retreive the second article from the DB
+        a2 = models.Article.objects.get(headline='Another article')
+        a2.reporter_proxy_id = 30
+        self.assertRaises(IntegrityError, a2.save)
 
     def test_disable_constraint_checks_manually(self):
         """
         When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
         """
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -560,17 +692,13 @@ class FkConstraintsTests(TransactionTestCase):
                 connection.enable_constraint_checking()
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            transaction.set_rollback(True)
 
     def test_disable_constraint_checks_context_manager(self):
         """
         When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
         """
-        transaction.set_autocommit(False)
-        try:
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
@@ -581,31 +709,23 @@ class FkConstraintsTests(TransactionTestCase):
                     a.save()
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            transaction.set_rollback(True)
 
     def test_check_constraints(self):
         """
         Constraint checks should raise an IntegrityError when bad data is in the DB.
         """
-        try:
-            transaction.set_autocommit(False)
+        with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
             # Retrive it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
-            try:
-                with connection.constraint_checks_disabled():
-                    a.save()
-                    with self.assertRaises(IntegrityError):
-                        connection.check_constraints()
-            finally:
-                transaction.rollback()
-        finally:
-            transaction.set_autocommit(True)
+            with connection.constraint_checks_disabled():
+                a.save()
+                with self.assertRaises(IntegrityError):
+                    connection.check_constraints()
+            transaction.set_rollback(True)
 
 
 class ThreadTests(TestCase):
@@ -774,6 +894,9 @@ class MySQLPKZeroTests(TestCase):
 
 
 class DBConstraintTestCase(TransactionTestCase):
+
+    available_apps = ['backends']
+
     def test_can_reference_existant(self):
         obj = models.Object.objects.create()
         ref = models.ObjectReference.objects.create(obj=obj)
@@ -840,3 +963,23 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class UnicodeArrayTestCase(TestCase):
+
+    def select(self, val):
+        cursor = connection.cursor()
+        cursor.execute("select %s", (val,))
+        return cursor.fetchone()[0]
+
+    def test_select_ascii_array(self):
+        a = ["awef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])
+
+    def test_select_unicode_array(self):
+        a = ["ᄲawef"]
+        b = self.select(a)
+        self.assertEqual(a[0], b[0])

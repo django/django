@@ -16,7 +16,7 @@ class BinaryData(models.Model):
     data = models.BinaryField(null=True)
 
 class BooleanData(models.Model):
-    data = models.BooleanField()
+    data = models.BooleanField(default=False)
 
 class CharData(models.Model):
     data = models.CharField(max_length=30, null=True)
@@ -166,7 +166,7 @@ class Intermediate(models.Model):
 # or all database backends.
 
 class BooleanPKData(models.Model):
-    data = models.BooleanField(primary_key=True)
+    data = models.BooleanField(primary_key=True, default=False)
 
 class CharPKData(models.Model):
     data = models.CharField(max_length=30, primary_key=True)

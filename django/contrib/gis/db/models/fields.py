@@ -148,6 +148,7 @@ class GeometryField(Field):
         value properly, and preserve any other lookup parameters before
         returning to the caller.
         """
+        value = super(GeometryField, self).get_prep_value(value)
         if isinstance(value, SQLEvaluator):
             return value
         elif isinstance(value, (tuple, list)):

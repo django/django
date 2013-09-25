@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.db.models import Max
 from django.test import TestCase, skipUnlessDBFeature
@@ -6,18 +6,19 @@ from django.test.utils import str_prefix
 
 from .models import Tag, Celebrity, Fan, Staff, StaffTag
 
+@skipUnlessDBFeature('can_distinct_on_fields')
 class DistinctOnTests(TestCase):
     def setUp(self):
         t1 = Tag.objects.create(name='t1')
-        t2 = Tag.objects.create(name='t2', parent=t1)
+        Tag.objects.create(name='t2', parent=t1)
         t3 = Tag.objects.create(name='t3', parent=t1)
-        t4 = Tag.objects.create(name='t4', parent=t3)
-        t5 = Tag.objects.create(name='t5', parent=t3)
+        Tag.objects.create(name='t4', parent=t3)
+        Tag.objects.create(name='t5', parent=t3)
 
         p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
         p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
         p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
-        p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
+        Staff.objects.create(id=4, name="p1", organisation="o2")
         p1_o1.coworkers.add(p2_o1, p3_o1)
         StaffTag.objects.create(staff=p1_o1, tag=t1)
         StaffTag.objects.create(staff=p1_o1, tag=t1)
@@ -29,7 +30,6 @@ class DistinctOnTests(TestCase):
         self.fan2 = Fan.objects.create(fan_of=celeb1)
         self.fan3 = Fan.objects.create(fan_of=celeb2)
 
-    @skipUnlessDBFeature('can_distinct_on_fields')
     def test_basic_distinct_on(self):
         """QuerySet.distinct('field', ...) works"""
         # (qset, expected) tuples
@@ -101,7 +101,6 @@ class DistinctOnTests(TestCase):
         c2 = c1.distinct('pk')
         self.assertNotIn('OUTER JOIN', str(c2.query))
 
-    @skipUnlessDBFeature('can_distinct_on_fields')
     def test_distinct_not_implemented_checks(self):
         # distinct + annotate not allowed
         with self.assertRaises(NotImplementedError):

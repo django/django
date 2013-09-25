@@ -3,10 +3,10 @@ A series of tests to establish that the command-line bash completion works.
 """
 import os
 import sys
+import unittest
 
 from django.conf import settings
 from django.core.management import ManagementUtility
-from django.utils import unittest
 from django.utils.six import StringIO
 
 
@@ -66,7 +66,7 @@ class BashCompletionTests(unittest.TestCase):
         "Subcommands can be autocompleted"
         self._user_input('django-admin.py sql')
         output = self._run_autocomplete()
-        self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqldropindexes sqlflush sqlindexes sqlinitialdata sqlsequencereset'])
+        self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqldropindexes sqlflush sqlindexes sqlinitialdata sqlmigrate sqlsequencereset'])
 
     def test_help(self):
         "No errors, just an empty list if there are no autocomplete options"

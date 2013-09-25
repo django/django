@@ -19,6 +19,7 @@ class ModelToValidate(models.Model):
     email = models.EmailField(blank=True)
     url = models.URLField(blank=True)
     f_with_custom_validator = models.IntegerField(blank=True, null=True, validators=[validate_answer_to_universe])
+    slug = models.SlugField(blank=True)
 
     def clean(self):
         super(ModelToValidate, self).clean()
@@ -95,7 +96,7 @@ class GenericIPAddressTestModel(models.Model):
             blank=True, null=True)
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
-    generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)
+    generic_v4unpack_ip = models.GenericIPAddressField(null=True, blank=True, unique=True, unpack_ipv4=True)
 
 
 # A model can't have multiple AutoFields

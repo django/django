@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import tempfile
 import os
@@ -9,11 +9,13 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
+from django.core.servers.basehttp import FileWrapper
 from django.conf.urls import patterns, url
 from django.db import models
 from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.admin import BooleanFieldListFilter
+from django.utils.six import StringIO
 
 from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -24,11 +26,11 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
     WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
+    Album, Question, Answer, ComplexSortedPerson, PluggableSearchPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram)
+    RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
+    ShortMessage, Telegram, FilteredManager)
 
 
 def callable_year(dt_value):
@@ -149,7 +151,7 @@ class InquisitionAdmin(admin.ModelAdmin):
 
 
 class SketchAdmin(admin.ModelAdmin):
-    raw_id_fields = ('inquisition',)
+    raw_id_fields = ('inquisition', 'defendant0', 'defendant1')
 
 
 class FabricAdmin(admin.ModelAdmin):
@@ -238,8 +240,20 @@ def redirect_to(modeladmin, request, selected):
 redirect_to.short_description = 'Redirect to (Awesome action)'
 
 
+def download(modeladmin, request, selected):
+    buf = StringIO('This is the content of the file')
+    return StreamingHttpResponse(FileWrapper(buf))
+download.short_description = 'Download subscription'
+
+
+def no_perm(modeladmin, request, selected):
+    return HttpResponse(content='No permission to perform this action',
+                        status=403)
+no_perm.short_description = 'No permission to run'
+
+
 class ExternalSubscriberAdmin(admin.ModelAdmin):
-    actions = [redirect_to, external_mail]
+    actions = [redirect_to, external_mail, download, no_perm]
 
 
 class Podcast(Media):
@@ -436,6 +450,10 @@ class GadgetAdmin(admin.ModelAdmin):
         return CustomChangeList
 
 
+class ToppingAdmin(admin.ModelAdmin):
+    readonly_fields = ('pizzas',)
+
+
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
 
@@ -528,6 +546,20 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
         return '<span style="color: #%s;">%s</span>' % ('ff00ff', obj.name)
     colored_name.allow_tags = True
     colored_name.admin_order_field = 'name'
+
+
+class PluggableSearchPersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age')
+    search_fields = ('name',)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(request, queryset, search_term)
+        try:
+            search_term_as_int = int(search_term)
+            queryset |= self.model.objects.filter(age=search_term_as_int)
+        except:
+            pass
+        return queryset, use_distinct
 
 
 class AlbumAdmin(admin.ModelAdmin):
@@ -628,12 +660,25 @@ class UndeletableObjectAdmin(admin.ModelAdmin):
         return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
 
 
+class UnchangeableObjectAdmin(admin.ModelAdmin):
+    def get_urls(self):
+        # Disable change_view, but leave other urls untouched
+        urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
+        return [p for p in urlpatterns if not p.name.endswith("_change")]
+
+
 def callable_on_unknown(obj):
     return obj.unknown
 
 
 class AttributeErrorRaisingAdmin(admin.ModelAdmin):
     list_display = [callable_on_unknown, ]
+
+
+class CustomManagerAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return FilteredManager.objects
+
 
 class MessageTestingAdmin(admin.ModelAdmin):
     actions = ["message_debug", "message_info", "message_success",
@@ -713,6 +758,7 @@ site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
+site.register(UnchangeableObject, UnchangeableObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
@@ -722,17 +768,19 @@ site.register(UndeletableObject, UndeletableObjectAdmin)
 #     related OneToOne object not registered in admin
 # when deleting Book so as exercise all four troublesome (w.r.t escaping
 # and calling force_text to avoid problems on Python 2.3) paths through
-# contrib.admin.util's get_deleted_objects function.
+# contrib.admin.utils's get_deleted_objects function.
 site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
 site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
-site.register(Topping)
+site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Question)
 site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
+site.register(FilteredManager, CustomManagerAdmin)
+site.register(PluggableSearchPerson, PluggableSearchPersonAdmin)
 site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
 site.register(AdminOrderedField, AdminOrderedFieldAdmin)
 site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
@@ -748,3 +796,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
+
+# Used to test URL namespaces
+site2 = admin.AdminSite(name="namespaced_admin")
+site2.register(User, UserAdmin)
+site2.register(Group, GroupAdmin)

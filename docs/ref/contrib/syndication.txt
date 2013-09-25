@@ -17,7 +17,7 @@ you want to generate feeds outside of a Web context, or in some other
 lower-level way.
 
 .. _RSS: http://www.whatisrss.com/
-.. _Atom: http://www.atomenabled.org/
+.. _Atom: http://tools.ietf.org/html/rfc4287
 
 The high-level framework
 ========================
@@ -49,17 +49,17 @@ are views which can be used in your :doc:`URLconf </topics/http/urls>`.
 A simple example
 ----------------
 
-This simple example, taken from `chicagocrime.org`_, describes a feed of the
-latest five news items::
+This simple example, taken from a hypothetical police beat news site describes
+a feed of the latest five news items::
 
     from django.contrib.syndication.views import Feed
     from django.core.urlresolvers import reverse
-    from chicagocrime.models import NewsItem
+    from policebeat.models import NewsItem
 
     class LatestEntriesFeed(Feed):
-        title = "Chicagocrime.org site news"
+        title = "Police beat site news"
         link = "/sitenews/"
-        description = "Updates on changes and additions to chicagocrime.org."
+        description = "Updates on changes and additions to police beat central."
 
         def items(self):
             return NewsItem.objects.order_by('-pub_date')[:5]
@@ -137,25 +137,29 @@ into those elements.
 
   See `a complex example`_ below that uses a description template.
 
-  There is also a way to pass additional information to title and description
-  templates, if you need to supply more than the two variables mentioned
-  before. You can provide your implementation of ``get_context_data`` method
-  in your Feed subclass. For example::
+  .. method:: Feed.get_context_data(self, **kwargs)
 
-    from mysite.models import Article
-    from django.contrib.syndication.views import Feed
+    .. versionadded:: 1.6
 
-    class ArticlesFeed(Feed):
-        title = "My articles"
-        description_template = "feeds/articles.html"
+      There is also a way to pass additional information to title and description
+      templates, if you need to supply more than the two variables mentioned
+      before. You can provide your implementation of ``get_context_data`` method
+      in your ``Feed`` subclass. For example::
 
-        def items(self):
-            return Article.objects.order_by('-pub_date')[:5]
+        from mysite.models import Article
+        from django.contrib.syndication.views import Feed
 
-        def get_context_data(self, **kwargs):
-            context = super(ArticlesFeed, self).get_context_data(**kwargs)
-            context['foo'] = 'bar'
-            return context
+        class ArticlesFeed(Feed):
+            title = "My articles"
+            description_template = "feeds/articles.html"
+
+            def items(self):
+                return Article.objects.order_by('-pub_date')[:5]
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticlesFeed, self).get_context_data(**kwargs)
+                context['foo'] = 'bar'
+                return context
 
   And the template:
 
@@ -195,22 +199,20 @@ into those elements.
   are responsible for doing all necessary URL quoting and conversion to
   ASCII inside the method itself.
 
-.. _chicagocrime.org: http://www.chicagocrime.org/
-
 A complex example
 -----------------
 
 The framework also supports more complex feeds, via arguments.
 
-For example, `chicagocrime.org`_ offers an RSS feed of recent crimes for every
-police beat in Chicago. It'd be silly to create a separate
+For example, a website could offer an RSS feed of recent crimes for every
+police beat in a city. It'd be silly to create a separate
 :class:`~django.contrib.syndication.views.Feed` class for each police beat; that
 would violate the :ref:`DRY principle <dry>` and would couple data to
 programming logic. Instead, the syndication framework lets you access the
 arguments passed from your :doc:`URLconf </topics/http/urls>` so feeds can output
 items based on information in the feed's URL.
 
-On chicagocrime.org, the police-beat feeds are accessible via URLs like this:
+The police beat feeds could be accessible via URLs like this:
 
 * :file:`/beats/613/rss/` -- Returns recent crimes for beat 613.
 * :file:`/beats/1424/rss/` -- Returns recent crimes for beat 1424.
@@ -234,7 +236,7 @@ Here's the code for these beat-specific feeds::
             return get_object_or_404(Beat, pk=beat_id)
 
         def title(self, obj):
-            return "Chicagocrime.org: Crimes for beat %s" % obj.beat
+            return "Police beat central: Crimes for beat %s" % obj.beat
 
         def link(self, obj):
             return obj.get_absolute_url()
@@ -335,13 +337,13 @@ URLconf to add the extra versions.
 Here's a full example::
 
     from django.contrib.syndication.views import Feed
-    from chicagocrime.models import NewsItem
+    from policebeat.models import NewsItem
     from django.utils.feedgenerator import Atom1Feed
 
     class RssSiteNewsFeed(Feed):
-        title = "Chicagocrime.org site news"
+        title = "Police beat site news"
         link = "/sitenews/"
-        description = "Updates on changes and additions to chicagocrime.org."
+        description = "Updates on changes and additions to police beat central."
 
         def items(self):
             return NewsItem.objects.order_by('-pub_date')[:5]
@@ -811,6 +813,24 @@ This example illustrates all possible attributes and methods for a
 
         item_pubdate = datetime.datetime(2005, 5, 3) # Hard-coded pubdate.
 
+        # ITEM UPDATED -- It's optional to use one of these three. This is a
+        # hook that specifies how to get the updateddate for a given item.
+        # In each case, the method/attribute should return a Python
+        # datetime.datetime object.
+
+        def item_updateddate(self, item):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            updateddate.
+            """
+
+        def item_updateddate(self):
+            """
+            Returns the updateddated for every item in the feed.
+            """
+
+        item_updateddate = datetime.datetime(2005, 5, 3) # Hard-coded updateddate.
+
         # ITEM CATEGORIES -- It's optional to use one of these three. This is
         # a hook that specifies how to get the list of categories for a given
         # item. In each case, the method/attribute should return an iterable
@@ -924,15 +944,21 @@ They share this interface:
     * ``categories``
     * ``item_copyright``
     * ``ttl``
+    * ``updateddate``
 
     Extra keyword arguments will be stored for `custom feed generators`_.
 
     All parameters, if given, should be Unicode objects, except:
 
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
+    * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosure`` should be an instance of
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
+
+    .. versionadded:: 1.7
+
+        The optional ``updateddate`` argument was added.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

@@ -8,7 +8,7 @@ from django import http
 from django.conf import settings
 from django.core import urlresolvers
 from django.core import signals
-from django.core.exceptions import MiddlewareNotUsed, PermissionDenied
+from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
@@ -66,10 +66,11 @@ class BaseHandler(object):
         self._request_middleware = request_middleware
 
     def make_view_atomic(self, view):
-        if getattr(view, 'transactions_per_request', True):
-            for db in connections.all():
-                if db.settings_dict['ATOMIC_REQUESTS']:
-                    view = transaction.atomic(using=db.alias)(view)
+        non_atomic_requests = getattr(view, '_non_atomic_requests', set())
+        for db in connections.all():
+            if (db.settings_dict['ATOMIC_REQUESTS']
+                    and db.alias not in non_atomic_requests):
+                view = transaction.atomic(using=db.alias)(view)
         return view
 
     def get_response(self, request):
@@ -169,11 +170,27 @@ class BaseHandler(object):
                 response = self.handle_uncaught_exception(request,
                         resolver, sys.exc_info())
 
+        except SuspiciousOperation as e:
+            # The request logger receives events for any problematic request
+            # The security logger receives events for all SuspiciousOperations
+            security_logger = logging.getLogger('django.security.%s' %
+                            e.__class__.__name__)
+            security_logger.error(force_text(e))
+
+            try:
+                callback, param_dict = resolver.resolve400()
+                response = callback(request, **param_dict)
+            except:
+                signals.got_request_exception.send(
+                        sender=self.__class__, request=request)
+                response = self.handle_uncaught_exception(request,
+                        resolver, sys.exc_info())
+
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
-        except: # Handle everything else, including SuspiciousOperation, etc.
+        except: # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -229,45 +246,3 @@ class BaseHandler(object):
         for func in self.response_fixes:
             response = func(request, response)
         return response
-
-
-def get_path_info(environ):
-    """
-    Returns the HTTP request's PATH_INFO as a unicode string.
-    """
-    path_info = environ.get('PATH_INFO', str('/'))
-    # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the web server.
-    if six.PY3:
-        path_info = path_info.encode('iso-8859-1')
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return path_info.decode('utf-8')
-
-
-def get_script_name(environ):
-    """
-    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
-    variable. If Apache mod_rewrite has been used, returns what would have been
-    the script name prior to any rewriting (so it's the script name as seen
-    from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
-    set (to anything).
-    """
-    if settings.FORCE_SCRIPT_NAME is not None:
-        return force_text(settings.FORCE_SCRIPT_NAME)
-
-    # If Apache's mod_rewrite had a whack at the URL, Apache set either
-    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
-    # rewrites. Unfortunately not every Web server (lighttpd!) passes this
-    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
-    # needed.
-    script_url = environ.get('SCRIPT_URL', environ.get('REDIRECT_URL', str('')))
-    if script_url:
-        script_name = script_url[:-len(environ.get('PATH_INFO', str('')))]
-    else:
-        script_name = environ.get('SCRIPT_NAME', str(''))
-    # Under Python 3, strings in environ are decoded with ISO-8859-1;
-    # re-encode to recover the original bytestring provided by the web server.
-    if six.PY3:
-        script_name = script_name.encode('iso-8859-1')
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return script_name.decode('utf-8')

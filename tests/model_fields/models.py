@@ -58,7 +58,7 @@ class NullBooleanModel(models.Model):
     nbfield = models.NullBooleanField()
 
 class BooleanModel(models.Model):
-    bfield = models.BooleanField()
+    bfield = models.BooleanField(default=None)
     string = models.CharField(max_length=10, default='abc')
 
 class FksToBooleans(models.Model):
@@ -72,7 +72,7 @@ class RenamedField(models.Model):
 class VerboseNameField(models.Model):
     id = models.AutoField("verbose pk", primary_key=True)
     field1 = models.BigIntegerField("verbose field1")
-    field2 = models.BooleanField("verbose field2")
+    field2 = models.BooleanField("verbose field2", default=False)
     field3 = models.CharField("verbose field3", max_length=10)
     field4 = models.CommaSeparatedIntegerField("verbose field4", max_length=99)
     field5 = models.DateField("verbose field5")

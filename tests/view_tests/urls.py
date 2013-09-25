@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import absolute_import
-
 from os import path
 
 from django.conf.urls import patterns, url, include
@@ -47,8 +45,11 @@ urlpatterns = patterns('',
 
     # a view that raises an exception for the debug view
     (r'raises/$', views.raises),
-    (r'raises404/$', views.raises404),
+
+    (r'raises400/$', views.raises400),
     (r'raises403/$', views.raises403),
+    (r'raises404/$', views.raises404),
+    (r'raises500/$', views.raises500),
 
     # i18n views
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -66,5 +67,6 @@ urlpatterns = patterns('',
 urlpatterns += patterns('view_tests.views',
     url(r'view_exception/(?P<n>\d+)/$', 'view_exception', name='view_exception'),
     url(r'template_exception/(?P<n>\d+)/$', 'template_exception', name='template_exception'),
-    url(r'^raises_template_does_not_exist/$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
+    url(r'^raises_template_does_not_exist/(?P<path>.+)$', 'raises_template_does_not_exist', name='raises_template_does_not_exist'),
+    url(r'^render_no_template/$', 'render_no_template', name='render_no_template'),
 )

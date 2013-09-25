@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from datetime import datetime
+from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
@@ -9,7 +10,6 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.db.models import Count, Min
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS:
     from .models import City, PennsylvaniaCity, State, Truth
@@ -37,7 +37,7 @@ class GeoRegressionTests(TestCase):
                   'description' : name,
                   'kml' : '<Point><coordinates>5.0,23.0</coordinates></Point>'
                   }]
-        kmz = render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
+        render_to_kmz('gis/kml/placemarks.kml', {'places' : places})
 
     @no_spatialite
     @no_mysql
@@ -52,20 +52,20 @@ class GeoRegressionTests(TestCase):
     def test_unicode_date(self):
         "Testing dates are converted properly, even on SpatiaLite. See #16408."
         founded = datetime(1857, 5, 23)
-        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
-                                                    founded=founded)
+        PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
+                                        founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.datetimes('founded', 'day')[0])
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):
-         "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
-         # contrived example, but need a geo lookup paired with an id__in lookup
-         pueblo = City.objects.get(name='Pueblo')
-         state = State.objects.filter(poly__contains=pueblo.point)
-         cities_within_state = City.objects.filter(id__in=state)
+        "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
+        # contrived example, but need a geo lookup paired with an id__in lookup
+        pueblo = City.objects.get(name='Pueblo')
+        state = State.objects.filter(poly__contains=pueblo.point)
+        cities_within_state = City.objects.filter(id__in=state)
 
-         # .count() should not throw TypeError in __eq__
-         self.assertEqual(cities_within_state.count(), 1)
+        # .count() should not throw TypeError in __eq__
+        self.assertEqual(cities_within_state.count(), 1)
 
     def test_defer_or_only_with_annotate(self):
         "Regression for #16409. Make sure defer() and only() work with annotate()"

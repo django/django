@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import os
 from datetime import date
+from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
-from django.utils.unittest import skipUnless
 from django.utils.formats import localize
 from django.utils._os import upath
 from django.utils.translation import activate, deactivate
@@ -76,6 +76,21 @@ class HTTPSitemapTests(SitemapTestsBase):
 </urlset>
 """ % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+
+    def test_sitemap_last_modified(self):
+        "Tests that Last-Modified header is set correctly"
+        response = self.client.get('/lastmod/sitemap.xml')
+        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+
+    def test_sitemap_last_modified_missing(self):
+        "Tests that Last-Modified header is missing when sitemap has no lastmod"
+        response = self.client.get('/generic/sitemap.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemap_last_modified_mixed(self):
+        "Tests that Last-Modified header is omitted when lastmod not on all items"
+        response = self.client.get('/lastmod-mixed/sitemap.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
@@ -151,3 +166,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
         response = self.client.get('/simple/sitemap.xml')
         self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
+
+    def test_empty_sitemap(self):
+        response = self.client.get('/empty/sitemap.xml')
+        self.assertEqual(response.status_code, 200)

@@ -19,7 +19,7 @@ class Category(models.Model):
     name = models.CharField(max_length=20)
 
     class Meta:
-       ordering = ('name',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -44,7 +44,7 @@ class Article(models.Model):
     categories = models.ManyToManyField(Category)
 
     class Meta:
-       ordering = ('pub_date',)
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.headline
@@ -77,7 +77,7 @@ class Movie(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:
-       ordering = ('title',)
+        ordering = ('title',)
 
     def __str__(self):
         return self.title

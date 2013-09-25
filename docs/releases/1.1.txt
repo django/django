@@ -211,7 +211,7 @@ Query expressions
 Queries can now refer to a another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`~django.db.models.F` object; for full details, including examples,
-consult the :ref:`documentation for F expressions <query-expressions>`.
+consult the :class:`F expressions documentation <django.db.models.F>`.
 
 Model improvements
 ------------------
@@ -284,8 +284,6 @@ full description, and some important notes on database support.
 
 Test client improvements
 ------------------------
-
-.. currentmodule:: django.test.client
 
 A couple of small -- but highly useful -- improvements have been made to the
 test client:

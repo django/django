@@ -13,6 +13,7 @@ class Member(models.Model):
     name = models.CharField(max_length=100)
     birthdate = models.DateTimeField(blank=True, null=True)
     gender = models.CharField(max_length=1, blank=True, choices=[('M','Male'), ('F', 'Female')])
+    email = models.EmailField(blank=True)
 
     def __str__(self):
         return self.name
@@ -42,20 +43,21 @@ class HiddenInventoryManager(models.Manager):
 
 @python_2_unicode_compatible
 class Inventory(models.Model):
-   barcode = models.PositiveIntegerField(unique=True)
-   parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
-   name = models.CharField(blank=False, max_length=20)
-   hidden = models.BooleanField(default=False)
+    barcode = models.PositiveIntegerField(unique=True)
+    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+    name = models.CharField(blank=False, max_length=20)
+    hidden = models.BooleanField(default=False)
 
-   # see #9258
-   default_manager = models.Manager()
-   objects = HiddenInventoryManager()
+    # see #9258
+    default_manager = models.Manager()
+    objects = HiddenInventoryManager()
 
-   def __str__(self):
-      return self.name
+    def __str__(self):
+        return self.name
 
 class Event(models.Model):
-    band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0))
+    main_band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0), related_name='events_main_band_at')
+    supporting_bands = models.ManyToManyField(Band, null=True, blank=True, related_name='events_supporting_band_at')
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)
@@ -128,3 +130,11 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class Profile(models.Model):
+    user = models.ForeignKey('auth.User', 'username')
+
+    def __str__(self):
+        return self.user.username

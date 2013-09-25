@@ -193,7 +193,7 @@ Attributes
 ----------
 
 All attributes can be set in your derived class and can be used in
-:class:`BaseCommand`'s :ref:`subclasses<ref-basecommand-subclasses>`.
+:class:`BaseCommand`’s :ref:`subclasses<ref-basecommand-subclasses>`.
 
 .. attribute:: BaseCommand.args
 
@@ -245,7 +245,7 @@ All attributes can be set in your derived class and can be used in
   Make sure you know what you are doing if you decide to change the value of
   this option in your custom command if it creates database content that
   is locale-sensitive and such content shouldn't contain any translations (like
-  it happens e.g. with django.contrim.auth permissions) as making the locale
+  it happens e.g. with django.contrib.auth permissions) as making the locale
   differ from the de facto default 'en-us' might cause unintended effects. See
   the `Management commands and locales`_ section above for further details.
 
@@ -267,7 +267,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 .. admonition:: Implementing a constructor in a subclass
 
   If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
-  you must call :class:`BaseCommand`'s ``__init__``.
+  you must call :class:`BaseCommand`’s ``__init__``.
 
   .. code-block:: python
 

@@ -1,13 +1,15 @@
 # -*- encoding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import decimal
+from importlib import import_module
 import os
 import pickle
 from threading import local
 
 from django.conf import settings
+from django.core.management.utils import find_command
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory
@@ -16,7 +18,6 @@ from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
     number_format, reset_format_cache, sanitize_separators)
-from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
@@ -33,17 +34,17 @@ from django.utils.translation import (activate, deactivate,
     npgettext, npgettext_lazy,
     check_for_language)
 
-from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
-if can_run_extraction_tests:
+if find_command('xgettext'):
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
         NoLocationExtractorTests, KeepPotFileExtractorTests,
         MultipleLocaleExtractionTests)
-if can_run_compilation_tests:
+if find_command('msgfmt'):
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
         PercentRenderingTests, MultipleLocaleCompilationTests,
         CompilationErrorHandling)
+from . import TransRealMixin
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
 
@@ -53,7 +54,8 @@ extended_locale_paths = settings.LOCALE_PATHS + (
     os.path.join(here, 'other', 'locale'),
 )
 
-class TranslationTests(TestCase):
+
+class TranslationTests(TransRealMixin, TestCase):
 
     def test_override(self):
         activate('de')
@@ -87,7 +89,7 @@ class TranslationTests(TestCase):
         s4 = ugettext_lazy('Some other string')
         self.assertEqual(False, s == s4)
 
-        if not six.PY3:
+        if six.PY2:
             # On Python 2, gettext_lazy should not transform a bytestring to unicode
             self.assertEqual(gettext_lazy(b"test").upper(), b"TEST")
 
@@ -334,10 +336,43 @@ class TranslationTests(TestCase):
             self.assertEqual(rendered, 'My other name is James.')
 
 
-@override_settings(USE_L10N=True)
-class FormattingTests(TestCase):
+class TranslationThreadSafetyTests(TestCase):
+    """Specifically not using TransRealMixin here to test threading."""
 
     def setUp(self):
+        self._old_language = get_language()
+        self._translations = trans_real._translations
+
+        # here we rely on .split() being called inside the _fetch()
+        # in trans_real.translation()
+        class sideeffect_str(str):
+            def split(self, *args, **kwargs):
+                res = str.split(self, *args, **kwargs)
+                trans_real._translations['en-YY'] = None
+                return res
+
+        trans_real._translations = {sideeffect_str('en-XX'): None}
+
+    def tearDown(self):
+        trans_real._translations = self._translations
+        activate(self._old_language)
+
+    def test_bug14894_translation_activate_thread_safety(self):
+        translation_count = len(trans_real._translations)
+        try:
+            translation.activate('pl')
+        except RuntimeError:
+            self.fail('translation.activate() is not thread-safe')
+
+        # make sure sideeffect_str actually added a new translation
+        self.assertLess(translation_count, len(trans_real._translations))
+
+
+@override_settings(USE_L10N=True)
+class FormattingTests(TransRealMixin, TestCase):
+
+    def setUp(self):
+        super(FormattingTests, self).setUp()
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -693,9 +728,8 @@ class FormattingTests(TestCase):
         with translation.override('de-at', deactivate=True):
             de_format_mod = import_module('django.conf.locale.de.formats')
             self.assertEqual(list(iter_format_modules('de')), [de_format_mod])
-            with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
-                test_de_format_mod = import_module('i18n.other.locale.de.formats')
-                self.assertEqual(list(iter_format_modules('de')), [test_de_format_mod, de_format_mod])
+            test_de_format_mod = import_module('i18n.other.locale.de.formats')
+            self.assertEqual(list(iter_format_modules('de', 'i18n.other.locale')), [test_de_format_mod, de_format_mod])
 
     def test_iter_format_modules_stability(self):
         """
@@ -739,9 +773,43 @@ class FormattingTests(TestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
-class MiscTests(TestCase):
+    def test_localized_as_text_as_hidden_input(self):
+        """
+        Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
+        """
+        self.maxDiff = 1200
+
+        with translation.override('de-at', deactivate=True):
+            template = Template('{% load l10n %}{{ form.date_added }}; {{ form.cents_paid }}')
+            template_as_text = Template('{% load l10n %}{{ form.date_added.as_text }}; {{ form.cents_paid.as_text }}')
+            template_as_hidden = Template('{% load l10n %}{{ form.date_added.as_hidden }}; {{ form.cents_paid.as_hidden }}')
+            form = CompanyForm({
+                'name': 'acme',
+                'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
+                'cents_paid': decimal.Decimal('59.47'),
+                'products_delivered': 12000,
+                })
+            context = Context({'form': form })
+            self.assertTrue(form.is_valid())
+
+            self.assertHTMLEqual(
+                template.render(context),
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" />; <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" />'
+            )
+            self.assertHTMLEqual(
+                template_as_text.render(context),
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" />; <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" />'
+            )
+            self.assertHTMLEqual(
+                template_as_hidden.render(context),
+                '<input id="id_date_added" name="date_added" type="hidden" value="31.12.2009 06:00:00" />; <input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47" />'
+            )
+
+
+class MiscTests(TransRealMixin, TestCase):
 
     def setUp(self):
+        super(MiscTests, self).setUp()
         self.rf = RequestFactory()
 
     def test_parse_spec_http_header(self):
@@ -781,6 +849,7 @@ class MiscTests(TestCase):
         self.assertEqual([], p('de;q=0.a'))
         self.assertEqual([], p('12-345'))
         self.assertEqual([], p(''))
+        self.assertEqual([], p('en; q=1,'))
 
     def test_parse_literal_http_header(self):
         """
@@ -885,17 +954,15 @@ class MiscTests(TestCase):
             self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '%(percent)s% represents 4 objects')
 
 
-class ResolutionOrderI18NTests(TestCase):
+class ResolutionOrderI18NTests(TransRealMixin, TestCase):
 
     def setUp(self):
-        # Okay, this is brutal, but we have no other choice to fully reset
-        # the translation framework
-        trans_real._active = local()
-        trans_real._translations = {}
+        super(ResolutionOrderI18NTests, self).setUp()
         activate('de')
 
     def tearDown(self):
         deactivate()
+        super(ResolutionOrderI18NTests, self).tearDown()
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
@@ -968,15 +1035,17 @@ class TestLanguageInfo(TestCase):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
 
-class MultipleLocaleActivationTests(TestCase):
+class MultipleLocaleActivationTests(TransRealMixin, TestCase):
     """
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
     """
     def setUp(self):
+        super(MultipleLocaleActivationTests, self).setUp()
         self._old_language = get_language()
 
     def tearDown(self):
+        super(MultipleLocaleActivationTests, self).tearDown()
         activate(self._old_language)
 
     def test_single_locale_activation(self):
@@ -993,9 +1062,8 @@ class MultipleLocaleActivationTests(TestCase):
     def test_multiple_locale_filter(self):
         with translation.override('de'):
             t = Template("{% load i18n %}{{ 0|yesno:_('yes,no,maybe') }}")
-        with translation.override(self._old_language):
-            with translation.override('nl'):
-                self.assertEqual(t.render(Context({})), 'nee')
+        with translation.override(self._old_language), translation.override('nl'):
+            self.assertEqual(t.render(Context({})), 'nee')
 
     def test_multiple_locale_filter_deactivate(self):
         with translation.override('de', deactivate=True):
@@ -1014,9 +1082,8 @@ class MultipleLocaleActivationTests(TestCase):
     def test_multiple_locale(self):
         with translation.override('de'):
             t = Template("{{ _('No') }}")
-        with translation.override(self._old_language):
-            with translation.override('nl'):
-                self.assertEqual(t.render(Context({})), 'Nee')
+        with translation.override(self._old_language), translation.override('nl'):
+            self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_deactivate(self):
         with translation.override('de', deactivate=True):
@@ -1035,9 +1102,8 @@ class MultipleLocaleActivationTests(TestCase):
     def test_multiple_locale_loadi18n(self):
         with translation.override('de'):
             t = Template("{% load i18n %}{{ _('No') }}")
-        with translation.override(self._old_language):
-            with translation.override('nl'):
-                self.assertEqual(t.render(Context({})), 'Nee')
+        with translation.override(self._old_language), translation.override('nl'):
+            self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_loadi18n_deactivate(self):
         with translation.override('de', deactivate=True):
@@ -1056,9 +1122,8 @@ class MultipleLocaleActivationTests(TestCase):
     def test_multiple_locale_trans(self):
         with translation.override('de'):
             t = Template("{% load i18n %}{% trans 'No' %}")
-        with translation.override(self._old_language):
-            with translation.override('nl'):
-                self.assertEqual(t.render(Context({})), 'Nee')
+        with translation.override(self._old_language), translation.override('nl'):
+            self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_deactivate_trans(self):
         with translation.override('de', deactivate=True):
@@ -1077,9 +1142,8 @@ class MultipleLocaleActivationTests(TestCase):
     def test_multiple_locale_btrans(self):
         with translation.override('de'):
             t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
-        with translation.override(self._old_language):
-            with translation.override('nl'):
-                self.assertEqual(t.render(Context({})), 'Nee')
+        with translation.override(self._old_language), translation.override('nl'):
+            self.assertEqual(t.render(Context({})), 'Nee')
 
     def test_multiple_locale_deactivate_btrans(self):
         with translation.override('de', deactivate=True):
@@ -1105,7 +1169,7 @@ class MultipleLocaleActivationTests(TestCase):
         'django.middleware.common.CommonMiddleware',
     ),
 )
-class LocaleMiddlewareTests(TestCase):
+class LocaleMiddlewareTests(TransRealMixin, TestCase):
 
     urls = 'i18n.urls'
 
@@ -1116,23 +1180,56 @@ class LocaleMiddlewareTests(TestCase):
         response = self.client.get('/en/streaming/')
         self.assertContains(response, "Yes/No")
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+        ),
+    )
+    def test_session_language(self):
+        """
+        Check that language is stored in session if missing.
+        """
+        # Create an empty session
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session.save()
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+
+        # Clear the session data before request
+        session.save()
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['django_language'], 'en')
+
+        # Clear the session data before request
+        session.save()
+        response = self.client.get('/fr/simple/')
+        self.assertEqual(self.client.session['django_language'], 'fr')
+
+        # Check that language is not changed in session
+        response = self.client.get('/en/simple/')
+        self.assertEqual(self.client.session['django_language'], 'fr')
+
+
 @override_settings(
     USE_I18N=True,
     LANGUAGES=(
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
+        ('pt-br', 'Portugese (Brazil)'),
     ),
     MIDDLEWARE_CLASSES=(
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
 )
-class CountrySpecificLanguageTests(TestCase):
+class CountrySpecificLanguageTests(TransRealMixin, TestCase):
 
     urls = 'i18n.urls'
 
     def setUp(self):
-        trans_real._accepted = {}
+        super(CountrySpecificLanguageTests, self).setUp()
         self.rf = RequestFactory()
 
     def test_check_for_language(self):
@@ -1140,8 +1237,8 @@ class CountrySpecificLanguageTests(TestCase):
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
 
-
     def test_get_language_from_request(self):
+        # issue 19919
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
@@ -1152,3 +1249,16 @@ class CountrySpecificLanguageTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
         lang = get_language_from_request(r)
         self.assertEqual('bg', lang)
+
+    def test_specific_language_codes(self):
+        # issue 11915
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
+        lang = get_language_from_request(r)
+        self.assertEqual('pt-br', lang)

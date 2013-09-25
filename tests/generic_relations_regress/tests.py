@@ -2,9 +2,10 @@ from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.test import TestCase, skipIfDBFeature
 
-from .models import (Address, Place, Restaurant, Link, CharLink, TextLink,
+from .models import (
+    Address, Place, Restaurant, Link, CharLink, TextLink,
     Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board)
+    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D)
 
 
 class GenericRelationTests(TestCase):
@@ -28,9 +29,9 @@ class GenericRelationTests(TestCase):
         originating model of a query.  See #12664.
         """
         p = Person.objects.create(account=23, name='Chef')
-        a = Address.objects.create(street='123 Anywhere Place',
-                                   city='Conifer', state='CO',
-                                   zipcode='80433', content_object=p)
+        Address.objects.create(street='123 Anywhere Place',
+                               city='Conifer', state='CO',
+                               zipcode='80433', content_object=p)
 
         qs = Person.objects.filter(addresses__zipcode='80433')
         self.assertEqual(1, qs.count())
@@ -38,12 +39,12 @@ class GenericRelationTests(TestCase):
 
     def test_charlink_delete(self):
         oddrel = OddRelation1.objects.create(name='clink')
-        cl = CharLink.objects.create(content_object=oddrel)
+        CharLink.objects.create(content_object=oddrel)
         oddrel.delete()
 
     def test_textlink_delete(self):
         oddrel = OddRelation2.objects.create(name='tlink')
-        tl = TextLink.objects.create(content_object=oddrel)
+        TextLink.objects.create(content_object=oddrel)
         oddrel.delete()
 
     def test_q_object_or(self):
@@ -61,12 +62,12 @@ class GenericRelationTests(TestCase):
         """
         note_contact = Contact.objects.create()
         org_contact = Contact.objects.create()
-        note = Note.objects.create(note='note', content_object=note_contact)
+        Note.objects.create(note='note', content_object=note_contact)
         org = Organization.objects.create(name='org name')
         org.contacts.add(org_contact)
         # search with a non-matching note and a matching org name
         qs = Contact.objects.filter(Q(notes__note__icontains=r'other note') |
-                            Q(organizations__name__icontains=r'org name'))
+                                    Q(organizations__name__icontains=r'org name'))
         self.assertTrue(org_contact in qs)
         # search again, with the same query parameters, in reverse order
         qs = Contact.objects.filter(
@@ -90,8 +91,8 @@ class GenericRelationTests(TestCase):
         p1 = Place.objects.create(name="South Park")
         p2 = Place.objects.create(name="The City")
         c = Company.objects.create(name="Chubby's Intl.")
-        l1 = Link.objects.create(content_object=p1)
-        l2 = Link.objects.create(content_object=c)
+        Link.objects.create(content_object=p1)
+        Link.objects.create(content_object=c)
 
         places = list(Place.objects.order_by('links__id'))
         def count_places(place):
@@ -114,8 +115,10 @@ class GenericRelationTests(TestCase):
         try:
             note = Note(note='Deserve a bonus', content_object=team1)
         except Exception as e:
-            if issubclass(type(e), Exception) and str(e) == 'Impossible arguments to GFK.get_content_type!':
-                self.fail("Saving model with GenericForeignKey to model instance whose __len__ method returns 0 shouldn't fail.")
+            if (issubclass(type(e), Exception) and
+                    str(e) == 'Impossible arguments to GFK.get_content_type!'):
+                self.fail("Saving model with GenericForeignKey to model instance whose "
+                          "__len__ method returns 0 shouldn't fail.")
             raise e
         note.save()
 
@@ -135,3 +138,77 @@ class GenericRelationTests(TestCase):
         b1 = Board.objects.create(name='')
         tag = Tag(label='VP', content_object=b1)
         tag.save()
+
+    def test_ticket_20378(self):
+        hs1 = HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        l1 = Link.objects.create(content_object=hs1)
+        l2 = Link.objects.create(content_object=hs2)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l1),
+            [hs1], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l2),
+            [hs2], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.exclude(links=l2),
+            [hs1], lambda x: x)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.exclude(links=l1),
+            [hs2], lambda x: x)
+
+    def test_ticket_20564(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        c1 = C.objects.create(b=b1)
+        c2 = C.objects.create(b=b2)
+        c3 = C.objects.create(b=b3)
+        A.objects.create(flag=None, content_object=b1)
+        A.objects.create(flag=True, content_object=b2)
+        self.assertQuerysetEqual(
+            C.objects.filter(b__a__flag=None),
+            [c1, c3], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            C.objects.exclude(b__a__flag=None),
+            [c2], lambda x: x
+        )
+
+    def test_ticket_20564_nullable_fk(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        d1 = D.objects.create(b=b1)
+        d2 = D.objects.create(b=b2)
+        d3 = D.objects.create(b=b3)
+        d4 = D.objects.create()
+        A.objects.create(flag=None, content_object=b1)
+        A.objects.create(flag=True, content_object=b1)
+        A.objects.create(flag=True, content_object=b2)
+        self.assertQuerysetEqual(
+            D.objects.exclude(b__a__flag=None),
+            [d2], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            D.objects.filter(b__a__flag=None),
+            [d1, d3, d4], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            B.objects.filter(a__flag=None),
+            [b1, b3], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            B.objects.exclude(a__flag=None),
+            [b2], lambda x: x
+        )
+
+    def test_extra_join_condition(self):
+        # A crude check that content_type_id is taken in account in the
+        # join/subquery condition.
+        self.assertIn("content_type_id", str(B.objects.exclude(a__flag=None).query).lower())
+        # No need for any joins - the join from inner query can be trimmed in
+        # this case (but not in the above case as no a objects at all for given
+        # B would then fail).
+        self.assertNotIn(" join ", str(B.objects.exclude(a__flag=True).query).lower())
+        self.assertIn("content_type_id", str(B.objects.exclude(a__flag=True).query).lower())

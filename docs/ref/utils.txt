@@ -105,22 +105,12 @@ to distinguish caches by the ``Accept-language`` header.
 
 .. class:: SortedDict
 
+.. deprecated:: 1.7
+    ``SortedDict`` is deprecated and will be removed in Django 1.9. Use
+    :class:`collections.OrderedDict` instead.
+
     The :class:`django.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
-    ``SortedDict`` adds two additional methods to the standard Python ``dict``
-    class:
-
-    .. method:: insert(index, key, value)
-
-        .. deprecated:: 1.5
-
-        Inserts the key, value pair before the item with the given index.
-
-    .. method:: value_for_index(index)
-
-        .. deprecated:: 1.5
-
-        Returns the value of the item at the given zero-based index.
 
 Creating a new SortedDict
 -------------------------
@@ -202,18 +192,7 @@ The functions defined in this module share the following properties:
 =========================
 
 .. module:: django.utils.encoding
-   :synopsis: A series of helper classes and function to manage character encoding.
-
-.. class:: StrAndUnicode
-
-    A class that derives ``__str__`` from ``__unicode__``.
-
-    On Python 2, ``__str__`` returns the output of ``__unicode__`` encoded as
-    a UTF-8 bytestring. On Python 3, ``__str__`` returns the output of
-    ``__unicode__``.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define ``__unicode__``.
+   :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
 
@@ -224,8 +203,6 @@ The functions defined in this module share the following properties:
     method returning text and apply this decorator to the class.
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. versionadded:: 1.5
 
     Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
     ``str`` on Python 3. Treats bytestrings using the ``encoding`` codec.
@@ -246,8 +223,6 @@ The functions defined in this module share the following properties:
 
 .. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Similar to ``smart_text``, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
@@ -260,8 +235,6 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    .. versionadded:: 1.5
-
     Returns a bytestring version of ``s``, encoded as specified in
     ``encoding``.
 
@@ -269,8 +242,6 @@ The functions defined in this module share the following properties:
     objects.
 
 .. function:: force_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    .. versionadded:: 1.5
 
     Similar to ``smart_bytes``, except that lazy instances are resolved to
     bytestrings, rather than kept as lazy objects.
@@ -367,11 +338,15 @@ SyndicationFeed
         All parameters should be Unicode objects, except ``categories``, which
         should be a sequence of Unicode objects.
 
-    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
+    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs])
 
         Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate``, which is a ``datetime.datetime`` object, and
-        ``enclosure``, which is an instance of the ``Enclosure`` class.
+        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
+
+        .. versionadded:: 1.7
+
+            The optional ``updateddate`` argument was added.
 
     .. method:: num_items()
 
@@ -405,8 +380,9 @@ SyndicationFeed
 
     .. method:: latest_post_date()
 
-        Returns the latest item's ``pubdate``. If none of them have a
-        ``pubdate``, this returns the current date/time.
+        Returns the latest ``pubdate`` or ``updateddate`` for all items in the
+        feed. If no items have either of these attributes this returns the
+        current date/time.
 
 Enclosure
 ---------
@@ -439,13 +415,71 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://www.atomenabled.org/developers/syndication/atom-format-spec.php
+    Spec: http://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================
 
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
+
+.. class:: cached_property(object)
+
+    The ``@cached_property`` decorator caches the result of a method with a
+    single ``self`` argument as a property. The cached result will persist
+    as long as the instance does, so if the instance is passed around and the
+    function subsequently invoked, the cached result will be returned.
+
+    Consider a typical case, where a view might need to call a model's method
+    to perform some computation, before placing the model instance into the
+    context, where the template might invoke the method once more::
+
+        # the model
+        class Person(models.Model):
+
+            def friends(self):
+                # expensive computation
+                ...
+                return friends
+
+        # in the view:
+        if person.friends():
+
+        # in the template:
+        {% for friend in person.friends %}
+
+    Here, ``friends()`` will be called twice. Since the instance ``person`` in
+    the view and the template are the same, ``@cached_property`` can avoid
+    that::
+
+        from django.utils.functional import cached_property
+
+        @cached_property
+        def friends(self):
+            # expensive computation
+            ...
+            return friends
+
+    Note that as the method is now a property, in Python code it will need to
+    be invoked appropriately::
+
+        # in the view:
+        if person.friends:
+
+    The cached value can be treated like an ordinary attribute of the instance::
+
+        # clear it, requiring re-computation next time it's called
+        del person.friends # or delattr(person, "friends")
+
+        # set a value manually, that will persist on the instance until cleared
+        person.friends = ["Huckleberry Finn", "Tom Sawyer"]
+
+    As well as offering potential performance advantages, ``@cached_property``
+    can ensure that an attribute's value does not change unexpectedly over the
+    life of an instance. This could occur with a method whose computation is
+    based on ``datetime.now()``, or simply if a change were saved to the
+    database by some other process in the brief interval between subsequent
+    invocations of a method on the same instance.
 
 .. function:: allow_lazy(func, *resultclasses)
 
@@ -461,8 +495,8 @@ Atom1Feed
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
-    translation as the first argument, the function evaluation is delayed until it
-    needs to be converted to a string.
+    translation as one of its arguments, the function evaluation is delayed
+    until it needs to be converted to a string.
 
     For example::
 
@@ -471,12 +505,14 @@ Atom1Feed
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
+        # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
     The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
     a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode`` here
-    and ensure that your function returns only Unicode strings.
+    original function can return. Usually, it's enough to include ``unicode``
+    (or ``str`` on Python 3) here and ensure that your function returns only
+    Unicode strings.
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at the
@@ -490,7 +526,7 @@ Atom1Feed
 
 Usually you should build up HTML using Django's templates to make use of its
 autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
-where appropriate. This module provides some additional low level utilitiesfor
+where appropriate. This module provides some additional low level utilities for
 escaping HTML.
 
 .. function:: escape(text)
@@ -564,7 +600,13 @@ escaping HTML.
         strip_tags(value)
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel is a slug"``.
+    return value will be ``"Joel is a slug"``. Note that ``strip_tags`` result
+    may still contain unsafe HTML content, so you might use
+    :func:`~django.utils.html.escape` to make it a safe string.
+
+    .. versionchanged:: 1.6
+
+        For improved safety, ``strip_tags`` is now parser-based.
 
 .. function:: remove_tags(value, tags)
 
@@ -643,6 +685,20 @@ escaping HTML.
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
     smaller than :data:`sys.maxint`.
 
+.. function:: urlsafe_base64_encode(s)
+
+    .. versionadded:: 1.6
+
+    Encodes a bytestring in base64 for use in URLs, stripping any trailing
+    equal signs.
+
+.. function::  urlsafe_base64_decode(s)
+
+    .. versionadded:: 1.6
+
+    Decodes a base64 encoded string, adding back any trailing equal signs that
+    might have been stripped.
+
 ``django.utils.module_loading``
 ===============================
 
@@ -652,6 +708,8 @@ escaping HTML.
 Functions for working with Python modules.
 
 .. function:: import_by_path(dotted_path, error_prefix='')
+
+    .. versionadded:: 1.6
 
     Imports a dotted module path and returns the attribute/class designated by
     the last name in the path. Raises
@@ -679,8 +737,6 @@ appropriate entities.
 
 .. class:: SafeBytes
 
-    .. versionadded:: 1.5
-
     A ``bytes`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes.
 
@@ -691,8 +747,6 @@ appropriate entities.
     :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
 
 .. class:: SafeText
-
-    .. versionadded:: 1.5
 
     A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
     that has been specifically marked as "safe" for HTML output purposes.
@@ -873,6 +927,17 @@ For a complete discussion on the usage of the following see the
 
     :class:`~datetime.tzinfo` instance that represents UTC.
 
+.. function:: get_fixed_timezone(offset)
+
+    .. versionadded:: 1.7
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
 .. function:: get_default_timezone()
 
     Returns a :class:`~datetime.tzinfo` instance that represents the
@@ -911,8 +976,6 @@ For a complete discussion on the usage of the following see the
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
-.. versionadded:: 1.5
-
 .. function:: localtime(value, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
@@ -923,9 +986,21 @@ For a complete discussion on the usage of the following see the
 
 .. function:: now()
 
-    Returns an aware or naive :class:`~datetime.datetime` that represents the
-    current point in time when :setting:`USE_TZ` is ``True`` or ``False``
-    respectively.
+    Returns a :class:`~datetime.datetime` that represents the
+    current point in time. Exactly what's returned depends on the value of
+    :setting:`USE_TZ`:
+
+    * If :setting:`USE_TZ` is ``False``, this will be be a
+      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
+      without an associated timezone) that represents the current time
+      in the system's local timezone.
+
+    * If :setting:`USE_TZ` is ``True``, this will be an
+      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
+      current time in UTC. Note that :func:`now` will always return
+      times in UTC regardless of the value of :setting:`TIME_ZONE`;
+      you can use :func:`localtime` to convert to a time in the current
+      time zone.
 
 .. function:: is_aware(value)
 
@@ -957,6 +1032,9 @@ For a complete discussion on the usage of the following see the
 ``django.utils.tzinfo``
 =======================
 
+.. deprecated:: 1.7
+    Use :mod:`~django.utils.timezone` instead.
+
 .. module:: django.utils.tzinfo
    :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
 
@@ -964,6 +1042,12 @@ For a complete discussion on the usage of the following see the
 
     Fixed offset in minutes east from UTC.
 
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
+
 .. class:: LocalTimezone
 
     Proxy timezone information from time module.
+
+    .. deprecated:: 1.7
+        Use :func:`~django.utils.timezone.get_default_timezone` instead.

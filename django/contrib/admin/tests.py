@@ -1,11 +1,20 @@
 import os
+from unittest import SkipTest
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerCase
 from django.utils.module_loading import import_by_path
-from django.utils.unittest import SkipTest
 from django.utils.translation import ugettext as _
 
-class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
+
+class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
+
+    available_apps = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+    ]
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     @classmethod
@@ -17,13 +26,14 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))
+        # This has to be last to ensure that resources are cleaned up properly!
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def _tearDownClassInternal(cls):
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
-        super(AdminSeleniumWebDriverTestCase, cls).tearDownClass()
+        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
 
     def wait_until(self, callback, timeout=10):
         """

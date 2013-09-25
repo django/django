@@ -27,9 +27,8 @@ class Command(BaseCommand):
                  'with LiveServerTestCase) is expected to run from. The '
                  'default value is localhost:8081.'),
     )
-    help = ('Runs the test suite for the specified applications, or the '
-            'entire site if no apps are specified.')
-    args = '[appname ...]'
+    help = ('Discover and run tests in the specified modules or the current directory.')
+    args = '[path.to.modulename|path.to.modulename.TestCase|path.to.modulename.TestCase.test_method]...'
 
     requires_model_validation = False
 

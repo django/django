@@ -1,15 +1,18 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import os
 import gzip
 import shutil
 import tempfile
+import unittest
 
 from django.core.cache import cache
 from django.core.files import File
+from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.temp import NamedTemporaryFile
 from django.test import TestCase
-from django.utils import unittest
 from django.utils.six import StringIO
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -129,7 +132,6 @@ class FileStorageTests(TestCase):
             self.assertEqual(f.read(), b'content')
 
 
-
 class FileTests(unittest.TestCase):
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
@@ -140,9 +142,35 @@ class FileTests(unittest.TestCase):
         self.assertTrue(f.closed)
         self.assertTrue(orig_file.closed)
 
+    def test_namedtemporaryfile_closes(self):
+        """
+        The symbol django.core.files.NamedTemporaryFile is assigned as
+        a different class on different operating systems. In
+        any case, the result should minimally mock some of the API of
+        tempfile.NamedTemporaryFile from the Python standard library.
+        """
+        tempfile = NamedTemporaryFile()
+        self.assertTrue(hasattr(tempfile, "closed"))
+        self.assertFalse(tempfile.closed)
+
+        tempfile.close()
+        self.assertTrue(tempfile.closed)
+
     def test_file_mode(self):
         # Should not set mode to None if it is not present.
         # See #14681, stdlib gzip module crashes if mode is set to None
         file = SimpleUploadedFile("mode_test.txt", b"content")
         self.assertFalse(hasattr(file, 'mode'))
         g = gzip.GzipFile(fileobj=file)
+
+
+class FileMoveSafeTests(unittest.TestCase):
+    def test_file_move_overwrite(self):
+        handle_a, self.file_a = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        handle_b, self.file_b = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+
+        # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
+        self.assertRaises(IOError, lambda: file_move_safe(self.file_a, self.file_b, allow_overwrite=False))
+
+        # should allow it and continue on if allow_overwrite is True
+        self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))

@@ -1,13 +1,13 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import re
 from functools import partial
-from inspect import getargspec
+from importlib import import_module
+from inspect import getargspec, getcallargs
 
 from django.conf import settings
-from django.template.context import (Context, RequestContext,
+from django.template.context import (BaseContext, Context, RequestContext,
     ContextPopException)
-from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
@@ -88,8 +88,8 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple([force_text(p, errors='replace')
-                                 for p in self.params])
+        return self.msg % tuple(force_text(p, errors='replace')
+                                 for p in self.params)
 
 class InvalidTemplateLibrary(Exception):
     pass
@@ -99,7 +99,7 @@ class Origin(object):
         self.name = name
 
     def reload(self):
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Origin must provide a reload() method')
 
     def __str__(self):
         return self.name
@@ -124,6 +124,7 @@ class Template(object):
             origin = StringOrigin(template_string)
         self.nodelist = compile_string(template_string, origin)
         self.name = name
+        self.origin = origin
 
     def __iter__(self):
         for node in self.nodelist:
@@ -384,7 +385,7 @@ class TokenParser(object):
         """
         Overload this method to do the actual parsing and return the result.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Tokenparser must provide a top() method')
 
     def more(self):
         """
@@ -621,34 +622,17 @@ class FilterExpression(object):
 
     def args_check(name, func, provided):
         provided = list(provided)
-        plen = len(provided)
+        # First argument, filter input, is implied.
+        plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
         func = getattr(func, '_decorated_function', func)
         args, varargs, varkw, defaults = getargspec(func)
-        # First argument is filter input.
-        args.pop(0)
-        if defaults:
-            nondefs = args[:-len(defaults)]
-        else:
-            nondefs = args
-        # Args without defaults must be provided.
-        try:
-            for arg in nondefs:
-                provided.pop(0)
-        except IndexError:
-            # Not enough
+        alen = len(args)
+        dlen = len(defaults or [])
+        # Not enough OR Too many
+        if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, len(nondefs), plen))
-
-        # Defaults can be overridden.
-        defaults = list(defaults) if defaults else []
-        try:
-            for parg in provided:
-                defaults.pop(0)
-        except IndexError:
-            # Too many.
-            raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, len(nondefs), plen))
+                                      (name, alen - dlen, plen))
 
         return True
     args_check = staticmethod(args_check)
@@ -691,6 +675,9 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
+        if not isinstance(var, six.string_types):
+            raise TypeError(
+                "Variable must be a string or number, got %s" % type(var))
         try:
             # First try to treat this variable as a number.
             #
@@ -765,6 +752,9 @@ class Variable(object):
                     current = current[bit]
                 except (TypeError, AttributeError, KeyError, ValueError):
                     try:  # attribute lookup
+                        # Don't return class attributes if the class is the context:
+                        if isinstance(current, BaseContext) and getattr(type(current), bit):
+                            raise AttributeError
                         current = getattr(current, bit)
                     except (TypeError, AttributeError):
                         try:  # list-index lookup
@@ -784,10 +774,13 @@ class Variable(object):
                     else:
                         try: # method call (assuming no args required)
                             current = current()
-                        except TypeError: # arguments *were* required
-                            # GOTCHA: This will also catch any TypeError
-                            # raised in the function itself.
-                            current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
+                        except TypeError:
+                            try:
+                                getcallargs(current)
+                            except TypeError: # arguments *were* required
+                                current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
+                            else:
+                                raise
         except Exception as e:
             if getattr(e, 'silent_variable_failure', False):
                 current = settings.TEMPLATE_STRING_IF_INVALID
@@ -1009,7 +1002,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         # Some positional arguments were not supplied
         raise TemplateSyntaxError(
             "'%s' did not receive value(s) for the argument(s): %s" %
-            (name, ", ".join(["'%s'" % p for p in unhandled_params])))
+            (name, ", ".join("'%s'" % p for p in unhandled_params)))
     return args, kwargs
 
 def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
@@ -1101,6 +1094,7 @@ class Library(object):
                     # for decorators that need it e.g. stringfilter
                     if hasattr(filter_func, "_decorated_function"):
                         setattr(filter_func._decorated_function, attr, value)
+            filter_func._filter_name = name
             return filter_func
         else:
             raise InvalidTemplateLibrary("Unsupported arguments to "

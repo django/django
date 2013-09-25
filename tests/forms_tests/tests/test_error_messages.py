@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
@@ -215,13 +215,13 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
                 raise ValidationError("I like to be awkward.")
 
         @python_2_unicode_compatible
-        class CustomErrorList(util.ErrorList):
+        class CustomErrorList(utils.ErrorList):
             def __str__(self):
                 return self.as_divs()
 
             def as_divs(self):
                 if not self: return ''
-                return mark_safe('<div class="error">%s</div>' % ''.join(['<p>%s</p>' % e for e in self]))
+                return mark_safe('<div class="error">%s</div>' % ''.join('<p>%s</p>' % e for e in self))
 
         # This form should print errors the default way.
         form1 = TestForm({'first_name': 'John'})

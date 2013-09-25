@@ -11,9 +11,9 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from django.test.utils import str_prefix
-from django.utils.tzinfo import LocalTimezone, FixedOffset
-from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 # These two classes are used to test auto-escaping of __unicode__ output.
 @python_2_unicode_compatible
@@ -31,63 +31,64 @@ class SafeClass:
 #                   'expected string output' or Exception class)
 def get_filter_tests():
     now = datetime.now()
-    now_tz = datetime.now(LocalTimezone(now))
-    now_tz_i = datetime.now(FixedOffset((3 * 60) + 15)) # imaginary time zone
+    now_tz = timezone.make_aware(now, timezone.get_default_timezone())
+    now_tz_i = timezone.localtime(now_tz, timezone.get_fixed_timezone(195))
     today = date.today()
 
+    # NOTE: \xa0 avoids wrapping between value and unit
     return {
         # Default compare with datetime.now()
-        'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
-        'filter-timesince02' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes = 1)}, '1 day'),
-        'filter-timesince03' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1 hour, 25 minutes'),
+        'filter-timesince01' : ('{{ a|timesince }}', {'a': datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1\xa0minute'),
+        'filter-timesince02' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(days=1, minutes = 1)}, '1\xa0day'),
+        'filter-timesince03' : ('{{ a|timesince }}', {'a': datetime.now() - timedelta(hours=1, minutes=25, seconds = 10)}, '1\xa0hour, 25\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timesince04' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=1)}, '1 day'),
-        'filter-timesince05' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2, minutes=1), 'b':now - timedelta(days=2)}, '1 minute'),
+        'filter-timesince04' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=1)}, '1\xa0day'),
+        'filter-timesince05' : ('{{ a|timesince:b }}', {'a':now - timedelta(days=2, minutes=1), 'b':now - timedelta(days=2)}, '1\xa0minute'),
 
         # Check that timezone is respected
-        'filter-timesince06' : ('{{ a|timesince:b }}', {'a':now_tz - timedelta(hours=8), 'b':now_tz}, '8 hours'),
+        'filter-timesince06' : ('{{ a|timesince:b }}', {'a':now_tz - timedelta(hours=8), 'b':now_tz}, '8\xa0hours'),
 
         # Regression for #7443
-        'filter-timesince07': ('{{ earlier|timesince }}', { 'earlier': now - timedelta(days=7) }, '1 week'),
-        'filter-timesince08': ('{{ earlier|timesince:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '1 week'),
-        'filter-timesince09': ('{{ later|timesince }}', { 'later': now + timedelta(days=7) }, '0 minutes'),
-        'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0 minutes'),
+        'filter-timesince07': ('{{ earlier|timesince }}', { 'earlier': now - timedelta(days=7) }, '1\xa0week'),
+        'filter-timesince08': ('{{ earlier|timesince:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '1\xa0week'),
+        'filter-timesince09': ('{{ later|timesince }}', { 'later': now + timedelta(days=7) }, '0\xa0minutes'),
+        'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0\xa0minutes'),
 
         # Ensures that differing timezones are calculated correctly
-        'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0 minutes'),
-        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0 minutes'),
-        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0 minutes'),
-        'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0 minutes'),
+        'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0\xa0minutes'),
+        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes'),
+        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes'),
+        'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0\xa0minutes'),
         'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
         'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
 
         # Regression for #9065 (two date objects).
-        'filter-timesince17' : ('{{ a|timesince:b }}', {'a': today, 'b': today}, '0 minutes'),
-        'filter-timesince18' : ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1 day'),
+        'filter-timesince17' : ('{{ a|timesince:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timesince18' : ('{{ a|timesince:b }}', {'a': today, 'b': today + timedelta(hours=24)}, '1\xa0day'),
 
         # Default compare with datetime.now()
-        'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
-        'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
-        'filter-timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8 hours, 10 minutes'),
+        'filter-timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2\xa0minutes'),
+        'filter-timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1\xa0day'),
+        'filter-timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8\xa0hours, 10\xa0minutes'),
 
         # Compare to a given parameter
-        'filter-timeuntil04' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=1), 'b':now - timedelta(days=2)}, '1 day'),
-        'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=2, minutes=1)}, '1 minute'),
+        'filter-timeuntil04' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=1), 'b':now - timedelta(days=2)}, '1\xa0day'),
+        'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
 
         # Regression for #7443
-        'filter-timeuntil06': ('{{ earlier|timeuntil }}', { 'earlier': now - timedelta(days=7) }, '0 minutes'),
-        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '0 minutes'),
-        'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7, hours=1) }, '1 week'),
-        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1 week'),
+        'filter-timeuntil06': ('{{ earlier|timeuntil }}', { 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
+        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
+        'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7, hours=1) }, '1\xa0week'),
+        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1\xa0week'),
 
         # Ensures that differing timezones are calculated correctly
-        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0 minutes'),
-        'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0 minutes'),
+        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes'),
+        'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
 
         # Regression for #9065 (two date objects).
-        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0 minutes'),
-        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1 day'),
+        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"&lt;a&gt;\&#39; <a>\'"),
@@ -354,11 +355,18 @@ def get_filter_tests():
         'date04': (r'{{ d|date:"o" }}', {'d': datetime(2008, 12, 29)}, '2009'),
         'date05': (r'{{ d|date:"o" }}', {'d': datetime(2010, 1, 3)}, '2009'),
         # Timezone name
-        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
+        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=timezone.get_fixed_timezone(30))}, '+0030'),
         'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
         # Ticket 19370: Make sure |date doesn't blow up on a midnight time object
         'date08': (r'{{ t|date:"H:i" }}', {'t': time(0, 1)}, '00:01'),
         'date09': (r'{{ t|date:"H:i" }}', {'t': time(0, 0)}, '00:00'),
+        # Ticket 20693: Add timezone support to built-in time template filter
+        'time01': (r'{{ dt|time:"e:O:T:Z" }}', {'dt': now_tz_i}, '+0315:+0315:+0315:11700'),
+        'time02': (r'{{ dt|time:"e:T" }}', {'dt': now}, ':' + now_tz.tzinfo.tzname(now_tz)),
+        'time03': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0, tzinfo=timezone.get_fixed_timezone(30))}, '4 a.m.::::'),
+        'time04': (r'{{ t|time:"P:e:O:T:Z" }}', {'t': time(4, 0)}, '4 a.m.::::'),
+        'time05': (r'{{ d|time:"P:e:O:T:Z" }}', {'d': today}, ''),
+        'time06': (r'{{ obj|time:"P:e:O:T:Z" }}', {'obj': 'non-datetime-value'}, ''),
 
          # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),

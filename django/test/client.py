@@ -5,15 +5,11 @@ import os
 import re
 import mimetypes
 from copy import copy
+from importlib import import_module
 from io import BytesIO
-try:
-    from urllib.parse import unquote, urlparse, urlsplit
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlparse, urlsplit
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -25,9 +21,9 @@ from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
-from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
 from django.utils import six
+from django.utils.six.moves.urllib.parse import unquote, urlparse, urlsplit
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
@@ -36,6 +32,7 @@ __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+
 
 class FakePayload(object):
     """
@@ -94,8 +91,6 @@ class ClientHandler(BaseHandler):
         super(ClientHandler, self).__init__(*args, **kwargs)
 
     def __call__(self, environ):
-        from django.conf import settings
-
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
@@ -123,6 +118,7 @@ class ClientHandler(BaseHandler):
 
         return response
 
+
 def store_rendered_templates(store, signal, sender, template, context, **kwargs):
     """
     Stores templates and contexts that are rendered.
@@ -132,6 +128,7 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     """
     store.setdefault('templates', []).append(template)
     store.setdefault('context', ContextList()).append(copy(context))
+
 
 def encode_multipart(boundary, data):
     """
@@ -178,15 +175,20 @@ def encode_multipart(boundary, data):
     ])
     return b'\r\n'.join(lines)
 
+
 def encode_file(boundary, key, file):
     to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
-    content_type = mimetypes.guess_type(file.name)[0]
+    if hasattr(file, 'content_type'):
+        content_type = file.content_type
+    else:
+        content_type = mimetypes.guess_type(file.name)[0]
+
     if content_type is None:
         content_type = 'application/octet-stream'
     return [
         to_bytes('--%s' % boundary),
-        to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"' \
-            % (key, os.path.basename(file.name))),
+        to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"'
+                 % (key, os.path.basename(file.name))),
         to_bytes('Content-Type: %s' % content_type),
         b'',
         file.read()
@@ -270,15 +272,11 @@ class RequestFactory(object):
     def get(self, path, data={}, **extra):
         "Construct a GET request."
 
-        parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
-            'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
-            'REQUEST_METHOD':  str('GET'),
+            'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
-        return self.request(**r)
+        return self.generic('GET', path, **r)
 
     def post(self, path, data={}, content_type=MULTIPART_CONTENT,
              **extra):
@@ -286,33 +284,19 @@ class RequestFactory(object):
 
         post_data = self._encode_data(data, content_type)
 
-        parsed = urlparse(path)
-        r = {
-            'CONTENT_LENGTH': len(post_data),
-            'CONTENT_TYPE':   content_type,
-            'PATH_INFO':      self._get_path(parsed),
-            'QUERY_STRING':   force_str(parsed[4]),
-            'REQUEST_METHOD': str('POST'),
-            'wsgi.input':     FakePayload(post_data),
-        }
-        r.update(extra)
-        return self.request(**r)
+        return self.generic('POST', path, post_data, content_type, **extra)
 
     def head(self, path, data={}, **extra):
         "Construct a HEAD request."
 
-        parsed = urlparse(path)
         r = {
-            'CONTENT_TYPE':    str('text/html; charset=utf-8'),
-            'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or force_str(parsed[4]),
-            'REQUEST_METHOD':  str('HEAD'),
+            'QUERY_STRING': urlencode(data, doseq=True),
         }
         r.update(extra)
-        return self.request(**r)
+        return self.generic('HEAD', path, **r)
 
     def options(self, path, data='', content_type='application/octet-stream',
-            **extra):
+                **extra):
         "Construct an OPTIONS request."
         return self.generic('OPTIONS', path, data, content_type, **extra)
 
@@ -322,22 +306,22 @@ class RequestFactory(object):
         return self.generic('PUT', path, data, content_type, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
-            **extra):
+              **extra):
         "Construct a PATCH request."
         return self.generic('PATCH', path, data, content_type, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
-            **extra):
+               **extra):
         "Construct a DELETE request."
         return self.generic('DELETE', path, data, content_type, **extra)
 
     def generic(self, method, path,
                 data='', content_type='application/octet-stream', **extra):
+        """Constructs an arbitrary HTTP request."""
         parsed = urlparse(path)
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO':      self._get_path(parsed),
-            'QUERY_STRING':   force_str(parsed[4]),
             'REQUEST_METHOD': str(method),
         }
         if data:
@@ -347,7 +331,15 @@ class RequestFactory(object):
                 'wsgi.input':     FakePayload(data),
             })
         r.update(extra)
+        # If QUERY_STRING is absent or empty, we want to extract it from the URL.
+        if not r.get('QUERY_STRING'):
+            query_string = force_bytes(parsed[4])
+            # WSGI requires latin-1 encoded strings. See get_path_info().
+            if six.PY3:
+                query_string = query_string.decode('iso-8859-1')
+            r['QUERY_STRING'] = query_string
         return self.request(**r)
+
 
 class Client(RequestFactory):
     """
@@ -390,7 +382,6 @@ class Client(RequestFactory):
         return {}
     session = property(_session)
 
-
     def request(self, **request):
         """
         The master request method. Composes the environment dictionary
@@ -404,7 +395,8 @@ class Client(RequestFactory):
         # callback function.
         data = {}
         on_template_render = curry(store_rendered_templates, data)
-        signals.template_rendered.connect(on_template_render, dispatch_uid="template-render")
+        signal_uid = "template-render-%s" % id(request)
+        signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
         got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
         try:
@@ -450,7 +442,7 @@ class Client(RequestFactory):
 
             return response
         finally:
-            signals.template_rendered.disconnect(dispatch_uid="template-render")
+            signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid="request-exception")
 
     def get(self, path, data={}, follow=False, **extra):
@@ -482,12 +474,11 @@ class Client(RequestFactory):
         return response
 
     def options(self, path, data='', content_type='application/octet-stream',
-            follow=False, **extra):
+                follow=False, **extra):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path,
-                data=data, content_type=content_type, **extra)
+        response = super(Client, self).options(path, data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -497,14 +488,13 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path,
-                data=data, content_type=content_type, **extra)
+        response = super(Client, self).put(path, data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def patch(self, path, data='', content_type='application/octet-stream',
-            follow=False, **extra):
+              follow=False, **extra):
         """
         Send a resource to the server using PATCH.
         """
@@ -515,12 +505,12 @@ class Client(RequestFactory):
         return response
 
     def delete(self, path, data='', content_type='application/octet-stream',
-            follow=False, **extra):
+               follow=False, **extra):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(path,
-                data=data, content_type=content_type, **extra)
+        response = super(Client, self).delete(
+            path, data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -534,8 +524,8 @@ class Client(RequestFactory):
         not available.
         """
         user = authenticate(**credentials)
-        if user and user.is_active \
-                and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if (user and user.is_active and
+                'django.contrib.sessions' in settings.INSTALLED_APPS):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request to store login details.
@@ -571,11 +561,17 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
-        session = import_module(settings.SESSION_ENGINE).SessionStore()
-        session_cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_cookie:
-            session.delete(session_key=session_cookie.value)
-        self.cookies = SimpleCookie()
+        request = HttpRequest()
+        engine = import_module(settings.SESSION_ENGINE)
+        UserModel = get_user_model()
+        if self.session:
+            request.session = self.session
+            uid = self.session.get("_auth_user_id")
+            if uid:
+                request.user = UserModel._default_manager.get(pk=uid)
+        else:
+            request.session = engine.SessionStore()
+        logout(request)
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."

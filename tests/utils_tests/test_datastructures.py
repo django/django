@@ -4,16 +4,17 @@ Tests for stuff in django.utils.datastructures.
 
 import copy
 import pickle
-import warnings
 
 from django.test import SimpleTestCase
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 from django.utils import six
 
 
-class SortedDictTests(SimpleTestCase):
+class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
     def setUp(self):
+        super(SortedDictTests, self).setUp()
         self.d1 = SortedDict()
         self.d1[7] = 'seven'
         self.d1[1] = 'one'
@@ -50,7 +51,7 @@ class SortedDictTests(SimpleTestCase):
         self.d2[7] = 'lucky number 7'
         self.assertEqual(list(six.iterkeys(self.d2)), [1, 9, 0, 7])
 
-    if not six.PY3:
+    if six.PY2:
         def test_change_keys(self):
             """
             Changing the keys won't do anything, it's only a copy of the
@@ -133,20 +134,6 @@ class SortedDictTests(SimpleTestCase):
         self.assertEqual(list(self.d2), [1, 9, 0, 7])
         self.assertEqual(list(reversed(self.d1)), [9, 1, 7])
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
-
-    def test_insert(self):
-        d = SortedDict()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            d.insert(0, "hello", "world")
-        assert w[0].category is DeprecationWarning
-
-    def test_value_for_index(self):
-        d = SortedDict({"a": 3})
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            self.assertEqual(d.value_for_index(0), 3)
-        assert w[0].category is DeprecationWarning
 
 
 class MergeDictTests(SimpleTestCase):
@@ -234,11 +221,7 @@ class MultiValueDictTests(SimpleTestCase):
                           [('name', ['Adrian', 'Simon']),
                            ('position', ['Developer'])])
 
-        # MultiValueDictKeyError: "Key 'lastname' not found in
-        # <MultiValueDict: {'position': ['Developer'],
-        #                   'name': ['Adrian', 'Simon']}>"
-        six.assertRaisesRegex(self, MultiValueDictKeyError,
-            r'"Key \'lastname\' not found in <MultiValueDict',
+        six.assertRaisesRegex(self, MultiValueDictKeyError, 'lastname',
             d.__getitem__, 'lastname')
 
         self.assertEqual(d.get('lastname'), None)

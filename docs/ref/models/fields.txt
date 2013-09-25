@@ -80,9 +80,10 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this
-field. If this is given, the default form widget will be a select box with
-these choices instead of the standard text field.
+An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
+two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
+this is given, the default form widget will be a select box with these choices
+instead of the standard text field.
 
 The first element in each tuple is the actual value to be stored, and the
 second element is the human-readable name. For example::
@@ -96,6 +97,8 @@ second element is the human-readable name. For example::
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
+
+    from django.db import models
 
     class Student(models.Model):
         FRESHMAN = 'FR'
@@ -149,11 +152,20 @@ method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
 documentation.
 
-Finally, note that choices can be any iterable object -- not necessarily a list
-or tuple. This lets you construct choices dynamically. But if you find yourself
-hacking :attr:`~Field.choices` to be dynamic, you're probably better off using a
-proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
-meant for static data that doesn't change much, if ever.
+Note that choices can be any iterable object -- not necessarily a list or tuple.
+This lets you construct choices dynamically. But if you find yourself hacking
+:attr:`~Field.choices` to be dynamic, you're probably better off using a proper
+database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
+static data that doesn't change much, if ever.
+
+.. versionadded:: 1.7
+
+Unless :attr:`blank=False<Field.blank>` is set on the field along with a
+:attr:`~Field.default` then a label containing ``"---------"`` will be rendered
+with the select box. To override this behavior, add a tuple to ``choices``
+containing ``None``; e.g. ``(None, 'Your String For Display')``.
+Alternatively, you can use an empty string instead of ``None`` where this makes
+sense - such as on a :class:`~django.db.models.CharField`.
 
 ``db_column``
 -------------
@@ -269,8 +281,8 @@ you try to save a model with a duplicate value in a :attr:`~Field.unique`
 field, a :exc:`django.db.IntegrityError` will be raised by the model's
 :meth:`~django.db.models.Model.save` method.
 
-This option is valid on all field types except :class:`ManyToManyField` and
-:class:`FileField`.
+This option is valid on all field types except :class:`ManyToManyField`,
+:class:`OneToOneField`, and :class:`FileField`.
 
 Note that when ``unique`` is ``True``, you don't need to specify
 :attr:`~Field.db_index`, because ``unique`` implies the creation of an index.
@@ -288,9 +300,16 @@ For example, if you have a field ``title`` that has
 records with the same ``title`` and ``pub_date``.
 
 Note that if you set this to point to a :class:`DateTimeField`, only the date
-portion of the field will be considered.
+portion of the field will be considered. Besides, when :setting:`USE_TZ` is
+``True``, the check will be performed in the :ref:`current time zone
+<default-current-time-zone>` at the time the object gets saved.
 
-This is enforced by model validation but not at the database level.
+This is enforced by :meth:`Model.validate_unique()` during model validation
+but not at the database level. If any :attr:`~Field.unique_for_date` constraint
+involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+example, if one of the fields is listed in ``exclude`` or has
+:attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
+skip validation for that particular constraint.
 
 ``unique_for_month``
 --------------------
@@ -365,7 +384,7 @@ to filter a queryset on a ``BinaryField`` value.
 
     Although you might think about storing files in the database, consider that
     it is bad design in 99% of the cases. This field is *not* a replacement for
-    proper :doc`static files </howto/static-files>` handling.
+    proper :doc:`static files </howto/static-files/index>` handling.
 
 ``BooleanField``
 ----------------
@@ -740,20 +759,15 @@ directory on the filesystem. Has three special arguments, of which the first is
 
 .. attribute:: FilePathField.allow_files
 
-    .. versionadded:: 1.5
-
     Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
     whether files in the specified location should be included.  Either this or
     :attr:`~FilePathField.allow_folders` must be ``True``.
 
 .. attribute:: FilePathField.allow_folders
 
-    .. versionadded:: 1.5
-
     Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
-
 
 Of course, these arguments can be used together.
 
@@ -866,6 +880,9 @@ are converted to lowercase.
     ``192.0.2.1``. Default is disabled. Can only be used
     when ``protocol`` is set to ``'both'``.
 
+If you allow for blank values, you have to allow for null values since blank
+values are stored as null.
+
 ``NullBooleanField``
 --------------------
 
@@ -889,7 +906,8 @@ The value ``0`` is accepted for backward compatibility reasons.
 .. class:: PositiveSmallIntegerField([**options])
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values up to 32767 are safe in all databases
+supported by Django.
 
 ``SlugField``
 -------------
@@ -917,7 +935,8 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point.
+(database-dependent) point. Values from -32768 to 32767 are safe in all databases
+supported by Django.
 
 ``TextField``
 -------------
@@ -958,12 +977,6 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
-.. versionadded:: 1.5
-
-    The current value of the field will be displayed as a clickable link above the
-    input widget.
-
-
 Relationship fields
 ===================
 
@@ -994,12 +1007,15 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
+    from django.db import models
+
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
         # ...
 
     class Manufacturer(models.Model):
         # ...
+        pass
 
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
@@ -1048,11 +1064,12 @@ define the details of how the relation works.
     only allows the choice of related objects with a ``pub_date`` before the
     current date to be chosen.
 
-    Instead of a dictionary this can also be a :class:`~django.db.models.Q`
-    object for more :ref:`complex queries <complex-lookups-with-q>`. However,
-    if ``limit_choices_to`` is a :class:`~django.db.models.Q` object then it
-    will only have an effect on the choices available in the admin when the
-    field is not listed in ``raw_id_fields`` in the ``ModelAdmin`` for the model.
+    Instead of a dictionary this can also be a :class:`Q object
+    <django.db.models.Q>` for more :ref:`complex queries
+    <complex-lookups-with-q>`. However, if ``limit_choices_to`` is a :class:`Q
+    object <django.db.models.Q>` then it will only have an effect on the
+    choices available in the admin when the field is not listed in
+    ``raw_id_fields`` in the ``ModelAdmin`` for the model.
 
 .. attribute:: ForeignKey.related_name
 
@@ -1069,6 +1086,22 @@ define the details of how the relation works.
     model::
 
         user = models.ForeignKey(User, related_name='+')
+
+.. attribute:: ForeignKey.related_query_name
+
+    .. versionadded:: 1.6
+
+    The name to use for the reverse filter name from the target model.
+    Defaults to the value of :attr:`related_name` if it is set, otherwise it
+    defaults to the name of the model::
+
+        # Declare the ForeignKey with related_query_name
+        class Tag(models.Model):
+            article = models.ForeignKey(Article, related_name="tags", related_query_name="tag")
+            name = models.CharField(max_length=255)
+
+        # That's now the name of the reverse filter
+        article_instance.filter(tag__name="important")
 
 .. attribute:: ForeignKey.to_field
 
@@ -1132,6 +1165,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     necessary to avoid executing queries at the time your models.py is
     imported::
 
+        from django.db import models
+        from django.contrib.auth.models import User
+
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
 
@@ -1142,7 +1178,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     Take no action. If your database backend enforces referential
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
-    you manually add a SQL ``ON DELETE`` constraint to the database field
+    you manually add an SQL ``ON DELETE`` constraint to the database field
     (perhaps using :ref:`initial sql<initial-sql>`).
 
 .. _ref-manytomany:
@@ -1152,10 +1188,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 .. class:: ManyToManyField(othermodel, [**options])
 
-A many-to-many relationship. Requires a positional argument: the class to which
-the model is related. This works exactly the same as it does for
-:class:`ForeignKey`, including all the options regarding :ref:`recursive
-<recursive-relationships>` and :ref:`lazy <lazy-relationships>` relationships.
+A many-to-many relationship. Requires a positional argument: the class to
+which the model is related, which works exactly the same as it does for
+:class:`ForeignKey`, including :ref:`recursive <recursive-relationships>` and
+:ref:`lazy <lazy-relationships>` relationships.
 
 Related objects can be added, removed, or created with the field's
 :class:`~django.db.models.fields.related.RelatedManager`.
@@ -1191,6 +1227,12 @@ that control how the relationship functions.
         users = models.ManyToManyField(User, related_name='u+')
         referents = models.ManyToManyField(User, related_name='ref+')
 
+.. attribute:: ForeignKey.related_query_name
+
+    .. versionadded:: 1.6
+
+    Same as :attr:`ForeignKey.related_query_name`.
+
 .. attribute:: ManyToManyField.limit_choices_to
 
     Same as :attr:`ForeignKey.limit_choices_to`.
@@ -1203,6 +1245,8 @@ that control how the relationship functions.
 
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
+
+        from django.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")

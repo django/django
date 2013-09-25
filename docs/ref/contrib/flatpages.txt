@@ -47,7 +47,7 @@ Then either:
 3. Add an entry in your URLconf. For example::
 
     urlpatterns = patterns('',
-        ('^pages/', include('django.contrib.flatpages.urls')),
+        (r'^pages/', include('django.contrib.flatpages.urls')),
     )
 
 or:
@@ -55,14 +55,14 @@ or:
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
    to your :setting:`MIDDLEWARE_CLASSES` setting.
 
-4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+4. Run the command :djadmin:`manage.py migrate <migrate>`.
 
 .. currentmodule:: django.contrib.flatpages.middleware
 
 How it works
 ============
 
-``manage.py syncdb`` creates two tables in your database: ``django_flatpage``
+``manage.py migrate`` creates two tables in your database: ``django_flatpage``
 and ``django_flatpage_sites``. ``django_flatpage`` is a simple lookup table
 that simply maps a URL to a title and bunch of text content.
 ``django_flatpage_sites`` associates a flatpage with a site.
@@ -74,7 +74,7 @@ There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
     urlpatterns = patterns('',
-        ('^pages/', include('django.contrib.flatpages.urls')),
+        (r'^pages/', include('django.contrib.flatpages.urls')),
     )
 
 You can also set it up as a "catchall" pattern. In this case, it is important
@@ -82,8 +82,14 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += patterns('django.contrib.flatpages.views',
-        (r'^(?P<url>.*)$', 'flatpage'),
+        (r'^(?P<url>.*/)$', 'flatpage'),
     )
+
+.. warning::
+
+    If you set :setting:`APPEND_SLASH` to ``False``, you must remove the slash
+    in the catchall pattern or flatpages without a trailing slash will not be
+    matched.
 
 Another common setup is to use flat pages for a limited set of known pages and
 to hard code the urls, so you can reference them with the :ttag:`url` template

@@ -6,10 +6,8 @@ against request forgeries from other sites.
 """
 from __future__ import unicode_literals
 
-import hashlib
 import logging
 import re
-import random
 
 from django.conf import settings
 from django.core.urlresolvers import get_callable
@@ -51,6 +49,14 @@ def get_token(request):
     """
     request.META["CSRF_COOKIE_USED"] = True
     return request.META.get("CSRF_COOKIE", None)
+
+
+def rotate_token(request):
+    """
+    Changes the CSRF token in use for a request - should be done on login
+    for security purposes.
+    """
+    request.META["CSRF_COOKIE"] = _get_new_csrf_key()
 
 
 def _sanitize_token(token):

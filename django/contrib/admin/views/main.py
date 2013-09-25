@@ -1,7 +1,6 @@
-import operator
+from collections import OrderedDict
 import sys
 import warnings
-from functools import reduce
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
@@ -9,15 +8,15 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.datastructures import SortedDict
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str, force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import (quote, get_fields_from_path,
+from django.contrib.admin.exceptions import DisallowedModelAdminLookup
+from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
+from django.contrib.admin.utils import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
 
 # Changelist settings
@@ -26,8 +25,6 @@ ORDER_VAR = 'o'
 ORDER_TYPE_VAR = 'ot'
 PAGE_VAR = 'p'
 SEARCH_VAR = 'q'
-TO_FIELD_VAR = 't'
-IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (
@@ -37,9 +34,32 @@ IGNORED_PARAMS = (
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 
+def _is_changelist_popup(request):
+    """
+    Returns True if the popup GET parameter is set.
+
+    This function is introduced to facilitate deprecating the legacy
+    value for IS_POPUP_VAR and should be removed at the end of the
+    deprecation cycle.
+    """
+
+    if IS_POPUP_VAR in request.GET:
+        return True
+
+    IS_LEGACY_POPUP_VAR = 'pop'
+    if IS_LEGACY_POPUP_VAR in request.GET:
+        warnings.warn(
+        "The `%s` GET parameter has been renamed to `%s`." %
+        (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
+        DeprecationWarning, 2)
+        return True
+
+    return False
+
+
 class RenameChangeListMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
     )
 
 
@@ -60,6 +80,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
+        self.preserved_filters = model_admin.get_preserved_filters(request)
 
         # Get search parameters from the query string.
         try:
@@ -67,7 +88,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         except ValueError:
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
-        self.is_popup = IS_POPUP_VAR in request.GET
+        self.is_popup = _is_changelist_popup(request)
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
@@ -93,14 +114,14 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def root_query_set(self):
         warnings.warn("`ChangeList.root_query_set` is deprecated, "
                       "use `root_queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.root_queryset
 
     @property
     def query_set(self):
         warnings.warn("`ChangeList.query_set` is deprecated, "
                       "use `queryset` instead.",
-                      PendingDeprecationWarning, 2)
+                      DeprecationWarning, 2)
         return self.queryset
 
     def get_filters_params(self, params=None):
@@ -130,7 +151,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                 lookup_params[force_str(key)] = value
 
             if not self.model_admin.lookup_allowed(key, value):
-                raise SuspiciousOperation("Filtering by %s not allowed" % key)
+                raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
         if self.list_filter:
@@ -297,13 +318,13 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
 
     def get_ordering_field_columns(self):
         """
-        Returns a SortedDict of ordering field column numbers and asc/desc
+        Returns an OrderedDict of ordering field column numbers and asc/desc
         """
 
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = SortedDict()
+        ordering_fields = OrderedDict()
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more
@@ -331,7 +352,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
-         use_distinct) = self.get_filters(request)
+         filters_use_distinct) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
@@ -357,55 +378,45 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             # ValueError, ValidationError, or ?.
             raise IncorrectLookupParameters(e)
 
-        # Use select_related() if one of the list_display options is a field
-        # with a relationship and the provided queryset doesn't already have
-        # select_related defined.
         if not qs.query.select_related:
-            if self.list_select_related:
-                qs = qs.select_related()
-            else:
-                for field_name in self.list_display:
-                    try:
-                        field = self.lookup_opts.get_field(field_name)
-                    except models.FieldDoesNotExist:
-                        pass
-                    else:
-                        if isinstance(field.rel, models.ManyToOneRel):
-                            qs = qs.select_related()
-                            break
+            qs = self.apply_select_related(qs)
 
         # Set ordering.
         ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+        # Apply search results
+        qs, search_use_distinct = self.model_admin.get_search_results(
+            request, qs, self.query)
 
-        if self.search_fields and self.query:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in self.search_fields]
-            for bit in self.query.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                qs = qs.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.lookup_opts, search_spec):
-                        use_distinct = True
-                        break
-
-        if use_distinct:
+        # Remove duplicates from results, if necessary
+        if filters_use_distinct | search_use_distinct:
             return qs.distinct()
         else:
             return qs
+
+    def apply_select_related(self, qs):
+        if self.list_select_related is True:
+            return qs.select_related()
+
+        if self.list_select_related is False:
+            if self.has_related_field_in_list_display():
+                return qs.select_related()
+
+        if self.list_select_related:
+            return qs.select_related(*self.list_select_related)
+        return qs
+
+    def has_related_field_in_list_display(self):
+        for field_name in self.list_display:
+            try:
+                field = self.lookup_opts.get_field(field_name)
+            except models.FieldDoesNotExist:
+                pass
+            else:
+                if isinstance(field.rel, models.ManyToOneRel):
+                    return True
+        return False
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)

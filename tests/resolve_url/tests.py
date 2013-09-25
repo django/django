@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
+from unittest import TestCase
+
 from django.core.urlresolvers import NoReverseMatch
 from django.contrib.auth.views import logout
-from django.utils.unittest import TestCase
 from django.shortcuts import resolve_url
 
 from .models import UnimportantThing

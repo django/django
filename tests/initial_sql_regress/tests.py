@@ -24,7 +24,7 @@ class InitialSQLTests(TestCase):
 
     def test_custom_sql(self):
         """
-        Simulate the custom SQL loading by syncdb.
+        Simulate the custom SQL loading by migrate.
         """
         connection = connections[DEFAULT_DB_ALIAS]
         custom_sql = custom_sql_for_model(Simple, no_style(), connection)

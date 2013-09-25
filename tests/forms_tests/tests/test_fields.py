@@ -125,6 +125,15 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_length_not_int(self):
+        """
+        Ensure that setting min_length or max_length to something that is not a
+        number returns an exception.
+        """
+        self.assertRaises(ValueError, CharField, min_length='a')
+        self.assertRaises(ValueError, CharField, max_length='a')
+        self.assertRaises(ValueError, CharField, 'a')
+
     def test_charfield_widget_attrs(self):
         """
         Ensure that CharField.widget_attrs() always returns a dictionary.
@@ -245,6 +254,9 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '1.0a')
         self.assertEqual(f.max_value, None)
         self.assertEqual(f.min_value, None)
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'Infinity')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, 'NaN')
+        self.assertRaisesMessage(ValidationError, "'Enter a number.'", f.clean, '-Inf')
 
     def test_floatfield_2(self):
         f = FloatField(required=False)
@@ -277,17 +289,16 @@ class FieldsTests(SimpleTestCase):
         n = 4.35
         self.assertFalse(f._has_changed(n, '4.3500'))
 
-        with translation.override('fr'):
-            with self.settings(USE_L10N=True):
-                f = FloatField(localize=True)
-                localized_n = formats.localize_input(n)  # -> '4,35' in French
-                self.assertFalse(f._has_changed(n, localized_n))
+        with translation.override('fr'), self.settings(USE_L10N=True):
+            f = FloatField(localize=True)
+            localized_n = formats.localize_input(n)  # -> '4,35' in French
+            self.assertFalse(f._has_changed(n, localized_n))
 
     # DecimalField ################################################################
 
     def test_decimalfield_1(self):
         f = DecimalField(max_digits=4, decimal_places=2)
-        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" maxlength="6" />')
+        self.assertWidgetRendersTo(f, '<input id="id_f" step="0.01" type="number" name="f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
         self.assertEqual(f.clean('1'), Decimal("1"))
@@ -333,7 +344,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_3(self):
         f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
-        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" maxlength="6" type="number" id="id_f" />')
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.5" max="1.5" type="number" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is less than or equal to 1.5.'", f.clean, '1.6')
         self.assertRaisesMessage(ValidationError, "'Ensure this value is greater than or equal to 0.5.'", f.clean, '0.4')
         self.assertEqual(f.clean('1.5'), Decimal("1.5"))
@@ -365,6 +376,17 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean('.01'), Decimal(".01"))
         self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 0 digits before the decimal point.'", f.clean, '1.1')
 
+    def test_decimalfield_widget_attrs(self):
+        f = DecimalField(max_digits=6, decimal_places=2)
+        self.assertEqual(f.widget_attrs(Widget()), {})
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '0.01'})
+        f = DecimalField(max_digits=10, decimal_places=0)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1'})
+        f = DecimalField(max_digits=19, decimal_places=19)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
+        f = DecimalField(max_digits=20)
+        self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+
     def test_decimalfield_localized(self):
         """
         Make sure localized DecimalField's widget renders to a text input with
@@ -379,11 +401,10 @@ class FieldsTests(SimpleTestCase):
         self.assertFalse(f._has_changed(d, '0.10'))
         self.assertTrue(f._has_changed(d, '0.101'))
 
-        with translation.override('fr'):
-            with self.settings(USE_L10N=True):
-                f = DecimalField(max_digits=2, decimal_places=2, localize=True)
-                localized_d = formats.localize_input(d)  # -> '0,1' in French
-                self.assertFalse(f._has_changed(d, localized_d))
+        with translation.override('fr'), self.settings(USE_L10N=True):
+            f = DecimalField(max_digits=2, decimal_places=2, localize=True)
+            localized_d = formats.localize_input(d)  # -> '0,1' in French
+            self.assertFalse(f._has_changed(d, localized_d))
 
     # DateField ###################################################################
 
@@ -1122,6 +1143,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1142,6 +1164,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1162,6 +1185,7 @@ class FieldsTests(SimpleTestCase):
                 ('/django/forms/formsets.py', 'formsets.py'),
                 ('/django/forms/models.py', 'models.py'),
                 ('/django/forms/util.py', 'util.py'),
+                ('/django/forms/utils.py', 'utils.py'),
                 ('/django/forms/widgets.py', 'widgets.py')
             ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
@@ -1227,6 +1251,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_splitdatetimefield_changed(self):
         f = SplitDateTimeField(input_date_formats=['%d/%m/%Y'])
+        self.assertFalse(f._has_changed(['11/01/2012', '09:18:15'], ['11/01/2012', '09:18:15']))
         self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
         self.assertFalse(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
         self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))

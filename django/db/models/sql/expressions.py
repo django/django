@@ -1,7 +1,9 @@
+import copy
+
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import FieldDoesNotExist
-import copy
+
 
 class SQLEvaluator(object):
     def __init__(self, expression, query, allow_joins=True, reuse=None):
@@ -109,8 +111,7 @@ class SQLEvaluator(object):
         timedelta = node.children.pop()
         sql, params = self.evaluate_node(node, qn, connection)
 
-        if timedelta.days == 0 and timedelta.seconds == 0 and \
-                timedelta.microseconds == 0:
+        if (timedelta.days == timedelta.seconds == timedelta.microseconds == 0):
             return sql, params
 
         return connection.ops.date_interval_sql(sql, node.connector, timedelta), params

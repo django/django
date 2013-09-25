@@ -98,6 +98,11 @@ crawlers often request::
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
 
+If you'd like to customize the behavior of
+:class:`django.middleware.common.BrokenLinkEmailsMiddleware` further (for
+example to ignore requests coming from web crawlers), you should subclass it
+and override its methods.
+
 .. seealso::
 
    404 errors are logged using the logging framework. By default, these log
@@ -112,11 +117,13 @@ Filtering error reports
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. currentmodule:: django.views.decorators.debug
+
 Error reports are really helpful for debugging errors, so it is generally
 useful to record as much relevant information about those errors as possible.
 For example, by default Django records the `full traceback`_ for the
-exception raised, each `traceback frame`_'s local variables, and the
-:class:`~django.http.HttpRequest`'s :ref:`attributes<httprequest-attributes>`.
+exception raised, each `traceback frame`_’s local variables, and the
+:class:`~django.http.HttpRequest`’s :ref:`attributes<httprequest-attributes>`.
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
@@ -159,7 +166,7 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     .. admonition:: When using mutiple decorators
 
         If the variable you want to hide is also a function argument (e.g.
-        '``user``' in the following example), and if the decorated function has
+        '``user``’ in the following example), and if the decorated function has
         mutiple decorators, then make sure to place ``@sensitive_variables`` at
         the top of the decorator chain. This way it will also hide the function
         argument as it gets passed through the other decorators::
@@ -227,7 +234,7 @@ own filter class and tell Django to use it via the
     DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
 
 You may also control in a more granular way which filter to use within any
-given view by setting the ``HttpRequest``'s ``exception_reporter_filter``
+given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
 attribute::
 
     def my_view(request):
@@ -235,11 +242,13 @@ attribute::
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 
+.. currentmodule:: django.views.debug
+
 Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
 following methods:
 
-.. class:: django.views.debug.SafeExceptionReporterFilter
+.. class:: SafeExceptionReporterFilter
 
 .. method:: SafeExceptionReporterFilter.is_active(self, request)
 

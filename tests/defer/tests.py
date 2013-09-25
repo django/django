@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
@@ -183,3 +183,9 @@ class DeferTests(TestCase):
         with self.assertNumQueries(0):
             bc_deferred.id
         self.assertEqual(bc_deferred.pk, bc_deferred.id)
+
+    def test_eq(self):
+        s1 = Secondary.objects.create(first="x1", second="y1")
+        s1_defer = Secondary.objects.only('pk').get(pk=s1.pk)
+        self.assertEqual(s1, s1_defer)
+        self.assertEqual(s1_defer, s1)

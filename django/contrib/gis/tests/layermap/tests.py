@@ -1,17 +1,17 @@
 # coding: utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-import os
 from copy import copy
 from decimal import Decimal
+import os
+import unittest
+from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
 from django.db import router
 from django.conf import settings
 from django.test import TestCase
-from django.utils import unittest
-from django.utils.unittest import skipUnless
 from django.utils._os import upath
 
 if HAS_GDAL:
@@ -58,11 +58,11 @@ class LayerMapTest(TestCase):
         # ensuring that a LayerMapError is raised.
         for bad_map in (bad1, bad2, bad3):
             with self.assertRaises(LayerMapError):
-                lm = LayerMapping(City, city_shp, bad_map)
+                LayerMapping(City, city_shp, bad_map)
 
         # A LookupError should be thrown for bogus encodings.
         with self.assertRaises(LookupError):
-            lm = LayerMapping(City, city_shp, city_mapping, encoding='foobar')
+            LayerMapping(City, city_shp, city_mapping, encoding='foobar')
 
     def test_simple_layermap(self):
         "Test LayerMapping import of a simple point shapefile."
@@ -311,7 +311,7 @@ class OtherRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return True
 
 

@@ -23,7 +23,7 @@ case of Django 1.2.2, we have made an exception to this rule.
 
 In order to test a bug fix that forms part of the 1.2.2 release, it
 was necessary to add a feature -- the ``enforce_csrf_checks`` flag --
-to the :mod:`test client <django.test.client>`. This flag forces
+to the :ref:`test client <test-client>`. This flag forces
 the test client to perform full CSRF checks on forms. The default
 behavior of the test client hasn't changed, but if you want to do
 CSRF checks with the test client, it is now possible to do so.

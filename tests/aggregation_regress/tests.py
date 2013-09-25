@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import pickle
@@ -8,9 +8,9 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
-from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import Approximate
 from django.utils import six
-from django.utils.unittest import expectedFailure
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
         ItemTag, WithManualPK)
@@ -250,6 +250,13 @@ class AggregationTests(TestCase):
             'pages__max': 1132,
             'price__max': Decimal("82.80")
         })
+
+        # Regression for #15624 - Missing SELECT columns when using values, annotate
+        # and aggregate in a single query
+        self.assertEqual(
+            Book.objects.annotate(c=Count('authors')).values('c').aggregate(Max('c')),
+            {'c__max': 3}
+            )
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported
@@ -581,6 +588,7 @@ class AggregationTests(TestCase):
             6
         )
 
+        # Note: intentionally no order_by(), that case needs tests, too.
         publishers = Publisher.objects.filter(id__in=[1, 2])
         self.assertEqual(
             sorted(p.name for p in publishers),
@@ -591,9 +599,14 @@ class AggregationTests(TestCase):
         )
 
         publishers = publishers.annotate(n_books=Count("book"))
+        sorted_publishers = sorted(publishers, key=lambda x: x.name)
         self.assertEqual(
-            publishers[0].n_books,
+            sorted_publishers[0].n_books,
             2
+        )
+        self.assertEqual(
+            sorted_publishers[1].n_books,
+            1
         )
 
         self.assertEqual(
@@ -1101,3 +1114,13 @@ class AggregationTests(TestCase):
         self.assertQuerysetEqual(
             qs, ['Sams Teach Yourself Django in 24 Hours'],
             lambda b: b.name)
+
+    def test_annotate_reserved_word(self):
+        """
+        Regression #18333 - Ensure annotated column name is properly quoted.
+        """
+        vals = Book.objects.annotate(select=Count('authors__id')).aggregate(Sum('select'), Avg('select'))
+        self.assertEqual(vals, {
+            'select__sum': 10,
+            'select__avg': Approximate(1.666, places=2),
+        })

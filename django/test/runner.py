@@ -1,12 +1,12 @@
 import os
 from optparse import make_option
+import unittest
+from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.utils import unittest
-from django.utils.unittest import TestSuite, defaultTestLoader
 
 
 class DiscoverRunner(object):
@@ -14,6 +14,8 @@ class DiscoverRunner(object):
     A Django test runner that uses unittest2 test discovery.
     """
 
+    test_suite = TestSuite
+    test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, )
     option_list = (
@@ -42,7 +44,7 @@ class DiscoverRunner(object):
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        suite = TestSuite()
+        suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
@@ -107,7 +109,7 @@ class DiscoverRunner(object):
         return setup_databases(self.verbosity, self.interactive, **kwargs)
 
     def run_suite(self, suite, **kwargs):
-        return unittest.TextTestRunner(
+        return self.test_runner(
             verbosity=self.verbosity,
             failfast=self.failfast,
         ).run(suite)
@@ -201,7 +203,8 @@ def reorder_suite(suite, classes):
     classes[1], etc. Tests with no match in classes are placed last.
     """
     class_count = len(classes)
-    bins = [unittest.TestSuite() for i in range(class_count+1)]
+    suite_class = type(suite)
+    bins = [suite_class() for i in range(class_count+1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
         bins[0].addTests(bins[i+1])
@@ -218,8 +221,9 @@ def partition_suite(suite, classes, bins):
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
+    suite_class = type(suite)
     for test in suite:
-        if isinstance(test, unittest.TestSuite):
+        if isinstance(test, suite_class):
             partition_suite(test, classes, bins)
         else:
             for i in range(len(classes)):
@@ -238,6 +242,7 @@ def setup_databases(verbosity, interactive, **kwargs):
     mirrored_aliases = {}
     test_databases = {}
     dependencies = {}
+    default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
     for alias in connections:
         connection = connections[alias]
         if connection.settings_dict['TEST_MIRROR']:
@@ -259,7 +264,7 @@ def setup_databases(verbosity, interactive, **kwargs):
                 dependencies[alias] = (
                     connection.settings_dict['TEST_DEPENDENCIES'])
             else:
-                if alias != DEFAULT_DB_ALIAS:
+                if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
                     dependencies[alias] = connection.settings_dict.get(
                         'TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
@@ -271,15 +276,16 @@ def setup_databases(verbosity, interactive, **kwargs):
         test_databases.items(), dependencies):
         test_db_name = None
         # Actually create the database for the first connection
-
         for alias in aliases:
             connection = connections[alias]
-            old_names.append((connection, db_name, True))
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
                         verbosity, autoclobber=not interactive)
+                destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name
+                destroy = False
+            old_names.append((connection, db_name, destroy))
 
     for alias, mirror_alias in mirrored_aliases.items():
         mirrors.append((alias, connections[alias].settings_dict['NAME']))

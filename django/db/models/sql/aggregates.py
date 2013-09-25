@@ -9,6 +9,7 @@ from django.db.models.fields import IntegerField, FloatField
 ordinal_aggregate_field = IntegerField()
 computed_aggregate_field = FloatField()
 
+
 class Aggregate(object):
     """
     Default SQL Aggregate.
@@ -76,9 +77,9 @@ class Aggregate(object):
         if hasattr(self.col, 'as_sql'):
             field_name, params = self.col.as_sql(qn, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join([qn(c) for c in self.col])
+            field_name = '.'.join(qn(c) for c in self.col)
         else:
-            field_name = self.col
+            field_name = qn(self.col)
 
         substitutions = {
             'function': self.sql_function,
@@ -93,19 +94,23 @@ class Avg(Aggregate):
     is_computed = True
     sql_function = 'AVG'
 
+
 class Count(Aggregate):
     is_ordinal = True
     sql_function = 'COUNT'
     sql_template = '%(function)s(%(distinct)s%(field)s)'
 
     def __init__(self, col, distinct=False, **extra):
-        super(Count, self).__init__(col, distinct=distinct and 'DISTINCT ' or '', **extra)
+        super(Count, self).__init__(col, distinct='DISTINCT ' if distinct else '', **extra)
+
 
 class Max(Aggregate):
     sql_function = 'MAX'
 
+
 class Min(Aggregate):
     sql_function = 'MIN'
+
 
 class StdDev(Aggregate):
     is_computed = True
@@ -114,8 +119,10 @@ class StdDev(Aggregate):
         super(StdDev, self).__init__(col, **extra)
         self.sql_function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
 
+
 class Sum(Aggregate):
     sql_function = 'SUM'
+
 
 class Variance(Aggregate):
     is_computed = True

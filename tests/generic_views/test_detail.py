@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
@@ -15,7 +15,7 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/obj/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'], {'foo': 'bar'})
-        self.assertTrue(isinstance(res.context['view'], View))
+        self.assertIsInstance(res.context['view'], View)
         self.assertTemplateUsed(res, 'generic_views/detail.html')
 
     def test_detail_by_pk(self):

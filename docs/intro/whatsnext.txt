@@ -66,6 +66,11 @@ different needs:
   where you'll turn to find the details of a particular function or
   whathaveyou.
 
+* If you are interested in deploying a project for public use, our docs have
+  :doc:`several guides</howto/deployment/index>` for various deployment
+  setups as well as a :doc:`deployment checklist</howto/deployment/checklist>`
+  for some things you'll need to think about.
+
 * Finally, there's some "specialized" documentation not usually relevant to
   most developers. This includes the :doc:`release notes </releases/index>` and
   :doc:`internals documentation </internals/index>` for those who want to add
@@ -187,7 +192,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
     Generation of the Django documentation will work with Sphinx version 0.6
     or newer, but we recommend going straight to Sphinx 1.0.2 or newer.
 
-__ http://sphinx.pocoo.org/
+__ http://sphinx-doc.org/
 __ http://www.gnu.org/software/make/
 
 .. _differences-between-doc-versions:

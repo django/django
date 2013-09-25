@@ -11,13 +11,13 @@ from __future__ import unicode_literals
 import os
 import tempfile
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core import validators
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
-from shared_models.models import Author, Book
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(temp_storage_dir)
@@ -47,12 +47,22 @@ class Category(models.Model):
         return self.__str__()
 
 @python_2_unicode_compatible
+class Writer(models.Model):
+    name = models.CharField(max_length=50, help_text='Use both first and last names.')
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=50)
     slug = models.SlugField()
     pub_date = models.DateField()
     created = models.DateField(editable=False)
-    writer = models.ForeignKey(Author)
+    writer = models.ForeignKey(Writer)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
@@ -72,12 +82,12 @@ class ImprovedArticle(models.Model):
 class ImprovedArticleWithParentLink(models.Model):
     article = models.OneToOneField(Article, parent_link=True)
 
-class BetterAuthor(Author):
+class BetterWriter(Writer):
     score = models.IntegerField()
 
 @python_2_unicode_compatible
-class AuthorProfile(models.Model):
-    writer = models.OneToOneField(Author, primary_key=True)
+class WriterProfile(models.Model):
+    writer = models.OneToOneField(Writer, primary_key=True)
     age = models.PositiveIntegerField()
 
     def __str__(self):
@@ -177,6 +187,14 @@ class Inventory(models.Model):
     def __repr__(self):
         return self.__str__()
 
+class Book(models.Model):
+    title = models.CharField(max_length=40)
+    author = models.ForeignKey(Writer, blank=True, null=True)
+    special_id = models.IntegerField(blank=True, null=True, unique=True)
+
+    class Meta:
+        unique_together = ('title', 'author')
+
 class BookXtra(models.Model):
     isbn = models.CharField(max_length=16, unique=True)
     suffix1 = models.IntegerField(blank=True, default=0)
@@ -207,7 +225,17 @@ class Post(models.Model):
     posted = models.DateField()
 
     def __str__(self):
-        return self.name
+        return self.title
+
+@python_2_unicode_compatible
+class DateTimePost(models.Model):
+    title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
+    slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
+    subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
+    posted = models.DateTimeField(editable=False)
+
+    def __str__(self):
+        return self.title
 
 class DerivedPost(Post):
     pass
@@ -255,3 +283,20 @@ class Colour(models.Model):
 class ColourfulItem(models.Model):
     name = models.CharField(max_length=50)
     colours = models.ManyToManyField(Colour)
+
+class ArticleStatusNote(models.Model):
+    name = models.CharField(max_length=20)
+    status = models.ManyToManyField(ArticleStatus)
+
+class CustomErrorMessage(models.Model):
+    name1 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})
+
+    name2 = models.CharField(max_length=50,
+        validators=[validators.validate_slug],
+        error_messages={'invalid': 'Model custom error message.'})
+
+    def clean(self):
+        if self.name1 == 'FORBIDDEN_VALUE':
+            raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})

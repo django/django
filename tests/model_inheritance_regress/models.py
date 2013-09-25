@@ -18,15 +18,15 @@ class Place(models.Model):
 
 @python_2_unicode_compatible
 class Restaurant(Place):
-    serves_hot_dogs = models.BooleanField()
-    serves_pizza = models.BooleanField()
+    serves_hot_dogs = models.BooleanField(default=False)
+    serves_pizza = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the restaurant" % self.name
 
 @python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
-    serves_gnocchi = models.BooleanField()
+    serves_gnocchi = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s the italian restaurant" % self.name
@@ -49,6 +49,19 @@ class ParkingLot3(Place):
     # The parent_link connector need not be the pk on the model.
     primary_key = models.AutoField(primary_key=True)
     parent = models.OneToOneField(Place, parent_link=True)
+
+class ParkingLot4(models.Model):
+    # Test parent_link connector can be discovered in abstract classes.
+    parent = models.OneToOneField(Place, parent_link=True)
+
+    class Meta:
+        abstract = True
+
+class ParkingLot4A(ParkingLot4, Place):
+    pass
+
+class ParkingLot4B(Place, ParkingLot4):
+    pass
 
 class Supplier(models.Model):
     restaurant = models.ForeignKey(Restaurant)
@@ -171,7 +184,7 @@ class Station(SearchableLocation):
 
 class BusStation(Station):
     bus_routes = models.CommaSeparatedIntegerField(max_length=128)
-    inbound = models.BooleanField()
+    inbound = models.BooleanField(default=False)
 
 class TrainStation(Station):
     zone = models.IntegerField()

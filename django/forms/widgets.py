@@ -2,25 +2,21 @@
 HTML Widget classes
 """
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import copy
-import datetime
 from itertools import chain
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
 import warnings
 
 from django.conf import settings
-from django.forms.util import flatatt, to_current_timezone
+from django.forms.utils import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.html import conditional_escape, format_html, format_html_join
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.html import conditional_escape, format_html
+from django.utils.translation import ugettext_lazy
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats, six
+from django.utils.six.moves.urllib.parse import urljoin
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput',
@@ -29,7 +25,7 @@ __all__ = (
     'FileInput', 'DateInput', 'DateTimeInput', 'TimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget',
-    'SplitDateTimeWidget',
+    'SplitDateTimeWidget', 'SplitHiddenDateTimeWidget',
 )
 
 MEDIA_TYPES = ('css','js')
@@ -194,7 +190,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         The 'value' given is not guaranteed to be valid input, so subclass
         implementations should program defensively.
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of Widget must provide a render() method')
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         "Helper function for building an attribute dictionary."
@@ -512,6 +508,8 @@ class Select(Widget):
         return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
+        if option_value == None:
+            option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
@@ -600,16 +598,15 @@ class ChoiceInput(SubWidget):
         self.choice_value = force_text(choice[0])
         self.choice_label = force_text(choice[1])
         self.index = index
+        if 'id' in self.attrs:
+            self.attrs['id'] += "_%d" % self.index
 
     def __str__(self):
         return self.render()
 
     def render(self, name=None, value=None, attrs=None, choices=()):
-        name = name or self.name
-        value = value or self.value
-        attrs = attrs or self.attrs
-        if 'id' in self.attrs:
-            label_for = format_html(' for="{0}_{1}"', self.attrs['id'], self.index)
+        if self.id_for_label:
+            label_for = format_html(' for="{0}"', self.id_for_label)
         else:
             label_for = ''
         return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
@@ -618,12 +615,14 @@ class ChoiceInput(SubWidget):
         return self.value == self.choice_value
 
     def tag(self):
-        if 'id' in self.attrs:
-            self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))
+
+    @property
+    def id_for_label(self):
+        return self.attrs.get('id', '')
 
 
 class RadioChoiceInput(ChoiceInput):
@@ -637,7 +636,7 @@ class RadioChoiceInput(ChoiceInput):
 class RadioInput(RadioChoiceInput):
     def __init__(self, *args, **kwargs):
         msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, PendingDeprecationWarning, stacklevel=2)
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
         super(RadioInput, self).__init__(*args, **kwargs)
 
 
@@ -838,6 +837,11 @@ class MultiWidget(Widget):
         obj = super(MultiWidget, self).__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
+
+    @property
+    def needs_multipart_form(self):
+        return any(w.needs_multipart_form for w in self.widgets)
+
 
 class SplitDateTimeWidget(MultiWidget):
     """

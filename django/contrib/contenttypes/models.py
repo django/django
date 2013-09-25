@@ -118,10 +118,12 @@ class ContentTypeManager(models.Manager):
 
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
-        model = ct.model_class()
-        key = (model._meta.app_label, model._meta.model_name)
+        # Note it's possible for ContentType objects to be stale; model_class() will return None.
+        # Hence, there is no reliance on model._meta.app_label here, just using the model fields instead.
+        key = (ct.app_label, ct.model)
         self.__class__._cache.setdefault(using, {})[key] = ct
         self.__class__._cache.setdefault(using, {})[ct.id] = ct
+
 
 @python_2_unicode_compatible
 class ContentType(models.Model):
@@ -153,7 +155,6 @@ class ContentType(models.Model):
 
     def model_class(self):
         "Returns the Python model class for this type of content."
-        from django.db import models
         return models.get_model(self.app_label, self.model,
                                 only_installed=False)
 

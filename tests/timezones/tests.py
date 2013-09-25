@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+from unittest import skipIf, skipUnless
 import warnings
 from xml.dom.minidom import parseString
 
@@ -24,10 +25,8 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
-from django.utils.tzinfo import FixedOffset
-from django.utils.unittest import skipIf, skipUnless
 
-from .forms import EventForm, EventSplitForm, EventModelForm
+from .forms import EventForm, EventSplitForm, EventLocalizedForm, EventModelForm, EventLocalizedModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
 
 
@@ -40,8 +39,8 @@ from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayE
 # 10:20:30 in UTC and 17:20:30 in ICT.
 
 UTC = timezone.utc
-EAT = FixedOffset(180)      # Africa/Nairobi
-ICT = FixedOffset(420)      # Asia/Bangkok
+EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
+ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
 TZ_SUPPORT = hasattr(time, 'tzset')
 
@@ -599,7 +598,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -623,7 +622,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30.405060")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -647,7 +646,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30.405060+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -671,7 +670,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 10:20:30+00:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -695,7 +694,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30+03:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -719,7 +718,7 @@ class SerializationTests(TestCase):
         obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
-        if 'yaml' in serializers.get_serializer_formats():
+        if not isinstance(serializers.get_serializer('yaml'), serializers.BadSerializer):
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
@@ -1012,6 +1011,11 @@ class NewFormsTests(TestCase):
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
+    def test_form_with_explicit_timezone(self):
+        form = EventForm({'dt': '2011-09-01 17:20:30+07:00'})
+        # Datetime inputs formats don't allow providing a time zone.
+        self.assertFalse(form.is_valid())
+
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_non_existent_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
@@ -1037,10 +1041,22 @@ class NewFormsTests(TestCase):
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
     @requires_tz_support
+    def test_localized_form(self):
+        form = EventLocalizedForm(initial={'dt': datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)})
+        with timezone.override(ICT):
+            self.assertIn("2011-09-01 17:20:30", str(form))
+
+    @requires_tz_support
     def test_model_form(self):
         EventModelForm({'dt': '2011-09-01 13:20:30'}).save()
         e = Event.objects.get()
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
+
+    @requires_tz_support
+    def test_localized_model_form(self):
+        form = EventLocalizedModelForm(instance=Event(dt=datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
+        with timezone.override(ICT):
+            self.assertIn("2011-09-01 17:20:30", str(form))
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,

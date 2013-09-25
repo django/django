@@ -12,7 +12,7 @@ register = template.Library()
 
 class RenameBaseCommentNodeMethods(RenameMethodsBase):
     renamed_methods = (
-        ('get_query_set', 'get_queryset', PendingDeprecationWarning),
+        ('get_query_set', 'get_queryset', DeprecationWarning),
     )
 
 
@@ -112,7 +112,7 @@ class BaseCommentNode(six.with_metaclass(RenameBaseCommentNodeMethods, template.
 
     def get_context_value_from_queryset(self, context, qs):
         """Subclasses should override this."""
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseCommentNode must provide a get_context_value_from_queryset() method')
 
 class CommentListNode(BaseCommentNode):
     """Insert a list of comments into the context."""
@@ -338,4 +338,3 @@ def get_comment_permalink(comment, anchor_pattern=None):
     if anchor_pattern:
         return comment.get_absolute_url(anchor_pattern)
     return comment.get_absolute_url()
-

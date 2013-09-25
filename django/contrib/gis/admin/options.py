@@ -55,7 +55,7 @@ class GeoModelAdmin(ModelAdmin):
         3D editing).
         """
         if isinstance(db_field, models.GeometryField) and db_field.dim < 3:
-            request = kwargs.pop('request', None)
+            kwargs.pop('request', None)
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)

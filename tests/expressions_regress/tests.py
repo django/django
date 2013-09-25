@@ -1,13 +1,14 @@
 """
 Spanning tests for all the operations that F() expressions can perform.
 """
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
 from django.db import connection
 from django.db.models import F
-from django.test import TestCase, Approximate, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import Approximate
 
 from .models import Number, Experiment
 

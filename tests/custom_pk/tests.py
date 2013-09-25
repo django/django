@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.db import transaction, IntegrityError
 from django.test import TestCase, skipIfDBFeature
@@ -141,12 +141,12 @@ class CustomPKTests(TestCase):
 
     def test_unicode_pk(self):
         # Primary key may be unicode string
-        bus = Business.objects.create(name='jaźń')
+        Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
         # The primary key must also obviously be unique, so trying to create a
         # new object with the same primary key will fail.
-        e = Employee.objects.create(
+        Employee.objects.create(
             employee_code=123, first_name="Frank", last_name="Jones"
         )
         sid = transaction.savepoint()

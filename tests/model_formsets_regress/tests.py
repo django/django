@@ -1,8 +1,8 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django import forms
 from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
-from django.forms.util import ErrorDict, ErrorList
+from django.forms.utils import ErrorDict, ErrorList
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
 from django.utils import six
@@ -236,11 +236,11 @@ class FormsetTests(TestCase):
         formset = Formset(data)
         # check if the returned error classes are correct
         # note: formset.errors returns a list as documented
-        self.assertTrue(isinstance(formset.errors, list))
-        self.assertTrue(isinstance(formset.non_form_errors(), ErrorList))
+        self.assertIsInstance(formset.errors, list)
+        self.assertIsInstance(formset.non_form_errors(), ErrorList)
         for form in formset.forms:
-            self.assertTrue(isinstance(form.errors, ErrorDict))
-            self.assertTrue(isinstance(form.non_field_errors(), ErrorList))
+            self.assertIsInstance(form.errors, ErrorDict)
+            self.assertIsInstance(form.non_field_errors(), ErrorList)
 
     def test_initial_data(self):
         User.objects.create(username="bibi", serial=1)
@@ -296,16 +296,16 @@ class FormfieldCallbackTests(TestCase):
     def test_inlineformset_factory_default(self):
         Formset = inlineformset_factory(User, UserSite, form=UserSiteForm, fields="__all__")
         form = Formset().forms[0]
-        self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
-        self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
+        self.assertIsInstance(form['id'].field.widget, CustomWidget)
+        self.assertIsInstance(form['data'].field.widget, CustomWidget)
         self.assertFalse(form.fields['id'].localize)
         self.assertTrue(form.fields['data'].localize)
 
     def test_modelformset_factory_default(self):
         Formset = modelformset_factory(UserSite, form=UserSiteForm)
         form = Formset().forms[0]
-        self.assertTrue(isinstance(form['id'].field.widget, CustomWidget))
-        self.assertTrue(isinstance(form['data'].field.widget, CustomWidget))
+        self.assertIsInstance(form['id'].field.widget, CustomWidget)
+        self.assertIsInstance(form['data'].field.widget, CustomWidget)
         self.assertFalse(form.fields['id'].localize)
         self.assertTrue(form.fields['data'].localize)
 

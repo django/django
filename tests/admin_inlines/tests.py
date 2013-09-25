@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
@@ -8,11 +8,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 # local test models
-from .admin import InnerInline, TitleInline, site
+from .admin import InnerInline
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Title, Novel, Chapter, FootNote)
+    Sighting, Novel, Chapter, FootNote, BinaryTree)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -45,7 +45,7 @@ class TestInline(TestCase):
     def test_readonly_stacked_inline_label(self):
         """Bug #13174."""
         holder = Holder.objects.create(dummy=42)
-        inner = Inner.objects.create(holder=holder, dummy=42, readonly='')
+        Inner.objects.create(holder=holder, dummy=42, readonly='')
         response = self.client.get('/admin/admin_inlines/holder/%i/'
                                    % holder.id)
         self.assertContains(response, '<label>Inner readonly label:</label>')
@@ -192,6 +192,42 @@ class TestInline(TestCase):
         response = self.client.post('/admin/admin_inlines/extraterrestrial/add/', data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Sighting.objects.filter(et__name='Martian').count(), 1)
+
+    def test_custom_get_extra_form(self):
+        bt_head = BinaryTree.objects.create(name="Tree Head")
+        BinaryTree.objects.create(name="First Child", parent=bt_head)
+
+        # The maximum number of forms should respect 'get_max_num' on the
+        # ModelAdmin
+        max_forms_input = '<input id="id_binarytree_set-MAX_NUM_FORMS" name="binarytree_set-MAX_NUM_FORMS" type="hidden" value="%d" />'
+        # The total number of forms will remain the same in either case
+        total_forms_hidden = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
+
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertContains(response, max_forms_input % 3)
+        self.assertContains(response, total_forms_hidden)
+
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, max_forms_input % 2)
+        self.assertContains(response, total_forms_hidden)
+
+    def test_inline_nonauto_noneditable_pk(self):
+        response = self.client.get('/admin/admin_inlines/author/add/')
+        self.assertContains(response,
+            '<input id="id_nonautopkbook_set-0-rand_pk" name="nonautopkbook_set-0-rand_pk" type="hidden" />',
+             html=True)
+        self.assertContains(response,
+            '<input id="id_nonautopkbook_set-2-0-rand_pk" name="nonautopkbook_set-2-0-rand_pk" type="hidden" />',
+             html=True)
+
+    def test_inline_editable_pk(self):
+        response = self.client.get('/admin/admin_inlines/author/add/')
+        self.assertContains(response,
+            '<input class="vIntegerField" id="id_editablepkbook_set-0-manual_pk" name="editablepkbook_set-0-manual_pk" type="text" />',
+             html=True, count=1)
+        self.assertContains(response,
+            '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" name="editablepkbook_set-2-0-manual_pk" type="text" />',
+             html=True, count=1)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -487,9 +523,11 @@ class TestInlinePermissions(TestCase):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-views-users.xml']
     urls = "admin_inlines.urls"
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_add_stackeds(self):
         """
@@ -537,7 +575,6 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         Ensure that the "Add another XXX" link correctly adds items to the
         inline form.
         """
-        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/admin/admin_inlines/profilecollection/add/'))

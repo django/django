@@ -250,18 +250,6 @@ class Command(NoArgsCommand):
                     "if you want to enable i18n for your project or application.")
 
         check_programs('xgettext')
-        # We require gettext version 0.15 or newer.
-        output, errors, status = popen_wrapper(['xgettext', '--version'])
-        if status != STATUS_OK:
-            raise CommandError("Error running xgettext. Note that Django "
-                        "internationalization requires GNU gettext 0.15 or newer.")
-        match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
-        if match:
-            xversion = (int(match.group('major')), int(match.group('minor')))
-            if xversion < (0, 15):
-                raise CommandError("Django internationalization requires GNU "
-                        "gettext 0.15 or newer. You are using version %s, please "
-                        "upgrade your gettext toolset." % match.group())
 
         potfile = self.build_pot_file(localedir)
 
@@ -414,11 +402,11 @@ class Command(NoArgsCommand):
                     if self.verbosity > 1:
                         self.stdout.write("copying plural forms: %s\n" % m.group('value'))
                     lines = []
-                    seen = False
+                    found = False
                     for line in msgs.split('\n'):
-                        if not line and not seen:
+                        if not found and (not line or plural_forms_re.search(line)):
                             line = '%s\n' % m.group('value')
-                            seen = True
+                            found = True
                         lines.append(line)
                     msgs = '\n'.join(lines)
                     break

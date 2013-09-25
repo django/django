@@ -1,5 +1,7 @@
 "This is the locale selecting middleware that will look at accept headers"
 
+from collections import OrderedDict
+
 from django.conf import settings
 from django.core.urlresolvers import (is_valid_path, get_resolver,
                                       LocaleRegexURLResolver)
@@ -18,7 +20,7 @@ class LocaleMiddleware(object):
     """
 
     def __init__(self):
-        self._supported_languages = dict(settings.LANGUAGES)
+        self._supported_languages = OrderedDict(settings.LANGUAGES)
         self._is_language_prefix_patterns_used = False
         for url_pattern in get_resolver(None).url_patterns:
             if isinstance(url_pattern, LocaleRegexURLResolver):
@@ -48,9 +50,13 @@ class LocaleMiddleware(object):
 
             if path_valid:
                 language_url = "%s://%s/%s%s" % (
-                    request.is_secure() and 'https' or 'http',
+                    'https' if request.is_secure() else 'http',
                     request.get_host(), language, request.get_full_path())
                 return HttpResponseRedirect(language_url)
+
+        # Store language back into session if it is not present
+        if hasattr(request, 'session'):
+            request.session.setdefault('django_language', language)
 
         if not (self.is_language_prefix_patterns_used()
                 and language_from_path):

@@ -65,11 +65,15 @@ manipulating the data of your Web application. Learn more about it below:
 
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
-  :doc:`QuerySet method reference <ref/models/querysets>`
+  :doc:`QuerySet method reference <ref/models/querysets>` |
+  :doc:`Query-related classes <ref/models/queries>`
 
 * **Model instances:**
   :doc:`Instance methods <ref/models/instances>` |
   :doc:`Accessing related objects <ref/models/relations>`
+
+* **Migrations:**
+  :doc:`Introduction to Migrations<topics/migrations>`
 
 * **Advanced:**
   :doc:`Managers <topics/db/managers>` |
@@ -190,7 +194,7 @@ testing of Django applications:
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
-  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` (deprecated) |
   :doc:`Deploying static files <howto/static-files/deployment>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`
 
@@ -211,6 +215,7 @@ Security is a topic of paramount importance in the development of Web
 applications and Django provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
+* :doc:`Disclosed security issues in Django <releases/security>`
 * :doc:`Clickjacking protection <ref/clickjacking>`
 * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
@@ -227,6 +232,14 @@ regions:
   :ref:`Localization <how-to-create-language-files>`
 * :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
+
+Performance and optimization
+============================
+
+There are a variety of techniques and tools that can help get your code running
+more efficiently - faster, and using fewer system resources.
+
+* :doc:`Performance and optimization overview <topics/performance>`
 
 Python compatibility
 ====================

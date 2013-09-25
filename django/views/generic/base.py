@@ -5,6 +5,7 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils.decorators import classonlymethod
 from django.utils import six
@@ -30,7 +31,7 @@ class View(object):
     dispatch-by-method and simple sanity checking.
     """
 
-    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
     def __init__(self, **kwargs):
         """
@@ -160,9 +161,10 @@ class RedirectView(View):
     """
     permanent = True
     url = None
+    pattern_name = None
     query_string = False
 
-    def get_redirect_url(self, **kwargs):
+    def get_redirect_url(self, *args, **kwargs):
         """
         Return the URL redirect to. Keyword arguments from the
         URL pattern match generating the redirect request
@@ -170,15 +172,21 @@ class RedirectView(View):
         """
         if self.url:
             url = self.url % kwargs
-            args = self.request.META.get('QUERY_STRING', '')
-            if args and self.query_string:
-                url = "%s?%s" % (url, args)
-            return url
+        elif self.pattern_name:
+            try:
+                url = reverse(self.pattern_name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                return None
         else:
             return None
 
+        args = self.request.META.get('QUERY_STRING', '')
+        if args and self.query_string:
+            url = "%s?%s" % (url, args)
+        return url
+
     def get(self, request, *args, **kwargs):
-        url = self.get_redirect_url(**kwargs)
+        url = self.get_redirect_url(*args, **kwargs)
         if url:
             if self.permanent:
                 return http.HttpResponsePermanentRedirect(url)
@@ -205,4 +213,7 @@ class RedirectView(View):
         return self.get(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

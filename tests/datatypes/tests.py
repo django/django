@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 
@@ -47,10 +47,10 @@ class DataTypesTestCase(TestCase):
 
     def test_year_boundaries(self):
         """Year boundary tests (ticket #3689)"""
-        d = Donut.objects.create(name='Date Test 2007',
+        Donut.objects.create(name='Date Test 2007',
              baked_date=datetime.datetime(year=2007, month=12, day=31),
              consumed_at=datetime.datetime(year=2007, month=12, day=31, hour=23, minute=59, second=59))
-        d1 = Donut.objects.create(name='Date Test 2006',
+        Donut.objects.create(name='Date Test 2006',
             baked_date=datetime.datetime(year=2006, month=1, day=1),
             consumed_at=datetime.datetime(year=2006, month=1, day=1))
 
@@ -60,7 +60,7 @@ class DataTypesTestCase(TestCase):
         self.assertEqual("Date Test 2006",
                          Donut.objects.filter(baked_date__year=2006)[0].name)
 
-        d2 = Donut.objects.create(name='Apple Fritter',
+        Donut.objects.create(name='Apple Fritter',
             consumed_at = datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59))
 
         self.assertEqual(['Apple Fritter', 'Date Test 2007'],
@@ -74,7 +74,7 @@ class DataTypesTestCase(TestCase):
         database should be unicode."""
         d = Donut.objects.create(name='Jelly Donut', review='Outstanding')
         newd = Donut.objects.get(id=d.id)
-        self.assertTrue(isinstance(newd.review, six.text_type))
+        self.assertIsInstance(newd.review, six.text_type)
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):
@@ -90,7 +90,7 @@ class DataTypesTestCase(TestCase):
         a Python datetime.date, not a datetime.datetime"""
         b = RumBaba.objects.create()
         # Verify we didn't break DateTimeField behavior
-        self.assertTrue(isinstance(b.baked_timestamp, datetime.datetime))
+        self.assertIsInstance(b.baked_timestamp, datetime.datetime)
         # We need to test this this way because datetime.datetime inherits
         # from datetime.date:
-        self.assertTrue(isinstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime))
+        self.assertIsInstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime)

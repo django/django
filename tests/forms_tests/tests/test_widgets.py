@@ -639,8 +639,8 @@ beatle J R Ringo False""")
 
         # You can create your own custom renderers for RadioSelect to use.
         class MyRenderer(RadioFieldRenderer):
-           def render(self):
-               return '<br />\n'.join([six.text_type(choice) for choice in self])
+            def render(self):
+                return '<br />\n'.join(six.text_type(choice) for choice in self)
         w = RadioSelect(renderer=MyRenderer)
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
@@ -649,7 +649,7 @@ beatle J R Ringo False""")
 
         # Or you can use custom RadioSelect fields that use your custom renderer.
         class CustomRadioSelect(RadioSelect):
-           renderer = MyRenderer
+            renderer = MyRenderer
         w = CustomRadioSelect()
         self.assertHTMLEqual(w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
@@ -833,6 +833,22 @@ beatle J R Ringo False""")
         with self.assertRaises(IndexError):
             r[42]
 
+    def test_subwidget(self):
+        # Each subwidget tag gets a separate ID when the widget has an ID specified
+        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
+<input type="checkbox" name="letters" value="b" id="abc_1" />
+<input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" />""")
+
+        # Each subwidget tag does not get an ID if the widget does not have an ID specified
+        self.assertHTMLEqual("\n".join(c.tag() for c in CheckboxSelectMultiple().subwidgets('letters', list('ac'), choices=zip(list('abc'), list('ABC')))), """<input checked="checked" type="checkbox" name="letters" value="a" />
+<input type="checkbox" name="letters" value="b" />
+<input checked="checked" type="checkbox" name="letters" value="c" />""")
+
+        # The id_for_label property of the subwidget should return the ID that is used on the subwidget's tag
+        self.assertHTMLEqual("\n".join('<input type="checkbox" name="letters" value="%s" id="%s" />' % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(attrs={'id': 'abc'}).subwidgets('letters', [], choices=zip(list('abc'), list('ABC')))), """<input type="checkbox" name="letters" value="a" id="abc_0" />
+<input type="checkbox" name="letters" value="b" id="abc_1" />
+<input type="checkbox" name="letters" value="c" id="abc_2" />""")
+
     def test_multi(self):
         class MyMultiWidget(MultiWidget):
             def decompress(self, value):
@@ -848,6 +864,14 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('name', 'john__lennon', attrs={'id':'foo'}), '<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><input id="foo_1" type="text" class="small" value="lennon" name="name_1" />')
         w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
         self.assertHTMLEqual(w.render('name', ['john', 'lennon']), '<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />')
+
+        # Test needs_multipart_form=True if any widget needs it
+        w = MyMultiWidget(widgets=(TextInput(), FileInput()))
+        self.assertTrue(w.needs_multipart_form)
+
+        # Test needs_multipart_form=False if no widget needs it
+        w = MyMultiWidget(widgets=(TextInput(), TextInput()))
+        self.assertFalse(w.needs_multipart_form)
 
     def test_splitdatetime(self):
         w = SplitDateTimeWidget()
@@ -1028,6 +1052,8 @@ class WidgetTests(TestCase):
 
 
 class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
+
+    available_apps = ['forms_tests'] + AdminSeleniumWebDriverTestCase.available_apps
     urls = 'forms_tests.urls'
 
     def test_textarea_trailing_newlines(self):

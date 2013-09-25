@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
+from collections import OrderedDict
 import hashlib
+from importlib import import_module
 import os
 import posixpath
 import re
-try:
-    from urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-except ImportError:     # Python 2
-    from urllib import unquote
-    from urlparse import urlsplit, urlunsplit, urldefrag
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
@@ -15,10 +12,9 @@ from django.core.cache import (get_cache, InvalidCacheBackendError,
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
-from django.utils.importlib import import_module
+from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
 from django.utils._os import upath
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
@@ -64,7 +60,7 @@ class CachedFilesMixin(object):
         except InvalidCacheBackendError:
             # Use the default backend
             self.cache = default_cache
-        self._patterns = SortedDict()
+        self._patterns = OrderedDict()
         for extension, patterns in self.patterns:
             for pattern in patterns:
                 if isinstance(pattern, (tuple, list)):
@@ -202,7 +198,7 @@ class CachedFilesMixin(object):
 
     def post_process(self, paths, dry_run=False, **options):
         """
-        Post process the given list of files (called from collectstatic).
+        Post process the given OrderedDict of files (called from collectstatic).
 
         Processing is actually two separate operations:
 

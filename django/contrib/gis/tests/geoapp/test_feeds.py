@@ -1,5 +1,6 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from unittest import skipUnless
 from xml.dom import minidom
 
 from django.conf import settings
@@ -7,7 +8,6 @@ from django.contrib.sites.models import Site
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 
 if HAS_GEOS:
     from .models import City
@@ -28,7 +28,7 @@ class GeoFeedTest(TestCase):
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."
-        actual = set([n.nodeName for n in elem.childNodes])
+        actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 

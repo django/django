@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
-from django.forms.util import flatatt, ErrorDict, ErrorList
+from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.test import TestCase
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -11,7 +11,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 class FormsUtilTestCase(TestCase):
-        # Tests for forms/util.py module.
+    # Tests for forms/utils.py module.
 
     def test_flatatt(self):
         ###########
