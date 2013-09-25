@@ -65,8 +65,8 @@ two databases:
 If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
 
-* The :setting:`USER` option for each of your databases needs to
-  specify an existing user account for the database.
+* The :setting:`USER` option needs to specify an existing user account
+  for the database.
 
 * The :setting:`PASSWORD` option needs to provide the password for
   the :setting:`USER` that has been specified.
