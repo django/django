@@ -1889,34 +1889,63 @@ class SubqueryTests(TestCase):
         DumbCategory.objects.create(id=1)
         DumbCategory.objects.create(id=2)
         DumbCategory.objects.create(id=3)
+        DumbCategory.objects.create(id=4)
 
     def test_ordered_subselect(self):
         "Subselects honor any manual ordering"
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([1]))
-        except DatabaseError:
+            self.assertEqual(set(query.values_list('id', flat=True)), set([1,2]))
+        except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
             # Refs #10099
-            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries)
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
+
+    def test_slice_subquery_and_query(self):
+        """
+        Slice a query that has a sliced subquery
+        """
+        try:
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
+            self.assertEqual(set([x.id for x in query]), set([3,4]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
+            self.assertEqual(set([x.id for x in query]), set([3]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])[1:]
+            self.assertEqual(set([x.id for x in query]), set([2]))
+        except DatabaseError as e:
+            # Oracle and MySQL both have problems with sliced subselects.
+            # This prevents us from even evaluating this test case at all.
+            # Refs #10099
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
 
     def test_sliced_delete(self):
         "Delete queries can safely contain sliced subqueries"
         try:
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2]))
-        except DatabaseError:
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2,3]))
+
+            DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,3]))
+
+            DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
+        except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
             # Refs #10099
-            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries)
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
 
 
 class CloneTests(TestCase):
