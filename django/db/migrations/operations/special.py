@@ -132,3 +132,6 @@ class RunPython(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         raise NotImplementedError("You cannot reverse this operation")
+
+    def describe(self):
+        return "Raw Python operation"

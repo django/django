@@ -71,9 +71,9 @@ class MigrationExecutor(object):
             with self.connection.schema_editor(collect_sql=True) as schema_editor:
                 project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
                 if not backwards:
-                    migration.apply(project_state, schema_editor)
+                    migration.apply(project_state, schema_editor, collect_sql=True)
                 else:
-                    migration.unapply(project_state, schema_editor)
+                    migration.unapply(project_state, schema_editor, collect_sql=True)
                 statements.extend(schema_editor.collected_sql)
         return statements
 
