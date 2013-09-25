@@ -256,5 +256,5 @@ def is_safe_url(url, host=None):
     if not url:
         return False
     url_info = urlparse(url)
-    return (not url_info.netloc or url_info.netloc == host) and \
-        (not url_info.scheme or url_info.scheme in ['http', 'https'])
+    return ((not url_info.netloc or url_info.netloc == host) and
+            (not url_info.scheme or url_info.scheme in ['http', 'https']))

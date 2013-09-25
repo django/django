@@ -1,6 +1,7 @@
 import re
-
+import textwrap
 from .base import Operation
+from django.utils import six
 
 
 class SeparateDatabaseAndState(Operation):
@@ -59,6 +60,10 @@ class RunSQL(Operation):
         self.state_operations = state_operations or []
         self.multiple = multiple
 
+    @property
+    def reversible(self):
+        return self.reverse_sql is not None
+
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
@@ -92,3 +97,66 @@ class RunSQL(Operation):
 
     def describe(self):
         return "Raw SQL operation"
+
+
+class RunPython(Operation):
+    """
+    Runs Python code in a context suitable for doing versioned ORM operations.
+    """
+
+    reduces_to_sql = False
+    reversible = False
+
+    def __init__(self, code, reverse_code=None):
+        # Forwards code
+        if isinstance(code, six.string_types):
+            # Trim any leading whitespace that is at the start of all code lines
+            # so users can nicely indent code in migration files
+            code = textwrap.dedent(code)
+            # Run the code through a parser first to make sure it's at least
+            # syntactically correct
+            self.code = compile(code, "<string>", "exec")
+        else:
+            self.code = code
+        # Reverse code
+        if reverse_code is None:
+            self.reverse_code = None
+        elif isinstance(reverse_code, six.string_types):
+            reverse_code = textwrap.dedent(reverse_code)
+            self.reverse_code = compile(reverse_code, "<string>", "exec")
+        else:
+            self.reverse_code = reverse_code
+
+    def state_forwards(self, app_label, state):
+        # RunPython objects have no state effect. To add some, combine this
+        # with SeparateDatabaseAndState.
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # We now execute the Python code in a context that contains a 'models'
+        # object, representing the versioned models as an AppCache.
+        # We could try to override the global cache, but then people will still
+        # use direct imports, so we go with a documentation approach instead.
+        if six.callable(self.code):
+            self.code(models=from_state.render(), schema_editor=schema_editor)
+        else:
+            context = {
+                "models": from_state.render(),
+                "schema_editor": schema_editor,
+            }
+            eval(self.code, context)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if self.reverse_code is None:
+            raise NotImplementedError("You cannot reverse this operation")
+        elif six.callable(self.reverse_code):
+            self.reverse_code(models=from_state.render(), schema_editor=schema_editor)
+        else:
+            context = {
+                "models": from_state.render(),
+                "schema_editor": schema_editor,
+            }
+            eval(self.reverse_code, context)
+
+    def describe(self):
+        return "Raw Python operation"

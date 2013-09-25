@@ -59,8 +59,8 @@ else:
                 attrname, rest, attrvalue = m.group(1, 2, 3)
                 if not rest:
                     attrvalue = None
-                elif attrvalue[:1] == '\'' == attrvalue[-1:] or \
-                     attrvalue[:1] == '"' == attrvalue[-1:]:
+                elif (attrvalue[:1] == '\'' == attrvalue[-1:] or
+                        attrvalue[:1] == '"' == attrvalue[-1:]):
                     attrvalue = attrvalue[1:-1]
                 if attrvalue:
                     attrvalue = self.unescape(attrvalue)
@@ -72,8 +72,8 @@ else:
                 lineno, offset = self.getpos()
                 if "\n" in self.__starttag_text:
                     lineno = lineno + self.__starttag_text.count("\n")
-                    offset = len(self.__starttag_text) \
-                             - self.__starttag_text.rfind("\n")
+                    offset = (len(self.__starttag_text)
+                             - self.__starttag_text.rfind("\n"))
                 else:
                     offset = offset + len(self.__starttag_text)
                 self.error("junk characters in start tag: %r"

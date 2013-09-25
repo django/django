@@ -18,9 +18,13 @@ __all__ = ('BaseFormSet', 'all_valid')
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
+MIN_NUM_FORM_COUNT = 'MIN_NUM_FORMS'
 MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
+
+# default minimum number of forms in a formset
+DEFAULT_MIN_NUM = 0
 
 # default maximum number of forms in a formset, to prevent memory exhaustion
 DEFAULT_MAX_NUM = 1000
@@ -34,9 +38,10 @@ class ManagementForm(Form):
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
         self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-        # MAX_NUM_FORM_COUNT is output with the rest of the management form,
-        # but only for the convenience of client-side code. The POST
-        # value of MAX_NUM_FORM_COUNT returned from the client is not checked.
+        # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of
+        # the management form, but only for the convenience of client-side
+        # code. The POST value of them returned from the client is not checked.
+        self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
@@ -92,6 +97,7 @@ class BaseFormSet(object):
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
                 INITIAL_FORM_COUNT: self.initial_form_count(),
+                MIN_NUM_FORM_COUNT: self.min_num,
                 MAX_NUM_FORM_COUNT: self.max_num
             })
         return form
@@ -323,6 +329,12 @@ class BaseFormSet(object):
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
+            if (self.validate_min and
+                self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                raise ValidationError(ungettext(
+                    "Please submit %d or more forms.",
+                    "Please submit %d or more forms.", self.min_num) % self.min_num,
+                    code='too_few_forms')
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
@@ -395,17 +407,22 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None, validate_max=False):
+                    can_delete=False, max_num=None, validate_max=False,
+                    min_num=None, validate_min=False):
     """Return a FormSet for the given form class."""
+    if min_num is None:
+        min_num = DEFAULT_MIN_NUM
     if max_num is None:
         max_num = DEFAULT_MAX_NUM
     # hard limit on forms instantiated, to prevent memory-exhaustion attacks
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
+    extra += min_num
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
-             'max_num': max_num, 'absolute_max': absolute_max,
+             'min_num': min_num, 'max_num': max_num,
+             'absolute_max': absolute_max, 'validate_min' : validate_min,
              'validate_max' : validate_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
 

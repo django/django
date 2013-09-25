@@ -463,6 +463,9 @@ class BoundField(object):
         if not widget:
             widget = self.field.widget
 
+        if self.field.localize:
+            widget.is_localized = True
+
         attrs = attrs or {}
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:

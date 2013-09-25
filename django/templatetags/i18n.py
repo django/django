@@ -359,7 +359,7 @@ def do_translate(parser, token):
                     asvar = self.tag()
                 else:
                     raise TemplateSyntaxError(
-                        "Only options for 'trans' are 'noop', " \
+                        "Only options for 'trans' are 'noop', "
                         "'context \"xxx\"', and 'as VAR'.")
             return value, noop, asvar, message_context
     value, noop, asvar, message_context = TranslateParser(token.contents).top()

@@ -453,6 +453,8 @@ these changes.
   * ``django.db.backends.util``
   * ``django.forms.util``
 
+* ``ModelAdmin.get_formsets`` will be removed.
+
 2.0
 ---
 

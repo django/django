@@ -123,9 +123,8 @@ def _fast_hmac(key, msg, digest):
     This function operates on bytes.
     """
     dig1, dig2 = digest(), digest()
-    if len(key) > dig1.block_size:
-        key = digest(key).digest()
-    key += b'\x00' * (dig1.block_size - len(key))
+    if len(key) != dig1.block_size:
+        raise ValueError('Key size needs to match the block_size of the digest.')
     dig1.update(key.translate(hmac.trans_36))
     dig1.update(msg)
     dig2.update(key.translate(hmac.trans_5C))
@@ -139,11 +138,12 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
 
     HMAC+SHA256 is used as the default pseudo random function.
 
-    Right now 10,000 iterations is the recommended default which takes
-    100ms on a 2.2Ghz Core 2 Duo.  This is probably the bare minimum
-    for security given 1000 iterations was recommended in 2001. This
-    code is very well optimized for CPython and is only four times
-    slower than openssl's implementation.
+    As of 2011, 10,000 iterations was the recommended default which
+    took 100ms on a 2.2Ghz Core 2 Duo. This is probably the bare
+    minimum for security given 1000 iterations was recommended in
+    2001. This code is very well optimized for CPython and is only
+    four times slower than openssl's implementation. Look in
+    django.contrib.auth.hashers for the present default.
     """
     assert iterations > 0
     if not digest:
@@ -159,6 +159,11 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     r = dklen - (l - 1) * hlen
 
     hex_format_string = "%%0%ix" % (hlen * 2)
+
+    inner_digest_size = digest().block_size
+    if len(password) > inner_digest_size:
+        password = digest(password).digest()
+    password += b'\x00' * (inner_digest_size - len(password))
 
     def F(i):
         def U():

@@ -393,6 +393,17 @@ class AggregationTests(TestCase):
         qs = Entries.objects.annotate(clue_count=Count('clues__ID'))
         self.assertQuerysetEqual(qs, [])
 
+    def test_boolean_conversion(self):
+        # Aggregates mixed up ordering of columns for backend's convert_values
+        # method. Refs #21126.
+        e = Entries.objects.create(Entry='foo')
+        c = Clues.objects.create(EntryID=e, Clue='bar')
+        qs = Clues.objects.select_related('EntryID').annotate(Count('ID'))
+        self.assertQuerysetEqual(
+            qs, [c], lambda x: x)
+        self.assertEqual(qs[0].EntryID, e)
+        self.assertIs(qs[0].EntryID.Exclude, False)
+
     def test_empty(self):
         # Regression for #10089: Check handling of empty result sets with
         # aggregates
@@ -1114,3 +1125,13 @@ class AggregationTests(TestCase):
         self.assertQuerysetEqual(
             qs, ['Sams Teach Yourself Django in 24 Hours'],
             lambda b: b.name)
+
+    def test_annotate_reserved_word(self):
+        """
+        Regression #18333 - Ensure annotated column name is properly quoted.
+        """
+        vals = Book.objects.annotate(select=Count('authors__id')).aggregate(Sum('select'), Avg('select'))
+        self.assertEqual(vals, {
+            'select__sum': 10,
+            'select__avg': Approximate(1.666, places=2),
+        })

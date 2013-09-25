@@ -76,7 +76,7 @@ manually using ``manage.py runserver``):
 
 .. code-block:: bash
 
-    python -Wall manage.py test
+    $ python -Wall manage.py test
 
 After you have run the tests, fix any failures. While you have the release
 notes fresh in your mind, it may also be a good time to take advantage of new

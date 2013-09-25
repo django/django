@@ -1,5 +1,6 @@
 # ACTION_CHECKBOX_NAME is unused, but should stay since its import from here
 # has been referenced in documentation.
+from django.contrib.admin.decorators import register
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 from django.contrib.admin.options import StackedInline, TabularInline

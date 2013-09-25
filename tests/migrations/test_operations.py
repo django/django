@@ -16,6 +16,16 @@ class OperationTests(MigrationTestBase):
         """
         Creates a test model state and database table.
         """
+        # Delete the tables if they already exist
+        cursor = connection.cursor()
+        try:
+            cursor.execute("DROP TABLE %s_pony" % app_label)
+        except:
+            pass
+        try:
+            cursor.execute("DROP TABLE %s_stable" % app_label)
+        except:
+            pass
         # Make the "current" state
         operations = [migrations.CreateModel(
             "Pony",
@@ -282,7 +292,7 @@ class OperationTests(MigrationTestBase):
 
     def test_run_sql(self):
         """
-        Tests the AlterIndexTogether operation.
+        Tests the RunSQL operation.
         """
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
@@ -305,6 +315,42 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
+
+    def test_run_python(self):
+        """
+        Tests the RunPython operation
+        """
+
+        project_state = self.set_up_test_model("test_runpython")
+        # Create the operation
+        operation = migrations.RunPython(
+            """
+            Pony = models.get_model("test_runpython", "Pony")
+            Pony.objects.create(pink=2, weight=4.55)
+            Pony.objects.create(weight=1)
+            """,
+        )
+        # Test the state alteration does nothing
+        new_state = project_state.clone()
+        operation.state_forwards("test_runpython", new_state)
+        self.assertEqual(new_state, project_state)
+        # Test the database alteration
+        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 0)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runpython", editor, project_state, new_state)
+        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 2)
+        # And test reversal fails
+        with self.assertRaises(NotImplementedError):
+            operation.database_backwards("test_runpython", None, new_state, project_state)
+        # Now test we can do it with a callable
+        def inner_method(models, schema_editor):
+            Pony = models.get_model("test_runpython", "Pony")
+            Pony.objects.create(pink=1, weight=3.55)
+            Pony.objects.create(weight=5)
+        operation = migrations.RunPython(inner_method)
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_runpython", editor, project_state, new_state)
+        self.assertEqual(project_state.render().get_model("test_runpython", "Pony").objects.count(), 4)
 
 
 class MigrateNothingRouter(object):

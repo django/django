@@ -26,7 +26,7 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils import timezone
 
-from .forms import EventForm, EventSplitForm, EventModelForm
+from .forms import EventForm, EventSplitForm, EventLocalizedForm, EventModelForm, EventLocalizedModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
 
 
@@ -1011,6 +1011,11 @@ class NewFormsTests(TestCase):
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
+    def test_form_with_explicit_timezone(self):
+        form = EventForm({'dt': '2011-09-01 17:20:30+07:00'})
+        # Datetime inputs formats don't allow providing a time zone.
+        self.assertFalse(form.is_valid())
+
     @skipIf(pytz is None, "this test requires pytz")
     def test_form_with_non_existent_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
@@ -1036,10 +1041,22 @@ class NewFormsTests(TestCase):
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
     @requires_tz_support
+    def test_localized_form(self):
+        form = EventLocalizedForm(initial={'dt': datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)})
+        with timezone.override(ICT):
+            self.assertIn("2011-09-01 17:20:30", str(form))
+
+    @requires_tz_support
     def test_model_form(self):
         EventModelForm({'dt': '2011-09-01 13:20:30'}).save()
         e = Event.objects.get()
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
+
+    @requires_tz_support
+    def test_localized_model_form(self):
+        form = EventLocalizedModelForm(instance=Event(dt=datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
+        with timezone.override(ICT):
+            self.assertIn("2011-09-01 17:20:30", str(form))
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,

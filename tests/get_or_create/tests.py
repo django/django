@@ -177,7 +177,7 @@ class UpdateOrCreateTests(TestCase):
         self.assertRaises(IntegrityError,
             Person.objects.update_or_create, first_name="Tom", last_name="Smith")
 
-    def test_mananual_primary_key_test(self):
+    def test_manual_primary_key_test(self):
         # If you specify an existing primary key, but different other fields,
         # then you will get an error and data will not be updated.
         ManualPrimaryKeyTest.objects.create(id=1, data="Original")

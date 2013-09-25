@@ -2488,6 +2488,13 @@ class EmptyStringsAsNullTest(TestCase):
             [self.nc.pk], attrgetter('pk')
         )
 
+    def test_21001(self):
+        foo = NamedCategory.objects.create(name='foo')
+        self.assertQuerysetEqual(
+            NamedCategory.objects.exclude(name=''),
+            [foo.pk], attrgetter('pk')
+        )
+
 class ProxyQueryCleanupTest(TestCase):
     def test_evaluated_proxy_count(self):
         """

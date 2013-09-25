@@ -92,6 +92,12 @@ The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
 class method has been added to :ref:`create Manager with QuerySet methods
 <create-manager-with-queryset-methods>`.
 
+Using a custom manager when traversing reverse relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is now possible to :ref:`specify a custom manager
+<using-custom-reverse-manager>` when traversing a reverse relationship.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -134,6 +140,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.get_fields>` method may be overridden to
   customize the value of :attr:`ModelAdmin.fields
   <django.contrib.admin.ModelAdmin.fields>`.
+
+* In addition to the existing ``admin.site.register`` syntax, you can use the
+  new :func:`~django.contrib.admin.register` decorator to register a
+  :class:`~django.contrib.admin.ModelAdmin`.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -230,6 +240,10 @@ Forms
   <django.forms.extras.widgets.SelectDateWidget.months>` can be used to
   customize the wording of the months displayed in the select widget.
 
+* The ``min_num`` and ``validate_min`` parameters were added to
+  :func:`~django.forms.formsets.formset_factory` to allow validating
+  a minimum number of submitted forms.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
@@ -284,6 +298,20 @@ Templates
 
 * ``TypeError`` exceptions are not longer silenced when raised during the
   rendering of a template.
+
+* The following functions now accept a ``dirs`` parameter which is a list or
+  tuple to override :setting:`TEMPLATE_DIRS`:
+
+  * :func:`django.template.loader.get_template()`
+  * :func:`django.template.loader.select_template()`
+  * :func:`django.shortcuts.render()`
+  * :func:`django.shortcuts.render_to_response()`
+
+* The :tfilter:`time` filter now accepts timzone-related :ref:`format
+  specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``
+  and ``'Z'`` and is able to digest :ref:`time-zone-aware
+  <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
+  rendering.
 
 Tests
 ^^^^^
@@ -402,6 +430,10 @@ Miscellaneous
   Rationale behind this is removal of dependency of non-contrib code on
   contrib applications.
 
+* The old cache URI syntax (e.g. ``"locmem://"``) is no longer supported. It
+  still worked, even though it was not documented or officially supported. If
+  you're still using it, please update to the current :setting:`CACHES` syntax.
+
 Features deprecated in 1.7
 ==========================
 
@@ -446,13 +478,13 @@ than simply ``myapp/models.py``, Django would look for :ref:`initial SQL data
 will search ``myapp/sql/`` as documented. The old location will continue to
 work until Django 1.9.
 
-``declared_fieldsets`` attribute on ``ModelAdmin.``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``declared_fieldsets`` attribute on ``ModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``ModelAdmin.declared_fieldsets`` was deprecated. Despite being a private API,
-it will go through a regular deprecation path. This attribute was mostly used
-by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was considered
-a bug and has been addressed.
+``ModelAdmin.declared_fieldsets`` has been deprecated. Despite being a private
+API, it will go through a regular deprecation path. This attribute was mostly
+used by methods that bypassed ``ModelAdmin.get_fieldsets()`` but this was
+considered a bug and has been addressed.
 
 ``syncdb``
 ~~~~~~~~~~
@@ -471,3 +503,10 @@ to ``utils.py`` in an effort to unify all util and utils references:
 * ``django.contrib.gis.db.backends.util``
 * ``django.db.backends.util``
 * ``django.forms.util``
+
+``get_formsets`` method on ``ModelAdmin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``ModelAdmin.get_formsets`` has been deprecated in favor of the new
+:meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
+better handle the case of selecting showing inlines on a ``ModelAdmin``.

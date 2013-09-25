@@ -63,6 +63,9 @@ def get_validation_errors(outfile, app=None):
             if not opts.get_field(cls.USERNAME_FIELD).unique:
                 e.add(opts, 'The USERNAME_FIELD must be unique. Add unique=True to the field parameters.')
 
+        # Store a list of column names which have already been used by other fields.
+        used_column_names = []
+
         # Model isn't swapped; do field-specific validation.
         for f in opts.local_fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
@@ -75,6 +78,17 @@ def get_validation_errors(outfile, app=None):
                 # consider NULL and '' to be equal (and thus set up
                 # character-based fields a little differently).
                 e.add(opts, '"%s": Primary key fields cannot have null=True.' % f.name)
+
+            # Column name validation.
+            # Determine which column name this field wants to use.
+            _, column_name = f.get_attname_column()
+
+            # Ensure the column name is not already in use.
+            if column_name and column_name in used_column_names:
+                e.add(opts, "Field '%s' has column name '%s' that is already used." % (f.name, column_name))
+            else:
+                used_column_names.append(column_name)
+
             if isinstance(f, models.CharField):
                 try:
                     max_length = int(f.max_length)

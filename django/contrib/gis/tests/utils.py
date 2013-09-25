@@ -1,13 +1,16 @@
+from unittest import skip
+
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 
-# function that will pass a test.
-def pass_test(*args): return
 
 def no_backend(test_func, backend):
     "Use this decorator to disable test on specified backend."
     if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1] == backend:
-        return pass_test
+        @skip("This test is skipped on '%s' backend" % backend)
+        def inner():
+            pass
+        return inner
     else:
         return test_func
 

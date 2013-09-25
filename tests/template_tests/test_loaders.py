@@ -174,8 +174,28 @@ class RenderToStringTest(unittest.TestCase):
                                 'No template names provided$',
                                 loader.render_to_string, [])
 
-
     def test_select_templates_from_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.select_template, [])
+
+
+class TemplateDirsOverrideTest(unittest.TestCase):
+
+    dirs_tuple = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
+    dirs_list = list(dirs_tuple)
+    dirs_iter = (dirs_tuple, dirs_list)
+
+    def test_render_to_string(self):
+        for dirs in self.dirs_iter:
+            self.assertEqual(loader.render_to_string('test_dirs.html', dirs=dirs), 'spam eggs\n')
+
+    def test_get_template(self):
+        for dirs in self.dirs_iter:
+            template = loader.get_template('test_dirs.html', dirs=dirs)
+            self.assertEqual(template.render(Context({})), 'spam eggs\n')
+
+    def test_select_template(self):
+        for dirs in self.dirs_iter:
+            template = loader.select_template(['test_dirs.html'], dirs=dirs)
+            self.assertEqual(template.render(Context({})), 'spam eggs\n')

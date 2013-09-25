@@ -8,6 +8,7 @@ import json
 import os
 import posixpath
 import re
+import socket
 import sys
 import threading
 import unittest
@@ -21,8 +22,7 @@ from django.core.handlers.wsgi import get_path_info, WSGIHandler
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.commands import flush
-from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
-    WSGIServerException)
+from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import connection, connections, DEFAULT_DB_ALIAS, transaction
 from django.db.models.loading import cache
@@ -734,9 +734,8 @@ class TransactionTestCase(SimpleTestCase):
     def _reset_sequences(self, db_name):
         conn = connections[db_name]
         if conn.features.supports_sequence_reset:
-            sql_list = \
-                conn.ops.sequence_reset_by_name_sql(no_style(),
-                                                    conn.introspection.sequence_list())
+            sql_list = conn.ops.sequence_reset_by_name_sql(
+                    no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.commit_on_success_unless_managed(using=db_name):
                     cursor = conn.cursor()
@@ -1029,10 +1028,9 @@ class LiveServerThread(threading.Thread):
                 try:
                     self.httpd = WSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
-                except WSGIServerException as e:
+                except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
-                        hasattr(e.args[0], 'errno') and
-                        e.args[0].errno == errno.EADDRINUSE):
+                        e.errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue

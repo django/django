@@ -7,10 +7,15 @@ from .models import Person, Book, Car, PersonManager, PublishedBookManager
 
 
 class CustomManagerTests(TestCase):
-    def test_manager(self):
-        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
-        p2 = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+    def setUp(self):
+        self.b1 = Book.published_objects.create(
+            title="How to program", author="Rodney Dangerfield", is_published=True)
+        self.b2 = Book.published_objects.create(
+            title="How to be smart", author="Albert Einstein", is_published=False)
+        self.p1 = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        self.p2 = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
 
+    def test_manager(self):
         # Test a custom `Manager` method.
         self.assertQuerysetEqual(
             Person.objects.get_fun_people(), [
@@ -61,14 +66,8 @@ class CustomManagerTests(TestCase):
 
         # The RelatedManager used on the 'books' descriptor extends the default
         # manager
-        self.assertIsInstance(p2.books, PublishedBookManager)
+        self.assertIsInstance(self.p2.books, PublishedBookManager)
 
-        Book.published_objects.create(
-            title="How to program", author="Rodney Dangerfield", is_published=True
-        )
-        b2 = Book.published_objects.create(
-            title="How to be smart", author="Albert Einstein", is_published=False
-        )
 
         # The default manager, "objects", doesn't exist, because a custom one
         # was provided.
@@ -76,7 +75,7 @@ class CustomManagerTests(TestCase):
 
         # The RelatedManager used on the 'authors' descriptor extends the
         # default manager
-        self.assertIsInstance(b2.authors, PersonManager)
+        self.assertIsInstance(self.b2.authors, PersonManager)
 
         self.assertQuerysetEqual(
             Book.published_objects.all(), [
@@ -113,4 +112,80 @@ class CustomManagerTests(TestCase):
                 "Neon",
             ],
             lambda c: c.name
+        )
+
+    def test_related_manager_fk(self):
+        self.p1.favorite_book = self.b1
+        self.p1.save()
+        self.p2.favorite_book = self.b1
+        self.p2.save()
+
+        self.assertQuerysetEqual(
+            self.b1.favorite_books.order_by('first_name').all(), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='fun_people').all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name
+        )
+
+    def test_related_manager_gfk(self):
+        self.p1.favorite_thing = self.b1
+        self.p1.save()
+        self.p2.favorite_thing = self.b1
+        self.p2.save()
+
+        self.assertQuerysetEqual(
+            self.b1.favorite_things.order_by('first_name').all(), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='fun_people').all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name
+        )
+
+    def test_related_manager_m2m(self):
+        self.b1.authors.add(self.p1)
+        self.b1.authors.add(self.p2)
+
+        self.assertQuerysetEqual(
+            self.b1.authors.order_by('first_name').all(), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name
+        )
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='fun_people').all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name
         )

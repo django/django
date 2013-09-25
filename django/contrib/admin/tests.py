@@ -31,9 +31,9 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
 
     @classmethod
     def _tearDownClassInternal(cls):
-        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
+        super(AdminSeleniumWebDriverTestCase, cls)._tearDownClassInternal()
 
     def wait_until(self, callback, timeout=10):
         """

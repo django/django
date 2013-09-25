@@ -1,6 +1,7 @@
 *.egg-info
 *.pot
 *.py[co]
+__pycache__
 MANIFEST
 dist/
 docs/_build/

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import division
+
 import logging
 import os
 import shutil
@@ -247,7 +249,7 @@ def bisect_tests(bisection_label, options, test_labels):
 
     iteration = 1
     while len(test_labels) > 1:
-        midpoint = len(test_labels)/2
+        midpoint = len(test_labels) // 2
         test_labels_a = test_labels[:midpoint] + [bisection_label]
         test_labels_b = test_labels[midpoint:] + [bisection_label]
         print('***** Pass %da: Running the first half of the test suite' % iteration)
