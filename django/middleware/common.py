@@ -10,6 +10,7 @@ from django import http
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
+from django.utils.cache import patch_vary_headers
 
 
 logger = logging.getLogger('django.request')
@@ -129,7 +130,12 @@ class CommonMiddleware(object):
                 else:
                     response['ETag'] = etag
 
+        if self._should_vary_cookie(request, response):
+            patch_vary_headers(response, ['Cookie'])
         return response
+
+    def _should_vary_cookie(self, request, response):
+        return getattr(request, '_cookies_accessed', False)
 
 
 class BrokenLinkEmailsMiddleware(object):

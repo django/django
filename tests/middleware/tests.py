@@ -287,6 +287,20 @@ class CommonMiddlewareTest(TestCase):
         response = CommonMiddleware().process_request(request)
         self.assertEqual(response.status_code, 301)
 
+    def test_request_cookie_accesses_sets_vary_header(self):
+        request = self._get_request('/test')
+        request._cookies_accessed = True
+        response = HttpResponse()
+        CommonMiddleware().process_response(request, response)
+        self.assertEqual(response['Vary'], 'Cookie')
+
+    def test_request_cookies_not_accessed_no_vary_header(self):
+        request = self._get_request('/test')
+        response = HttpResponse()
+        CommonMiddleware().process_response(request, response)
+        with self.assertRaises(KeyError):
+            response['Vary']
+
 
 @override_settings(
     IGNORABLE_404_URLS=(re.compile(r'foo'),),
