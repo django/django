@@ -16,6 +16,16 @@ class OperationTests(MigrationTestBase):
         """
         Creates a test model state and database table.
         """
+        # Delete the tables if they already exist
+        cursor = connection.cursor()
+        try:
+            cursor.execute("DROP TABLE %s_pony" % app_label)
+        except:
+            pass
+        try:
+            cursor.execute("DROP TABLE %s_stable" % app_label)
+        except:
+            pass
         # Make the "current" state
         operations = [migrations.CreateModel(
             "Pony",
