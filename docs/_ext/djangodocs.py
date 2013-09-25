@@ -56,28 +56,44 @@ def setup(app):
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
     app.add_builder(DjangoStandaloneHTMLBuilder)
+
+    # register the snippet directive
+    app.add_directive('snippet', SnippetWithFilename)
+    # register a node for snippet directive so that the xml parser
+    # knows how to handle the enter/exit parsing event
     app.add_node(snippet_with_filename,
                  html=(visit_snippet, depart_snippet_literal),
                  latex=(visit_snippet_latex, depart_snippet_latex),
                  man=(visit_snippet_literal, depart_snippet_literal),
                  text=(visit_snippet_literal, depart_snippet_literal),
                  texinfo=(visit_snippet_literal, depart_snippet_literal))
-    app.add_directive('snippet', SnippetWithFilename)
 
 
 class snippet_with_filename(nodes.literal_block):
+    """
+    Subclass the literal_block to override the visit/depart event handlers
+    """
     pass
 
 
 def visit_snippet_literal(self, node):
+    """
+    default literal block handler
+    """
     self.visit_literal_block(node)
 
 
 def depart_snippet_literal(self, node):
+    """
+    default literal block handler
+    """
     self.depart_literal_block(node)
 
 
 def visit_snippet(self, node):
+    """
+    HTML document generator visit handler
+    """
     lang = self.highlightlang
     linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
     fname = node['filename']
@@ -106,10 +122,16 @@ def visit_snippet(self, node):
 
 
 def visit_snippet_latex(self, node):
+    """
+    Latex document generator visit handler
+    """
     self.verbatim = ''
 
 
 def depart_snippet_latex(self, node):
+    """
+    Latex document generator depart handler.
+    """
     code = self.verbatim.rstrip('\n')
     lang = self.hlsettingstack[-1][0]
     linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
@@ -130,7 +152,8 @@ def depart_snippet_latex(self, node):
                                               **highlight_args)
 
     self.body.append('\n{\\colorbox[rgb]{0.9,0.9,0.9}'
-                     '{\\makebox[\\textwidth][l]{%s}}}\n' % (fname,))
+                     '{\\makebox[\\textwidth][l]'
+                     '{\\small\\texttt{%s}}}}\n' % (fname,))
 
     if self.table:
         hlcode = hlcode.replace('\\begin{Verbatim}',
@@ -146,6 +169,10 @@ def depart_snippet_latex(self, node):
 
 
 class SnippetWithFilename(Directive):
+    """
+    The 'snippet' directive that allows to add the filename (optional)
+    of a code snippet in the document. This is modeled after CodeBlock.
+    """
     has_content = True
     optional_arguments = 1
     option_spec = {'filename': directives.unchanged_required}

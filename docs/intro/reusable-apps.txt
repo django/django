@@ -130,7 +130,7 @@ this. For a small app like polls, this process isn't too difficult.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
-3. Create a file ``django-polls/README.rst`` with the following contents
+3. Create a file ``django-polls/README.rst`` with the following contents:
 
    .. snippet::
        :filename: django-polls/README.rst
@@ -177,7 +177,7 @@ this. For a small app like polls, this process isn't too difficult.
    scope of this tutorial, but the `distribute docs
    <http://packages.python.org/distribute/setuptools.html>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
-   contents
+   contents:
 
    .. snippet::
        :filename: django-polls/setup.py
@@ -227,7 +227,7 @@ this. For a small app like polls, this process isn't too difficult.
    distribute docs referred to in the previous step discuss this file in more
    details. To include the templates, the ``README.rst`` and our ``LICENSE``
    file, create a file ``django-polls/MANIFEST.in`` with the following
-   contents
+   contents:
 
    .. snippet::
        :filename: django-polls/MANIFEST.in
