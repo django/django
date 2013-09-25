@@ -1,6 +1,7 @@
 import re
 import textwrap
 from .base import Operation
+from django.utils import six
 
 
 class SeparateDatabaseAndState(Operation):
@@ -107,12 +108,17 @@ class RunPython(Operation):
     reversible = False
 
     def __init__(self, code):
-        # Trim any leading whitespace that is at the start of all code lines
-        # so users can nicely indent code in migration files
-        code = textwrap.dedent(code)
-        # Run the code through a parser first to make sure it's at least
-        # syntactically correct
-        self.code = compile(code, "<string>", "exec")
+        if isinstance(code, six.string_types):
+            # Trim any leading whitespace that is at the start of all code lines
+            # so users can nicely indent code in migration files
+            code = textwrap.dedent(code)
+            # Run the code through a parser first to make sure it's at least
+            # syntactically correct
+            self.code = compile(code, "<string>", "exec")
+            self.is_callable = False
+        else:
+            self.code = code
+            self.is_callable = True
 
     def state_forwards(self, app_label, state):
         # RunPython objects have no state effect. To add some, combine this
@@ -124,11 +130,14 @@ class RunPython(Operation):
         # object, representing the versioned models as an AppCache.
         # We could try to override the global cache, but then people will still
         # use direct imports, so we go with a documentation approach instead.
-        context = {
-            "models": from_state.render(),
-            "schema_editor": schema_editor,
-        }
-        eval(self.code, context)
+        if self.is_callable:
+            self.code(models=from_state.render(), schema_editor=schema_editor)
+        else:
+            context = {
+                "models": from_state.render(),
+                "schema_editor": schema_editor,
+            }
+            eval(self.code, context)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         raise NotImplementedError("You cannot reverse this operation")
