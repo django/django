@@ -247,6 +247,7 @@ class HttpResponseBase(six.Iterator):
             self.cookies[key]['secure'] = True
         if httponly:
             self.cookies[key]['httponly'] = True
+        self._cookies_accessed = True
 
     def set_signed_cookie(self, key, value, salt='', **kwargs):
         value = signing.get_cookie_signer(salt=key + salt).sign(value)

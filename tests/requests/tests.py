@@ -473,6 +473,11 @@ class RequestsTests(SimpleTestCase):
         request.COOKIES["testing"] = "Testing"
         self.assertTrue(request._cookies_accessed)
 
+    def test_response_set_cookie_sets_cookies_accessed_flag(self):
+        response = HttpResponse()
+        response.set_cookie('example')
+        self.assertTrue(response._cookies_accessed)
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [

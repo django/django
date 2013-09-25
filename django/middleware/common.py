@@ -135,7 +135,8 @@ class CommonMiddleware(object):
         return response
 
     def _should_vary_cookie(self, request, response):
-        return getattr(request, '_cookies_accessed', False)
+        return (getattr(request, '_cookies_accessed', False) or
+                getattr(response, '_cookies_accessed', False))
 
 
 class BrokenLinkEmailsMiddleware(object):

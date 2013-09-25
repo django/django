@@ -294,6 +294,13 @@ class CommonMiddlewareTest(TestCase):
         CommonMiddleware().process_response(request, response)
         self.assertEqual(response['Vary'], 'Cookie')
 
+    def test_response_cookie_accesses_sets_vary_header(self):
+        request = self._get_request('/test')
+        response = HttpResponse()
+        response._cookies_accessed = True
+        CommonMiddleware().process_response(request, response)
+        self.assertEqual(response['Vary'], 'Cookie')
+
     def test_request_cookies_not_accessed_no_vary_header(self):
         request = self._get_request('/test')
         response = HttpResponse()
