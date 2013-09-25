@@ -348,6 +348,10 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
                 # later.
                 return True
             if hasattr(field, 'rel'):
+                if field.rel is None:
+                    # This property or relation doesn't exist, but it's allowed
+                    # since it's ignored in ChangeList.get_filters().
+                    return True
                 model = field.rel.to
                 rel_name = field.rel.get_related_field().name
             elif isinstance(field, RelatedObject):

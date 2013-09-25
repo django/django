@@ -95,6 +95,18 @@ class ModelAdminTests(TestCase):
         form = ma.get_formset(None).form
         self.assertEqual(form._meta.fields, ['day', 'transport'])
 
+    def test_lookup_allowed_allows_nonexistent_lookup(self):
+        """
+        Ensure that a lookup_allowed allows a parameter
+        whose field lookup doesn't exist.
+        Refs #21129.
+        """
+        class BandAdmin(ModelAdmin):
+            fields = ['name']
+
+        ma = BandAdmin(Band, self.site)
+        self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
+
     def test_field_arguments(self):
         # If we specify the fields argument, fieldsets_add and fielsets_change should
         # just stick the fields into a formsets structure and return it.
