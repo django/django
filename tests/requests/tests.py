@@ -463,6 +463,16 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
+    def test_accessing_cookies_sets_cookies_accessed_flag(self):
+        request = HttpRequest()
+        request.COOKIES.get("testing")
+        self.assertTrue(request._cookies_accessed)
+
+    def test_set_cookie_sets_cookies_accessed_flag(self):
+        request = HttpRequest()
+        request.COOKIES["testing"] = "Testing"
+        self.assertTrue(request._cookies_accessed)
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [

@@ -43,7 +43,7 @@ class HttpRequest(object):
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET, self.POST, self._COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
         self.path_info = ''
         self.method = None
@@ -270,6 +270,14 @@ class HttpRequest(object):
 
     def readlines(self):
         return list(iter(self))
+
+    def get_cookies(self):
+        self._cookies_accessed = True
+        return self._COOKIES
+    def set_cookies(self, value):
+        self._cookies_accessed = True
+        self._COOKIES = value
+    COOKIES = property(get_cookies, set_cookies)
 
 
 class QueryDict(MultiValueDict):
