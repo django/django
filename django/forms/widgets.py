@@ -665,10 +665,6 @@ class ChoiceFieldRenderer(object):
         self.attrs = attrs
         self.choices = choices
 
-    def __iter__(self):
-        for i, choice in enumerate(self.choices):
-            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, i)
-
     def __getitem__(self, idx):
         choice = self.choices[idx] # Let the IndexError propogate
         return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
@@ -685,8 +681,23 @@ class ChoiceFieldRenderer(object):
         id_ = self.attrs.get('id', None)
         start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
         output = [start_tag]
-        for widget in self:
-            output.append(format_html('<li>{0}</li>', force_text(widget)))
+        for i, choice in enumerate(self.choices):
+            choice_value, choice_label = choice
+            if isinstance(choice_label, (tuple,list)):
+                attrs_plus = self.attrs.copy()
+                if id_:
+                    attrs_plus['id'] += '_{0}'.format(i)
+                sub_ul_renderer = ChoiceFieldRenderer(name=self.name,
+                                                      value=self.value,
+                                                      attrs=attrs_plus,
+                                                      choices=choice_label)
+                sub_ul_renderer.choice_input_class = self.choice_input_class
+                output.append(format_html('<li>{0}{1}</li>', choice_value,
+                                          sub_ul_renderer.render()))
+            else:
+                w = self.choice_input_class(self.name, self.value,
+                                            self.attrs.copy(), choice, i)
+                output.append(format_html('<li>{0}</li>', force_text(w)))
         output.append('</ul>')
         return mark_safe('\n'.join(output))
 
