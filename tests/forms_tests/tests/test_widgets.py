@@ -697,6 +697,21 @@ beatle J R Ringo False""")
 <li><label for="bar_3"><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
 </ul>""")
 
+        # Choices can be nested:
+        w = RadioSelect()
+        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
+        self.assertHTMLEqual(w.render('nestchoice', 'dvd', attrs={'id':'media'}), """<ul id="media">
+<li><label for="media_0"><input id="media_0" name="nestchoice" type="radio" value="unknown" /> Unknown</label></li>
+<li>Audio<ul id="media_1">
+<li><label for="media_1_0"><input id="media_1_0" name="nestchoice" type="radio" value="vinyl" /> Vinyl</label></li>
+<li><label for="media_1_1"><input id="media_1_1" name="nestchoice" type="radio" value="cd" /> CD</label></li>
+</ul></li>
+<li>Video<ul id="media_2">
+<li><label for="media_2_0"><input id="media_2_0" name="nestchoice" type="radio" value="vhs" /> VHS</label></li>
+<li><label for="media_2_1"><input checked="checked" id="media_2_1" name="nestchoice" type="radio" value="dvd" /> DVD</label></li>
+</ul></li>
+</ul>""")
+
     def test_checkboxselectmultiple(self):
         w = CheckboxSelectMultiple()
         self.assertHTMLEqual(w.render('beatles', ['J'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))), """<ul>
@@ -832,6 +847,21 @@ beatle J R Ringo False""")
         # Out-of-range errors are propagated
         with self.assertRaises(IndexError):
             r[42]
+
+        # Choices can be nested:
+        w = CheckboxSelectMultiple()
+        w.choices=(('unknown', 'Unknown'), ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))), ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))))
+        self.assertHTMLEqual(w.render('nestchoice', 'dvd', attrs={'id':'media'}), """<ul id="media">
+<li><label for="media_0"><input id="media_0" name="nestchoice" type="checkbox" value="unknown" /> Unknown</label></li>
+<li>Audio<ul id="media_1">
+<li><label for="media_1_0"><input id="media_1_0" name="nestchoice" type="checkbox" value="vinyl" /> Vinyl</label></li>
+<li><label for="media_1_1"><input id="media_1_1" name="nestchoice" type="checkbox" value="cd" /> CD</label></li>
+</ul></li>
+<li>Video<ul id="media_2">
+<li><label for="media_2_0"><input id="media_2_0" name="nestchoice" type="checkbox" value="vhs" /> VHS</label></li>
+<li><label for="media_2_1"><input id="media_2_1" name="nestchoice" type="checkbox" value="dvd" /> DVD</label></li>
+</ul></li>
+</ul>""")
 
     def test_subwidget(self):
         # Each subwidget tag gets a separate ID when the widget has an ID specified
