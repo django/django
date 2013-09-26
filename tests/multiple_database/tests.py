@@ -7,7 +7,7 @@ from operator import attrgetter
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import connections, router, DEFAULT_DB_ALIAS
+from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase
@@ -490,21 +490,24 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         try:
-            dive.editor = marty
+            with transaction.atomic(using='default'):
+                dive.editor = marty
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Set a foreign key set with an object from a different database
         try:
-            marty.edited = [pro, dive]
+            with transaction.atomic(using='default'):
+                marty.edited = [pro, dive]
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Add to a foreign key set with an object from a different database
         try:
-            marty.edited.add(dive)
+            with transaction.atomic(using='default'):
+                marty.edited.add(dive)
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass

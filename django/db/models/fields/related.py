@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from django.db import connection, connections, router
+from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
@@ -17,7 +17,6 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
-
 
 def add_lazy_relation(cls, field, relation, operation):
     """
@@ -416,11 +415,16 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
             return qs, rel_obj_attr, instance_attr, False, cache_name
 
         def add(self, *objs):
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
-                setattr(obj, rel_field.name, self.instance)
-                obj.save()
+            objs = list(objs)
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.commit_on_success_unless_managed(
+                    using=db, savepoint=False):
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected, got %r" %
+                                        (self.model._meta.object_name, obj))
+                    setattr(obj, rel_field.name, self.instance)
+                    obj.save()
         add.alters_data = True
 
         def create(self, **kwargs):
