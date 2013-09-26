@@ -465,8 +465,9 @@ Jeremy Dunck
     part of a sweeping move to Python from a grab bag of half a dozen
     languages. He was drawn to Django's balance of practical batteries included
     philosophy, care and thought in code design, and strong open source
-    community. In addition to his current job in private progressive education,
-    Preston contributes some developer time to local non-profits.
+    community. Currently working for Amazon Web Services, he is always for
+    opportunities to volunteer for community oriented education projects, such
+    as for kids and scientists (e.g. Software Carpentry).
 
     Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
 
