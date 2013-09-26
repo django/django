@@ -2,6 +2,7 @@ from functools import wraps
 from importlib import import_module
 import os
 import pkgutil
+import re
 from threading import local
 import warnings
 
@@ -278,3 +279,23 @@ class ConnectionRouter(object):
                 if allow is not None:
                     return allow
         return True
+
+
+def split_statements(sql_content):
+    """
+    Split a multi-statements SQL content into a list of individual statements.
+    Note that this is not failure-proof, as regex parsing is sub-optimal.
+    It does succeed for simple cases, though.
+    """
+    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+    statements = []
+    statement = []
+    for line in sql_content.split("\n"):
+        cleaned_line = comment_re.sub(r"\1", line).strip()
+        if not cleaned_line:
+            continue
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
+    return statements

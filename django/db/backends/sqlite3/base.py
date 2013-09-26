@@ -206,6 +206,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def drop_foreignkey_sql(self):
         return ""
 
+    def prepare_bulk_sql(self, sql):
+        """
+        SQLite does not support multiple statements per execute call.
+        """
+        return utils.split_statements(sql)
+
     def pk_default_value(self):
         return "NULL"
 
