@@ -81,7 +81,7 @@ def get_validation_errors(outfile, app=None):
 
             # Column name validation.
             # Determine which column name this field wants to use.
-            _, column_name = f.get_attname_column()
+            column_name = f.get_column()
 
             # Ensure the column name is not already in use.
             if column_name and column_name in used_column_names:
