@@ -2132,6 +2132,8 @@ extract two field values, where only one is expected::
     inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
+.. _nested-queries-performance:
+
 .. admonition:: Performance considerations
 
     Be cautious about using nested queries and understand your database
