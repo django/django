@@ -107,10 +107,23 @@ class WriterTests(TestCase):
         """
         Tests serializing a simple migration.
         """
+        fields = {
+            'charfield': models.DateTimeField(default=datetime.datetime.utcnow),
+            'datetimefield': models.DateTimeField(default=datetime.datetime.utcnow),
+        }
+
+        options = {
+            'verbose_name': 'My model',
+            'verbose_name_plural': 'My models',
+        }
+
         migration = type(str("Migration"), (migrations.Migration,), {
             "operations": [
+                migrations.CreateModel("MyModel", tuple(fields.items()), options, (models.Model,)),
+                migrations.CreateModel("MyModel2", tuple(fields.items()), bases=(models.Model,)),
+                migrations.CreateModel(name="MyModel3", fields=tuple(fields.items()), options=options, bases=(models.Model,)),
                 migrations.DeleteModel("MyModel"),
-                migrations.AddField("OtherModel", "field_name", models.DateTimeField(default=datetime.datetime.utcnow))
+                migrations.AddField("OtherModel", "datetimefield", fields["datetimefield"]),
             ],
             "dependencies": [("testapp", "some_other_one")],
         })

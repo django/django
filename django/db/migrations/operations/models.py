@@ -1,14 +1,16 @@
-from .base import Operation
-from django.utils import six
 from django.db import models, router
 from django.db.models.options import normalize_unique_together
 from django.db.migrations.state import ModelState
+from django.db.migrations.operations.base import Operation
+from django.utils import six
 
 
 class CreateModel(Operation):
     """
     Create a model's table.
     """
+
+    serialization_expand_args = ['fields', 'options']
 
     def __init__(self, name, fields, options=None, bases=None):
         self.name = name
