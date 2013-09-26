@@ -184,6 +184,8 @@ class DatabaseCache(BaseDatabaseCache):
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
         cursor.execute('DELETE FROM %s' % table)
+        if connections[db].vendor == 'oracle':
+            connections[db]._commit()
 
 # For backwards compatibility
 class CacheClass(DatabaseCache):
