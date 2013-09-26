@@ -326,17 +326,17 @@ class DefaultFiltersTests(TestCase):
 
         # Check urlize correctly include quotation marks in links - #20364
         self.assertEqual(urlize('before "hi@example.com" afterwards'),
-                         u'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
+                         'before "<a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
         self.assertEqual(urlize('before hi@example.com" afterwards'),
-                         u'before <a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
+                         'before <a href="mailto:hi@example.com">hi@example.com</a>" afterwards')
         self.assertEqual(urlize('before "hi@example.com afterwards'),
-                         u'before "<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
+                         'before "<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
         self.assertEqual(urlize('before \'hi@example.com\' afterwards'),
-                         u'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
+                         'before \'<a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
         self.assertEqual(urlize('before hi@example.com\' afterwards'),
-                         u'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
+                         'before <a href="mailto:hi@example.com">hi@example.com</a>\' afterwards')
         self.assertEqual(urlize('before \'hi@example.com afterwards'),
-                         u'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
+                         'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
 
         # Check urlize copes with commas following URLs in quotes - see #20364 
         self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
