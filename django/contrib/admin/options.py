@@ -319,6 +319,8 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         return qs
 
     def lookup_allowed(self, lookup, value):
+        from django.contrib.admin.filters import SimpleListFilter
+
         model = self.model
         # Check FKey lookups that are allowed, so that popups produced by
         # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
@@ -365,7 +367,15 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         if len(parts) == 1:
             return True
         clean_lookup = LOOKUP_SEP.join(parts)
-        return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
+        valid_lookups = [self.date_hierarchy]
+        for filter_item in self.list_filter:
+            if isinstance(filter_item, type) and issubclass(filter_item, SimpleListFilter):
+                valid_lookups.append(filter_item.parameter_name)
+            elif isinstance(filter_item, (list, tuple)):
+                valid_lookups.append(filter_item[0])
+            else:
+                valid_lookups.append(filter_item)
+        return clean_lookup in valid_lookups
 
     def has_add_permission(self, request):
         """
