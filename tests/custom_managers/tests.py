@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.utils import six
 
-from .models import Person, Book, Car, PersonManager, PublishedBookManager
+from .models import Person, FunPerson, Book, Car, PersonManager, PublishedBookManager
 
 
 class CustomManagerTests(TestCase):
@@ -12,10 +12,11 @@ class CustomManagerTests(TestCase):
             title="How to program", author="Rodney Dangerfield", is_published=True)
         self.b2 = Book.published_objects.create(
             title="How to be smart", author="Albert Einstein", is_published=False)
-        self.p1 = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
-        self.p2 = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
 
     def test_manager(self):
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+
         # Test a custom `Manager` method.
         self.assertQuerysetEqual(
             Person.objects.get_fun_people(), [
@@ -66,7 +67,7 @@ class CustomManagerTests(TestCase):
 
         # The RelatedManager used on the 'books' descriptor extends the default
         # manager
-        self.assertIsInstance(self.p2.books, PublishedBookManager)
+        self.assertIsInstance(droopy.books, PublishedBookManager)
 
         # The default manager, "objects", doesn't exist, because a custom one
         # was provided.
@@ -113,78 +114,341 @@ class CustomManagerTests(TestCase):
             lambda c: c.name
         )
 
-    def test_related_manager_fk(self):
-        self.p1.favorite_book = self.b1
-        self.p1.save()
-        self.p2.favorite_book = self.b1
-        self.p2.save()
+    def test_fk_related_manager(self):
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
+        Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
+        FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
+        FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
 
         self.assertQuerysetEqual(
             self.b1.favorite_books.order_by('first_name').all(), [
                 "Bugs",
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.fun_people_favorite_books.all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='fun_people').all(), [
                 "Bugs",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
         )
 
-    def test_related_manager_gfk(self):
-        self.p1.favorite_thing = self.b1
-        self.p1.save()
-        self.p2.favorite_thing = self.b1
-        self.p2.save()
+    def test_gfk_related_manager(self):
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
+        Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
+        FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
+        FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
 
         self.assertQuerysetEqual(
-            self.b1.favorite_things.order_by('first_name').all(), [
+            self.b1.favorite_things.all(), [
                 "Bugs",
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.fun_people_favorite_things.all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='fun_people').all(), [
                 "Bugs",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
         )
 
-    def test_related_manager_m2m(self):
-        self.b1.authors.add(self.p1)
-        self.b1.authors.add(self.p2)
+    def test_m2m_related_manager(self):
+        bugs = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        self.b1.authors.add(bugs)
+        droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+        self.b1.authors.add(droopy)
+        bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        self.b1.fun_authors.add(bugs)
+        droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+        self.b1.fun_authors.add(droopy)
 
         self.assertQuerysetEqual(
             self.b1.authors.order_by('first_name').all(), [
                 "Bugs",
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.fun_authors.order_by('first_name').all(), [
+                "Bugs",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.authors(manager='boring_people').all(), [
                 "Droopy",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
         )
         self.assertQuerysetEqual(
             self.b1.authors(manager='fun_people').all(), [
                 "Bugs",
             ],
-            lambda c: c.first_name
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_default_fk_related_manager(self):
+        bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
+        droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
+
+        self.b1.fun_people_favorite_books.remove(droopy)
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.filter(favorite_book=self.b1), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+        self.b1.fun_people_favorite_books.remove(bugs)
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.filter(favorite_book=self.b1), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        bugs.favorite_book = self.b1
+        bugs.save()
+
+        self.b1.fun_people_favorite_books.clear()
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.filter(favorite_book=self.b1), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_specified_fk_related_manager(self):
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
+        droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
+
+        # Check that the fun manager DOESN'T remove boring people.
+        self.b1.favorite_books(manager='fun_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        # Check that the boring manager DOES remove boring people.
+        self.b1.favorite_books(manager='boring_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='boring_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        droopy.favorite_book = self.b1
+        droopy.save()
+
+        # Check that the fun manager ONLY clears fun people.
+        self.b1.favorite_books(manager='fun_people').clear()
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_books(manager='fun_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_default_gfk_related_manager(self):
+        bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
+        droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
+
+        self.b1.fun_people_favorite_things.remove(droopy)
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+        self.b1.fun_people_favorite_things.remove(bugs)
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        bugs.favorite_book = self.b1
+        bugs.save()
+
+        self.b1.fun_people_favorite_things.clear()
+        self.assertQuerysetEqual(
+            FunPerson._base_manager.order_by('first_name').filter(favorite_thing_id=self.b1.pk), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_specified_gfk_related_manager(self):
+        Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
+        droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
+
+        # Check that the fun manager DOESN'T remove boring people.
+        self.b1.favorite_things(manager='fun_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+        # Check that the boring manager DOES remove boring people.
+        self.b1.favorite_things(manager='boring_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='boring_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        droopy.favorite_thing = self.b1
+        droopy.save()
+
+        # Check that the fun manager ONLY clears fun people.
+        self.b1.favorite_things(manager='fun_people').clear()
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.favorite_things(manager='fun_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_default_m2m_related_manager(self):
+        bugs = FunPerson.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        self.b1.fun_authors.add(bugs)
+        droopy = FunPerson.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+        self.b1.fun_authors.add(droopy)
+
+        self.b1.fun_authors.remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.fun_authors.through._default_manager.all(), [
+                "Bugs",
+                "Droopy",
+            ],
+            lambda c: c.funperson.first_name,
+            ordered=False,
+        )
+
+        self.b1.fun_authors.remove(bugs)
+        self.assertQuerysetEqual(
+            self.b1.fun_authors.through._default_manager.all(), [
+                "Droopy",
+            ],
+            lambda c: c.funperson.first_name,
+            ordered=False,
+        )
+        self.b1.fun_authors.add(bugs)
+
+        self.b1.fun_authors.clear()
+        self.assertQuerysetEqual(
+            self.b1.fun_authors.through._default_manager.all(), [
+                "Droopy",
+            ],
+            lambda c: c.funperson.first_name,
+            ordered=False,
+        )
+
+    def test_removal_through_specified_m2m_related_manager(self):
+        bugs = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
+        self.b1.authors.add(bugs)
+        droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
+        self.b1.authors.add(droopy)
+
+        # Check that the fun manager DOESN'T remove boring people.
+        self.b1.authors(manager='fun_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+
+        # Check that the boring manager DOES remove boring people.
+        self.b1.authors(manager='boring_people').remove(droopy)
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='boring_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.b1.authors.add(droopy)
+
+
+        # Check that the fun manager ONLY clears fun people.
+        self.b1.authors(manager='fun_people').clear()
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='boring_people').all(), [
+                "Droopy",
+            ],
+            lambda c: c.first_name,
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            self.b1.authors(manager='fun_people').all(), [
+            ],
+            lambda c: c.first_name,
+            ordered=False,
         )
