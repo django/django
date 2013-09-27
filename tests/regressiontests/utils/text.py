@@ -121,3 +121,16 @@ class TestUtilsText(SimpleTestCase):
         )
         for value, output in items:
             self.assertEqual(text.slugify(value), output)
+
+    def test_unescape_entities(self):
+        items = [
+            ('', ''),
+            ('foo', 'foo'),
+            ('&amp;', '&'),
+            ('&#x26;', '&'),
+            ('&#38;', '&'),
+            ('foo &amp; bar', 'foo & bar'),
+            ('foo & bar', 'foo & bar'),
+        ]
+        for value, output in items:
+            self.assertEqual(text.unescape_entities(value), output)

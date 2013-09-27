@@ -381,12 +381,12 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return unichr(c)
+            return six.unichr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return unichr(html_entities.name2codepoint[text])
+            return six.unichr(html_entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 
