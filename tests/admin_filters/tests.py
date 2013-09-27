@@ -143,6 +143,11 @@ class ListFiltersTests(TestCase):
         self.today = datetime.date.today()
         self.tomorrow = self.today + datetime.timedelta(days=1)
         self.one_week_ago = self.today - datetime.timedelta(days=7)
+        if self.today.month == 12:
+            self.next_month = self.today.replace(year=self.today.year + 1, month=1, day=1)
+        else:
+            self.next_month = self.today.replace(month=self.today.month + 1, day=1)
+        self.next_year = self.today.replace(year=self.today.year + 1, month=1, day=1)
 
         self.request_factory = RequestFactory()
 
@@ -196,7 +201,7 @@ class ListFiltersTests(TestCase):
                                                 % (self.today, self.tomorrow))
 
         request = self.request_factory.get('/', {'date_registered__gte': self.today.replace(day=1),
-                                                 'date_registered__lt': self.tomorrow})
+                                                 'date_registered__lt': self.next_month})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -214,10 +219,10 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
                                                  '&date_registered__lt=%s'
-                                                % (self.today.replace(day=1), self.tomorrow))
+                                                % (self.today.replace(day=1), self.next_month))
 
         request = self.request_factory.get('/', {'date_registered__gte': self.today.replace(month=1, day=1),
-                                                 'date_registered__lt': self.tomorrow})
+                                                 'date_registered__lt': self.next_year})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -235,7 +240,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
                                                  '&date_registered__lt=%s'
-                                                % (self.today.replace(month=1, day=1), self.tomorrow))
+                                                % (self.today.replace(month=1, day=1), self.next_year))
 
         request = self.request_factory.get('/', {'date_registered__gte': str(self.one_week_ago),
                                                  'date_registered__lt': str(self.tomorrow)})
