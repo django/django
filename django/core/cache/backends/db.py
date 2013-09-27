@@ -11,7 +11,7 @@ except ImportError:
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 from django.db import connections, transaction, router, DatabaseError
-from django.db.backends.utils import typecast_timestamp
+from django.db.backends.util import typecast_timestamp
 from django.utils import timezone, six
 from django.utils.encoding import force_bytes
 
