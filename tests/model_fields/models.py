@@ -1,5 +1,6 @@
 import os
 import tempfile
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -85,7 +86,9 @@ class VerboseNameField(models.Model):
     # Don't want to depend on Pillow/PIL in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
-    field13 = models.IPAddressField("verbose field13")
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        field13 = models.IPAddressField("verbose field13")
     field14 = models.GenericIPAddressField("verbose field14", protocol="ipv4")
     field15 = models.NullBooleanField("verbose field15")
     field16 = models.PositiveIntegerField("verbose field16")

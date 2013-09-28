@@ -529,3 +529,12 @@ to ``utils.py`` in an effort to unify all util and utils references:
 ``ModelAdmin.get_formsets`` has been deprecated in favor of the new
 :meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
 better handle the case of selecting showing inlines on a ``ModelAdmin``.
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+The :class:`django.db.models.IPAddressField` and
+:class:`django.forms.IPAddressField` fields have been deprecated in favor of
+:class:`django.db.models.GenericIPAddressField` and
+:class:`django.forms.GenericIPAddressField`.
+

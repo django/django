@@ -1,3 +1,4 @@
+import warnings
 from django.test import TestCase
 from django.db import models
 
@@ -173,7 +174,9 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {})
 
     def test_ip_address_field(self):
-        field = models.IPAddressField()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            field = models.IPAddressField()
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.IPAddressField")
         self.assertEqual(args, [])
