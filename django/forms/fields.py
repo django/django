@@ -1144,6 +1144,12 @@ class SplitDateTimeField(MultiValueField):
 class IPAddressField(CharField):
     default_validators = [validators.validate_ipv4_address]
 
+    def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
+                      PendingDeprecationWarning)
+        super(IPAddressField, self).__init__(*args, **kwargs)
+
     def to_python(self, value):
         if value in self.empty_values:
             return ''

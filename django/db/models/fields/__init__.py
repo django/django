@@ -1312,6 +1312,9 @@ class IPAddressField(Field):
     description = _("IPv4 address")
 
     def __init__(self, *args, **kwargs):
+        import warnings
+        warnings.warn("IPAddressField has been deprecated. Use GenericIPAddressField instead.",
+                      PendingDeprecationWarning)
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
 
