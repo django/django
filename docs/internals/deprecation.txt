@@ -455,6 +455,8 @@ these changes.
 
 * ``ModelAdmin.get_formsets`` will be removed.
 
+* The model and form ``IPAddressField`` will be removed.
+
 2.0
 ---
 

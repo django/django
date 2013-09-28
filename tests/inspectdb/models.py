@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
+import warnings
 
 from django.db import models
 
@@ -49,7 +50,9 @@ class ColumnTypes(models.Model):
     file_path_field = models.FilePathField()
     float_field = models.FloatField()
     int_field = models.IntegerField()
-    ip_address_field = models.IPAddressField()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        ip_address_field = models.IPAddressField()
     gen_ip_adress_field = models.GenericIPAddressField(protocol="ipv4")
     pos_int_field = models.PositiveIntegerField()
     pos_small_int_field = models.PositiveSmallIntegerField()
