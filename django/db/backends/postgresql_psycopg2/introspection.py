@@ -137,6 +137,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 kc.table_schema = %s AND
                 kc.table_name = %s
+            ORDER BY kc.ordinal_position ASC
         """, ["public", table_name])
         for constraint, column, kind, used_cols in cursor.fetchall():
             # If we're the first column, make the record

@@ -1136,6 +1136,31 @@ above example code would look like this::
     >>> b.entries.filter(headline__contains='Lennon')
     >>> b.entries.count()
 
+.. _using-custom-reverse-manager:
+
+Using a custom reverse manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+By default the :class:`~django.db.models.fields.related.RelatedManager` used
+for reverse relations is a subclass of the :ref:`default manager <manager-names>`
+for that model. If you would like to specify a different manager for a given
+query you can use the following syntax::
+
+    from django.db import models
+
+    class Entry(models.Model):
+        #...
+        objects = models.Manager() # Default Manager
+        entries = EntryManager() # Custom Manager
+
+    >>> b = Blog.objects.get(id=1)
+    >>> b.entry_set(manager='entries').all()
+
+Additional methods to handle related objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 In addition to the :class:`~django.db.models.query.QuerySet` methods defined in
 "Retrieving objects" above, the :class:`~django.db.models.ForeignKey`
 :class:`~django.db.models.Manager` has additional methods used to handle the

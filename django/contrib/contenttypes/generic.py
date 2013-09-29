@@ -319,6 +319,23 @@ def create_generic_related_manager(superclass):
                 '%s__exact' % object_id_field_name: instance._get_pk_val(),
             }
 
+        def __call__(self, **kwargs):
+            # We use **kwargs rather than a kwarg argument to enforce the
+            # `manager='manager_name'` syntax.
+            manager = getattr(self.model, kwargs.pop('manager'))
+            manager_class = create_generic_related_manager(manager.__class__)
+            return manager_class(
+                model = self.model,
+                instance = self.instance,
+                symmetrical = self.symmetrical,
+                source_col_name = self.source_col_name,
+                target_col_name = self.target_col_name,
+                content_type = self.content_type,
+                content_type_field_name = self.content_type_field_name,
+                object_id_field_name = self.object_id_field_name,
+                prefetch_cache_name = self.prefetch_cache_name,
+            )
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]

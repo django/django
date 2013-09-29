@@ -92,6 +92,12 @@ The :meth:`QuerySet.as_manager() <django.db.models.query.QuerySet.as_manager>`
 class method has been added to :ref:`create Manager with QuerySet methods
 <create-manager-with-queryset-methods>`.
 
+Using a custom manager when traversing reverse relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is now possible to :ref:`specify a custom manager
+<using-custom-reverse-manager>` when traversing a reverse relationship.
+
 Admin shortcuts support time zones
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -104,6 +110,25 @@ time zone on the server.
 In addition, the widgets now display a help message when the browser and
 server time zone are different, to clarify how the value inserted in the field
 will be interpreted.
+
+Using database cursors as context managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Python 2.7, database cursors could be used as a context manager. The
+specific backend's cursor defined the behavior of the context manager. The
+behavior of magic method lookups was changed with Python 2.7 and cursors were
+no longer usable as context managers.
+
+Django 1.7 allows a cursor to be used as a context manager that is a shortcut
+for the following, instead of backend specific behavior.
+
+.. code-block:: python
+
+    c = connection.cursor()
+    try:
+        c.execute(...)
+    finally:
+        c.close()
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -504,3 +529,12 @@ to ``utils.py`` in an effort to unify all util and utils references:
 ``ModelAdmin.get_formsets`` has been deprecated in favor of the new
 :meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
 better handle the case of selecting showing inlines on a ``ModelAdmin``.
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+The :class:`django.db.models.IPAddressField` and
+:class:`django.forms.IPAddressField` fields have been deprecated in favor of
+:class:`django.db.models.GenericIPAddressField` and
+:class:`django.forms.GenericIPAddressField`.
+
