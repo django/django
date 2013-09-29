@@ -390,6 +390,10 @@ class OneToOneCategory(models.Model):
     def __str__(self):
         return "one2one " + self.new_name
 
+class CategoryRelationship(models.Model):
+    first = models.ForeignKey(SimpleCategory, related_name='first_rel')
+    second = models.ForeignKey(SimpleCategory, related_name='second_rel')
+
 class NullableName(models.Model):
     name = models.CharField(max_length=20, null=True)
 

@@ -4,7 +4,6 @@ from collections import OrderedDict
 import datetime
 from operator import attrgetter
 import pickle
-import sys
 import unittest
 
 from django.conf import settings
@@ -26,7 +25,8 @@ from .models import (
     OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser)
+    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
+    CategoryRelationship)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -2451,6 +2451,21 @@ class ExcludeTest17600(TestCase):
         self.assertQuerysetEqual(
             Order.objects.exclude(~Q(items__status=1)).distinct(),
             ['<Order: 1>'])
+
+class Exclude15786(TestCase):
+    """Regression test for #15786"""
+    def test_ticket15786(self):
+        c1 = SimpleCategory.objects.create(name='c1')
+        c2 = SimpleCategory.objects.create(name='c2')
+        o2o1 = OneToOneCategory.objects.create(category=c1)
+        o2o2 = OneToOneCategory.objects.create(category=c2)
+        rel = CategoryRelationship.objects.create(first=c1, second=c2)
+        self.assertEqual(
+            CategoryRelationship.objects.exclude(
+                first__onetoonecategory=F('second__onetoonecategory')
+            ).get(), rel
+        )
+
 
 class NullInExcludeTest(TestCase):
     def setUp(self):
