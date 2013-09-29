@@ -273,10 +273,19 @@ texinfo_documents = [(
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'Django'
+epub_title = project
 epub_author = 'Django Software Foundation'
 epub_publisher = 'Django Software Foundation'
-epub_copyright = '2010, Django Software Foundation'
+epub_copyright = copyright
+
+# The basename for the epub file. It defaults to the project name.
+#epub_basename = 'Django'
+
+# The HTML theme for the epub output. Since the default themes are not optimized
+# for small screen space, using the same theme for HTML and epub output is
+# usually not wise. This defaults to 'epub', a theme designed to save visual
+# space.
+epub_theme = 'djangodocs-epub'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -291,6 +300,12 @@ epub_copyright = '2010, Django Software Foundation'
 
 # A unique identification for the text.
 #epub_uid = ''
+
+# A tuple containing the cover image and cover page html template filenames.
+epub_cover = ('', 'epub-cover.html')
+
+# A sequence of (type, uri, title) tuples for the guide element of content.opf.
+#epub_guide = ()
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
@@ -308,3 +323,18 @@ epub_copyright = '2010, Django Software Foundation'
 
 # Allow duplicate toc entries.
 #epub_tocdup = True
+
+# Choose between 'default' and 'includehidden'.
+#epub_tocscope = 'default'
+
+# Fix unsupported image types using the PIL.
+#epub_fix_images = False
+
+# Scale large images.
+#epub_max_image_width = 0
+
+# How to display URL addresses: 'footnote', 'no', or 'inline'.
+#epub_show_urls = 'inline'
+
+# If false, no index is generated.
+#epub_use_index = True
