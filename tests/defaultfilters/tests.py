@@ -187,7 +187,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_truncatechars_html(self):
         self.assertEqual(truncatechars_html(
-            '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '')
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '...')
         self.assertEqual(truncatechars_html('<p>one <a href="#">two - '\
             'three <br>four</a> five</p>', 6),
             '<p>one...</p>')
@@ -199,7 +199,8 @@ class DefaultFiltersTests(TestCase):
             '<p>one <a href="#">two - three <br>four</a> five</p>')
         self.assertEqual(truncatechars_html(
             '<b>\xc5ngstr\xf6m</b> was here', 5), '<b>\xc5n...</b>')
-
+        self.assertEqual(truncatechars_html(
+            'a<b>b</b>c', 3), 'a<b>b</b>c')
 
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
