@@ -1,0 +1,55 @@
+h1 { margin-top: 0; }
+
+/* Keep lists a bit narrow to maximize page estate regarding width. */
+ol, ul {
+	margin: 0;
+	padding: 0 0 0 1.3em;
+}
+
+/* Images should never exceed the width of the page. */
+img { max-width: 100%; }
+
+/* Don't display URL after links, this is not print. */
+.link-target { display: none; }
+
+/* This is the front cover page of the book. */
+.epub-cover { text-align: center; }
+.epub-cover h1 { margin: 4em 0 0 0; }
+.epub-cover h2 { margin: 1em 0; }
+.epub-cover h3 { margin: 3em 0 2em 0; }
+
+/* Code examples should never exceed the width of the page, so wrap instead. */
+pre, span.pre {
+	white-space: pre-wrap;
+	font-size: 90%;
+}
+
+pre {
+	background-color: #f6f6f6;
+	border: 0;
+	padding: 0.5em;
+}
+
+a:link, a:visited { color: #396623; }
+a:hover { color: #1d3311; }
+
+/* Unlike in the default theme, we will only use em units, to make sure changing text size works. */
+.note, .admonition {
+	background-position: 0.8em 0.8em;
+	background-repeat: no-repeat;
+	padding: 0.8em 1em 0.8em 4.25em;
+	margin: 1em 0;
+	border: 0.01em solid black;
+}
+
+.note, .admonition { background-image: url(docicons-note.png); }
+div.admonition-philosophy { background-image: url(docicons-philosophy.png); }
+div.admonition-behind-the-scenes { background-image: url(docicons-behindscenes.png); }
+.admonition.warning { background-image: url(docicons-warning.png); }
+
+.admonition-title {
+	font-weight: bold;
+	margin: 0;
+}
+
+.admonition .last { margin-bottom: 0; }
