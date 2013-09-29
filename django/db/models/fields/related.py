@@ -1692,11 +1692,12 @@ class ForeignKey(ForeignObject):
         return field_default
 
     def get_db_prep_save(self, value, connection):
-        if value == '' or value is None:
+        if value is None or (value == '' and
+                             (not self.related_field.empty_strings_allowed or
+                              connection.features.interprets_empty_strings_as_nulls)):
             return None
         else:
-            return self.related_field.get_db_prep_save(value,
-                connection=connection)
+            return self.related_field.get_db_prep_save(value, connection=connection)
 
     def value_to_string(self, obj):
         if not obj:
