@@ -132,10 +132,13 @@ TemplateResponse objects
 
 .. class:: TemplateResponse()
 
-   TemplateResponse is a subclass of
-   :class:`~django.template.response.SimpleTemplateResponse` that uses
-   a :class:`~django.template.RequestContext` instead of
-   a :class:`~django.template.Context`.
+    TemplateResponse is a subclass of
+    :class:`~django.template.response.SimpleTemplateResponse` that uses
+    a :class:`~django.template.RequestContext` instead of
+    a :class:`~django.template.Context`.
+
+    If you pass a :class:`~django.template.Context` instance or subclass, it
+    will be used instead of creating a new one.
 
 Methods
 -------
