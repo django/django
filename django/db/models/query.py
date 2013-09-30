@@ -47,9 +47,10 @@ class QuerySet(object):
     Represents a lazy database lookup for a set of objects.
     """
 
-    def __init__(self, model=None, query=None, using=None):
+    def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
         self._db = using
+        self._hints = hints or {}
         self.query = query or sql.Query(self.model)
         self._result_cache = None
         self._sticky_filter = False
@@ -904,8 +905,8 @@ class QuerySet(object):
     def db(self):
         "Return the database that will be used if this query is executed now"
         if self._for_write:
-            return self._db or router.db_for_write(self.model)
-        return self._db or router.db_for_read(self.model)
+            return self._db or router.db_for_write(self.model, **self._hints)
+        return self._db or router.db_for_read(self.model, **self._hints)
 
     ###################
     # PRIVATE METHODS #
@@ -955,7 +956,7 @@ class QuerySet(object):
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True
-        c = klass(model=self.model, query=query, using=self._db)
+        c = klass(model=self.model, query=query, using=self._db, hints=self._hints)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c._known_related_objects = self._known_related_objects
@@ -1024,6 +1025,14 @@ class QuerySet(object):
     # When used as part of a nested query, a queryset will never be an "always
     # empty" result.
     value_annotation = True
+
+    def _add_hints(self, **hints):
+        """
+        Update hinting information for later use by Routers
+        """
+        # If there is any hinting information, add it to what we already know.
+        # If we have a new hint for an existing key, overwrite with the new value.
+        self._hints.update(hints)
 
 
 class InstanceCheckMeta(type):
@@ -1485,10 +1494,11 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-        translations=None, using=None):
+        translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using
+        self._hints = hints or {}
         self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
         self.params = params or ()
         self.translations = translations or {}
@@ -1572,7 +1582,7 @@ class RawQuerySet(object):
     @property
     def db(self):
         "Return the database that will be used if this query is executed now"
-        return self._db or router.db_for_read(self.model)
+        return self._db or router.db_for_read(self.model, **self._hints)
 
     def using(self, alias):
         """

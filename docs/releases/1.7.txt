@@ -368,6 +368,20 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+Passing ``None`` to ``Manager.db_manager()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions of Django, it was possible to use
+``db_manager(using=None)`` on a model manager instance to obtain a manager
+instance using default routing behavior, overriding any manually specified
+database routing. In Django 1.7, a value of ``None`` passed to db_manager will
+produce a router that *retains* any manually assigned database routing -- the
+manager will *not* be reset. This was necessary to resolve an inconsistency in
+the way routing information cascaded over joins. See `Ticket #13724`_ for more
+details.
+
+.. _Ticket #13724: https://code.djangoproject.com/ticket/13724
+
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
 
