@@ -16,14 +16,15 @@ import warnings
 
 from functools import wraps
 
-from django.db import connections, DatabaseError, DEFAULT_DB_ALIAS
+from django.db import (
+        connections, DEFAULT_DB_ALIAS,
+        DatabaseError, ProgrammingError)
 from django.utils.decorators import available_attrs
 
 
-class TransactionManagementError(Exception):
+class TransactionManagementError(ProgrammingError):
     """
-    This exception is thrown when something bad happens with transaction
-    management.
+    This exception is thrown when transaction management is used improperly.
     """
     pass
 
