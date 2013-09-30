@@ -15,7 +15,7 @@ from django.db import (connection, connections, DEFAULT_DB_ALIAS,
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.utils import format_number
+from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
@@ -618,7 +618,6 @@ class BackendTestCase(TestCase):
         Test that cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
-            from django.db.backends.util import CursorWrapper
             self.assertTrue(isinstance(cursor, CursorWrapper))
         # Both InterfaceError and ProgrammingError seem to be used when
         # accessing closed cursor (psycopg2 has InterfaceError, rest seem
@@ -634,7 +633,6 @@ class BackendTestCase(TestCase):
         # psycopg2 offers us a way to check that by closed attribute.
         # So, run only on psycopg2 for that reason.
         with connection.cursor() as cursor:
-            from django.db.backends.util import CursorWrapper
             self.assertTrue(isinstance(cursor, CursorWrapper))
         self.assertTrue(cursor.closed)
 
