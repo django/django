@@ -377,6 +377,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
             manager = getattr(self.model, kwargs.pop('manager'))
             manager_class = create_foreign_related_manager(manager.__class__, rel_field, rel_model)
             return manager_class(self.instance)
+        do_not_call_in_templates = True
 
         def get_queryset(self):
             try:
@@ -545,6 +546,7 @@ def create_many_related_manager(superclass, rel):
                 through=self.through,
                 prefetch_cache_name=self.prefetch_cache_name,
             )
+        do_not_call_in_templates = True
 
         def get_queryset(self):
             try:

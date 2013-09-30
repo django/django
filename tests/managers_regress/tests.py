@@ -4,8 +4,9 @@ import copy
 from django.conf import settings
 from django.db import models
 from django.db.models.loading import cache
+from django.template import Context, Template
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.utils.encoding import force_text
 
 from .models import (
     Child1,
@@ -18,6 +19,8 @@ from .models import (
     AbstractBase1,
     AbstractBase2,
     AbstractBase3,
+    RelatedModel,
+    RelationModel,
 )
 
 
@@ -193,3 +196,19 @@ class ManagersRegressionTests(TestCase):
             del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
+
+    def test_regress_3871(self):
+        related = RelatedModel.objects.create()
+
+        relation = RelationModel()
+        relation.fk = related
+        relation.gfk = related
+        relation.save()
+        relation.m2m.add(related)
+
+        t = Template('{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}{{ related.test_m2m.all.0 }}')
+
+        self.assertEqual(
+            t.render(Context({'related': related})),
+            ''.join([force_text(relation.pk)] * 3),
+        )

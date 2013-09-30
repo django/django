@@ -335,6 +335,7 @@ def create_generic_related_manager(superclass):
                 object_id_field_name = self.object_id_field_name,
                 prefetch_cache_name = self.prefetch_cache_name,
             )
+        do_not_call_in_templates = True
 
         def get_queryset(self):
             try:
