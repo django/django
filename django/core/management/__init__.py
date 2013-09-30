@@ -209,7 +209,7 @@ class LaxOptionParser(OptionParser):
                     # dealing with options
                     del rargs[0]
                     raise Exception
-            except:
+            except:  # Needed because we might need to catch a SystemExit
                 largs.append(arg)
 
 class ManagementUtility(object):
@@ -360,7 +360,7 @@ class ManagementUtility(object):
         try:
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
-        except:
+        except:  # Needed because parser.parse_args can raise SystemExit
             pass # Ignore any option errors at this point.
 
         try:

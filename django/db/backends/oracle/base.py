@@ -620,7 +620,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         try:
             self.connection.stmtcachesize = 20
-        except:
+        except AttributeError:
             # Django docs specify cx_Oracle version 4.3.1 or higher, but
             # stmtcachesize is available only in 4.3.2 and up.
             pass

@@ -7,7 +7,7 @@
    http://geodjango.org/docs/layermapping.html
 """
 import sys
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, router
 from django.contrib.gis.db.models import GeometryField
@@ -337,7 +337,7 @@ class LayerMapping(object):
             try:
                 # Creating an instance of the Decimal value to use.
                 d = Decimal(str(ogr_field.value))
-            except:
+            except DecimalInvalidOperation:
                 raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field.value)
 
             # Getting the decimal value as a tuple.
@@ -365,7 +365,7 @@ class LayerMapping(object):
             # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
             try:
                 val = int(ogr_field.value)
-            except:
+            except ValueError:
                 raise InvalidInteger('Could not construct integer from: %s' % ogr_field.value)
         else:
             val = ogr_field.value
@@ -547,8 +547,6 @@ class LayerMapping(object):
                         m.save(using=self.using)
                         num_saved += 1
                         if verbose: stream.write('%s: %s\n' % ('Updated' if is_update else 'Saved', m))
-                    except SystemExit:
-                        raise
                     except Exception as msg:
                         if strict:
                             # Bailing out if the `strict` keyword is set.
@@ -588,7 +586,7 @@ class LayerMapping(object):
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
-                except:
+                except:  # Deliberately catch everything
                     stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
                     raise
         else:

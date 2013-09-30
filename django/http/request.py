@@ -16,7 +16,7 @@ from django.conf import settings
 from django.core import signing
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser
+from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
@@ -222,7 +222,7 @@ class HttpRequest(object):
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except:
+            except MultiPartParserError:
                 # An error occured while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -230,7 +230,7 @@ class HttpRequest(object):
                 # Mark that an error occured. This allows self.__repr__ to
                 # be explicit about it instead of simply representing an
                 # empty POST
-                self._mark_post_parse_error()
+                # self._mark_post_parse_error()
                 raise
         elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()

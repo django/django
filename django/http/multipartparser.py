@@ -7,6 +7,7 @@ file upload handlers for processing.
 from __future__ import unicode_literals
 
 import base64
+import binascii
 import cgi
 import sys
 
@@ -32,6 +33,8 @@ class InputStreamExhausted(Exception):
 RAW = "raw"
 FILE = "file"
 FIELD = "field"
+
+_BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
 
 class MultiPartParser(object):
     """
@@ -161,8 +164,8 @@ class MultiPartParser(object):
                     if transfer_encoding == 'base64':
                         raw_data = field_stream.read()
                         try:
-                            data = str(raw_data).decode('base64')
-                        except:
+                            data = base64.b64decode(raw_data)
+                        except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
                         data = field_stream.read()
@@ -546,7 +549,7 @@ def parse_boundary_stream(stream, max_header_size):
         main_value_pair, params = parse_header(line)
         try:
             name, value = main_value_pair.split(':', 1)
-        except:
+        except ValueError:
             raise ValueError("Invalid header: %r" % line)
         return name, (value, params)
 
@@ -571,7 +574,7 @@ def parse_boundary_stream(stream, max_header_size):
         # parameters") is from the Python docs.
         try:
             name, (value, params) = _parse_header(line)
-        except:
+        except ValueError:
             continue
 
         if name == 'content-disposition':

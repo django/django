@@ -143,7 +143,7 @@ class IncludeNode(Node):
                 return template.render(context.new(values))
             with context.push(**values):
                 return template.render(context)
-        except:
+        except Exception:
             if settings.TEMPLATE_DEBUG:
                 raise
             return ''

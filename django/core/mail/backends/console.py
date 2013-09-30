@@ -28,7 +28,7 @@ class EmailBackend(BaseEmailBackend):
                     msg_count += 1
                 if stream_created:
                     self.close()
-            except:
+            except Exception:
                 if not self.fail_silently:
                     raise
         return msg_count
