@@ -1939,7 +1939,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             pet.owner.delete()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Person)
             self.assertEqual(e.hints, {'instance': owner})
@@ -1951,7 +1951,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             to_del_qs.delete()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Pet)
             self.assertEqual(e.hints, {'instance': owner})
@@ -1962,7 +1962,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             owner.pet_set.get_or_create(name='fido')
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Pet)
             self.assertEqual(e.hints, {'instance': owner})
@@ -1974,7 +1974,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             owner.pet_set.update(name='max')
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Pet)
             self.assertEqual(e.hints, {'instance': owner})
@@ -1987,7 +1987,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.add(auth)
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': book})
@@ -2001,7 +2001,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.clear()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': book})
@@ -2015,7 +2015,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.all().delete()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Person)
             self.assertEqual(e.hints, {'instance': book})
@@ -2028,7 +2028,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.get_or_create(name='Someone else')
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book)
             self.assertEqual(e.hints, {'instance': book})
@@ -2043,7 +2043,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.remove(auth)
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': book})
@@ -2057,7 +2057,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             book.authors.all().update(name='Different')
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Person)
             self.assertEqual(e.hints, {'instance': book})
@@ -2070,7 +2070,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.add(book)
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': auth})
@@ -2084,7 +2084,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.clear()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': auth})
@@ -2098,7 +2098,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.all().delete()
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book)
             self.assertEqual(e.hints, {'instance': auth})
@@ -2111,7 +2111,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.get_or_create(title="New Book", published=datetime.datetime.now())
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Person)
             self.assertEqual(e.hints, {'instance': auth})
@@ -2125,7 +2125,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.remove(book)
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book.authors.through)
             self.assertEqual(e.hints, {'instance': auth})
@@ -2139,7 +2139,7 @@ class RouteForWriteTestCase(TestCase):
         try:
             auth.book_set.all().update(title='Different')
             self.fail('db_for_write() not invoked on router')
-        except RouterUsed, e:
+        except RouterUsed as e:
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book)
             self.assertEqual(e.hints, {'instance': auth})
