@@ -330,7 +330,7 @@ class WizardView(TemplateView):
     def render_done(self, form, **kwargs):
         """
         This method gets called when all forms passed. The method should also
-        re-validate all steps to prevent manipulation. If any form don't
+        re-validate all steps to prevent manipulation. If any form fails to
         validate, `render_revalidation_failure` should get called.
         If everything is fine call `done`.
         """
