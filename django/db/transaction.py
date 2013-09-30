@@ -18,7 +18,7 @@ from functools import wraps
 
 from django.db import (
         connections, DEFAULT_DB_ALIAS,
-        DatabaseError, ProgrammingError)
+        DatabaseError, ProgrammingError, InterfaceError)
 from django.utils.decorators import available_attrs
 
 
@@ -312,47 +312,56 @@ class Atomic(object):
             connection.in_atomic_block = False
 
         try:
-            if exc_type is None and not connection.needs_rollback:
-                if connection.in_atomic_block:
-                    # Release savepoint if there is one
-                    if sid is not None:
+            try:
+                if exc_type is None and not connection.needs_rollback:
+                    if connection.in_atomic_block:
+                        # Release savepoint if there is one
+                        if sid is not None:
+                            try:
+                                connection.savepoint_commit(sid)
+                            except DatabaseError:
+                                connection.savepoint_rollback(sid)
+                                raise
+                    else:
+                        # Commit transaction
                         try:
-                            connection.savepoint_commit(sid)
+                            connection.commit()
                         except DatabaseError:
-                            connection.savepoint_rollback(sid)
+                            connection.rollback()
                             raise
                 else:
-                    # Commit transaction
-                    try:
-                        connection.commit()
-                    except DatabaseError:
-                        connection.rollback()
-                        raise
-            else:
-                # This flag will be set to True again if there isn't a savepoint
-                # allowing to perform the rollback at this level.
-                connection.needs_rollback = False
-                if connection.in_atomic_block:
-                    # Roll back to savepoint if there is one, mark for rollback
-                    # otherwise.
-                    if sid is None:
-                        connection.needs_rollback = True
+                    # This flag will be set to True again if there isn't a savepoint
+                    # allowing to perform the rollback at this level.
+                    connection.needs_rollback = False
+                    if connection.in_atomic_block:
+                        # Roll back to savepoint if there is one, mark for rollback
+                        # otherwise.
+                        if sid is None:
+                            connection.needs_rollback = True
+                        else:
+                            connection.savepoint_rollback(sid)
                     else:
-                        connection.savepoint_rollback(sid)
-                else:
-                    # Roll back transaction
-                    connection.rollback()
+                        # Roll back transaction
+                        connection.rollback()
 
-        finally:
-            # Outermost block exit when autocommit was enabled.
-            if not connection.in_atomic_block:
-                if connection.features.autocommits_when_autocommit_is_off:
-                    connection.autocommit = True
-                else:
-                    connection.set_autocommit(True)
-            # Outermost block exit when autocommit was disabled.
-            elif not connection.savepoint_ids and not connection.commit_on_exit:
-                connection.in_atomic_block = False
+            finally:
+                # Outermost block exit when autocommit was enabled.
+                if not connection.in_atomic_block:
+                    if connection.features.autocommits_when_autocommit_is_off:
+                        connection.autocommit = True
+                    else:
+                        connection.set_autocommit(True)
+                # Outermost block exit when autocommit was disabled.
+                elif not connection.savepoint_ids and not connection.commit_on_exit:
+                    connection.in_atomic_block = False
+
+        except InterfaceError:
+            if exc_type is not None:
+                # We tried to clean up from an exception, but ran into an
+                # InterfaceError, meaning the connection is unusable from now
+                # on. Propagate up the original error instead of masking it
+                # with InterfaceError ("connection already closed")
+                return
 
     def __call__(self, func):
         @wraps(func, assigned=available_attrs(func))
