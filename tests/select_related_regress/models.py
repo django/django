@@ -108,3 +108,21 @@ class Hen(Fowl):
 
 class Chick(Fowl):
     mother = models.ForeignKey(Hen)
+
+class Base(models.Model):
+    name = models.CharField(max_length=10)
+    lots_of_text = models.TextField()
+
+    class Meta:
+        abstract = True
+
+class A(Base):
+    a_field = models.CharField(max_length=10)
+
+class B(Base):
+    b_field = models.CharField(max_length=10)
+
+class C(Base):
+    c_a = models.ForeignKey(A)
+    c_b = models.ForeignKey(B)
+    is_published = models.BooleanField()
