@@ -120,13 +120,13 @@ this. For a small app like polls, this process isn't too difficult.
 1. First, create a parent directory for ``polls``, outside of your Django
    project. Call this directory ``django-polls``.
 
-.. admonition::  Choosing a name for your app
+   .. admonition::  Choosing a name for your app
 
-   When choosing a name for your package, check resources like PyPI to avoid
-   naming conflicts with existing packages. It's often useful to prepend
-   ``django-`` to your module name when creating a package to distribute.
-   This helps others looking for Django apps identify your app as Django
-   specific.
+       When choosing a name for your package, check resources like PyPI to avoid
+       naming conflicts with existing packages. It's often useful to prepend
+       ``django-`` to your module name when creating a package to distribute.
+       This helps others looking for Django apps identify your app as Django
+       specific.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
@@ -161,7 +161,7 @@ this. For a small app like polls, this process isn't too difficult.
        3. Run `python manage.py migrate` to create the polls models.
 
        4. Start the development server and visit http://127.0.0.1:8000/admin/
-       to create a poll (you'll need the Admin app enabled).
+          to create a poll (you'll need the Admin app enabled).
 
        5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
 
