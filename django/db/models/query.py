@@ -47,9 +47,10 @@ class QuerySet(object):
     Represents a lazy database lookup for a set of objects.
     """
 
-    def __init__(self, model=None, query=None, using=None):
+    def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
         self._db = using
+        self._hints = hints or {}
         self.query = query or sql.Query(self.model)
         self._result_cache = None
         self._sticky_filter = False
@@ -435,14 +436,9 @@ class QuerySet(object):
         for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
 
-        sid = transaction.savepoint(using=self.db)
-        try:
+        with transaction.atomic(using=self.db):
             obj.save(using=self.db)
-            transaction.savepoint_commit(sid, using=self.db)
-            return obj, False
-        except DatabaseError:
-            transaction.savepoint_rollback(sid, using=self.db)
-            six.reraise(*sys.exc_info())
+        return obj, False
 
     def _create_object_from_params(self, lookup, params):
         """
@@ -450,19 +446,16 @@ class QuerySet(object):
         Used by get_or_create and update_or_create
         """
         obj = self.model(**params)
-        sid = transaction.savepoint(using=self.db)
         try:
-            obj.save(force_insert=True, using=self.db)
-            transaction.savepoint_commit(sid, using=self.db)
+            with transaction.atomic(using=self.db):
+                obj.save(force_insert=True, using=self.db)
             return obj, True
-        except DatabaseError as e:
-            transaction.savepoint_rollback(sid, using=self.db)
+        except IntegrityError:
             exc_info = sys.exc_info()
-            if isinstance(e, IntegrityError):
-                try:
-                    return self.get(**lookup), False
-                except self.model.DoesNotExist:
-                    pass
+            try:
+                return self.get(**lookup), False
+            except self.model.DoesNotExist:
+                pass
             six.reraise(*exc_info)
 
     def _extract_model_params(self, defaults, **kwargs):
@@ -904,8 +897,8 @@ class QuerySet(object):
     def db(self):
         "Return the database that will be used if this query is executed now"
         if self._for_write:
-            return self._db or router.db_for_write(self.model)
-        return self._db or router.db_for_read(self.model)
+            return self._db or router.db_for_write(self.model, **self._hints)
+        return self._db or router.db_for_read(self.model, **self._hints)
 
     ###################
     # PRIVATE METHODS #
@@ -955,7 +948,7 @@ class QuerySet(object):
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True
-        c = klass(model=self.model, query=query, using=self._db)
+        c = klass(model=self.model, query=query, using=self._db, hints=self._hints)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c._known_related_objects = self._known_related_objects
@@ -1025,6 +1018,14 @@ class QuerySet(object):
     # empty" result.
     value_annotation = True
 
+    def _add_hints(self, **hints):
+        """
+        Update hinting information for later use by Routers
+        """
+        # If there is any hinting information, add it to what we already know.
+        # If we have a new hint for an existing key, overwrite with the new value.
+        self._hints.update(hints)
+
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
@@ -1081,7 +1082,7 @@ class ValuesQuerySet(QuerySet):
         if self._fields:
             self.extra_names = []
             self.aggregate_names = []
-            if not self.query.extra and not self.query.aggregates:
+            if not self.query._extra and not self.query._aggregates:
                 # Short cut - if there are no extra or aggregates, then
                 # the values() clause must be just field names.
                 self.field_names = list(self._fields)
@@ -1092,7 +1093,7 @@ class ValuesQuerySet(QuerySet):
                     # we inspect the full extra_select list since we might
                     # be adding back an extra select item that we hadn't
                     # had selected previously.
-                    if f in self.query.extra:
+                    if self.query._extra and f in self.query._extra:
                         self.extra_names.append(f)
                     elif f in self.query.aggregate_select:
                         self.aggregate_names.append(f)
@@ -1486,10 +1487,11 @@ class RawQuerySet(object):
     annotated model instances.
     """
     def __init__(self, raw_query, model=None, query=None, params=None,
-        translations=None, using=None):
+        translations=None, using=None, hints=None):
         self.raw_query = raw_query
         self.model = model
         self._db = using
+        self._hints = hints or {}
         self.query = query or sql.RawQuery(sql=raw_query, using=self.db, params=params)
         self.params = params or ()
         self.translations = translations or {}
@@ -1573,7 +1575,7 @@ class RawQuerySet(object):
     @property
     def db(self):
         "Return the database that will be used if this query is executed now"
-        return self._db or router.db_for_read(self.model)
+        return self._db or router.db_for_read(self.model, **self._hints)
 
     def using(self, alias):
         """

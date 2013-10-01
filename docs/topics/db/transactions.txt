@@ -163,19 +163,30 @@ Django provides a single API to control database transactions.
     called, so the exception handler can also operate on the database if
     necessary.
 
-    .. admonition:: Don't catch database exceptions inside ``atomic``!
+    .. admonition:: Avoid catching exceptions inside ``atomic``!
 
-        If you catch :exc:`~django.db.DatabaseError` or a subclass such as
-        :exc:`~django.db.IntegrityError` inside an ``atomic`` block, you will
-        hide from Django the fact that an error has occurred and that the
-        transaction is broken. At this point, Django's behavior is unspecified
-        and database-dependent. It will usually result in a rollback, which
-        may break your expectations, since you caught the exception.
+        When exiting an ``atomic`` block, Django looks at whether it's exited
+        normally or with an exception to determine whether to commit or roll
+        back. If you catch and handle exceptions inside an ``atomic`` block,
+        you may hide from Django the fact that a problem has happened. This
+        can result in unexpected behavior.
+
+        This is mostly a concern for :exc:`~django.db.DatabaseError` and its
+        subclasses such as :exc:`~django.db.IntegrityError`. After such an
+        error, the transaction is broken and Django will perform a rollback at
+        the end of the ``atomic`` block. If you attempt to run database
+        queries before the rollback happens, Django will raise a
+        :class:`~django.db.transaction.TransactionManagementError`. You may
+        also encounter this behavior when an ORM-related signal handler raises
+        an exception.
 
         The correct way to catch database errors is around an ``atomic`` block
         as shown above. If necessary, add an extra ``atomic`` block for this
-        purpose -- it's cheap! This pattern is useful to delimit explicitly
+        purpose. This pattern has another advantage: it delimits explicitly
         which operations will be rolled back if an exception occurs.
+
+        If you catch exceptions raised by raw SQL queries, Django's behavior
+        is unspecified and database-dependent.
 
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
     to commit, roll back, or change the autocommit state of the database

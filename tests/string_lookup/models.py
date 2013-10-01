@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import warnings
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -49,7 +50,9 @@ class Base(models.Model):
 class Article(models.Model):
     name = models.CharField(max_length=50)
     text = models.TextField()
-    submitted_from = models.IPAddressField(blank=True, null=True)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        submitted_from = models.IPAddressField(blank=True, null=True)
 
     def __str__(self):
         return "Article %s" % self.name

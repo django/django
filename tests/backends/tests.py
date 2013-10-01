@@ -15,7 +15,7 @@ from django.db import (connection, connections, DEFAULT_DB_ALIAS,
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.utils import format_number
+from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
@@ -612,6 +612,29 @@ class BackendTestCase(TestCase):
         query = 'CREATE TABLE %s (id INTEGER);' % models.Article._meta.db_table
         with self.assertRaises(DatabaseError):
             cursor.execute(query)
+
+    def test_cursor_contextmanager(self):
+        """
+        Test that cursors can be used as a context manager
+        """
+        with connection.cursor() as cursor:
+            self.assertTrue(isinstance(cursor, CursorWrapper))
+        # Both InterfaceError and ProgrammingError seem to be used when
+        # accessing closed cursor (psycopg2 has InterfaceError, rest seem
+        # to use ProgrammingError).
+        with self.assertRaises(connection.features.closed_cursor_error_class):
+            # cursor should be closed, so no queries should be possible.
+            cursor.execute("select 1")
+
+    @unittest.skipUnless(connection.vendor == 'postgresql',
+                         "Psycopg2 specific cursor.closed attribute needed")
+    def test_cursor_contextmanager_closing(self):
+        # There isn't a generic way to test that cursors are closed, but
+        # psycopg2 offers us a way to check that by closed attribute.
+        # So, run only on psycopg2 for that reason.
+        with connection.cursor() as cursor:
+            self.assertTrue(isinstance(cursor, CursorWrapper))
+        self.assertTrue(cursor.closed)
 
 
 # We don't make these tests conditional because that means we would need to

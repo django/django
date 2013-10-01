@@ -15,6 +15,7 @@ from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
+from django.db.utils import InterfaceError
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
@@ -60,6 +61,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     supports_combined_alters = True
     nulls_order_largest = True
+    closed_cursor_error_class = InterfaceError
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

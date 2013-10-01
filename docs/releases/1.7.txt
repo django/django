@@ -111,6 +111,25 @@ In addition, the widgets now display a help message when the browser and
 server time zone are different, to clarify how the value inserted in the field
 will be interpreted.
 
+Using database cursors as context managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Python 2.7, database cursors could be used as a context manager. The
+specific backend's cursor defined the behavior of the context manager. The
+behavior of magic method lookups was changed with Python 2.7 and cursors were
+no longer usable as context managers.
+
+Django 1.7 allows a cursor to be used as a context manager that is a shortcut
+for the following, instead of backend specific behavior.
+
+.. code-block:: python
+
+    c = connection.cursor()
+    try:
+        c.execute(...)
+    finally:
+        c.close()
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -349,6 +368,20 @@ For apps with migrations, ``allow_migrate`` will now get passed
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
 
+Passing ``None`` to ``Manager.db_manager()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions of Django, it was possible to use
+``db_manager(using=None)`` on a model manager instance to obtain a manager
+instance using default routing behavior, overriding any manually specified
+database routing. In Django 1.7, a value of ``None`` passed to db_manager will
+produce a router that *retains* any manually assigned database routing -- the
+manager will *not* be reset. This was necessary to resolve an inconsistency in
+the way routing information cascaded over joins. See `Ticket #13724`_ for more
+details.
+
+.. _Ticket #13724: https://code.djangoproject.com/ticket/13724
+
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -510,3 +543,12 @@ to ``utils.py`` in an effort to unify all util and utils references:
 ``ModelAdmin.get_formsets`` has been deprecated in favor of the new
 :meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
 better handle the case of selecting showing inlines on a ``ModelAdmin``.
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+The :class:`django.db.models.IPAddressField` and
+:class:`django.forms.IPAddressField` fields have been deprecated in favor of
+:class:`django.db.models.GenericIPAddressField` and
+:class:`django.forms.GenericIPAddressField`.
+

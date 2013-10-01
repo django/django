@@ -1,7 +1,7 @@
 import datetime
 import time
 
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, ProgrammingError
 
 try:
     from django.utils.six.moves import _thread as thread
@@ -361,6 +361,12 @@ class BaseDatabaseWrapper(object):
             raise TransactionManagementError(
                 "This is forbidden when an 'atomic' block is active.")
 
+    def validate_no_broken_transaction(self):
+        if self.needs_rollback:
+            raise TransactionManagementError(
+                "An error occurred in the current transaction. You can't "
+                "execute queries until the end of the 'atomic' block.")
+
     def abort(self):
         """
         Roll back any ongoing transaction and clean the transaction state
@@ -638,6 +644,9 @@ class BaseDatabaseFeatures(object):
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
+    # Does the backend prevent running SQL queries in broken transactions?
+    atomic_transactions = True
+
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
@@ -663,6 +672,9 @@ class BaseDatabaseFeatures(object):
 
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
+
+    # What kind of error does the backend throw when accessing closed cursor?
+    closed_cursor_error_class = ProgrammingError
 
     def __init__(self, connection):
         self.connection = connection

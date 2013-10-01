@@ -303,6 +303,11 @@ class DateFieldListFilter(FieldListFilter):
         else:       # field is a models.DateField
             today = now.date()
         tomorrow = today + datetime.timedelta(days=1)
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+        next_year = today.replace(year=today.year + 1, month=1, day=1)
 
         self.lookup_kwarg_since = '%s__gte' % field_path
         self.lookup_kwarg_until = '%s__lt' % field_path
@@ -318,11 +323,11 @@ class DateFieldListFilter(FieldListFilter):
             }),
             (_('This month'), {
                 self.lookup_kwarg_since: str(today.replace(day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_month),
             }),
             (_('This year'), {
                 self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_year),
             }),
         )
         super(DateFieldListFilter, self).__init__(
