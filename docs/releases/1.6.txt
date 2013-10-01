@@ -372,6 +372,11 @@ Minor features
   default value.
 
 
+* ``truncatechars_html`` template filter. This new filter truncates a string
+  to be no longer than the specified number of characters, taking HTML into
+  account. Truncated strings end with a translatable ellipsis sequence ("...").
+  See the documentation for :tfilter:`truncatechars_html` for more details.
+
 Backwards incompatible changes in 1.6
 =====================================
 

@@ -185,6 +185,22 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(truncatewords_html(
             '\xc5ngstr\xf6m was here', 1), '\xc5ngstr\xf6m ...')
 
+    def test_truncatechars_html(self):
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '')
+        self.assertEqual(truncatechars_html('<p>one <a href="#">two - '\
+            'three <br>four</a> five</p>', 6),
+            '<p>one...</p>')
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 11),
+            '<p>one <a href="#">two ...</a></p>')
+        self.assertEqual(truncatechars_html(
+            '<p>one <a href="#">two - three <br>four</a> five</p>', 100),
+            '<p>one <a href="#">two - three <br>four</a> five</p>')
+        self.assertEqual(truncatechars_html(
+            '<b>\xc5ngstr\xf6m</b> was here', 5), '<b>\xc5n...</b>')
+
+
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
         # lowercase e umlaut

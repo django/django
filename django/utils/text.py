@@ -78,7 +78,7 @@ class Truncator(SimpleLazyObject):
             return text
         return '%s%s' % (text, truncate)
 
-    def chars(self, num, truncate=None):
+    def chars(self, num, truncate=None, html=False):
         """
         Returns the text truncated to be no longer than the specified number
         of characters.
@@ -97,7 +97,15 @@ class Truncator(SimpleLazyObject):
                 truncate_len -= 1
                 if truncate_len == 0:
                     break
+        if html:
+            return self._html_chars(truncate_len, truncate, text)
+        return self._text_chars(length, truncate, text, truncate_len)
+    chars = allow_lazy(chars)
 
+    def _text_chars(self, length, truncate, text, truncate_len):
+        """
+        Truncates a string after a certain number of chars.
+        """
         s_len = 0
         end_index = None
         for i, char in enumerate(text):
@@ -115,7 +123,72 @@ class Truncator(SimpleLazyObject):
 
         # Return the original string since no truncation was necessary
         return text
-    chars = allow_lazy(chars)
+
+    def _html_chars(self, length, truncate, text):
+        """
+        Truncates HTML to a certain number of chars (not counting tags and
+        comments). Closes opened tags if they were correctly closed in the
+        given HTML.
+
+        Newlines in the HTML are preserved.
+        """
+        if length <= 0:
+            return ''
+        html4_singlets = (
+            'br', 'col', 'link', 'base', 'img',
+            'param', 'area', 'hr', 'input'
+        )
+        # Count non-HTML chars and keep note of open tags
+        pos = 0
+        end_text_pos = 0
+        chars = 0
+        open_tags = []
+        text_length = len(text)
+        while chars < length:
+            if pos == text_length:
+                break
+            # Check for tag
+            tag = re_tag.match(text, pos)
+            if not tag or end_text_pos:
+                # Don't worry about non tags or tags after our truncate point
+                if not unicodedata.combining(text[pos]):
+                    chars = chars + 1
+                pos = pos + 1
+                if chars == length:
+                    end_text_pos = pos
+                continue
+            else:
+                pos = tag.end(0)
+            closing_tag, tagname, self_closing = tag.groups()
+            # Element names are always case-insensitive
+            tagname = tagname.lower()
+            if self_closing or tagname in html4_singlets:
+                pass
+            elif closing_tag:
+                # Check for match in open tags list
+                try:
+                    i = open_tags.index(tagname)
+                except ValueError:
+                    pass
+                else:
+                    # SGML: An end tag closes, back to the matching start tag,
+                    # all unclosed intervening start tags with omitted end tags
+                    open_tags = open_tags[i + 1:]
+            else:
+                # Add it to the start of the open tags list
+                open_tags.insert(0, tagname)
+        if chars < length:
+            # Don't try to close tags if we don't need to truncate
+            return text
+        out = text[:end_text_pos]
+        truncate_text = self.add_truncation_text('', truncate)
+        if truncate_text:
+            out += truncate_text
+        # Close any tags still open
+        for tag in open_tags:
+            out += '</%s>' % tag
+        # Return string
+        return out
 
     def words(self, num, truncate=None, html=False):
         """
