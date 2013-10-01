@@ -210,10 +210,29 @@ class Collector(object):
         """
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
 
+        Some database backends (i.e. SQLite) have a certain limit for the
+        number of variables in query. Thus, we retrieve objects in batches and
+        add them to a list.
         """
-        return related.model._base_manager.using(self.using).filter(
-            **{"%s__in" % related.field.name: objs}
-        )
+        ops = connections[self.using].ops
+        batch_size = max(ops.bulk_batch_size([related.field.name], objs), 1)
+
+        # If the query can be done in one batch, return the queryset directly to
+        # avoid evaluating it.
+        if len(objs) < batch_size:
+            return related.model._base_manager.using(self.using).filter(
+                **{"%s__in" % related.field.name: objs}
+            )
+
+        related_objs = []
+        for batch in [objs[i:i + batch_size]
+                      for i in range(0, len(objs), batch_size)]:
+            related_objs.extend(
+                related.model._base_manager.using(self.using).filter(
+                    **{"%s__in" % related.field.name: batch}
+                )
+            )
+        return related_objs
 
     def instances_with_model(self):
         for model, instances in six.iteritems(self.data):
