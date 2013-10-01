@@ -23,7 +23,8 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
     SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
-    SingleObject, RelatedObject, ModelA, ModelD)
+    SingleObject, RelatedObject, ModelA, ModelD,
+    Ticket21203Parent, Ticket21203Child)
 
 
 class BaseQuerysetTest(TestCase):
@@ -2149,3 +2150,11 @@ class EmptyStringPromotionTests(TestCase):
             self.assertIn('LEFT OUTER JOIN', str(qs.query))
         else:
             self.assertNotIn('LEFT OUTER JOIN', str(qs.query))
+
+class Ticket21203Tests(TestCase):
+    def test_ticket_21203(self):
+        p = Ticket21203Parent.objects.create(parent_bool=True)
+        c = Ticket21203Child.objects.create(parent=p)
+        qs = Ticket21203Child.objects.select_related('parent').defer('parent__created')
+        self.assertQuerysetEqual(qs, [c], lambda x: x)
+        self.assertIs(qs[0].parent.parent_bool, True)
