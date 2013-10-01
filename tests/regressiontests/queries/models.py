@@ -401,3 +401,12 @@ class ModelA(models.Model):
     name = models.TextField()
     b = models.ForeignKey(ModelB, null=True)
     d = models.ForeignKey(ModelD)
+
+class Ticket21203Parent(models.Model):
+    parentid = models.AutoField(primary_key=True)
+    parent_bool = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now=True)
+
+class Ticket21203Child(models.Model):
+    childid = models.AutoField(primary_key=True)
+    parent = models.ForeignKey(Ticket21203Parent)
