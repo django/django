@@ -6,7 +6,8 @@ Databrowse
    :synopsis: Databrowse is a Django application that lets you browse your data.
 
 .. deprecated:: 1.4
-    This module has been deprecated.
+    This module has been deprecated. It's available as a `third-party package
+    <https://pypi.python.org/pypi/django-databrowse>`_.
 
 Databrowse is a Django application that lets you browse your data.
 
