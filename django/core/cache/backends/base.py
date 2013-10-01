@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import time
 import warnings
 
+import time
+
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
 from django.utils.module_loading import import_by_path
 
