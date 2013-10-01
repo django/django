@@ -377,23 +377,39 @@ class NoWrapExtractorTests(ExtractorTests):
             self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
 
 
-class NoLocationExtractorTests(ExtractorTests):
+class LocationCommentsTests(ExtractorTests):
 
     def test_no_location_enabled(self):
+        """Behavior is correct if --no-location switch is specified. See #16903."""
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
-            self.assertFalse('#: templates/test.html:55' in po_contents)
+            needle = os.sep.join(['#: templates', 'test.html:55'])
+            self.assertFalse(needle in po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
 
     def test_no_location_disabled(self):
+        """Behavior is correct if --no-location switch isn't specified."""
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
+            # Standard comment with source file relative path should be present -- #16903
             po_contents = force_text(fp.read())
-            self.assertTrue('#: templates/test.html:55' in po_contents)
+            if os.name == 'nt':
+                # #: .\path\to\file.html:123
+                cwd_prefix = '%s%s' % (os.curdir, os.sep)
+            else:
+                # #: path/to/file.html:123
+                cwd_prefix = ''
+            needle = os.sep.join(['#: %stemplates' % cwd_prefix, 'test.html:55'])
+            self.assertTrue(needle in po_contents, '"%s" not found in final .po file.' % needle)
+
+            # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
+            bad_suffix = '.py'
+            bad_string = 'templates%stest.html%s' % (os.sep, bad_suffix) #
+            self.assertFalse(bad_string in po_contents, '"%s" shouldn\'t be in final .po file.' % bad_string)
 
 
 class KeepPotFileExtractorTests(ExtractorTests):

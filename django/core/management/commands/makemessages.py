@@ -135,8 +135,14 @@ class TranslatableFile(object):
                 command.stdout.write(errors)
         if msgs:
             if is_templatized:
-                old = '#: ' + work_file[2:]
-                new = '#: ' + orig_file[2:]
+                # Remove '.py' suffix
+                if os.name =='nt':
+                    # Preserve '.\' prefix on Windows to respect gettext behavior
+                    old = '#: ' + work_file
+                    new = '#: ' + orig_file
+                else:
+                    old = '#: ' + work_file[2:]
+                    new = '#: ' + orig_file[2:]
                 msgs = msgs.replace(old, new)
             write_pot_file(potfile, msgs)
         if is_templatized:
