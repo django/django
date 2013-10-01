@@ -1,8 +1,8 @@
 from collections import defaultdict
 
 from django.conf import settings
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
+from django.template.base import (TemplateDoesNotExist, TemplateSyntaxError, Library,
+                                  Node, TextNode, token_kwargs, Variable)
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 from django.utils import six
@@ -83,8 +83,14 @@ class ExtendsNode(Node):
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
 
+    def get_template_dirs(self, context):
+        if self.template_dirs is not None:
+            return self.template_dirs.resolve(context)
+        return self.template_dirs
+
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
+        template_dirs = self.get_template_dirs(context)
         if not parent:
             error_msg = "Invalid template name in 'extends' tag: %r." % parent
             if self.parent_name.filters or\
@@ -94,7 +100,7 @@ class ExtendsNode(Node):
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
-        return get_template(parent)
+        return get_template(parent, dirs=template_dirs)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
@@ -122,19 +128,26 @@ class ExtendsNode(Node):
         return compiled_parent._render(context)
 
 class IncludeNode(Node):
-    def __init__(self, template, *args, **kwargs):
+    def __init__(self, template, dirs=None, *args, **kwargs):
         self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
         self.isolated_context = kwargs.pop('isolated_context', False)
+        self.template_dirs = dirs
         super(IncludeNode, self).__init__(*args, **kwargs)
+
+    def get_template_dirs(self, context):
+        if self.template_dirs is not None:
+            return self.template_dirs.resolve(context)
+        return self.template_dirs
 
     def render(self, context):
         try:
             template = self.template.resolve(context)
+            template_dirs = self.get_template_dirs(context)
             # Does this quack like a Template?
             if not callable(getattr(template, 'render', None)):
                 # If not, we'll try get_template
-                template = get_template(template)
+                template = get_template(template, dirs=template_dirs)
             values = {
                 name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)
@@ -187,15 +200,24 @@ def do_extends(parser, token):
     or ``{% extends variable %}`` uses the value of ``variable`` as either the
     name of the parent template to extend (if it evaluates to a string) or as
     the parent template itself (if it evaluates to a Template object).
+
+    To override the :setting:`TEMPLATE_DIRS` setting, provide a ``dirs``
+    variable which is a list or tuple of directories::
+
+        {% extends "some_base.html" dirs %}
+
     """
     bits = token.split_contents()
-    if len(bits) != 2:
-        raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
+    if len(bits) != 2 and len(bits) != 3:
+        raise TemplateSyntaxError("'%s' takes one or two argument" % bits[0])
     parent_name = parser.compile_filter(bits[1])
+    template_dirs = None
+    if len(bits) == 3:
+        template_dirs = parser.compile_filter(bits[2])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
-    return ExtendsNode(nodelist, parent_name)
+    return ExtendsNode(nodelist, parent_name, template_dirs=template_dirs)
 
 @register.tag('include')
 def do_include(parser, token):
@@ -213,6 +235,12 @@ def do_include(parser, token):
 
         {% include "foo/some_include" only %}
         {% include "foo/some_include" with bar="1" only %}
+
+    To override the :setting:`TEMPLATE_DIRS` setting, provide a ``dirs``
+    variable which is a list or tuple of directories::
+
+        {% include "some_include" dirs %}
+
     """
     bits = token.split_contents()
     if len(bits) < 2:
@@ -231,11 +259,15 @@ def do_include(parser, token):
                                           'one keyword argument.' % bits[0])
         elif option == 'only':
             value = True
+
+        elif option == 'dirs':
+            value = parser.compile_filter(option)
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
                                       (bits[0], option))
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
+    template_dirs = options.get('dirs')
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
-                       isolated_context=isolated_context)
+                       isolated_context=isolated_context, dirs=template_dirs)
