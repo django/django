@@ -190,7 +190,7 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get('Vary'), 'Accept-Language')
+        self.assertEqual(response.get('Vary'), 'Cookie, Accept-Language')
 
     def test_en_redirect(self):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')

@@ -155,9 +155,11 @@ class WSGIRequest(http.HttpRequest):
         if not hasattr(self, '_cookies'):
             raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
             self._cookies = http.parse_cookie(raw_cookie)
+        self._cookies_accessed = True
         return self._cookies
 
     def _set_cookies(self, cookies):
+        self._cookies_accessed = True
         self._cookies = cookies
 
     def _get_files(self):

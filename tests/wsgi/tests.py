@@ -47,10 +47,12 @@ class WSGITest(TestCase):
         self.assertEqual(response_data["status"], "200 OK")
         self.assertEqual(
             response_data["headers"],
-            [('Content-Type', 'text/html; charset=utf-8')])
+            [('Vary', 'Cookie'),
+             ('Content-Type', 'text/html; charset=utf-8')])
         self.assertEqual(
             bytes(response),
-            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
+            b"Vary: Cookie\r\nContent-Type: text/html; charset=utf-8\r\n\r\n"
+             "Hello World!")
 
 
 class GetInternalWSGIApplicationTest(unittest.TestCase):
