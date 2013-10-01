@@ -1082,7 +1082,7 @@ class ValuesQuerySet(QuerySet):
         if self._fields:
             self.extra_names = []
             self.aggregate_names = []
-            if not self.query.extra and not self.query.aggregates:
+            if not self.query._extra and not self.query._aggregates:
                 # Short cut - if there are no extra or aggregates, then
                 # the values() clause must be just field names.
                 self.field_names = list(self._fields)
@@ -1093,7 +1093,7 @@ class ValuesQuerySet(QuerySet):
                     # we inspect the full extra_select list since we might
                     # be adding back an extra select item that we hadn't
                     # had selected previously.
-                    if f in self.query.extra:
+                    if self.query._extra and f in self.query._extra:
                         self.extra_names.append(f)
                     elif f in self.query.aggregate_select:
                         self.aggregate_names.append(f)
