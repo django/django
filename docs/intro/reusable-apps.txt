@@ -216,11 +216,11 @@ this. For a small app like polls, this process isn't too difficult.
            ],
        )
 
-.. admonition:: I thought you said we were going to use ``distribute``?
+   .. admonition:: I thought you said we were going to use ``distribute``?
 
-    Distribute is a drop-in replacement for ``setuptools``. Even though we
-    appear to import from ``setuptools``, since we have ``distribute``
-    installed, it will override the import.
+       Distribute is a drop-in replacement for ``setuptools``. Even though we
+       appear to import from ``setuptools``, since we have ``distribute``
+       installed, it will override the import.
 
 6. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
