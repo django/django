@@ -125,4 +125,4 @@ class B(Base):
 class C(Base):
     c_a = models.ForeignKey(A)
     c_b = models.ForeignKey(B)
-    is_published = models.BooleanField()
+    is_published = models.BooleanField(default=False)
