@@ -4,7 +4,6 @@ import datetime
 import os
 import re
 import sys
-import time
 import warnings
 from xml.dom.minidom import parseString
 
@@ -21,11 +20,11 @@ from django.db.models import Min, Max
 from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import override_settings
+from django.test.utils import override_settings, requires_tz_support
 from django.utils import six
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
-from django.utils.unittest import skipIf, skipUnless
+from django.utils.unittest import skipIf
 
 from .forms import EventForm, EventSplitForm, EventLocalizedForm, EventModelForm, EventLocalizedModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
@@ -42,17 +41,6 @@ from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayE
 UTC = timezone.utc
 EAT = FixedOffset(180)      # Africa/Nairobi
 ICT = FixedOffset(420)      # Asia/Bangkok
-
-TZ_SUPPORT = hasattr(time, 'tzset')
-
-# On OSes that don't provide tzset (Windows), we can't set the timezone
-# in which the program runs. As a consequence, we must skip tests that
-# don't enforce a specific timezone (with timezone.override or equivalent),
-# or attempt to interpret naive datetimes in the default timezone.
-
-requires_tz_support = skipUnless(TZ_SUPPORT,
-        "This test relies on the ability to run a program in an arbitrary "
-        "time zone, but your operating system isn't able to do that.")
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=False)

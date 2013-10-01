@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import logging
 import re
 import sys
+import time
 import warnings
 from functools import wraps
 from xml.dom.minidom import parseString, Node
@@ -17,14 +18,16 @@ from django.test.signals import template_rendered, setting_changed
 from django.utils.encoding import force_str
 from django.utils import six
 from django.utils.translation import deactivate
+from django.utils.unittest import skipUnless
 
 
 __all__ = (
     'Approximate', 'ContextList',  'get_runner', 'override_settings',
-    'setup_test_environment', 'teardown_test_environment',
+    'requires_tz_support', 'setup_test_environment', 'teardown_test_environment',
 )
 
 RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
+TZ_SUPPORT = hasattr(time, 'tzset')
 
 
 class Approximate(object):
@@ -436,3 +439,13 @@ def patch_logger(logger_name, log_level):
         yield calls
     finally:
         setattr(logger, log_level, orig)
+
+
+# On OSes that don't provide tzset (Windows), we can't set the timezone
+# in which the program runs. As a consequence, we must skip tests that
+# don't enforce a specific timezone (with timezone.override or equivalent),
+# or attempt to interpret naive datetimes in the default timezone.
+
+requires_tz_support = skipUnless(TZ_SUPPORT,
+        "This test relies on the ability to run a program in an arbitrary "
+        "time zone, but your operating system isn't able to do that.")
