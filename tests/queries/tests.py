@@ -26,7 +26,7 @@ from .models import (
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
-    CategoryRelationship)
+    CategoryRelationship, Ticket21203Parent, Ticket21203Child)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -3071,3 +3071,11 @@ class Ticket20955Tests(TestCase):
                              task_get.creator.staffuser.staff)
             self.assertEqual(task_select_related.owner.staffuser.staff,
                              task_get.owner.staffuser.staff)
+
+class Ticket21203Tests(TestCase):
+    def test_ticket_21203(self):
+        p = Ticket21203Parent.objects.create(parent_bool=True)
+        c = Ticket21203Child.objects.create(parent=p)
+        qs = Ticket21203Child.objects.select_related('parent').defer('parent__created')
+        self.assertQuerysetEqual(qs, [c], lambda x: x)
+        self.assertIs(qs[0].parent.parent_bool, True)
