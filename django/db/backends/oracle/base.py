@@ -59,6 +59,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
+from django.db.utils import InterfaceError
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
@@ -103,6 +104,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     connection_persists_old_columns = True
     nulls_order_largest = True
+    closed_cursor_error_class = InterfaceError
 
 
 class DatabaseOperations(BaseDatabaseOperations):
