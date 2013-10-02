@@ -1063,12 +1063,14 @@ class LiveServerThread(threading.Thread):
             self.error = e
             self.is_ready.set()
 
-    def join(self, timeout=None):
+    def terminate(self):
+        """
+        Shuts down live WSGI server.
+        """
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
-        super(LiveServerThread, self).join(timeout)
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1148,6 +1150,7 @@ class LiveServerTestCase(TransactionTestCase):
         # reasons has raised an exception.
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
+            cls.server_thread.terminate()
             cls.server_thread.join()
 
         # Restore sqlite connections' non-sharability
