@@ -38,7 +38,7 @@ if find_command('xgettext'):
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
-        NoLocationExtractorTests, KeepPotFileExtractorTests,
+        LocationCommentsTests, KeepPotFileExtractorTests,
         MultipleLocaleExtractionTests)
 if find_command('msgfmt'):
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
