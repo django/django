@@ -216,7 +216,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
                 form.save()
                 return HttpResponseRedirect(post_reset_redirect)
         else:
-            form = set_password_form(None)
+            form = set_password_form(user)
     else:
         validlink = False
         form = None
