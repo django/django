@@ -674,14 +674,17 @@ class BaseAggregateTestCase(TestCase):
     def _test_op_aggregate(self, op_method, class_1, class_2, number, always_float=False, int_if_int=False):
         aggregate_result = Book.objects.aggregate(res_1=class_1('pages'), res_2=class_2('price'))
         self._assert_float_equal(
-            Book.objects.aggregate(result=op_method(op_method(class_1('pages'), class_2('price')), number))['result']
+            Book.objects.aggregate(result=op_method(number, op_method(class_1('pages'), class_2('price'))))['result']
             ,
-            op_method(op_method(
-                aggregate_result['res_1'],
-                int(aggregate_result['res_2']) if int_if_int and int(aggregate_result['res_2']) == float(aggregate_result['res_2']) else (
-                    float(aggregate_result['res_2']) if always_float or class_2 is not Count else aggregate_result['res_2']
+            op_method(
+                number,
+                op_method(
+                    aggregate_result['res_1'],
+                    int(aggregate_result['res_2']) if int_if_int and int(aggregate_result['res_2']) == float(aggregate_result['res_2']) else (
+                        float(aggregate_result['res_2']) if always_float or class_2 is not Count else aggregate_result['res_2']
+                    )
                 )
-            ), number)
+            )
         )
 
     def _test_op_annotate(self, op_method, class_1, class_2, number, always_float=False, int_if_int=False):

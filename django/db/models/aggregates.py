@@ -78,6 +78,7 @@ class Aggregate(object):
         for operation in self.operations:
             operator = operation[0]
             operand = operation[1]
+            reverse_order = operation[2]
 
             if operator == self.DIVISION and not is_computed:
                 is_computed = True
@@ -91,7 +92,9 @@ class Aggregate(object):
                 if isinstance(operand_aggregate.field, (FloatField, DecimalField)) and not is_computed:
                     is_computed = True
             else:
-                aggregate.sql_template = '({} {} {})'.format(aggregate.sql_template, operator, operand)
+                aggregate.sql_template = '({} {} {})'.format(
+                    *[operand, operator, aggregate.sql_template] if reverse_order else [aggregate.sql_template, operator, operand]
+                )
 
                 if isinstance(operand, float) and not is_computed:
                     is_computed = True
@@ -103,27 +106,37 @@ class Aggregate(object):
 
         return aggregate
 
-    def _update_operations(self, operator, obj):
+    def _update_operations(self, operator, obj, reverse_order=False):
         if not isinstance(obj, (int, long, float, Aggregate)):
             raise TypeError("unsupported operand type(s) for {}: '{}' and '{}'".format(operator, type(self).__name__, type(obj).__name__))
 
         clone = copy.copy(self)
         if isinstance(obj, Aggregate):
             obj = copy.copy(obj)
-        clone.operations.append((operator, obj))
+        clone.operations.append((operator, obj, reverse_order))
         return clone
 
     def __add__(self, obj):
         return self._update_operations(self.ADDITION, obj)
 
+    __radd__ = __add__
+
     def __mul__(self, obj):
         return self._update_operations(self.MULTIPLICATION, obj)
+
+    __rmul__ = __mul__
 
     def __sub__(self, obj):
         return self._update_operations(self.SUBSTRACTION, obj)
 
+    def __rsub__(self, obj):
+        return self._update_operations(self.SUBSTRACTION, obj, reverse_order=True)
+
     def __div__(self, obj):
         return self._update_operations(self.DIVISION, obj)
+
+    def __rdiv__(self, obj):
+        return self._update_operations(self.DIVISION, obj, reverse_order=True)
 
 
 class Avg(Aggregate):
