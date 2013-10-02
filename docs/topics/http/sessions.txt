@@ -163,8 +163,12 @@ and the :setting:`SECRET_KEY` setting.
     integrity of the data (that it is all there and correct), it cannot
     guarantee freshness i.e. that you are being sent back the last thing you
     sent to the client. This means that for some uses of session data, the
-    cookie backend might open you up to `replay attacks`_. Cookies will only be
-    detected as 'stale' if they are older than your
+    cookie backend might open you up to `replay attacks`_. Unlike other session
+    backends which keep a server-side record of each session and invalidate it
+    when a user logs out, cookie-based sessions are not invalidated when a user
+    logs out. Thus if an attacker steals a user's cookie, he can use that
+    cookie to login as that user even if the user logs out. Cookies will only
+    be detected as 'stale' if they are older than your
     :setting:`SESSION_COOKIE_AGE`.
 
     **Performance**
