@@ -1124,8 +1124,9 @@ Example::
     >>> b.entry_set.filter(headline__contains='Lennon')
     >>> b.entry_set.count()
 
-You can override the ``FOO_set`` name by setting the ``related_name``
-parameter in the ``ForeignKey()`` definition. For example, if the ``Entry``
+You can override the ``FOO_set`` name by setting the
+:attr:`~django.db.models.ForeignKey.related_name` parameter in the
+:class:`~django.db.models.ForeignKey` definition. For example, if the ``Entry``
 model was altered to ``blog = ForeignKey(Blog, related_name='entries')``, the
 above example code would look like this::
 
@@ -1224,10 +1225,11 @@ An example makes this easier to understand::
     a.entry_set.all() # Returns all Entry objects for this Author.
 
 Like :class:`~django.db.models.ForeignKey`,
-:class:`~django.db.models.ManyToManyField` can specify ``related_name``. In the
-above example, if the :class:`~django.db.models.ManyToManyField` in ``Entry``
-had specified ``related_name='entries'``, then each ``Author`` instance would
-have an ``entries`` attribute instead of ``entry_set``.
+:class:`~django.db.models.ManyToManyField` can specify
+:attr:`~django.db.models.ManyToManyField.related_name`. In the above example,
+if the :class:`~django.db.models.ManyToManyField` in ``Entry`` had specified
+``related_name='entries'``, then each ``Author`` instance would have an
+``entries`` attribute instead of ``entry_set``.
 
 One-to-one relationships
 ------------------------
