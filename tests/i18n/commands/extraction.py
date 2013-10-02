@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import os
 import re
 import shutil
-from unittest import SkipTest
 import warnings
 
 from django.core import management
@@ -14,6 +13,7 @@ from django.utils._os import upath
 from django.utils import six
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
+from django.utils.unittest import SkipTest
 
 
 LOCALE='de'
