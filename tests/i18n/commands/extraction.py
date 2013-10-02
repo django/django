@@ -206,13 +206,13 @@ class BasicExtractorTests(ExtractorTests):
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
             six.assertRegex(self, str(ws[0].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates/comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
+                r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates[/\\]comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
             )
             six.assertRegex(self, str(ws[1].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates/comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
+                r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates[/\\]comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
             )
             six.assertRegex(self, str(ws[2].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates/comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
+                r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates[/\\]comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
             )
         # Now test .po file contents
         self.assertTrue(os.path.exists(self.PO_FILE))
