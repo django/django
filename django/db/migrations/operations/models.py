@@ -32,6 +32,15 @@ class CreateModel(Operation):
     def describe(self):
         return "Create model %s" % (self.name, )
 
+    def __eq__(self, other):
+        return (
+            (self.__class__ == other.__class__) and
+            (self.name == other.name) and
+            (self.options == other.options) and
+            (self.bases == other.bases) and
+            ([(k, f.deconstruct()[1:]) for k, f in self.fields] == [(k, f.deconstruct()[1:]) for k, f in other.fields])
+        )
+
 
 class DeleteModel(Operation):
     """
