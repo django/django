@@ -166,7 +166,7 @@ and the :setting:`SECRET_KEY` setting.
     cookie backend might open you up to `replay attacks`_. Unlike other session
     backends which keep a server-side record of each session and invalidate it
     when a user logs out, cookie-based sessions are not invalidated when a user
-    logs out. Thus if an attacker steals a user's cookie, he can use that
+    logs out. Thus if an attacker steals a user's cookie, he or she can use that
     cookie to login as that user even if the user logs out. Cookies will only
     be detected as 'stale' if they are older than your
     :setting:`SESSION_COOKIE_AGE`.
