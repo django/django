@@ -5,6 +5,7 @@ from xml.dom import minidom
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import requires_tz_support
 from django.utils import tzinfo
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 
@@ -260,9 +261,20 @@ class SyndicationFeedTest(FeedTestCase):
         updated = doc.getElementsByTagName('updated')[0].firstChild.wholeText
         self.assertEqual(updated[-6:], '+00:42')
 
-    def test_feed_last_modified_time(self):
+    @requires_tz_support
+    def test_feed_last_modified_time_naive_date(self):
+        """
+        Tests the Last-Modified header with naive publication dates.
+        """
         response = self.client.get('/syndication/naive-dates/')
         self.assertEqual(response['Last-Modified'], 'Thu, 03 Jan 2008 19:30:00 GMT')
+
+    def test_feed_last_modified_time(self):
+        """
+        Tests the Last-Modified header with aware publication dates.
+        """
+        response = self.client.get('/syndication/aware-dates/')
+        self.assertEqual(response['Last-Modified'], 'Thu, 03 Jan 2008 12:48:00 GMT')
 
         # No last-modified when feed has no item_pubdate
         response = self.client.get('/syndication/no_pubdate/')
