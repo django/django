@@ -1,17 +1,24 @@
 from __future__ import unicode_literals
 
+from django.core.cache import get_cache, InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
 from django.template import Library, Node, TemplateSyntaxError, VariableDoesNotExist
-from django.core.cache import cache
 
 register = Library()
 
+try:
+    default_cache = get_cache('template_fragments')
+except InvalidCacheBackendError:
+    from django.core.cache import cache as default_cache
+
+
 class CacheNode(Node):
-    def __init__(self, nodelist, expire_time_var, fragment_name, vary_on):
+    def __init__(self, nodelist, expire_time_var, fragment_name, vary_on, cache_name):
         self.nodelist = nodelist
         self.expire_time_var = expire_time_var
         self.fragment_name = fragment_name
         self.vary_on = vary_on
+        self.cache_name = cache_name
 
     def render(self, context):
         try:
@@ -22,6 +29,17 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
+        if self.cache_name:
+            try:
+                cache_name = self.cache_name.resolve(context)
+            except VariableDoesNotExist:
+                raise TemplateSyntaxError('"cache" tag got an unknown variable: %r' % self.cache_name.var)
+            try:
+                cache = get_cache(cache_name)
+            except InvalidCacheBackendError:
+                raise TemplateSyntaxError('Invalid cache name specified for cache tag: %r' % cache_name)
+        else:
+            cache = default_cache
         vary_on = [var.resolve(context) for var in self.vary_on]
         cache_key = make_template_fragment_key(self.fragment_name, vary_on)
         value = cache.get(cache_key)
@@ -50,6 +68,9 @@ def do_cache(parser, token):
             .. some expensive processing ..
         {% endcache %}
 
+    Optionally the cache to use may be specified thus::
+
+        {% cache ....  using="cachename" %}
     Each unique set of arguments will result in a unique cache entry.
     """
     nodelist = parser.parse(('endcache',))
@@ -57,7 +78,14 @@ def do_cache(parser, token):
     tokens = token.split_contents()
     if len(tokens) < 3:
         raise TemplateSyntaxError("'%r' tag requires at least 2 arguments." % tokens[0])
+    if len(tokens) > 3 and tokens[-1].startswith('using='):
+        cache_name = parser.compile_filter(tokens[-1][len('using='):])
+        tokens = tokens[:-1]
+    else:
+        cache_name = None
     return CacheNode(nodelist,
         parser.compile_filter(tokens[1]),
         tokens[2], # fragment_name can't be a variable.
-        [parser.compile_filter(t) for t in tokens[3:]])
+        [parser.compile_filter(t) for t in tokens[3:]],
+        cache_name,
+    )

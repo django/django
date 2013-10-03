@@ -652,6 +652,19 @@ equivalent:
 This feature is useful in avoiding repetition in templates. You can set the
 timeout in a variable, in one place, and just reuse that value.
 
+.. versionadded:: 1.7
+
+    By default, the cache tag will try to use the cache called
+    "template_fragments". If no such cache exists, it will fall back to using
+    the default cache. You may select an alternate cache backend to use with
+    the ``using`` keyword argument, which must be the last argument to the tag.
+
+.. code-block:: html+django
+
+    {% cache 300 local-thing ...  using="localcache" %}
+
+It is considered an error to specify a cache name that is not configured.
+
 .. function:: django.core.cache.utils.make_template_fragment_key(fragment_name, vary_on=None)
 
 If you want to obtain the cache key used for a cached fragment, you can use

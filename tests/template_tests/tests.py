@@ -478,6 +478,42 @@ class TemplateRegressionTests(TestCase):
         cachenode = t.nodelist[1]
         self.assertEqual(cachenode.fragment_name, 'regression_20130')
 
+    @override_settings(CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'default',
+        },
+        'template_fragments': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'fragments',
+        },
+    })
+    def test_cache_fragment_cache(self):
+        """
+        When a cache called "template_fragments" is present, the cache tag
+        will use it in preference to 'default'
+        """
+        t1 = Template('{% load cache %}{% cache 1 fragment %}foo{% endcache %}')
+        t2 = Template('{% load cache %}{% cache 1 fragment using="default" %}bar{% endcache %}')
+
+        ctx = Context()
+        o1 = t1.render(ctx)
+        o2 = t2.render(ctx)
+
+        self.assertEqual(o1, 'foo')
+        self.assertNotEqual(o1, o2)
+
+    def test_cache_missing_backend(self):
+        """
+        When a cache that doesn't exist is specified, the cache tag will
+        raise a TemplateSyntaxError
+        '"""
+        t = Template('{% load cache %}{% cache 1 backend using="unknown" %}bar{% endcache %}')
+
+        ctx = Context()
+        with self.assertRaises(TemplateSyntaxError):
+            t.render(ctx)
+
     def test_ifchanged_render_once(self):
         """ Test for ticket #19890. The content of ifchanged template tag was
         rendered twice."""
@@ -1735,7 +1771,6 @@ class TemplateTests(TransRealMixin, TestCase):
 
             # Test whitespace in filter arguments
             'cache18': ('{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}', {}, 'cache18'),
-
 
             ### AUTOESCAPE TAG ##############################################
             'autoescape-tag01': ("{% autoescape off %}hello{% endautoescape %}", {}, "hello"),

@@ -396,6 +396,11 @@ Templates
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
   rendering.
 
+* The :ttag:`cache` tag will now try to use the cache called
+  "template_fragments" if it exists and fall back to using the default cache
+  otherwise. It also now accepts an optional ``using`` keyword argument to
+  control which cache it uses.
+
 Requests
 ^^^^^^^^
 
