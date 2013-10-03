@@ -139,7 +139,7 @@ FAQ
 
    First off, it's not personal. Django is entirely developed by volunteers
    (even the core developers), and sometimes folks just don't have time. The
-   best thing to do is to send a gentle reminder to the django-developers
+   best thing to do is to send a gentle reminder to the |django-developers|
    mailing list asking for review on the ticket, or to bring it up in the
    #django-dev IRC channel.
 
