@@ -32,27 +32,34 @@ class TaggedItem(models.Model):
     def __str__(self):
         return self.tag
 
+
 class ValuableTaggedItem(TaggedItem):
     value = models.PositiveIntegerField()
 
-@python_2_unicode_compatible
-class Comparison(models.Model):
-    """
-    A model that tests having multiple GenericForeignKeys
-    """
+
+class AbstractComparison(models.Model):
     comparative = models.CharField(max_length=50)
 
     content_type1 = models.ForeignKey(ContentType, related_name="comparative1_set")
     object_id1 = models.PositiveIntegerField()
 
-    content_type2 = models.ForeignKey(ContentType,  related_name="comparative2_set")
+    first_obj = generic.GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
+
+
+@python_2_unicode_compatible
+class Comparison(AbstractComparison):
+    """
+    A model that tests having multiple GenericForeignKeys. One is defined
+    through an inherited abstract model and one defined directly on this class.
+    """
+    content_type2 = models.ForeignKey(ContentType, related_name="comparative2_set")
     object_id2 = models.PositiveIntegerField()
 
-    first_obj = generic.GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
     other_obj = generic.GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
 
     def __str__(self):
         return "%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
+
 
 @python_2_unicode_compatible
 class Animal(models.Model):
@@ -67,6 +74,7 @@ class Animal(models.Model):
     def __str__(self):
         return self.common_name
 
+
 @python_2_unicode_compatible
 class Vegetable(models.Model):
     name = models.CharField(max_length=150)
@@ -76,6 +84,7 @@ class Vegetable(models.Model):
 
     def __str__(self):
         return self.name
+
 
 @python_2_unicode_compatible
 class Mineral(models.Model):
@@ -87,17 +96,21 @@ class Mineral(models.Model):
     def __str__(self):
         return self.name
 
+
 class GeckoManager(models.Manager):
     def get_queryset(self):
         return super(GeckoManager, self).get_queryset().filter(has_tail=True)
+
 
 class Gecko(models.Model):
     has_tail = models.BooleanField(default=False)
     objects = GeckoManager()
 
+
 # To test fix for #11263
 class Rock(Mineral):
     tags = generic.GenericRelation(TaggedItem)
+
 
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -110,13 +123,16 @@ class ForProxyModelModel(models.Model):
     obj = generic.GenericForeignKey(for_concrete_model=False)
     title = models.CharField(max_length=255, null=True)
 
+
 class ForConcreteModelModel(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     obj = generic.GenericForeignKey()
 
+
 class ConcreteRelatedModel(models.Model):
     bases = generic.GenericRelation(ForProxyModelModel, for_concrete_model=False)
+
 
 class ProxyRelatedModel(ConcreteRelatedModel):
     class Meta:
