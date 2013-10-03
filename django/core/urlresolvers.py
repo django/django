@@ -39,34 +39,31 @@ class ResolverMatch(object):
         self.func = func
         self.args = args
         self.kwargs = kwargs
+        self.url_name = url_name
         self.app_name = app_name
+
         if namespaces:
             self.namespaces = [x for x in namespaces if x]
         else:
             self.namespaces = []
-        if not url_name:
-            if not hasattr(func, '__name__'):
-                # An instance of a callable class
-                url_name = '.'.join([func.__class__.__module__, func.__class__.__name__])
-            else:
-                # A function
-                url_name = '.'.join([func.__module__, func.__name__])
-        self.url_name = url_name
+        self.namespace = ':'.join(self.namespaces)
 
-    @property
-    def namespace(self):
-        return ':'.join(self.namespaces)
+        if not hasattr(func, '__name__'):
+            # A class-based view
+            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+        else:
+            # A function-based view
+            self._func_path = '.'.join([func.__module__, func.__name__])
 
-    @property
-    def view_name(self):
-        return ':'.join(filter(bool, (self.namespace, self.url_name)))
+        view_path = url_name or self._func_path
+        self.view_name = ':'.join(self.namespaces + [view_path])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name='%s', app_name='%s', namespace='%s')" % (
-            self.func, self.args, self.kwargs, self.url_name, self.app_name, self.namespace)
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_name=%s, namespaces=%s)" % (
+            self._func_path, self.args, self.kwargs, self.url_name, self.app_name, self.namespaces)
 
 
 class Resolver404(Http404):
@@ -80,43 +77,61 @@ class NoReverseMatch(Exception):
 @lru_cache.lru_cache(maxsize=None)
 def get_callable(lookup_view, can_fail=False):
     """
-    Convert a string version of a function name to the callable object.
+    Return a callable corresponding to lookup_view. This function is used
+    by both resolve() and reverse(), so can_fail allows the caller to choose
+    between returning the input as is and raising an exception when the input
+    string can't be interpreted as an import path.
 
-    If the lookup_view is not an import path, it is assumed to be a URL pattern
-    label and the original string is returned.
-
-    If can_fail is True, lookup_view might be a URL pattern label, so errors
-    during the import fail and the string is returned.
+    If lookup_view is already a callable, return it.
+    If lookup_view is a string import path that can be resolved to a callable,
+      import that callable and return it.
+    If lookup_view is some other kind of string and can_fail is True, the string
+      is returned as is. If can_fail is False, an exception is raised (either
+      ImportError or ViewDoesNotExist).
     """
-    if not callable(lookup_view):
-        mod_name, func_name = get_mod_func(lookup_view)
-        if func_name == '':
-            return lookup_view
+    if callable(lookup_view):
+        return lookup_view
 
-        try:
-            mod = import_module(mod_name)
-        except ImportError:
-            parentmod, submod = get_mod_func(mod_name)
-            if (not can_fail and submod != '' and
-                    not module_has_submodule(import_module(parentmod), submod)):
-                raise ViewDoesNotExist(
-                    "Could not import %s. Parent module %s does not exist." %
-                    (lookup_view, mod_name))
-            if not can_fail:
-                raise
+    mod_name, func_name = get_mod_func(lookup_view)
+    if not func_name:  # No '.' in lookup_view
+        if can_fail:
+            return lookup_view
         else:
-            try:
-                lookup_view = getattr(mod, func_name)
-                if not callable(lookup_view):
-                    raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable." %
-                        (mod_name, func_name))
-            except AttributeError:
-                if not can_fail:
-                    raise ViewDoesNotExist(
-                        "Could not import %s. View does not exist in module %s." %
-                        (lookup_view, mod_name))
-    return lookup_view
+            raise ImportError(
+                "Could not import '%s'. The path must be fully qualified." %
+                lookup_view)
+
+    try:
+        mod = import_module(mod_name)
+    except ImportError:
+        if can_fail:
+            return lookup_view
+        else:
+            parentmod, submod = get_mod_func(mod_name)
+            if submod and not module_has_submodule(import_module(parentmod), submod):
+                raise ViewDoesNotExist(
+                    "Could not import '%s'. Parent module %s does not exist." %
+                    (lookup_view, mod_name))
+            else:
+                raise
+    else:
+        try:
+            view_func = getattr(mod, func_name)
+        except AttributeError:
+            if can_fail:
+                return lookup_view
+            else:
+                raise ViewDoesNotExist(
+                    "Could not import '%s'. View does not exist in module %s." %
+                    (lookup_view, mod_name))
+        else:
+            if not callable(view_func):
+                # For backwards compatibility this is raised regardless of can_fail
+                raise ViewDoesNotExist(
+                    "Could not import '%s.%s'. View is not callable." %
+                    (mod_name, func_name))
+
+            return view_func
 
 
 @lru_cache.lru_cache(maxsize=None)
