@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 urlpatterns = [
-    url(r'^noslash$', 'view'),
-    url(r'^slash/$', 'view'),
-    url(r'^needsquoting#/$', 'view'),
+    url(r'^noslash$', 'middleware.views.empty_view'),
+    url(r'^slash/$', 'middleware.views.empty_view'),
+    url(r'^needsquoting#/$', 'middleware.views.empty_view'),
 ]

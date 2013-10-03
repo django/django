@@ -62,14 +62,14 @@ with warnings.catch_warnings(record=True):
         url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),
 
         # Regression views for #9038. See tests for more details
-        url(r'arg_view/$', 'kwargs_view'),
-        url(r'arg_view/(?P<arg1>[0-9]+)/$', 'kwargs_view'),
+        url(r'arg_view/$', 'urlpatterns_reverse.views.kwargs_view'),
+        url(r'arg_view/(?P<arg1>[0-9]+)/$', 'urlpatterns_reverse.views.kwargs_view'),
         url(r'absolute_arg_view/(?P<arg1>[0-9]+)/$', absolute_kwargs_view),
         url(r'absolute_arg_view/$', absolute_kwargs_view),
 
         # Tests for #13154. Mixed syntax to test both ways of defining URLs.
-        url(r'defaults_view1/(?P<arg1>[0-9]+)/', 'defaults_view', {'arg2': 1}, name='defaults'),
-        (r'defaults_view2/(?P<arg1>[0-9]+)/', 'defaults_view', {'arg2': 2}, 'defaults'),
+        url(r'defaults_view1/(?P<arg1>[0-9]+)/', 'urlpatterns_reverse.views.defaults_view', {'arg2': 1}, name='defaults'),
+        (r'defaults_view2/(?P<arg1>[0-9]+)/', 'urlpatterns_reverse.views.defaults_view', {'arg2': 2}, 'defaults'),
 
         url('^includes/', include(other_patterns)),
     )
