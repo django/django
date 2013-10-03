@@ -177,6 +177,4 @@ Other add-ons
 =============
 
 If you have an idea for functionality to include in ``contrib``, let us know!
-Code it up, and post it to the `django-users mailing list`_.
-
-.. _django-users mailing list: http://groups.google.com/group/django-users
+Code it up, and post it to the |django-users| mailing list.

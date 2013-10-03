@@ -310,8 +310,8 @@ Now you're ready to actually put the release out there. To do this:
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
 
-#. Post the release announcement to the django-announce,
-   django-developers and django-users mailing lists. This should
+#. Post the release announcement to the |django-announce|,
+   |django-developers| and |django-users| mailing lists. This should
    include links to the announcement blog post and the release notes.
 
 Post-release

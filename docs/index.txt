@@ -17,7 +17,7 @@ Having trouble? We'd like to help!
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
   the :doc:`detailed table of contents <contents>`.
 
-* Search for information in the `archives of the django-users mailing list`_, or
+* Search for information in the archives of the |django-users| mailing list, or
   `post a question`_.
 
 * Ask a question in the `#django IRC channel`_, or search the `IRC logs`_ to see
@@ -25,8 +25,7 @@ Having trouble? We'd like to help!
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives of the django-users mailing list: https://groups.google.com/d/forum/django-users
-.. _post a question: https://groups.google.com/d/forum/django-users
+.. _post a question: http://groups.google.com/group/django-users/
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
 .. _ticket tracker: https://code.djangoproject.com/
@@ -289,7 +288,8 @@ you can contribute:
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
   :doc:`The Django source code repository <internals/git>` |
-  :doc:`Security policies <internals/security>`
+  :doc:`Security policies <internals/security>` |
+  :doc:`Mailing lists <internals/mailing-lists>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

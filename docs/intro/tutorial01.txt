@@ -36,10 +36,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to `django-users`__ or drop by `#django on irc.freenode.net`__ to chat
+    to |django-users| or drop by `#django on irc.freenode.net`__ to chat
     with other Django users who might be able to help.
 
-__ http://groups.google.com/group/django-users
 __ irc://irc.freenode.net/django
 
 Creating a project

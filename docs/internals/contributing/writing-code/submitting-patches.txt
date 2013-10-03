@@ -153,7 +153,7 @@ A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on `django-developers`_.
+been discussed on |django-developers|.
 
 If you're not sure whether your patch should be considered non-trivial, just
 ask.
@@ -198,6 +198,5 @@ Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's javascript.
 
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _django-developers: http://groups.google.com/group/django-developers
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
