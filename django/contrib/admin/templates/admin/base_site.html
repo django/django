@@ -14,10 +14,9 @@
 {% endblock %}
 
 {% block userlinks %}
-    {% if site_title %}
-    <a href="{% url 'home' %}">{{ site_title }}</a> /
-    {% else %}
-    <a href="{% url 'home' %}">View Site</a> /
+    {% url 'home' as homeroot %}
+    {% if homeroot %}
+    <a href="{% homeroot %}">{{ site_title }}</a> /
     {% endif %}
 
     {% url 'django-admindocs-docroot' as docsroot %}
