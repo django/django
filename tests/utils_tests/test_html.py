@@ -42,13 +42,14 @@ class TestUtilsHtml(TestCase):
 
     def test_format_html(self):
         self.assertEqual(
-            html.format_html("{0} {1} {third} {fourth}",
+            html.format_html(u"{0} {1} {third} {fourth} {fifth}",
                              "< Dangerous >",
                              html.mark_safe("<b>safe</b>"),
                              third="< dangerous again",
-                             fourth=html.mark_safe("<i>safe again</i>")
+                             fourth=html.mark_safe("<i>safe again</i>"),
+                             fifth=u"à l'aise je gère l'unicode",
                              ),
-            "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
+            u'&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i> \xe0 l&#39;aise je g\xe8re l&#39;unicode'
             )
 
     def test_linebreaks(self):

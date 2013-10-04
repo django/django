@@ -33,9 +33,9 @@ def paginator_number(cl,i):
     if i == DOT:
         return '... '
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{0}</span> ', i+1)
+        return format_html(u'<span class="this-page">{0}</span> ', i+1)
     else:
-        return format_html('<a href="{0}"{1}>{2}</a> ',
+        return format_html(u'<a href="{0}"{1}>{2}</a> ',
                            cl.get_query_string({PAGE_VAR: i}),
                            mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
                            i+1)
@@ -113,7 +113,7 @@ def result_headers(cl):
                 # Not sortable
                 yield {
                     "text": text,
-                    "class_attrib": format_html(' class="column-{0}"', field_name),
+                    "class_attrib": format_html(u' class="column-{0}"', field_name),
                     "sortable": False,
                 }
                 continue
@@ -165,14 +165,14 @@ def result_headers(cl):
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
             "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
-            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes))
+            "class_attrib": format_html(u' class="{0}"', ' '.join(th_classes))
                             if th_classes else '',
         }
 
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.gif' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
-    return format_html('<img src="{0}" alt="{1}" />', icon_url, field_val)
+    return format_html(u'<img src="{0}" alt="{1}" />', icon_url, field_val)
 
 def items_for_result(cl, result, form):
     """
@@ -245,13 +245,13 @@ def items_for_result(cl, result, form):
                 value = result.serializable_value(attr)
                 result_id = escapejs(value)
                 link_or_text = format_html(
-                    '<a href="{0}"{1}>{2}</a>',
+                    u'<a href="{0}"{1}>{2}</a>',
                     url,
-                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
+                    format_html(u' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
                         if cl.is_popup else '',
                     result_repr)
 
-            yield format_html('<{0}{1}>{2}</{3}>',
+            yield format_html(u'<{0}{1}>{2}</{3}>',
                               table_tag,
                               row_class,
                               link_or_text,
@@ -265,9 +265,9 @@ def items_for_result(cl, result, form):
                         form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
                 result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
-            yield format_html('<td{0}>{1}</td>', row_class, result_repr)
+            yield format_html(u'<td{0}>{1}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield format_html('<td>{0}</td>', force_text(form[cl.model._meta.pk.name]))
+        yield format_html(u'<td>{0}</td>', force_text(form[cl.model._meta.pk.name]))
 
 class ResultList(list):
     # Wrapper class used to return items in a list_editable

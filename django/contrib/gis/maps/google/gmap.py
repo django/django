@@ -113,17 +113,17 @@ class GoogleMap(object):
     @property
     def body(self):
         "Returns HTML body tag for loading and unloading Google Maps javascript."
-        return format_html('<body {0} {1}>', self.onload, self.onunload)
+        return format_html(u'<body {0} {1}>', self.onload, self.onunload)
 
     @property
     def onload(self):
         "Returns the `onload` HTML <body> attribute."
-        return format_html('onload="{0}.{1}_load()"', self.js_module, self.dom_id)
+        return format_html(u'onload="{0}.{1}_load()"', self.js_module, self.dom_id)
 
     @property
     def api_script(self):
         "Returns the <script> tag for the Google Maps API javascript."
-        return format_html('<script src="{0}{1}" type="text/javascript"></script>',
+        return format_html(u'<script src="{0}{1}" type="text/javascript"></script>',
                            self.api_url, self.key)
 
     @property
@@ -134,18 +134,18 @@ class GoogleMap(object):
     @property
     def scripts(self):
         "Returns all <script></script> tags required with Google Maps JavaScript."
-        return format_html('{0}\n  <script type="text/javascript">\n//<![CDATA[\n{1}//]]>\n  </script>',
+        return format_html(u'{0}\n  <script type="text/javascript">\n//<![CDATA[\n{1}//]]>\n  </script>',
                            self.api_script, mark_safe(self.js))
 
     @property
     def style(self):
         "Returns additional CSS styling needed for Google Maps on IE."
-        return format_html('<style type="text/css">{0}</style>', self.vml_css)
+        return format_html(u'<style type="text/css">{0}</style>', self.vml_css)
 
     @property
     def xhtml(self):
         "Returns XHTML information needed for IE VML overlays."
-        return format_html('<html xmlns="http://www.w3.org/1999/xhtml" {0}>', self.xmlns)
+        return format_html(u'<html xmlns="http://www.w3.org/1999/xhtml" {0}>', self.xmlns)
 
     @property
     def icons(self):

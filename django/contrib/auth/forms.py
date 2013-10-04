@@ -44,7 +44,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                                             for key, value in hasher.safe_summary(encoded).items())
                                            )
 
-        return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
+        return format_html(u"<div{0}>{1}</div>", flatatt(final_attrs), summary)
 
 
 class ReadOnlyPasswordHashField(forms.Field):
