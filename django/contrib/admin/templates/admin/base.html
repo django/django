@@ -31,9 +31,13 @@
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
             {% endblock %}
             {% block userlinks %}
+                {% url 'home' as homeroot %}
+                {% if homeroot %}
+                <a href="{{ homeroot }}">{{ site_title }}</a> /
+                {% endif %}
                 {% url 'django-admindocs-docroot' as docsroot %}
                 {% if docsroot %}
-                    <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
                 {% endif %}
                 {% if user.has_usable_password %}
                 <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
