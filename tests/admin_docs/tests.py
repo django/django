@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.admindocs import utils
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -43,3 +44,43 @@ class XViewMiddlewareTest(TestCase):
         user.save()
         response = self.client.head('/xview/class/')
         self.assertFalse('X-View' in response)
+
+
+class DefaultRoleTest(TestCase):
+    urls = 'admin_docs.urls'
+
+    def test_parse_rst(self):
+        """
+        Tests that ``django.contrib.admindocs.utils.parse_rst`` uses
+        ``cmsreference`` as the default role.
+        """
+        markup = ('<p><a class="reference external" href="/admindocs/%s">'
+                  'title</a></p>\n')
+        self.assertEqual(utils.parse_rst('`title`', 'model'),
+                         markup % 'models/title/')
+        self.assertEqual(utils.parse_rst('`title`', 'view'),
+                         markup % 'views/title/')
+        self.assertEqual(utils.parse_rst('`title`', 'template'),
+                         markup % 'templates/title/')
+        self.assertEqual(utils.parse_rst('`title`', 'filter'),
+                         markup % 'filters/#title')
+        self.assertEqual(utils.parse_rst('`title`', 'tag'),
+                         markup % 'tags/#title')
+
+    def test_publish_parts(self):
+        """
+        Tests that Django hasn't broken the default role for interpreted text
+        when ``publish_parts`` is used directly, by setting it to
+        ``cmsreference``. See #6681.
+        """
+        try:
+            from docutils.core import publish_parts
+            import docutils.parsers.rst.roles
+        except ImportError:
+            return
+        self.assertNotEqual(docutils.parsers.rst.roles.DEFAULT_INTERPRETED_ROLE,
+                            'cmsreference')
+        source = 'reST, `interpreted text`, default role.'
+        markup = '<p>reST, <cite>interpreted text</cite>, default role.</p>\n'
+        parts = publish_parts(source=source, writer_name="html4css1")
+        self.assertEqual(parts['fragment'], markup)
