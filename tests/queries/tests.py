@@ -6,14 +6,13 @@ from operator import attrgetter
 import pickle
 import unittest
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, CaptureQueriesContext
 from django.utils import six
 
 from .models import (
@@ -1848,16 +1847,14 @@ class ComparisonTests(TestCase):
 
 
 class ExistsSql(TestCase):
-    def setUp(self):
-        settings.DEBUG = True
-
     def test_exists(self):
-        self.assertFalse(Tag.objects.exists())
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertFalse(Tag.objects.exists())
         # Ok - so the exist query worked - but did it include too many columns?
-        self.assertTrue("id" not in connection.queries[-1]['sql'] and "name" not in connection.queries[-1]['sql'])
-
-    def tearDown(self):
-        settings.DEBUG = False
+        self.assertEqual(len(captured_queries), 1)
+        qstr = captured_queries[0]
+        id, name = connection.ops.quote_name('id'), connection.ops.quote_name('name')
+        self.assertTrue(id not in qstr and name not in qstr)
 
 
 class QuerysetOrderedTests(unittest.TestCase):
