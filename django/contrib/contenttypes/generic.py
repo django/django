@@ -372,14 +372,12 @@ def create_generic_related_manager(superclass):
 
         def remove(self, *objs):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in objs:
-                obj.delete(using=db)
+            self.using(db).filter(pk__in=[o.pk for o in objs]).delete()
         remove.alters_data = True
 
         def clear(self):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in self.all():
-                obj.delete(using=db)
+            self.using(db).delete()
         clear.alters_data = True
 
         def create(self, **kwargs):
