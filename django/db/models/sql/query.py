@@ -431,7 +431,8 @@ class Query(object):
 
     def has_results(self, using):
         q = self.clone()
-        q.clear_select_clause()
+        if not q.distinct:
+            q.clear_select_clause()
         q.clear_ordering(True)
         q.set_limits(high=1)
         compiler = q.get_compiler(using=using)

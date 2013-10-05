@@ -1856,6 +1856,25 @@ class ExistsSql(TestCase):
         id, name = connection.ops.quote_name('id'), connection.ops.quote_name('name')
         self.assertTrue(id not in qstr and name not in qstr)
 
+    def test_ticket_18414(self):
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='two', created=datetime.datetime.now())
+        self.assertTrue(Article.objects.exists())
+        self.assertTrue(Article.objects.distinct().exists())
+        self.assertTrue(Article.objects.distinct()[1:3].exists())
+        self.assertFalse(Article.objects.distinct()[1:1].exists())
+
+    @unittest.skipUnless(connection.features.can_distinct_on_fields,
+                         'Uses distinct(fields)')
+    def test_ticket_18414_distinct_on(self):
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='two', created=datetime.datetime.now())
+        self.assertTrue(Article.objects.distinct('name').exists())
+        self.assertTrue(Article.objects.distinct('name')[1:2].exists())
+        self.assertFalse(Article.objects.distinct('name')[2:3].exists())
+
 
 class QuerysetOrderedTests(unittest.TestCase):
     """
