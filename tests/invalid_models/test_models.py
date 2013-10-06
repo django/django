@@ -191,6 +191,11 @@ class OtherModelTests(IsolatedModelsTestCase):
                     'add primary_key=True to a field.',
                 obj=Model,
                 id='E005',
+            ),
+            Error(
+                'Field "id" has column name "id" that is already used.',
+                hint=None,
+                obj=Model,
             )
         ]
         self.assertEqual(errors, expected)
