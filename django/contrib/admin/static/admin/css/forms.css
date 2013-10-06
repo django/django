@@ -207,6 +207,14 @@ body.popup .submit-row {
     margin-right: 2px;
 }
 
+.vDateField {
+    min-width: 6.85em;
+}
+
+.vTimeField {
+    min-width: 4.7em;
+}
+
 .vURLField {
     width: 30em;
 }
