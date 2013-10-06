@@ -73,6 +73,7 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
