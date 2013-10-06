@@ -607,8 +607,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check that list_display_links is a unique subset of list_display.
         """
 
-        if not isinstance(cls.list_display_links, (list, tuple)):
-            return must_be('a list or tuple', option='list_display_links', obj=cls, id='admin.E111')
+        if cls.list_display_links is None:
+            return []
+        elif not isinstance(cls.list_display_links, (list, tuple)):
+            return must_be('a list or tuple or None', option='list_display_links', obj=cls, id='admin.E111')
         else:
             return list(chain(*[
                 self._check_list_display_links_item(cls, model, field_name, "list_display_links[%d]" % index)

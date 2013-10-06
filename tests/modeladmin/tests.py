@@ -971,7 +971,7 @@ class ListDisplayLinksCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            '"list_display_links" must be a list or tuple.',
+            '"list_display_links" must be a list or tuple or None.',
             'admin.E111')
 
     def test_missing_field(self):
@@ -1004,7 +1004,7 @@ class ListDisplayLinksCheckTests(CheckTestCase):
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
 
-    def test_second_valid_case(self):
+    def test_None_is_valid_case(self):
         class ValidationTestModelAdmin(ModelAdmin):
             list_display_links = None
 
