@@ -59,7 +59,8 @@ class GeometryProxy(object):
             # Set with None, WKT, HEX, or WKB
             pass
         else:
-            raise TypeError('cannot set %s GeometryProxy with value of type: %s' % (obj.__class__.__name__, type(value)))
+            raise TypeError('Cannot set %s GeometryProxy (%s) with value of type: %s' % (
+                obj.__class__.__name__, gtype, type(value)))
 
         # Setting the objects dictionary with the value, and returning.
         obj.__dict__[self._field.attname] = value
