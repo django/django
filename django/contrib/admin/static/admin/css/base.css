@@ -8,7 +8,7 @@ body {
     font-size: 12px;
     font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     color: #333;
-    background: #fff;
+    background: #fdfdfd;
 }
 
 /* LINKS */
@@ -476,6 +476,7 @@ textarea, select, .vTextField {
     border: 1px solid #ccc;
     margin-bottom: 5px;
     background: white;
+    border-radius: 3px;
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -501,7 +502,8 @@ textarea, select, .vTextField {
     font-size: 11px;
     text-align: left;
     font-weight: bold;
-    background: #7CA0C7 url(../img/default-bg.gif) top left repeat-x;
+    background: #bcd2e9;
+    background: linear-gradient(to bottom,  #bcd2e9 0%, #97b5d4 100%);
     color: white;
 }
 
@@ -773,6 +775,7 @@ table#change-history tbody th {
 
 #header {
     background: #417690;
+    background: linear-gradient(to bottom, #417690 0%, #306780 100%);
     color: #ffc;
     overflow: hidden;
 }
