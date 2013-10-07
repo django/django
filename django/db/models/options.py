@@ -25,6 +25,11 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'app_cache', 'default_permissions',
                  'select_on_save')
 
+def normalize_unique_together(unique_together):
+    if unique_together and not isinstance(unique_together[0], (tuple, list)):
+        unique_together = (unique_together,)
+    return unique_together
+
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
@@ -112,9 +117,7 @@ class Options(object):
             # tuple of two strings. Normalize it to a tuple of tuples, so that
             # calling code can uniformly expect that.
             ut = meta_attrs.pop('unique_together', self.unique_together)
-            if ut and not isinstance(ut[0], (tuple, list)):
-                ut = (ut,)
-            self.unique_together = ut
+            self.unique_together = normalize_unique_together(ut)
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
