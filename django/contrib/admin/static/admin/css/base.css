@@ -27,7 +27,7 @@ a img {
 }
 
 a.section:link, a.section:visited {
-    color: white;
+    color: #fff;
     text-decoration: none;
 }
 
@@ -304,7 +304,7 @@ tr.alt {
 }
 
 .row2 {
-    background: white;
+    background: #fff;
 }
 
 /* SORTABLE TABLES */
@@ -323,7 +323,7 @@ thead th.sorted {
 }
 
 thead th.sorted .text {
-	padding-right: 42px;
+    padding-right: 42px;
 }
 
 table thead th .text span {
@@ -338,7 +338,7 @@ table thead th .text a {
 }
 
 table thead th.sortable:hover {
-    background: white url(../img/nav-bg-reverse.gif) 0 -5px repeat-x;
+    background: #fff url(../img/nav-bg-reverse.gif) 0 -5px repeat-x;
 }
 
 thead th.sorted a.sortremove {
@@ -432,7 +432,7 @@ textarea, select, .vTextField {
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input {
-    background: white url(../img/nav-bg.gif) bottom repeat-x;
+    background: #fff url(../img/nav-bg.gif) bottom repeat-x;
     padding: 3px 5px;
     color: black;
     border: 1px solid #bbb;
@@ -445,16 +445,16 @@ textarea, select, .vTextField {
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
-	background-image: url(../img/nav-bg.gif);
-	background-position: bottom;
-	opacity: 0.4;
+    background-image: url(../img/nav-bg.gif);
+    background-position: bottom;
+    opacity: 0.4;
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
     border: 2px solid #5b80b2;
     background: #7CA0C7 url(../img/default-bg.gif) bottom repeat-x;
     font-weight: bold;
-    color: white;
+    color: #fff;
     float: right;
 }
 
@@ -464,9 +464,9 @@ textarea, select, .vTextField {
 }
 
 .button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
-	background-image: url(../img/default-bg.gif);
-	background-position: bottom;
-	opacity: 0.4;
+    background-image: url(../img/default-bg.gif);
+    background-position: bottom;
+    opacity: 0.4;
 }
 
 
@@ -475,7 +475,7 @@ textarea, select, .vTextField {
 .module {
     border: 1px solid #ccc;
     margin-bottom: 5px;
-    background: white;
+    background: #fff;
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -502,7 +502,7 @@ textarea, select, .vTextField {
     text-align: left;
     font-weight: bold;
     background: #7CA0C7 url(../img/default-bg.gif) top left repeat-x;
-    color: white;
+    color: #fff;
 }
 
 .module table {
@@ -555,12 +555,12 @@ ul.errorlist {
     padding: 4px 5px 4px 25px;
     margin: 0 0 3px 0;
     border: 1px solid red;
-    color: white;
+    color: #fff;
     background: red url(../img/icon_alert.gif) 5px .3em no-repeat;
 }
 
 .errorlist li a {
- 	color: white;
+    color: #fff;
     text-decoration: underline;
 }
 
@@ -672,7 +672,7 @@ a.deletelink:hover {
 .object-tools a:link, .object-tools a:visited {
     display: block;
     float: left;
-    color: white;
+    color: #fff;
     padding: .2em 10px;
     background: #999;
 }
@@ -712,10 +712,6 @@ table#change-history tbody th {
 
 #content {
     margin: 10px 15px;
-}
-
-#header {
-    width: 100%;
 }
 
 #content-main {
@@ -772,13 +768,14 @@ table#change-history tbody th {
 /* HEADER */
 
 #header {
+    width: 100%;
     background: #417690;
     color: #ffc;
     overflow: hidden;
 }
 
 #header a:link, #header a:visited {
-    color: white;
+    color: #fff;
 }
 
 #header a:hover {
