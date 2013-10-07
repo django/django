@@ -643,6 +643,56 @@ class ChangeListTests(TestCase):
                 list(real_page_range),
             )
 
+    def test_search_query_efficiency(self):
+        """Ensure that search queries only add one ORM filter rather than one per term"""
+        new_parent = Parent.objects.create(name='parent')
+        for i in range(200):
+            Child.objects.create(name='foo bar baz qux quux corge %s' % i,
+                                 parent=new_parent)
+
+        m = ParentAdmin(Parent, admin.site)
+
+        request = self.factory.get('/parent/', data={'q': 'foo bar baz'})
+
+        cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_max_show_all, m.list_editable, m)
+
+        self.assertEqual(2, cl.queryset.query.count_active_tables(),
+                         "ChangeList search filters should not cause duplicate JOINs")
+
+    def test_search_query_logic(self):
+        """Changelist search terms should be ANDed"""
+
+        parent1 = Parent.objects.create(name='parent 1')
+        parent2 = Parent.objects.create(name='parent 2')
+
+        Child.objects.create(name='foo bar baz', parent=parent1)
+        Child.objects.create(name='bar baz qux', parent=parent2)
+
+        m = ParentAdmin(Parent, admin.site)
+
+        request = self.factory.get('/parent/', data={'q': 'foo bar baz'})
+
+        cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_max_show_all, m.list_editable, m)
+
+        cl.get_results(request)
+        self.assertListEqual(["parent 1"], list(cl.queryset.values_list("name", flat=True)))
+
+
+        request2 = self.factory.get('/parent/', data={'q': 'bar baz'})
+        cl2 = ChangeList(request2, Parent, m.list_display, m.list_display_links,
+                         m.list_filter, m.date_hierarchy, m.search_fields,
+                         m.list_select_related, m.list_per_page,
+                         m.list_max_show_all, m.list_editable, m)
+        cl2.get_results(request2)
+        self.assertListEqual(['parent 1', 'parent 2'],
+                             list(cl2.queryset.order_by("name").values_list("name", flat=True)))
+
 
 class AdminLogNodeTestCase(TestCase):
 
