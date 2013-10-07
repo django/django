@@ -145,6 +145,9 @@ TEST_DATA = (
     (URLValidator(), 'http://valid-----hyphens.com/', None),
     (URLValidator(), 'http://example.com?something=value', None),
     (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
+    (URLValidator(), 'https://example.com/', None)
+    (URLValidator(), 'ftp://example.com/', None)
+    (URLValidator(), 'ftps://example.com/', None)
 
     (URLValidator(), 'foo', ValidationError),
     (URLValidator(), 'http://', ValidationError),
