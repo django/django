@@ -790,6 +790,9 @@ table#change-history tbody th {
     font-size: 18px;
     margin: 8px 0;
     font-weight: normal;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
     color: #f4f379;
 }
 
@@ -799,6 +802,10 @@ table#change-history tbody th {
     margin: -8px 0 8px 0;
     font-weight: normal;
     color: #ffc;
+}
+
+#branding a:hover {
+    text-decoration: none;
 }
 
 #user-tools {

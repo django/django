@@ -3,7 +3,7 @@
 {% block title %}{{ title }} | {{ site_title }}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name">{{ site_header }}</h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header }}</a></h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
