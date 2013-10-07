@@ -779,6 +779,7 @@ table#change-history tbody th {
 
 #header a:link, #header a:visited {
     color: white;
+    text-decoration: none;
 }
 
 #header a:hover {
@@ -799,6 +800,10 @@ table#change-history tbody th {
     margin: -8px 0 8px 0;
     font-weight: normal;
     color: #ffc;
+}
+
+#branding a:hover{
+    text-decoration: none;
 }
 
 #user-tools {
