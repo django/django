@@ -8,7 +8,7 @@ body {
     font-size: 12px;
     font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     color: #333;
-    background: #fff;
+    background: #fdfdfd;
 }
 
 /* LINKS */
@@ -323,7 +323,7 @@ thead th.sorted {
 }
 
 thead th.sorted .text {
-	padding-right: 42px;
+    padding-right: 42px;
 }
 
 table thead th .text span {
@@ -445,9 +445,9 @@ textarea, select, .vTextField {
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
-	background-image: url(../img/nav-bg.gif);
-	background-position: bottom;
-	opacity: 0.4;
+    background-image: url(../img/nav-bg.gif);
+    background-position: bottom;
+    opacity: 0.4;
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
@@ -464,9 +464,9 @@ textarea, select, .vTextField {
 }
 
 .button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
-	background-image: url(../img/default-bg.gif);
-	background-position: bottom;
-	opacity: 0.4;
+    background-image: url(../img/default-bg.gif);
+    background-position: bottom;
+    opacity: 0.4;
 }
 
 
@@ -476,6 +476,7 @@ textarea, select, .vTextField {
     border: 1px solid #ccc;
     margin-bottom: 5px;
     background: white;
+    border-radius: 3px;
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -512,55 +513,60 @@ textarea, select, .vTextField {
 /* MESSAGES & ERRORS */
 
 ul.messagelist {
-    padding: 0 0 5px 0;
+    padding: 0;
     margin: 0;
 }
 
 ul.messagelist li {
     font-size: 12px;
     display: block;
-    padding: 4px 5px 4px 25px;
+    padding: 5px 5px 4px 25px;
     margin: 0 0 3px 0;
     border-bottom: 1px solid #ddd;
     color: #666;
-    background: #ffc url(../img/icon_success.gif) 5px .3em no-repeat;
+    background: #dfd url(../img/icon_success.gif) 5px .3em no-repeat;
 }
 
 ul.messagelist li.warning{
-    background-image: url(../img/icon_alert.gif);
+    background: #ffc url(../img/icon_alert.gif) 5px .3em no-repeat;
 }
 
 ul.messagelist li.error{
-    background-image: url(../img/icon_error.gif);
+    background: #fff5f4 url(../img/icon_error.gif) 5px .3em no-repeat;
 }
 
 .errornote {
     font-size: 12px !important;
     display: block;
-    padding: 4px 5px 4px 25px;
+    padding: 5px 5px 4px 25px;
     margin: 0 0 3px 0;
-    border: 1px solid red;
-    color: red;
-    background: #ffc url(../img/icon_error.gif) 5px .3em no-repeat;
+    border: 1px solid #c22;
+    color: #c11;
+    background: #fff5f4 url(../img/icon_error.gif) 5px .3em no-repeat;
+    border-radius: 1px;
 }
 
 ul.errorlist {
-    margin: 0 !important;
+    margin: 0 0 4px!important;
     padding: 0 !important;
+    color: #fff;
+    background: #c11 5px .3em no-repeat;
+    border-radius: 1px;
 }
 
-.errorlist li {
+ul.errorlist li {
     font-size: 12px !important;
     display: block;
-    padding: 4px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border: 1px solid red;
-    color: white;
-    background: red url(../img/icon_alert.gif) 5px .3em no-repeat;
+    padding: 5px 5px 4px 6px;
+    margin: 3px 0 0 0;
 }
 
-.errorlist li a {
- 	color: white;
+ul.errorlist li:first-child{
+    margin-top: 0;
+}
+
+ul.errorlist li a {
+    color: white;
     text-decoration: underline;
 }
 
@@ -573,12 +579,12 @@ td ul.errorlist li {
     margin: 0 !important;
 }
 
-.errors {
-    background: #ffc;
+.errors, .form-row.errors {
+    background: #fff5f4;
 }
 
 .errors input, .errors select, .errors textarea {
-    border: 1px solid red;
+    border: 1px solid #c11;
 }
 
 div.system-message {
@@ -608,7 +614,7 @@ div.breadcrumbs {
     font-size: 11px;
     color: #999;
     border-top: 1px solid white;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #ddd;
     text-align: left;
 }
 
@@ -674,21 +680,14 @@ a.deletelink:hover {
     float: left;
     color: white;
     padding: .2em 10px;
-    background: #999;
+    background: #5080a2;
+    background: linear-gradient(to bottom, #5080a2 0%,#407090 100%);
+    border: 1px solid #3d7d7d;
 }
 
 .object-tools a:hover, .object-tools li:hover a {
-    background-color: #5b80b2;
-}
-
-.object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/tooltag-arrowright.png) 95% center no-repeat;
-    padding-right: 26px;
-}
-
-.object-tools a.addlink {
-    background: #999 url(../img/tooltag-add.png) 95% center no-repeat;
-    padding-right: 26px;
+    background: #407090;
+    background: linear-gradient(to bottom, #407090 0%,#368 100%);
 }
 
 /* OBJECT HISTORY */
@@ -712,10 +711,6 @@ table#change-history tbody th {
 
 #content {
     margin: 10px 15px;
-}
-
-#header {
-    width: 100%;
 }
 
 #content-main {
@@ -773,12 +768,15 @@ table#change-history tbody th {
 
 #header {
     background: #417690;
+    background: linear-gradient(to bottom,  #417690 0%,#306780 100%);
     color: #ffc;
     overflow: hidden;
+    width: 100%;
 }
 
 #header a:link, #header a:visited {
     color: white;
+    text-decoration: none;
 }
 
 #header a:hover {
@@ -799,6 +797,10 @@ table#change-history tbody th {
     margin: -8px 0 8px 0;
     font-weight: normal;
     color: #ffc;
+}
+
+#branding a:hover{
+    text-decoration: none;
 }
 
 #user-tools {
