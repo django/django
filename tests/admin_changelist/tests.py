@@ -643,6 +643,25 @@ class ChangeListTests(TestCase):
                 list(real_page_range),
             )
 
+    def test_search_query_efficiency(self):
+        """Ensure that search queries only add one ORM filter rather than one per term"""
+        new_parent = Parent.objects.create(name='parent')
+        for i in range(200):
+            Child.objects.create(name='foo bar baz qux quux corge %s' % i,
+                                 parent=new_parent)
+
+        m = ParentAdmin(Parent, admin.site)
+
+        request = self.factory.get('/parent/', data={'q': 'foo bar baz'})
+
+        cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_max_show_all, m.list_editable, m)
+
+        self.assertEqual(2, cl.queryset.query.count_active_tables(),
+                         "ChangeList search filters should not cause duplicate JOINs")
+
 
 class AdminLogNodeTestCase(TestCase):
 

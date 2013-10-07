@@ -849,10 +849,14 @@ class ModelAdmin(BaseModelAdmin):
         if search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
+
+            query_parts = []
             for bit in search_term.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
+                or_queries = (models.Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups)
+                query_parts.append(reduce(operator.or_, or_queries))
+            queryset = queryset.filter(reduce(operator.and_, query_parts))
+
             if not use_distinct:
                 for search_spec in orm_lookups:
                     if lookup_needs_distinct(self.opts, search_spec):
