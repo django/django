@@ -7,6 +7,7 @@ from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
 
 site = admin.AdminSite(name="admin")
 
+
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
@@ -80,6 +81,7 @@ class DynamicListDisplayChildAdmin(admin.ModelAdmin):
             my_list_display.remove('parent')
         return my_list_display
 
+
 class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
     list_display = ('parent', 'name', 'age')
     list_display_links = ['parent', 'name']
@@ -89,11 +91,19 @@ class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
 
 site.register(Child, DynamicListDisplayChildAdmin)
 
+
+class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
+    list_display_links = None
+
+site.register(Parent, NoListDisplayLinksParentAdmin)
+
+
 class SwallowAdmin(admin.ModelAdmin):
     actions = None # prevent ['action_checkbox'] + list(list_display)
     list_display = ('origin', 'load', 'speed')
 
 site.register(Swallow, SwallowAdmin)
+
 
 class DynamicListFilterChildAdmin(admin.ModelAdmin):
     list_filter = ('parent', 'name', 'age')
@@ -104,6 +114,7 @@ class DynamicListFilterChildAdmin(admin.ModelAdmin):
             my_list_filter = list(my_list_filter)
             my_list_filter.remove('parent')
         return my_list_filter
+
 
 class DynamicSearchFieldsChildAdmin(admin.ModelAdmin):
     search_fields = ('name',)

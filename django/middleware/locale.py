@@ -18,6 +18,7 @@ class LocaleMiddleware(object):
     translated to the language the user desires (if the language
     is available, of course).
     """
+    response_redirect_class = HttpResponseRedirect
 
     def __init__(self):
         self._supported_languages = OrderedDict(settings.LANGUAGES)
@@ -52,7 +53,7 @@ class LocaleMiddleware(object):
                 language_url = "%s://%s/%s%s" % (
                     'https' if request.is_secure() else 'http',
                     request.get_host(), language, request.get_full_path())
-                return HttpResponseRedirect(language_url)
+                return self.response_redirect_class(language_url)
 
         # Store language back into session if it is not present
         if hasattr(request, 'session'):

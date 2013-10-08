@@ -65,7 +65,7 @@ def notice_h(fmt, lst):
     fmt, lst = fmt.decode(), lst.decode()
     try:
         warn_msg = fmt % lst
-    except:
+    except TypeError:
         warn_msg = fmt
     logger.warning('GEOS_NOTICE: %s\n' % warn_msg)
 notice_h = NOTICEFUNC(notice_h)
@@ -75,7 +75,7 @@ def error_h(fmt, lst):
     fmt, lst = fmt.decode(), lst.decode()
     try:
         err_msg = fmt % lst
-    except:
+    except TypeError:
         err_msg = fmt
     logger.error('GEOS_ERROR: %s\n' % err_msg)
 error_h = ERRORFUNC(error_h)

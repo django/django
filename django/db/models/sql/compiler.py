@@ -713,9 +713,8 @@ class SQLCompiler(object):
                         # into `resolve_columns` because it wasn't selected.
                         only_load = self.deferred_to_columns()
                         if only_load:
-                            db_table = self.query.get_meta().db_table
-                            fields = [f for f in fields if db_table in only_load and
-                                      f.column in only_load[db_table]]
+                            fields = [f for f in fields if f.model._meta.db_table not in only_load or
+                                      f.column in only_load[f.model._meta.db_table]]
                         if has_aggregate_select:
                             # pad None in to fields for aggregates
                             fields = fields[:aggregate_start] + [

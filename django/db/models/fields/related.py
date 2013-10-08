@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from django.db import connection, connections, router
+from django.db import connection, connections, router, transaction
 from django.db.backends import utils
 from django.db.models import signals
 from django.db.models.fields import (AutoField, Field, IntegerField,
@@ -17,7 +17,6 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
-
 
 def add_lazy_relation(cls, field, relation, operation):
     """
@@ -416,11 +415,16 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
             return qs, rel_obj_attr, instance_attr, False, cache_name
 
         def add(self, *objs):
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
-                setattr(obj, rel_field.name, self.instance)
-                obj.save()
+            objs = list(objs)
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.commit_on_success_unless_managed(
+                    using=db, savepoint=False):
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected, got %r" %
+                                        (self.model._meta.object_name, obj))
+                    setattr(obj, rel_field.name, self.instance)
+                    obj.save()
         add.alters_data = True
 
         def create(self, **kwargs):
@@ -960,6 +964,7 @@ class ManyToManyRel(object):
 class ForeignObject(RelatedField):
     requires_unique_target = True
     generate_reverse_relation = True
+    related_accessor_class = ForeignRelatedObjectsDescriptor
     # GenericRelation is an example of a reverse link.
     is_reverse_link = False
 
@@ -1182,7 +1187,7 @@ class ForeignObject(RelatedField):
         # Internal FK's - i.e., those with a related name ending with '+' -
         # and swapped models don't get a related descriptor.
         if not self.rel.is_hidden() and not related.model._meta.swapped:
-            setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
+            setattr(cls, related.get_accessor_name(), self.related_accessor_class(related))
             if self.rel.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.rel.limit_choices_to)
 
@@ -1438,6 +1443,7 @@ class OneToOneField(ForeignKey):
     always returns the object pointed to (since there will only ever be one),
     rather than returning a list.
     """
+    related_accessor_class = SingleRelatedObjectDescriptor
     description = _("One-to-one relationship")
 
     def __init__(self, to, to_field=None, **kwargs):
@@ -1449,10 +1455,6 @@ class OneToOneField(ForeignKey):
         if "unique" in kwargs:
             del kwargs['unique']
         return name, path, args, kwargs
-
-    def contribute_to_related_class(self, cls, related):
-        setattr(cls, related.get_accessor_name(),
-                SingleRelatedObjectDescriptor(related))
 
     def formfield(self, **kwargs):
         if self.rel.parent_link:

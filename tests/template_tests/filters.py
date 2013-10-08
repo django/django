@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, TZ_SUPPORT
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils import timezone
@@ -56,9 +56,10 @@ def get_filter_tests():
         'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0\xa0minutes'),
 
         # Ensures that differing timezones are calculated correctly
+        # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
         'filter-timesince11' : ('{{ a|timesince }}', {'a': now}, '0\xa0minutes'),
-        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes'),
-        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes'),
+        'filter-timesince12' : ('{{ a|timesince }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timesince13' : ('{{ a|timesince }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
         'filter-timesince14' : ('{{ a|timesince:b }}', {'a': now_tz, 'b': now_tz_i}, '0\xa0minutes'),
         'filter-timesince15' : ('{{ a|timesince:b }}', {'a': now, 'b': now_tz_i}, ''),
         'filter-timesince16' : ('{{ a|timesince:b }}', {'a': now_tz_i, 'b': now}, ''),
@@ -83,12 +84,14 @@ def get_filter_tests():
         'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1\xa0week'),
 
         # Ensures that differing timezones are calculated correctly
-        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes'),
-        'filter-timeuntil11' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
+        # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
+        'filter-timeuntil10' : ('{{ a|timeuntil }}', {'a': now_tz}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil11' : ('{{ a|timeuntil }}', {'a': now_tz_i}, '0\xa0minutes') if TZ_SUPPORT else ('', {}, ''),
+        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': now_tz_i, 'b': now_tz}, '0\xa0minutes'),
 
         # Regression for #9065 (two date objects).
-        'filter-timeuntil12' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
-        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
+        'filter-timeuntil13' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today}, '0\xa0minutes'),
+        'filter-timeuntil14' : ('{{ a|timeuntil:b }}', {'a': today, 'b': today - timedelta(hours=24)}, '1\xa0day'),
 
         'filter-addslash01': ("{% autoescape off %}{{ a|addslashes }} {{ b|addslashes }}{% endautoescape %}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"<a>\' <a>\'"),
         'filter-addslash02': ("{{ a|addslashes }} {{ b|addslashes }}", {"a": "<a>'", "b": mark_safe("<a>'")}, r"&lt;a&gt;\&#39; <a>\'"),

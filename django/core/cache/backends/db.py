@@ -92,8 +92,7 @@ class DatabaseCache(BaseDatabaseCache):
         return self._base_set('add', key, value, timeout)
 
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
-        if timeout == DEFAULT_TIMEOUT:
-            timeout = self.default_timeout
+        timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
         table = connections[db].ops.quote_name(self._table)
         cursor = connections[db].cursor()
@@ -105,9 +104,9 @@ class DatabaseCache(BaseDatabaseCache):
         if timeout is None:
             exp = datetime.max
         elif settings.USE_TZ:
-            exp = datetime.utcfromtimestamp(time.time() + timeout)
+            exp = datetime.utcfromtimestamp(timeout)
         else:
-            exp = datetime.fromtimestamp(time.time() + timeout)
+            exp = datetime.fromtimestamp(timeout)
         exp = exp.replace(microsecond=0)
         if num > self._max_entries:
             self._cull(db, cursor, now)

@@ -29,6 +29,14 @@ class AddField(Operation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
+    def __eq__(self, other):
+        return (
+            (self.__class__ == other.__class__) and
+            (self.name == other.name) and
+            (self.model_name == other.model_name) and
+            (self.field.deconstruct()[1:] == other.field.deconstruct()[1:])
+        )
+
 
 class RemoveField(Operation):
     """
@@ -91,6 +99,14 @@ class AlterField(Operation):
 
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
+
+    def __eq__(self, other):
+        return (
+            (self.__class__ == other.__class__) and
+            (self.name == other.name) and
+            (self.model_name == other.model_name) and
+            (self.field.deconstruct()[1:] == other.field.deconstruct()[1:])
+        )
 
 
 class RenameField(Operation):

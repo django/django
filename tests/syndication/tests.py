@@ -11,6 +11,7 @@ except ImportError:
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import requires_tz_support
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 from django.utils import timezone
 
@@ -334,9 +335,20 @@ class SyndicationFeedTest(FeedTestCase):
         published = doc.getElementsByTagName('published')[0].firstChild.wholeText
         self.assertEqual(published[-6:], '+00:42')
 
-    def test_feed_last_modified_time(self):
+    @requires_tz_support
+    def test_feed_last_modified_time_naive_date(self):
+        """
+        Tests the Last-Modified header with naive publication dates.
+        """
         response = self.client.get('/syndication/naive-dates/')
         self.assertEqual(response['Last-Modified'], 'Tue, 26 Mar 2013 01:00:00 GMT')
+
+    def test_feed_last_modified_time(self):
+        """
+        Tests the Last-Modified header with aware publication dates.
+        """
+        response = self.client.get('/syndication/aware-dates/')
+        self.assertEqual(response['Last-Modified'], 'Mon, 25 Mar 2013 19:18:00 GMT')
 
         # No last-modified when feed has no item_pubdate
         response = self.client.get('/syndication/no_pubdate/')

@@ -12,6 +12,7 @@ class Place(models.Model):
     def __str__(self):
         return "%s the place" % self.name
 
+
 @python_2_unicode_compatible
 class Restaurant(models.Model):
     place = models.OneToOneField(Place)
@@ -21,6 +22,7 @@ class Restaurant(models.Model):
     def __str__(self):
         return "%s the restaurant" % self.place.name
 
+
 @python_2_unicode_compatible
 class Bar(models.Model):
     place = models.OneToOneField(Place)
@@ -29,23 +31,32 @@ class Bar(models.Model):
     def __str__(self):
         return "%s the bar" % self.place.name
 
+
 class UndergroundBar(models.Model):
     place = models.OneToOneField(Place, null=True)
     serves_cocktails = models.BooleanField(default=True)
 
+
 @python_2_unicode_compatible
 class Favorites(models.Model):
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
     restaurants = models.ManyToManyField(Restaurant)
 
     def __str__(self):
         return "Favorites for %s" % self.name
 
+
 class Target(models.Model):
     pass
+
 
 class Pointer(models.Model):
     other = models.OneToOneField(Target, primary_key=True)
 
+
 class Pointer2(models.Model):
-    other = models.OneToOneField(Target)
+    other = models.OneToOneField(Target, related_name='second_pointer')
+
+
+class HiddenPointer(models.Model):
+    target = models.OneToOneField(Target, related_name='hidden+')

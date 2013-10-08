@@ -13,7 +13,7 @@ from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.where import Constraint
 from django.forms import ModelForm, ALL_FIELDS
-from django.forms.models import (BaseModelFormSet, modelformset_factory, save_instance,
+from django.forms.models import (BaseModelFormSet, modelformset_factory,
     modelform_defines_fields)
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
@@ -368,14 +368,12 @@ def create_generic_related_manager(superclass):
 
         def remove(self, *objs):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in objs:
-                obj.delete(using=db)
+            self.using(db).filter(pk__in=[o.pk for o in objs]).delete()
         remove.alters_data = True
 
         def clear(self):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in self.all():
-                obj.delete(using=db)
+            self.using(db).delete()
         clear.alters_data = True
 
         def create(self, **kwargs):

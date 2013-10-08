@@ -345,5 +345,5 @@ class SpatialRefSysMixin(object):
         """
         try:
             return six.text_type(self.srs)
-        except:
+        except Exception:
             return six.text_type(self.wkt)

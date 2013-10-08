@@ -178,6 +178,14 @@ def items_for_result(cl, result, form):
     """
     Generates the actual list of data.
     """
+
+    def link_in_col(is_first, field_name, cl):
+        if cl.list_display_links is None:
+            return False
+        if is_first and not cl.list_display_links:
+            return True
+        return field_name in cl.list_display_links
+
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
@@ -216,7 +224,7 @@ def items_for_result(cl, result, form):
             result_repr = mark_safe('&nbsp;')
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.list_display_links) or field_name in cl.list_display_links:
+        if link_in_col(first, field_name, cl):
             table_tag = 'th' if first else 'td'
             first = False
 

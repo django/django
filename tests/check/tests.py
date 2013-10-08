@@ -39,7 +39,7 @@ class CompatChecksTestCase(TestCase):
     def test_check_test_runner_new_default(self):
         with self.settings(TEST_RUNNER='django.test.runner.DiscoverRunner'):
             result = django_1_6_0.check_test_runner()
-            self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in result)
+            self.assertTrue("Django 1.6 introduced a new default test runner" in result)
 
     def test_check_test_runner_overridden(self):
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
@@ -49,7 +49,7 @@ class CompatChecksTestCase(TestCase):
         with self.settings(TEST_RUNNER='django.test.runner.DiscoverRunner'):
             result = django_1_6_0.run_checks()
             self.assertEqual(len(result), 1)
-            self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in result[0])
+            self.assertTrue("Django 1.6 introduced a new default test runner" in result[0])
 
     def test_run_checks_overridden(self):
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
@@ -77,7 +77,7 @@ class CompatChecksTestCase(TestCase):
         with self.settings(TEST_RUNNER='django.test.runner.DiscoverRunner'):
             result = base.check_compatibility()
             self.assertEqual(len(result), 1)
-            self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in result[0])
+            self.assertTrue("Django 1.6 introduced a new default test runner" in result[0])
 
         with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
             self.assertEqual(len(base.check_compatibility()), 0)
@@ -121,7 +121,7 @@ class CompatChecksTestCase(TestCase):
             call_command('check')
 
         self.assertEqual(len(check.warnings._warnings), 1)
-        self.assertTrue("You have not explicitly set 'TEST_RUNNER'" in check.warnings._warnings[0])
+        self.assertTrue("Django 1.6 introduced a new default test runner" in check.warnings._warnings[0])
 
         # Restore the ``warnings``.
         base.warnings = old_warnings

@@ -17,6 +17,7 @@ the hood".
    :maxdepth: 2
 
    contributing/index
+   mailing-lists
    committers
    security
    release-process

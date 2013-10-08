@@ -14,5 +14,5 @@
 try:
     from .base import GeoIP, GeoIPException
     HAS_GEOIP = True
-except:
+except ImportError:
     HAS_GEOIP = False

@@ -855,12 +855,14 @@ that the application works with *any* user model, not just the default User
 model. To assist with this, Django provides two substitute user models that
 can be used in test suites:
 
-* ``django.contrib.auth.tests.custom_user.CustomUser``, a custom user
-  model that uses an ``email`` field as the username, and has a basic
+.. class:: tests.custom_user.CustomUser
+
+  A custom user model that uses an ``email`` field as the username, and has a basic
   admin-compliant permissions setup
 
-* ``django.contrib.auth.tests.custom_user.ExtensionUser``, a custom
-  user model that extends ``django.contrib.auth.models.AbstractUser``,
+.. class:: tests.custom_user.ExtensionUser
+
+  A custom user model that extends ``django.contrib.auth.models.AbstractUser``,
   adding a ``date_of_birth`` field.
 
 You can then use the ``@override_settings`` decorator to make that test run
@@ -869,6 +871,7 @@ would test three possible User models -- the default, plus the two User
 models provided by ``auth`` app::
 
     from django.contrib.auth.tests.utils import skipIfCustomUser
+    from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
     from django.test import TestCase, override_settings
 
 
@@ -888,6 +891,9 @@ models provided by ``auth`` app::
             "Run tests for a simple extension of the built-in User."
             self.assertSomething()
 
+.. versionchanged:: 1.6
+
+    In Django 1.5, it wasn't necessary to explicitly import the test User models.
 
 A full example
 --------------
