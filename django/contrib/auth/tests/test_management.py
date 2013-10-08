@@ -5,7 +5,7 @@ from django.contrib.auth import models, management
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword
 from django.contrib.auth.models import User
-from django.contrib.auth.tests.test_custom_user import CustomUser
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
