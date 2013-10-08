@@ -12,7 +12,7 @@ from django.forms.widgets import RadioFieldRenderer
 from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils import six
-from django.utils.translation import activate, deactivate
+from django.utils.translation import activate, deactivate, override
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import python_2_unicode_compatible, force_text
@@ -997,26 +997,30 @@ class FormsI18NWidgetsTestCase(TestCase):
     def test_datetimeinput(self):
         w = DateTimeInput()
         d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17.09.2007 12:51:34" />')
 
     def test_dateinput(self):
         w = DateInput()
         d = datetime.date(2007, 9, 17)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17.09.2007" />')
 
     def test_timeinput(self):
         w = TimeInput()
         t = datetime.time(12, 51, 34, 482548)
-        w.is_localized = True
         self.assertHTMLEqual(w.render('time', t), '<input type="text" name="time" value="12:51:34" />')
+
+    def test_datetime_locale_aware(self):
+        w = DateTimeInput()
+        d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
+        with self.settings(USE_L10N=False):
+            self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="2007-09-17 12:51:34" />')
+        with override('es'):
+            self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007 12:51:34" />')
 
     def test_splithiddendatetime(self):
         from django.forms.widgets import SplitHiddenDateTimeWidget
 
         w = SplitHiddenDateTimeWidget()
-        w.is_localized = True
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />')
 
     def test_nullbooleanselect(self):
