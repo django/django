@@ -422,7 +422,7 @@ Console backend
 ~~~~~~~~~~~~~~~
 
 Instead of sending out real emails the console backend just writes the
-emails that would be send to the standard output. By default, the console
+emails that would be sent to the standard output. By default, the console
 backend writes to ``stdout``. You can use a different stream-like object by
 providing the ``stream`` keyword argument when constructing the connection.
 
@@ -461,7 +461,7 @@ The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the
 first message is sent. It's a list with an
 :class:`~django.core.mail.EmailMessage` instance for each message that would
-be send.
+be sent.
 
 To specify this backend, put the following in your settings::
 
