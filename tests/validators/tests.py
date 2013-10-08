@@ -145,6 +145,11 @@ TEST_DATA = (
     (URLValidator(), 'http://valid-----hyphens.com/', None),
     (URLValidator(), 'http://example.com?something=value', None),
     (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
+    (URLValidator(), 'http://user:password@example.com', None),
+    (URLValidator(), 'http://user@example.com', None),
+    (URLValidator(), 'http://user:@example.com', None),
+    (URLValidator(), 'http://:@example.com', None),
+    (URLValidator(), 'http://we!rd;:p&ssw*rd@example.com', None),
 
     (URLValidator(), 'foo', ValidationError),
     (URLValidator(), 'http://', ValidationError),
@@ -155,6 +160,9 @@ TEST_DATA = (
     (URLValidator(), 'http://-invalid.com', ValidationError),
     (URLValidator(), 'http://inv-.alid-.com', ValidationError),
     (URLValidator(), 'http://inv-.-alid.com', ValidationError),
+    (URLValidator(), 'http://user:example.com', ValidationError),
+    (URLValidator(), 'http://we:rd:pass@example.com', ValidationError),
+    (URLValidator(), 'http://weird:p@ss@example.com', ValidationError),
 
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),
