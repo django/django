@@ -22,7 +22,7 @@ def index(request, sitemaps,
           template_name='sitemap_index.xml', content_type='application/xml',
           sitemap_url_name='django.contrib.sitemaps.views.sitemap'):
 
-    req_protocol = 'https' if request.is_secure() else 'http'
+    req_protocol = request.scheme
     req_site = get_current_site(request)
 
     sites = []
@@ -44,7 +44,7 @@ def index(request, sitemaps,
 def sitemap(request, sitemaps, section=None,
             template_name='sitemap.xml', content_type='application/xml'):
 
-    req_protocol = 'https' if request.is_secure() else 'http'
+    req_protocol = request.scheme
     req_site = get_current_site(request)
 
     if section is not None:

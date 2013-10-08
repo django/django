@@ -110,8 +110,8 @@ class WSGIRequest(http.HttpRequest):
         self._read_started = False
         self.resolver_match = None
 
-    def _is_secure(self):
-        return self.environ.get('wsgi.url_scheme') == 'https'
+    def _get_scheme(self):
+        return self.environ.get('wsgi.url_scheme')
 
     def _parse_content_type(self, ctype):
         """

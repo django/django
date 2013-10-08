@@ -32,6 +32,13 @@ Attributes
 All attributes should be considered read-only, unless stated otherwise below.
 ``session`` is a notable exception.
 
+.. attribute:: HttpRequest.scheme
+
+   .. versionadded:: 1.7
+
+   A string representing the scheme of the request (``http`` or ``https`` 
+   usually).
+
 .. attribute:: HttpRequest.body
 
     The raw HTTP request body as a byte string. This is useful for processing
