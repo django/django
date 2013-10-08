@@ -397,60 +397,27 @@ class Textarea(Widget):
                            force_text(value))
 
 
-class DateInput(TextInput):
+class DateTimeBaseInput(TextInput):
+    format_key = ''
     def __init__(self, attrs=None, format=None):
-        super(DateInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
-            self.manual_format = False
+        super(DateTimeBaseInput, self).__init__(attrs)
+        self.format = format if format else None
 
     def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            value = datetime_safe.new_date(value)
-            return value.strftime(self.format)
-        return value
+        return formats.localize_input(value,
+            self.format or formats.get_format(self.format_key)[0])
 
 
-class DateTimeInput(TextInput):
-    def __init__(self, attrs=None, format=None):
-        super(DateTimeInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
-            self.manual_format = False
-
-    def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            value = datetime_safe.new_datetime(value)
-            return value.strftime(self.format)
-        return value
+class DateInput(DateTimeBaseInput):
+    format_key = 'DATE_INPUT_FORMATS'
 
 
-class TimeInput(TextInput):
-    def __init__(self, attrs=None, format=None):
-        super(TimeInput, self).__init__(attrs)
-        if format:
-            self.format = format
-            self.manual_format = True
-        else:
-            self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
-            self.manual_format = False
+class DateTimeInput(DateTimeBaseInput):
+    format_key = 'DATETIME_INPUT_FORMATS'
 
-    def _format_value(self, value):
-        if self.is_localized and not self.manual_format:
-            return formats.localize_input(value)
-        elif hasattr(value, 'strftime'):
-            return value.strftime(self.format)
-        return value
+
+class TimeInput(DateTimeBaseInput):
+    format_key = 'TIME_INPUT_FORMATS'
 
 
 # Defined at module level so that CheckboxInput is picklable (#17976)
