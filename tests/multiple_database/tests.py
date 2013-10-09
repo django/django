@@ -48,7 +48,7 @@ class QueryTestCase(TestCase):
             Book.objects.get(title="Pro Django")
             Book.objects.using('default').get(title="Pro Django")
         except Book.DoesNotExist:
-            self.fail('"Dive Into Python" should exist on default database')
+            self.fail('"Pro Django" should exist on default database')
 
         self.assertRaises(Book.DoesNotExist,
             Book.objects.using('other').get,
@@ -83,7 +83,7 @@ class QueryTestCase(TestCase):
         try:
             Book.objects.using('other').get(title="Pro Django")
         except Book.DoesNotExist:
-            self.fail('"Dive Into Python" should exist on other database')
+            self.fail('"Pro Django" should exist on other database')
 
         self.assertRaises(Book.DoesNotExist,
             Book.objects.get,
