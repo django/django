@@ -1026,6 +1026,14 @@ class QuerySet(object):
         # If we have a new hint for an existing key, overwrite with the new value.
         self._hints.update(hints)
 
+    def _has_filters(self):
+        """
+        Checks if this QuerySet has any filtering going on. Note that this
+        isn't equivalent for checking if all objects are present in results,
+        for example qs[1:]._has_filters() -> True.
+        """
+        return self.query.has_filters()
+
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
