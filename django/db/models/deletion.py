@@ -225,8 +225,8 @@ class Collector(object):
             )
 
         related_objs = []
-        for batch in [objs[i:i + batch_size]
-                      for i in range(0, len(objs), batch_size)]:
+        for batch in (objs[i:i + batch_size]
+                      for i in range(0, len(objs), batch_size)):
             related_objs.extend(
                 related.model._base_manager.using(self.using).filter(
                     **{"%s__in" % related.field.name: batch}
