@@ -63,7 +63,7 @@ def sql_delete(app, style, connection):
     # This should work even if a connection isn't available
     try:
         cursor = connection.cursor()
-    except:
+    except Exception:
         cursor = None
 
     # Figure out which tables already exist

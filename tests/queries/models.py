@@ -390,6 +390,10 @@ class OneToOneCategory(models.Model):
     def __str__(self):
         return "one2one " + self.new_name
 
+class CategoryRelationship(models.Model):
+    first = models.ForeignKey(SimpleCategory, related_name='first_rel')
+    second = models.ForeignKey(SimpleCategory, related_name='second_rel')
+
 class NullableName(models.Model):
     name = models.CharField(max_length=20, null=True)
 
@@ -531,3 +535,12 @@ class StaffUser(BaseUser):
 
     def __str__(self):
         return self.staff
+
+class Ticket21203Parent(models.Model):
+    parentid = models.AutoField(primary_key=True)
+    parent_bool = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now=True)
+
+class Ticket21203Child(models.Model):
+    childid = models.AutoField(primary_key=True)
+    parent = models.ForeignKey(Ticket21203Parent)

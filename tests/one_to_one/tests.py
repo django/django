@@ -118,7 +118,7 @@ class OneToOneTests(TestCase):
         self.assertEqual(repr(o1.multimodel), '<MultiModel: Multimodel x1>')
         # This will fail because each one-to-one field must be unique (and
         # link2=o1 was used for x1, above).
-        sid = transaction.savepoint()
         mm = MultiModel(link1=self.p2, link2=o1, name="x1")
-        self.assertRaises(IntegrityError, mm.save)
-        transaction.savepoint_rollback(sid)
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                mm.save()

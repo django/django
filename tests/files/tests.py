@@ -174,3 +174,6 @@ class FileMoveSafeTests(unittest.TestCase):
 
         # should allow it and continue on if allow_overwrite is True
         self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))
+
+        os.close(handle_a)
+        os.close(handle_b)

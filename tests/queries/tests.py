@@ -4,17 +4,15 @@ from collections import OrderedDict
 import datetime
 from operator import attrgetter
 import pickle
-import sys
 import unittest
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count, F, Q
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, CaptureQueriesContext
 from django.utils import six
 
 from .models import (
@@ -26,7 +24,8 @@ from .models import (
     OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
     ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser)
+    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
+    CategoryRelationship, Ticket21203Parent, Ticket21203Child)
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
@@ -1848,16 +1847,33 @@ class ComparisonTests(TestCase):
 
 
 class ExistsSql(TestCase):
-    def setUp(self):
-        settings.DEBUG = True
-
     def test_exists(self):
-        self.assertFalse(Tag.objects.exists())
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertFalse(Tag.objects.exists())
         # Ok - so the exist query worked - but did it include too many columns?
-        self.assertTrue("id" not in connection.queries[-1]['sql'] and "name" not in connection.queries[-1]['sql'])
+        self.assertEqual(len(captured_queries), 1)
+        qstr = captured_queries[0]
+        id, name = connection.ops.quote_name('id'), connection.ops.quote_name('name')
+        self.assertTrue(id not in qstr and name not in qstr)
 
-    def tearDown(self):
-        settings.DEBUG = False
+    def test_ticket_18414(self):
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='two', created=datetime.datetime.now())
+        self.assertTrue(Article.objects.exists())
+        self.assertTrue(Article.objects.distinct().exists())
+        self.assertTrue(Article.objects.distinct()[1:3].exists())
+        self.assertFalse(Article.objects.distinct()[1:1].exists())
+
+    @unittest.skipUnless(connection.features.can_distinct_on_fields,
+                         'Uses distinct(fields)')
+    def test_ticket_18414_distinct_on(self):
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='one', created=datetime.datetime.now())
+        Article.objects.create(name='two', created=datetime.datetime.now())
+        self.assertTrue(Article.objects.distinct('name').exists())
+        self.assertTrue(Article.objects.distinct('name')[1:2].exists())
+        self.assertFalse(Article.objects.distinct('name')[2:3].exists())
 
 
 class QuerysetOrderedTests(unittest.TestCase):
@@ -1889,34 +1905,63 @@ class SubqueryTests(TestCase):
         DumbCategory.objects.create(id=1)
         DumbCategory.objects.create(id=2)
         DumbCategory.objects.create(id=3)
+        DumbCategory.objects.create(id=4)
 
     def test_ordered_subselect(self):
         "Subselects honor any manual ordering"
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3,4]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
+            self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-            self.assertEqual(set(query.values_list('id', flat=True)), set([1]))
-        except DatabaseError:
+            self.assertEqual(set(query.values_list('id', flat=True)), set([1,2]))
+        except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
             # Refs #10099
-            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries)
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
+
+    def test_slice_subquery_and_query(self):
+        """
+        Slice a query that has a sliced subquery
+        """
+        try:
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
+            self.assertEqual(set([x.id for x in query]), set([3,4]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
+            self.assertEqual(set([x.id for x in query]), set([3]))
+
+            query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])[1:]
+            self.assertEqual(set([x.id for x in query]), set([2]))
+        except DatabaseError as e:
+            # Oracle and MySQL both have problems with sliced subselects.
+            # This prevents us from even evaluating this test case at all.
+            # Refs #10099
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
 
     def test_sliced_delete(self):
         "Delete queries can safely contain sliced subqueries"
         try:
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2]))
-        except DatabaseError:
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2,3]))
+
+            DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,3]))
+
+            DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
+        except DatabaseError as e:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
             # Refs #10099
-            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries)
+            self.assertFalse(connections[DEFAULT_DB_ALIAS].features.allow_sliced_subqueries, str(e))
 
 
 class CloneTests(TestCase):
@@ -2423,6 +2468,21 @@ class ExcludeTest17600(TestCase):
             Order.objects.exclude(~Q(items__status=1)).distinct(),
             ['<Order: 1>'])
 
+class Exclude15786(TestCase):
+    """Regression test for #15786"""
+    def test_ticket15786(self):
+        c1 = SimpleCategory.objects.create(name='c1')
+        c2 = SimpleCategory.objects.create(name='c2')
+        o2o1 = OneToOneCategory.objects.create(category=c1)
+        o2o2 = OneToOneCategory.objects.create(category=c2)
+        rel = CategoryRelationship.objects.create(first=c1, second=c2)
+        self.assertEqual(
+            CategoryRelationship.objects.exclude(
+                first__onetoonecategory=F('second__onetoonecategory')
+            ).get(), rel
+        )
+
+
 class NullInExcludeTest(TestCase):
     def setUp(self):
         NullableName.objects.create(name='i1')
@@ -2645,6 +2705,15 @@ class NullJoinPromotionOrTest(TestCase):
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
         self.assertEqual(list(qs), [self.a2])
 
+    def test_null_join_demotion(self):
+        qs = ModelA.objects.filter(Q(b__name__isnull=False) & Q(b__name__isnull=True))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        qs = ModelA.objects.filter(Q(b__name__isnull=True) & Q(b__name__isnull=False))
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        qs = ModelA.objects.filter(Q(b__name__isnull=False) | Q(b__name__isnull=True))
+        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+        qs = ModelA.objects.filter(Q(b__name__isnull=True) | Q(b__name__isnull=False))
+        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
 
 class ReverseJoinTrimmingTest(TestCase):
     def test_reverse_trimming(self):
@@ -2741,22 +2810,19 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
 
-    @unittest.expectedFailure
-    def test_disjunction_promotion3_failing(self):
-        # Now the ORed filter creates LOUTER join, but we do not have
-        # logic to unpromote it for the AND filter after it. The query
-        # results will be correct, but we have one LOUTER JOIN too much
-        # currently.
+    def test_disjunction_promotion3_demote(self):
+        # This one needs demotion logic: the first filter causes a to be
+        # outer joined, the second filter makes it inner join again.
         qs = BaseA.objects.filter(
             Q(a__f1='foo') | Q(b__f2='foo')).filter(a__f2='bar')
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
 
-    @unittest.expectedFailure
-    def test_disjunction_promotion4_failing(self):
-        # Failure because no join repromotion
+    def test_disjunction_promotion4_demote(self):
         qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
         self.assertEqual(str(qs.query).count('JOIN'), 0)
+        # Demote needed for the "a" join. It is marked as outer join by
+        # above filter (even if it is trimmed away).
         qs = qs.filter(a__f1='foo')
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
 
@@ -2766,9 +2832,8 @@ class DisjunctionPromotionTests(TestCase):
         qs = qs.filter(Q(a=1) | Q(a=2))
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
 
-    @unittest.expectedFailure
-    def test_disjunction_promotion5_failing(self):
-        # Failure because no join repromotion logic.
+    def test_disjunction_promotion5_demote(self):
+        # Failure because no join demotion logic for this case.
         qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
         # Note that the above filters on a force the join to an
         # inner join even if it is trimmed.
@@ -2779,8 +2844,8 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
         qs = BaseA.objects.filter(Q(a__f1='foo') | Q(b__f1='foo'))
         # Now the join to a is created as LOUTER
-        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 0)
-        qs = qs.objects.filter(Q(a=1) | Q(a=2))
+        self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
+        qs = qs.filter(Q(a=1) | Q(a=2))
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 1)
 
@@ -3027,3 +3092,25 @@ class Ticket20955Tests(TestCase):
                              task_get.creator.staffuser.staff)
             self.assertEqual(task_select_related.owner.staffuser.staff,
                              task_get.owner.staffuser.staff)
+
+class Ticket21203Tests(TestCase):
+    def test_ticket_21203(self):
+        p = Ticket21203Parent.objects.create(parent_bool=True)
+        c = Ticket21203Child.objects.create(parent=p)
+        qs = Ticket21203Child.objects.select_related('parent').defer('parent__created')
+        self.assertQuerysetEqual(qs, [c], lambda x: x)
+        self.assertIs(qs[0].parent.parent_bool, True)
+
+class ValuesJoinPromotionTests(TestCase):
+    def test_values_no_promotion_for_existing(self):
+        qs = Node.objects.filter(parent__parent__isnull=False)
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        qs = qs.values('parent__parent__id')
+        self.assertTrue(' INNER JOIN ' in str(qs.query))
+        # Make sure there is a left outer join without the filter.
+        qs = Node.objects.values('parent__parent__id')
+        self.assertTrue(' LEFT OUTER JOIN ' in str(qs.query))
+
+    def test_non_nullable_fk_not_promoted(self):
+        qs = ObjectB.objects.values('objecta__name')
+        self.assertTrue(' INNER JOIN ' in str(qs.query))

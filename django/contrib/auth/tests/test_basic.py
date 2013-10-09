@@ -6,7 +6,7 @@ import locale
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management.commands import createsuperuser
 from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.tests.test_custom_user import CustomUser
+from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command

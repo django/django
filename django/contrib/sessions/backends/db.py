@@ -58,12 +58,11 @@ class SessionStore(SessionBase):
             expire_date=self.get_expiry_date()
         )
         using = router.db_for_write(Session, instance=obj)
-        sid = transaction.savepoint(using=using)
         try:
-            obj.save(force_insert=must_create, using=using)
+            with transaction.atomic(using=using):
+                obj.save(force_insert=must_create, using=using)
         except IntegrityError:
             if must_create:
-                transaction.savepoint_rollback(sid, using=using)
                 raise CreateError
             raise
 

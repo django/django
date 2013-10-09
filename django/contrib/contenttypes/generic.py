@@ -14,7 +14,7 @@ from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.where import Constraint
 from django.forms import ModelForm, ALL_FIELDS
-from django.forms.models import (BaseModelFormSet, modelformset_factory, save_instance,
+from django.forms.models import (BaseModelFormSet, modelformset_factory,
     modelform_defines_fields)
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
 from django.contrib.contenttypes.models import ContentType
@@ -46,10 +46,10 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_virtual_field(self)
 
-        # For some reason I don't totally understand, using weakrefs here doesn't work.
-        signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
+        # Only run pre-initialization field assignment on non-abstract models
+        if not cls._meta.abstract:
+            signals.pre_init.connect(self.instance_pre_init, sender=cls)
 
-        # Connect myself as the descriptor for this field
         setattr(cls, name, self)
 
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
@@ -335,6 +335,7 @@ def create_generic_related_manager(superclass):
                 object_id_field_name = self.object_id_field_name,
                 prefetch_cache_name = self.prefetch_cache_name,
             )
+        do_not_call_in_templates = True
 
         def get_queryset(self):
             try:
@@ -371,14 +372,12 @@ def create_generic_related_manager(superclass):
 
         def remove(self, *objs):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in objs:
-                obj.delete(using=db)
+            self.using(db).filter(pk__in=[o.pk for o in objs]).delete()
         remove.alters_data = True
 
         def clear(self):
             db = router.db_for_write(self.model, instance=self.instance)
-            for obj in self.all():
-                obj.delete(using=db)
+            self.using(db).delete()
         clear.alters_data = True
 
         def create(self, **kwargs):

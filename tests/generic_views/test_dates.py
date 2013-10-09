@@ -1,26 +1,13 @@
 from __future__ import unicode_literals
 
-import time
 import datetime
-from unittest import skipUnless
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import override_settings
+from django.test.utils import override_settings, requires_tz_support
 from django.utils import timezone
 
 from .models import Book, BookSigning
-
-TZ_SUPPORT = hasattr(time, 'tzset')
-
-# On OSes that don't provide tzset (Windows), we can't set the timezone
-# in which the program runs. As a consequence, we must skip tests that
-# don't enforce a specific timezone (with timezone.override or equivalent),
-# or attempt to interpret naive datetimes in the default timezone.
-
-requires_tz_support = skipUnless(TZ_SUPPORT,
-        "This test relies on the ability to run a program in an arbitrary "
-        "time zone, but your operating system isn't able to do that.")
 
 
 def _make_books(n, base_date):

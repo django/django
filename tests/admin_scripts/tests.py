@@ -1692,9 +1692,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
-        with codecs.open(path, 'r', 'utf-8') as f:
-            self.assertEqual(f.read(),
-                'Some non-ASCII text for testing ticket #18091:\nüäö €\n')
+        with codecs.open(path, 'r', encoding='utf-8') as f:
+            self.assertEqual(f.read().splitlines(False), [
+                'Some non-ASCII text for testing ticket #18091:',
+                'üäö €'])
 
 
 class DiffSettings(AdminScriptTestCase):

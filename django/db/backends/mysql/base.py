@@ -172,6 +172,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     allows_primary_key_0 = False
     uses_savepoints = True
+    atomic_transactions = False
     supports_check_constraints = False
 
     def __init__(self, connection):
@@ -484,7 +485,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Re-enable foreign key checks after they have been disabled.
         """
-        self.cursor().execute('SET foreign_key_checks=1')
+        # Override needs_rollback in case constraint_checks_disabled is
+        # nested inside transaction.atomic.
+        self.needs_rollback, needs_rollback = False, self.needs_rollback
+        try:
+            self.cursor().execute('SET foreign_key_checks=1')
+        finally:
+            self.needs_rollback = needs_rollback
 
     def check_constraints(self, table_names=None):
         """

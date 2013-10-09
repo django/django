@@ -2,6 +2,7 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -68,8 +69,10 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
         # Adding an object of the wrong type raises TypeError.
-        with six.assertRaisesRegex(self, TypeError, "'Article' instance expected, got <Reporter.*"):
-            self.r.article_set.add(self.r2)
+        with transaction.atomic():
+            with six.assertRaisesRegex(self, TypeError,
+                                       "'Article' instance expected, got <Reporter.*"):
+                self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",

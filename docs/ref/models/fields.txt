@@ -1078,10 +1078,11 @@ define the details of how the relation works.
 .. attribute:: ForeignKey.related_name
 
     The name to use for the relation from the related object back to this one.
-    See the :ref:`related objects documentation <backwards-related-objects>` for
-    a full explanation and example. Note that you must set this value
-    when defining relations on :ref:`abstract models
-    <abstract-base-classes>`; and when you do so
+    It's also the default value for :attr:`related_query_name` (the name to use
+    for the reverse filter name from the target model). See the :ref:`related
+    objects documentation <backwards-related-objects>` for a full explanation
+    and example. Note that you must set this value when defining relations on
+    :ref:`abstract models <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
     If you'd prefer Django not to create a backwards relation, set

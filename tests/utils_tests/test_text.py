@@ -82,6 +82,15 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
             truncator.words(3, '...', html=True ))
 
+        # Test html entities
+        truncator = text.Truncator('<i>Buenos d&iacute;as!'
+            ' &#x00bf;C&oacute;mo est&aacute;?</i>')
+        self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo...</i>',
+            truncator.words(3, '...', html=True))
+        truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
+        self.assertEqual('<p>I &lt;3 python...</p>',
+            truncator.words(3, '...', html=True))
+
     def test_wrap(self):
         digits = '1234 67 9'
         self.assertEqual(text.wrap(digits, 100), '1234 67 9')

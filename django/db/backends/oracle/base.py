@@ -59,6 +59,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
+from django.db.utils import InterfaceError
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
@@ -96,12 +97,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    atomic_transactions = False
     supports_combined_alters = False
     max_index_name_length = 30
     nulls_order_largest = True
     requires_literal_defaults = True
     connection_persists_old_columns = True
     nulls_order_largest = True
+    closed_cursor_error_class = InterfaceError
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -617,7 +620,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         try:
             self.connection.stmtcachesize = 20
-        except:
+        except AttributeError:
             # Django docs specify cx_Oracle version 4.3.1 or higher, but
             # stmtcachesize is available only in 4.3.2 and up.
             pass

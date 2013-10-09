@@ -151,6 +151,12 @@ Enables language selection based on data from the request. It customizes
 content for each user. See the :doc:`internationalization documentation
 </topics/i18n/translation>`.
 
+.. attribute:: LocaleMiddleware.response_redirect_class
+
+Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
+``LocaleMiddleware`` and override the attribute to customize the redirects
+issued by the middleware.
+
 Message middleware
 ------------------
 

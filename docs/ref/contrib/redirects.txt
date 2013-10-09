@@ -26,10 +26,11 @@ How it works
 ``manage.py migrate`` creates a ``django_redirect`` table in your database. This
 is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
 
-The ``RedirectFallbackMiddleware`` does all of the work. Each time any Django
-application raises a 404 error, this middleware checks the redirects database
-for the requested URL as a last resort. Specifically, it checks for a redirect
-with the given ``old_path`` with a site ID that corresponds to the
+The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+does all of the work. Each time any Django application raises a 404
+error, this middleware checks the redirects database for the requested
+URL as a last resort. Specifically, it checks for a redirect with the
+given ``old_path`` with a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
 * If it finds a match, and ``new_path`` is not empty, it redirects to
@@ -43,8 +44,8 @@ The middleware only gets activated for 404s -- not for 500s or responses of any
 other status code.
 
 Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
-can put ``RedirectFallbackMiddleware`` at the end of the list, because it's a
-last resort.
+can put :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+at the end of the list, because it's a last resort.
 
 For more on middleware, read the :doc:`middleware docs
 </topics/http/middleware>`.
@@ -69,3 +70,29 @@ Via the Python API
     objects via the :doc:`Django database API </topics/db/queries>`.
 
 .. _django/contrib/redirects/models.py: https://github.com/django/django/blob/master/django/contrib/redirects/models.py
+
+Middleware
+==========
+
+.. class:: middleware.RedirectFallbackMiddleware
+
+    You can change the :class:`~django.http.HttpResponse` classes used
+    by the middleware by creating a subclass of
+    :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+    and overriding ``response_gone_class`` and/or ``response_redirect_class``.
+
+    .. attribute:: response_gone_class
+
+        The :class:`~django.http.HttpResponse` class used when a
+        :class:`~django.contrib.redirects.models.Redirect` is not
+        found for the requested path or has a blank ``new_path``
+        value.
+
+        Defaults to :class:`~django.http.HttpResponseGone`.
+
+    .. attribute:: response_redirect_class
+
+        The :class:`~django.http.HttpResponse` class that handles the
+        redirect.
+
+        Defaults to :class:`~django.http.HttpResponsePermanentRedirect`.

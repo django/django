@@ -19,14 +19,9 @@ class CursorWrapper(object):
         self.cursor = cursor
         self.db = db
 
-    SET_DIRTY_ATTRS = frozenset(['execute', 'executemany', 'callproc'])
-    WRAP_ERROR_ATTRS = frozenset([
-        'callproc', 'close', 'execute', 'executemany',
-        'fetchone', 'fetchmany', 'fetchall', 'nextset'])
+    WRAP_ERROR_ATTRS = frozenset(['fetchone', 'fetchmany', 'fetchall', 'nextset'])
 
     def __getattr__(self, attr):
-        if attr in CursorWrapper.SET_DIRTY_ATTRS:
-            self.db.set_dirty()
         cursor_attr = getattr(self.cursor, attr)
         if attr in CursorWrapper.WRAP_ERROR_ATTRS:
             return self.db.wrap_database_errors(cursor_attr)
@@ -44,18 +39,42 @@ class CursorWrapper(object):
         # specific behavior.
         self.close()
 
+    # The following methods cannot be implemented in __getattr__, because the
+    # code must run when the method is invoked, not just when it is accessed.
+
+    def callproc(self, procname, params=None):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            if params is None:
+                return self.cursor.callproc(procname)
+            else:
+                return self.cursor.callproc(procname, params)
+
+    def execute(self, sql, params=None):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            if params is None:
+                return self.cursor.execute(sql)
+            else:
+                return self.cursor.execute(sql, params)
+
+    def executemany(self, sql, param_list):
+        self.db.validate_no_broken_transaction()
+        self.db.set_dirty()
+        with self.db.wrap_database_errors:
+            return self.cursor.executemany(sql, param_list)
+
 
 class CursorDebugWrapper(CursorWrapper):
 
+    # XXX callproc isn't instrumented at this time.
+
     def execute(self, sql, params=None):
-        self.db.set_dirty()
         start = time()
         try:
-            with self.db.wrap_database_errors:
-                if params is None:
-                    # params default might be backend specific
-                    return self.cursor.execute(sql)
-                return self.cursor.execute(sql, params)
+            return super(CursorDebugWrapper, self).execute(sql, params)
         finally:
             stop = time()
             duration = stop - start
@@ -69,11 +88,9 @@ class CursorDebugWrapper(CursorWrapper):
             )
 
     def executemany(self, sql, param_list):
-        self.db.set_dirty()
         start = time()
         try:
-            with self.db.wrap_database_errors:
-                return self.cursor.executemany(sql, param_list)
+            return super(CursorDebugWrapper, self).executemany(sql, param_list)
         finally:
             stop = time()
             duration = stop - start

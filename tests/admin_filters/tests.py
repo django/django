@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
-    BooleanFieldListFilter)
+    BooleanFieldListFilter, AllValuesFieldListFilter)
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -38,25 +38,31 @@ class DecadeListFilter(SimpleListFilter):
         if decade == 'the 00s':
             return queryset.filter(year__gte=2000, year__lte=2009)
 
+
 class DecadeListFilterWithTitleAndParameter(DecadeListFilter):
     title = 'publication decade'
     parameter_name = 'publication-decade'
 
+
 class DecadeListFilterWithoutTitle(DecadeListFilter):
     parameter_name = 'publication-decade'
 
+
 class DecadeListFilterWithoutParameter(DecadeListFilter):
     title = 'publication decade'
+
 
 class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParameter):
 
     def lookups(self, request, model_admin):
         pass
 
+
 class DecadeListFilterWithFailingQueryset(DecadeListFilterWithTitleAndParameter):
 
     def queryset(self, request, queryset):
         raise 1/0
+
 
 class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParameter):
 
@@ -69,9 +75,11 @@ class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParam
         if qs.filter(year__gte=2000, year__lte=2009).exists():
             yield ('the 00s', "the 2000's")
 
+
 class DecadeListFilterParameterEndsWith__In(DecadeListFilter):
     title = 'publication decade'
     parameter_name = 'decade__in' # Ends with '__in"
+
 
 class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
     title = 'publication decade'
@@ -93,40 +101,60 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
         if self.value():
             return queryset.filter(department__id=self.value())
 
+
+class DepartmentListFilterLookupWithUnderscoredParameter(DepartmentListFilterLookupWithNonStringValue):
+    parameter_name = 'department__whatever'
+
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
+
 
 class BookAdmin(ModelAdmin):
     list_filter = ('year', 'author', 'contributors', 'is_best_seller', 'date_registered', 'no')
     ordering = ('-id',)
 
+
 class BookAdminWithTupleBooleanFilter(BookAdmin):
     list_filter = ('year', 'author', 'contributors', ('is_best_seller', BooleanFieldListFilter), 'date_registered', 'no')
+
+
+class BookAdminWithUnderscoreLookupAndTuple(BookAdmin):
+    list_filter = ('year', ('author__email', AllValuesFieldListFilter), 'contributors', 'is_best_seller', 'date_registered', 'no')
+
 
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
     ordering = ('-id',)
 
+
 class DecadeFilterBookAdminWithoutTitle(ModelAdmin):
     list_filter = (DecadeListFilterWithoutTitle,)
+
 
 class DecadeFilterBookAdminWithoutParameter(ModelAdmin):
     list_filter = (DecadeListFilterWithoutParameter,)
 
+
 class DecadeFilterBookAdminWithNoneReturningLookups(ModelAdmin):
     list_filter = (DecadeListFilterWithNoneReturningLookups,)
+
 
 class DecadeFilterBookAdminWithFailingQueryset(ModelAdmin):
     list_filter = (DecadeListFilterWithFailingQueryset,)
 
+
 class DecadeFilterBookAdminWithQuerysetBasedLookups(ModelAdmin):
     list_filter = (DecadeListFilterWithQuerysetBasedLookups,)
+
 
 class DecadeFilterBookAdminParameterEndsWith__In(ModelAdmin):
     list_filter = (DecadeListFilterParameterEndsWith__In,)
 
+
 class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
     list_filter = (DecadeListFilterParameterEndsWith__Isnull,)
+
 
 class EmployeeAdmin(ModelAdmin):
     list_display = ['name', 'department']
@@ -135,6 +163,10 @@ class EmployeeAdmin(ModelAdmin):
 
 class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
     list_filter = [DepartmentListFilterLookupWithNonStringValue, ]
+
+
+class DepartmentFilterUnderscoredEmployeeAdmin(EmployeeAdmin):
+    list_filter = [DepartmentListFilterLookupWithUnderscoredParameter, ]
 
 
 class ListFiltersTests(TestCase):
@@ -453,6 +485,23 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?is_best_seller__isnull=True')
 
+    def test_fieldlistfilter_underscorelookup_tuple(self):
+        """
+        Ensure ('fieldpath', ClassName ) lookups pass lookup_allowed checks
+        when fieldpath contains double underscore in value.
+        Refs #19182
+        """
+        modeladmin = BookAdminWithUnderscoreLookupAndTuple(Book, site)
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        request = self.request_factory.get('/', {'author__email': 'alfred@example.com'})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(list(queryset), [self.bio_book, self.djangonaut_book])
+
     def test_simplelistfilter(self):
         modeladmin = DecadeFilterBookAdmin(Book, site)
 
@@ -691,6 +740,27 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[1]['display'], 'DEV')
         self.assertEqual(choices[1]['selected'], True)
         self.assertEqual(choices[1]['query_string'], '?department=%s' % self.john.pk)
+
+    def test_lookup_with_non_string_value_underscored(self):
+        """
+        Ensure SimpleListFilter lookups pass lookup_allowed checks when
+        parameter_name attribute contains double-underscore value.
+        Refs #19182
+        """
+        modeladmin = DepartmentFilterUnderscoredEmployeeAdmin(Employee, site)
+        request = self.request_factory.get('/', {'department__whatever': self.john.pk})
+        changelist = self.get_changelist(request, Employee, modeladmin)
+
+        queryset = changelist.get_queryset(request)
+
+        self.assertEqual(list(queryset), [self.john])
+
+        filterspec = changelist.get_filters(request)[0][-1]
+        self.assertEqual(force_text(filterspec.title), 'department')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[1]['display'], 'DEV')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?department__whatever=%s' % self.john.pk)
 
     def test_fk_with_to_field(self):
         """

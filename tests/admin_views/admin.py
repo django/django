@@ -30,7 +30,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UnchangeableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram, FilteredManager)
+    ShortMessage, Telegram, FilteredManager, EmptyModelHidden,
+    EmptyModelVisible, EmptyModelMixin)
 
 
 def callable_year(dt_value):
@@ -709,6 +710,36 @@ class ChoiceList(admin.ModelAdmin):
     fields = ['choice']
 
 
+# Tests for ticket 11277 ----------------------------------
+
+class FormWithoutHiddenField(forms.ModelForm):
+    first = forms.CharField()
+    second = forms.CharField()
+
+class FormWithoutVisibleField(forms.ModelForm):
+    first = forms.CharField(widget=forms.HiddenInput)
+    second = forms.CharField(widget=forms.HiddenInput)
+
+class FormWithVisibleAndHiddenField(forms.ModelForm):
+    first = forms.CharField(widget=forms.HiddenInput)
+    second = forms.CharField()
+
+class EmptyModelVisibleAdmin(admin.ModelAdmin):
+    form = FormWithoutHiddenField
+    fieldsets = (
+        (None, {
+            'fields':(('first', 'second'),),
+        }),
+    )
+
+class EmptyModelHiddenAdmin(admin.ModelAdmin):
+    form = FormWithoutVisibleField
+    fieldsets = EmptyModelVisibleAdmin.fieldsets
+
+class EmptyModelMixinAdmin(admin.ModelAdmin):
+    form = FormWithVisibleAndHiddenField
+    fieldsets = EmptyModelVisibleAdmin.fieldsets
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -790,6 +821,9 @@ site.register(Color2, CustomTemplateFilterColorAdmin)
 site.register(Simple, AttributeErrorRaisingAdmin)
 site.register(UserMessenger, MessageTestingAdmin)
 site.register(Choice, ChoiceList)
+site.register(EmptyModelHidden, EmptyModelHiddenAdmin)
+site.register(EmptyModelVisible, EmptyModelVisibleAdmin)
+site.register(EmptyModelMixin, EmptyModelMixinAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

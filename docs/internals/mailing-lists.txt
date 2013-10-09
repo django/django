@@ -1,0 +1,104 @@
+=============
+Mailing lists
+=============
+
+.. Important::
+
+    Please report security issues **only** to
+    security@djangoproject.com.  This is a private list only open to
+    long-time, highly trusted Django developers, and its archives are
+    not public. For further details, please see :doc:`our security
+    policies </internals/security>`.
+
+Django has several official mailing lists on Google Groups that are open to
+anyone.
+
+.. _django-users-mailing-list:
+
+``django-users``
+----------------
+
+This is the right place if you are looking to ask any question regarding the
+installation, usage, or debugging of Django.
+
+.. note::
+    If it's the first time you send an email to this list, your email must be
+    accepted first so don't worry if :ref:`your message does not appear
+    <message-does-not-appear-on-django-users>` instantly.
+
+* `django-users mailing archive`_
+* `django-users subscription email address`_
+* `django-users posting email`_
+
+.. _django-users mailing archive: http://groups.google.com/group/django-users/
+.. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
+.. _django-users posting email: mailto:django-users@googlegroups.com
+
+.. _django-core-mentorship-mailing-list:
+
+``django-core-mentorship``
+--------------------------
+
+The Django Core Development Mentorship list is intended to provide a welcoming
+introductory environment for developers interested in contributing to core
+Django development.
+
+* `django-core-mentorship mailing archive`_
+* `django-core-mentorship subscription email address`_
+* `django-core-mentorship posting email`_
+
+.. _django-core-mentorship mailing archive: http://groups.google.com/group/django-core-mentorship/
+.. _django-core-mentorship subscription email address: mailto:django-core-mentorship+subscribe@googlegroups.com
+.. _django-core-mentorship posting email: mailto:django-core-mentorship@googlegroups.com
+
+.. _django-developers-mailing-list:
+
+``django-developers``
+---------------------
+
+The discussion about the development of Django itself takes place here.
+
+.. note::
+    Please make use of
+    :ref:`django-users mailing list <django-users-mailing-list>` if you want
+    to ask for tech support, doing so in this list is inappropriate.
+
+* `django-developers mailing archive`_
+* `django-developers subscription email address`_
+* `django-developers posting email`_
+
+.. _django-developers mailing archive: http://groups.google.com/group/django-developers/
+.. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
+.. _django-developers posting email: mailto:django-developers@googlegroups.com
+
+.. _django-announce-mailing-list:
+
+``django-announce``
+-------------------
+
+A (very) low-traffic list for announcing new releases of Django and important
+bugfixes.
+
+* `django-announce mailing archive`_
+* `django-announce subscription email address`_
+* `django-announce posting email`_
+
+.. _django-announce mailing archive: http://groups.google.com/group/django-announce/
+.. _django-announce subscription email address: mailto:django-announce+subscribe@googlegroups.com
+.. _django-announce posting email: mailto:django-announce@googlegroups.com
+
+.. _django-updates-mailing-list:
+
+``django-updates``
+------------------
+
+All the ticket updates are mailed automatically to this list, which is tracked
+by developers and interested community members.
+
+* `django-updates mailing archive`_
+* `django-updates subscription email address`_
+* `django-updates posting email`_
+
+.. _django-updates mailing archive: http://groups.google.com/group/django-updates/
+.. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
+.. _django-updates posting email: mailto:django-updates@googlegroups.com

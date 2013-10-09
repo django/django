@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.contrib.auth.tests.test_custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
+from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.contrib.auth import authenticate, get_user

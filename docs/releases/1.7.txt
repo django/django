@@ -164,6 +164,10 @@ Minor features
   new :func:`~django.contrib.admin.register` decorator to register a
   :class:`~django.contrib.admin.ModelAdmin`.
 
+* You may specify :meth:`ModelAdmin.list_display_links
+  <django.contrib.admin.ModelAdmin.list_display_links>` ``= None`` to disable
+  links on the change list page grid.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -188,6 +192,17 @@ Minor features
 * The backends for :mod:`django.contrib.messages` that use cookies, will now
   follow the :setting:`SESSION_COOKIE_SECURE` and
   :setting:`SESSION_COOKIE_HTTPONLY` settings.
+
+:mod:`django.contrib.redirects`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+  has two new attributes
+  (:attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class`
+  and
+  :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`)
+  that specify the types of :class:`~django.http.HttpResponse` instances the
+  middleware returns.
 
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -263,6 +278,12 @@ Forms
   :func:`~django.forms.formsets.formset_factory` to allow validating
   a minimum number of submitted forms.
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+* The :attr:`django.middleware.locale.LocaleMiddleware.response_redirect_class`
+  attribute allows you to customize the redirects issued by the middleware.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
@@ -284,6 +305,11 @@ Models
 
 * Explicit :class:`~django.db.models.OneToOneField` for
   :ref:`multi-table-inheritance` are now discovered in abstract classes.
+
+* Is it now possible to avoid creating a backward relation for
+  :class:`~django.db.models.OneToOneField` by setting its
+  :attr:`~django.db.models.ForeignKey.related_name` to
+  `'+'` or ending it with `'+'`.
 
 Signals
 ^^^^^^^
@@ -367,6 +393,20 @@ For apps with migrations, ``allow_migrate`` will now get passed
 :ref:`historical models <historical-models>`, which are special versioned models
 without custom attributes, methods or managers. Make sure your ``allow_migrate``
 methods are only referring to fields or other items in ``model._meta``.
+
+Passing ``None`` to ``Manager.db_manager()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions of Django, it was possible to use
+``db_manager(using=None)`` on a model manager instance to obtain a manager
+instance using default routing behavior, overriding any manually specified
+database routing. In Django 1.7, a value of ``None`` passed to db_manager will
+produce a router that *retains* any manually assigned database routing -- the
+manager will *not* be reset. This was necessary to resolve an inconsistency in
+the way routing information cascaded over joins. See `Ticket #13724`_ for more
+details.
+
+.. _Ticket #13724: https://code.djangoproject.com/ticket/13724
 
 pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
@@ -538,3 +578,9 @@ The :class:`django.db.models.IPAddressField` and
 :class:`django.db.models.GenericIPAddressField` and
 :class:`django.forms.GenericIPAddressField`.
 
+``BaseMemcachedCache._get_memcache_timeout`` method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``BaseMemcachedCache._get_memcache_timeout()`` method has been renamed to
+``get_backend_timeout()``. Despite being a private API, it will go through the
+normal deprecation.

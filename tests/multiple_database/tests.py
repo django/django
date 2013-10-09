@@ -7,7 +7,7 @@ from operator import attrgetter
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import connections, router, DEFAULT_DB_ALIAS
+from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase
@@ -48,7 +48,7 @@ class QueryTestCase(TestCase):
             Book.objects.get(title="Pro Django")
             Book.objects.using('default').get(title="Pro Django")
         except Book.DoesNotExist:
-            self.fail('"Dive Into Python" should exist on default database')
+            self.fail('"Pro Django" should exist on default database')
 
         self.assertRaises(Book.DoesNotExist,
             Book.objects.using('other').get,
@@ -83,7 +83,7 @@ class QueryTestCase(TestCase):
         try:
             Book.objects.using('other').get(title="Pro Django")
         except Book.DoesNotExist:
-            self.fail('"Dive Into Python" should exist on other database')
+            self.fail('"Pro Django" should exist on other database')
 
         self.assertRaises(Book.DoesNotExist,
             Book.objects.get,
@@ -490,21 +490,24 @@ class QueryTestCase(TestCase):
 
         # Set a foreign key with an object from a different database
         try:
-            dive.editor = marty
+            with transaction.atomic(using='default'):
+                dive.editor = marty
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Set a foreign key set with an object from a different database
         try:
-            marty.edited = [pro, dive]
+            with transaction.atomic(using='default'):
+                marty.edited = [pro, dive]
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
 
         # Add to a foreign key set with an object from a different database
         try:
-            marty.edited.add(dive)
+            with transaction.atomic(using='default'):
+                marty.edited.add(dive)
             self.fail("Shouldn't be able to assign across databases")
         except ValueError:
             pass
@@ -1902,3 +1905,244 @@ class MigrateTestCase(TestCase):
             router.routers = old_routers
 
         self.assertEqual(cts.count(), 0)
+
+
+
+
+class RouterUsed(Exception):
+    WRITE = 'write'
+
+    def __init__(self, mode, model, hints):
+        self.mode = mode
+        self.model = model
+        self.hints = hints
+
+
+class RouteForWriteTestCase(TestCase):
+    multi_db = True
+    RAISE_MSG = 'Db for write called'
+
+    class WriteCheckRouter(object):
+        def db_for_write(self, model, **hints):
+            raise RouterUsed(mode=RouterUsed.WRITE, model=model, hints=hints)
+
+    def setUp(self):
+        self._old_rtrs = router.routers
+
+    def tearDown(self):
+        router.routers = self._old_rtrs
+
+    def enable_router(self):
+        router.routers = [RouteForWriteTestCase.WriteCheckRouter()]
+
+    def test_fk_delete(self):
+        owner = Person.objects.create(name='Someone')
+        pet = Pet.objects.create(name='fido', owner=owner)
+        self.enable_router()
+        try:
+            pet.owner.delete()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Person)
+            self.assertEqual(e.hints, {'instance': owner})
+
+    def test_reverse_fk_delete(self):
+        owner = Person.objects.create(name='Someone')
+        to_del_qs = owner.pet_set.all()
+        self.enable_router()
+        try:
+            to_del_qs.delete()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Pet)
+            self.assertEqual(e.hints, {'instance': owner})
+
+    def test_reverse_fk_get_or_create(self):
+        owner = Person.objects.create(name='Someone')
+        self.enable_router()
+        try:
+            owner.pet_set.get_or_create(name='fido')
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Pet)
+            self.assertEqual(e.hints, {'instance': owner})
+
+    def test_reverse_fk_update(self):
+        owner = Person.objects.create(name='Someone')
+        pet = Pet.objects.create(name='fido', owner=owner)
+        self.enable_router()
+        try:
+            owner.pet_set.update(name='max')
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Pet)
+            self.assertEqual(e.hints, {'instance': owner})
+
+    def test_m2m_add(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        try:
+            book.authors.add(auth)
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_m2m_clear(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            book.authors.clear()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_m2m_delete(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            book.authors.all().delete()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Person)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_m2m_get_or_create(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        try:
+            book.authors.get_or_create(name='Someone else')
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_m2m_remove(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        self.assertRaisesMessage(AttributeError, self.RAISE_MSG, )
+        try:
+            book.authors.remove(auth)
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_m2m_update(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            book.authors.all().update(name='Different')
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Person)
+            self.assertEqual(e.hints, {'instance': book})
+
+    def test_reverse_m2m_add(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        try:
+            auth.book_set.add(book)
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': auth})
+
+    def test_reverse_m2m_clear(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            auth.book_set.clear()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': auth})
+
+    def test_reverse_m2m_delete(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            auth.book_set.all().delete()
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book)
+            self.assertEqual(e.hints, {'instance': auth})
+
+    def test_reverse_m2m_get_or_create(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        self.enable_router()
+        try:
+            auth.book_set.get_or_create(title="New Book", published=datetime.datetime.now())
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Person)
+            self.assertEqual(e.hints, {'instance': auth})
+
+    def test_reverse_m2m_remove(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            auth.book_set.remove(book)
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book.authors.through)
+            self.assertEqual(e.hints, {'instance': auth})
+
+    def test_reverse_m2m_update(self):
+        auth = Person.objects.create(name='Someone')
+        book = Book.objects.create(title="Pro Django",
+                                   published=datetime.date(2008, 12, 16))
+        book.authors.add(auth)
+        self.enable_router()
+        try:
+            auth.book_set.all().update(title='Different')
+            self.fail('db_for_write() not invoked on router')
+        except RouterUsed as e:
+            self.assertEqual(e.mode, RouterUsed.WRITE)
+            self.assertEqual(e.model, Book)
+            self.assertEqual(e.hints, {'instance': auth})

@@ -18,57 +18,69 @@ class Foo(models.Model):
     a = models.CharField(max_length=10)
     d = models.DecimalField(max_digits=5, decimal_places=3)
 
+
 def get_foo():
     return Foo.objects.get(id=1)
+
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
     a = models.ForeignKey(Foo, default=get_foo)
 
+
 class Whiz(models.Model):
     CHOICES = (
         ('Group 1', (
-                (1,'First'),
-                (2,'Second'),
+                (1, 'First'),
+                (2, 'Second'),
             )
         ),
         ('Group 2', (
-                (3,'Third'),
-                (4,'Fourth'),
+                (3, 'Third'),
+                (4, 'Fourth'),
             )
         ),
-        (0,'Other'),
+        (0, 'Other'),
     )
     c = models.IntegerField(choices=CHOICES, null=True)
+
 
 class BigD(models.Model):
     d = models.DecimalField(max_digits=38, decimal_places=30)
 
+
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
+
 class BigInt(models.Model):
     value = models.BigIntegerField()
-    null_value = models.BigIntegerField(null = True, blank = True)
+    null_value = models.BigIntegerField(null=True, blank=True)
+
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField()
 
+
 class NullBooleanModel(models.Model):
     nbfield = models.NullBooleanField()
+
 
 class BooleanModel(models.Model):
     bfield = models.BooleanField(default=None)
     string = models.CharField(max_length=10, default='abc')
+
 
 class FksToBooleans(models.Model):
     """Model wih FKs to models with {Null,}BooleanField's, #15040"""
     bf = models.ForeignKey(BooleanModel)
     nbf = models.ForeignKey(NullBooleanModel)
 
+
 class RenamedField(models.Model):
-    modelname = models.IntegerField(name="fieldname", choices=((1,'One'),))
+    modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
+
 
 class VerboseNameField(models.Model):
     id = models.AutoField("verbose pk", primary_key=True)
@@ -99,10 +111,12 @@ class VerboseNameField(models.Model):
     field21 = models.TimeField("verbose field21")
     field22 = models.URLField("verbose field22")
 
+
 # This model isn't used in any test, just here to ensure it validates successfully.
 # See ticket #16570.
 class DecimalLessThanOne(models.Model):
     d = models.DecimalField(max_digits=3, decimal_places=3)
+
 
 class DataModel(models.Model):
     short_data = models.BinaryField(max_length=10, default=b'\x08')
@@ -110,6 +124,7 @@ class DataModel(models.Model):
 
 ###############################################################################
 # FileField
+
 
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused')
@@ -126,7 +141,8 @@ if Image:
         """
         def __init__(self, *args, **kwargs):
             self.was_opened = False
-            super(TestImageFieldFile, self).__init__(*args,**kwargs)
+            super(TestImageFieldFile, self).__init__(*args, **kwargs)
+
         def open(self):
             self.was_opened = True
             super(TestImageFieldFile, self).open()
@@ -146,14 +162,25 @@ if Image:
         name = models.CharField(max_length=50)
         mugshot = TestImageField(storage=temp_storage, upload_to='tests')
 
-    class PersonWithHeight(models.Model):
+    class AbsctractPersonWithHeight(models.Model):
         """
-        Model that defines an ImageField with only one dimension field.
+        Abstract model that defines an ImageField with only one dimension field
+        to make sure the dimension update is correctly run on concrete subclass
+        instance post-initialization.
         """
-        name = models.CharField(max_length=50)
         mugshot = TestImageField(storage=temp_storage, upload_to='tests',
                                  height_field='mugshot_height')
         mugshot_height = models.PositiveSmallIntegerField()
+
+        class Meta:
+            abstract = True
+
+    class PersonWithHeight(AbsctractPersonWithHeight):
+        """
+        Concrete model that subclass an abctract one with only on dimension
+        field.
+        """
+        name = models.CharField(max_length=50)
 
     class PersonWithHeightAndWidth(models.Model):
         """

@@ -1,5 +1,6 @@
 from .base import Operation
 from django.db import models, router
+from django.db.models.options import normalize_unique_together
 from django.db.migrations.state import ModelState
 
 
@@ -31,6 +32,15 @@ class CreateModel(Operation):
 
     def describe(self):
         return "Create model %s" % (self.name, )
+
+    def __eq__(self, other):
+        return (
+            (self.__class__ == other.__class__) and
+            (self.name == other.name) and
+            (self.options == other.options) and
+            (self.bases == other.bases) and
+            ([(k, f.deconstruct()[1:]) for k, f in self.fields] == [(k, f.deconstruct()[1:]) for k, f in other.fields])
+        )
 
 
 class DeleteModel(Operation):
@@ -99,6 +109,7 @@ class AlterUniqueTogether(Operation):
 
     def __init__(self, name, unique_together):
         self.name = name
+        unique_together = normalize_unique_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):

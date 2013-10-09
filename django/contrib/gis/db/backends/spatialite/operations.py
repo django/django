@@ -238,15 +238,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Helper routine for calling SpatiaLite functions and returning
         their result.
+        Any error occuring in this method should be handled by the caller.
         """
         cursor = self.connection._cursor()
         try:
-            try:
-                cursor.execute('SELECT %s' % func)
-                row = cursor.fetchone()
-            except:
-                # Responsibility of caller to perform error handling.
-                raise
+            cursor.execute('SELECT %s' % func)
+            row = cursor.fetchone()
         finally:
             cursor.close()
         return row[0]
