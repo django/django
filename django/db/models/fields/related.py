@@ -580,17 +580,20 @@ def create_many_related_manager(superclass, rel):
             )
         do_not_call_in_templates = True
 
-        def _build_clear_filters(self, qs):
-            filters = Q(**{
-                self.source_field_name: self.related_val,
-                '%s__in' % self.target_field_name: qs
-            })
-
+        def _build_remove_filters(self, removed_vals):
+            filters = Q(**{self.source_field_name: self.related_val})
+            # No need to add a subquery condition if removed_vals is a QuerySet without
+            # filters.
+            removed_vals_filters = (not isinstance(removed_vals, QuerySet) or
+                                    removed_vals._has_filters())
+            if removed_vals_filters:
+                filters &= Q(**{'%s__in' % self.target_field_name: removed_vals})
             if self.symmetrical:
-                filters |= Q(**{
-                    self.target_field_name: self.related_val,
-                    '%s__in' % self.source_field_name: qs
-                })
+                symmetrical_filters = Q(**{self.target_field_name: self.related_val})
+                if removed_vals_filters:
+                    symmetrical_filters &= Q(
+                        **{'%s__in' % self.source_field_name: removed_vals})
+                filters |= symmetrical_filters
             return filters
 
         def get_queryset(self):
@@ -654,7 +657,7 @@ def create_many_related_manager(superclass, rel):
             signals.m2m_changed.send(sender=self.through, action="pre_clear",
                 instance=self.instance, reverse=self.reverse,
                 model=self.model, pk_set=None, using=db)
-            filters = self._build_clear_filters(self.using(db))
+            filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
             self.through._default_manager.using(db).filter(filters).delete()
 
             signals.m2m_changed.send(sender=self.through, action="post_clear",
@@ -763,10 +766,13 @@ def create_many_related_manager(superclass, rel):
             signals.m2m_changed.send(sender=self.through, action="pre_remove",
                 instance=self.instance, reverse=self.reverse,
                 model=self.model, pk_set=old_ids, using=db)
-
-            old_vals_qs = self.using(db).filter(**{
-                '%s__in' % self.target_field.related_field.attname: old_ids})
-            filters = self._build_clear_filters(old_vals_qs)
+            target_model_qs = super(ManyRelatedManager, self).get_queryset()
+            if target_model_qs._has_filters():
+                old_vals = target_model_qs.using(db).filter(**{
+                    '%s__in' % self.target_field.related_field.attname: old_ids})
+            else:
+                old_vals = old_ids
+            filters = self._build_remove_filters(old_vals)
             self.through._default_manager.using(db).filter(filters).delete()
 
             signals.m2m_changed.send(sender=self.through, action="post_remove",
