@@ -16,6 +16,10 @@ except ImportError:
 
 try:
     import bcrypt
+    # Django 1.5 works only with py-bcrypt, not with bcrypt. py-bcrypt has
+    # '_bcrypt' attribute, bcrypt doesn't.
+    if not hasattr(bcrypt, '_bcrypt'):
+        bcrypt = None
 except ImportError:
     bcrypt = None
 
