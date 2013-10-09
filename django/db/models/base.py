@@ -158,7 +158,7 @@ class ModelBase(type):
         # All the fields of any type declared on this model
         new_fields = new_class._meta.local_fields + \
                      new_class._meta.local_many_to_many + \
-                     new_class._meta.virtual_fields
+                     new_class._meta.local_private_fields
         field_names = set(f.name for f in new_fields)
 
         # Basic setup for proxy models.
@@ -229,6 +229,9 @@ class ModelBase(type):
                 else:
                     field = None
                 new_class._meta.parents[base] = field
+                # We need to clear any existing field caches to ensure
+                # superclass fields are propagated properly.
+                new_class._meta.clear_all_caches()
             else:
                 # .. and abstract ones.
                 for field in parent_fields:
@@ -245,9 +248,9 @@ class ModelBase(type):
             if is_proxy:
                 new_class.copy_managers(original_base._meta.concrete_managers)
 
-            # Inherit virtual fields (like GenericForeignKey) from the parent
-            # class
-            for field in base._meta.virtual_fields:
+            # Inherit virtual fields that have to be cloned (like
+            # GenericRelation).
+            for field in base._meta.local_private_fields:
                 if base._meta.abstract and field.name in field_names:
                     raise FieldError('Local field %r in class %r clashes '
                                      'with field of similar name from '
@@ -285,6 +288,8 @@ class ModelBase(type):
     def add_to_class(cls, name, value):
         if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
+            if getattr(value, 'prepare_after_contribute_to_class', False):
+                value.prepare()
         else:
             setattr(cls, name, value)
 
@@ -360,8 +365,8 @@ class Model(six.with_metaclass(ModelBase)):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
+        fields_iter = iter(self._meta.concrete_fields)
         if not kwargs:
-            fields_iter = iter(self._meta.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
@@ -370,7 +375,6 @@ class Model(six.with_metaclass(ModelBase)):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
-            fields_iter = iter(self._meta.fields)
             for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
@@ -382,32 +386,26 @@ class Model(six.with_metaclass(ModelBase)):
         # keywords, or default.
 
         for field in fields_iter:
-            is_related_object = False
             # This slightly odd construct is so that we can access any
             # data-descriptor object (DeferredAttribute) without triggering its
             # __get__ method.
             if (field.attname not in kwargs and
-                    (isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)
-                     or field.column is None)):
+                    isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute)):
                 # This field will be populated on request.
                 continue
+            use_attname = True
             if kwargs:
-                if isinstance(field.rel, ForeignObjectRel):
+                if field.auxiliary_to is not None:
                     try:
                         # Assume object instance was passed in.
-                        rel_obj = kwargs.pop(field.name)
-                        is_related_object = True
+                        val = kwargs.pop(field.auxiliary_to.name)
+                        use_attname = False
                     except KeyError:
                         try:
                             # Object instance wasn't passed in -- must be an ID.
                             val = kwargs.pop(field.attname)
                         except KeyError:
-                            val = field.get_default()
-                    else:
-                        # Object instance was passed in. Special case: You can
-                        # pass in "None" for related objects if it's allowed.
-                        if rel_obj is None and field.null:
-                            val = None
+                            val = field.auxiliary_to.get_default()
                 else:
                     try:
                         val = kwargs.pop(field.attname)
@@ -417,24 +415,35 @@ class Model(six.with_metaclass(ModelBase)):
                         # get_default() to be evaluated, and then not used.
                         # Refs #12057.
                         val = field.get_default()
+            elif field.auxiliary_to is not None:
+                val = field.auxiliary_to.get_default()
             else:
                 val = field.get_default()
 
-            if is_related_object:
+            if use_attname:
+                setattr(self, field.attname, val)
+            else:
                 # If we are passed a related instance, set it using the
                 # field.name instead of field.attname (e.g. "user" instead of
                 # "user_id") so that the object gets properly cached (and type
                 # checked) by the RelatedObjectDescriptor.
-                setattr(self, field.name, rel_obj)
-            else:
-                setattr(self, field.attname, val)
+                setattr(self, field.auxiliary_to.name, val)
 
         if kwargs:
             for prop in list(kwargs):
                 try:
                     if isinstance(getattr(self.__class__, prop), property):
                         setattr(self, prop, kwargs.pop(prop))
+                        continue
                 except AttributeError:
+                    pass
+
+                # We also have to try to look the name up again in case it
+                # was a virtual field.
+                try:
+                    self._meta.get_field_by_name(prop)
+                    setattr(self, prop, kwargs.pop(prop))
+                except FieldDoesNotExist:
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
@@ -486,12 +495,12 @@ class Model(six.with_metaclass(ModelBase)):
         data = self.__dict__
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
-            return model_unpickle, (class_id, [], simple_class_factory), data
-        defers = []
-        for field in self._meta.fields:
+            return model_unpickle, (class_id, set(), simple_class_factory), data
+        defers = set()
+        for field in self._meta.concrete_fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
                           DeferredAttribute):
-                defers.append(field.attname)
+                defers.add(field.attname)
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
         return (model_unpickle, (class_id, defers, deferred_class_factory), data)
@@ -546,6 +555,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             update_fields = frozenset(update_fields)
             field_names = set()
+            basic_update_fields = set()
 
             for field in self._meta.fields:
                 if not field.primary_key:
@@ -554,6 +564,10 @@ class Model(six.with_metaclass(ModelBase)):
                     if field.name != field.attname:
                         field_names.add(field.attname)
 
+                    if (field.name in update_fields
+                            or field.attname in update_fields):
+                        basic_update_fields.update(field.resolve_basic_fields())
+
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -561,12 +575,24 @@ class Model(six.with_metaclass(ModelBase)):
                                  "model or are m2m fields: %s"
                                  % ', '.join(non_model_fields))
 
+            update_fields = frozenset(f.name for f in basic_update_fields)
+
         # If saving to the same database, and this model is deferred, then
         # automatically do a "update_fields" save on the loaded fields.
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set()
+
+            # We need to determine the set of fields which are the primary
+            # keys for either the local model or any of its parents so
+            # that we don't update those as well. They might be virtual
+            # fields, which means we need to resolve them into basic
+            # concrete fields first.
+            pk_field_names = set(f.name for f in self._meta.pk.resolve_basic_fields())
+            for parent in self._meta.parents:
+                pk_field_names.update(f.name for f in parent._meta.pk.resolve_basic_fields())
+
             for field in self._meta.concrete_fields:
-                if not field.primary_key and not hasattr(field, 'through'):
+                if not field.name in pk_field_names and not hasattr(field, 'through'):
                     field_names.add(field.attname)
             deferred_fields = [
                 f.attname for f in self._meta.fields
@@ -651,7 +677,8 @@ class Model(six.with_metaclass(ModelBase)):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+        pk_names = set(f.name for f in meta.pk.resolve_basic_fields())
+        non_pks = [f for f in meta.local_concrete_fields if not f.name in pk_names]
 
         if update_fields:
             non_pks = [f for f in non_pks

@@ -2,12 +2,14 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import MultipleObjectsReturned, FieldError
-from django.db import transaction
+from django.db import models, transaction
+from django.db.models.query_utils import InvalidQuery
+from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article, Reporter
+from .models import Article, Reporter, Assignment
 
 
 class ManyToOneTests(TestCase):
@@ -442,3 +444,118 @@ class ManyToOneTests(TestCase):
                                  expected_message % ', '.join(['EXTRA',] + Article._meta.get_all_field_names()),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')
+
+
+class FieldCloningTests(TestCase):
+    def test_basic_cloning(self):
+        original_field = models.CharField(max_length=47)
+        clone_result = original_field.clone_for_foreignkey(
+            'test_name',
+            False,
+            'test_tablespace',
+            original_field.creation_counter,
+            original_field.creation_counter + 1,
+            'dummy_column',
+            fk_field='dummy value',
+        )
+        self.assertEqual(len(clone_result), 1)
+        new_name, new_field = clone_result[0]
+        self.assertEqual(new_name, 'test_name')
+        self.assertIsNot(original_field, new_field)
+        self.assertLess(original_field.creation_counter,
+                        new_field.creation_counter)
+        self.assertLess(new_field.creation_counter,
+                        original_field.creation_counter + 1)
+        self.assertEqual(original_field.max_length,
+                         new_field.max_length)
+        self.assertEqual(new_field.db_column, 'dummy_column')
+        self.assertEqual(new_field.auxiliary_to, 'dummy value')
+        self.assertEqual(new_field.db_tablespace, 'test_tablespace')
+
+    def test_autofield_cloning(self):
+        original_field = models.AutoField(primary_key=True)
+        clone_result = original_field.clone_for_foreignkey(
+            'test_name',
+            False,
+            'test_tablespace',
+            original_field.creation_counter,
+            original_field.creation_counter + 1,
+            'dummy_column',
+        )
+        self.assertEqual(len(clone_result), 1)
+        new_name, new_field = clone_result[0]
+        self.assertIsInstance(new_field, models.IntegerField)
+        self.assertFalse(new_field.primary_key)
+
+
+class AuxiliaryFieldTests(TestCase):
+    def create_some_objects(self):
+        # Create a few Reporters.
+        self.r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
+        self.r.save()
+        self.r2 = Reporter(first_name='Paul', last_name='Jones', email='paul@example.com')
+        self.r2.save()
+        # Create an Assignment.
+        self.a = Assignment(description='Write an article', assignee=self.r)
+        self.a.save()
+
+    def test_aux_created(self):
+        fk = Article._meta.get_field('reporter')
+        aux = Article._meta.get_field('reporter_id')
+
+        # The aux field should compare more than its owner to ensure
+        # correct order of fields.
+        self.assertLess(fk, aux)
+        self.assertIs(fk.auxiliary_field, aux)
+        self.assertIs(aux.auxiliary_to, fk)
+        self.assertIsNot(fk, aux)
+
+    def test_aux_not_created_when_specified(self):
+        with self.assertRaises(FieldDoesNotExist):
+            Assignment._meta.get_field('assignee_id')
+
+        fk = Assignment._meta.get_field('assignee')
+        aux = Assignment._meta.get_field('person_id')
+
+        self.assertEqual(fk.attname, aux.name)
+        self.assertIs(fk.auxiliary_field, aux)
+        self.assertIs(aux.auxiliary_to, fk)
+
+    def test_custom_aux_get(self):
+        self.create_some_objects()
+        r = self.a.assignee
+        self.assertEqual(r.id, self.r.id)
+        self.assertEqual((r.first_name, self.r.last_name), ('John', 'Smith'))
+        self.assertEqual(self.a.person_id, self.r.id)
+
+    def test_custom_aux_assign(self):
+        self.create_some_objects()
+        self.assertEqual(self.a.person_id, self.r.pk)
+
+        self.a.assignee = self.r2
+        self.a.save()
+
+        self.assertQuerysetEqual(self.r.assignments.all(), [])
+        self.assertQuerysetEqual(self.r2.assignments.all(), [
+            '<Assignment: Write an article>',
+        ])
+
+    def test_custom_aux_join(self):
+        self.create_some_objects()
+        qs = Reporter.objects.filter(assignments__description__contains='article')
+        self.assertQuerysetEqual(qs, ['<Reporter: John Smith>'])
+        qs = Reporter.objects.exclude(assignments__description__contains='article')
+        self.assertQuerysetEqual(qs, ['<Reporter: Paul Jones>'])
+
+    def test_custom_aux_defer_select_related(self):
+        with self.assertRaises(InvalidQuery):
+            list(Assignment.objects.defer('person_id').select_related('assignee'))
+
+    def test_custom_aux_select_related(self):
+        self.create_some_objects()
+
+        with self.assertNumQueries(1):
+            a = Assignment.objects.select_related('assignee').get()
+            self.assertEqual(a.pk, self.a.pk)
+            self.assertEqual(a.assignee.first_name, self.r.first_name)
+            self.assertEqual(a.assignee.last_name, self.r.last_name)

@@ -54,6 +54,14 @@ class BookWithSlug(models.Model):
         db_table = "schema_book"
 
 
+class BookWithRepointedAuthor(models.Model):
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+
+    class Meta:
+        app_cache = new_app_cache
+
+
 class Tag(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
@@ -95,3 +103,8 @@ class UniqueTest(models.Model):
     class Meta:
         app_cache = new_app_cache
         unique_together = ["year", "slug"]
+
+
+class DummyTarget(models.Model):
+    class Meta:
+        app_cache = new_app_cache

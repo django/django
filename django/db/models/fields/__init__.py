@@ -7,11 +7,13 @@ import decimal
 import math
 import warnings
 from base64 import b64decode, b64encode
+from fractions import Fraction
 from itertools import tee
 
 from django.db import connection
 from django.db.models.loading import get_model
 from django.db.models.query_utils import QueryWrapper
+from django.db.models import signals
 from django.conf import settings
 from django import forms
 from django.core import exceptions, validators
@@ -76,6 +78,17 @@ class Field(object):
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
 
+    # If true, a separate instance of the field will be used in each
+    # subclass of the model to which it belongs. This only makes sense
+    # with virtual fields (and is only required by GenericRelation which
+    # relies on this).
+    clone_in_subclasses = False
+
+    # Whether ModelBase.add_to_class should prepare the field after its
+    # contribute_to_class finishes. Subclasses that set this to False have
+    # to call the "prepare" method on their own.
+    prepare_after_contribute_to_class = True
+
     # These track each time a Field instance is created. Used to retain order.
     # The auto_creation_counter is used for fields that Django implicitly
     # creates, creation_counter is used for all user-specified fields.
@@ -103,7 +116,7 @@ class Field(object):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+            error_messages=None, auxiliary_to=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -144,6 +157,9 @@ class Field(object):
         messages.update(error_messages or {})
         self._error_messages = error_messages  # Store for deconstruction later
         self.error_messages = messages
+        self.auxiliary_to = auxiliary_to
+
+        self.prepared = False
 
     def deconstruct(self):
         """
@@ -227,6 +243,44 @@ class Field(object):
             [],
             keywords,
         )
+
+    def clone_for_foreignkey(self, name, null, db_tablespace, counter_low,
+                             counter_high, db_column, klass=None,
+                             args=None, kwargs=None, fk_field=None):
+        """
+        Returns a list of fields to be added to another model in order to
+        create an auxiliary field for a ForeignKey. For each field,
+        returns a pair (name, instance) where name is the new name of the
+        field in the target model.
+        """
+        if args is None or kwargs is None:
+            name_, path_, args_, kwargs_ = self.deconstruct()
+            args = args_ if args is None else args
+            kwargs = kwargs_ if kwargs is None else kwargs
+        klass = klass or self.__class__
+        # Certain field arguments are not supposed to be set on the
+        # auxiliary field, instead, the owning ForeignKey takes care of
+        # them.
+        for arg_name in ['primary_key', 'choices', 'default', 'unique',
+                         'db_index']:
+            if arg_name in kwargs:
+                del kwargs[arg_name]
+        kwargs['auxiliary_to'] = fk_field
+        kwargs['serialize'] = False
+        kwargs['null'] = null
+        kwargs['editable'] = False
+        kwargs['db_column'] = db_column
+        kwargs['db_tablespace'] = db_tablespace
+        kwargs['auto_created'] = True
+        instance = klass(*args, **kwargs)
+        # We need to set this manually in order to make the field appear
+        # just after the ForeignKey to preserve the order of columns.
+        instance.creation_counter = (Fraction(counter_low) +
+                                     Fraction(counter_high)) / 2
+        return [(name, instance)]
+
+    def resolve_basic_fields(self):
+        return [self]
 
     def __eq__(self, other):
         # Needed for @total_ordering
@@ -405,28 +459,28 @@ class Field(object):
     def set_attributes_from_name(self, name):
         if not self.name:
             self.name = name
-        self.attname, self.column = self.get_attname_column()
+        self.attname = self.get_attname()
+        self.column = self.get_column()
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name):
         self.set_attributes_from_name(name)
         self.model = cls
-        if virtual_only:
-            cls._meta.add_virtual_field(self)
-        else:
-            cls._meta.add_field(self)
+        cls._meta.add_field(self)
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
 
+    def prepare(self):
+        self.prepared = True
+        signals.field_prepared.send(sender=self)
+
     def get_attname(self):
         return self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return self.db_column or self.attname
 
     def get_cache_name(self):
         return '_%s_cache' % self.name
@@ -713,6 +767,10 @@ class AutoField(Field):
         del kwargs['blank']
         kwargs['primary_key'] = True
         return name, path, args, kwargs
+
+    def clone_for_foreignkey(self, *args, **kwargs):
+        kwargs['klass'] = IntegerField
+        return super(AutoField, self).clone_for_foreignkey(*args, **kwargs)
 
     def get_internal_type(self):
         return "AutoField"

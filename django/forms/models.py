@@ -118,7 +118,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     from django.db.models.fields.related import ManyToManyField
     opts = instance._meta
     data = {}
-    for f in opts.concrete_fields + opts.many_to_many:
+    for f in opts.fields + opts.many_to_many:
         if not f.editable:
             continue
         if fields and not f.name in fields:
@@ -168,7 +168,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     field_list = []
     ignored = []
     opts = model._meta
-    for f in sorted(opts.concrete_fields + opts.many_to_many):
+    for f in sorted(opts.fields + opts.many_to_many):
         if not f.editable:
             continue
         if fields is not None and not f.name in fields:

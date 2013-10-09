@@ -6,8 +6,9 @@ from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
+from django.db.models.loading import BaseAppCache
 from django.db.transaction import atomic
-from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest
+from .models import Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget
 
 
 class SchemaTests(TransactionTestCase):
@@ -21,7 +22,7 @@ class SchemaTests(TransactionTestCase):
 
     available_apps = []
 
-    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest]
+    models = [Author, AuthorWithM2M, Book, BookWithSlug, BookWithM2M, BookWithRepointedAuthor, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest, DummyTarget]
 
     # Utility functions
 
@@ -99,7 +100,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Book)
             editor.create_model(Author)
-            editor.create_model(Tag)
+            editor.create_model(DummyTarget)
         # Check that initial tables are there
         list(Author.objects.all())
         list(Book.objects.all())
@@ -111,8 +112,8 @@ class SchemaTests(TransactionTestCase):
                 pub_date = datetime.datetime.now(),
             )
         # Repoint the FK constraint
-        new_field = ForeignKey(Tag)
-        new_field.set_attributes_from_name("author")
+        new_field = ForeignKey(DummyTarget)
+        new_field.contribute_to_class(BookWithRepointedAuthor, "author")
         with connection.schema_editor() as editor:
             editor.alter_field(
                 Book,
@@ -124,7 +125,7 @@ class SchemaTests(TransactionTestCase):
         constraints = connection.introspection.get_constraints(connection.cursor(), Book._meta.db_table)
         for name, details in constraints.items():
             if details['columns'] == ["author_id"] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                self.assertEqual(details['foreign_key'], ('schema_dummytarget', 'id'))
                 break
         else:
             self.fail("No FK constraint for author_id found")

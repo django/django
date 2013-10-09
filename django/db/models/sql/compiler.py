@@ -923,6 +923,12 @@ class SQLUpdateCompiler(SQLCompiler):
         result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:
+            basic_fields = field.resolve_basic_fields()
+            if len(basic_fields) != 1:
+                raise FieldError("Cannot update field %s which is not "
+                                 "backed by exactly one column." %
+                                 field.name)
+            field = basic_fields[0]
             if hasattr(val, 'prepare_database_save'):
                 val = val.prepare_database_save(field)
             else:

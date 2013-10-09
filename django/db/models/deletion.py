@@ -192,19 +192,19 @@ class Collector(object):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
-                sub_objs = self.related_objects(related, new_objs)
-                if self.can_fast_delete(sub_objs, from_field=field):
-                    self.fast_deletes.append(sub_objs)
-                elif sub_objs:
-                    field.rel.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.virtual_fields:
                 if hasattr(field, 'bulk_related_objects'):
-                    # Its something like generic foreign key.
+                    # It's something like GenericRelation.
                     sub_objs = field.bulk_related_objects(new_objs, self.using)
                     self.collect(sub_objs,
                                  source=model,
                                  source_attr=field.rel.related_name,
                                  nullable=True)
+                    continue
+                sub_objs = self.related_objects(related, new_objs)
+                if self.can_fast_delete(sub_objs, from_field=field):
+                    self.fast_deletes.append(sub_objs)
+                elif sub_objs:
+                    field.rel.on_delete(self, field, sub_objs, self.using)
 
     def related_objects(self, related, objs):
         """

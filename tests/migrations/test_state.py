@@ -57,7 +57,7 @@ class StateTests(TestCase):
         
         self.assertEqual(book_state.app_label, "migrations")
         self.assertEqual(book_state.name, "Book")
-        self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author"])
+        self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author", "author_id"])
         self.assertEqual(book_state.fields[1][1].max_length, 1000)
         self.assertEqual(book_state.fields[2][1].null, False)
         self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome"})

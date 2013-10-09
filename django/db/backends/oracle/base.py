@@ -231,9 +231,11 @@ WHEN (new.%(col_name)s IS NULL)
 
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
-        # string instead of null, but only if the field accepts the
-        # empty string.
-        if value is None and field and field.empty_strings_allowed:
+        # string instead of null, but only if the field accepts the empty
+        # string and is not auxiliary to a ForeignKey which does not.
+        if (value is None and field and field.empty_strings_allowed
+                and (field.auxiliary_to is None or
+                field.auxiliary_to.empty_strings_allowed)):
             value = ''
         # Convert 1 or 0 to True or False
         elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):

@@ -389,7 +389,7 @@ class QuerySet(object):
             return objs
         self._for_write = True
         connection = connections[self.db]
-        fields = self.model._meta.local_fields
+        fields = self.model._meta.local_concrete_fields
         with transaction.commit_on_success_unless_managed(using=self.db):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                 and self.model._meta.has_auto_field):
@@ -1374,9 +1374,10 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:
-        pk_idx = field_names.index(klass._meta.pk.attname)
+        pk_idx = [field_names.index(basic.name)
+                  for basic in klass._meta.pk.resolve_basic_fields()]
     else:
-        pk_idx = klass._meta.pk_index()
+        pk_idx = klass._meta.pk_indexes()
 
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
@@ -1409,7 +1410,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
     fields = row[index_start:index_start + field_count]
     # If the pk column is None (or the Oracle equivalent ''), then the related
     # object must be non-existent - set the relation to None.
-    if fields[pk_idx] is None or fields[pk_idx] == '':
+    if any(fields[i] is None or fields[i] == '' for i in pk_idx):
         obj = None
     elif field_names:
         fields = list(fields)
@@ -1523,7 +1524,7 @@ class RawQuerySet(object):
 
         # Find out which model's fields are not present in the query.
         skip = set()
-        for field in self.model._meta.fields:
+        for field in self.model._meta.concrete_fields:
             if field.attname not in model_init_field_names:
                 skip.add(field.attname)
         if skip:
@@ -1536,7 +1537,7 @@ class RawQuerySet(object):
             # to use *args based model instantation. For each field of the model,
             # record the query column position matching that field.
             model_init_field_pos = []
-            for field in self.model._meta.fields:
+            for field in self.model._meta.concrete_fields:
                 model_init_field_pos.append(model_init_field_names[field.attname])
         if need_resolv_columns:
             fields = [self.model_fields.get(c, None) for c in self.columns]
@@ -1613,8 +1614,8 @@ class RawQuerySet(object):
         if not hasattr(self, '_model_fields'):
             converter = connections[self.db].introspection.table_name_converter
             self._model_fields = {}
-            for field in self.model._meta.fields:
-                name, column = field.get_attname_column()
+            for field in self.model._meta.concrete_fields:
+                column = field.column
                 self._model_fields[converter(column)] = field
         return self._model_fields
 

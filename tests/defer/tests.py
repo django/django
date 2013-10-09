@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild, ChildProxy
+from .models import (Secondary, Primary, Child, BigChild, ChildProxy,
+    RelatedWithCustomAux)
 
 
 class DeferTests(TestCase):
     def assert_delayed(self, obj, num):
         count = 0
-        for field in obj._meta.fields:
+        for field in obj._meta.concrete_fields:
             if isinstance(obj.__class__.__dict__.get(field.attname),
                 DeferredAttribute):
                 count += 1
@@ -28,6 +29,8 @@ class DeferTests(TestCase):
 
         self.assert_delayed(qs.defer("name")[0], 1)
         self.assert_delayed(qs.only("name")[0], 2)
+        self.assert_delayed(qs.defer("related")[0], 1)
+        self.assert_delayed(qs.only("name", "value")[0], 1)
         self.assert_delayed(qs.defer("related__first")[0], 0)
 
         # Using 'pk' with only() should result in 3 deferred fields, namely all
@@ -189,3 +192,15 @@ class DeferTests(TestCase):
         s1_defer = Secondary.objects.only('pk').get(pk=s1.pk)
         self.assertEqual(s1, s1_defer)
         self.assertEqual(s1_defer, s1)
+
+    def test_custom_aux_field(self):
+        s = Secondary.objects.create(first='x1', second='y1')
+        rel = RelatedWithCustomAux.objects.create(secondary=s)
+
+        r = RelatedWithCustomAux.objects.defer('secondary').get(pk=rel.pk)
+        self.assert_delayed(r, 1)
+        with self.assertNumQueries(2):
+            # We need to fetch the deferred attribute and the related
+            # object.
+            s2 = r.secondary
+        self.assertEqual(s2.pk, s.pk)

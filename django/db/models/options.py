@@ -39,7 +39,9 @@ def normalize_unique_together(unique_together):
 class Options(object):
     def __init__(self, meta, app_label=None):
         self.local_fields, self.local_many_to_many = [], []
-        self.virtual_fields = []
+        # These are fields whose instances cannot be shared among model
+        # subclasses, like GenericRelation
+        self.local_private_fields = []
         self.model_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
@@ -181,48 +183,77 @@ class Options(object):
         # self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
-            if hasattr(self, '_m2m_cache'):
-                del self._m2m_cache
+            self.clear_m2m_caches()
         else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
+            if field.clone_in_subclasses:
+                target = self.local_private_fields
+            else:
+                target = self.local_fields
+            target.insert(bisect(target, field), field)
             self.setup_pk(field)
-            if hasattr(self, '_field_cache'):
-                del self._field_cache
-                del self._field_name_cache
-                # The fields, concrete_fields and local_concrete_fields are
-                # implemented as cached properties for performance reasons.
-                # The attrs will not exists if the cached property isn't
-                # accessed yet, hence the try-excepts.
-                try:
-                    del self.fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.concrete_fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.local_concrete_fields
-                except AttributeError:
-                    pass
-
-        if hasattr(self, '_name_map'):
-            del self._name_map
-
-    def add_virtual_field(self, field):
-        self.virtual_fields.append(field)
+            self.clear_field_caches()
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
             self.pk = field
             field.serialize = False
 
-    def pk_index(self):
+    def clear_all_caches(self):
         """
-        Returns the index of the primary key field in the self.concrete_fields
-        list.
+        The Options class holds all kinds of field caches for various
+        purposes. These have to be cleared each time a new field is added
+        to the model or a new base class is processed.
+
+        Caches have to be cleared recursively in all subclasses as well.
         """
-        return self.concrete_fields.index(self.pk)
+        self.clear_field_caches()
+        self.clear_m2m_caches()
+
+    def clear_field_caches(self):
+        if hasattr(self, '_field_cache'):
+            del self._field_cache
+            del self._field_name_cache
+            # The fields, concrete_fields and local_concrete_fields are
+            # implemented as cached properties for performance reasons.
+            # The attrs will not exists if the cached property isn't
+            # accessed yet, hence the try-excepts.
+            try:
+                del self.fields
+            except AttributeError:
+                pass
+            try:
+                del self.concrete_fields
+            except AttributeError:
+                pass
+            try:
+                del self.local_concrete_fields
+            except AttributeError:
+                pass
+        self.clear_global_field_caches(recurse_subclasses=False)
+        for submodel in self.model.__subclasses__():
+            submodel._meta.clear_field_caches()
+
+    def clear_m2m_caches(self):
+        if hasattr(self, '_m2m_cache'):
+            del self._m2m_cache
+        self.clear_global_field_caches(recurse_subclasses=False)
+        for submodel in self.model.__subclasses__():
+            submodel._meta.clear_m2m_caches()
+
+    def clear_global_field_caches(self, recurse_subclasses=False):
+        if hasattr(self, '_name_map'):
+            del self._name_map
+        if recurse_subclasses:
+            for submodel in self.model.__subclasses__():
+                submodel._meta.clear_global_field_caches()
+
+    def pk_indexes(self):
+        """
+        Returns the indexes of the basic fields backing the primary key in
+        the self.concrete_fields list.
+        """
+        return [self.concrete_fields.index(basic)
+                for basic in self.pk.resolve_basic_fields()]
 
     def setup_proxy(self, target):
         """
@@ -321,11 +352,15 @@ class Options(object):
         cache = []
         for parent in self.parents:
             for field, model in parent._meta.get_fields_with_model():
+                if field.clone_in_subclasses:
+                    # Our own copy of this field will be added later.
+                    continue
                 if model:
                     cache.append((field, model))
                 else:
                     cache.append((field, parent))
         cache.extend((f, None) for f in self.local_fields)
+        cache.extend((f, None) for f in self.local_private_fields)
         self._field_cache = tuple(cache)
         self._field_name_cache = [x for x, _ in cache]
 
@@ -412,20 +447,24 @@ class Options(object):
         Initialises the field name -> field object mapping.
         """
         cache = {}
+
+        def add_to_cache(field, key, value):
+            # This hook is used by GenericRelation
+            if hasattr(field, 'contribute_to_field_name_cache'):
+                field.contribute_to_field_name_cache(cache, self.model)
+            else:
+                cache[key] = value
+
         # We intentionally handle related m2m objects first so that symmetrical
         # m2m accessor names can be overridden, if necessary.
         for f, model in self.get_all_related_m2m_objects_with_model():
-            cache[f.field.related_query_name()] = (f, model, False, True)
+            add_to_cache(f, f.field.related_query_name(), (f, model, False, True))
         for f, model in self.get_all_related_objects_with_model():
-            cache[f.field.related_query_name()] = (f, model, False, False)
+            add_to_cache(f, f.field.related_query_name(), (f, model, False, False))
         for f, model in self.get_m2m_with_model():
-            cache[f.name] = cache[f.attname] = (f, model, True, True)
+            add_to_cache(f, f.name, (f, model, True, True))
         for f, model in self.get_fields_with_model():
-            cache[f.name] = cache[f.attname] = (f, model, True, False)
-        for f in self.virtual_fields:
-            if hasattr(f, 'related'):
-                cache[f.name] = cache[f.attname] = (
-                    f.related, None if f.model == self.model else f.model, True, False)
+            add_to_cache(f, f.name, (f, model, True, False))
         if app_cache_ready():
             self._name_map = cache
         return cache
@@ -500,6 +539,10 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
+        # Collect locally defined reverse relations.
+        for f in self.local_fields + self.local_private_fields:
+            if f.rel and f.is_reverse_link:
+                cache[f.related] = None
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in self.app_cache.get_models(include_auto_created=True, only_installed=False):

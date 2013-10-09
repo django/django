@@ -140,13 +140,16 @@ class ModelInheritanceTests(TestCase):
         # the right order.
         self.assertEqual(
             [f.name for f in Restaurant._meta.fields],
-            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs",
-             "serves_pizza", "chef"]
+            ["id", "name", "address", "place_ptr", "place_ptr_id",
+             "rating", "serves_hot_dogs", "serves_pizza", "chef",
+             "chef_id"]
         )
         self.assertEqual(
             [f.name for f in ItalianRestaurant._meta.fields],
-            ["id", "name", "address", "place_ptr", "rating", "serves_hot_dogs",
-             "serves_pizza", "chef", "restaurant_ptr", "serves_gnocchi"],
+            ["id", "name", "address", "place_ptr", "place_ptr_id",
+             "rating", "serves_hot_dogs", "serves_pizza", "chef",
+             "chef_id", "restaurant_ptr", "restaurant_ptr_id",
+             "serves_gnocchi"],
         )
         self.assertEqual(Restaurant._meta.ordering, ["-rating"])
 

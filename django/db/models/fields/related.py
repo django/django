@@ -94,14 +94,14 @@ class RelatedField(Field):
            as it relates columns to another table'''
         return None
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
+    def contribute_to_class(self, cls, name):
         sup = super(RelatedField, self)
 
         # Store the opts for related_query_name()
         self.opts = cls._meta
 
         if hasattr(sup, 'contribute_to_class'):
-            sup.contribute_to_class(cls, name, virtual_only=virtual_only)
+            sup.contribute_to_class(cls, name)
 
         if not cls._meta.abstract and self.rel.related_name:
             related_name = self.rel.related_name % {
@@ -965,6 +965,8 @@ class ForeignObject(RelatedField):
     requires_unique_target = True
     generate_reverse_relation = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
+    # GenericRelation is an example of a reverse link.
+    is_reverse_link = False
 
     def __init__(self, to, from_fields, to_fields, **kwargs):
         self.from_fields = from_fields
@@ -980,15 +982,25 @@ class ForeignObject(RelatedField):
                 on_delete=kwargs.pop('on_delete', CASCADE),
             )
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
+        kwargs.setdefault('editable', False)
 
         super(ForeignObject, self).__init__(**kwargs)
 
+    def get_enclosed_fields(self):
+        return self.local_related_fields
+
+    def resolve_basic_fields(self):
+        return [f
+                for myfield in self.get_enclosed_fields()
+                for f in myfield.resolve_basic_fields()]
+
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
-            raise ValueError('Foreign Object from and to fields must be the same non-zero length')
+            raise ValueError('Foreign Object from and to fields must be '
+                             'the same non-zero length.')
         if isinstance(self.rel.to, six.string_types):
             raise ValueError('Related model %r cannot been resolved' % self.rel.to)
-        related_fields = []
+        basic_from_fields, basic_to_fields = [], []
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
             to_field_name = self.to_fields[index]
@@ -996,8 +1008,15 @@ class ForeignObject(RelatedField):
                           else self.opts.get_field_by_name(from_field_name)[0])
             to_field = (self.rel.to._meta.pk if to_field_name is None
                         else self.rel.to._meta.get_field_by_name(to_field_name)[0])
-            related_fields.append((from_field, to_field))
-        return related_fields
+            basic_from = from_field.resolve_basic_fields()
+            basic_to = to_field.resolve_basic_fields()
+            if len(basic_from) != len(basic_to):
+                raise ValueError('Related from field %s and to field %s '
+                                 'resolve to different numbers of basic '
+                                 'fields.' % (from_field.name, to_field.name))
+            basic_from_fields.extend(basic_from)
+            basic_to_fields.extend(basic_to)
+        return list(zip(basic_from_fields, basic_to_fields))
 
     @property
     def related_fields(self):
@@ -1039,9 +1058,8 @@ class ForeignObject(RelatedField):
             ret.append(getattr(instance, field.attname))
         return tuple(ret)
 
-    def get_attname_column(self):
-        attname, column = super(ForeignObject, self).get_attname_column()
-        return attname, None
+    def get_column(self):
+        return None
 
     def get_joining_columns(self, reverse_join=False):
         source = self.reverse_related_fields if reverse_join else self.related_fields
@@ -1092,7 +1110,8 @@ class ForeignObject(RelatedField):
         """
         opts = self.model._meta
         from_opts = self.rel.to._meta
-        pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
+        fields = opts.pk.resolve_basic_fields()
+        pathinfos = [PathInfo(from_opts, opts, fields, self.rel, not self.unique, False)]
         return pathinfos
 
     def get_lookup_constraint(self, constraint_class, alias, targets, sources, lookup_type,
@@ -1108,7 +1127,10 @@ class ForeignObject(RelatedField):
                 value_list = []
                 for source in sources:
                     # Account for one-to-one relations when sent a different model
-                    while not isinstance(value, source.model) and source.rel:
+                    while not isinstance(value, source.model) and (source.rel
+                            or source.auxiliary_to is not None):
+                        if source.auxiliary_to is not None:
+                            source = source.auxiliary_to
                         source = source.rel.to._meta.get_field(source.rel.field_name)
                     value_list.append(getattr(value, source.attname))
                 return tuple(value_list)
@@ -1157,8 +1179,8 @@ class ForeignObject(RelatedField):
     def get_defaults(self):
         return tuple(field.get_default() for field in self.local_related_fields)
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+    def contribute_to_class(self, cls, name):
+        super(ForeignObject, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
@@ -1176,9 +1198,10 @@ class ForeignKey(ForeignObject):
         'invalid': _('%(model)s instance with pk %(pk)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
+    prepare_after_contribute_to_class = False
 
     def __init__(self, to, to_field=None, rel_class=ManyToOneRel,
-                 db_constraint=True, **kwargs):
+                 db_constraint=True, aux_field=None, **kwargs):
         try:
             to._meta.object_name.lower()
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -1194,6 +1217,7 @@ class ForeignKey(ForeignObject):
             kwargs['db_index'] = True
 
         self.db_constraint = db_constraint
+        self._aux_field = aux_field
 
         kwargs['rel'] = rel_class(
             self, to, to_field,
@@ -1203,6 +1227,7 @@ class ForeignKey(ForeignObject):
             parent_link=kwargs.pop('parent_link', False),
             on_delete=kwargs.pop('on_delete', CASCADE),
         )
+        kwargs.setdefault('editable', True)
         super(ForeignKey, self).__init__(to, ['self'], [to_field], **kwargs)
 
     def deconstruct(self):
@@ -1216,6 +1241,8 @@ class ForeignKey(ForeignObject):
             kwargs['db_constraint'] = self.db_constraint
         if self.rel.on_delete is not CASCADE:
             kwargs['on_delete'] = self.rel.on_delete
+        if self._aux_field is not None:
+            kwargs['aux_field'] = self._aux_field
         # Rel needs more work.
         if self.rel.field_name:
             kwargs['to_field'] = self.rel.field_name
@@ -1225,9 +1252,17 @@ class ForeignKey(ForeignObject):
             kwargs['to'] = "%s.%s" % (self.rel.to._meta.app_label, self.rel.to._meta.object_name)
         return name, path, args, kwargs
 
-    @property
+    def clone_for_foreignkey(self, *args, **kwargs):
+        # We only need to clone our auxiliary field and not the ForeignKey
+        # itself.
+        return self.auxiliary_field.clone_for_foreignkey(*args, **kwargs)
+
+    def get_enclosed_fields(self):
+        return [self.auxiliary_field]
+
+    @cached_property
     def related_field(self):
-        return self.foreign_related_fields[0]
+        return self.rel.get_related_field()
 
     def get_reverse_path_info(self):
         """
@@ -1235,7 +1270,8 @@ class ForeignKey(ForeignObject):
         """
         opts = self.model._meta
         from_opts = self.rel.to._meta
-        pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.rel, not self.unique, False)]
+        fields = opts.pk.resolve_basic_fields()
+        pathinfos = [PathInfo(from_opts, opts, fields, self.rel, not self.unique, False)]
         return pathinfos
 
     def validate(self, value, model_instance):
@@ -1258,12 +1294,12 @@ class ForeignKey(ForeignObject):
             )
 
     def get_attname(self):
+        if self._aux_field is not None:
+            return self._aux_field
         return '%s_id' % self.name
 
-    def get_attname_column(self):
-        attname = self.get_attname()
-        column = self.db_column or attname
-        return attname, column
+    def get_column(self):
+        return None
 
     def get_validator_unique_lookup_type(self):
         return '%s__%s__exact' % (self.name, self.related_field.name)
@@ -1294,10 +1330,90 @@ class ForeignKey(ForeignObject):
                     return smart_text(choice_list[1][0])
         return super(ForeignKey, self).value_to_string(obj)
 
+    def contribute_to_class(self, cls, name):
+        super(ForeignKey, self).contribute_to_class(cls, name)
+        self.setup_custom_aux_field()
+
+    def setup_custom_aux_field(self, class_prepared=False):
+        if self._aux_field is not None:
+            try:
+                f = self.model._meta.get_field(self._aux_field,
+                                               many_to_many=False)
+                self.auxiliary_field = f
+                # TODO: Do we want to check here that the same field isn't
+                # auxiliary to multiple ForeignKeys?
+                f.auxiliary_to = self
+                if f.prepared:
+                    self.prepare()
+                else:
+                    def delayed_prepare(sender, **kwargs):
+                        self.prepare()
+                    signals.field_prepared.connect(delayed_prepare,
+                                                   sender=f, weak=False)
+            except FieldDoesNotExist:
+                if class_prepared:
+                    raise exceptions.FieldError('Auxiliary field name '
+                                                '%r could not be resolved '
+                                                'into a field.' %
+                                                (self._aux_field,))
+                def delayed_custom_aux_field_setup(sender, **kwargs):
+                    self.setup_custom_aux_field(class_prepared=True)
+                signals.class_prepared.connect(delayed_custom_aux_field_setup,
+                                               sender=self.model,
+                                               weak=False)
+
     def contribute_to_related_class(self, cls, related):
         super(ForeignKey, self).contribute_to_related_class(cls, related)
         if self.rel.field_name is None:
             self.rel.field_name = cls._meta.pk.name
+
+    def do_related_class(self, other, cls):
+        super(ForeignKey, self).do_related_class(other, cls)
+        if self._aux_field is not None:
+            # A custom auxiliary field has been set, which means
+            # setup_custom_aux_field is responsible for preparing this
+            # field.
+            return
+        if self.model._meta.abstract:
+            # We don't add auxiliary fields to abstract models, that would
+            # result in them being added twice. They are only added to
+            # concrete subclasses.
+            self.prepare()
+        else:
+            # contribute_to_related_class is called from
+            # RelatedField.do_related_class, which means self.rel.field_name
+            # contains a valid string by now. However, we can't just use
+            # self.related_field as that eventually calls the other
+            # model's get_field_by_name and it might be too early for that
+            # to succeed.
+            rel_field = other._meta.get_field(self.rel.field_name)
+            self.create_aux_field(rel_field, self.attname)
+
+    def create_aux_field(self, field, name):
+        if not field.prepared:
+            def delayed_aux_field_creation(sender, **kwargs):
+                self.create_aux_field(field, name)
+            signals.field_prepared.connect(delayed_aux_field_creation,
+                                           sender=field,
+                                           weak=False)
+            return
+        to_add = field.clone_for_foreignkey(
+            name, self.null, self.db_tablespace,
+            self.creation_counter, self.creation_counter + 1,
+            self.db_column or self.attname,
+            fk_field=self
+        )
+        for new_name, new_field in to_add:
+            self.model.add_to_class(new_name, new_field)
+        aux_field = self.model._meta.get_field(self.attname)
+        # It is safe to assume here that all auxiliary fields are prepared
+        # by now -- they are supposed to be only basic concrete fields or
+        # a CompositeField which is added only after all its constituents.
+        self.from_fields = [f.name for f in aux_field.resolve_basic_fields()]
+        self.to_fields = [f.name for f in field.resolve_basic_fields()]
+        # Cache the aux field for later use.
+        self.auxiliary_field = aux_field
+        self.prepare()
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)
@@ -1314,19 +1430,7 @@ class ForeignKey(ForeignObject):
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
-        # The database column type of a ForeignKey is the column type
-        # of the field to which it points. An exception is if the ForeignKey
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        # If the database needs similar types for key fields however, the only
-        # thing we can do is making AutoField an IntegerField.
-        rel_field = self.related_field
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+        return None
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
@@ -1571,10 +1675,6 @@ class ManyToManyField(RelatedField):
         # and swapped models don't get a related descriptor.
         if not self.rel.is_hidden() and not related.model._meta.swapped:
             setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(related))
-
-        # Set up the accessors for the column names on the m2m table
-        self.m2m_column_name = curry(self._get_m2m_attr, related, 'column')
-        self.m2m_reverse_name = curry(self._get_m2m_reverse_attr, related, 'column')
 
         self.m2m_field_name = curry(self._get_m2m_attr, related, 'name')
         self.m2m_reverse_field_name = curry(self._get_m2m_reverse_attr, related, 'name')

@@ -81,7 +81,7 @@ def get_validation_errors(outfile, app=None):
 
             # Column name validation.
             # Determine which column name this field wants to use.
-            _, column_name = f.get_attname_column()
+            column_name = f.get_column()
 
             # Ensure the column name is not already in use.
             if column_name and column_name in used_column_names:
@@ -170,7 +170,14 @@ def get_validation_errors(outfile, app=None):
 
                 # Make sure the related field specified by a ForeignKey is unique
                 if f.requires_unique_target:
-                    if len(f.foreign_related_fields) > 1:
+                    if hasattr(f, 'related_field') and f.related_field.unique:
+                        pass
+                    elif len(f.foreign_related_fields) > 1:
+                        # FIXME: This is probably too restrictive, it
+                        # would be sufficient if there was a
+                        # unique_together subset of
+                        # foreign_related_fields, that is, however, way
+                        # more difficult to check.
                         has_unique_field = False
                         for rel_field in f.foreign_related_fields:
                             has_unique_field = has_unique_field or rel_field.unique

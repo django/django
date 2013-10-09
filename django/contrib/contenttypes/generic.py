@@ -9,7 +9,6 @@ from functools import partial
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, DEFAULT_DB_ALIAS
-from django.db.models import signals
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.where import Constraint
@@ -29,38 +28,23 @@ class RenameGenericForeignKeyMethods(RenameMethodsBase):
     )
 
 
-class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
+class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods,
+                                           models.VirtualField)):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
 
-    def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
+    def __init__(self, ct_field="content_type", fk_field="object_id",
+                 for_concrete_model=True, **kwargs):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        super(GenericForeignKey, self).__init__(**kwargs)
 
     def contribute_to_class(self, cls, name):
-        self.name = name
-        self.model = cls
+        super(GenericForeignKey, self).contribute_to_class(cls, name)
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
-
-        # Only run pre-initialization field assignment on non-abstract models
-        if not cls._meta.abstract:
-            signals.pre_init.connect(self.instance_pre_init, sender=cls)
-
-        setattr(cls, name, self)
-
-    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
-        """
-        Handles initializing an object with the generic FK instead of
-        content-type/object-id fields.
-        """
-        if self.name in kwargs:
-            value = kwargs.pop(self.name)
-            kwargs[self.ct_field] = self.get_content_type(obj=value)
-            kwargs[self.fk_field] = value._get_pk_val()
 
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
@@ -152,6 +136,11 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    is_reverse_link = True
+    # This doesn't generate an additional reverse link as this is one
+    # already.
+    generate_reverse_relation = False
+    clone_in_subclasses = True
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -178,8 +167,10 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
-                 self.model._meta.pk)]
+        from_field = self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0]
+        basic_from = from_field.resolve_basic_fields()
+        basic_to = self.model._meta.pk.resolve_basic_fields()
+        return list(zip(basic_from, basic_to))
 
     def get_reverse_path_info(self):
         opts = self.rel.to._meta
@@ -201,7 +192,7 @@ class GenericRelation(ForeignObject):
         return super(GenericRelation, self).get_joining_columns(reverse_join)
 
     def contribute_to_class(self, cls, name):
-        super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
+        super(GenericRelation, self).contribute_to_class(cls, name)
         # Save a reference to which model this class is on for future use
         self.model = cls
         # Add the descriptor for the relation
@@ -209,6 +200,9 @@ class GenericRelation(ForeignObject):
 
     def contribute_to_related_class(self, cls, related):
         pass
+
+    def contribute_to_field_name_cache(self, cache, model):
+        cache[self.name] = (self.related, None if model == self.model else self.model, True, False)
 
     def set_attributes_from_rel(self):
         pass
@@ -225,6 +219,8 @@ class GenericRelation(ForeignObject):
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
         field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        # Resolve the auxiliary field holding the actual value.
+        field = field.auxiliary_field
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         cond.add((Constraint(remote_alias, field.column, field), 'exact', contenttype_pk), 'AND')
