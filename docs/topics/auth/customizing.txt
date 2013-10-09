@@ -501,13 +501,13 @@ password resets. You must then provide some key implementation details:
         "active".  This attribute is provided as an attribute on
         ``AbstractBaseUser`` defaulting to ``True``. How you choose to
         implement it will depend on the details of your chosen auth backends.
-        See the documentation of the :attr:`attribute on the builtin user model
-        <django.contrib.auth.models.User.is_active>` for details.
+        See the documentation of the :attr:`is_active attribute on the built-in
+        user model <django.contrib.auth.models.User.is_active>` for details.
 
     .. method:: get_full_name()
 
         A longer formal identifier for the user. A common interpretation
-        would be the full name name of the user, but it can be any string that
+        would be the full name of the user, but it can be any string that
         identifies the user.
 
     .. method:: get_short_name()
@@ -602,7 +602,7 @@ additional methods:
         The prototype of ``create_user()`` should accept the username field,
         plus all required fields as arguments. For example, if your user model
         uses ``email`` as the username field, and has ``date_of_birth`` as a
-        required fields, then ``create_user`` should be defined as::
+        required field, then ``create_user`` should be defined as::
 
             def create_user(self, email, date_of_birth, password=None):
                 # create user here
@@ -613,14 +613,14 @@ additional methods:
         The prototype of ``create_superuser()`` should accept the username
         field, plus all required fields as arguments. For example, if your user
         model uses ``email`` as the username field, and has ``date_of_birth``
-        as a required fields, then ``create_superuser`` should be defined as::
+        as a required field, then ``create_superuser`` should be defined as::
 
             def create_superuser(self, email, date_of_birth, password):
                 # create superuser here
                 ...
 
         Unlike ``create_user()``, ``create_superuser()`` *must* require the
-        caller to provider a password.
+        caller to provide a password.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
@@ -629,7 +629,7 @@ utility methods:
 
     .. method:: models.BaseUserManager.normalize_email(email)
 
-        A classmethod that normalizes email addresses by lowercasing
+        A ``classmethod`` that normalizes email addresses by lowercasing
         the domain portion of the email address.
 
     .. method:: models.BaseUserManager.get_by_natural_key(username)
@@ -640,12 +640,12 @@ utility methods:
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
         Returns a random password with the given length and given string of
-        allowed characters. (Note that the default value of ``allowed_chars``
+        allowed characters. Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:
 
         * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
           letter L, uppercase letter i, and the number one)
-        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+        * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
           and zero)
 
 Extending Django's default User
@@ -738,7 +738,7 @@ your custom User model extends ``django.contrib.auth.models.AbstractUser``,
 you can use Django's existing ``django.contrib.auth.admin.UserAdmin``
 class. However, if your User model extends
 :class:`~django.contrib.auth.models.AbstractBaseUser`, you'll need to define
-a custom ModelAdmin class. It may be possible to subclass the default
+a custom ``ModelAdmin`` class. It may be possible to subclass the default
 ``django.contrib.auth.admin.UserAdmin``; however, you'll need to
 override any of the definitions that refer to fields on
 ``django.contrib.auth.models.AbstractUser`` that aren't on your
@@ -781,8 +781,8 @@ methods and attributes:
 
     .. method:: models.PermissionsMixin.has_perm(perm, obj=None)
 
-        Returns ``True`` if the user has the specified permission, where perm is
-        in the format ``"<app label>.<permission codename>"`` (see
+        Returns ``True`` if the user has the specified permission, where
+        ``perm`` is in the format ``"<app label>.<permission codename>"`` (see
         :ref:`permissions <topic-authorization>`). If the user is inactive, this method will
         always return ``False``.
 
@@ -832,7 +832,7 @@ Custom users and signals
 Another limitation of custom User models is that you can't use
 :func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
 handler. Instead, you must register the handler with the resulting User model.
-See :doc:`/topics/signals` for more information on registering an sending
+See :doc:`/topics/signals` for more information on registering and sending
 signals.
 
 Custom users and testing/fixtures
@@ -1077,7 +1077,7 @@ code would be required in the app's ``admin.py`` file::
 
     # Now register the new UserAdmin...
     admin.site.register(MyUser, MyUserAdmin)
-    # ... and, since we're not using Django's builtin permissions,
+    # ... and, since we're not using Django's built-in permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
 
