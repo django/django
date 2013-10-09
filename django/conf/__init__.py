@@ -162,6 +162,9 @@ class Settings(BaseSettings):
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
+    def is_overridden(self, setting):
+        return setting in self.__dict__
+
 
 class UserSettingsHolder(BaseSettings):
     """
@@ -194,5 +197,11 @@ class UserSettingsHolder(BaseSettings):
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
+    def is_overridden(self, setting):
+        if setting in self._deleted:
+            return False
+        else:
+            return self.default_settings.is_overridden(setting)
 
 settings = LazySettings()

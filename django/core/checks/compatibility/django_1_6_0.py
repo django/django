@@ -21,8 +21,7 @@ def _check_test_runner(apps=None, **kwargs):
 
     from django.conf import settings
 
-    user_settings = settings._wrapped
-    if 'TEST_RUNNER' not in user_settings.__dict__:
+    if not settings.is_overridden("TEST_RUNNER"):
         return [
             Warning(
                 'You have not explicitly set "TEST_RUNNER". In Django 1.6, '
