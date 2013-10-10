@@ -244,10 +244,14 @@ class AutoNowDateTimeData(models.Model):
 class ModifyingSaveData(models.Model):
     data = models.IntegerField(null=True)
 
-    def save(self):
-        "A save method that modifies the data in the object"
+    def save(self, *args, **kwargs):
+        """
+        A save method that modifies the data in the object.
+        Verifies that a user-defined save() method isn't called when objects
+        are deserialized (#4459).
+        """
         self.data = 666
-        super(ModifyingSaveData, self).save(raw)
+        super(ModifyingSaveData, self).save(*args, **kwargs)
 
 # Tests for serialization of models using inheritance.
 # Regression for #7202, #7350
@@ -282,4 +286,3 @@ class LengthModel(models.Model):
 
     def __len__(self):
         return self.data
-
