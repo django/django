@@ -1,5 +1,6 @@
 from .base import Operation
 from django.db import models, router
+from django.db.models.options import normalize_unique_together
 from django.db.migrations.state import ModelState
 
 
@@ -108,6 +109,7 @@ class AlterUniqueTogether(Operation):
 
     def __init__(self, name, unique_together):
         self.name = name
+        unique_together = normalize_unique_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):

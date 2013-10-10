@@ -31,6 +31,15 @@ class UnreadablePostError(IOError):
     pass
 
 
+class RawPostDataException(Exception):
+    """
+    You cannot access raw_post_data from a request that has
+    multipart/* POST data if it has been accessed via POST,
+    FILES, etc..
+    """
+    pass
+
+
 class HttpRequest(object):
     """A basic HTTP request."""
 
@@ -192,7 +201,7 @@ class HttpRequest(object):
     def body(self):
         if not hasattr(self, '_body'):
             if self._read_started:
-                raise Exception("You cannot access body after reading from request's data stream")
+                raise RawPostDataException("You cannot access body after reading from request's data stream")
             try:
                 self._body = self.read()
             except IOError as e:

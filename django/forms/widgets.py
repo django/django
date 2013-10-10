@@ -508,7 +508,7 @@ class Select(Widget):
         return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
-        if option_value == None:
+        if option_value is None:
             option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:

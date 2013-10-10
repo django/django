@@ -12,7 +12,8 @@ from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.core import signals
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
+from django.http import (HttpRequest, HttpResponse, parse_cookie,
+    build_request_repr, UnreadablePostError, RawPostDataException)
 from django.test import SimpleTestCase, TransactionTestCase
 from django.test.client import FakePayload
 from django.test.utils import override_settings, str_prefix
@@ -263,7 +264,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.read(2), b'na')
-        self.assertRaises(Exception, lambda: request.body)
+        self.assertRaises(RawPostDataException, lambda: request.body)
         self.assertEqual(request.POST, {})
 
     def test_non_ascii_POST(self):
@@ -308,7 +309,7 @@ class RequestsTests(SimpleTestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': payload})
         self.assertEqual(request.POST, {'name': ['value']})
-        self.assertRaises(Exception, lambda: request.body)
+        self.assertRaises(RawPostDataException, lambda: request.body)
 
     def test_body_after_POST_multipart_related(self):
         """

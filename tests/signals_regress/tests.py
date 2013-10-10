@@ -34,11 +34,11 @@ class SignalsRegressTests(TestCase):
 
     def pre_delete_test(self, signal, sender, instance, **kwargs):
         self.signal_output.append('pre_save signal, %s' % instance)
-        self.signal_output.append('instance.id is not None: %s' % (instance.id != None))
+        self.signal_output.append('instance.id is not None: %s' % (instance.id is not None))
 
     def post_delete_test(self, signal, sender, instance, **kwargs):
         self.signal_output.append('post_delete signal, %s' % instance)
-        self.signal_output.append('instance.id is not None: %s' % (instance.id != None))
+        self.signal_output.append('instance.id is not None: %s' % (instance.id is not None))
 
     def setUp(self):
         self.signal_output = []

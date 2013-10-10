@@ -1899,7 +1899,7 @@ class FormsTestCase(TestCase):
         class JSONForm(forms.Form):
             json = CustomJSONField()
 
-        form = JSONForm(data={'json': '{}'});
+        form = JSONForm(data={'json': '{}'})
         form.full_clean()
         self.assertEqual(form.cleaned_data, {'json' : {}})
 

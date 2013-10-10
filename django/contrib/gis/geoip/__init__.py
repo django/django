@@ -14,5 +14,5 @@
 try:
     from .base import GeoIP, GeoIPException
     HAS_GEOIP = True
-except ImportError:
+except RuntimeError:  # libgeoip.py raises a RuntimeError if no GeoIP library is found
     HAS_GEOIP = False

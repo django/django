@@ -165,6 +165,22 @@ class BinaryTreeAdmin(admin.TabularInline):
 class SightingInline(admin.TabularInline):
     model = Sighting
 
+# admin and form for #18263
+class SomeChildModelForm(forms.ModelForm):
+
+    class Meta:
+        fields = '__all__'
+        model = SomeChildModel
+        widgets = {
+            'position': forms.HiddenInput,
+        }
+
+
+class SomeChildModelInline(admin.TabularInline):
+    model = SomeChildModel
+    form = SomeChildModelForm
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -184,3 +200,4 @@ site.register(ProfileCollection, inlines=[ProfileInline])
 site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])
 site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
+site.register(SomeParentModel, inlines=[SomeChildModelInline])

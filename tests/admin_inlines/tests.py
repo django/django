@@ -12,7 +12,8 @@ from .admin import InnerInline
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
-    Sighting, Novel, Chapter, FootNote, BinaryTree)
+    Sighting, Novel, Chapter, FootNote, BinaryTree, SomeParentModel,
+    SomeChildModel)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -126,6 +127,16 @@ class TestInline(TestCase):
         response = self.client.get('/admin/admin_inlines/capofamiglia/add/')
         self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Help text for ReadOnlyInline)" title="Help text for ReadOnlyInline" />', 1)
 
+    def test_inline_hidden_field_no_column(self):
+        """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
+        parent = SomeParentModel.objects.create(name='a')
+        SomeChildModel.objects.create(name='b', position='0', parent=parent)
+        SomeChildModel.objects.create(name='c', position='1', parent=parent)
+        response = self.client.get('/admin/admin_inlines/someparentmodel/%s/' % parent.pk)
+        self.assertNotContains(response, '<td class="field-position">')
+        self.assertContains(response, (
+            '<input id="id_somechildmodel_set-1-position" '
+            'name="somechildmodel_set-1-position" type="hidden" value="1" />'))
 
     def test_non_related_name_inline(self):
         """
