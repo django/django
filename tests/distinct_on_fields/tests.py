@@ -16,13 +16,13 @@ class DistinctOnTests(TestCase):
         Tag.objects.create(name='t4', parent=t3)
         Tag.objects.create(name='t5', parent=t3)
 
-        p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
-        p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
-        p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
-        Staff.objects.create(id=4, name="p1", organisation="o2")
-        p1_o1.coworkers.add(p2_o1, p3_o1)
-        StaffTag.objects.create(staff=p1_o1, tag=t1)
-        StaffTag.objects.create(staff=p1_o1, tag=t1)
+        self.p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
+        self.p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
+        self.p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
+        self.p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
+        self.p1_o1.coworkers.add(self.p2_o1, self.p3_o1)
+        StaffTag.objects.create(staff=self.p1_o1, tag=t1)
+        StaffTag.objects.create(staff=self.p1_o1, tag=t1)
 
         celeb1 = Celebrity.objects.create(name="c1")
         celeb2 = Celebrity.objects.create(name="c2")
@@ -114,3 +114,17 @@ class DistinctOnTests(TestCase):
         # distinct + aggregate not allowed
         with self.assertRaises(NotImplementedError):
             Celebrity.objects.distinct('id').aggregate(Max('id'))
+
+    def test_distinct_on_in_ordered_subquery(self):
+        qs = Staff.objects.distinct('name').order_by('name', 'id')
+        qs = Staff.objects.filter(pk__in=qs).order_by('name')
+        self.assertQuerysetEqual(
+            qs, [self.p1_o1, self.p2_o1, self.p3_o1],
+            lambda x: x
+        )
+        qs = Staff.objects.distinct('name').order_by('name', '-id')
+        qs = Staff.objects.filter(pk__in=qs).order_by('name')
+        self.assertQuerysetEqual(
+            qs, [self.p1_o2, self.p2_o1, self.p3_o1],
+            lambda x: x
+        )

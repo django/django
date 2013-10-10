@@ -347,3 +347,19 @@ class ExtraRegressTests(TestCase):
             ['<TestObject: TestObject: a,a,a>', '<TestObject: TestObject: b,a,a>'],
             ordered=False
         )
+
+    def test_extra_values_distinct_ordering(self):
+        t1 = TestObject.objects.create(first='a', second='a', third='a')
+        t2 = TestObject.objects.create(first='a', second='b', third='b')
+        qs = TestObject.objects.extra(
+            select={'second_extra': 'second'}
+        ).values_list('id', flat=True).distinct()
+        self.assertQuerysetEqual(
+            qs.order_by('second_extra'), [t1.pk, t2.pk], lambda x: x)
+        self.assertQuerysetEqual(
+            qs.order_by('-second_extra'), [t2.pk, t1.pk], lambda x: x)
+        # Note: the extra ordering must appear in select clause, so we get two
+        # non-distinct results here (this is on purpose, see #7070).
+        self.assertQuerysetEqual(
+            qs.order_by('-second_extra').values_list('first', flat=True),
+            ['a', 'a'], lambda x: x)
