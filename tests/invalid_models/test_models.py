@@ -91,7 +91,7 @@ class UniqueTogetherTests(IsolatedModelsTestCase):
     def test_non_iterable(self):
         class Model(models.Model):
             class Meta:
-                unique_together = 'not-a-list'
+                unique_together = 0
 
         errors = Model.check()
         expected = [
