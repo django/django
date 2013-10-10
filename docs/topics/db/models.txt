@@ -4,9 +4,9 @@ Models
 
 .. module:: django.db.models
 
-A model is the single, definitive source of data about your data. It contains
-the essential fields and behaviors of the data you're storing. Generally, each
-model maps to a single database table.
+A model is the single, definitive source of information about your data. It
+contains the essential fields and behaviors of the data you're storing.
+Generally, each model maps to a single database table.
 
 The basics:
 
@@ -48,7 +48,7 @@ Some technical notes:
 
 * The name of the table, ``myapp_person``, is automatically derived from
   some model metadata but can be overridden. See :ref:`table-names` for more
-  details..
+  details.
 
 * An ``id`` field is added automatically, but this behavior can be
   overridden. See :ref:`automatic-primary-key-fields`.
@@ -110,7 +110,7 @@ determine a few things:
 
 * The database column type (e.g. ``INTEGER``, ``VARCHAR``).
 
-* The default :doc:`widget </ref/forms/widgets>` to use when rendering a form
+* The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
   field (e.g. ``<input type="text">``, ``<select>``).
 
 * The minimal validation requirements, used in Django's admin and in
@@ -234,7 +234,7 @@ sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 ``id`` column.
 
 Each model requires exactly one field to have :attr:`primary_key=True
-<Field.primary_key>`.
+<Field.primary_key>` (either explicitly declared or automatically added).
 
 .. _verbose-field-names:
 
