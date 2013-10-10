@@ -164,7 +164,7 @@ class SQLCompiler(object):
         Used when nesting this query inside another.
         """
         obj = self.query.clone()
-        if obj.low_mark == 0 and obj.high_mark is None:
+        if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
         return obj.get_compiler(connection=self.connection).as_sql()
@@ -364,6 +364,10 @@ class SQLCompiler(object):
 
         params = []
         ordering_params = []
+        # For plain DISTINCT queries any ORDER BY clause must appear
+        # in SELECT clause.
+        # http://www.postgresql.org/message-id/27009.1171559417@sss.pgh.pa.us
+        must_append_to_select = distinct and not self.query.distinct_fields
         for pos, field in enumerate(ordering):
             if field == '?':
                 result.append(self.connection.ops.random_function_sql())
@@ -388,7 +392,7 @@ class SQLCompiler(object):
                 if (table, col) not in processed_pairs:
                     elt = '%s.%s' % (qn(table), col)
                     processed_pairs.add((table, col))
-                    if not distinct or elt in select_aliases:
+                    if not must_append_to_select or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
                         group_by.append((elt, []))
             elif not self.query._extra or get_order_dir(field)[0] not in self.query._extra:
@@ -400,21 +404,23 @@ class SQLCompiler(object):
                         if (table, col) not in processed_pairs:
                             elt = '%s.%s' % (qn(table), qn2(col))
                             processed_pairs.add((table, col))
-                            if distinct and elt not in select_aliases:
+                            if must_append_to_select and elt not in select_aliases:
                                 ordering_aliases.append(elt)
                             result.append('%s %s' % (elt, order))
                             group_by.append((elt, []))
             else:
                 elt = qn2(col)
                 if col not in self.query.extra_select:
-                    sql = "(%s) AS %s" % (self.query.extra[col][0], elt)
-                    ordering_aliases.append(sql)
-                    ordering_params.extend(self.query.extra[col][1])
+                    if must_append_to_select:
+                        sql = "(%s) AS %s" % (self.query.extra[col][0], elt)
+                        ordering_aliases.append(sql)
+                        ordering_params.extend(self.query.extra[col][1])
+                        result.append('%s %s' % (elt, order))
+                    else:
+                        result.append("(%s) %s" % (self.query.extra[col][0], order))
+                        params.extend(self.query.extra[col][1])
                 else:
-                    if distinct and col not in select_aliases:
-                        ordering_aliases.append(elt)
-                        ordering_params.extend(params)
-                result.append('%s %s' % (elt, order))
+                    result.append('%s %s' % (elt, order))
                 group_by.append(self.query.extra[col])
         self.ordering_aliases = ordering_aliases
         self.ordering_params = ordering_params
