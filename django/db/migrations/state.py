@@ -53,11 +53,11 @@ class ProjectState(object):
     @classmethod
     def from_app_cache(cls, app_cache):
         "Takes in an AppCache and returns a ProjectState matching it"
-        models = {}
+        app_models = {}
         for model in app_cache.get_models():
             model_state = ModelState.from_model(model)
-            models[(model_state.app_label, model_state.name.lower())] = model_state
-        return cls(models)
+            app_models[(model_state.app_label, model_state.name.lower())] = model_state
+        return cls(app_models)
 
     def __eq__(self, other):
         if set(self.models.keys()) != set(other.models.keys()):

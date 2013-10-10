@@ -928,21 +928,21 @@ class ConnectionRouterTestCase(TestCase):
         'multiple_database.tests.TestRouter',
         'multiple_database.tests.WriteRouter'])
     def test_router_init_default(self):
-        router = ConnectionRouter()
-        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+        connection_router = ConnectionRouter()
+        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers],
                              ['TestRouter', 'WriteRouter'])
 
     def test_router_init_arg(self):
-        router = ConnectionRouter([
+        connection_router = ConnectionRouter([
             'multiple_database.tests.TestRouter',
             'multiple_database.tests.WriteRouter'
         ])
-        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers],
                              ['TestRouter', 'WriteRouter'])
 
         # Init with instances instead of strings
-        router = ConnectionRouter([TestRouter(), WriteRouter()])
-        self.assertListEqual([r.__class__.__name__ for r in router.routers],
+        connection_router = ConnectionRouter([TestRouter(), WriteRouter()])
+        self.assertListEqual([r.__class__.__name__ for r in connection_router.routers],
                              ['TestRouter', 'WriteRouter'])
 
 

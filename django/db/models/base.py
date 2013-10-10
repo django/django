@@ -276,7 +276,7 @@ class ModelBase(type):
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
         base_managers.sort()
-        for _, mgr_name, manager in base_managers:
+        for _, mgr_name, manager in base_managers: # NOQA (redefinition of _)
             val = getattr(cls, mgr_name, None)
             if not val or val is manager:
                 new_manager = manager._copy_to_model(cls)

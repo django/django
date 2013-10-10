@@ -43,7 +43,6 @@ from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str, force_text
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six

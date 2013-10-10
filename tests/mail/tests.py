@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import asyncore
-import email
+from email import message_from_file, message_from_string
 from email.mime.text import MIMEText
 import os
 import shutil
@@ -23,6 +23,11 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_str, force_text
 from django.utils.six import PY3, StringIO, string_types
 from django.utils.translation import ugettext_lazy
+
+if PY3:
+    from email.utils import parseaddr
+else:
+    from email.Utils import parseaddr
 
 
 class HeadersCheckMixin(object):
@@ -244,7 +249,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         msg.attach_alternative(html_content, "text/html")
         msg.attach("an attachment.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
-        message = email.message_from_string(msg_str)
+        message = message_from_string(msg_str)
         self.assertTrue(message.is_multipart())
         self.assertEqual(message.get_content_type(), 'multipart/mixed')
         self.assertEqual(message.get_default_type(), 'text/plain')
@@ -261,7 +266,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Unicode in file name
         msg.attach("une pièce jointe.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
-        message = email.message_from_string(msg_str)
+        message = message_from_string(msg_str)
         payload = message.get_payload()
         self.assertEqual(payload[1].get_filename(), 'une pièce jointe.pdf')
 
@@ -689,7 +694,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         for filename in os.listdir(self.tmp_dir):
             with open(os.path.join(self.tmp_dir, filename), 'r') as fp:
                 session = force_text(fp.read()).split('\n' + ('-' * 79) + '\n')
-            messages.extend(email.message_from_string(force_str(m)) for m in session if m)
+            messages.extend(message_from_string(force_str(m)) for m in session if m)
         return messages
 
     def test_file_sessions(self):
@@ -700,7 +705,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
         self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
         with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])) as fp:
-            message = email.message_from_file(fp)
+            message = message_from_file(fp)
         self.assertEqual(message.get_content_type(), 'text/plain')
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@example.com')
@@ -742,7 +747,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def get_mailbox_content(self):
         messages = force_text(self.stream.getvalue()).split('\n' + ('-' * 79) + '\n')
-        return [email.message_from_string(force_str(m)) for m in messages if m]
+        return [message_from_string(force_str(m)) for m in messages if m]
 
     def test_console_stream_kwarg(self):
         """
@@ -788,11 +793,8 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.sink_lock = threading.Lock()
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        m = email.message_from_string(data)
-        if PY3:
-            maddr = email.utils.parseaddr(m.get('from'))[1]
-        else:
-            maddr = email.Utils.parseaddr(m.get('from'))[1]
+        m = message_from_string(data)
+        maddr = parseaddr(m.get('from'))[1]
         if mailfrom != maddr:
             return "553 '%s' != '%s'" % (mailfrom, maddr)
         with self.sink_lock:

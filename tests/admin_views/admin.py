@@ -567,11 +567,6 @@ class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
 
-class WorkHourAdmin(admin.ModelAdmin):
-    list_display = ('datum', 'employee')
-    list_filter = ('employee',)
-
-
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug' : ('title',)
