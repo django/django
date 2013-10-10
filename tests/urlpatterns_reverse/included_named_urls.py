@@ -9,4 +9,3 @@ urlpatterns = patterns('',
     url(r'^(?P<one>\d+)|(?P<two>\d+)/$', empty_view),
     (r'^included/', include('urlpatterns_reverse.included_named_urls2')),
 )
-

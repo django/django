@@ -114,4 +114,3 @@ class DistinctOnTests(TestCase):
         # distinct + aggregate not allowed
         with self.assertRaises(NotImplementedError):
             Celebrity.objects.distinct('id').aggregate(Max('id'))
-

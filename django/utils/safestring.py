@@ -135,4 +135,3 @@ def mark_for_escaping(s):
     if isinstance(s, (six.text_type, Promise)):
         return EscapeText(s)
     return EscapeBytes(bytes(s))
-

@@ -60,4 +60,3 @@ def get_language_from_request(request, check_path=False):
 
 def get_language_from_path(request, supported=None):
     return None
-

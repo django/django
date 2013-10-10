@@ -27,4 +27,3 @@ class Issue(models.Model):
 
 class UnicodeReferenceModel(models.Model):
     others = models.ManyToManyField("UnicodeReferenceModel")
-

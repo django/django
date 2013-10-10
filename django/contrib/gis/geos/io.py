@@ -16,5 +16,3 @@ class WKTReader(_WKTReader):
     def read(self, wkt):
         "Returns a GEOSGeometry for the given WKT string."
         return GEOSGeometry(super(WKTReader, self).read(wkt))
-
-

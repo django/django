@@ -3,7 +3,7 @@
  topological operations on geometries.
 """
 __all__ = ['geos_boundary', 'geos_buffer', 'geos_centroid', 'geos_convexhull',
-           'geos_difference', 'geos_envelope', 'geos_intersection', 
+           'geos_difference', 'geos_envelope', 'geos_intersection',
            'geos_linemerge', 'geos_pointonsurface', 'geos_preservesimplify',
            'geos_simplify', 'geos_symdifference', 'geos_union', 'geos_relate']
 

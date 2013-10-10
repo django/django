@@ -154,5 +154,3 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Root</p>")
-
-

@@ -141,4 +141,3 @@ class PerformUniqueChecksTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
         self.assertEqual(cm.exception.message_dict, {'no': ['Custom unique number message.']})
-

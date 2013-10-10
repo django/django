@@ -112,7 +112,7 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
         self.assertNotContains(response, "nonexisting")
-    
+
     def test_perm_in_perms_attrs(self):
         u = User.objects.create_user(username='normal', password='secret')
         u.user_permissions.add(

@@ -20,4 +20,3 @@ class ChoicesTests(TestCase):
 
         a.gender = 'U'
         self.assertEqual(a.get_gender_display(), 'U')
-

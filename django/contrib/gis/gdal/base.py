@@ -33,4 +33,3 @@ class GDALBase(object):
             raise TypeError('Incompatible pointer type')
 
     ptr = property(_get_ptr, _set_ptr)
-

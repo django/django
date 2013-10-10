@@ -334,7 +334,7 @@ class Moderator(object):
         moderation_class = self._registry[model]
 
         # Comment will be disallowed outright (HTTP 403 response)
-        if not moderation_class.allow(comment, content_object, request): 
+        if not moderation_class.allow(comment, content_object, request):
             return False
 
         if moderation_class.moderate(comment, content_object, request):

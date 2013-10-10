@@ -20,4 +20,3 @@ class Command(AppCommand):
 
     def handle_app(self, app, **options):
         return '\n'.join(sql_destroy_indexes(app, self.style, connections[options.get('database')]))
-

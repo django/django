@@ -39,4 +39,3 @@ class Writer(models.Model):
 
     def __str__(self):
         return '%s (%s)' % (self.reporter, self.position)
-

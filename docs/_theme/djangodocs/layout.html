@@ -2,13 +2,13 @@
 
 {%- macro secondnav() %}
   {%- if prev %}
-    &laquo; <a href="{{ prev.link|e }}" title="{{ prev.title|e }}">previous</a> 
+    &laquo; <a href="{{ prev.link|e }}" title="{{ prev.title|e }}">previous</a>
     {{ reldelim2 }}
   {%- endif %}
   {%- if parents %}
-    <a href="{{ parents.0.link|e }}" title="{{ parents.0.title|e }}" accesskey="U">up</a> 
+    <a href="{{ parents.0.link|e }}" title="{{ parents.0.title|e }}" accesskey="U">up</a>
   {%- else %}
-    <a title="{{ docstitle }}" href="{{ pathto('index') }}" accesskey="U">up</a> 
+    <a title="{{ docstitle }}" href="{{ pathto('index') }}" accesskey="U">up</a>
   {%- endif %}
   {%- if next %}
   {{ reldelim2 }}
@@ -65,13 +65,13 @@
       </div>
       <div class="nav">{{ secondnav() }}</div>
     </div>
-    
+
     <div id="bd">
       <div id="yui-main">
         <div class="yui-b">
           <div class="yui-g" id="{{ pagename|replace('/', '-') }}">
             {% block body %}{% endblock %}
-          </div>         
+          </div>
         </div>
       </div>
       {% block sidebarwrapper %}
@@ -82,11 +82,11 @@
               <h3>Last update:</h3>
               <p class="topless">{{ last_updated }}</p>
             {%- endif %}
-          </div> 
+          </div>
         {% endif %}
       {% endblock %}
     </div>
-    
+
     <div id="ft">
       <div class="nav">{{ secondnav() }}</div>
     </div>
@@ -113,7 +113,7 @@
         <ul><li>{{ title }}</li></ul>
         {% for p in parents %}</li></ul>{% endfor %}
       </li>
-  </ul>  
+  </ul>
 {% endblock %}
 
 {# Empty some default blocks out #}

@@ -656,4 +656,3 @@ class ViewLoadingTests(TestCase):
         # swallow it.
         self.assertRaises(AttributeError, get_callable,
             'urlpatterns_reverse.views_broken.i_am_broken')
-

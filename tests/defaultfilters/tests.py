@@ -341,7 +341,7 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('before \'hi@example.com afterwards'),
                          'before \'<a href="mailto:hi@example.com">hi@example.com</a> afterwards')
 
-        # Check urlize copes with commas following URLs in quotes - see #20364 
+        # Check urlize copes with commas following URLs in quotes - see #20364
         self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
             'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy')
 

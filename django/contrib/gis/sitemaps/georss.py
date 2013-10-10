@@ -50,4 +50,3 @@ class GeoRSSSitemap(Sitemap):
 
     def location(self, obj):
         return urlresolvers.reverse('django.contrib.gis.views.feed', args=(obj,))
-

@@ -375,4 +375,3 @@ class DeleteViewTests(TestCase):
             self.fail('Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
         except ImproperlyConfigured:
             pass
-

@@ -66,4 +66,3 @@ class ResolveUrlTests(TestCase):
         """
         with self.assertRaises(NoReverseMatch):
             resolve_url(lambda: 'asdf')
-

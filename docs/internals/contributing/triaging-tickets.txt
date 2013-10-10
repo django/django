@@ -175,7 +175,7 @@ This means the ticket has an associated
 :doc:`patch<writing-code/submitting-patches>`. These will be reviewed
 to see if the patch is "good".
 
-The following three fields (Needs documentation, Needs tests, 
+The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.
 
 Needs documentation

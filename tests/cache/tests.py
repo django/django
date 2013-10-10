@@ -1917,4 +1917,3 @@ class TestMakeTemplateFragmentKey(TestCase):
         key = make_template_fragment_key('spam', ['abc:def%'])
         self.assertEqual(key,
             'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
-

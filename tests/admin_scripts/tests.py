@@ -1633,7 +1633,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         for f in ('Procfile', 'additional_file.py', 'requirements.txt'):
             self.assertTrue(os.path.exists(os.path.join(base_path, f)))
             with open(os.path.join(base_path, f)) as fh:
-                self.assertEqual(fh.read(),
+                self.assertEqual(fh.read().strip(),
                     '# some file for customtestproject test project')
 
     def test_custom_project_template_context_variables(self):

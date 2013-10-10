@@ -47,7 +47,7 @@ class HttpUtilTests(TestCase):
             conditional_content_removal(req, res)
             self.assertEqual(b''.join(res), b'')
 
-        # Issue #20472  
+        # Issue #20472
         abc = gzip_compress(b'abc')
         res = HttpResponse(abc, status=304)
         res['Content-Encoding'] = 'gzip'

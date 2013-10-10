@@ -64,7 +64,7 @@ class GeoFeedMixin(object):
                 # Getting the lower-case geometry type.
                 gtype = str(geom.geom_type).lower()
                 if gtype == 'point':
-                    self.add_georss_point(handler, geom.coords, w3c_geo=w3c_geo) 
+                    self.add_georss_point(handler, geom.coords, w3c_geo=w3c_geo)
                 else:
                     if w3c_geo: raise ValueError('W3C Geo only supports Point geometries.')
                     # For formatting consistent w/the GeoRSS simple standard:

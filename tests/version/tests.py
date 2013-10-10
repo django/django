@@ -24,4 +24,3 @@ class VersionTests(TestCase):
         )
         for ver_tuple, ver_string in tuples_to_strings:
             self.assertEqual(get_version(ver_tuple), ver_string)
-

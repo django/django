@@ -34,7 +34,7 @@ to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result
 getx = pnt_func(lgdal.OGR_G_GetX)
 gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
-    
+
 # Geometry creation routines.
 from_wkb = geom_output(lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2)
 from_wkt = geom_output(lgdal.OGR_G_CreateFromWkt, [POINTER(c_char_p), c_void_p, POINTER(c_void_p)], offset=-1)
@@ -95,4 +95,3 @@ geom_transform_to = void_output(lgdal.OGR_G_TransformTo, [c_void_p, c_void_p])
 
 # For retrieving the envelope of the geometry.
 get_envelope = env_func(lgdal.OGR_G_GetEnvelope, [c_void_p, POINTER(OGREnvelope)])
-

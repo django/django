@@ -28,7 +28,7 @@
         <field to="auth.group" name="groups" rel="ManyToManyRel"></field>
         <field to="auth.permission" name="user_permissions" rel="ManyToManyRel"></field>
     </object>
-    
+
     <object pk="1" model="admin_widgets.car">
         <field to="auth.user" name="owner" rel="ManyToOneRel">100</field>
         <field type="CharField" name="make">Volkswagon</field>

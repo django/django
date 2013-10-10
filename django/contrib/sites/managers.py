@@ -8,15 +8,15 @@ class CurrentSiteManager(models.Manager):
         super(CurrentSiteManager, self).__init__()
         self.__field_name = field_name
         self.__is_validated = False
-        
+
     def _validate_field_name(self):
         field_names = self.model._meta.get_all_field_names()
-        
+
         # If a custom name is provided, make sure the field exists on the model
         if self.__field_name is not None and self.__field_name not in field_names:
             raise ValueError("%s couldn't find a field named %s in %s." % \
                 (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
-        
+
         # Otherwise, see if there is a field called either 'site' or 'sites'
         else:
             for potential_name in ['site', 'sites']:
@@ -24,7 +24,7 @@ class CurrentSiteManager(models.Manager):
                     self.__field_name = potential_name
                     self.__is_validated = True
                     break
-        
+
         # Now do a type check on the field (FK or M2M only)
         try:
             field = self.model._meta.get_field(self.__field_name)
@@ -34,7 +34,7 @@ class CurrentSiteManager(models.Manager):
             raise ValueError("%s couldn't find a field named %s in %s." % \
                     (self.__class__.__name__, self.__field_name, self.model._meta.object_name))
         self.__is_validated = True
-    
+
     def get_queryset(self):
         if not self.__is_validated:
             self._validate_field_name()

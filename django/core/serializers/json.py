@@ -109,4 +109,3 @@ class DjangoJSONEncoder(json.JSONEncoder):
 
 # Older, deprecated class name (for backwards compatibility purposes).
 DateTimeAwareJSONEncoder = DjangoJSONEncoder
-

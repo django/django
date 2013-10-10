@@ -133,4 +133,3 @@ class FlatpageTemplateTagTests(TestCase):
                           "{% load flatpages %}{% get_flatpages for user as flatpages asdf%}")
         self.assertRaises(TemplateSyntaxError, render,
                           "{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf%}")
-

@@ -339,4 +339,3 @@ def flatten_result(source):
         for i in range(len(result)):
             result[i] += piece
     return result, result_args
-
