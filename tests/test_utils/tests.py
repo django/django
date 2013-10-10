@@ -307,7 +307,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom[0], 'foo')
 
     def test_parse_html_in_script(self):
-        parse_html('<script>var a = "<p" + ">";</script>');
+        parse_html('<script>var a = "<p" + ">";</script>')
         parse_html('''
             <script>
             var js_sha_link='<p>***</p>';
