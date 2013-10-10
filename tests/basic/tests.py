@@ -33,7 +33,7 @@ class ModelTest(TestCase):
         a.save()
 
         # Now it has an ID.
-        self.assertTrue(a.id != None)
+        self.assertTrue(a.id is not None)
 
         # Models have a pk property that is an alias for the primary key
         # attribute (by default, the 'id' attribute).
@@ -585,7 +585,7 @@ class ModelTest(TestCase):
         f3 = Field()
         self.assertTrue(f2 < f1)
         self.assertTrue(f3 > f1)
-        self.assertFalse(f1 == None)
+        self.assertFalse(f1 is None)
         self.assertFalse(f2 in (None, 1, ''))
 
     def test_extra_method_select_argument_with_dashes_and_values(self):

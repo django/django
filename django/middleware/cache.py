@@ -96,7 +96,7 @@ class UpdateCacheMiddleware(object):
         # Control" header before reverting to using the default cache_timeout
         # length.
         timeout = get_max_age(response)
-        if timeout == None:
+        if timeout is None:
             timeout = self.cache_timeout
         elif timeout == 0:
             # max-age was set to 0, don't bother caching.

@@ -1345,7 +1345,7 @@ class DocTestRunner:
                     # exception message will be in group(2)
                     m = re.match(r'(.*)\.(\w+:.+\s)', exc_msg)
                     # make sure there's a match
-                    if m != None:
+                    if m is not None:
                         f_name = m.group(1)
                         # check to see if m.group(1) contains the module name
                         if f_name == exception[0].__module__:
