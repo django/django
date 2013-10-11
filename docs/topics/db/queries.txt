@@ -139,8 +139,8 @@ To retrieve objects from your database, construct a
 :class:`~django.db.models.Manager` on your model class.
 
 A :class:`~django.db.models.query.QuerySet` represents a collection of objects
-from your database. It can have zero, one or many *filters* -- criteria that
-narrow down the collection based on given parameters. In SQL terms, a
+from your database. It can have zero, one or many *filters*. Filters narrow
+down the query results based on the given parameters. In SQL terms, a
 :class:`~django.db.models.query.QuerySet` equates to a ``SELECT`` statement,
 and a filter is a limiting clause such as ``WHERE`` or ``LIMIT``.
 
@@ -256,10 +256,10 @@ Example::
 These three ``QuerySets`` are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
 headline starting with "What". The second is a subset of the first, with an
-additional criteria that excludes records whose ``pub_date`` is greater than
-now. The third is a subset of the first, with an additional criteria that
-selects only the records whose ``pub_date`` is greater than now. The initial
-:class:`~django.db.models.query.QuerySet` (``q1``) is unaffected by the
+additional criteria that excludes records whose ``pub_date`` is today or in the
+future. The third is a subset of the first, with an additional criteria that
+selects only the records whose ``pub_date`` is today or in the future. The
+initial :class:`~django.db.models.query.QuerySet` (``q1``) is unaffected by the
 refinement process.
 
 .. _querysets-are-lazy:
@@ -1092,8 +1092,9 @@ the foreign key aren't saved to the database until you call
     >>> e.blog = some_blog
     >>> e.save()
 
-If a :class:`~django.db.models.ForeignKey` field has ``null=True`` set (i.e., it allows ``NULL``
-values), you can assign ``None`` to it. Example::
+If a :class:`~django.db.models.ForeignKey` field has ``null=True`` set (i.e.,
+it allows ``NULL`` values), you can assign ``None`` to remove the relation.
+Example::
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = None
