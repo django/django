@@ -149,7 +149,7 @@ class DummyCacheTests(unittest.TestCase):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1 }
+            'ascii2': {'x' : 1}
             }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -434,7 +434,7 @@ class BaseCacheTests(object):
         it is an absolute expiration timestamp instead of a relative
         offset. Test that we honour this convention. Refs #12399.
         '''
-        self.cache.set('key1', 'eggs', 60*60*24*30 + 1) #30 days + 1 second
+        self.cache.set('key1', 'eggs', 60*60*24*30 + 1)  # 30 days + 1 second
         self.assertEqual(self.cache.get('key1'), 'eggs')
 
         self.cache.add('key2', 'ham', 60*60*24*30 + 1)
@@ -1432,7 +1432,7 @@ class CacheI18nTest(TestCase):
         self.assertEqual(key, key2)
 
     @override_settings(USE_I18N=False, USE_L10N=False)
-    def test_cache_key_no_i18n (self):
+    def test_cache_key_no_i18n(self):
         request = self._get_request()
         lang = translation.get_language()
         tz = force_text(timezone.get_current_timezone_name(), errors='ignore')

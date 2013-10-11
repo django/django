@@ -16,11 +16,14 @@ class UserListA(ListMixin):
         self._list = self._mytype(i_list)
         super(UserListA, self).__init__(*args, **kwargs)
 
-    def __len__(self):  return len(self._list)
+    def __len__(self):
+        return len(self._list)
 
-    def __str__(self):  return str(self._list)
+    def __str__(self):
+        return str(self._list)
 
-    def __repr__(self): return repr(self._list)
+    def __repr__(self):
+        return repr(self._list)
 
     def _set_list(self, length, items):
         # this would work:

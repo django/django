@@ -1558,7 +1558,9 @@ class Queries5Tests(TestCase):
         # extra()
         qs = Ranking.objects.extra(select={'good': 'case when rank > 2 then 1 else 0 end'})
         dicts = qs.values().order_by('id')
-        for d in dicts: del d['id']; del d['author_id']
+        for d in dicts:
+            del d['id']
+            del d['author_id']
         self.assertEqual(
             [sorted(d.items()) for d in dicts],
             [[('good', 0), ('rank', 2)], [('good', 0), ('rank', 1)], [('good', 1), ('rank', 3)]]
@@ -2668,7 +2670,7 @@ class NullJoinPromotionOrTest(TestCase):
         # problem here was that b__name generates a LOUTER JOIN, then
         # b__c__name generates join to c, which the ORM tried to promote but
         # failed as that join isn't nullable.
-        q_obj =  (
+        q_obj = (
             Q(d__name='foo')|
             Q(b__name='foo')|
             Q(b__c__name='foo')

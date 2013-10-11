@@ -81,7 +81,7 @@ class GoogleMap(object):
         # level and a center coordinate are provided with polygons/polylines,
         # no automatic determination will occur.
         self.calc_zoom = False
-        if self.polygons or self.polylines  or self.markers:
+        if self.polygons or self.polylines or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
 

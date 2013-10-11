@@ -113,7 +113,7 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        dive =  Book.objects.using('other').get(published=datetime.date(2009, 5, 4))
+        dive = Book.objects.using('other').get(published=datetime.date(2009, 5, 4))
         self.assertEqual(dive.title, "Dive into Python")
         self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, published=datetime.date(2009, 5, 4))
 
@@ -125,7 +125,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(dive.title, "Dive into Python")
         self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, title__iexact="dive INTO python")
 
-        dive =  Book.objects.using('other').get(published__year=2009)
+        dive = Book.objects.using('other').get(published__year=2009)
         self.assertEqual(dive.title, "Dive into Python")
         self.assertEqual(dive.published, datetime.date(2009, 5, 4))
         self.assertRaises(Book.DoesNotExist, Book.objects.using('default').get, published__year=2009)

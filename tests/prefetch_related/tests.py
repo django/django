@@ -321,9 +321,9 @@ class GenericRelationTests(TestCase):
                          [t.created_by for t in TaggedItem.objects.all()])
 
     def test_generic_relation(self):
-        b = Bookmark.objects.create(url='http://www.djangoproject.com/')
-        t1 = TaggedItem.objects.create(content_object=b, tag='django')
-        t2 = TaggedItem.objects.create(content_object=b, tag='python')
+        bookmark = Bookmark.objects.create(url='http://www.djangoproject.com/')
+        t1 = TaggedItem.objects.create(content_object=bookmark, tag='django')
+        t2 = TaggedItem.objects.create(content_object=bookmark, tag='python')
 
         with self.assertNumQueries(2):
             tags = [t.tag for b in Bookmark.objects.prefetch_related('tags')
@@ -509,8 +509,8 @@ class NullableTest(TestCase):
             co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs]
 
-        qs2 =  Employee.objects.select_related('boss')
-        co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
+        qs2 = Employee.objects.select_related('boss')
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)
@@ -522,8 +522,8 @@ class NullableTest(TestCase):
             co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs]
 
-        qs2 =  Employee.objects.all()
-        co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
+        qs2 = Employee.objects.all()
+        co_serfs2 = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs2]
 
         self.assertEqual(co_serfs, co_serfs2)

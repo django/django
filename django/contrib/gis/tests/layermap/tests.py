@@ -163,8 +163,10 @@ class LayerMapTest(TestCase):
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
         # mapping for the model the ForeignKey points to.
-        bad_fk_map1 = copy(co_mapping); bad_fk_map1['state'] = 'name'
-        bad_fk_map2 = copy(co_mapping); bad_fk_map2['state'] = {'nombre' : 'State'}
+        bad_fk_map1 = copy(co_mapping)
+        bad_fk_map1['state'] = 'name'
+        bad_fk_map2 = copy(co_mapping)
+        bad_fk_map2['state'] = {'nombre' : 'State'}
         self.assertRaises(TypeError, LayerMapping, County, co_shp, bad_fk_map1, transform=False)
         self.assertRaises(LayerMapError, LayerMapping, County, co_shp, bad_fk_map2, transform=False)
 

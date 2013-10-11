@@ -101,7 +101,7 @@ class GeoModelAdmin(ModelAdmin):
                       'num_zoom' : self.num_zoom,
                       'max_zoom' : self.max_zoom,
                       'min_zoom' : self.min_zoom,
-                      'units' : self.units, #likely shoud get from object
+                      'units' : self.units,  # likely should get from object
                       'max_resolution' : self.max_resolution,
                       'max_extent' : self.max_extent,
                       'modifiable' : self.modifiable,

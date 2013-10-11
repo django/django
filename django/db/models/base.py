@@ -164,7 +164,7 @@ class ModelBase(type):
         # Basic setup for proxy models.
         if is_proxy:
             base = None
-            for parent in [cls for cls in parents if hasattr(cls, '_meta')]:
+            for parent in [kls for kls in parents if hasattr(kls, '_meta')]:
                 if parent._meta.abstract:
                     if parent._meta.fields:
                         raise TypeError("Abstract base class containing model fields not permitted for proxy model '%s'." % name)

@@ -568,7 +568,7 @@ class GeoQuerySetTest(TestCase):
         # The reference KML depends on the version of PostGIS used
         # (the output stopped including altitude in 1.3.3).
         if connection.ops.spatial_version >= (1, 3, 3):
-            ref_kml =  '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
+            ref_kml = '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
         else:
             ref_kml = '<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>'
 

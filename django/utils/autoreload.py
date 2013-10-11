@@ -28,7 +28,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os, sys, time, signal, traceback
+import os
+import signal
+import sys
+import time
+import traceback
 
 try:
     from django.utils.six.moves import _thread as thread

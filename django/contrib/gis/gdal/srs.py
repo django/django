@@ -105,7 +105,7 @@ class SpatialReference(GDALBase):
         doesn't exist.  Can also take a tuple as a parameter, (target, child),
         where child is the index of the attribute in the WKT.  For example:
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
+        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
         >>> print(srs['GEOGCS'])
         WGS 84

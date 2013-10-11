@@ -24,7 +24,7 @@ class OrLookupsTests(TestCase):
 
     def test_filter_or(self):
         self.assertQuerysetEqual(
-            Article.objects.filter(headline__startswith='Hello') |  Article.objects.filter(headline__startswith='Goodbye'), [
+            Article.objects.filter(headline__startswith='Hello') | Article.objects.filter(headline__startswith='Goodbye'), [
                 'Hello',
                 'Goodbye',
                 'Hello and goodbye'

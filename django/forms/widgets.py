@@ -117,7 +117,7 @@ def media_property(cls):
         if definition:
             extend = getattr(definition, 'extend', True)
             if extend:
-                if extend == True:
+                if extend is True:
                     m = base
                 else:
                     m = Media()

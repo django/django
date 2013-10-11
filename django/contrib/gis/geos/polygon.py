@@ -17,12 +17,14 @@ class Polygon(GEOSGeometry):
 
         Examples of initialization, where shell, hole1, and hole2 are
         valid LinearRing geometries:
+        >>> from django.contrib.gis.geos import LinearRing, Polygon
+        >>> shell = hole1 = hole2 = LinearRing()
         >>> poly = Polygon(shell, hole1, hole2)
         >>> poly = Polygon(shell, (hole1, hole2))
 
-        Example where a tuple parameters are used:
+        >>> # Example where a tuple parameters are used:
         >>> poly = Polygon(((0, 0), (0, 10), (10, 10), (0, 10), (0, 0)),
-                           ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
+        ...                ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:
             raise TypeError('Must provide at least one LinearRing, or a tuple, to initialize a Polygon.')

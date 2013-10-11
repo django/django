@@ -170,7 +170,7 @@ class TestInline(TestCase):
         holder = Holder.objects.create(pk=123456789, dummy=42)
         inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly='')
         response = self.client.get('/admin/admin_inlines/holder/%i/' % holder.id)
-        inner_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(inner).pk, inner.pk)
+        inner_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(inner).pk, inner.pk)
         self.assertContains(response, inner_shortcut)
 
     def test_custom_pk_shortcut(self):
@@ -182,8 +182,8 @@ class TestInline(TestCase):
         child1 = ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
         child2 = ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
         response = self.client.get('/admin/admin_inlines/parentmodelwithcustompk/foo/')
-        child1_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child1).pk, child1.pk)
-        child2_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child2).pk, child2.pk)
+        child1_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child1).pk, child1.pk)
+        child2_shortcut = 'r/%s/%s/' % (ContentType.objects.get_for_model(child2).pk, child2.pk)
         self.assertContains(response, child1_shortcut)
         self.assertContains(response, child2_shortcut)
 
