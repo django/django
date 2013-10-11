@@ -45,10 +45,9 @@ Using a :class:`~django.db.models.FileField` or an
    account.
 
 #. Add the :class:`~django.db.models.FileField` or
-   :class:`~django.db.models.ImageField` to your model, making sure to
-   define the :attr:`~django.db.models.FileField.upload_to` option to tell
-   Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload
-   files.
+   :class:`~django.db.models.ImageField` to your model, defining the
+   :attr:`~django.db.models.FileField.upload_to` option to specify a
+   subdirectory of :setting:`MEDIA_ROOT` to use for uploaded files.
 
 #. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the

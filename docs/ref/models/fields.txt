@@ -542,7 +542,7 @@ A :class:`CharField` that checks that the value is a valid email address.
 ``FileField``
 -------------
 
-.. class:: FileField(upload_to=None, [max_length=100, **options])
+.. class:: FileField([upload_to=None, max_length=100, **options])
 
 A file-upload field.
 
@@ -550,9 +550,13 @@ A file-upload field.
     The ``primary_key`` and ``unique`` arguments are not supported, and will
     raise a ``TypeError`` if used.
 
-Has one **required** argument:
+Has two optional arguments:
 
 .. attribute:: FileField.upload_to
+
+    .. versionchanged:: 1.7
+
+        ``upload_to`` was required in older versions of Django.
 
     A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
     setting to determine the value of the
@@ -586,11 +590,9 @@ Has one **required** argument:
                             when determining the final destination path.
     ======================  ===============================================
 
-Also has one optional argument:
-
 .. attribute:: FileField.storage
 
-    Optional. A storage object, which handles the storage and retrieval of your
+    A storage object, which handles the storage and retrieval of your
     files. See :doc:`/topics/files` for details on how to provide this object.
 
 The default form widget for this field is a :class:`~django.forms.FileInput`.
@@ -604,9 +606,9 @@ takes a few steps:
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
    that this directory is writable by the Web server's user account.
 
-2. Add the :class:`FileField` or :class:`ImageField` to your model, making
-   sure to define the :attr:`~FileField.upload_to` option to tell Django
-   to which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
+2. Add the :class:`FileField` or :class:`ImageField` to your model, defining
+   the :attr:`~FileField.upload_to` option to specify a subdirectory of
+   :setting:`MEDIA_ROOT` to use for uploaded files.
 
 3. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
@@ -807,7 +809,7 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 ``ImageField``
 --------------
 
-.. class:: ImageField(upload_to=None, [height_field=None, width_field=None, max_length=100, **options])
+.. class:: ImageField([upload_to=None, height_field=None, width_field=None, max_length=100, **options])
 
 Inherits all attributes and methods from :class:`FileField`, but also
 validates that the uploaded object is a valid image.

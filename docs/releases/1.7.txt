@@ -246,6 +246,10 @@ File Uploads
   the file system permissions of directories created during file upload, like
   :setting:`FILE_UPLOAD_PERMISSIONS` does for the files themselves.
 
+* The :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`
+  attribute is now optional. If it is omitted or given ``None`` or an empty
+  string, a subdirectory won't be used for storing the uploaded files.
+
 Forms
 ^^^^^
 

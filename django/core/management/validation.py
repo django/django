@@ -120,8 +120,6 @@ def get_validation_errors(outfile, app=None):
                 if decimalp_ok and mdigits_ok:
                     if decimal_places > max_digits:
                         e.add(opts, invalid_values_msg % f.name)
-            if isinstance(f, models.FileField) and not f.upload_to:
-                e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
                 try:
                     from django.utils.image import Image

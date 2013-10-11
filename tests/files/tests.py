@@ -106,6 +106,12 @@ class FileStorageTests(TestCase):
         obj4.random.save("random_file", ContentFile("random content"))
         self.assertTrue(obj4.random.name.endswith("/random_file"))
 
+        # upload_to can be empty, meaning it does not use subdirectory.
+        obj5 = Storage()
+        obj5.empty.save('django_test.txt', ContentFile('more content'))
+        self.assertEqual(obj5.empty.name, "./django_test.txt")
+        self.assertEqual(obj5.empty.read(), b"more content")
+
     def test_file_object(self):
         # Create sample file
         temp_storage.save('tests/example.txt', ContentFile('some content'))
