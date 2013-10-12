@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.formtools.wizard.views import CookieWizardView
 from django.utils._os import upath
+from django.contrib.formtools.tests.models import Poet, Poem
 
 
 class UserForm(forms.ModelForm):
@@ -19,6 +20,7 @@ class UserForm(forms.ModelForm):
 
 
 UserFormSet = forms.models.modelformset_factory(User, form=UserForm, extra=2)
+PoemFormSet = forms.models.inlineformset_factory(Poet, Poem, fields="__all__")
 
 
 class WizardTests(object):
@@ -405,3 +407,25 @@ class WizardFormKwargsOverrideTests(TestCase):
         self.assertEqual(formset.initial_form_count(), 1)
         self.assertEqual(['staff@example.com'],
             list(formset.queryset.values_list('email', flat=True)))
+
+
+class WizardInlineFormSetTests(TestCase):
+    def setUp(self):
+        self.rf = RequestFactory()
+        self.poet = Poet.objects.create(name='test')
+        self.poem = self.poet.poem_set.create(name='test poem')
+
+    def test_set_instance(self):
+        # Regression test for #21259
+        poet = self.poet
+        class InlineFormSetWizard(CookieWizardView):
+            instance = None
+            def get_form_instance(self, step):
+                if self.instance is None:
+                    self.instance = poet
+                return self.instance
+
+        view = InlineFormSetWizard.as_view([PoemFormSet])
+        response = view(self.rf.get('/'))
+        formset = response.context_data['wizard']['form']
+        self.assertEqual(formset.instance, self.poet)

@@ -398,23 +398,24 @@ class WizardView(TemplateView):
         """
         if step is None:
             step = self.steps.current
+        form_class = self.form_list[step]
         # prepare the kwargs for the form instance.
         kwargs = self.get_form_kwargs(step)
         kwargs.update({
             'data': data,
             'files': files,
-            'prefix': self.get_form_prefix(step, self.form_list[step]),
+            'prefix': self.get_form_prefix(step, form_class),
             'initial': self.get_form_initial(step),
         })
-        if issubclass(self.form_list[step], forms.ModelForm):
-            # If the form is based on ModelForm, add instance if available
-            # and not previously set.
+        if issubclass(form_class, (forms.ModelForm, forms.models.BaseInlineFormSet)):
+            # If the form is based on ModelForm or InlineFormSet,
+            # add instance if available and not previously set.
             kwargs.setdefault('instance', self.get_form_instance(step))
-        elif issubclass(self.form_list[step], forms.models.BaseModelFormSet):
+        elif issubclass(form_class, forms.models.BaseModelFormSet):
             # If the form is based on ModelFormSet, add queryset if available
             # and not previous set.
             kwargs.setdefault('queryset', self.get_form_instance(step))
-        return self.form_list[step](**kwargs)
+        return form_class(**kwargs)
 
     def process_step(self, form):
         """
