@@ -186,6 +186,12 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+:mod:`django.contrib.gis`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The default OpenLayers library version included in widgets has been updated
+  from 2.11 to 2.13.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
