@@ -7,8 +7,18 @@ import datetime
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text, filepath_to_uri
 
+from .models import python_2_unicode_compatible_failed
+
 
 class TestEncodingUtils(unittest.TestCase):
+    @unittest.skipIf(six.PY3, "@python_2_unicode_compatible is only for PY2")
+    def test_python_2_unicode_compatible_exception(self):
+        """
+        Check that a class using @python_2_unicode_compatible has a __str__()
+        method defined.
+        """
+        self.assertTrue(python_2_unicode_compatible_failed)
+
     def test_force_text_exception(self):
         """
         Check that broken __unicode__/__str__ actually raises an error.
