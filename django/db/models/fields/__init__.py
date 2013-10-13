@@ -998,8 +998,9 @@ class DateTimeField(DateField):
                 # local time. This won't work during DST change, but we can't
                 # do much about it, so we let the exceptions percolate up the
                 # call stack.
-                warnings.warn("DateTimeField received a naive datetime (%s)"
-                              " while time zone support is active." % value,
+                warnings.warn("DateTimeField %s.%s received a naive datetime "
+                              "(%s) while time zone support is active." %
+                              (self.model.__name__, self.name, value),
                               RuntimeWarning)
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_aware(value, default_timezone)
@@ -1053,8 +1054,9 @@ class DateTimeField(DateField):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
-            warnings.warn("DateTimeField received a naive datetime (%s)"
-                          " while time zone support is active." % value,
+            warnings.warn("DateTimeField %s.%s received a naive datetime (%s)"
+                          " while time zone support is active." %
+                          (self.model.__name__, self.name, value),
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)

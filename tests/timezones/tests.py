@@ -274,7 +274,8 @@ class NewDatabaseTests(TestCase):
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
+            self.assertTrue(msg.startswith("DateTimeField Event.dt received "
+                                           "a naive datetime"))
         event = Event.objects.get()
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
@@ -287,7 +288,8 @@ class NewDatabaseTests(TestCase):
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
+            self.assertTrue(msg.startswith("DateTimeField Event.dt received "
+                                           "a naive datetime"))
         event = Event.objects.get()
         self.assertEqual(event.dt, datetime.datetime(2011, 9, 1, tzinfo=EAT))
 
@@ -300,7 +302,8 @@ class NewDatabaseTests(TestCase):
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
+            self.assertTrue(msg.startswith("DateTimeField Event.dt received "
+                                           "a naive datetime"))
         event = Event.objects.get()
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
@@ -314,7 +317,8 @@ class NewDatabaseTests(TestCase):
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
-            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
+            self.assertTrue(msg.startswith("DateTimeField Event.dt received "
+                                           "a naive datetime"))
         event = Event.objects.get()
         # microseconds are lost during a round-trip in the database
         # naive datetimes are interpreted in local time
@@ -401,7 +405,8 @@ class NewDatabaseTests(TestCase):
             self.assertEqual(len(recorded), 3)
             for warning in recorded:
                 msg = str(warning.message)
-                self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
+                self.assertTrue(msg.startswith("DateTimeField Event.dt "
+                                               "received a naive datetime"))
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetime_lookups(self):
