@@ -431,14 +431,15 @@ code: :func:`~django.utils.timezone.now`,
 Finally, in order to help you locate code that needs upgrading, Django raises
 a warning when you attempt to save a naive datetime to the database::
 
-    RuntimeWarning: DateTimeField received a naive datetime (2012-01-01 00:00:00) while time zone support is active.
+    RuntimeWarning: DateTimeField ModelName.field_name received a naive
+    datetime (2012-01-01 00:00:00) while time zone support is active.
 
 During development, you can turn such warnings into exceptions and get a
 traceback by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
-            'error', r"DateTimeField received a naive datetime",
+            'error', r"DateTimeField .* received a naive datetime",
             RuntimeWarning, r'django\.db\.models\.fields')
 
 Fixtures
