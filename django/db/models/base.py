@@ -450,11 +450,6 @@ class Model(six.with_metaclass(ModelBase)):
 
     def __str__(self):
         if six.PY2 and hasattr(self, '__unicode__'):
-            if type(self).__unicode__ == Model.__str__:
-                klass_name = type(self).__name__
-                raise RuntimeError("%s.__unicode__ is aliased to __str__. Did"
-                                   " you apply @python_2_unicode_compatible"
-                                   " without defining __str__?" % klass_name)
             return force_text(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
