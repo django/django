@@ -670,7 +670,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, ADDITION
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(object).pk,
+            content_type_id=ContentType.objects.get_for_model(object, for_concrete_model=False).pk,
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=ADDITION
@@ -685,7 +685,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, CHANGE
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(object).pk,
+            content_type_id=ContentType.objects.get_for_model(object, for_concrete_model=False).pk,
             object_id=object.pk,
             object_repr=force_text(object),
             action_flag=CHANGE,
@@ -702,7 +702,7 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
             user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(self.model).pk,
+            content_type_id=ContentType.objects.get_for_model(self.model, for_concrete_model=False).pk,
             object_id=object.pk,
             object_repr=object_repr,
             action_flag=DELETION
@@ -1596,7 +1596,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
             object_id=unquote(object_id),
-            content_type__id__exact=ContentType.objects.get_for_model(model).id
+            content_type__id__exact=ContentType.objects.get_for_model(model, for_concrete_model=False).id
         ).select_related().order_by('action_time')
 
         context = dict(self.admin_site.each_context(),
