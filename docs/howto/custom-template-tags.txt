@@ -478,8 +478,9 @@ Notes:
 
 * The ``render()`` method is where the work actually happens.
 
-* ``render()`` should never raise ``TemplateSyntaxError`` or any other
-  exception. It should fail silently, just as template filters should.
+* ``render()`` should fail silently, just as template filters should. However
+  for severe problems an exception could be raised when
+  :setting:`TEMPLATE_DEBUG` is set to ``True``.
 
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
