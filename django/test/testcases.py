@@ -157,6 +157,7 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    _custom_settings = None
 
     def __call__(self, result=None):
         """
@@ -193,6 +194,9 @@ class SimpleTestCase(unittest.TestCase):
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
         * Clearing the mail test outbox.
         """
+        if self._custom_settings:
+            self._overridden = override_settings(**self._custom_settings)
+            self._overridden.enable()
         self.client = self.client_class()
         self._urlconf_setup()
         mail.outbox = []
@@ -210,6 +214,8 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        if self._custom_settings:
+            self._overridden.disable()
 
     def _urlconf_teardown(self):
         set_urlconf(None)

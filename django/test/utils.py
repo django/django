@@ -203,18 +203,11 @@ class override_settings(object):
                 raise Exception(
                     "Only subclasses of Django SimpleTestCase can be decorated "
                     "with override_settings")
-            original_pre_setup = test_func._pre_setup
-            original_post_teardown = test_func._post_teardown
-
-            def _pre_setup(innerself):
-                self.enable()
-                original_pre_setup(innerself)
-
-            def _post_teardown(innerself):
-                original_post_teardown(innerself)
-                self.disable()
-            test_func._pre_setup = _pre_setup
-            test_func._post_teardown = _post_teardown
+            if test_func._custom_settings:
+                test_func._custom_settings = dict(
+                    test_func._custom_settings, **self.options)
+            else:
+                test_func._custom_settings = self.options
             return test_func
         else:
             @wraps(test_func)
