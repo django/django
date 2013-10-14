@@ -968,16 +968,8 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
         self.assertTrue(msgstr in result, ("The string '%s' isn't in the "
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
+@override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
-
-    def setUp(self):
-        self.old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = ['i18n.resolution'] + list(settings.INSTALLED_APPS)
-        super(AppResolutionOrderI18NTests, self).setUp()
-
-    def tearDown(self):
-        settings.INSTALLED_APPS = self.old_installed_apps
-        super(AppResolutionOrderI18NTests, self).tearDown()
 
     def test_app_translation(self):
         self.assertUgettext('Date/time', 'APP')

@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.loading import cache
 from django.template import Context, Template
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.encoding import force_text
 
 from .models import (
@@ -108,6 +109,7 @@ class ManagersRegressionTests(TestCase):
         except AttributeError as e:
             self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_swappable_manager(self):
         try:
             # This test adds dummy models to the app cache. These
@@ -115,8 +117,6 @@ class ManagersRegressionTests(TestCase):
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
             old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
 
             class SwappableModel(models.Model):
                 class Meta:
@@ -131,10 +131,10 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_custom_swappable_manager(self):
         try:
             # This test adds dummy models to the app cache. These
@@ -142,8 +142,6 @@ class ManagersRegressionTests(TestCase):
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
             old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
 
             class SwappableModel(models.Model):
 
@@ -162,10 +160,10 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
 
+    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_explicit_swappable_manager(self):
         try:
             # This test adds dummy models to the app cache. These
@@ -173,8 +171,6 @@ class ManagersRegressionTests(TestCase):
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
             old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'managers_regress.Parent'
 
             class SwappableModel(models.Model):
 
@@ -193,7 +189,6 @@ class ManagersRegressionTests(TestCase):
                 self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
 
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
 

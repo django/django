@@ -56,7 +56,8 @@ ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   USE_I18N=True, USE_L10N=False, LANGUAGE_CODE='en')
 class AdminViewBasicTestCase(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
@@ -69,16 +70,9 @@ class AdminViewBasicTestCase(TestCase):
     urls = "admin_views.urls"
 
     def setUp(self):
-        self.old_USE_I18N = settings.USE_I18N
-        self.old_USE_L10N = settings.USE_L10N
-        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
         self.client.login(username='super', password='secret')
-        settings.USE_I18N = True
 
     def tearDown(self):
-        settings.USE_I18N = self.old_USE_I18N
-        settings.USE_L10N = self.old_USE_L10N
-        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
         self.client.logout()
         formats.reset_format_cache()
 
@@ -2410,15 +2404,12 @@ class AdminActionsTest(TestCase):
         self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
 
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
     def test_non_localized_pk(self):
         """If USE_THOUSAND_SEPARATOR is set, make sure that the ids for
         the objects selected for deletion are rendered without separators.
         Refs #14895.
         """
-        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
-        self.old_USE_L10N = settings.USE_L10N
-        settings.USE_THOUSAND_SEPARATOR = True
-        settings.USE_L10N = True
         subscriber = Subscriber.objects.get(id=1)
         subscriber.id = 9999
         subscriber.save()
@@ -2431,8 +2422,6 @@ class AdminActionsTest(TestCase):
         self.assertTemplateUsed(response, 'admin/delete_selected_confirmation.html')
         self.assertContains(response, 'value="9999"')  # Instead of 9,999
         self.assertContains(response, 'value="2"')
-        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
-        settings.USE_L10N = self.old_USE_L10N
 
     def test_model_admin_default_delete_action_protected(self):
         """
@@ -4127,21 +4116,16 @@ class ValidXHTMLTests(TestCase):
         self.assertNotContains(response, ' xml:lang=""')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
 class DateHierarchyTests(TestCase):
     urls = "admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-        self.old_USE_THOUSAND_SEPARATOR = settings.USE_THOUSAND_SEPARATOR
-        self.old_USE_L10N = settings.USE_L10N
-        settings.USE_THOUSAND_SEPARATOR = True
-        settings.USE_L10N = True
 
     def tearDown(self):
-        settings.USE_THOUSAND_SEPARATOR = self.old_USE_THOUSAND_SEPARATOR
-        settings.USE_L10N = self.old_USE_L10N
         formats.reset_format_cache()
 
     def assert_non_localized_year(self, response, year):

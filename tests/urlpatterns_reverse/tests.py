@@ -14,6 +14,7 @@ from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callab
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import six
 
 from . import urlconf_outer, middleware, views
@@ -453,16 +454,9 @@ class NamespaceTests(TestCase):
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
         self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78','foobar']))
 
+
+@override_settings(ROOT_URLCONF = urlconf_outer.__name__)
 class RequestURLconfTests(TestCase):
-    def setUp(self):
-        self.root_urlconf = settings.ROOT_URLCONF
-        self.middleware_classes = settings.MIDDLEWARE_CLASSES
-        settings.ROOT_URLCONF = urlconf_outer.__name__
-
-    def tearDown(self):
-        settings.ROOT_URLCONF = self.root_urlconf
-        settings.MIDDLEWARE_CLASSES = self.middleware_classes
-
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
@@ -473,10 +467,12 @@ class RequestURLconfTests(TestCase):
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 404)
 
-    def test_urlconf_overridden(self):
-        settings.MIDDLEWARE_CLASSES += (
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
         )
+    )
+    def test_urlconf_overridden(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 404)
         response = self.client.get('/inner_urlconf/second_test/')
@@ -485,60 +481,70 @@ class RequestURLconfTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'outer:,inner:/second_test/')
 
-    def test_urlconf_overridden_with_null(self):
-        settings.MIDDLEWARE_CLASSES += (
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
             '%s.NullChangeURLconfMiddleware' % middleware.__name__,
         )
+    )
+    def test_urlconf_overridden_with_null(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
+        )
+    )
     def test_reverse_inner_in_response_middleware(self):
         """
         Test reversing an URL from the *overridden* URLconf from inside
         a response middleware.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
-        )
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
+        )
+    )
     def test_reverse_outer_in_response_middleware(self):
         """
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
-        )
         message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseInnerInStreaming' % middleware.__name__,
+        )
+    )
     def test_reverse_inner_in_streaming(self):
         """
         Test reversing an URL from the *overridden* URLconf from inside
         a streaming response.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseInnerInStreaming' % middleware.__name__,
-        )
         response = self.client.get('/second_test/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b''.join(response), b'/second_test/')
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=(
+            '%s.ChangeURLconfMiddleware' % middleware.__name__,
+            '%s.ReverseOuterInStreaming' % middleware.__name__,
+        )
+    )
     def test_reverse_outer_in_streaming(self):
         """
         Test reversing an URL from the *default* URLconf from inside
         a streaming response.
         """
-        settings.MIDDLEWARE_CLASSES += (
-            '%s.ChangeURLconfMiddleware' % middleware.__name__,
-            '%s.ReverseOuterInStreaming' % middleware.__name__,
-        )
         message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')

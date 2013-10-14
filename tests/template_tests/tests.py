@@ -201,10 +201,10 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
+    # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
+    # the compiled templates.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
-        # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
-        # the compiled templates.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -237,7 +237,6 @@ class TemplateLoaderTests(TestCase):
                 'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_loader_origin(self):
         with self.settings(TEMPLATE_DEBUG=True):
@@ -253,15 +252,14 @@ class TemplateLoaderTests(TestCase):
         template = loader.get_template('login.html')
         self.assertEqual(template.origin, None)
 
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -276,13 +274,14 @@ class TemplateLoaderTests(TestCase):
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
+    # TEMPLATE_DEBUG must be true, otherwise the exception raised
+    # during {% include %} processing will be suppressed.
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -290,10 +289,6 @@ class TemplateLoaderTests(TestCase):
         that template has an {% include %} of something that does not
         exist. See #12787.
         """
-
-        # TEMPLATE_DEBUG must be true, otherwise the exception raised
-        # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -308,20 +303,18 @@ class TemplateLoaderTests(TestCase):
             try:
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of BaseLoader.
         """
 
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -348,7 +341,6 @@ class TemplateLoaderTests(TestCase):
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_include_template_argument(self):
         """
@@ -1822,17 +1814,15 @@ class TemplateTests(TransRealMixin, TestCase):
         return tests
 
 
-class TemplateTagLoading(unittest.TestCase):
+class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.old_path = sys.path[:]
-        self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 
     def tearDown(self):
-        settings.INSTALLED_APPS = self.old_apps
         sys.path = self.old_path
         template_base.templatetags_modules = self.old_tag_modules
 
@@ -1845,11 +1835,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
@@ -1857,11 +1847,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         template.Template(ttext)
 
 

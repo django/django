@@ -18,7 +18,7 @@ from django.conf import settings
 from django.core import management, serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import Approximate
+from django.test.utils import Approximate, override_settings
 from django.utils import six
 from django.utils.six import StringIO
 
@@ -26,22 +26,18 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
 
 
-class SerializerRegistrationTests(unittest.TestCase):
+@override_settings(
+    SERIALIZATION_MODULES = {
+        "json2" : "django.core.serializers.json",
+    }
+)
+class SerializerRegistrationTests(TestCase):
     def setUp(self):
-        self.old_SERIALIZATION_MODULES = getattr(settings, 'SERIALIZATION_MODULES', None)
         self.old_serializers = serializers._serializers
-
         serializers._serializers = {}
-        settings.SERIALIZATION_MODULES = {
-            "json2" : "django.core.serializers.json",
-        }
 
     def tearDown(self):
         serializers._serializers = self.old_serializers
-        if self.old_SERIALIZATION_MODULES:
-            settings.SERIALIZATION_MODULES = self.old_SERIALIZATION_MODULES
-        else:
-            delattr(settings, 'SERIALIZATION_MODULES')
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"

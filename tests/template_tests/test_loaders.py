@@ -23,6 +23,8 @@ except ImportError:
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
+from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -46,7 +48,8 @@ def create_egg(name, resources):
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-class EggLoaderTest(unittest.TestCase):
+@override_settings(INSTALLED_APPS=[])
+class EggLoaderTest(TestCase):
     def setUp(self):
         # Defined here b/c at module scope we may not have pkg_resources
         class MockProvider(pkg_resources.NullProvider):
@@ -73,51 +76,42 @@ class EggLoaderTest(unittest.TestCase):
             os.path.normcase('templates/y.html'): StringIO("y"),
             os.path.normcase('templates/x.txt'): StringIO("x"),
         })
-        self._old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = []
 
-    def tearDown(self):
-        settings.INSTALLED_APPS = self._old_installed_apps
-
+    @override_settings(INSTALLED_APPS=['egg_empty'])
     def test_empty(self):
         "Loading any template on an empty egg should fail"
-        settings.INSTALLED_APPS = ['egg_empty']
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_non_existing(self):
         "Template loading fails if the template is not in the egg"
-        settings.INSTALLED_APPS = ['egg_1']
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_existing(self):
         "A template can be loaded from an egg"
-        settings.INSTALLED_APPS = ['egg_1']
         egg_loader = EggLoader()
         contents, template_name = egg_loader.load_template_source("y.html")
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
+    @override_settings(INSTALLED_APPS=[])
     def test_not_installed(self):
         "Loading an existent template from an egg not included in INSTALLED_APPS should fail"
-        settings.INSTALLED_APPS = []
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 
 
-class CachedLoader(unittest.TestCase):
-    def setUp(self):
-        self.old_TEMPLATE_LOADERS = settings.TEMPLATE_LOADERS
-        settings.TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                'django.template.loaders.filesystem.Loader',
-            )
-            ),
-        )
-    def tearDown(self):
-        settings.TEMPLATE_LOADERS = self.old_TEMPLATE_LOADERS
-
+@override_settings(
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+        )),
+    )
+)
+class CachedLoader(TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
         # Retrive a template specifying a template directory to check
@@ -144,17 +138,12 @@ class CachedLoader(unittest.TestCase):
                          "Cached template loader doesn't cache file lookup misses. It should.")
 
 
-class RenderToStringTest(unittest.TestCase):
-
-    def setUp(self):
-        self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        )
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self._old_TEMPLATE_DIRS
-
+@override_settings(
+    TEMPLATE_DIRS = (
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+    )
+)
+class RenderToStringTest(TestCase):
     def test_basic(self):
         self.assertEqual(loader.render_to_string('test_context.html'), 'obj:')
 

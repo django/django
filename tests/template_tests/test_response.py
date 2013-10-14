@@ -296,17 +296,13 @@ class TemplateResponseTest(TestCase):
         pickle.dumps(unpickled_response)
 
 
+@override_settings(
+    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+        'template_tests.test_response.CustomURLConfMiddleware'
+    ]
+)
 class CustomURLConfTest(TestCase):
     urls = 'template_tests.urls'
-
-    def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES) + [
-            'template_tests.test_response.CustomURLConfMiddleware'
-        ]
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
@@ -314,22 +310,15 @@ class CustomURLConfTest(TestCase):
         self.assertContains(response, 'This is where you can find the snark: /snark/')
 
 
+@override_settings(
+    CACHE_MIDDLEWARE_SECONDS=2.0,
+    MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
+        'django.middleware.cache.FetchFromCacheMiddleware',
+        'django.middleware.cache.UpdateCacheMiddleware',
+    ]
+)
 class CacheMiddlewareTest(TestCase):
     urls = 'template_tests.alternate_urls'
-
-    def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        self.CACHE_MIDDLEWARE_SECONDS = settings.CACHE_MIDDLEWARE_SECONDS
-
-        settings.CACHE_MIDDLEWARE_SECONDS = 2.0
-        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES) + [
-            'django.middleware.cache.FetchFromCacheMiddleware',
-            'django.middleware.cache.UpdateCacheMiddleware',
-        ]
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-        settings.CACHE_MIDDLEWARE_SECONDS = self.CACHE_MIDDLEWARE_SECONDS
 
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')

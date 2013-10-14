@@ -83,22 +83,19 @@ class CommentViewTests(CommentTestCase):
 
     def testDebugCommentErrors(self):
         """The debug error template should be shown only if DEBUG is True"""
-        olddebug = settings.DEBUG
-
-        settings.DEBUG = True
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         data["security_hash"] = "Nobody expects the Spanish Inquisition!"
-        response = self.client.post("/post/", data)
-        self.assertEqual(response.status_code, 400)
-        self.assertTemplateUsed(response, "comments/400-debug.html")
 
-        settings.DEBUG = False
-        response = self.client.post("/post/", data)
-        self.assertEqual(response.status_code, 400)
-        self.assertTemplateNotUsed(response, "comments/400-debug.html")
+        with self.settings(DEBUG=True):
+            response = self.client.post("/post/", data)
+            self.assertEqual(response.status_code, 400)
+            self.assertTemplateUsed(response, "comments/400-debug.html")
 
-        settings.DEBUG = olddebug
+        with self.settings(DEBUG=False):
+            response = self.client.post("/post/", data)
+            self.assertEqual(response.status_code, 400)
+            self.assertTemplateNotUsed(response, "comments/400-debug.html")
 
     def testCreateValidComment(self):
         address = "1.2.3.4"
