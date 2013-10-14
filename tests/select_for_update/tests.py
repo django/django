@@ -9,6 +9,7 @@ from django.db import transaction, connection, router
 from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
 from django.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
+from django.test.utils import override_settings
 
 from multiple_database.routers import TestRouter
 
@@ -23,6 +24,9 @@ except ImportError:
 requires_threading = unittest.skipUnless(threading, 'requires threading')
 
 
+# We need to set settings.DEBUG to True so we can capture the output SQL
+# to examine.
+@override_settings(DEBUG=True)
 class SelectForUpdateTests(TransactionTestCase):
 
     available_apps = ['select_for_update']
@@ -41,11 +45,6 @@ class SelectForUpdateTests(TransactionTestCase):
         self.new_connection = new_connections[DEFAULT_DB_ALIAS]
         self.new_connection.enter_transaction_management()
 
-        # We need to set settings.DEBUG to True so we can capture
-        # the output SQL to examine.
-        self._old_debug = settings.DEBUG
-        settings.DEBUG = True
-
     def tearDown(self):
         try:
             # We don't really care if this fails - some of the tests will set
@@ -55,7 +54,6 @@ class SelectForUpdateTests(TransactionTestCase):
         except transaction.TransactionManagementError:
             pass
         self.new_connection.close()
-        settings.DEBUG = self._old_debug
         try:
             self.end_blocking_transaction()
         except (DatabaseError, AttributeError):
