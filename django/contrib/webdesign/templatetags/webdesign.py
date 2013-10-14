@@ -41,10 +41,11 @@ def lorem(parser, token):
     paragraph (starting "Lorem ipsum dolor sit amet, consectetuer...").
 
     Examples:
-        * ``{% lorem %}`` will output the common "lorem ipsum" paragraph
-        * ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
-          and two random paragraphs each wrapped in HTML ``<p>`` tags
-        * ``{% lorem 2 w random %}`` will output two random latin words
+
+    * ``{% lorem %}`` will output the common "lorem ipsum" paragraph
+    * ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
+      and two random paragraphs each wrapped in HTML ``<p>`` tags
+    * ``{% lorem 2 w random %}`` will output two random latin words
     """
     bits = list(token.split_contents())
     tagname = bits[0]
