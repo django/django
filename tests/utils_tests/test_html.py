@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from unittest import TestCase
 
-from django.utils import html
+from django.utils import html, safestring
 from django.utils._os import upath
 from django.utils.encoding import force_text
 
@@ -192,3 +192,9 @@ class TestUtilsHtml(TestCase):
         self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
         self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
         self.assertEqual(quote('http://example.com/?x=1&y=2'), 'http://example.com/?x=1&y=2')
+
+    def test_conditional_escape(self):
+        s = '<h1>interop</h1>'
+        self.assertEqual(html.conditional_escape(s),
+                         '&lt;h1&gt;interop&lt;/h1&gt;')
+        self.assertEqual(html.conditional_escape(safestring.mark_safe(s)), s)
