@@ -293,6 +293,9 @@ Forms
   inheriting from both ``Form`` and ``ModelForm`` simultaneously have been
   removed as long as ``ModelForm`` appears first in the MRO.
 
+* It's now possible to opt-out from a ``Form`` field declared in a parent class
+  by shadowing it with a non-``Field`` value.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

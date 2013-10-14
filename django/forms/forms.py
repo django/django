@@ -90,6 +90,11 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if hasattr(base, 'declared_fields'):
                 declared_fields.update(base.declared_fields)
 
+            # Field shadowing.
+            for attr in base.__dict__.keys():
+                if attr in declared_fields:
+                    declared_fields.pop(attr)
+
         new_class.base_fields = declared_fields
         new_class.declared_fields = declared_fields
 

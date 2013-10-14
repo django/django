@@ -1815,3 +1815,26 @@ class ModelFormInheritanceTests(TestCase):
                 fields = '__all__'
 
         self.assertEqual(list(ModelForm().fields.keys()), ['name', 'age'])
+
+    def test_field_shadowing(self):
+        class ModelForm(forms.ModelForm):
+            class Meta:
+                model = Writer
+                fields = '__all__'
+
+        class Mixin(object):
+            age = None
+
+        class Form(forms.Form):
+            age = forms.IntegerField()
+
+        class Form2(forms.Form):
+            foo = forms.IntegerField()
+
+        self.assertEqual(list(ModelForm().fields.keys()), ['name'])
+        self.assertEqual(list(type(str('NewForm'), (Mixin, Form), {})().fields.keys()), [])
+        self.assertEqual(list(type(str('NewForm'), (Form2, Mixin, Form), {})().fields.keys()), ['foo'])
+        self.assertEqual(list(type(str('NewForm'), (Mixin, ModelForm, Form), {})().fields.keys()), ['name'])
+        self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
+        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
+        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
