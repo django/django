@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
+from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.management.validation import get_validation_errors
@@ -201,10 +202,12 @@ class PermissionTestCase(TestCase):
     def setUp(self):
         self._original_permissions = models.Permission._meta.permissions[:]
         self._original_default_permissions = models.Permission._meta.default_permissions
+        self._original_verbose_name = models.Permission._meta.verbose_name
 
     def tearDown(self):
         models.Permission._meta.permissions = self._original_permissions
         models.Permission._meta.default_permissions = self._original_default_permissions
+        models.Permission._meta.verbose_name = self._original_verbose_name
         ContentType.objects.clear_cache()
 
     def test_duplicated_permissions(self):
@@ -258,3 +261,12 @@ class PermissionTestCase(TestCase):
         self.assertEqual(models.Permission.objects.filter(
             content_type=permission_content_type,
         ).count(), 1)
+
+    def test_verbose_name_length(self):
+        permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
+        models.Permission.objects.filter(content_type=permission_content_type).delete()
+        models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
+
+        six.assertRaisesRegex(self, exceptions.ValidationError,
+            "The verbose_name of permission is longer than 39 characters",
+            create_permissions, models, [], verbosity=0)
