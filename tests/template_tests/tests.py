@@ -201,10 +201,10 @@ class TemplateLoaderTests(TestCase):
             test_template_sources('/DIR1/index.HTML', template_dirs,
                                   ['/DIR1/index.HTML'])
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_loader_debug_origin(self):
         # Turn TEMPLATE_DEBUG on, so that the origin file name will be kept with
         # the compiled templates.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -237,7 +237,6 @@ class TemplateLoaderTests(TestCase):
                 'Cached template loaded through cached loader has incorrect name for debug page: %s' % template_name)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_loader_origin(self):
         with self.settings(TEMPLATE_DEBUG=True):
@@ -253,6 +252,7 @@ class TemplateLoaderTests(TestCase):
         template = loader.get_template('login.html')
         self.assertEqual(template.origin, None)
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
@@ -261,7 +261,6 @@ class TemplateLoaderTests(TestCase):
 
         # TEMPLATE_DEBUG must be true, otherwise the exception raised
         # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -276,14 +275,12 @@ class TemplateLoaderTests(TestCase):
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
-
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_baseloader(self):
         """
         Tests that the correct template is identified as not existing
@@ -294,7 +291,6 @@ class TemplateLoaderTests(TestCase):
 
         # TEMPLATE_DEBUG must be true, otherwise the exception raised
         # during {% include %} processing will be suppressed.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -309,20 +305,18 @@ class TemplateLoaderTests(TestCase):
             try:
                 r = tmpl.render(template.Context({}))
             except template.TemplateDoesNotExist as e:
-                settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
+    @override_settings(TEMPLATE_DEBUG=True)
     def test_extends_include_missing_cachedloader(self):
         """
         Same as test_extends_include_missing_baseloader, only tests
         behavior of the cached loader instead of BaseLoader.
         """
 
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, True
         old_loaders = loader.template_source_loaders
 
         try:
@@ -349,7 +343,6 @@ class TemplateLoaderTests(TestCase):
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
             loader.template_source_loaders = old_loaders
-            settings.TEMPLATE_DEBUG = old_td
 
     def test_include_template_argument(self):
         """
