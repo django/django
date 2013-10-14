@@ -19,24 +19,24 @@ DetailView
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
+    * ``django.views.generic.detail.BaseDetailView``
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_template_names()`
-    4. :meth:`get_slug_field()`
-    5. :meth:`get_queryset()`
-    6. :meth:`get_object()`
-    7. :meth:`get_context_object_name()`
-    8. :meth:`get_context_data()`
-    9. :meth:`get()`
-    10. :meth:`render_to_response()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    4. :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field()`
+    5. :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset()`
+    6. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+    7. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
+    8. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
+    9. ``get()``
+    10. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
-    **Example views.py**::
+    **Example myapp/views.py**::
 
         from django.views.generic.detail import DetailView
         from django.utils import timezone
@@ -52,7 +52,7 @@ DetailView
                 context['now'] = timezone.now()
                 return context
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -61,6 +61,16 @@ DetailView
         urlpatterns = patterns('',
             url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
         )
+
+    **Example myapp/article_detail.html**:
+
+    .. code-block:: html+django
+
+        <h1>{{ object.headline }}</h1>
+        <p>{{ object.content }}</p>
+        <p>Reporter: {{ object.reporter }}</p>
+        <p>Published: {{ object.pub_date|date }}</p>
+        <p>Date: {{ now|date }}</p>
 
 ListView
 --------
@@ -77,7 +87,6 @@ ListView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.list.ListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.list.BaseListView`
@@ -86,14 +95,14 @@ ListView
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_template_names()`
-    4. :meth:`get_queryset()`
-    5. :meth:`get_objects()`
-    6. :meth:`get_context_data()`
-    7. :meth:`get()`
-    8. :meth:`render_to_response()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+    4. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
+    5. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
+    6. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
+    7. ``get()``
+    8. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
 
     **Example views.py**::
@@ -112,7 +121,7 @@ ListView
                 context['now'] = timezone.now()
                 return context
 
-    **Example urls.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
 
@@ -121,6 +130,19 @@ ListView
         urlpatterns = patterns('',
             url(r'^$', ArticleListView.as_view(), name='article-list'),
         )
+
+    **Example myapp/article_list.html**:
+
+    .. code-block:: html+django
+
+        <h1>Articles</h1>
+        <ul>
+        {% for article in object_list %}
+            <li>{{ article.pub_date|date }} - {{ article.headline }}</li>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+        </ul>
 
 .. class:: django.views.generic.list.BaseListView
 
@@ -140,7 +162,7 @@ ListView
 
     .. method:: get(request, *args, **kwargs)
 
-        Adds :attr:`object_list` to the context. If
+        Adds ``object_list`` to the context. If
         :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty`
         is True then display an empty list. If
         :attr:`~django.views.generic.list.MultipleObjectMixin.allow_empty` is

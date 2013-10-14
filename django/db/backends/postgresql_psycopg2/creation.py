@@ -1,7 +1,5 @@
-import psycopg2.extensions
-
 from django.db.backends.creation import BaseDatabaseCreation
-from django.db.backends.util import truncate_name
+from django.db.backends.utils import truncate_name
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -10,28 +8,34 @@ class DatabaseCreation(BaseDatabaseCreation):
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
-        'AutoField':         'serial',
-        'BooleanField':      'boolean',
-        'CharField':         'varchar(%(max_length)s)',
+        'AutoField': 'serial',
+        'BinaryField': 'bytea',
+        'BooleanField': 'boolean',
+        'CharField': 'varchar(%(max_length)s)',
         'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField':         'date',
-        'DateTimeField':     'timestamp with time zone',
-        'DecimalField':      'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField':         'varchar(%(max_length)s)',
-        'FilePathField':     'varchar(%(max_length)s)',
-        'FloatField':        'double precision',
-        'IntegerField':      'integer',
-        'BigIntegerField':   'bigint',
-        'IPAddressField':    'inet',
+        'DateField': 'date',
+        'DateTimeField': 'timestamp with time zone',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'inet',
         'GenericIPAddressField': 'inet',
-        'NullBooleanField':  'boolean',
-        'OneToOneField':     'integer',
-        'PositiveIntegerField': 'integer CHECK ("%(column)s" >= 0)',
-        'PositiveSmallIntegerField': 'smallint CHECK ("%(column)s" >= 0)',
-        'SlugField':         'varchar(%(max_length)s)',
+        'NullBooleanField': 'boolean',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer',
+        'PositiveSmallIntegerField': 'smallint',
+        'SlugField': 'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
-        'TextField':         'text',
-        'TimeField':         'time',
+        'TextField': 'text',
+        'TimeField': 'time',
+    }
+
+    data_type_check_constraints = {
+        'PositiveIntegerField': '"%(column)s" >= 0',
+        'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
 
     def sql_table_creation_suffix(self):
@@ -41,7 +45,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         return ''
 
     def sql_indexes_for_field(self, model, f, style):
-        if f.db_index and not f.unique:
+        output = []
+        if f.db_index or f.unique:
             qn = self.connection.ops.quote_name
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
@@ -54,13 +59,14 @@ class DatabaseCreation(BaseDatabaseCreation):
 
             def get_index_sql(index_name, opclass=''):
                 return (style.SQL_KEYWORD('CREATE INDEX') + ' ' +
-                        style.SQL_TABLE(qn(truncate_name(index_name,self.connection.ops.max_name_length()))) + ' ' +
+                        style.SQL_TABLE(qn(truncate_name(index_name, self.connection.ops.max_name_length()))) + ' ' +
                         style.SQL_KEYWORD('ON') + ' ' +
                         style.SQL_TABLE(qn(db_table)) + ' ' +
                         "(%s%s)" % (style.SQL_FIELD(qn(f.column)), opclass) +
                         "%s;" % tablespace_sql)
 
-            output = [get_index_sql('%s_%s' % (db_table, f.column))]
+            if not f.unique:
+                output = [get_index_sql('%s_%s' % (db_table, f.column))]
 
             # Fields with database column types of `varchar` and `text` need
             # a second index that specifies their operator class, which is
@@ -73,15 +79,4 @@ class DatabaseCreation(BaseDatabaseCreation):
             elif db_type.startswith('text'):
                 output.append(get_index_sql('%s_%s_like' % (db_table, f.column),
                                             ' text_pattern_ops'))
-        else:
-            output = []
         return output
-
-    def set_autocommit(self):
-        self._prepare_for_test_db_ddl()
-
-    def _prepare_for_test_db_ddl(self):
-        """Rollback and close the active transaction."""
-        self.connection.connection.rollback()
-        self.connection.connection.set_isolation_level(
-                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

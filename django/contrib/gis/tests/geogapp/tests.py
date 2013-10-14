@@ -1,17 +1,23 @@
 """
 Tests for geography support in PostGIS 1.5+
 """
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
+from unittest import skipUnless
 
-from django.contrib.gis import gdal
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
+from django.contrib.gis.tests.utils import postgis
 from django.test import TestCase
+from django.utils._os import upath
 
-from .models import City, County, Zipcode
+if HAS_GEOS:
+    from .models import City, County, Zipcode
 
 
+@skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeographyTest(TestCase):
 
     def test01_fixture_load(self):
@@ -36,7 +42,7 @@ class GeographyTest(TestCase):
         "Testing GeoQuerySet.distance() support on non-point geography fields."
         # `GeoQuerySet.distance` is not allowed geometry fields.
         htown = City.objects.get(name='Houston')
-        qs = Zipcode.objects.distance(htown.point)
+        Zipcode.objects.distance(htown.point)
 
     def test04_invalid_operators_functions(self):
         "Ensuring exceptions are raised for operators & functions invalid on geography fields."
@@ -53,15 +59,15 @@ class GeographyTest(TestCase):
         htown = City.objects.get(name='Houston')
         self.assertRaises(ValueError, City.objects.get, point__exact=htown.point)
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test05_geography_layermapping(self):
         "Testing LayerMapping support on models with geography fields."
         # There is a similar test in `layermap` that uses the same data set,
         # but the County model here is a bit different.
-        if not gdal.HAS_GDAL: return
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name' : 'Name',
                       'state' : 'State',

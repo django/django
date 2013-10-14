@@ -31,7 +31,7 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.11/OpenLayers.js'
+    openlayers_url = 'http://openlayers.org/api/2.13/OpenLayers.js'
     point_zoom = num_zoom - 6
     wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
@@ -51,10 +51,11 @@ class GeoModelAdmin(ModelAdmin):
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Overloaded from ModelAdmin so that an OpenLayersWidget is used
-        for viewing/editing GeometryFields.
+        for viewing/editing 2D GeometryFields (OpenLayers 2 does not support
+        3D editing).
         """
-        if isinstance(db_field, models.GeometryField):
-            request = kwargs.pop('request', None)
+        if isinstance(db_field, models.GeometryField) and db_field.dim < 3:
+            kwargs.pop('request', None)
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
@@ -93,13 +94,14 @@ class GeoModelAdmin(ModelAdmin):
                       'scrollable' : self.scrollable,
                       'layerswitcher' : self.layerswitcher,
                       'collection_type' : collection_type,
+                      'is_generic' : db_field.geom_type == 'GEOMETRY',
                       'is_linestring' : db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
                       'is_polygon' : db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
                       'is_point' : db_field.geom_type in ('POINT', 'MULTIPOINT'),
                       'num_zoom' : self.num_zoom,
                       'max_zoom' : self.max_zoom,
                       'min_zoom' : self.min_zoom,
-                      'units' : self.units, #likely shoud get from object
+                      'units' : self.units,  # likely should get from object
                       'max_resolution' : self.max_resolution,
                       'max_extent' : self.max_extent,
                       'modifiable' : self.modifiable,

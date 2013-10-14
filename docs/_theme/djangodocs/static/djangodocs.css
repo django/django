@@ -1,7 +1,7 @@
 /*** setup ***/
 html { background:#092e20;}
 body { font:12px/1.5 Verdana,sans-serif; background:#092e20; color: white;}
-#custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;} 
+#custom-doc { width:76.54em;*width:74.69em;min-width:995px; max-width:100em; margin:auto; text-align:left; padding-top:16px; margin-top:0;}
 #hd { padding: 4px 0 12px 0; }
 #bd { background:#234F32; }
 #ft { color:#487858; font-size:90%; padding-bottom: 2em; }
@@ -54,7 +54,7 @@ hr { color:#ccc; background-color:#ccc; height:1px; border:0; }
 p, ul, dl { margin-top:.6em; margin-bottom:1em; padding-bottom: 0.1em;}
 #yui-main div.yui-b img { max-width: 50em; margin-left: auto; margin-right: auto; display: block; }
 caption { font-size:1em; font-weight:bold; margin-top:0.5em; margin-bottom:0.5em; margin-left: 2px; text-align: center; }
-blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; } 
+blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans-serif; color:#234f32; border-left:2px solid #94da3a; }
 strong { font-weight: bold; }
 em { font-style: italic; }
 ins { font-weight: bold; text-decoration: none; }
@@ -64,6 +64,8 @@ ul { padding-left:30px; }
 ol { padding-left:30px; }
 ol.arabic li { list-style-type: decimal; }
 ul li { list-style-type:square; margin-bottom:.4em; }
+ul ul li { list-style-type:disc; }
+ul ul ul li { list-style-type:circle; }
 ol li { margin-bottom: .4em; }
 ul ul { padding-left:1.2em; }
 ul ul ul { padding-left:1em; }
@@ -90,8 +92,8 @@ table.docutils thead th p { margin: 0; padding: 0; }
 table.docutils { border-collapse:collapse; }
 
 /*** code blocks ***/
-.literal { white-space:nowrap; }
-.literal { color:#234f32; }
+.literal { color:#234f32; white-space:nowrap; }
+dt > tt.literal { white-space: normal; }
 #sidebar .literal { color:white; background:transparent; font-size:11px; }
 h4 .literal { color: #234f32; font-size: 13px; }
 pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-width:1px 0; margin: 1em 0; padding: .3em .4em; overflow: hidden; line-height: 1.3em;}
@@ -111,10 +113,11 @@ dt .literal, table .literal { background:none; }
 .note, .admonition { padding-left:65px; background:url(docicons-note.png) .8em .8em no-repeat;}
 div.admonition-philosophy { padding-left:65px; background:url(docicons-philosophy.png) .8em .8em no-repeat;}
 div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-behindscenes.png) .8em .8em no-repeat;}
+.admonition.warning { background:url(docicons-warning.png) .8em .8em no-repeat; border:1px solid #ffc83c;}
 
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
-div.versionadded span.title, div.versionchanged span.title { font-weight: bold; }
+div.versionadded span.title, div.versionchanged span.title, div.deprecated span.title { font-weight: bold; }
 
 /*** p-links ***/
 a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }

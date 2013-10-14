@@ -1,11 +1,7 @@
-try:
-    from urllib.parse import urljoin
-except ImportError:     # Python 2
-    from urlparse import urljoin
-
 from django import template
 from django.template.base import Node
 from django.utils.encoding import iri_to_uri
+from django.utils.six.moves.urllib.parse import urljoin
 
 register = template.Library()
 
@@ -27,6 +23,7 @@ class PrefixNode(template.Node):
         """
         Class method to parse prefix node and return a Node.
         """
+        # token.split_contents() isn't useful here because tags using this method don't accept variable as arguments
         tokens = token.contents.split()
         if len(tokens) > 1 and tokens[1] != 'as':
             raise template.TemplateSyntaxError(

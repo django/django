@@ -20,9 +20,7 @@ documentation.
 
 Databases can have any alias you choose. However, the alias
 ``default`` has special significance. Django uses the database with
-the alias of ``default`` when no other database has been selected. If
-you don't have a ``default`` database, you need to be careful to
-always specify the database that you want to use.
+the alias of ``default`` when no other database has been selected.
 
 The following is an example ``settings.py`` snippet defining two
 databases -- a default PostgreSQL database and a MySQL database called
@@ -42,6 +40,29 @@ databases -- a default PostgreSQL database and a MySQL database called
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'priv4te'
+        }
+    }
+
+If the concept of a ``default`` database doesn't make sense in the context
+of your project, you need to be careful to always specify the database
+that you want to use. Django requires that a ``default`` database entry
+be defined, but the parameters dictionary can be left blank if it will not be
+used. The following is an example ``settings.py`` snippet defining two
+non-default databases, with the ``default`` entry intentionally left empty::
+
+    DATABASES = {
+        'default': {},
+        'users': {
+            'NAME': 'user_data',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_user',
+            'PASSWORD': 'superS3cret'
+        },
+        'customers': {
+            'NAME': 'customer_data',
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'mysql_cust',
+            'PASSWORD': 'veryPriv@ate'
         }
     }
 
@@ -134,13 +155,22 @@ A database Router is a class that provides up to four methods:
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_syncdb(db, model)
+.. method:: allow_migrate(db, model)
 
-    Determine if the ``model`` should be synchronized onto the
+    Determine if the ``model`` should have tables/indexes created in the
     database with alias ``db``. Return True if the model should be
-    synchronized, False if it should not be synchronized, or None if
+    migrated, False if it should not be migrated, or None if
     the router has no opinion. This method can be used to determine
     the availability of a model on a given database.
+
+    Note that migrations will just silently not perform any operations
+    on a model for which this returns ``False``. This may result in broken
+    ForeignKeys, extra tables or missing tables if you change it once you
+    have applied some migrations.
+
+    The value passed for ``model`` may be a
+    :ref:`historical model <historical-models>`, and thus not have any
+    custom attributes, methods or managers. You should only rely on ``_meta``.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
@@ -267,7 +297,7 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
@@ -303,11 +333,11 @@ from::
             in the master/slave pool.
             """
             db_list = ('master', 'slave1', 'slave2')
-            if obj1.state.db in db_list and obj2.state.db in db_list:
+            if obj1._state.db in db_list and obj2._state.db in db_list:
                 return True
             return None
 
-        def allow_syncdb(self, db, model):
+        def allow_migrate(self, db, model):
             """
             All non-auth models end up in this pool.
             """
@@ -326,7 +356,7 @@ be queried in the order the are listed in the
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
-``MasterSlaveRouter.allow_syncdb()`` would be processed first. The
+``MasterSlaveRouter.allow_migrate()`` would be processed first. The
 catch-all nature of the MasterSlaveRouter implementation would mean
 that all models would be available on all databases.
 
@@ -412,7 +442,7 @@ Consider the following example::
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
-issues a SQL ``INSERT`` statement. This creates a primary key, and
+issues an SQL ``INSERT`` statement. This creates a primary key, and
 Django assigns that primary key to ``p``.
 
 When the save occurs in statement 2, ``p`` already has a primary key
@@ -436,7 +466,7 @@ database::
     >>> p.save(using='second') # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
-to ensure that Django does a SQL ``INSERT``::
+to ensure that Django does an SQL ``INSERT``::
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
@@ -485,19 +515,19 @@ solution is to use ``db_manager()``, like this::
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
-Using ``get_query_set()`` with multiple databases
+Using ``get_queryset()`` with multiple databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're overriding ``get_query_set()`` on your manager, be sure to
+If you're overriding ``get_queryset()`` on your manager, be sure to
 either call the method on the parent (using ``super()``) or do the
 appropriate handling of the ``_db`` attribute on the manager (a string
 containing the name of the database to use).
 
 For example, if you want to return a custom ``QuerySet`` class from
-the ``get_query_set`` method, you could do this::
+the ``get_queryset`` method, you could do this::
 
     class MyManager(models.Manager):
-        def get_query_set(self):
+        def get_queryset(self):
             qs = CustomQuerySet(self.model)
             if self._db is not None:
                 qs = qs.using(self._db)
@@ -527,9 +557,9 @@ multiple-database support::
             # Tell Django to delete objects from the 'other' database
             obj.delete(using=self.using)
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for objects on the 'other' database.
-            return super(MultiDBModelAdmin, self).queryset(request).using(self.using)
+            return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
@@ -552,9 +582,9 @@ Inlines can be handled in a similar fashion. They require three customized metho
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
 
-        def queryset(self, request):
+        def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
-            return super(MultiDBTabularInline, self).queryset(request).using(self.using)
+            return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
 
         def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
@@ -630,3 +660,45 @@ However, if you're using SQLite or MySQL with MyISAM tables, there is
 no enforced referential integrity; as a result, you may be able to
 'fake' cross database foreign keys. However, this configuration is not
 officially supported by Django.
+
+.. _contrib_app_multiple_databases:
+
+Behavior of contrib apps
+------------------------
+
+Several contrib apps include models, and some apps depend on others. Since
+cross-database relationships are impossible, this creates some restrictions on
+how you can split these models across databases:
+
+- each one of ``contenttypes.ContentType``, ``sessions.Session`` and
+  ``sites.Site`` can be stored in any database, given a suitable router.
+- ``auth`` models — ``User``, ``Group`` and ``Permission`` — are linked
+  together and linked to ``ContentType``, so they must be stored in the same
+  database as ``ContentType``.
+- ``admin`` and ``comments`` depend on ``auth``, so their models must be in
+  the same database as ``auth``.
+- ``flatpages`` and ``redirects`` depend on ``sites``, so their models must be
+  in the same database as ``sites``.
+
+In addition, some objects are automatically created just after
+:djadmin:`syncdb` creates a table to hold them in a database:
+
+- a default ``Site``,
+- a ``ContentType`` for each model (including those not stored in that
+  database),
+- three ``Permission`` for each model (including those not stored in that
+  database).
+
+For common setups with multiple databases, it isn't useful to have these
+objects in more than one database. Common setups include master / slave and
+connecting to external databases. Therefore, it's recommended:
+
+- either to run :djadmin:`syncdb` only for the default database;
+- or to write :ref:`database router<topics-db-multi-db-routing>` that allows
+  synchronizing these three models only to one database.
+
+.. warning::
+
+    If you're synchronizing content types to more that one database, be aware
+    that their primary keys may not match across databases. This may result in
+    data corruption or data loss.

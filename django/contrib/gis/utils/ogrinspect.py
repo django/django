@@ -89,7 +89,7 @@ def ogrinspect(*args, **kwargs):
      `multi_geom` => Boolean (default: False) - specify as multigeometry.
 
      `name_field` => String - specifies a field name to return for the
-       `__unicode__` function (which will be generated if specified).
+       `__unicode__`/`__str__` function (which will be generated if specified).
 
      `imports` => Boolean (default: True) - set to False to omit the
        `from django.contrib.gis.db import models` code from the
@@ -123,7 +123,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     to the given data source.  See the `ogrinspect` docstring for more details.
     """
     # Getting the DataSource
-    if isinstance(data_source, str):
+    if isinstance(data_source, six.string_types):
         data_source = DataSource(data_source)
     elif isinstance(data_source, DataSource):
         pass
@@ -221,4 +221,5 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     if name_field:
         yield ''
-        yield '    def __str__(self): return self.%s' % name_field
+        yield '    def __%s__(self): return self.%s' % (
+            'str' if six.PY3 else 'unicode', name_field)

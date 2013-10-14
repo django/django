@@ -89,6 +89,17 @@ We'll be using these models::
         class Meta:
             ordering = ["-name"]
 
+        # On Python 3: def __str__(self):
+        def __unicode__(self):
+            return self.name
+
+    class Author(models.Model):
+        salutation = models.CharField(max_length=10)
+        name = models.CharField(max_length=200)
+        email = models.EmailField()
+        headshot = models.ImageField(upload_to='author_headshots')
+
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.name
 
@@ -110,7 +121,7 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import patterns, url
     from books.views import PublisherList
 
     urlpatterns = patterns('',
@@ -132,11 +143,11 @@ bit is just the lowercased version of the model's name.
     enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
     /path/to/project/books/templates/books/publisher_list.html
 
-.. highlightlang:: html+django
-
 This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A very simple template
-might look like the following::
+might look like the following:
+
+.. code-block:: html+django
 
     {% extends "base.html" %}
 
@@ -159,8 +170,6 @@ consider some of the common ways you might customize and extend generic views.
 Making "friendly" template contexts
 -----------------------------------
 
-.. highlightlang:: python
-
 You might have noticed that our sample publisher list template stores all the
 publishers in a variable named ``object_list``. While this works just fine, it
 isn't all that "friendly" to template authors: they have to "just know" that
@@ -172,7 +181,7 @@ context using the lower cased version of the model class' name. This is
 provided in addition to the default ``object_list`` entry, but contains exactly
 the same data, i.e. ``publisher_list``.
 
-If the this still isn't a good match, you can manually set the name of the
+If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
@@ -188,6 +197,8 @@ Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
 
 
+.. _adding-extra-context:
+
 Adding extra context
 --------------------
 
@@ -196,15 +207,12 @@ provided by the generic view. For example, think of showing a list of
 all the books on each publisher detail page. The
 :class:`~django.views.generic.detail.DetailView` generic view provides
 the publisher to the context, but how do we get additional information
-in that template.
+in that template?
 
-However, there is; you can subclass
-:class:`~django.views.generic.detail.DetailView` and provide your own
-implementation of the ``get_context_data`` method. The default
-implementation of this that comes with
-:class:`~django.views.generic.detail.DetailView` simply adds in the
-object being displayed to the template, but you can override it to send
-more::
+The answer is to subclass :class:`~django.views.generic.detail.DetailView`
+and provide your own implementation of the ``get_context_data`` method.
+The default implementation simply adds the object being displayed to the
+template, but you can override it to send more::
 
     from django.views.generic import DetailView
     from books.models import Publisher, Book
@@ -222,13 +230,13 @@ more::
 
 .. note::
 
-    Generally, get_context_data will merge the context data of all parent
+    Generally, ``get_context_data`` will merge the context data of all parent
     classes with those of the current class. To preserve this behavior in your
     own classes where you want to alter the context, you should be sure to call
-    get_context_data on the super class. When no two classes try to define the
+    ``get_context_data`` on the super class. When no two classes try to define the
     same key, this will give the expected results. However if any class
     attempts to override a key after parent classes have set it (after the call
-    to super), any children of that class will also need to explictly set it
+    to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 
@@ -246,7 +254,7 @@ specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Publisher
 
     class PublisherDetail(DetailView):
 
@@ -257,9 +265,9 @@ Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
-for more information about :class:`QuerySet` objects, and see the
-:doc:`class-based views reference </ref/class-based-views/index>` for the
-complete details).
+for more information about :class:`~django.db.models.query.QuerySet` objects,
+and see the :doc:`class-based views reference </ref/class-based-views/index>`
+for the complete details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
@@ -312,9 +320,9 @@ what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
 Handily, the ``ListView`` has a
-:meth:`~django.views.generic.detail.ListView.get_queryset` method we can
-override. Previously, it has just been returning the value of the ``queryset``
-attribute, but now we can add more logic.
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method we
+can override. Previously, it has just been returning the value of the
+``queryset`` attribute, but now we can add more logic.
 
 The key part to making this work is that when class-based views are called,
 various useful things are stored on ``self``; as well as the request
@@ -324,6 +332,7 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
+    from django.conf.urls import patterns
     from books.views import PublisherBookList
 
     urlpatterns = patterns('',
@@ -369,16 +378,17 @@ Performing extra work
 The last common pattern we'll look at involves doing some extra work before
 or after calling the generic view.
 
-Imagine we had a ``last_accessed`` field on our ``Author`` object that we were
+Imagine we had a ``last_accessed`` field on our ``Author`` model that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
+    from django.db import models
 
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
         name = models.CharField(max_length=200)
         email = models.EmailField()
-        headshot = models.ImageField(upload_to='/tmp')
+        headshot = models.ImageField(upload_to='author_headshots')
         last_accessed = models.DateTimeField()
 
 The generic ``DetailView`` class, of course, wouldn't know anything about this
@@ -388,6 +398,7 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
+    from django.conf.urls import patterns, url
     from books.views import AuthorDetailView
 
     urlpatterns = patterns('',
@@ -399,7 +410,6 @@ Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
     from django.views.generic import DetailView
-    from django.shortcuts import get_object_or_404
     from django.utils import timezone
     from books.models import Author
 

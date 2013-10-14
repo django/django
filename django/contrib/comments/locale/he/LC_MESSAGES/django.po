@@ -6,68 +6,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
 "PO-Revision-Date: 2012-02-14 13:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hebrew (http://www.transifex.net/projects/p/django/language/"
+"Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
-"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "תוכן"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "מטא־נתונים"
 
-#: admin.py:42
+#: admin.py:55
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "סומנה"
 msgstr[1] "סומנו"
 
-#: admin.py:43
+#: admin.py:56
 msgid "Flag selected comments"
 msgstr "סמן תגובות שנבחרו"
 
-#: admin.py:47
+#: admin.py:60
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "אושרה"
 msgstr[1] "אושרו"
 
-#: admin.py:48
+#: admin.py:61
 msgid "Approve selected comments"
 msgstr "אשר תגובות שנבחרו"
 
-#: admin.py:52
+#: admin.py:65
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "הוסרה"
 msgstr[1] "הוסרו"
 
-#: admin.py:53
+#: admin.py:66
 msgid "Remove selected comments"
 msgstr "הסר תגובות שנבחרו"
 
-#: admin.py:65
+#: admin.py:78
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "תגובה אחת %(action)s בהצלחה"
 msgstr[1] "%(count)s תגובות %(action)s בהצלחה"
 
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "תגובות עבור %(site_name)s"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "התגובות האחרונות על %(site_name)s"
@@ -104,56 +104,56 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "אם יוזן משהו בשדה זה תגובתך תטופל כספאם"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "סוג תוכן"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "מזהה אובייקט"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "משתמש"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "שם משתמש"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "כתובת דוא\"ל משתמש"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "אתר המשתמש"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "תגובה"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "תאריך/שעת הגשה"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "כתובת IP"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "פומבי "
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "ביטול סימון התיבה יעלים בפועל את התגובה מהאתר"
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "האם הוסר"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -161,23 +161,23 @@ msgstr ""
 "יש לסמן תיבה זו עבור תגובה לא נאותה. הודעת \"תגובה זו נמחקה\" תוצג במקום "
 "התגובה."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "תגובות"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr "הודעה זו נשלחה ע\"י משתמש מחובר לכן השם אינו ניתן לשינוי."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr "הודעה זו נשלחה ע\"י משתמש מחובר לכן כתובת הדוא\"ל אינה ניתנת לשינוי."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -192,19 +192,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "סימן"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "תאריך"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "סמן הערה"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "סמני הערה"
 

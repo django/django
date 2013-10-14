@@ -1,3 +1,4 @@
+import logging
 import sys
 import os
 from optparse import make_option, OptionParser
@@ -5,6 +6,7 @@ from optparse import make_option, OptionParser
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.test.utils import get_runner
+
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -25,9 +27,8 @@ class Command(BaseCommand):
                  'with LiveServerTestCase) is expected to run from. The '
                  'default value is localhost:8081.'),
     )
-    help = ('Runs the test suite for the specified applications, or the '
-            'entire site if no apps are specified.')
-    args = '[appname ...]'
+    help = ('Discover and run tests in the specified modules or the current directory.')
+    args = '[path.to.modulename|path.to.modulename.TestCase|path.to.modulename.TestCase.test_method]...'
 
     requires_model_validation = False
 
@@ -56,6 +57,21 @@ class Command(BaseCommand):
                             usage=self.usage(subcommand),
                             version=self.get_version(),
                             option_list=options)
+
+    def execute(self, *args, **options):
+        if int(options['verbosity']) > 0:
+            # ensure that deprecation warnings are displayed during testing
+            # the following state is assumed:
+            # logging.capturewarnings is true
+            # a "default" level warnings filter has been added for
+            # DeprecationWarning. See django.conf.LazySettings._configure_logging
+            logger = logging.getLogger('py.warnings')
+            handler = logging.StreamHandler()
+            logger.addHandler(handler)
+        super(Command, self).execute(*args, **options)
+        if int(options['verbosity']) > 0:
+            # remove the testing-specific handler
+            logger.removeHandler(handler)
 
     def handle(self, *test_labels, **options):
         from django.conf import settings

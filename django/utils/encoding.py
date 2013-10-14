@@ -4,14 +4,10 @@ import codecs
 import datetime
 from decimal import Decimal
 import locale
-try:
-    from urllib.parse import quote
-except ImportError:     # Python 2
-    from urllib import quote
-import warnings
 
 from django.utils.functional import Promise
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -23,29 +19,6 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         return '%s. You passed in %r (%s)' % (original, self.obj,
                 type(self.obj))
 
-class StrAndUnicode(object):
-    """
-    A class that derives __str__ from __unicode__.
-
-    On Python 2, __str__ returns the output of __unicode__ encoded as a UTF-8
-    bytestring. On Python 3, __str__ returns the output of __unicode__.
-
-    Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-    you can inherit this mix-in and just define __unicode__.
-    """
-    def __init__(self, *args, **kwargs):
-        warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
-                      "and apply the @python_2_unicode_compatible decorator "
-                      "instead.", PendingDeprecationWarning, stacklevel=2)
-        super(StrAndUnicode, self).__init__(*args, **kwargs)
-
-    if six.PY3:
-        def __str__(self):
-            return self.__unicode__()
-    else:
-        def __str__(self):
-            return self.__unicode__().encode('utf-8')
-
 def python_2_unicode_compatible(klass):
     """
     A decorator that defines __unicode__ and __str__ methods under Python 2.
@@ -54,7 +27,11 @@ def python_2_unicode_compatible(klass):
     To support Python 2 and 3 with a single code base, define a __str__ method
     returning text and apply this decorator to the class.
     """
-    if not six.PY3:
+    if six.PY2:
+        if '__str__' not in klass.__dict__:
+            raise ValueError("@python_2_unicode_compatible cannot be applied "
+                             "to %s because it doesn't define __str__()." %
+                             klass.__name__)
         klass.__unicode__ = klass.__str__
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass
@@ -87,24 +64,22 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    # Handle the common case first, saves 30-40% when s is an instance of
-    # six.text_type. This function gets called often in that setting.
+    # Handle the common case first for performance reasons.
     if isinstance(s, six.text_type):
         return s
     if strings_only and is_protected_type(s):
         return s
     try:
         if not isinstance(s, six.string_types):
-            if hasattr(s, '__unicode__'):
-                s = s.__unicode__()
-            else:
-                if six.PY3:
-                    if isinstance(s, bytes):
-                        s = six.text_type(s, encoding, errors)
-                    else:
-                        s = six.text_type(s)
+            if six.PY3:
+                if isinstance(s, bytes):
+                    s = six.text_type(s, encoding, errors)
                 else:
-                    s = six.text_type(bytes(s), encoding, errors)
+                    s = six.text_type(s)
+            elif hasattr(s, '__unicode__'):
+                s = six.text_type(s)
+            else:
+                s = six.text_type(bytes(s), encoding, errors)
         else:
             # Note: We use .decode() here, instead of six.text_type(s, encoding,
             # errors), so that if s is a SafeBytes, it ends up being a
@@ -142,13 +117,16 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
+    # Handle the common case first for performance reasons.
     if isinstance(s, bytes):
         if encoding == 'utf-8':
             return s
         else:
             return s.decode('utf-8', errors).encode(encoding, errors)
-    if strings_only and (s is None or isinstance(s, int)):
+    if strings_only and is_protected_type(s):
         return s
+    if isinstance(s, six.memoryview):
+        return bytes(s)
     if isinstance(s, Promise):
         return six.text_type(s).encode(encoding, errors)
     if not isinstance(s, six.string_types):
@@ -178,13 +156,13 @@ else:
     smart_unicode = smart_text
     force_unicode = force_text
 
-smart_str.__doc__ = """\
+smart_str.__doc__ = """
 Apply smart_text in Python 3 and smart_bytes in Python 2.
 
 This is suitable for writing to sys.stdout (for instance).
 """
 
-force_str.__doc__ = """\
+force_str.__doc__ = """
 Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
@@ -216,7 +194,7 @@ def iri_to_uri(iri):
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
-    """Convert an file system path to a URI portion that is suitable for
+    """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
 
     We are assuming input is either UTF-8 or unicode already.
@@ -232,13 +210,19 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(force_bytes(path.replace("\\", "/")), safe=b"/~!*()'")
+    return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
 
-# The encoding of the default system locale but falls back to the
-# given fallback encoding if the encoding is unsupported by python or could
-# not be determined.  See tickets #10335 and #5846
-try:
-    DEFAULT_LOCALE_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
-    codecs.lookup(DEFAULT_LOCALE_ENCODING)
-except:
-    DEFAULT_LOCALE_ENCODING = 'ascii'
+def get_system_encoding():
+    """
+    The encoding of the default system locale but falls back to the given
+    fallback encoding if the encoding is unsupported by python or could
+    not be determined.  See tickets #10335 and #5846
+    """
+    try:
+        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        codecs.lookup(encoding)
+    except Exception:
+        encoding = 'ascii'
+    return encoding
+
+DEFAULT_LOCALE_ENCODING = get_system_encoding()

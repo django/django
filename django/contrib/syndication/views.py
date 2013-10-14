@@ -7,11 +7,12 @@ from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext
-from django.utils import feedgenerator, tzinfo
+from django.utils import feedgenerator
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
-from django.utils.timezone import is_naive
+from django.utils import six
+from django.utils.timezone import get_default_timezone, is_naive, make_aware
 
 
 def add_domain(domain, url, secure=False):
@@ -42,9 +43,9 @@ class Feed(object):
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
         response = HttpResponse(content_type=feedgen.mime_type)
-        if hasattr(self, 'item_pubdate'):
-            # if item_pubdate is defined for the feed, set header so as
-            # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
+            # if item_pubdate or item_updateddate is defined for the feed, set
+            # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
             response['Last-Modified'] = http_date(
                 timegm(feedgen.latest_post_date().utctimetuple()))
         feedgen.write(response, 'utf-8')
@@ -69,15 +70,14 @@ class Feed(object):
         except AttributeError:
             return default
         if callable(attr):
-            # Check __code__.co_argcount rather than try/excepting the
-            # function and catching the TypeError, because something inside
-            # the function may raise the TypeError. This technique is more
-            # accurate.
-            if hasattr(attr, '__code__'):
-                argcount = attr.__code__.co_argcount
-            else:
-                argcount = attr.__call__.__code__.co_argcount
-            if argcount == 2: # one argument is 'self'
+            # Check co_argcount rather than try/excepting the function and
+            # catching the TypeError, because something inside the function
+            # may raise the TypeError. This technique is more accurate.
+            try:
+                code = six.get_function_code(attr)
+            except AttributeError:
+                code = six.get_function_code(attr.__call__)
+            if code.co_argcount == 2:       # one argument is 'self'
                 return attr(obj)
             else:
                 return attr()
@@ -99,6 +99,16 @@ class Feed(object):
 
     def get_object(self, request, *args, **kwargs):
         return None
+
+    def get_context_data(self, **kwargs):
+        """
+        Returns a dictionary to use as extra context if either
+        ``self.description_template`` or ``self.item_template`` are used.
+
+        Default implementation preserves the old behavior
+        of using {'obj': item, 'site': current_site} as the context.
+        """
+        return {'obj': kwargs.get('item'), 'site': kwargs.get('site')}
 
     def get_feed(self, obj, request):
         """
@@ -146,12 +156,14 @@ class Feed(object):
                 pass
 
         for item in self.__get_dynamic_attr('items', obj):
+            context = self.get_context_data(item=item, site=current_site,
+                                            obj=obj, request=request)
             if title_tmp is not None:
-                title = title_tmp.render(RequestContext(request, {'obj': item, 'site': current_site}))
+                title = title_tmp.render(RequestContext(request, context))
             else:
                 title = self.__get_dynamic_attr('item_title', item)
             if description_tmp is not None:
-                description = description_tmp.render(RequestContext(request, {'obj': item, 'site': current_site}))
+                description = description_tmp.render(RequestContext(request, context))
             else:
                 description = self.__get_dynamic_attr('item_description', item)
             link = add_domain(
@@ -174,18 +186,26 @@ class Feed(object):
             else:
                 author_email = author_link = None
 
+            tz = get_default_timezone()
+
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
             if pubdate and is_naive(pubdate):
-                ltz = tzinfo.LocalTimezone(pubdate)
-                pubdate = pubdate.replace(tzinfo=ltz)
+                pubdate = make_aware(pubdate, tz)
+
+            updateddate = self.__get_dynamic_attr('item_updateddate', item)
+            if updateddate and is_naive(updateddate):
+                updateddate = make_aware(updateddate, tz)
 
             feed.add_item(
                 title = title,
                 link = link,
                 description = description,
                 unique_id = self.__get_dynamic_attr('item_guid', item, link),
+                unique_id_is_permalink = self.__get_dynamic_attr(
+                    'item_guid_is_permalink', item),
                 enclosure = enc,
                 pubdate = pubdate,
+                updateddate = updateddate,
                 author_name = author_name,
                 author_email = author_email,
                 author_link = author_link,

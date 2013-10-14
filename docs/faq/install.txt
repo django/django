@@ -16,9 +16,8 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python, specifically Python 2.6.5 - 2.7.x. No other Python
-libraries are required for basic Django usage. Django 1.5 also has
-experimental support for Python 3.2.3 and above.
+Django requires Python, specifically Python 2.7 or 3.2 and above. No other
+Python libraries are required for basic Django usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -39,25 +38,6 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
-Do I lose anything by using Python 2.6 versus newer Python versions, such as Python 2.7?
-----------------------------------------------------------------------------------------
-
-Not in the core framework. Currently, Django itself officially supports
-Python 2.6 (2.6.5 or higher) and 2.7. However, newer versions of
-Python are often faster, have more features, and are better supported. If you
-use a newer version of Python you will also have access to some APIs that
-aren't available under older versions of Python.
-
-Third-party applications for use with Django are, of course, free to set their
-own version requirements.
-
-All else being equal, we recommend that you use the latest 2.x release
-(currently Python 2.7). This will let you take advantage of the numerous
-improvements and optimizations to the Python language since version 2.6.
-
-Generally speaking, we don't recommend running Django on Python 3 yet; see
-below for more.
-
 What Python version can I use with Django?
 ------------------------------------------
 
@@ -68,22 +48,36 @@ Django version Python versions
 1.1            2.3, 2.4, 2.5, 2.6
 1.2            2.4, 2.5, 2.6, 2.7
 1.3            2.4, 2.5, 2.6, 2.7
-**1.4**        **2.5, 2.6, 2.7**
-*1.5 (future)* *2.6, 2.7* and *3.2.3, 3.3 (experimental)*
+1.4            2.5, 2.6, 2.7
+1.5            2.6, 2.7 and 3.2, 3.3 (experimental)
+1.6            2.6, 2.7 and 3.2, 3.3
+**1.7**        **2.7** and **3.2, 3.3**
 ============== ===============
 
-Can I use Django with Python 3?
--------------------------------
+For a given series of Python versions, only the latest release is officially
+supported. For instance, at the time of writing (July 1st, 2013), the latest
+release in the 2.7 series is 2.7.5.
 
-Django 1.5 introduces experimental support for Python 3.2.3 and above. However,
-we don't yet suggest that you use Django and Python 3 in production.
+What Python version should I use with Django?
+---------------------------------------------
 
-Python 3 support should be considered a "preview". It's offered to bootstrap
-the transition of the Django ecosystem to Python 3, and to help you start
-porting your apps for future Python 3 compatibility. But we're not yet
-confident enough to promise stability in production.
+As of Django 1.6, Python 3 support is considered stable and you can safely use
+it in production. See also :doc:`/topics/python3`. However, the community is
+still in the process of migrating third-party packages and applications to
+Python 3.
 
-Our current plan is to make Django 1.6 suitable for general use with Python 3.
+If you're starting a new project, and the dependencies you plan to use work on
+Python 3, you should use Python 3. If they don't, consider contributing to the
+porting efforts, or stick to Python 2.
+
+Since newer versions of Python are often faster, have more features, and are
+better supported, all else being equal, we recommend that you use the latest
+2.x.y or 3.x.y release.
+
+You don't lose anything in Django by using an older release, but you don't take
+advantage of the improvements and optimizations in newer Python releases.
+Third-party applications for use with Django are, of course, free to set their
+own version requirements.
 
 Will Django run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------

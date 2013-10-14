@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2011-2012.
+# Alireza Savand <alireza.savand@gmail.com>, 2012-2013.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-08 12:07+0000\n"
-"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
-"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2012-12-15 23:27+0100\n"
+"PO-Revision-Date: 2013-01-11 08:28+0000\n"
+"Last-Translator: Alireza Savand <alireza.savand@gmail.com>\n"
+"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin.py:41
 msgid "Personal info"
@@ -30,64 +31,76 @@ msgstr "اجازه‌ها"
 msgid "Important dates"
 msgstr "تاریخ‌های مهم"
 
-#: admin.py:125
+#: admin.py:126
 msgid "Password changed successfully."
 msgstr "گذرواژه با موفقیت تغییر یافت."
 
-#: admin.py:135
+#: admin.py:136
 #, python-format
 msgid "Change password: %s"
 msgstr "تغییر گذرواژه: %s"
 
-#: forms.py:62
+#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+msgid "No password set."
+msgstr "هیچ رمزی انتخاب نشده است."
+
+#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "رمز نامعتبر یا الگوریتم رمزنگاری ناشناس"
+
+#: forms.py:67
 msgid "A user with that username already exists."
 msgstr "کاربری با این نام کاربری وجود دارد."
 
-#: forms.py:63 forms.py:251 forms.py:308
+#: forms.py:68 forms.py:269 forms.py:329
 msgid "The two password fields didn't match."
 msgstr "دو فیلد گذرواژه با هم مطابقت ندارند."
 
-#: forms.py:65 forms.py:110 forms.py:139
+#: forms.py:70 forms.py:115
 msgid "Username"
 msgstr "نام کاربری"
 
-#: forms.py:67 forms.py:111
+#: forms.py:72 forms.py:116
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "الزامی. ۳۰ حرف یا کمتر. فقط حروف الفبا (ارقام، الفبا و علائم @/./+/-/_)."
 
-#: forms.py:70 forms.py:114
+#: forms.py:75 forms.py:119
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "این مقدار فقط باید حاوی حروف، اعداد و یا علائم @/./+/-/_ باشد."
 
-#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
+#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
 msgid "Password"
 msgstr "گذرواژه"
 
-#: forms.py:74
+#: forms.py:79
 msgid "Password confirmation"
 msgstr "تصدیق گذرواژه"
 
-#: forms.py:76
+#: forms.py:81
 msgid "Enter the same password as above, for verification."
 msgstr "همان گذرواژهٔ بالایی را برای اطمینان دوباره وارد کنید."
 
-#: forms.py:117
+#: forms.py:122
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"کلمات عبور نگهداری نمی شوند، لذا روشی برای مشاهده کلمه عبور کاربر وجود "
+"ندارد. ولی شما می توانید کلمه عبور را بوسیله <a href=\"password/\">این فرم</"
+"a> عوض کنید."
 
-#: forms.py:143
+#: forms.py:151
+#, python-format
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
 msgstr ""
-"لطفاً نام کاربری و گذرواژه صحیح را وارد کنید. توجه کنید که هر دو مقدار به "
-"حروف کوچک و بزرگ (انگلیسی) حساس هستند."
+"لطفا %(username)s و گذرواژه‌ی را برای حساب کارکنان وارد کنید.\n"
+"توجه داشته باشید که هر دو میتوانند به کوچکی و بزرگی حروف حساس باشند."
 
-#: forms.py:145
+#: forms.py:153
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -95,134 +108,165 @@ msgstr ""
 "به نطر می رسد مرورگر شما کوکی‌ها را قبول نمی‌کند. کوکی‌ها برای ورود به وبگاه "
 "لازم هستند."
 
-#: forms.py:147
+#: forms.py:155
 msgid "This account is inactive."
 msgstr "این حساب غیرفعال است."
 
-#: forms.py:191
+#: forms.py:206
 msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
+"That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "این پست الکترونیکی در سیستم حساب ندارد. آیا مطمئن هستید که عضو شده‌اید؟"
+msgstr "این آدرس ایمیل به حسابی متصل نیست. آیا شما ثبت نام کرده اید؟"
 
-#: forms.py:193
+#: forms.py:208 tests/forms.py:374
 msgid ""
-"The user account associated with this e-mail address cannot reset the "
+"The user account associated with this email address cannot reset the "
 "password."
-msgstr ""
+msgstr "کاربری که به این آدرس ایمیل متسل است نمیتواند رمز خود را ریست کند"
 
-#: forms.py:196
-msgid "E-mail"
-msgstr "پست الکترونیکی"
+#: forms.py:211
+msgid "Email"
+msgstr "ایمیل"
 
-#: forms.py:253
+#: forms.py:271
 msgid "New password"
 msgstr "گذرواژهٔ جدید"
 
-#: forms.py:255
+#: forms.py:273
 msgid "New password confirmation"
 msgstr "تصدیق گذرواژهٔ جدید"
 
-#: forms.py:284
+#: forms.py:302
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "گذرواژهٔ قدیمی شما اشتباه بود. لطفاً دوباره وارد کنید."
 
-#: forms.py:287
+#: forms.py:305
 msgid "Old password"
 msgstr "گذرواژهٔ قدیمی"
 
-#: forms.py:312
+#: forms.py:333
 msgid "Password (again)"
 msgstr "گذرواژه (تکرار)"
 
-#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
-#: hashers.py:389
+#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
+#: hashers.py:412
 msgid "algorithm"
-msgstr ""
+msgstr "الگوریتم"
 
-#: hashers.py:219
+#: hashers.py:242
 msgid "iterations"
-msgstr ""
+msgstr "تکرار"
 
-#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
 msgid "salt"
-msgstr ""
+msgstr "salt"
 
-#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
 msgid "hash"
-msgstr ""
+msgstr "hash"
 
-#: hashers.py:270
+#: hashers.py:293
 msgid "work factor"
-msgstr ""
+msgstr "عامل کار"
 
-#: hashers.py:272
+#: hashers.py:295
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
-#: models.py:66 models.py:113
+#: models.py:72 models.py:121
 msgid "name"
 msgstr "نام"
 
-#: models.py:68
+#: models.py:74
 msgid "codename"
 msgstr "نام کد"
 
-#: models.py:72
+#: models.py:78
 msgid "permission"
 msgstr "اجازه"
 
-#: models.py:73 models.py:115
+#: models.py:79 models.py:123
 msgid "permissions"
 msgstr "اجازه‌ها"
 
-#: models.py:120
+#: models.py:128
 msgid "group"
 msgstr "گروه"
 
-#: models.py:121 models.py:250
+#: models.py:129 models.py:301
 msgid "groups"
 msgstr "گروه‌ها"
 
-#: models.py:232
+#: models.py:200
+msgid "password"
+msgstr "گذرواژه"
+
+#: models.py:201
+msgid "last login"
+msgstr "آخرین ورود"
+
+#: models.py:298
+msgid "superuser status"
+msgstr "ابرکاربر"
+
+#: models.py:299
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"نشان می‌دهد که آیا این کاربر دسترسی نامحدود به کلیهٔ بخشهای وبگاه مدیریت دارد."
+
+#: models.py:302
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+"گروه های این کاربر به آن تعلق دارد. کاربر تمامی دسترسیهای اعطا شده به هر یک "
+"از / گروه خود را دریافت کنید."
+
+#: models.py:306
+msgid "user permissions"
+msgstr "اجازه‌های کاربر"
+
+#: models.py:377
 msgid "username"
 msgstr "نام کاربری"
 
-#: models.py:233
+#: models.py:378
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "الزامی. 30 حرف یا کمتر. فقط حروف الفبا (ارقام، الفبا و علائم @/./+/-/_ )."
 
-#: models.py:235
+#: models.py:381
+msgid "Enter a valid username."
+msgstr "یک نام کاربری معتبر وارد کنید"
+
+#: models.py:383
 msgid "first name"
 msgstr "نام"
 
-#: models.py:236
+#: models.py:384
 msgid "last name"
 msgstr "نام خانوادگی"
 
-#: models.py:237
-msgid "e-mail address"
-msgstr "نشانی پست الکترونیکی"
+#: models.py:385
+msgid "email address"
+msgstr "آدرس ایمیل"
 
-#: models.py:238
-msgid "password"
-msgstr "گذرواژه"
-
-#: models.py:239
+#: models.py:386
 msgid "staff status"
 msgstr "وضعیت کارمندی"
 
-#: models.py:240
+#: models.py:387
 msgid "Designates whether the user can log into this admin site."
 msgstr "تعبیه شده برای اینکه در وبگاه مدیریت، کاربر بتواند یا نتواند وارد شود."
 
-#: models.py:242
+#: models.py:389
 msgid "active"
 msgstr "فعال"
 
-#: models.py:243
+#: models.py:390
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -230,52 +274,23 @@ msgstr ""
 "برای نشان دادن اینکه آیا باید با این کاربر به عنوان کاربر فعال رفتار کرد "
 "تعبیه شده است. به جای حذف کاربر تیک را بردارید."
 
-#: models.py:245
-msgid "superuser status"
-msgstr "ابرکاربر"
-
-#: models.py:246
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-"نشان می‌دهد که آیا این کاربر دسترسی نامحدود به کلیهٔ بخشهای وبگاه مدیریت دارد."
-
-#: models.py:248
-msgid "last login"
-msgstr "آخرین ورود"
-
-#: models.py:249
+#: models.py:392
 msgid "date joined"
 msgstr "تاریخ پیوستن"
 
-#: models.py:251
-msgid ""
-"The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
-msgstr ""
-
-#: models.py:255
-msgid "user permissions"
-msgstr "اجازه‌های کاربر"
-
-#: models.py:260
+#: models.py:400
 msgid "user"
 msgstr "کاربر"
 
-#: models.py:261
+#: models.py:401
 msgid "users"
 msgstr "کاربرها"
 
-#: views.py:93
+#: views.py:94
 msgid "Logged out"
 msgstr "خارج شدید"
-
-#: management/commands/createsuperuser.py:27
-msgid "Enter a valid e-mail address."
-msgstr "یک نشانی پست الکترونیکی معتبر وارد کنید."
 
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "بازیابی کلمه عبور بر روی %(site_name)s"

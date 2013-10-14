@@ -19,7 +19,7 @@ only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
 `PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
 
-.. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
+.. _PostgreSQL custom types: http://www.postgresql.org/docs/current/interactive/sql-createtype.html
 
 Alternatively, you may have a complex Python object that can somehow be
 serialized to fit into a standard database column type. This is another case
@@ -31,7 +31,7 @@ Our example object
 Creating custom fields requires a bit of attention to detail. To make things
 easier to follow, we'll use a consistent example throughout this document:
 wrapping a Python object representing the deal of cards in a hand of Bridge_.
-Don't worry, you don't have know how to play Bridge to follow this example.
+Don't worry, you don't have to know how to play Bridge to follow this example.
 You only need to know that 52 cards are dealt out equally to four players, who
 are traditionally called *north*, *east*, *south* and *west*.  Our class looks
 something like this::
@@ -153,8 +153,8 @@ class, from which everything is descended.
 
 Initializing your new field is a matter of separating out any arguments that are
 specific to your case from the common arguments and passing the latter to the
-:meth:`~django.db.models.Field.__init__` method of
-:class:`~django.db.models.Field` (or your parent class).
+``__init__()`` method of :class:`~django.db.models.Field` (or your parent
+class).
 
 In our example, we'll call our field ``HandField``. (It's a good idea to call
 your :class:`~django.db.models.Field` subclass ``<Something>Field``, so it's
@@ -199,20 +199,20 @@ The :meth:`~django.db.models.Field.__init__` method takes the following
 parameters:
 
 * :attr:`~django.db.models.Field.verbose_name`
-* :attr:`~django.db.models.Field.name`
+* ``name``
 * :attr:`~django.db.models.Field.primary_key`
-* :attr:`~django.db.models.Field.max_length`
+* :attr:`~django.db.models.CharField.max_length`
 * :attr:`~django.db.models.Field.unique`
 * :attr:`~django.db.models.Field.blank`
 * :attr:`~django.db.models.Field.null`
 * :attr:`~django.db.models.Field.db_index`
-* :attr:`~django.db.models.Field.rel`: Used for related fields (like
-  :class:`ForeignKey`). For advanced use only.
+* ``rel``: Used for related fields (like :class:`ForeignKey`). For advanced
+  use only.
 * :attr:`~django.db.models.Field.default`
 * :attr:`~django.db.models.Field.editable`
-* :attr:`~django.db.models.Field.serialize`: If ``False``, the field will
-  not be serialized when the model is passed to Django's :doc:`serializers
-  </topics/serialization>`. Defaults to ``True``.
+* ``serialize``: If ``False``, the field will not be serialized when the model
+  is passed to Django's :doc:`serializers </topics/serialization>`. Defaults to
+  ``True``.
 * :attr:`~django.db.models.Field.unique_for_date`
 * :attr:`~django.db.models.Field.unique_for_month`
 * :attr:`~django.db.models.Field.unique_for_year`
@@ -222,9 +222,9 @@ parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* :attr:`~django.db.models.Field.auto_created`: True if the field was
-  automatically created, as for the `OneToOneField` used by model
-  inheritance. For advanced use only.
+* ``auto_created``: ``True`` if the field was automatically created, as for the
+  :class:`~django.db.models.OneToOneField` used by model inheritance. For
+  advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
@@ -249,7 +249,7 @@ appropriate Python object. The details of how this happens internally are a
 little complex, but the code you need to write in your ``Field`` class is
 simple: make sure your field subclass uses a special metaclass:
 
-For example::
+For example, on Python 2::
 
     class HandField(models.Field):
 
@@ -258,7 +258,21 @@ For example::
         __metaclass__ = models.SubfieldBase
 
         def __init__(self, *args, **kwargs):
-            # ...
+            ...
+
+On Python 3, in lieu of setting the ``__metaclass__`` attribute, add
+``metaclass`` to the class definition::
+
+    class HandField(models.Field, metaclass=models.SubfieldBase):
+        ...
+
+If you want your code to work on Python 2 & 3, you can use
+:func:`six.with_metaclass`::
+
+    from django.utils.six import with_metaclass
+
+    class HandField(with_metaclass(models.SubfieldBase, models.Field)):
+        ...
 
 This ensures that the :meth:`.to_python` method, documented below, will always
 be called when the attribute is initialized.
@@ -281,9 +295,9 @@ validation process will break.
 Therefore, you must ensure that the form field used to represent your
 custom field performs whatever input validation and data cleaning is
 necessary to convert user-provided form input into a
-`to_python()`-compatible model field value. This may require writing a
+``to_python()``-compatible model field value. This may require writing a
 custom form field, and/or implementing the :meth:`.formfield` method on
-your field to return a form field class whose `to_python()` returns the
+your field to return a form field class whose ``to_python()`` returns the
 correct datatype.
 
 Documenting your custom field
@@ -299,6 +313,13 @@ field type via the :doc:`django.contrib.admindocs
 descriptive text in a ``description`` class attribute of your custom field. In
 the above example, the description displayed by the ``admindocs``
 application for a ``HandField`` will be 'A hand of cards (bridge style)'.
+
+In the :mod:`django.contrib.admindocs` display, the field description is
+interpolated with ``field.__dict__`` which allows the description to
+incorporate arguments of the field. For example, the description for
+:class:`~django.db.models.CharField` is::
+
+    description = _("String (up to %(max_length)s)")
 
 Useful methods
 --------------
@@ -443,7 +464,7 @@ Python object type we want to store in the model's attribute. If anything is
 going wrong during value conversion, you should raise a
 :exc:`~django.core.exceptions.ValidationError` exception.
 
-**Remember:** If your custom field needs the :meth:`to_python` method to be
+**Remember:** If your custom field needs the :meth:`.to_python` method to be
 called when it is created, you should be using `The SubfieldBase metaclass`_
 mentioned earlier. Otherwise :meth:`.to_python` won't be called
 automatically.
@@ -596,18 +617,23 @@ prepared with :meth:`.get_prep_lookup`.
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.formfield(self, form_class=forms.CharField, **kwargs)
+.. method:: Field.formfield(self, form_class=None, choices_form_class=None, **kwargs)
 
-Returns the default form field to use when this field is displayed in a model.
-This method is called by the :class:`~django.forms.ModelForm` helper.
+Returns the default form field to use when this model field is displayed in a
+form.  This method is called by the :class:`~django.forms.ModelForm` helper.
+
+The form field class can be specified via the ``form_class`` and
+``choices_form_class`` arguments; the latter is used if the field has choices
+specified, the former otherwise. If these arguments are not provided,
+:class:`~django.forms.CharField` or :class:`~django.forms.TypedChoiceField`
+will be used.
 
 All of the ``kwargs`` dictionary is passed directly to the form field's
-:meth:`~django.forms.Field__init__` method. Normally, all you need to do is
-set up a good default for the ``form_class`` argument and then delegate further
-handling to the parent class. This might require you to write a custom form
-field (and even a form widget). See the :doc:`forms documentation
-</topics/forms/index>` for information about this, and take a look at the code in
-:mod:`django.contrib.localflavor` for some examples of custom widgets.
+``__init__()`` method. Normally, all you need to do is set up a good default
+for the ``form_class`` (and maybe ``choices_form_class``) argument and then
+delegate further handling to the parent class. This might require you to write
+a custom form field (and even a form widget). See the :doc:`forms documentation
+</topics/forms/index>` for information about this.
 
 Continuing our ongoing example, we can write the :meth:`.formfield` method as::
 
@@ -668,7 +694,7 @@ Converting field data for serialization
 .. method:: Field.value_to_string(self, obj)
 
 This method is used by the serializers to convert the field into a string for
-output. Calling :meth:`Field._get_val_from_obj(obj)` is the best way to get the
+output. Calling ``Field._get_val_from_obj(obj)`` is the best way to get the
 value to serialize. For example, since our ``HandField`` uses strings for its
 data storage anyway, we can reuse some existing conversion code::
 
@@ -692,14 +718,14 @@ smoothly:
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
-2. Put a :meth:`__str__` or :meth:`__unicode__` method on the class you're
+2. Put a ``__str__()`` or ``__unicode__()`` method on the class you're
    wrapping up as a field. There are a lot of places where the default
    behavior of the field code is to call
    :func:`~django.utils.encoding.force_text` on the value. (In our
    examples in this document, ``value`` would be a ``Hand`` instance, not a
-   ``HandField``). So if your :meth:`__unicode__` method automatically
-   converts to the string form of your Python object, you can save yourself
-   a lot of work.
+   ``HandField``). So if your ``__unicode__()`` method (``__str__()`` on
+   Python 3) automatically converts to the string form of your Python object,
+   you can save yourself a lot of work.
 
 
 Writing a ``FileField`` subclass

@@ -1,9 +1,5 @@
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
-
 from django.db.models.sql import compiler
+from django.utils.six.moves import zip_longest
 
 
 class SQLCompiler(compiler.SQLCompiler):
@@ -17,17 +13,31 @@ class SQLCompiler(compiler.SQLCompiler):
             values.append(value)
         return row[:index_extra_select] + tuple(values)
 
+    def as_subquery_condition(self, alias, columns, qn):
+        qn2 = self.connection.ops.quote_name
+        sql, params = self.as_sql()
+        return '(%s) IN (%s)' % (', '.join('%s.%s' % (qn(alias), qn2(column)) for column in columns), sql), params
+
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
+
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
     pass
 
+
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
     pass
+
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
 
+
 class SQLDateCompiler(compiler.SQLDateCompiler, SQLCompiler):
+    pass
+
+
+class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, SQLCompiler):
     pass

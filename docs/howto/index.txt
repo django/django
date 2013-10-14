@@ -15,13 +15,15 @@ you quickly accomplish common tasks.
    custom-template-tags
    custom-file-storage
    deployment/index
+   upgrade-version
    error-reporting
    initial-data
    jython
    legacy-databases
    outputting-csv
    outputting-pdf
-   static-files
+   static-files/index
+   static-files/deployment
 
 .. seealso::
 

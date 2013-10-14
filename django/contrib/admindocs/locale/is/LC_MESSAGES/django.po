@@ -7,73 +7,85 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2012-03-19 14:46+0000\n"
+"POT-Creation-Date: 2012-10-22 09:28+0200\n"
+"PO-Revision-Date: 2012-10-22 08:46+0000\n"
 "Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
-"Language-Team: Icelandic (http://www.transifex.net/projects/p/django/"
+"Language-Team: Icelandic (http://www.transifex.com/projects/p/django/"
 "language/is/)\n"
-"Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
+#: views.py:58 views.py:60 views.py:62
 msgid "tag:"
 msgstr "merki:"
 
-#: views.py:92 views.py:94 views.py:96
+#: views.py:93 views.py:95 views.py:97
 msgid "filter:"
 msgstr "sía:"
 
-#: views.py:155 views.py:157 views.py:159
+#: views.py:156 views.py:158 views.py:160
 msgid "view:"
 msgstr "skoða:"
 
-#: views.py:187
+#: views.py:188
 #, python-format
 msgid "App %r not found"
 msgstr "Forrit %r fannst ekki"
 
-#: views.py:194
+#: views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Líkanið %(model_name)r finnst ekki í forritinu %(app_label)r"
 
-#: views.py:206
+#: views.py:207
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "tengdi `%(app_label)s.%(data_type)s` hluturinn"
 
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
+#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
+#: views.py:264
 msgid "model:"
 msgstr "líkan:"
 
-#: views.py:221 views.py:253
+#: views.py:222 views.py:254
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "tengdir `%(app_label)s.%(object_name)s` hlutir"
 
-#: views.py:225 views.py:258
+#: views.py:226 views.py:259
 #, python-format
 msgid "all %s"
 msgstr "allt %s"
 
-#: views.py:230 views.py:263
+#: views.py:231 views.py:264
 #, python-format
 msgid "number of %s"
 msgstr "fjöldi af %s"
 
-#: views.py:268
+#: views.py:269
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Svæði í %s hlutnum"
 
-#: views.py:360
+#: views.py:361
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s virðist ekki vera urlpattern hlutur"
+
+#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
+#: templates/admin_doc/missing_docutils.html:6
+#: templates/admin_doc/model_detail.html:14
+#: templates/admin_doc/model_index.html:8
+#: templates/admin_doc/template_detail.html:6
+#: templates/admin_doc/template_filter_index.html:7
+#: templates/admin_doc/template_tag_index.html:7
+#: templates/admin_doc/view_detail.html:6
+#: templates/admin_doc/view_index.html:7
+msgid "Home"
+msgstr "Heim"
 
 #: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
 #: templates/admin_doc/missing_docutils.html:7
@@ -84,30 +96,18 @@ msgstr "%s virðist ekki vera urlpattern hlutur"
 #: templates/admin_doc/template_tag_index.html:8
 #: templates/admin_doc/view_detail.html:7
 #: templates/admin_doc/view_index.html:8
-msgid "Home"
-msgstr "Heim"
-
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "Skjölun"
 
-#: templates/admin_doc/bookmarklets.html:9
+#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "Bókamerklar"
 
-#: templates/admin_doc/bookmarklets.html:12
+#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Skjölunarbókamerklar"
 
-#: templates/admin_doc/bookmarklets.html:16
+#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -129,11 +129,11 @@ msgstr ""
 "skráð sem \"internal\" (hafðu samband við kerfisstjórann ef þú ert óviss "
 "hvort tölvan þín er \"internal\").</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Skjölun þessarar síðu"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -141,52 +141,61 @@ msgstr ""
 "Sendir þig af hvaða síðu sem er á skjölun þess framsetningarlags sem myndar "
 "hana."
 
-#: templates/admin_doc/bookmarklets.html:29
+#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Sýna kenni hlutar"
 
-#: templates/admin_doc/bookmarklets.html:30
+#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr "Sýnir efnistag og sérkenni síða sem gefa tiltekna mynd af stökum hlut."
 
-#: templates/admin_doc/bookmarklets.html:32
+#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Breyta þessum hlut (í þessum glugga)"
 
-#: templates/admin_doc/bookmarklets.html:33
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Stekkur á stjórnunarsíðuna fyrir þær síður sem gefa tiltekna mynd af stökum "
 "hlut."
 
-#: templates/admin_doc/bookmarklets.html:35
+#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Breyta þessum hlut (nýr gluggi)"
 
-#: templates/admin_doc/bookmarklets.html:36
+#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Eins og að ofan en opnar stjórnunarsíðuna í nýjum glugga."
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
 msgid "Models"
 msgstr "Módel"
 
-#: templates/admin_doc/template_detail.html:9
+#: templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Sniðmát"
 
-#: templates/admin_doc/template_filter_index.html:10
+#: templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Síur"
 
-#: templates/admin_doc/template_tag_index.html:10
+#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Tögg"
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Views"
 msgstr "Ásýndir"
+
+#: tests/__init__.py:23
+msgid "Boolean (Either True or False)"
+msgstr "Boole-gildi (True eða False)"
+
+#: tests/__init__.py:33
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Reitur af gerð: %(field_type)s"

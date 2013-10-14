@@ -1,0 +1,84 @@
+{% load i18n %}
+{% comment %}Translators: Django comment block for translators
+string's meaning unveiled
+{% endcomment %}
+{% trans "This literal should be included." %}
+{% trans "This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option." %}
+
+{# Translators: Django template comment for translators #}
+<p>{% blocktrans %}I think that 100% is more that 50% of anything.{% endblocktrans %}</p>
+{% blocktrans with 'txt' as obj %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: One-line translator comment #1
+{% endcomment %}
+{% trans "Translatable literal #1a" %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: Two-line translator comment #1
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #1b" %}
+
+{% comment %}Some random comment
+Translators: One-line translator comment #2
+{% endcomment %}
+{% trans "Translatable literal #2a" %}
+
+{% comment %}Some random comment
+Translators: Two-line translator comment #2
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #2b" %}
+
+{% comment %}
+    Translators: One-line translator comment #3
+{% endcomment %}
+{% trans "Translatable literal #3a" %}
+
+{% comment %}
+Translators: Two-line translator comment #3
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #3b" %}
+
+{% comment %} Translators: One-line translator comment #4{% endcomment %}
+{% trans "Translatable literal #4a" %}
+
+{% comment %}  Translators: Two-line translator comment #4
+continued here.{% endcomment %}
+{% trans "Translatable literal #4b" %}
+
+{% comment %} Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö{% endcomment %}
+{% trans "Translatable literal #5a" %}
+
+{% comment %}  Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö
+continued here.{% endcomment %}
+{% trans "Translatable literal #6b" %}
+
+{% trans "Translatable literal #7a" context "Special trans context #1" %}
+{% trans "Translatable literal #7b" as var context "Special trans context #2" %}
+{% trans "Translatable literal #7c" context "Special trans context #3" as var %}
+
+{% blocktrans context "Special blocktrans context #1" %}Translatable literal #8a{% endblocktrans %}
+{% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
+{% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}
+{% blocktrans with a=1 context "Special blocktrans context #4" %}Translatable literal #8d {{ a }}{% endblocktrans %}
+
+{% blocktrans with a=1 %}Blocktrans extraction shouldn't double escape this: %%, a={{ a }}{% endblocktrans %}
+
+{% trans "Literal with a percent symbol at the end %" %}
+{% trans "Literal with a percent % symbol in the middle" %}
+{% trans "Completed 50% of all the tasks" %}
+{% trans "Completed 99% of all the tasks" context "ctx0" %}
+{% trans "Shouldn't double escape this sequence: %% (two percent signs)" %}
+{% trans "Shouldn't double escape this sequence %% either" context "ctx1" %}
+{% trans "Looks like a str fmt spec %s but shouldn't be interpreted as such" %}
+{% trans "Looks like a str fmt spec % o but shouldn't be interpreted as such" %}
+
+{% trans "Translatable literal with context wrapped in single quotes" context 'Context wrapped in single quotes' as var %}
+{% trans "Translatable literal with context wrapped in double quotes" context "Context wrapped in double quotes" as var %}
+{% blocktrans context 'Special blocktrans context wrapped in single quotes' %}Translatable literal with context wrapped in single quotes{% endblocktrans %}
+{% blocktrans context "Special blocktrans context wrapped in double quotes" %}Translatable literal with context wrapped in double quotes{% endblocktrans %}

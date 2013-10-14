@@ -2,16 +2,16 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
@@ -34,6 +34,16 @@ class AdminSite(object):
     functions that present a full admin interface for the collection of registered
     models.
     """
+
+    # Text to put at the end of each page's <title>.
+    site_title = ugettext_lazy('Django site admin')
+
+    # Text to put in each page's <h1>.
+    site_header = ugettext_lazy('Django administration')
+
+    # Text to put at the top of the admin index page.
+    index_title = ugettext_lazy('Site administration')
+
     login_form = None
     index_template = None
     app_index_template = None
@@ -66,12 +76,6 @@ class AdminSite(object):
         if not admin_class:
             admin_class = ModelAdmin
 
-        # Don't import the humongous validation code unless required
-        if admin_class and settings.DEBUG:
-            from django.contrib.admin.validation import validate
-        else:
-            validate = lambda model, adminclass: None
-
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -94,8 +98,8 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                # Validate (which might be a no-op)
-                validate(admin_class, model)
+                if admin_class is not ModelAdmin and settings.DEBUG:
+                    admin_class.validate(model)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
@@ -129,7 +133,7 @@ class AdminSite(object):
 
     def get_action(self, name):
         """
-        Explicitally get a registered global action wheather it's enabled or
+        Explicitly get a registered global action whether it's enabled or
         not. Raises KeyError for invalid names.
         """
         return self._global_actions[name]
@@ -193,9 +197,10 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
+            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
+                auth_logout(request)
             if not self.has_permission(request):
-                if request.path == reverse('admin:logout',
-                                           current_app=self.name):
+                if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
                 return self.login(request)
@@ -221,40 +226,46 @@ class AdminSite(object):
 
         # Admin-site-wide views.
         urlpatterns = patterns('',
-            url(r'^$',
-                wrap(self.index),
-                name='index'),
-            url(r'^logout/$',
-                wrap(self.logout),
-                name='logout'),
-            url(r'^password_change/$',
-                wrap(self.password_change, cacheable=True),
-                name='password_change'),
-            url(r'^password_change/done/$',
-                wrap(self.password_change_done, cacheable=True),
-                name='password_change_done'),
-            url(r'^jsi18n/$',
-                wrap(self.i18n_javascript, cacheable=True),
-                name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$',
-                wrap(contenttype_views.shortcut),
-                name='view_on_site'),
-            url(r'^(?P<app_label>\w+)/$',
-                wrap(self.app_index),
-                name='app_list')
+            url(r'^$', wrap(self.index), name='index'),
+            url(r'^logout/$', wrap(self.logout), name='logout'),
+            url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
+            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
+            url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
+            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
         )
 
-        # Add in each model's views.
+        # Add in each model's views, and create a list of valid URLS for the
+        # app_index
+        valid_app_labels = []
         for model, model_admin in six.iteritems(self._registry):
             urlpatterns += patterns('',
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.module_name),
-                    include(model_admin.urls))
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
+            )
+            if model._meta.app_label not in valid_app_labels:
+                valid_app_labels.append(model._meta.app_label)
+
+        # If there were ModelAdmins registered, we should have a list of app
+        # labels for which we need to allow access to the app_index view,
+        if valid_app_labels:
+            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+            urlpatterns += patterns('',
+                url(regex, wrap(self.app_index), name='app_list'),
             )
         return urlpatterns
 
     @property
     def urls(self):
         return self.get_urls(), self.app_name, self.name
+
+    def each_context(self):
+        """
+        Returns a dictionary of variables to put in the template context for
+        *every* page in the admin site.
+        """
+        return {
+            'site_title': self.site_title,
+            'site_header': self.site_header,
+        }
 
     def password_change(self, request):
         """
@@ -264,7 +275,8 @@ class AdminSite(object):
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
             'current_app': self.name,
-            'post_change_redirect': url
+            'post_change_redirect': url,
+            'extra_context': self.each_context(),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -277,7 +289,7 @@ class AdminSite(object):
         from django.contrib.auth.views import password_change_done
         defaults = {
             'current_app': self.name,
-            'extra_context': extra_context or {},
+            'extra_context': dict(self.each_context(), **(extra_context or {})),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -306,7 +318,7 @@ class AdminSite(object):
         from django.contrib.auth.views import logout
         defaults = {
             'current_app': self.name,
-            'extra_context': extra_context or {},
+            'extra_context': dict(self.each_context(), **(extra_context or {})),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -318,11 +330,11 @@ class AdminSite(object):
         Displays the login form for the given HttpRequest.
         """
         from django.contrib.auth.views import login
-        context = {
-            'title': _('Log in'),
-            'app_path': request.get_full_path(),
-            REDIRECT_FIELD_NAME: request.get_full_path(),
-        }
+        context = dict(self.each_context(),
+            title=_('Log in'),
+            app_path=request.get_full_path(),
+        )
+        context[REDIRECT_FIELD_NAME] = request.get_full_path()
         context.update(extra_context or {})
 
         defaults = {
@@ -351,9 +363,10 @@ class AdminSite(object):
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
-                    info = (app_label, model._meta.module_name)
+                    info = (app_label, model._meta.model_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
                         'perms': perms,
                     }
                     if perms.get('change', False):
@@ -371,6 +384,7 @@ class AdminSite(object):
                     else:
                         app_dict[app_label] = {
                             'name': app_label.title(),
+                            'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
@@ -384,62 +398,66 @@ class AdminSite(object):
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
 
-        context = {
-            'title': _('Site administration'),
-            'app_list': app_list,
-        }
+        context = dict(self.each_context(),
+            title=self.index_title,
+            app_list=app_list,
+        )
         context.update(extra_context or {})
-        return TemplateResponse(request, [
-            self.index_template or 'admin/index.html',
-        ], context, current_app=self.name)
+        return TemplateResponse(request, self.index_template or
+                                'admin/index.html', context,
+                                current_app=self.name)
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
         has_module_perms = user.has_module_perms(app_label)
+        if not has_module_perms:
+            raise PermissionDenied
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
-                if has_module_perms:
-                    perms = model_admin.get_model_perms(request)
+                perms = model_admin.get_model_perms(request)
 
-                    # Check whether user has any perm for this module.
-                    # If so, add the module to the model_list.
-                    if True in perms.values():
-                        info = (app_label, model._meta.module_name)
-                        model_dict = {
-                            'name': capfirst(model._meta.verbose_name_plural),
-                            'perms': perms,
+                # Check whether user has any perm for this module.
+                # If so, add the module to the model_list.
+                if True in perms.values():
+                    info = (app_label, model._meta.model_name)
+                    model_dict = {
+                        'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
+                        'perms': perms,
+                    }
+                    if perms.get('change'):
+                        try:
+                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if perms.get('add'):
+                        try:
+                            model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if app_dict:
+                        app_dict['models'].append(model_dict),
+                    else:
+                        # First time around, now that we know there's
+                        # something to display, add in the necessary meta
+                        # information.
+                        app_dict = {
+                            'name': app_label.title(),
+                            'app_label': app_label,
+                            'app_url': '',
+                            'has_module_perms': has_module_perms,
+                            'models': [model_dict],
                         }
-                        if perms.get('change', False):
-                            try:
-                                model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if perms.get('add', False):
-                            try:
-                                model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if app_dict:
-                            app_dict['models'].append(model_dict),
-                        else:
-                            # First time around, now that we know there's
-                            # something to display, add in the necessary meta
-                            # information.
-                            app_dict = {
-                                'name': app_label.title(),
-                                'app_url': '',
-                                'has_module_perms': has_module_perms,
-                                'models': [model_dict],
-                            }
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
-        context = {
-            'title': _('%s administration') % capfirst(app_label),
-            'app_list': [app_dict],
-        }
+        context = dict(self.each_context(),
+            title=_('%s administration') % capfirst(app_label),
+            app_list=[app_dict],
+            app_label=app_label,
+        )
         context.update(extra_context or {})
 
         return TemplateResponse(request, self.app_index_template or [

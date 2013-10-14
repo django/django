@@ -1,8 +1,9 @@
 import re
+import sys
 from decimal import Decimal
 
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
-from django.contrib.gis.db.backends.util import SpatialOperation, SpatialFunction
+from django.contrib.gis.db.backends.utils import SpatialOperation, SpatialFunction
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
@@ -10,6 +11,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.utils import DatabaseError
 from django.utils import six
+from django.utils.functional import cached_property
+
 
 class SpatiaLiteOperator(SpatialOperation):
     "For SpatiaLite operators (e.g. `&&`, `~`)."
@@ -53,7 +56,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = dict([(k, None) for k in ('Extent', 'Union')])
+    valid_aggregates = {'Extent', 'Union'}
 
     Adapter = SpatiaLiteAdapter
     Adaptor = Adapter # Backwards-compatibility alias.
@@ -114,46 +117,59 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         super(DatabaseOperations, self).__init__(connection)
 
         # Creating the GIS terms dictionary.
-        gis_terms = ['isnull']
-        gis_terms += self.geometry_functions.keys()
-        self.gis_terms = dict([(term, None) for term in gis_terms])
+        self.gis_terms = set(['isnull'])
+        self.gis_terms.update(self.geometry_functions)
 
-    def confirm_spatial_components_versions(self):
-        # Determine the version of the SpatiaLite library.
+    @cached_property
+    def spatial_version(self):
+        """Determine the version of the SpatiaLite library."""
         try:
-            vtup = self.spatialite_version_tuple()
-            version = vtup[1:]
-            if version < (2, 3, 0):
-                raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
-                                           '2.3.0 and above')
-            self.spatial_version = version
-        except ImproperlyConfigured:
-            raise
+            version = self.spatialite_version_tuple()[1:]
         except Exception as msg:
-            raise ImproperlyConfigured('Cannot determine the SpatiaLite version for the "%s" '
-                                       'database (error was "%s").  Was the SpatiaLite initialization '
-                                       'SQL loaded on this database?' %
-                                       (self.connection.settings_dict['NAME'], msg))
+            new_msg = (
+                'Cannot determine the SpatiaLite version for the "%s" '
+                'database (error was "%s").  Was the SpatiaLite initialization '
+                'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
+            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
+        if version < (2, 3, 0):
+            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
+                                       '2.3.0 and above')
+        return version
 
-        if version >= (2, 4, 0):
+    @property
+    def _version_greater_2_4_0_rc4(self):
+        if self.spatial_version >= (2, 4, 1):
+            return True
+        elif self.spatial_version < (2, 4, 0):
+            return False
+        else:
             # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both
             # RC2 (shipped in popular Debian/Ubuntu packages) and RC4
             # report version as '2.4.0', so we fall back to feature detection
             try:
                 self._get_spatialite_func("AsGML(GeomFromText('POINT(1 1)'))")
-                self.gml = 'AsGML'
-                self.kml = 'AsKML'
             except DatabaseError:
-                # we are using < 2.4.0-RC4
-                pass
-        if version >= (3, 0, 0):
-            self.geojson = 'AsGeoJSON'
+                return False
+            return True
+
+    @cached_property
+    def gml(self):
+        return 'AsGML' if self._version_greater_2_4_0_rc4 else None
+
+    @cached_property
+    def kml(self):
+        return 'AsKML' if self._version_greater_2_4_0_rc4 else None
+
+    @cached_property
+    def geojson(self):
+        return 'AsGeoJSON' if self.spatial_version >= (3, 0, 0) else None
 
     def check_aggregate_support(self, aggregate):
         """
         Checks if the given aggregate name is supported (that is, if it's
         in `self.valid_aggregates`).
         """
+        super(SpatiaLiteOperations, self).check_aggregate_support(aggregate)
         agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
 
@@ -222,15 +238,12 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Helper routine for calling SpatiaLite functions and returning
         their result.
+        Any error occuring in this method should be handled by the caller.
         """
         cursor = self.connection._cursor()
         try:
-            try:
-                cursor.execute('SELECT %s' % func)
-                row = cursor.fetchone()
-            except:
-                # Responsibility of caller to perform error handling.
-                raise
+            cursor.execute('SELECT %s' % func)
+            row = cursor.fetchone()
         finally:
             cursor.close()
         return row[0]
@@ -344,7 +357,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             return op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
         elif lookup_type == 'isnull':
             # Handling 'isnull' lookup type
-            return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
+            return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []
 
         raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 

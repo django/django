@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Gašper Žejn <zejn@kiberpipa.org>, 2012.
 # iElectric <domen@dev.si>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 #   <zejn@kiberpipa.org>, 2012.
@@ -8,32 +9,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
-"Language-Team: Slovenian (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-31 19:50+0000\n"
+"Last-Translator: mateju <>\n"
+"Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
-"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3)\n"
+"%100==4 ? 2 : 3);\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "Napredne možnosti"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
-msgstr "URL (spletni naslov)"
+msgstr "Naslov URL"
 
 #: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"Primer: '/about/contact/'. Preverite ali vsebuje / (poševnico) na začetku in "
-"koncu vnosa."
+"Primer: '/about/contact/'. Poševnica (/) mora biti na začetku in na koncu "
+"vnosa."
 
 #: forms.py:10
 msgid ""
@@ -45,55 +46,57 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr "Na začetku URL naslova manjka poševnica."
+msgstr "Na začetku naslov URL manjka poševnica."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr "Na koncu URL naslova manjka poševnica."
+msgstr "Na koncu naslova URL manjka poševnica."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "Enostavna stran na naslovu %(url)s že obstaja na strani %(site)s"
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "naslov"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "vsebina"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
-msgstr "omogoči komentarje"
+msgstr "omogoči opombe"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "ime predloge"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Primer: 'flatpages/contact_page.html'. Če to polje ni izpolnjeno, bo sistem "
-"uporabil 'flatpages/default.html'."
+"Primer: 'flatpages/contact_page.html'. Kadar je to polje prazno, sistem "
+"uporabi 'flatpages/default.html'."
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
-msgstr "obvezna registracija"
+msgstr "zahtevana je registracija"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Če je to polje izbrano, si bodo to stran lahko ogledali le prijavljeni "
-"uporabniki."
+msgstr "Izbrana možnost omogoča ogled strani le prijavljenim uporabnikom."
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "enostavna stran"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "enostavne strani"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "To polje mora biti izpolnjeno."

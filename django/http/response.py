@@ -1,8 +1,8 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
 import datetime
 import time
-import warnings
+import sys
 from email.header import Header
 try:
     from urllib.parse import urlparse
@@ -10,13 +10,77 @@ except ImportError:
     from urlparse import urlparse
 
 from django.conf import settings
+from django.core import signals
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, iri_to_uri
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
+
+
+# See http://www.iana.org/assignments/http-status-codes
+REASON_PHRASES = {
+    100: 'CONTINUE',
+    101: 'SWITCHING PROTOCOLS',
+    102: 'PROCESSING',
+    200: 'OK',
+    201: 'CREATED',
+    202: 'ACCEPTED',
+    203: 'NON-AUTHORITATIVE INFORMATION',
+    204: 'NO CONTENT',
+    205: 'RESET CONTENT',
+    206: 'PARTIAL CONTENT',
+    207: 'MULTI-STATUS',
+    208: 'ALREADY REPORTED',
+    226: 'IM USED',
+    300: 'MULTIPLE CHOICES',
+    301: 'MOVED PERMANENTLY',
+    302: 'FOUND',
+    303: 'SEE OTHER',
+    304: 'NOT MODIFIED',
+    305: 'USE PROXY',
+    306: 'RESERVED',
+    307: 'TEMPORARY REDIRECT',
+    400: 'BAD REQUEST',
+    401: 'UNAUTHORIZED',
+    402: 'PAYMENT REQUIRED',
+    403: 'FORBIDDEN',
+    404: 'NOT FOUND',
+    405: 'METHOD NOT ALLOWED',
+    406: 'NOT ACCEPTABLE',
+    407: 'PROXY AUTHENTICATION REQUIRED',
+    408: 'REQUEST TIMEOUT',
+    409: 'CONFLICT',
+    410: 'GONE',
+    411: 'LENGTH REQUIRED',
+    412: 'PRECONDITION FAILED',
+    413: 'REQUEST ENTITY TOO LARGE',
+    414: 'REQUEST-URI TOO LONG',
+    415: 'UNSUPPORTED MEDIA TYPE',
+    416: 'REQUESTED RANGE NOT SATISFIABLE',
+    417: 'EXPECTATION FAILED',
+    418: "I'M A TEAPOT",
+    422: 'UNPROCESSABLE ENTITY',
+    423: 'LOCKED',
+    424: 'FAILED DEPENDENCY',
+    426: 'UPGRADE REQUIRED',
+    428: 'PRECONDITION REQUIRED',
+    429: 'TOO MANY REQUESTS',
+    431: 'REQUEST HEADER FIELDS TOO LARGE',
+    500: 'INTERNAL SERVER ERROR',
+    501: 'NOT IMPLEMENTED',
+    502: 'BAD GATEWAY',
+    503: 'SERVICE UNAVAILABLE',
+    504: 'GATEWAY TIMEOUT',
+    505: 'HTTP VERSION NOT SUPPORTED',
+    506: 'VARIANT ALSO NEGOTIATES',
+    507: 'INSUFFICIENT STORAGE',
+    508: 'LOOP DETECTED',
+    510: 'NOT EXTENDED',
+    511: 'NETWORK AUTHENTICATION REQUIRED',
+}
 
 
 class BadHeaderError(ValueError):
@@ -32,25 +96,29 @@ class HttpResponseBase(six.Iterator):
     """
 
     status_code = 200
+    reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, mimetype=None):
+    def __init__(self, content_type=None, status=None, reason=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
         self._closable_objects = []
-        if mimetype:
-            warnings.warn("Using mimetype keyword argument is deprecated, use"
-                          " content_type instead", PendingDeprecationWarning)
-            content_type = mimetype
+        # This parameter is set by the handler. It's necessary to preserve the
+        # historical behavior of request_finished.
+        self._handler_class = None
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
         self.cookies = SimpleCookie()
-        if status:
+        if status is not None:
             self.status_code = status
-
+        if reason is not None:
+            self.reason_phrase = reason
+        elif self.reason_phrase is None:
+            self.reason_phrase = REASON_PHRASES.get(self.status_code,
+                                                    'UNKNOWN STATUS CODE')
         self['Content-Type'] = content_type
 
     def serialize_headers(self):
@@ -93,7 +161,7 @@ class HttpResponseBase(six.Iterator):
         except UnicodeError as e:
             if mime_encode:
                 # Wrapping in str() is a workaround for #12422 under Python 2.
-                value = str(Header(value, 'utf-8').encode())
+                value = str(Header(value, 'utf-8', maxlinelen=sys.maxsize).encode())
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
@@ -225,7 +293,11 @@ class HttpResponseBase(six.Iterator):
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            closable.close()
+            try:
+                closable.close()
+            except Exception:
+                pass
+        signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
         raise Exception("This %s instance is not writable" % self.__class__.__name__)
@@ -246,7 +318,7 @@ class HttpResponse(HttpResponseBase):
 
     streaming = False
 
-    def __init__(self, content='', *args, **kwargs):
+    def __init__(self, content=b'', *args, **kwargs):
         super(HttpResponse, self).__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
@@ -260,53 +332,27 @@ class HttpResponse(HttpResponseBase):
     else:
         __str__ = serialize
 
-    def _consume_content(self):
-        # If the response was instantiated with an iterator, when its content
-        # is accessed, the iterator is going be exhausted and the content
-        # loaded in memory. At this point, it's better to abandon the original
-        # iterator and save the content for later reuse. This is a temporary
-        # solution. See the comment in __iter__ below for the long term plan.
-        if self._base_content_is_iter:
-            self.content = b''.join(self.make_bytes(e) for e in self._container)
-
     @property
     def content(self):
-        self._consume_content()
         return b''.join(self.make_bytes(e) for e in self._container)
 
     @content.setter
     def content(self, value):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
-            self._container = value
-            self._base_content_is_iter = True
             if hasattr(value, 'close'):
                 self._closable_objects.append(value)
-        else:
-            self._container = [value]
-            self._base_content_is_iter = False
+            value = b''.join(self.make_bytes(e) for e in value)
+        self._container = [value]
 
     def __iter__(self):
-        # Raise a deprecation warning only if the content wasn't consumed yet,
-        # because the response may be intended to be streamed.
-        # Once the deprecation completes, iterators should be consumed upon
-        # assignment rather than upon access. The _consume_content method
-        # should be removed. See #6527.
-        if self._base_content_is_iter:
-            warnings.warn(
-                'Creating streaming responses with `HttpResponse` is '
-                'deprecated. Use `StreamingHttpResponse` instead '
-                'if you need the streaming behavior.',
-                PendingDeprecationWarning, stacklevel=2)
         if not hasattr(self, '_iterator'):
             self._iterator = iter(self._container)
         return self
 
     def write(self, content):
-        self._consume_content()
         self._container.append(content)
 
     def tell(self):
-        self._consume_content()
         return len(self.content)
 
 
@@ -344,44 +390,17 @@ class StreamingHttpResponse(HttpResponseBase):
             self._closable_objects.append(value)
 
 
-class CompatibleStreamingHttpResponse(StreamingHttpResponse):
-    """
-    This class maintains compatibility with middleware that doesn't know how
-    to handle the content of a streaming response by exposing a `content`
-    attribute that will consume and cache the content iterator when accessed.
-
-    These responses will stream only if no middleware attempts to access the
-    `content` attribute. Otherwise, they will behave like a regular response,
-    and raise a `PendingDeprecationWarning`.
-    """
-    @property
-    def content(self):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
-        content = b''.join(self)
-        self.streaming_content = [content]
-        return content
-
-    @content.setter
-    def content(self, content):
-        warnings.warn(
-            'Accessing the `content` attribute on a streaming response is '
-            'deprecated. Use the `streaming_content` attribute instead.',
-            PendingDeprecationWarning)
-        self.streaming_content = [content]
-
-
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
-        parsed = urlparse(redirect_to)
+        parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
-            raise SuspiciousOperation("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+            raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
+
+    url = property(lambda self: self['Location'])
 
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
@@ -404,7 +423,6 @@ class HttpResponseNotModified(HttpResponse):
         if value:
             raise AttributeError("You cannot set content to a 304 (Not Modified) response")
         self._container = []
-        self._base_content_is_iter = False
 
 
 class HttpResponseBadRequest(HttpResponse):

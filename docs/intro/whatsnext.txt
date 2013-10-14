@@ -4,8 +4,8 @@ What to read next
 
 So you've read all the :doc:`introductory material </intro/index>` and have
 decided you'd like to keep using Django. We've only just scratched the surface
-with this intro (in fact, if you've read every single word you've still read
-less than 10% of the overall documentation).
+with this intro (in fact, if you've read every single word, you've read about
+5% of the overall documentation).
 
 So what's next?
 
@@ -23,9 +23,9 @@ to write a document about how to read the document about documentation.)
 Finding documentation
 =====================
 
-Django's got a *lot* of documentation -- almost 200,000 words -- so finding what
-you need can sometimes be tricky. A few good places to start are the :ref:`search`
-and the :ref:`genindex`.
+Django's got a *lot* of documentation -- almost 450,000 words and counting --
+so finding what you need can sometimes be tricky. A few good places to start
+are the :ref:`search` and the :ref:`genindex`.
 
 Or you can just browse around!
 
@@ -65,6 +65,11 @@ different needs:
   methods, and modules are kept in the :doc:`reference </ref/index>`. This is
   where you'll turn to find the details of a particular function or
   whathaveyou.
+
+* If you are interested in deploying a project for public use, our docs have
+  :doc:`several guides</howto/deployment/index>` for various deployment
+  setups as well as a :doc:`deployment checklist</howto/deployment/checklist>`
+  for some things you'll need to think about.
 
 * Finally, there's some "specialized" documentation not usually relevant to
   most developers. This includes the :doc:`release notes </releases/index>` and
@@ -120,11 +125,10 @@ ticket system and use your feedback to improve the documentation for everybody.
 
 Note, however, that tickets should explicitly relate to the documentation,
 rather than asking broad tech-support questions. If you need help with your
-particular Django setup, try the `django-users mailing list`_ or the `#django
+particular Django setup, try the |django-users| mailing list or the `#django
 IRC channel`_ instead.
 
 .. _ticket system: https://code.djangoproject.com/newticket?component=Documentation
-.. _django-users mailing list: http://groups.google.com/group/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 
 In plain text
@@ -187,7 +191,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
     Generation of the Django documentation will work with Sphinx version 0.6
     or newer, but we recommend going straight to Sphinx 1.0.2 or newer.
 
-__ http://sphinx.pocoo.org/
+__ http://sphinx-doc.org/
 __ http://www.gnu.org/software/make/
 
 .. _differences-between-doc-versions:

@@ -1,13 +1,16 @@
+from unittest import skip
+
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 
-# function that will pass a test.
-def pass_test(*args): return
 
 def no_backend(test_func, backend):
     "Use this decorator to disable test on specified backend."
     if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1] == backend:
-        return pass_test
+        @skip("This test is skipped on '%s' backend" % backend)
+        def inner():
+            pass
+        return inner
     else:
         return test_func
 
@@ -35,3 +38,12 @@ elif spatialite:
 else:
     HAS_SPATIALREFSYS = False
     SpatialRefSys = None
+
+
+def has_spatial_db():
+    # All databases must have spatial backends to run GeoDjango tests.
+    spatial_dbs = [name for name, db_dict in settings.DATABASES.items()
+        if db_dict['ENGINE'].startswith('django.contrib.gis')]
+    return len(spatial_dbs) == len(settings.DATABASES)
+
+HAS_SPATIAL_DB = has_spatial_db()

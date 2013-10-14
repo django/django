@@ -1,8 +1,10 @@
+import logging
+
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import IntegrityError, transaction, router
 from django.utils import timezone
-
+from django.utils.encoding import force_text
 
 class SessionStore(SessionBase):
     """
@@ -18,7 +20,11 @@ class SessionStore(SessionBase):
                 expire_date__gt=timezone.now()
             )
             return self.decode(s.session_data)
-        except (Session.DoesNotExist, SuspiciousOperation):
+        except (Session.DoesNotExist, SuspiciousOperation) as e:
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' %
+                        e.__class__.__name__)
+                logger.warning(force_text(e))
             self.create()
             return {}
 
@@ -52,12 +58,11 @@ class SessionStore(SessionBase):
             expire_date=self.get_expiry_date()
         )
         using = router.db_for_write(Session, instance=obj)
-        sid = transaction.savepoint(using=using)
         try:
-            obj.save(force_insert=must_create, using=using)
+            with transaction.atomic(using=using):
+                obj.save(force_insert=must_create, using=using)
         except IntegrityError:
             if must_create:
-                transaction.savepoint_rollback(sid, using=using)
                 raise CreateError
             raise
 
@@ -74,7 +79,6 @@ class SessionStore(SessionBase):
     @classmethod
     def clear_expired(cls):
         Session.objects.filter(expire_date__lt=timezone.now()).delete()
-        transaction.commit_unless_managed()
 
 
 # At bottom to avoid circular import

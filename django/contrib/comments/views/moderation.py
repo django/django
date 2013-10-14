@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django import template
 from django.conf import settings
 from django.contrib import comments
@@ -8,7 +6,6 @@ from django.contrib.comments import signals
 from django.contrib.comments.views.utils import next_redirect, confirmation_view
 from django.shortcuts import get_object_or_404, render_to_response
 from django.views.decorators.csrf import csrf_protect
-
 
 
 @csrf_protect
@@ -27,7 +24,8 @@ def flag(request, comment_id, next=None):
     # Flag on POST
     if request.method == 'POST':
         perform_flag(request, comment)
-        return next_redirect(request.POST.copy(), next, flag_done, c=comment.pk)
+        return next_redirect(request, fallback=next or 'comments-flag-done',
+            c=comment.pk)
 
     # Render a form on GET
     else:
@@ -54,7 +52,8 @@ def delete(request, comment_id, next=None):
     if request.method == 'POST':
         # Flag the comment as deleted instead of actually deleting it.
         perform_delete(request, comment)
-        return next_redirect(request.POST.copy(), next, delete_done, c=comment.pk)
+        return next_redirect(request, fallback=next or 'comments-delete-done',
+            c=comment.pk)
 
     # Render a form on GET
     else:
@@ -81,7 +80,8 @@ def approve(request, comment_id, next=None):
     if request.method == 'POST':
         # Flag the comment as approved.
         perform_approve(request, comment)
-        return next_redirect(request.POST.copy(), next, approve_done, c=comment.pk)
+        return next_redirect(request, fallback=next or 'comments-approve-done',
+            c=comment.pk)
 
     # Render a form on GET
     else:

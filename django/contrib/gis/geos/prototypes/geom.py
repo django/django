@@ -27,7 +27,7 @@ def bin_constructor(func):
 
 # HEX & WKB output
 def bin_output(func):
-    "Generates a prototype for the routines that return a a sized string."
+    "Generates a prototype for the routines that return a sized string."
     func.argtypes = [GEOM_PTR, POINTER(c_size_t)]
     func.errcheck = check_sized_string
     func.restype = c_uchar_p

@@ -6,15 +6,17 @@ variable, and then from django.conf.global_settings; see the global settings fil
 a list of all possible variables.
 """
 
+import importlib
 import logging
 import os
+import sys
 import time     # Needed for Windows
 import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils import importlib
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -56,29 +58,21 @@ class LazySettings(LazyObject):
         """
         Setup logging from LOGGING_CONFIG and LOGGING settings.
         """
-        try:
+        if not sys.warnoptions:
             # Route warnings through python logging
             logging.captureWarnings(True)
             # Allow DeprecationWarnings through the warnings filters
             warnings.simplefilter("default", DeprecationWarning)
-        except AttributeError:
-            # No captureWarnings on Python 2.6, DeprecationWarnings are on anyway
-            pass
 
         if self.LOGGING_CONFIG:
             from django.utils.log import DEFAULT_LOGGING
             # First find the logging configuration function ...
-            logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
-            logging_config_module = importlib.import_module(logging_config_path)
-            logging_config_func = getattr(logging_config_module, logging_config_func_name)
+            logging_config_func = import_by_path(self.LOGGING_CONFIG)
 
             logging_config_func(DEFAULT_LOGGING)
 
+            # ... then invoke it with the logging settings
             if self.LOGGING:
-                # Backwards-compatibility shim for #16288 fix
-                compat_patch_logging_config(self.LOGGING)
-
-                # ... then invoke it with the logging settings
                 logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
@@ -110,12 +104,14 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        elif name == "ADMIN_MEDIA_PREFIX":
-            warnings.warn("The ADMIN_MEDIA_PREFIX setting has been removed; "
-                          "use STATIC_URL instead.", DeprecationWarning)
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
+        elif name == "INSTALLED_APPS":
+            value = list(value)  # force evaluation of generators on Python 3
+            if len(value) != len(set(value)):
+                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
+
         object.__setattr__(self, name, value)
 
 
@@ -132,21 +128,22 @@ class Settings(BaseSettings):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError as e:
-            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
+            raise ImportError(
+                "Could not import settings '%s' (Is it on sys.path? Is there an import error in the settings file?): %s"
+                % (self.SETTINGS_MODULE, e)
+            )
 
-        # Settings that should be converted into tuples if they're mistakenly entered
-        # as strings.
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
 
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
-                if setting in tuple_settings and \
-                        isinstance(setting_value, six.string_types):
-                    warnings.warn("The %s setting must be a tuple. Please fix your "
-                                  "settings, as auto-correction is now deprecated." % setting,
-                        PendingDeprecationWarning)
-                    setting_value = (setting_value,) # In case the user forgot the comma.
+
+                if (setting in tuple_settings and
+                        isinstance(setting_value, six.string_types)):
+                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                            "Please fix your settings." % setting)
+
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:
@@ -198,37 +195,3 @@ class UserSettingsHolder(BaseSettings):
         return list(self.__dict__) + dir(self.default_settings)
 
 settings = LazySettings()
-
-
-
-def compat_patch_logging_config(logging_config):
-    """
-    Backwards-compatibility shim for #16288 fix. Takes initial value of
-    ``LOGGING`` setting and patches it in-place (issuing deprecation warning)
-    if "mail_admins" logging handler is configured but has no filters.
-
-    """
-    #  Shim only if LOGGING["handlers"]["mail_admins"] exists,
-    #  but has no "filters" key
-    if "filters" not in logging_config.get(
-        "handlers", {}).get(
-        "mail_admins", {"filters": []}):
-
-        warnings.warn(
-            "You have no filters defined on the 'mail_admins' logging "
-            "handler: adding implicit debug-false-only filter. "
-            "See http://docs.djangoproject.com/en/dev/releases/1.4/"
-            "#request-exceptions-are-now-always-logged",
-            DeprecationWarning)
-
-        filter_name = "require_debug_false"
-
-        filters = logging_config.setdefault("filters", {})
-        while filter_name in filters:
-            filter_name = filter_name + "_"
-
-        filters[filter_name] = {
-            "()": "django.utils.log.RequireDebugFalse",
-        }
-
-        logging_config["handlers"]["mail_admins"]["filters"] = [filter_name]

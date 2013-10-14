@@ -27,8 +27,8 @@
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
-from django.utils.importlib import import_module
 from django.conf import settings
+from django.utils.module_loading import import_by_path
 from django.utils import six
 
 template_source_loaders = None
@@ -61,7 +61,7 @@ class BaseLoader(object):
         name.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError('subclasses of BaseLoader must provide a load_template_source() method')
 
     def reset(self):
         """
@@ -91,15 +91,7 @@ def find_template_loader(loader):
     else:
         args = []
     if isinstance(loader, six.string_types):
-        module, attr = loader.rsplit('.', 1)
-        try:
-            mod = import_module(module)
-        except ImportError as e:
-            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
-        try:
-            TemplateLoader = getattr(mod, attr)
-        except AttributeError as e:
-            raise ImproperlyConfigured('Error importing template source loader %s: "%s"' % (loader, e))
+        TemplateLoader = import_by_path(loader)
 
         if hasattr(TemplateLoader, 'load_template_source'):
             func = TemplateLoader(*args)
@@ -138,12 +130,12 @@ def find_template(name, dirs=None):
             pass
     raise TemplateDoesNotExist(name)
 
-def get_template(template_name):
+def get_template(template_name, dirs=None):
     """
     Returns a compiled Template object for the given template name,
     handling template inheritance recursively.
     """
-    template, origin = find_template(template_name)
+    template, origin = find_template(template_name, dirs)
     if not hasattr(template, 'render'):
         # template needs to be compiled
         template = get_template_from_string(template, origin, template_name)
@@ -156,7 +148,8 @@ def get_template_from_string(source, origin=None, name=None):
     """
     return Template(source, origin, name)
 
-def render_to_string(template_name, dictionary=None, context_instance=None):
+def render_to_string(template_name, dictionary=None, context_instance=None,
+                     dirs=None):
     """
     Loads the given template_name and renders it with the given dictionary as
     context. The template_name may be a string to load a single template using
@@ -165,27 +158,24 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
     """
     dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
-        t = select_template(template_name)
+        t = select_template(template_name, dirs)
     else:
-        t = get_template(template_name)
+        t = get_template(template_name, dirs)
     if not context_instance:
         return t.render(Context(dictionary))
     # Add the dictionary to the context stack, ensuring it gets removed again
     # to keep the context_instance in the same state it started in.
-    context_instance.update(dictionary)
-    try:
+    with context_instance.push(dictionary):
         return t.render(context_instance)
-    finally:
-        context_instance.pop()
 
-def select_template(template_name_list):
+def select_template(template_name_list, dirs=None):
     "Given a list of template names, returns the first that can be loaded."
     if not template_name_list:
         raise TemplateDoesNotExist("No template names provided")
     not_found = []
     for template_name in template_name_list:
         try:
-            return get_template(template_name)
+            return get_template(template_name, dirs)
         except TemplateDoesNotExist as e:
             if e.args[0] not in not_found:
                 not_found.append(e.args[0])

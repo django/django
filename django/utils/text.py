@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import re
 import unicodedata
-import warnings
 from gzip import GzipFile
 from io import BytesIO
 
@@ -13,7 +12,7 @@ from django.utils.six.moves import html_entities
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
 from django.utils.safestring import mark_safe
 
-if not six.PY3:
+if six.PY2:
     # Import force_unicode even though this module doesn't use it, because some
     # people rely on it being here.
     from django.utils.encoding import force_unicode
@@ -23,8 +22,8 @@ capfirst = lambda x: x and force_text(x)[0].upper() + force_text(x)[1:]
 capfirst = allow_lazy(capfirst, six.text_type)
 
 # Set up regular expressions
-re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U|re.S)
-re_tag = re.compile(r'<(/)?([^ ]+?)(?: (/)| .*?)?>', re.S)
+re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U|re.S)
+re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 
 
 def wrap(text, width):
@@ -209,20 +208,6 @@ class Truncator(SimpleLazyObject):
         # Return string
         return out
 
-def truncate_words(s, num, end_text='...'):
-    warnings.warn('This function has been deprecated. Use the Truncator class '
-        'in django.utils.text instead.', category=DeprecationWarning)
-    truncate = end_text and ' %s' % end_text or ''
-    return Truncator(s).words(num, truncate=truncate)
-truncate_words = allow_lazy(truncate_words, six.text_type)
-
-def truncate_html_words(s, num, end_text='...'):
-    warnings.warn('This function has been deprecated. Use the Truncator class '
-        'in django.utils.text instead.', category=DeprecationWarning)
-    truncate = end_text and ' %s' % end_text or ''
-    return Truncator(s).words(num, truncate=truncate, html=True)
-truncate_html_words = allow_lazy(truncate_html_words, six.text_type)
-
 def get_valid_filename(s):
     """
     Returns the given string converted to a string that can be used for a clean
@@ -253,7 +238,7 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
     if len(list_) == 1: return force_text(list_[0])
     return '%s %s %s' % (
         # Translators: This string is used as a separator between list elements
-        _(', ').join([force_text(i) for i in list_][:-1]),
+        _(', ').join(force_text(i) for i in list_[:-1]),
         force_text(last_word), force_text(list_[-1]))
 get_text_list = allow_lazy(get_text_list, six.text_type)
 
@@ -370,7 +355,6 @@ def smart_split(text):
     text = force_text(text)
     for bit in smart_split_re.finditer(text):
         yield bit.group(0)
-smart_split = allow_lazy(smart_split, six.text_type)
 
 def _replace_entity(match):
     text = match.group(1)
@@ -381,12 +365,12 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return unichr(c)
+            return six.unichr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return unichr(html_entities.name2codepoint[text])
+            return six.unichr(html_entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 

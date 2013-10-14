@@ -6,24 +6,29 @@ Django Exceptions
 Django raises some Django specific exceptions as well as many standard
 Python exceptions.
 
-Django-specific Exceptions
-==========================
+Django Core Exceptions
+======================
 
 .. module:: django.core.exceptions
-    :synopsis: Django specific exceptions
+    :synopsis: Django core exceptions
+
+Django core exception classes are defined in :mod:`django.core.exceptions`.
 
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
 .. exception:: DoesNotExist
+
+    The ``DoesNotExist`` exception is raised when an object is not found for
+    the given parameters of a query. Django provides a ``DoesNotExist``
+    exception as an attribute of each model class to identify the class of
+    object that could not be found and to allow you to catch a particular model
+    class with ``try/except``.
+
 .. exception:: ObjectDoesNotExist
 
-    The :exc:`DoesNotExist` exception is raised when an object is not found
-    for the given parameters of a query.
-
-    :exc:`ObjectDoesNotExist` is defined in :mod:`django.core.exceptions`.
-    :exc:`DoesNotExist` is a subclass of the base :exc:`ObjectDoesNotExist`
-    exception that is provided on every model class as a way of
-    identifying the specific type of object that could not be found.
+    The base class for ``DoesNotExist`` exceptions; a ``try/except`` for
+    ``ObjectDoesNotExist`` will catch ``DoesNotExist`` exceptions for all
+    models.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
@@ -44,9 +49,24 @@ SuspiciousOperation
 -------------------
 .. exception:: SuspiciousOperation
 
-    The :exc:`SuspiciousOperation` exception is raised when a user has performed
-    an operation that should be considered suspicious from a security perspective,
-    such as tampering with a session cookie.
+    The :exc:`SuspiciousOperation` exception is raised when a user has
+    performed an operation that should be considered suspicious from a security
+    perspective, such as tampering with a session cookie. Subclasses of
+    SuspiciousOperation include:
+
+    * DisallowedHost
+    * DisallowedModelAdminLookup
+    * DisallowedRedirect
+    * InvalidSessionKey
+    * SuspiciousFileOperation
+    * SuspiciousMultipartForm
+    * SuspiciousSession
+    * WizardViewCookieModified
+
+    If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
+    logged at the ``Error`` level and results in
+    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    documentation </topics/logging/>` for more information.
 
 PermissionDenied
 ----------------
@@ -106,6 +126,20 @@ ValidationError
 
 .. currentmodule:: django.core.urlresolvers
 
+URL Resolver exceptions
+=======================
+
+URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
+
+Resolver404
+--------------
+.. exception:: Resolver404
+
+    The :exc:`Resolver404` exception is raised by
+    :func:`django.core.urlresolvers.resolve()` if the path passed to
+    ``resolve()`` doesn't map to a view. It's a subclass of
+    :class:`django.http.Http404`
+
 NoReverseMatch
 --------------
 .. exception:: NoReverseMatch
@@ -119,28 +153,64 @@ NoReverseMatch
 Database Exceptions
 ===================
 
-Django wraps the standard database exceptions :exc:`DatabaseError` and
-:exc:`IntegrityError` so that your Django code has a guaranteed common
-implementation of these classes. These database exceptions are
-provided in :mod:`django.db`.
+Database exceptions are provided in :mod:`django.db`.
 
+Django wraps the standard database exceptions so that your Django code has a
+guaranteed common implementation of these classes.
+
+.. exception:: Error
+.. exception:: InterfaceError
 .. exception:: DatabaseError
+.. exception:: DataError
+.. exception:: OperationalError
 .. exception:: IntegrityError
+.. exception:: InternalError
+.. exception:: ProgrammingError
+.. exception:: NotSupportedError
 
 The Django wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
+
+As per :pep:`3134`, a ``__cause__`` attribute is set with the original
+(underlying) database exception, allowing access to any additional
+information provided. (Note that this attribute is available under
+both Python 2 and Python 3, although :pep:`3134` normally only applies
+to Python 3.)
+
+.. versionchanged:: 1.6
+
+    Previous versions of Django only wrapped ``DatabaseError`` and
+    ``IntegrityError``, and did not provide ``__cause__``.
+
+.. exception:: models.ProtectedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+of :exc:`IntegrityError`.
+
+.. currentmodule:: django.http
+
+Http Exceptions
+===============
+
+Http exceptions are provided in :mod:`django.http`.
+
+.. exception:: UnreadablePostError
+
+    The :exc:`UnreadablePostError` is raised when a user cancels an upload.
 
 .. currentmodule:: django.db.transaction
 
 Transaction Exceptions
 ======================
 
+Transaction exceptions are defined in :mod:`django.db.transaction`.
+
 .. exception:: TransactionManagementError
 
     The :exc:`TransactionManagementError` is raised for any and all problems
-    related to database transactions. It is available from
-    :mod:`django.db.transaction`.
+    related to database transactions.
 
 Python Exceptions
 =================

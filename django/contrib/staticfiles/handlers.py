@@ -1,12 +1,7 @@
-try:
-    from urllib.parse import urlparse
-    from urllib.request import url2pathname
-except ImportError:     # Python 2
-    from urllib import url2pathname
-    from urlparse import urlparse
-
 from django.conf import settings
-from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.wsgi import get_path_info, WSGIHandler
+from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.six.moves.urllib.request import url2pathname
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
@@ -67,6 +62,6 @@ class StaticFilesHandler(WSGIHandler):
         return super(StaticFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):
-        if not self._should_handle(environ['PATH_INFO']):
+        if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
         return super(StaticFilesHandler, self).__call__(environ, start_response)

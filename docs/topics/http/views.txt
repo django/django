@@ -70,6 +70,8 @@ documentation.  Just return an instance of one of those subclasses instead of
 a normal :class:`~django.http.HttpResponse` in order to signify an error. For
 example::
 
+    from django.http import HttpResponse, HttpResponseNotFound
+
     def my_view(request):
         # ...
         if foo:
@@ -82,6 +84,8 @@ since many of them aren't going to be that common. However, as documented in
 the :class:`~django.http.HttpResponse` documentation, you can also pass the
 HTTP status code into the constructor for :class:`~django.http.HttpResponse`
 to create a return class for any status code you like. For example::
+
+    from django.http import HttpResponse
 
     def my_view(request):
         # ...
@@ -110,6 +114,8 @@ standard error page for your application, along with an HTTP error code 404.
 Example usage::
 
     from django.http import Http404
+    from django.shortcuts import render_to_response
+    from polls.models import Poll
 
     def detail(request, poll_id):
         try:
@@ -132,18 +138,21 @@ Customizing error views
 The 404 (page not found) view
 -----------------------------
 
-When you raise an ``Http404`` exception, Django loads a special view devoted
-to handling 404 errors. By default, it's the view
-``django.views.defaults.page_not_found``, which either produces a very simple
-"Not Found" message or loads and renders the template ``404.html`` if you
-created it in your root template directory.
+.. function:: django.views.defaults.page_not_found(request, template_name='404.html')
+
+When you raise :exc:`~django.http.Http404` from within a view, Django loads a
+special view devoted to handling 404 errors. By default, it's the view
+:func:`django.views.defaults.page_not_found`, which either produces a very
+simple "Not Found" message or loads and renders the template ``404.html`` if
+you created it in your root template directory.
 
 The default 404 view will pass one variable to the template: ``request_path``,
 which is the URL that resulted in the error.
 
 The ``page_not_found`` view should suffice for 99% of Web applications, but if
-you want to override it, you can specify ``handler404`` in your URLconf, like
-so::
+you want to override it, you can specify :data:`~django.conf.urls.handler404`
+in your root URLconf (setting ``handler404`` anywhere else will have no
+effect), like so::
 
     handler404 = 'mysite.views.my_custom_404_view'
 
@@ -169,6 +178,8 @@ Three things to note about 404 views:
 The 500 (server error) view
 ----------------------------
 
+.. function:: django.views.defaults.server_error(request, template_name='500.html')
+
 Similarly, Django executes special-case behavior in the case of runtime errors
 in view code. If a view results in an exception, Django will, by default, call
 the view ``django.views.defaults.server_error``, which either produces a very
@@ -179,8 +190,8 @@ The default 500 view passes no variables to the ``500.html`` template and is
 rendered with an empty ``Context`` to lessen the chance of additional errors.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
-you want to override the view, you can specify ``handler500`` in your URLconf,
-like so::
+you want to override the view, you can specify
+:data:`~django.conf.urls.handler500` in your root URLconf, like so::
 
     handler500 = 'mysite.views.my_custom_error_view'
 
@@ -199,7 +210,7 @@ One thing to note about 500 views:
 The 403 (HTTP Forbidden) view
 -----------------------------
 
-.. versionadded:: 1.4
+.. function:: django.views.defaults.permission_denied(request, template_name='403.html')
 
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by
@@ -221,7 +232,33 @@ view you can use code like this::
         # ...
 
 It is possible to override ``django.views.defaults.permission_denied`` in the
-same way you can for the 404 and 500 views by specifying a ``handler403`` in
-your URLconf::
+same way you can for the 404 and 500 views by specifying a
+:data:`~django.conf.urls.handler403` in your root URLconf::
 
     handler403 = 'mysite.views.my_custom_permission_denied_view'
+
+.. _http_bad_request_view:
+
+The 400 (bad request) view
+--------------------------
+
+.. versionadded:: 1.6
+
+.. function:: django.views.defaults.bad_request(request, template_name='400.html')
+
+When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
+it may be handled by a component of Django (for example resetting the session
+data). If not specifically handled, Django will consider the current request a
+'bad request' instead of a server error.
+
+``django.views.defaults.bad_request``, is otherwise very similar to the
+``server_error`` view, but returns with the status code 400 indicating that
+the error condition was the result of a client operation.
+
+Like ``server_error``, the default ``bad_request`` should suffice for
+99% of Web applications, but if you want to override the view, you can specify
+:data:`~django.conf.urls.handler400` in your root URLconf, like so::
+
+    handler400 = 'mysite.views.my_custom_bad_request_view'
+
+``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.

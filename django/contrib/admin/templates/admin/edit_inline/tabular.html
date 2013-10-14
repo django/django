@@ -1,4 +1,4 @@
-{% load i18n admin_static admin_modify %}
+{% load i18n admin_static admin_modify %}{% load cycle from future %}
 <div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
@@ -29,13 +29,13 @@
           {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
           {% if inline_admin_form.show_url %}<a href="{% url 'admin:view_on_site' inline_admin_form.original_content_type_id inline_admin_form.original.pk %}">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
-          {% if inline_admin_form.has_auto_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+          {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
           {{ inline_admin_form.fk_field.field }}
           {% spaceless %}
           {% for fieldset in inline_admin_form %}
             {% for line in fieldset %}
               {% for field in line %}
-                {% if field.is_hidden %} {{ field.field }} {% endif %}
+                {% if field.field.is_hidden %} {{ field.field }} {% endif %}
               {% endfor %}
             {% endfor %}
           {% endfor %}
@@ -44,14 +44,16 @@
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
             {% for field in line %}
+              {% if not field.field.is_hidden %}
               <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
               {% if field.is_readonly %}
-                  <p>{{ field.contents }}</p>
+                  <p>{{ field.contents|linebreaksbr }}</p>
               {% else %}
                   {{ field.field.errors.as_ul }}
                   {{ field.field }}
               {% endif %}
               </td>
+              {% endif %}
             {% endfor %}
           {% endfor %}
         {% endfor %}

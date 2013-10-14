@@ -1,16 +1,14 @@
 from __future__ import unicode_literals
 
 import re
-try:
-    from urllib.parse import urlsplit, urlunsplit
-except ImportError:     # Python 2
-    from urlparse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils import six
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -50,6 +48,7 @@ class URLValidator(RegexValidator):
         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    message = _('Enter a valid URL.')
 
     def __call__(self, value):
         try:
@@ -75,33 +74,56 @@ def validate_integer(value):
     try:
         int(value)
     except (ValueError, TypeError):
-        raise ValidationError('')
+        raise ValidationError(_('Enter a valid integer.'), code='invalid')
 
 
-class EmailValidator(RegexValidator):
+class EmailValidator(object):
+    message = _('Enter a valid email address.')
+    code = 'invalid'
+    user_regex = re.compile(
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)', # quoted-string
+        re.IGNORECASE)
+    domain_regex = re.compile(
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,})\.?$'  # domain
+        # literal form, ipv4 address (SMTP 4.1.3)
+        r'|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$',
+        re.IGNORECASE)
+    domain_whitelist = ['localhost']
+
+    def __init__(self, message=None, code=None, whitelist=None):
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+        if whitelist is not None:
+            self.domain_whitelist = whitelist
 
     def __call__(self, value):
-        try:
-            super(EmailValidator, self).__call__(value)
-        except ValidationError as e:
-            # Trivial case failed. Try for possible IDN domain-part
-            if value and '@' in value:
-                parts = value.split('@')
-                try:
-                    parts[-1] = parts[-1].encode('idna').decode('ascii')
-                except UnicodeError:
-                    raise e
-                super(EmailValidator, self).__call__('@'.join(parts))
-            else:
-                raise
+        value = force_text(value)
 
-email_re = re.compile(
-    r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    # quoted-string, see also http://tools.ietf.org/html/rfc2822#section-3.2.5
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'
-    r')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)$)'  # domain
-    r'|\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]$', re.IGNORECASE)  # literal form, ipv4 address (SMTP 4.1.3)
-validate_email = EmailValidator(email_re, _('Enter a valid email address.'), 'invalid')
+        if not value or '@' not in value:
+            raise ValidationError(self.message, code=self.code)
+
+        user_part, domain_part = value.rsplit('@', 1)
+
+        if not self.user_regex.match(user_part):
+            raise ValidationError(self.message, code=self.code)
+
+        if (not domain_part in self.domain_whitelist and
+                not self.domain_regex.match(domain_part)):
+            # Try for possible IDN domain-part
+            try:
+                domain_part = domain_part.encode('idna').decode('ascii')
+                if not self.domain_regex.match(domain_part):
+                    raise ValidationError(self.message, code=self.code)
+                else:
+                    return
+            except UnicodeError:
+                pass
+            raise ValidationError(self.message, code=self.code)
+
+validate_email = EmailValidator()
 
 slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
 validate_slug = RegexValidator(slug_re, _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."), 'invalid')
@@ -164,11 +186,7 @@ class BaseValidator(object):
         cleaned = self.clean(value)
         params = {'limit_value': self.limit_value, 'show_value': cleaned}
         if self.compare(cleaned, self.limit_value):
-            raise ValidationError(
-                self.message % params,
-                code=self.code,
-                params=params,
-            )
+            raise ValidationError(self.message, code=self.code, params=params)
 
 
 class MaxValueValidator(BaseValidator):
@@ -186,12 +204,18 @@ class MinValueValidator(BaseValidator):
 class MinLengthValidator(BaseValidator):
     compare = lambda self, a, b: a < b
     clean = lambda self, x: len(x)
-    message = _('Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).')
+    message = ungettext_lazy(
+        'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
+        'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
+        'limit_value')
     code = 'min_length'
 
 
 class MaxLengthValidator(BaseValidator):
     compare = lambda self, a, b: a > b
     clean = lambda self, x: len(x)
-    message = _('Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).')
+    message = ungettext_lazy(
+        'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
+        'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
+        'limit_value')
     code = 'max_length'

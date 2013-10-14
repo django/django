@@ -57,4 +57,3 @@ class EmailBackend(ConsoleEmailBackend):
                 self.stream.close()
         finally:
             self.stream = None
-

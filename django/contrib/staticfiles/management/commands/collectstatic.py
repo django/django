@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 import os
 import sys
+from collections import OrderedDict
 from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
-from django.utils.datastructures import SortedDict
 from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
@@ -60,9 +60,6 @@ class Command(NoArgsCommand):
             self.local = False
         else:
             self.local = True
-        # Use ints for file times (ticket #14665), if supported
-        if hasattr(os, 'stat_float_times'):
-            os.stat_float_times(False)
 
     def set_options(self, **options):
         """
@@ -100,7 +97,7 @@ class Command(NoArgsCommand):
         else:
             handler = self.copy_file
 
-        found_files = SortedDict()
+        found_files = OrderedDict()
         for finder in finders.get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it
@@ -119,8 +116,14 @@ class Command(NoArgsCommand):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
             for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    self.stderr.write("Post-processing '%s' failed!" % original_path)
+                    # Add a blank line before the traceback, otherwise it's
+                    # too easy to miss the relevant part of the error message.
+                    self.stderr.write("")
+                    raise processed
                 if processed:
-                    self.log("Post-processed '%s' as '%s" %
+                    self.log("Post-processed '%s' as '%s'" %
                              (original_path, processed_path), level=1)
                     self.post_processed_files.append(original_path)
                 else:
@@ -171,12 +174,10 @@ Type 'yes' to continue, or 'no' to cancel: """
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
-                'action': self.symlink and 'symlinked' or 'copied',
-                'destination': (destination_path and " to '%s'"
-                                % destination_path or ''),
-                'unmodified': (collected['unmodified'] and ', %s unmodified'
-                               % unmodified_count or ''),
+                'identifier': 'static file' + ('' if modified_count == 1 else 's'),
+                'action': 'symlinked' if self.symlink else 'copied',
+                'destination': (" to '%s'" % destination_path if destination_path else ''),
+                'unmodified': (', %s unmodified' % unmodified_count if collected['unmodified'] else ''),
                 'post_processed': (collected['post_processed'] and
                                    ', %s post-processed'
                                    % post_processed_count or ''),
@@ -231,7 +232,9 @@ Type 'yes' to continue, or 'no' to cancel: """
                     else:
                         full_path = None
                     # Skip the file if the source file is younger
-                    if target_last_modified >= source_last_modified:
+                    # Avoid sub-second precision (see #14665, #19540)
+                    if (target_last_modified.replace(microsecond=0)
+                            >= source_last_modified.replace(microsecond=0)):
                         if not ((self.symlink and full_path
                                  and not os.path.islink(full_path)) or
                                 (not self.symlink and full_path

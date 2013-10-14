@@ -40,7 +40,7 @@ class CityBase(models.Model):
 
 class ICity1(CityBase):
     dt = models.DateField()
-    
+
 class ICity2(ICity1):
     dt_time = models.DateTimeField(auto_now=True)
 

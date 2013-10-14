@@ -8,28 +8,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:34+0100\n"
-"PO-Revision-Date: 2012-03-09 17:50+0000\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
-"Language-Team: Malayalam (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2013-01-01 16:10+0100\n"
+"PO-Revision-Date: 2013-01-02 08:52+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
-"Language: ml\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s വിജയകരമായി ഡിലീറ്റ് ചെയ്തു."
 
-#: actions.py:60 options.py:1295
+#: actions.py:60 options.py:1347
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Cannot delete %(name)s"
 
-#: actions.py:62 options.py:1297
+#: actions.py:62 options.py:1349
 msgid "Are you sure?"
 msgstr "തീര്‍ച്ചയാണോ?"
 
@@ -38,255 +38,269 @@ msgstr "തീര്‍ച്ചയാണോ?"
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "തെരഞ്ഞെടുത്ത %(verbose_name_plural)s ഡിലീറ്റ് ചെയ്യുക."
 
-#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
+#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
 msgid "All"
 msgstr "എല്ലാം"
 
-#: filters.py:232
+#: filters.py:238
 msgid "Yes"
 msgstr "അതെ"
 
-#: filters.py:233
+#: filters.py:239
 msgid "No"
 msgstr "അല്ല"
 
-#: filters.py:247
+#: filters.py:253
 msgid "Unknown"
 msgstr "അജ്ഞാതം"
 
-#: filters.py:306
+#: filters.py:308
 msgid "Any date"
 msgstr "ഏതെങ്കിലും തീയതി"
 
-#: filters.py:307
+#: filters.py:309
 msgid "Today"
 msgstr "ഇന്ന്"
 
-#: filters.py:311
+#: filters.py:313
 msgid "Past 7 days"
 msgstr "കഴിഞ്ഞ ഏഴു ദിവസം"
 
-#: filters.py:315
+#: filters.py:317
 msgid "This month"
 msgstr "ഈ മാസം"
 
-#: filters.py:319
+#: filters.py:321
 msgid "This year"
 msgstr "ഈ വര്‍ഷം"
 
 #: forms.py:9
+#, python-format
 msgid ""
-"Please enter the correct username and password for a staff account. Note "
-"that both fields are case-sensitive."
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
 msgstr ""
-"സ്റ്റാഫ് അക്കൗണ്ടിന്റെ ശരിയായ ഉപയോക്തൃ നാമവും പാസ്‌വേര്‍ഡും നല്കുക. രണ്ടിലേയും ഇംഗ്ലീഷ് "
-"വല്യക്ഷരങ്ങളും ചെറിയക്ഷരങ്ങളും അങ്ങനെത്തന്നെ നല്കാന്‍ ശ്രദ്ധിക്കുക."
 
-#: forms.py:18
+#: forms.py:19
 msgid "Please log in again, because your session has expired."
 msgstr "താങ്കളുടെ സെഷന്റെ കാലാവധി കഴിഞ്ഞു. വീണ്ടും ലോഗിന്‍ ചെയ്യണം."
 
-#: forms.py:37
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "നിങ്ങളുടെ ഇ-മെയില്‍ അഡ്രസ്സ് അല്ല യൂസര്‍നാമം. പകരം '%s' ഉപയോഗിച്ച് നോക്കുക."
-
-#: helpers.py:20
+#: helpers.py:23
 msgid "Action:"
 msgstr "ആക്ഷന്‍"
 
-#: models.py:19
+#: models.py:24
 msgid "action time"
 msgstr "ആക്ഷന്‍ സമയം"
 
-#: models.py:22
+#: models.py:27
 msgid "object id"
 msgstr "ഒബ്ജെക്ട് ഐഡി"
 
-#: models.py:23
+#: models.py:28
 msgid "object repr"
 msgstr "ഒബ്ജെക്ട് സൂചന"
 
-#: models.py:24
+#: models.py:29
 msgid "action flag"
 msgstr "ആക്ഷന്‍ ഫ്ളാഗ്"
 
-#: models.py:25
+#: models.py:30
 msgid "change message"
 msgstr "സന്ദേശം മാറ്റുക"
 
-#: models.py:30
+#: models.py:35
 msgid "log entry"
 msgstr "ലോഗ് എന്ട്രി"
 
-#: models.py:31
+#: models.py:36
 msgid "log entries"
 msgstr "ലോഗ് എന്ട്രികള്‍"
 
-#: models.py:40
+#: models.py:45
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" ചേര്‍ത്തു."
 
-#: models.py:42
+#: models.py:47
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\"ല്‍ %(changes)s മാറ്റം വരുത്തി"
 
-#: models.py:44
+#: models.py:52
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" നീക്കം ചെയ്തു."
 
-#: models.py:46
+#: models.py:54
 msgid "LogEntry Object"
-msgstr ""
+msgstr "ലോഗ്‌എന്‍ട്രി വസ്തു"
 
-#: options.py:150 options.py:166
+#: options.py:156 options.py:172
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-#: options.py:671
+#: options.py:684
 #, python-format
 msgid "Changed %s."
 msgstr "%s മാറ്റി."
 
-#: options.py:671 options.py:681
+#: options.py:684 options.py:694
 msgid "and"
 msgstr "ഉം"
 
-#: options.py:676
+#: options.py:689
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ചേര്‍ത്തു."
 
-#: options.py:680
+#: options.py:693
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ന്റെ %(list)s മാറ്റി."
 
-#: options.py:685
+#: options.py:698
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:689
+#: options.py:702
 msgid "No fields changed."
 msgstr "ഒരു മാറ്റവുമില്ല."
 
-#: options.py:772
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" വിജയകരമായി കൂട്ടിച്ചേര്ത്തു."
-
-#: options.py:776 options.py:824
-msgid "You may edit it again below."
-msgstr "താഴെ നിന്ന് വീണ്ടും മാറ്റം വരുത്താം"
-
-#: options.py:788 options.py:837
-#, python-format
-msgid "You may add another %s below."
-msgstr "%s ഒന്നു കൂടി ചേര്‍ക്കാം"
-
-#: options.py:822
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ല്‍ മാറ്റം വരുത്തി."
-
-#: options.py:830
+#: options.py:807 options.py:860
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" കൂട്ടി ചേര്‍ത്തു. താഴെ നിന്നും മാറ്റം വരുത്താം."
 
-#: options.py:899 options.py:1159
+#: options.py:835
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:839
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" വിജയകരമായി കൂട്ടിച്ചേര്ത്തു."
+
+#: options.py:853
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+
+#: options.py:867
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+
+#: options.py:873
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ല്‍ മാറ്റം വരുത്തി."
+
+#: options.py:951 options.py:1211
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നും മാറ്റിയിട്ടില്ല."
 
-#: options.py:918
+#: options.py:970
 msgid "No action selected."
 msgstr "ആക്ഷനൊന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:998
+#: options.py:1050
 #, python-format
 msgid "Add %s"
 msgstr "%s ചേര്‍ക്കുക"
 
-#: options.py:1023 options.py:1267
+#: options.py:1074 options.py:1319
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r എന്ന പ്രാഥമിക കീ ഉള്ള %(name)s വസ്തു ഒന്നും നിലവിലില്ല."
 
-#: options.py:1089
+#: options.py:1140
 #, python-format
 msgid "Change %s"
 msgstr "%s മാറ്റാം"
 
-#: options.py:1138
+#: options.py:1190
 msgid "Database error"
 msgstr "ഡേറ്റാബേസ് തകരാറാണ്."
 
-#: options.py:1201
+#: options.py:1253
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 msgstr[1] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 
-#: options.py:1228
+#: options.py:1280
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s തെരഞ്ഞെടുത്തു."
 msgstr[1] "%(total_count)sഉം തെരഞ്ഞെടുത്തു."
 
-#: options.py:1233
+#: options.py:1285
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s ല്‍ ഒന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:1283
+#: options.py:1335
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:1330
+#: options.py:1382
 #, python-format
 msgid "Change history: %s"
 msgstr "%s ലെ മാറ്റങ്ങള്‍."
 
-#: sites.py:315 tests.py:61 templates/admin/login.html:49
-#: templates/registration/password_reset_complete.html:20
-#: views/decorators.py:23
+#: sites.py:322 tests.py:57 templates/admin/login.html:48
+#: templates/registration/password_reset_complete.html:19
+#: views/decorators.py:24
 msgid "Log in"
 msgstr "ലോഗ്-ഇന്‍"
 
-#: sites.py:380
+#: sites.py:388
 msgid "Site administration"
 msgstr "സൈറ്റ് ഭരണം"
 
-#: sites.py:432
+#: sites.py:440
 #, python-format
 msgid "%s administration"
 msgstr "%s ഭരണം"
 
-#: widgets.py:87
+#: widgets.py:90
 msgid "Date:"
 msgstr "തീയതി:"
 
-#: widgets.py:87
+#: widgets.py:91
 msgid "Time:"
 msgstr "സമയം:"
 
-#: widgets.py:161
+#: widgets.py:165
 msgid "Lookup"
 msgstr "തിരയുക"
 
-#: widgets.py:267
+#: widgets.py:271
 msgid "Add Another"
 msgstr "ഒന്നു കൂടി ചേര്‍ക്കുക"
+
+#: widgets.py:316
+msgid "Currently:"
+msgstr ""
+
+#: widgets.py:317
+msgid "Change:"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -296,42 +310,40 @@ msgstr "പേജ് കണ്ടില്ല"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "ക്ഷമിക്കണം, ആവശ്യപ്പെട്ട പേജ് കണ്ടെത്താന്‍ കഴിഞ്ഞില്ല."
 
-#: templates/admin/500.html:7 templates/admin/app_index.html:8
-#: templates/admin/base.html:45 templates/admin/change_form.html:21
-#: templates/admin/change_list.html:43
-#: templates/admin/delete_confirmation.html:8
-#: templates/admin/delete_selected_confirmation.html:8
-#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
-#: templates/admin/auth/user/change_password.html:15
-#: templates/registration/logged_out.html:5
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:7
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
+#: templates/admin/500.html:6 templates/admin/app_index.html:7
+#: templates/admin/base.html:47 templates/admin/change_form.html:19
+#: templates/admin/change_list.html:41
+#: templates/admin/delete_confirmation.html:7
+#: templates/admin/delete_selected_confirmation.html:7
+#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
+#: templates/admin/auth/user/change_password.html:13
+#: templates/registration/logged_out.html:4
+#: templates/registration/password_change_done.html:6
+#: templates/registration/password_change_form.html:7
+#: templates/registration/password_reset_complete.html:6
+#: templates/registration/password_reset_confirm.html:6
+#: templates/registration/password_reset_done.html:6
+#: templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "പൂമുഖം"
 
-#: templates/admin/500.html:8
+#: templates/admin/500.html:7
 msgid "Server error"
 msgstr "സെര്‍വര്‍ തകരാറാണ്"
 
-#: templates/admin/500.html:12
+#: templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "സെര്‍വര്‍ തകരാറാണ് (500)"
 
-#: templates/admin/500.html:15
+#: templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "സെര്‍വര്‍ തകരാറാണ് <em>(500)</em>"
 
-#: templates/admin/500.html:16
+#: templates/admin/500.html:15
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"എന്തോ തകരാറുണ്ട്. ഉടന്‍ പരിഹരിക്കാനായി സൈറ്റ് നിയന്ത്രകര്‍ക്കു ഇ-മെയില്‍ വഴി രിപ്പോര്‍ട്ട് "
-"ചെയ്തിട്ടുണ്ട്.ദയവായി കാത്തിരിക്കുക."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
@@ -354,7 +366,7 @@ msgstr "മുഴുവന്‍ %(total_count)s %(module_name)s ഉം തെ�
 msgid "Clear selection"
 msgstr "തെരഞ്ഞെടുത്തത് റദ്ദാക്കുക."
 
-#: templates/admin/app_index.html:11 templates/admin/index.html:19
+#: templates/admin/app_index.html:10 templates/admin/index.html:21
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -364,22 +376,22 @@ msgid "Welcome,"
 msgstr "സ്വാഗതം, "
 
 #: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Documentation"
 msgstr "സഹായക്കുറിപ്പുകള്‍"
 
-#: templates/admin/base.html:35
-#: templates/admin/auth/user/change_password.html:19
-#: templates/admin/auth/user/change_password.html:53
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:36
+#: templates/admin/auth/user/change_password.html:17
+#: templates/admin/auth/user/change_password.html:51
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റുക."
 
-#: templates/admin/base.html:36
-#: templates/registration/password_change_done.html:4
-#: templates/registration/password_change_form.html:5
+#: templates/admin/base.html:38
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "പുറത്ത് കടക്കുക."
 
@@ -391,35 +403,35 @@ msgstr "ജാംഗോ സൈറ്റ് അഡ്മിന്‍"
 msgid "Django administration"
 msgstr "ജാംഗോ ഭരണം"
 
-#: templates/admin/change_form.html:24 templates/admin/index.html:29
+#: templates/admin/change_form.html:22 templates/admin/index.html:33
 msgid "Add"
 msgstr "Add"
 
-#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
+#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
 msgid "History"
 msgstr "ചരിത്രം"
 
-#: templates/admin/change_form.html:35
+#: templates/admin/change_form.html:33
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "View on site"
 
-#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
-#: templates/admin/login.html:18
-#: templates/admin/auth/user/change_password.html:29
-#: templates/registration/password_change_form.html:21
+#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
+#: templates/admin/login.html:17
+#: templates/admin/auth/user/change_password.html:27
+#: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "ദയവായി താഴെയുള്ള തെറ്റ് പരിഹരിക്കുക."
 msgstr[1] "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
 
-#: templates/admin/change_list.html:60
+#: templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Add %(name)s"
 
-#: templates/admin/change_list.html:80
+#: templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filter"
 
@@ -434,14 +446,14 @@ msgstr "ക്രമീകരണത്തിനുള്ള മുന്‍ഗ�
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "ക്രമീകരണം വിപരീത ദിശയിലാക്കുക."
 
-#: templates/admin/delete_confirmation.html:12
+#: templates/admin/delete_confirmation.html:11
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Delete"
 
-#: templates/admin/delete_confirmation.html:19
+#: templates/admin/delete_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -452,7 +464,7 @@ msgstr ""
 "വസ്തുക്കളുംഡിലീറ്റ് ആവും. പക്ഷേ നിങ്ങള്‍ക്ക് താഴെ പറഞ്ഞ തരം വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്യാനുള്ള അനുമതി "
 "ഇല്ല:"
 
-#: templates/admin/delete_confirmation.html:27
+#: templates/admin/delete_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -461,7 +473,7 @@ msgstr ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 
-#: templates/admin/delete_confirmation.html:35
+#: templates/admin/delete_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -470,16 +482,16 @@ msgstr ""
 "%(object_name)s \"%(escaped_object)s\" ഡിലീറ്റ് ചെയ്യണമെന്ന് തീര്‍ച്ചയാണോ?അതുമായി "
 "ബന്ധമുള്ള താഴെപ്പറയുന്ന വസ്തുക്കളെല്ലാം ഡിലീറ്റ് ആവും:"
 
-#: templates/admin/delete_confirmation.html:40
-#: templates/admin/delete_selected_confirmation.html:45
+#: templates/admin/delete_confirmation.html:39
+#: templates/admin/delete_selected_confirmation.html:44
 msgid "Yes, I'm sure"
 msgstr "അതെ, തീര്‍ച്ചയാണ്"
 
-#: templates/admin/delete_selected_confirmation.html:11
+#: templates/admin/delete_selected_confirmation.html:10
 msgid "Delete multiple objects"
 msgstr "ഒന്നിലേറെ വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്തോളൂ"
 
-#: templates/admin/delete_selected_confirmation.html:18
+#: templates/admin/delete_selected_confirmation.html:17
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -490,7 +502,7 @@ msgstr ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 
-#: templates/admin/delete_selected_confirmation.html:26
+#: templates/admin/delete_selected_confirmation.html:25
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -499,7 +511,7 @@ msgstr ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 
-#: templates/admin/delete_selected_confirmation.html:34
+#: templates/admin/delete_selected_confirmation.html:33
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -513,36 +525,36 @@ msgstr ""
 msgid " By %(filter_title)s "
 msgstr " By %(filter_title)s "
 
-#: templates/admin/index.html:18
+#: templates/admin/index.html:20
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Models available in the %(name)s application."
+msgid "Models in the %(name)s application"
+msgstr ""
 
-#: templates/admin/index.html:35
+#: templates/admin/index.html:39
 msgid "Change"
 msgstr "മാറ്റുക"
 
-#: templates/admin/index.html:45
+#: templates/admin/index.html:49
 msgid "You don't have permission to edit anything."
 msgstr "ഒന്നിലും മാറ്റം വരുത്താനുള്ള അനുമതി ഇല്ല."
 
-#: templates/admin/index.html:53
+#: templates/admin/index.html:57
 msgid "Recent Actions"
 msgstr "സമീപകാല പ്രവ്രുത്തികള്‍"
 
-#: templates/admin/index.html:54
+#: templates/admin/index.html:58
 msgid "My Actions"
 msgstr "എന്റെ പ്രവ്രുത്തികള്‍"
 
-#: templates/admin/index.html:58
+#: templates/admin/index.html:62
 msgid "None available"
 msgstr "ഒന്നും ലഭ്യമല്ല"
 
-#: templates/admin/index.html:72
+#: templates/admin/index.html:76
 msgid "Unknown content"
 msgstr "ഉള്ളടക്കം അറിയില്ല."
 
-#: templates/admin/invalid_setup.html:13
+#: templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -551,31 +563,27 @@ msgstr ""
 "നിങ്ങളുടെ ഡേറ്റാബേസ് ഇന്‍സ്ടാലേഷനില്‍ എന്തോ പിശകുണ്ട്. ശരിയായ ടേബിളുകള്‍ ഉണ്ടെന്നും ഡേറ്റാബേസ് "
 "വായനായോഗ്യമാണെന്നും ഉറപ്പു വരുത്തുക."
 
-#: templates/admin/login.html:34
-msgid "Username:"
-msgstr "യൂസര്‍ നാമം"
-
-#: templates/admin/login.html:38
+#: templates/admin/login.html:37
 msgid "Password:"
 msgstr "പാസ് വേര്‍ഡ്"
 
-#: templates/admin/login.html:45
+#: templates/admin/login.html:44
 msgid "Forgotten your password or username?"
 msgstr "രഹസ്യവാക്കോ ഉപയോക്തൃനാമമോ മറന്നുപോയോ?"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:23
 msgid "Date/time"
 msgstr "തീയതി/സമയം"
 
-#: templates/admin/object_history.html:25
+#: templates/admin/object_history.html:24
 msgid "User"
 msgstr "യൂസര്‍"
 
-#: templates/admin/object_history.html:26
+#: templates/admin/object_history.html:25
 msgid "Action"
 msgstr "ആക്ഷന്‍"
 
-#: templates/admin/object_history.html:40
+#: templates/admin/object_history.html:39
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -629,64 +637,64 @@ msgstr "ആദ്യം, യൂസര്‍ നാമവും പാസ് വ�
 msgid "Enter a username and password."
 msgstr "Enter a username and password."
 
-#: templates/admin/auth/user/change_password.html:33
+#: templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> ന് പുതിയ പാസ് വേര്‍ഡ് നല്കുക."
 
-#: templates/admin/auth/user/change_password.html:40
+#: templates/admin/auth/user/change_password.html:38
 msgid "Password"
 msgstr "പാസ് വേര്‍ഡ്"
 
-#: templates/admin/auth/user/change_password.html:46
-#: templates/registration/password_change_form.html:43
+#: templates/admin/auth/user/change_password.html:44
+#: templates/registration/password_change_form.html:42
 msgid "Password (again)"
 msgstr "പാസ് വേര്‍ഡ് (വീണ്ടും)"
 
-#: templates/admin/auth/user/change_password.html:47
+#: templates/admin/auth/user/change_password.html:45
 msgid "Enter the same password as above, for verification."
 msgstr "പാസ് വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
 
-#: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:115
+#: templates/admin/edit_inline/stacked.html:26
+#: templates/admin/edit_inline/tabular.html:76
+msgid "Remove"
+msgstr "നീക്കം ചെയ്യുക"
+
+#: templates/admin/edit_inline/stacked.html:27
+#: templates/admin/edit_inline/tabular.html:75
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "%(verbose_name)s ഒന്നു കൂടി ചേര്‍ക്കുക"
-
-#: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:118
-msgid "Remove"
-msgstr "നീക്കം ചെയ്യുക"
 
 #: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "ഡിലീറ്റ് ചെയ്യട്ടെ?"
 
-#: templates/registration/logged_out.html:9
+#: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ഈ വെബ് സൈറ്റില്‍ കുറെ നല്ല സമയം ചെലവഴിച്ചതിനു നന്ദി."
 
-#: templates/registration/logged_out.html:11
+#: templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "വീണ്ടും ലോഗ്-ഇന്‍ ചെയ്യുക."
 
-#: templates/registration/password_change_done.html:8
-#: templates/registration/password_change_form.html:9
-#: templates/registration/password_change_form.html:13
-#: templates/registration/password_change_form.html:25
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_change_form.html:12
+#: templates/registration/password_change_form.html:24
 msgid "Password change"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റം"
 
-#: templates/registration/password_change_done.html:12
-#: templates/registration/password_change_done.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:15
 msgid "Password change successful"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റം വിജയിച്ചു"
 
-#: templates/registration/password_change_done.html:18
+#: templates/registration/password_change_done.html:17
 msgid "Your password was changed."
 msgstr "നിങ്ങളുടെ പാസ് വേര്‍ഡ് മാറ്റിക്കഴിഞ്ഞു."
 
-#: templates/registration/password_change_form.html:27
+#: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -694,46 +702,46 @@ msgstr ""
 "സുരക്ഷയ്ക്കായി നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് നല്കുക. പിന്നെ, പുതിയ പാസ് വേര്‍ഡ് രണ്ട് തവണ നല്കുക. "
 "(ടയ്പ് ചെയ്തതു ശരിയാണെന്ന് ഉറപ്പാക്കാന്‍)"
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "പഴയ പാസ് വേര്‍ഡ്"
 
-#: templates/registration/password_change_form.html:38
+#: templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "പുതിയ പാസ് വേര്‍ഡ്"
 
-#: templates/registration/password_change_form.html:49
-#: templates/registration/password_reset_confirm.html:27
+#: templates/registration/password_change_form.html:48
+#: templates/registration/password_reset_confirm.html:26
 msgid "Change my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് മാറ്റണം"
 
-#: templates/registration/password_reset_complete.html:8
-#: templates/registration/password_reset_confirm.html:12
-#: templates/registration/password_reset_done.html:8
-#: templates/registration/password_reset_form.html:8
-#: templates/registration/password_reset_form.html:12
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:11
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
+#: templates/registration/password_reset_form.html:11
+#: templates/registration/password_reset_form.html:15
 msgid "Password reset"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍"
 
-#: templates/registration/password_reset_complete.html:12
-#: templates/registration/password_reset_complete.html:16
+#: templates/registration/password_reset_complete.html:11
+#: templates/registration/password_reset_complete.html:15
 msgid "Password reset complete"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍ പൂര്‍ണം"
 
-#: templates/registration/password_reset_complete.html:18
+#: templates/registration/password_reset_complete.html:17
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "നിങ്ങളുടെ പാസ് വേര്‍ഡ് തയ്യാര്‍. ഇനി ലോഗ്-ഇന്‍ ചെയ്യാം."
 
-#: templates/registration/password_reset_confirm.html:8
+#: templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍ ഉറപ്പാക്കല്‍"
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:17
 msgid "Enter new password"
 msgstr "പുതിയ പാസ് വേര്‍ഡ് നല്കൂ"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:19
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -741,19 +749,19 @@ msgstr ""
 "ദയവായി നിങ്ങളുടെ പുതിയ പാസ് വേര്‍ഡ് രണ്ടു തവണ നല്കണം. ശരിയായാണ് ടൈപ്പു ചെയ്തത് എന്നു "
 "ഉറപ്പിക്കാനാണ്."
 
-#: templates/registration/password_reset_confirm.html:24
+#: templates/registration/password_reset_confirm.html:23
 msgid "New password:"
 msgstr "പുതിയ പാസ് വേര്‍ഡ്:"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:25
 msgid "Confirm password:"
 msgstr "പാസ് വേര്‍ഡ് ഉറപ്പാക്കൂ:"
 
-#: templates/registration/password_reset_confirm.html:32
+#: templates/registration/password_reset_confirm.html:31
 msgid "Password reset unsuccessful"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍ പരാജയം"
 
-#: templates/registration/password_reset_confirm.html:34
+#: templates/registration/password_reset_confirm.html:33
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -761,27 +769,23 @@ msgstr ""
 "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കാന്‍ നല്കിയ ലിങ്ക് യോഗ്യമല്ല. ഒരു പക്ഷേ, അതു മുന്പ് തന്നെ ഉപയോഗിച്ചു "
 "കഴിഞ്ഞതാവാം. പുതിയ ഒരു ലിങ്കിന് അപേക്ഷിക്കൂ."
 
-#: templates/registration/password_reset_done.html:12
-#: templates/registration/password_reset_done.html:16
+#: templates/registration/password_reset_done.html:11
+#: templates/registration/password_reset_done.html:15
 msgid "Password reset successful"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍ വിജയം"
 
-#: templates/registration/password_reset_done.html:18
+#: templates/registration/password_reset_done.html:17
 msgid ""
-"We've e-mailed you instructions for setting your password to the e-mail "
+"We've emailed you instructions for setting your password to the email "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"നിങ്ങളുടെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കാനായി നിര്‍ദ്ദേശങ്ങള്‍ അടങ്ങിയ ഒരു ഈ-മെയില്‍ നിങ്ങള്‍ "
-"നല്കിയവിലാസത്തില്‍ അയച്ചിട്ടുണ്ട്. അത് നിങ്ങള്‍ക്ക് ഉടന്‍ ലഭിക്കേണ്ടതാണ്."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your "
+"You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"%(site_name)s ലെ നിങ്ങളുടെ അക്കൗണ്ടിന്റെ പാസ്‌വേര്‍ഡ് മാറ്റാനുള്ള നിങ്ങളുടെ "
-"അഭ്യര്‍ഥനയെത്തുടര്‍ന്നാണു് ഈ ഈ-മെയില്‍ നിങ്ങള്‍ക്ക് ലഭിക്കുന്നത്."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -800,36 +804,34 @@ msgstr "ഞങ്ങളുടെ സൈറ്റ് ഉപയോഗിച്ച�
 msgid "The %(site_name)s team"
 msgstr "The %(site_name)s team"
 
-#: templates/registration/password_reset_form.html:18
+#: templates/registration/password_reset_form.html:17
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
-"പാസ് വേര്‍ഡ് മറന്നോ? നിങ്ങളുടെ ഇ-മെയില്‍ വിലാസം നല്കൂ, പുതിയ പാസ് വേര്‍ഡ് സ്ഥാപിക്കാനായി ഞങ്ങള്‍ "
-"നിര്‍ദ്ദേശങ്ങള്‍ ആ വിലാസത്തില്‍ അയക്കാം."
 
-#: templates/registration/password_reset_form.html:22
-msgid "E-mail address:"
-msgstr "ഇ-മെയില്‍ വിലാസം:"
+#: templates/registration/password_reset_form.html:21
+msgid "Email address:"
+msgstr ""
 
-#: templates/registration/password_reset_form.html:22
+#: templates/registration/password_reset_form.html:21
 msgid "Reset my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കൂ"
 
-#: templatetags/admin_list.py:336
+#: templatetags/admin_list.py:344
 msgid "All dates"
 msgstr "എല്ലാ തീയതികളും"
 
-#: views/main.py:31
+#: views/main.py:33
 msgid "(None)"
 msgstr "(None)"
 
-#: views/main.py:74
+#: views/main.py:76
 #, python-format
 msgid "Select %s"
 msgstr "%s തെരഞ്ഞെടുക്കൂ"
 
-#: views/main.py:76
+#: views/main.py:78
 #, python-format
 msgid "Select %s to change"
 msgstr "മാറ്റാനുള്ള %s തെരഞ്ഞെടുക്കൂ"

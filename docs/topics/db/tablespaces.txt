@@ -30,7 +30,7 @@ Declaring tablespaces for indexes
 ---------------------------------
 
 You can pass the :attr:`~django.db.models.Field.db_tablespace` option to a
-``Field`` constructor to specify an alternate tablespace for the ``Field``'s
+``Field`` constructor to specify an alternate tablespace for the ``Field``’s
 column index. If no index would be created for the column, the option is
 ignored.
 
@@ -68,6 +68,3 @@ PostgreSQL and Oracle support tablespaces. SQLite and MySQL don't.
 
 When you use a backend that lacks support for tablespaces, Django ignores all
 tablespace-related options.
-
-.. versionchanged:: 1.4
-    Since Django 1.4, the PostgreSQL backend supports tablespaces.

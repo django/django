@@ -1,9 +1,5 @@
 from django.db.models.sql import compiler
-# The izip_longest was renamed to zip_longest in py3
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
+from django.utils.six.moves import zip_longest
 
 
 class SQLCompiler(compiler.SQLCompiler):
@@ -25,7 +21,7 @@ class SQLCompiler(compiler.SQLCompiler):
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list
-        of parameters.  This is overriden from the original Query class
+        of parameters.  This is overridden from the original Query class
         to handle the additional SQL Oracle requires to emulate LIMIT
         and OFFSET.
 
@@ -60,14 +56,22 @@ class SQLCompiler(compiler.SQLCompiler):
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
 
+
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
     pass
+
 
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
     pass
 
+
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
     pass
 
+
 class SQLDateCompiler(compiler.SQLDateCompiler, SQLCompiler):
+    pass
+
+
+class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, SQLCompiler):
     pass

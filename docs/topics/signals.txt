@@ -30,7 +30,7 @@ notifications:
 
 * :data:`django.db.models.signals.m2m_changed`
 
-  Sent when a :class:`ManyToManyField` on a model is changed.
+  Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
 
 * :data:`django.core.signals.request_started` &
   :data:`django.core.signals.request_finished`
@@ -132,10 +132,6 @@ Now, our ``my_callback`` function will be called each time a request finishes.
 Note that ``receiver`` can also take a list of signals to connect a function
 to.
 
-.. versionchanged:: 1.5
-
-The ability to pass a list of signals was added.
-
 .. admonition:: Where should this code live?
 
     You can put signal handling and registration code anywhere you like.
@@ -213,7 +209,8 @@ Defining signals
 
 All signals are :class:`django.dispatch.Signal` instances. The
 ``providing_args`` is a list of the names of arguments the signal will provide
-to listeners.
+to listeners. This is purely documentational, however, as there is nothing that
+checks that the signal actually provides these arguments to its listeners.
 
 For example:
 

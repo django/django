@@ -5,19 +5,21 @@ from django.contrib.auth.models import Permission
 
 class ModelBackend(object):
     """
-    Authenticates against django.contrib.auth.models.User.
+    Authenticates against settings.AUTH_USER_MODEL.
     """
 
-    # TODO: Model, login attribute name and password attribute name should be
-    # configurable.
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, username=None, password=None, **kwargs):
+        UserModel = get_user_model()
+        if username is None:
+            username = kwargs.get(UserModel.USERNAME_FIELD)
         try:
-            UserModel = get_user_model()
-            user = UserModel.objects.get_by_natural_key(username)
+            user = UserModel._default_manager.get_by_natural_key(username)
             if user.check_password(password):
                 return user
         except UserModel.DoesNotExist:
-            return None
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a non-existing user (#20760).
+            UserModel().set_password(password)
 
     def get_group_permissions(self, user_obj, obj=None):
         """
@@ -34,14 +36,14 @@ class ModelBackend(object):
                 user_groups_query = 'group__%s' % user_groups_field.related_query_name()
                 perms = Permission.objects.filter(**{user_groups_query: user_obj})
             perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            user_obj._group_perm_cache = set(["%s.%s" % (ct, name) for ct, name in perms])
+            user_obj._group_perm_cache = set("%s.%s" % (ct, name) for ct, name in perms)
         return user_obj._group_perm_cache
 
     def get_all_permissions(self, user_obj, obj=None):
         if user_obj.is_anonymous() or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = set(["%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related()])
+            user_obj._perm_cache = set("%s.%s" % (p.content_type.app_label, p.codename) for p in user_obj.user_permissions.select_related())
             user_obj._perm_cache.update(self.get_group_permissions(user_obj))
         return user_obj._perm_cache
 
@@ -64,7 +66,7 @@ class ModelBackend(object):
     def get_user(self, user_id):
         try:
             UserModel = get_user_model()
-            return UserModel.objects.get(pk=user_id)
+            return UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
 

@@ -1,0 +1,20 @@
+====================
+Formset Functions
+====================
+
+.. module:: django.forms.formsets
+   :synopsis: Django's functions for building formsets.
+
+.. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False)
+
+    Returns a ``FormSet`` class for the given ``form`` class.
+
+    See :ref:`formsets` for example usage.
+
+    .. versionchanged:: 1.6
+
+    The ``validate_max`` parameter was added.
+
+    .. versionchanged:: 1.7
+
+    The ``min_num`` and ``validate_min`` parameters were added.

@@ -1,13 +1,15 @@
 import hashlib
 import logging
 import re
+import warnings
 
 from django.conf import settings
-from django import http
 from django.core.mail import mail_managers
+from django.core import urlresolvers
+from django import http
+from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
-from django.core import urlresolvers
 
 
 logger = logging.getLogger('django.request')
@@ -83,7 +85,7 @@ class CommonMiddleware(object):
             return
         if new_url[0]:
             newurl = "%s://%s%s" % (
-                request.is_secure() and 'https' or 'http',
+                'https' if request.is_secure() else 'http',
                 new_url[0], urlquote(new_url[1]))
         else:
             newurl = urlquote(new_url[1])
@@ -102,25 +104,15 @@ class CommonMiddleware(object):
         return http.HttpResponsePermanentRedirect(newurl)
 
     def process_response(self, request, response):
-        "Send broken link emails and calculate the Etag, if needed."
-        if response.status_code == 404:
-            if settings.SEND_BROKEN_LINK_EMAILS and not settings.DEBUG:
-                # If the referrer was from an internal link or a non-search-engine site,
-                # send a note to the managers.
-                domain = request.get_host()
-                referer = request.META.get('HTTP_REFERER', None)
-                is_internal = _is_internal_request(domain, referer)
-                path = request.get_full_path()
-                if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
-                    ua = request.META.get('HTTP_USER_AGENT', '<none>')
-                    ip = request.META.get('REMOTE_ADDR', '<none>')
-                    mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" \
-                                  % (referer, request.get_full_path(), ua, ip),
-                                  fail_silently=True)
-                return response
+        """
+        Calculate the ETag, if needed.
+        """
+        if settings.SEND_BROKEN_LINK_EMAILS:
+            warnings.warn("SEND_BROKEN_LINK_EMAILS is deprecated. "
+                "Use BrokenLinkEmailsMiddleware instead.",
+                DeprecationWarning, stacklevel=2)
+            BrokenLinkEmailsMiddleware().process_response(request, response)
 
-        # Use ETags, if requested.
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
@@ -139,29 +131,44 @@ class CommonMiddleware(object):
 
         return response
 
-def _is_ignorable_404(uri):
-    """
-    Returns True if a 404 at the given URL *shouldn't* notify the site managers.
-    """
-    if getattr(settings, 'IGNORABLE_404_STARTS', ()):
-        import warnings
-        warnings.warn('The IGNORABLE_404_STARTS setting has been deprecated '
-                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning)
-        for start in settings.IGNORABLE_404_STARTS:
-            if uri.startswith(start):
-                return True
-    if getattr(settings, 'IGNORABLE_404_ENDS', ()):
-        import warnings
-        warnings.warn('The IGNORABLE_404_ENDS setting has been deprecated '
-                      'in favor of IGNORABLE_404_URLS.', DeprecationWarning)
-        for end in settings.IGNORABLE_404_ENDS:
-            if uri.endswith(end):
-                return True
-    return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)
 
-def _is_internal_request(domain, referer):
-    """
-    Returns true if the referring URL is the same domain as the current request.
-    """
-    # Different subdomains are treated as different domains.
-    return referer is not None and re.match("^https?://%s/" % re.escape(domain), referer)
+class BrokenLinkEmailsMiddleware(object):
+
+    def process_response(self, request, response):
+        """
+        Send broken link emails for relevant 404 NOT FOUND responses.
+        """
+        if response.status_code == 404 and not settings.DEBUG:
+            domain = request.get_host()
+            path = request.get_full_path()
+            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+
+            if not self.is_ignorable_request(request, path, domain, referer):
+                ua = request.META.get('HTTP_USER_AGENT', '<none>')
+                ip = request.META.get('REMOTE_ADDR', '<none>')
+                mail_managers(
+                    "Broken %slink on %s" % (
+                        ('INTERNAL ' if self.is_internal_request(domain, referer) else ''),
+                        domain
+                    ),
+                    "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
+                    "IP address: %s\n" % (referer, path, ua, ip),
+                    fail_silently=True)
+        return response
+
+    def is_internal_request(self, domain, referer):
+        """
+        Returns True if the referring URL is the same domain as the current request.
+        """
+        # Different subdomains are treated as different domains.
+        return bool(re.match("^https?://%s/" % re.escape(domain), referer))
+
+    def is_ignorable_request(self, request, uri, domain, referer):
+        """
+        Returns True if the given request *shouldn't* notify the site managers.
+        """
+        # '?' in referer is identified as search engine source
+        if (not referer or
+                (not self.is_internal_request(domain, referer) and '?' in referer)):
+            return True
+        return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

@@ -7,23 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"POT-Creation-Date: 2012-10-15 10:56+0200\n"
+"PO-Revision-Date: 2012-10-18 10:56+0000\n"
 "Last-Translator: Janos Guljas <janos@resenje.org>\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"Language-Team: Serbian (Latin) (http://www.transifex.com/projects/p/django/"
 "language/sr@latin/)\n"
-"Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sr@latin\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: admin.py:10
 msgid "Advanced options"
 msgstr "Napredna podešavanja"
 
-#: forms.py:7 models.py:7
+#: forms.py:7 models.py:11
 msgid "URL"
 msgstr "URL"
 
@@ -55,23 +55,23 @@ msgstr "Nedostaje kosa crta na kraju URL-a."
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "Stranica sa adresom %(url)s već postoji za sajt %(site)s"
 
-#: models.py:8
+#: models.py:12
 msgid "title"
 msgstr "naslov"
 
-#: models.py:9
+#: models.py:13
 msgid "content"
 msgstr "sadržaj"
 
-#: models.py:10
+#: models.py:14
 msgid "enable comments"
 msgstr "omogući komentarisanje"
 
-#: models.py:11
+#: models.py:15
 msgid "template name"
 msgstr "naziv templejta"
 
-#: models.py:12
+#: models.py:16
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -79,20 +79,24 @@ msgstr ""
 "Primer: 'flatpages/contact_page.html'. Ako ovo ostavite praznim, sistem će "
 "koristiti 'flatpages/default.html'."
 
-#: models.py:13
+#: models.py:17
 msgid "registration required"
 msgstr "potrebna registracija"
 
-#: models.py:13
+#: models.py:17
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Ako je ovo obeleženo, samo će prijavljeni korisnici moći da vide ovu "
 "stranicu."
 
-#: models.py:18
+#: models.py:22
 msgid "flat page"
 msgstr "flet stranica"
 
-#: models.py:19
+#: models.py:23
 msgid "flat pages"
 msgstr "flet stranice"
+
+#: tests/forms.py:97
+msgid "This field is required."
+msgstr "Ovo polje se mora popuniti."

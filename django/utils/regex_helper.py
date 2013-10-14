@@ -92,7 +92,7 @@ def normalize(pattern):
                 result.append(".")
             elif ch == '|':
                 # FIXME: One day we'll should do this, but not in 1.0.
-                raise NotImplementedError
+                raise NotImplementedError('Awaiting Implementation')
             elif ch == "^":
                 pass
             elif ch == '$':
@@ -339,4 +339,3 @@ def flatten_result(source):
         for i in range(len(result)):
             result[i] += piece
     return result, result_args
-

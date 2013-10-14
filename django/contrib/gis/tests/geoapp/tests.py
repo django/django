@@ -1,28 +1,34 @@
-from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
+import unittest
+from unittest import skipUnless
 
 from django.db import connection
-from django.db.utils import DatabaseError
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import (fromstr, GEOSGeometry,
-    Point, LineString, LinearRing, Polygon, GeometryCollection)
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import (
-    no_mysql, no_oracle, no_spatialite,
+    HAS_SPATIAL_DB, no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
-from django.utils import six, unittest
+from django.utils import six
 
-from .models import Country, City, PennsylvaniaCity, State, Track
+if HAS_GEOS:
+    from django.contrib.gis.geos import (fromstr, GEOSGeometry,
+        Point, LineString, LinearRing, Polygon, GeometryCollection)
 
-from .test_feeds import GeoFeedTest
-from .test_regress import GeoRegressionTests
-from .test_sitemaps import GeoSitemapTest
+    from .models import Country, City, PennsylvaniaCity, State, Track
 
-
-if not spatialite:
+if HAS_GEOS and not spatialite:
     from .models import Feature, MinusOneSRID
 
+
+def postgis_bug_version():
+    spatial_version = getattr(connection.ops, "spatial_version", (0,0,0))
+    return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
+
+
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoModelTest(TestCase):
 
     def test_fixtures(self):
@@ -177,7 +183,7 @@ class GeoModelTest(TestCase):
     def test_inherited_geofields(self):
         "Test GeoQuerySet methods on inherited Geometry fields."
         # Creating a Pennsylvanian city.
-        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
+        PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
 
         # All transformation SQL will need to be performed on the
         # _parent_ table.
@@ -197,6 +203,7 @@ class GeoModelTest(TestCase):
         self.assertTrue(isinstance(cities2[0].point, Point))
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoLookupTest(TestCase):
 
     @no_mysql
@@ -295,11 +302,9 @@ class GeoLookupTest(TestCase):
         self.assertEqual(2, len(qs))
         for c in qs: self.assertEqual(True, c.name in cities)
 
-    # The left/right lookup tests are known failures on PostGIS 2.0+
-    # until the following bug is fixed:
-    #  http://trac.osgeo.org/postgis/ticket/2035
-    # TODO: Ensure fixed in 2.0.2, else modify upper bound for version here.
-    if (2, 0, 0) <= connection.ops.spatial_version <= (2, 0, 1):
+    # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
+    # http://trac.osgeo.org/postgis/ticket/2035
+    if postgis_bug_version():
         test_left_right_lookups = unittest.expectedFailure(test_left_right_lookups)
 
     def test_equals_lookups(self):
@@ -384,6 +389,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
+@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoQuerySetTest(TestCase):
     # Please keep the tests in GeoQuerySet method's alphabetic order
 
@@ -404,7 +410,6 @@ class GeoQuerySetTest(TestCase):
     def test_diff_intersection_union(self):
         "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
         geom = Point(5, 23)
-        tol = 1
         qs = Country.objects.all().difference(geom).sym_difference(geom).union(geom)
 
         # XXX For some reason SpatiaLite does something screwey with the Texas geometry here.  Also,
@@ -426,6 +431,13 @@ class GeoQuerySetTest(TestCase):
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
                 self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
                 self.assertEqual(c.mpoly.union(geom), c.union)
+
+    @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
+    def test_envelope(self):
+        "Testing the `envelope` GeoQuerySet method."
+        countries = Country.objects.all().envelope()
+        for country in countries:
+            self.assertIsInstance(country.envelope, Polygon)
 
     @no_mysql
     @no_spatialite # SpatiaLite does not have an Extent function
@@ -556,7 +568,7 @@ class GeoQuerySetTest(TestCase):
         # The reference KML depends on the version of PostGIS used
         # (the output stopped including altitude in 1.3.3).
         if connection.ops.spatial_version >= (1, 3, 3):
-            ref_kml =  '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
+            ref_kml = '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
         else:
             ref_kml = '<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>'
 
@@ -679,7 +691,7 @@ class GeoQuerySetTest(TestCase):
                '12.46472 43.89555,12.45917 43.89611,12.41639 43.90472,'
                '12.41222 43.90610,12.40782 43.91366,12.40389 43.92667,'
                '12.40500 43.94833,12.40889 43.95499,12.41580 43.95795)))')
-        sm = Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
+        Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
 
         # Because floating-point arithmetic isn't exact, we set a tolerance
         # to pass into GEOS `equals_exact`.

@@ -58,7 +58,7 @@ def patch_cache_control(response, **kwargs):
 
     if response.has_header('Cache-Control'):
         cc = cc_delim_re.split(response['Cache-Control'])
-        cc = dict([dictitem(el) for el in cc])
+        cc = dict(dictitem(el) for el in cc)
     else:
         cc = {}
 
@@ -76,7 +76,7 @@ def patch_cache_control(response, **kwargs):
 
     for (k, v) in kwargs.items():
         cc[k.replace('_', '-')] = v
-    cc = ', '.join([dictvalue(el) for el in cc.items()])
+    cc = ', '.join(dictvalue(el) for el in cc.items())
     response['Cache-Control'] = cc
 
 def get_max_age(response):
@@ -86,8 +86,8 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict([_to_tuple(el) for el in
-        cc_delim_re.split(response['Cache-Control'])])
+    cc = dict(_to_tuple(el) for el in
+        cc_delim_re.split(response['Cache-Control']))
     if 'max-age' in cc:
         try:
             return int(cc['max-age'])
@@ -144,7 +144,7 @@ def patch_vary_headers(response, newheaders):
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
@@ -156,7 +156,7 @@ def has_vary_header(response, header_query):
     if not response.has_header('Vary'):
         return False
     vary_headers = cc_delim_re.split(response['Vary'])
-    existing_headers = set([header.lower() for header in vary_headers])
+    existing_headers = set(header.lower() for header in vary_headers)
     return header_query.lower() in existing_headers
 
 def _i18n_cache_key_suffix(request, cache_key):
@@ -181,7 +181,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:
-            ctx.update(value)
+            ctx.update(force_bytes(value))
     path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, path.hexdigest(), ctx.hexdigest())
@@ -236,8 +236,18 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
     if cache is None:
         cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
     if response.has_header('Vary'):
-        headerlist = ['HTTP_'+header.upper().replace('-', '_')
-                      for header in cc_delim_re.split(response['Vary'])]
+        is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
+        # If i18n or l10n are used, the generated cache key will be suffixed
+        # with the current locale. Adding the raw value of Accept-Language is
+        # redundant in that case and would result in storing the same content
+        # under multiple keys in the cache. See #18191 for details.
+        headerlist = []
+        for header in cc_delim_re.split(response['Vary']):
+            header = header.upper().replace('-', '_')
+            if header == 'ACCEPT_LANGUAGE' and is_accept_language_redundant:
+                continue
+            headerlist.append('HTTP_' + header)
+        headerlist.sort()
         cache.set(cache_key, headerlist, cache_timeout)
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:

@@ -7,29 +7,18 @@ Geolocation with GeoIP
 .. module:: django.contrib.gis.geoip
    :synopsis: High-level Python interface for MaxMind's GeoIP C library.
 
-.. versionchanged:: 1.4
-
-.. note::
-
-    In Django 1.4, the :class:`GeoIP` object was moved out of
-    :mod:`django.contrib.gis.utils` and into its own module, 
-    :mod:`django.contrib.gis.geoip`. A shortcut is still provided
-    in ``utils``, but will be removed in Django 1.6.
-
 The :class:`GeoIP` object is a ctypes wrapper for the
-`MaxMind GeoIP C API`__. [#]_  This interface is a BSD-licensed alternative
-to the GPL-licensed `Python GeoIP`__ interface provided by MaxMind.
+`MaxMind GeoIP C API`__. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP` object requires
-the GeoIP C libary and either the GeoIP `Country`__ or `City`__ 
-datasets in binary format (the CSV files will not work!).  These datasets may be 
+the GeoIP C libary and either the GeoIP `Country`__ or `City`__
+datasets in binary format (the CSV files will not work!).  These datasets may be
 `downloaded from MaxMind`__.  Grab the ``GeoLiteCountry/GeoIP.dat.gz`` and
 ``GeoLiteCity.dat.gz`` files and unzip them in a directory corresponding to what
 you set :setting:`GEOIP_PATH` with in your settings.  See the example and
 reference below for more details.
 
 __ http://www.maxmind.com/app/c
-__ http://www.maxmind.com/app/python
 __ http://www.maxmind.com/app/country
 __ http://www.maxmind.com/app/city
 __ http://www.maxmind.com/download/geoip/database/
@@ -58,7 +47,7 @@ usage::
      >>> g.lat_lon('salon.com')
      (37.789798736572266, -122.39420318603516)
      >>> g.lon_lat('uh.edu')
-     (-95.415199279785156, 29.77549934387207) 
+     (-95.415199279785156, 29.77549934387207)
      >>> g.geos('24.124.1.80').wkt
      'POINT (-95.2087020874023438 39.0392990112304688)'
 
@@ -104,30 +93,30 @@ Defaults to ``'GeoLiteCity.dat'``.
 
 .. class:: GeoIP([path=None, cache=0, country=None, city=None])
 
-The ``GeoIP`` object does not require any parameters to use the default 
+The ``GeoIP`` object does not require any parameters to use the default
 settings.  However, at the very least the :setting:`GEOIP_PATH` setting
-should be set with the path of the location of your GeoIP data sets.  The 
-following intialization keywords may be used to customize any of the 
-defaults. 
+should be set with the path of the location of your GeoIP data sets.  The
+following intialization keywords may be used to customize any of the
+defaults.
 
 ===================  =======================================================
 Keyword Arguments    Description
 ===================  =======================================================
-``path``             Base directory to where GeoIP data is located or the 
-                     full path to where the city or country data files 
-                     (.dat) are located.  Assumes that both the city and 
-                     country data sets are located in this directory; 
+``path``             Base directory to where GeoIP data is located or the
+                     full path to where the city or country data files
+                     (.dat) are located.  Assumes that both the city and
+                     country data sets are located in this directory;
                      overrides the :setting:`GEOIP_PATH` settings attribute.
 
 ``cache``            The cache settings when opening up the GeoIP datasets,
                      and may be an integer in (0, 1, 2, 4) corresponding to
-                     the ``GEOIP_STANDARD``, ``GEOIP_MEMORY_CACHE``, 
-                     ``GEOIP_CHECK_CACHE``, and ``GEOIP_INDEX_CACHE`` 
-                     ``GeoIPOptions`` C API settings, respectively. 
+                     the ``GEOIP_STANDARD``, ``GEOIP_MEMORY_CACHE``,
+                     ``GEOIP_CHECK_CACHE``, and ``GEOIP_INDEX_CACHE``
+                     ``GeoIPOptions`` C API settings, respectively.
                      Defaults to 0 (``GEOIP_STANDARD``).
- 
+
 ``country``          The name of the GeoIP country data file.  Defaults
-                     to ``GeoIP.dat``.  Setting this keyword overrides the 
+                     to ``GeoIP.dat``.  Setting this keyword overrides the
                      :setting:`GEOIP_COUNTRY` settings attribute.
 
 ``city``             The name of the GeoIP city data file.  Defaults to
@@ -142,9 +131,9 @@ Querying
 --------
 
 All the following querying routines may take either a string IP address
-or a fully qualified domain name (FQDN).  For example, both 
-``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query 
-parameters. 
+or a fully qualified domain name (FQDN).  For example, both
+``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
+parameters.
 
 .. method:: GeoIP.city(query)
 
@@ -153,7 +142,7 @@ of the values in the dictionary may be undefined (``None``).
 
 .. method:: GeoIP.country(query)
 
-Returns a dictionary with the country code and country for the given 
+Returns a dictionary with the country code and country for the given
 query.
 
 .. method:: GeoIP.country_code(query)
@@ -202,7 +191,7 @@ and country), and the version of the GeoIP C library (if supported).
 GeoIP-Python API compatibility methods
 ----------------------------------------
 
-These methods exist to ease compatibility with any code using MaxMind's 
+These methods exist to ease compatibility with any code using MaxMind's
 existing Python API.
 
 .. classmethod:: GeoIP.open(path, cache)

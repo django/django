@@ -8,9 +8,10 @@ servers and applications.
 .. _WSGI: http://www.wsgi.org
 
 Django's :djadmin:`startproject` management command sets up a simple default
-WSGI configuration for you, which you can tweak as needed for your project, and
-direct any WSGI-compliant webserver to use. Django includes getting-started
-documentation for the following WSGI servers:
+WSGI configuration for you, which you can tweak as needed for your project,
+and direct any WSGI-compliant application server to use.
+
+Django includes getting-started documentation for the following WSGI servers:
 
 .. toctree::
    :maxdepth: 1
@@ -23,34 +24,84 @@ documentation for the following WSGI servers:
 The ``application`` object
 --------------------------
 
-One key concept of deploying with WSGI is to specify a central ``application``
-callable object which the webserver uses to communicate with your code. This is
-commonly specified as an object named ``application`` in a Python module
-accessible to the server.
+The key concept of deploying with WSGI is the ``application`` callable which
+the application server uses to communicate with your code. It's commonly
+provided as an object named ``application`` in a Python module accessible to
+the server.
 
-.. versionchanged:: 1.4
+The :djadmin:`startproject` command creates a file
+:file:`<project_name>/wsgi.py` that contains such an ``application`` callable.
 
-The :djadmin:`startproject` command creates a :file:`projectname/wsgi.py` that
-contains such an application callable.
+It's used both by Django's development server and in production WSGI
+deployments.
+
+WSGI servers obtain the path to the ``application`` callable from their
+configuration. Django's built-in servers, namely the :djadmin:`runserver` and
+:djadmin:`runfcgi` commands, read it from the :setting:`WSGI_APPLICATION`
+setting. By default, it's set to ``<project_name>.wsgi.application``, which
+points to the ``application`` callable in :file:`<project_name>/wsgi.py`.
+
+Configuring the settings module
+-------------------------------
+
+When the WSGI server loads your application, Django needs to import the
+settings module — that's where your entire application is defined.
+
+Django uses the :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
+locate the appropriate settings module. It must contain the dotted path to the
+settings module. You can use a different value for development and production;
+it all depends on how you organize your settings.
+
+If this variable isn't set, the default :file:`wsgi.py` sets it to
+``mysite.settings``, where ``mysite`` is the name of your project. That's how
+:djadmin:`runserver` discovers the default settings file by default.
 
 .. note::
 
-   Upgrading from a previous release of Django and don't have a :file:`wsgi.py`
-   file in your project? You can simply add one to your project's top-level
-   Python package (probably next to :file:`settings.py` and :file:`urls.py`)
-   with the contents below. If you want :djadmin:`runserver` to also make use
-   of this WSGI file, you can also add ``WSGI_APPLICATION =
-   "mysite.wsgi.application"`` in your settings (replacing ``mysite`` with the
-   name of your project).
+    Since environment variables are process-wide, this doesn't work when you
+    run multiple Django sites in the same process. This happens with mod_wsgi.
 
-Initially this file contains::
+    To avoid this problem, use mod_wsgi's daemon mode with each site in its
+    own daemon process, or override the value from the environment by
+    enforcing ``os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"`` in
+    your :file:`wsgi.py`.
+
+
+Applying WSGI middleware
+------------------------
+
+To apply `WSGI middleware`_ you can simply wrap the application object. For
+instance you could add these lines at the bottom of :file:`wsgi.py`::
+
+    from helloworld.wsgi import HelloWorldApplication
+    application = HelloWorldApplication(application)
+
+You could also replace the Django WSGI application with a custom WSGI
+application that later delegates to the Django WSGI application, if you want
+to combine a Django application with a WSGI application of another framework.
+
+.. _`WSGI middleware`: http://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
+
+.. note::
+
+    Some third-party WSGI middleware do not call ``close`` on the response
+    object after handling a request — most notably Sentry's error reporting
+    middleware up to version 2.0.7. In those cases the
+    :data:`~django.core.signals.request_finished` signal isn't sent. This can
+    result in idle connections to database and memcache servers.
+
+Upgrading from Django < 1.4
+---------------------------
+
+If you're upgrading from Django 1.3.x or earlier, you don't have a
+:file:`wsgi.py` file in your project.
+
+You can simply add one to your project's top-level Python package (probably
+next to :file:`settings.py` and :file:`urls.py`) with the contents below::
 
     import os
-
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 
-    # This application object is used by the development server
-    # as well as any WSGI server configured to use this file.
     from django.core.wsgi import get_wsgi_application
     application = get_wsgi_application()
 
@@ -60,14 +111,6 @@ environment variable. You'll need to edit this line to replace ``mysite`` with
 the name of your project package, so the path to your settings module is
 correct.
 
-To apply `WSGI middleware`_ you can simply wrap the application object
-in the same file::
-
-    from helloworld.wsgi import HelloWorldApplication
-    application = HelloWorldApplication(application)
-
-You could also replace the Django WSGI application with a custom WSGI
-application that later delegates to the Django WSGI application, if you want to
-combine a Django application with a WSGI application of another framework.
-
-.. _`WSGI middleware`: http://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
+Also add ``WSGI_APPLICATION = "mysite.wsgi.application"`` in your settings, so
+that :djadmin:`runserver` finds your ``application`` callable. Don't forget to
+replace ``mysite`` with the name of your project in this line.

@@ -7,15 +7,21 @@ Django's comments framework
 
 .. highlightlang:: html+django
 
+.. warning::
+
+    Django's comment framework has been deprecated and is no longer supported.
+    Most users will be better served with a custom solution, or a hosted
+    product like Disqus__.
+
+    The code formerly known as ``django.contrib.comments`` is `still available
+    in an external repository`__.
+
+    __ https://disqus.com/
+    __ https://github.com/django/django-contrib-comments
+
 Django includes a simple, yet customizable comments framework. The built-in
 comments framework can be used to attach comments to any model, so you can use
 it for comments on blog entries, photos, book chapters, or anything else.
-
-.. note::
-
-    If you used to use Django's older (undocumented) comments framework, you'll
-    need to upgrade. See the :doc:`upgrade guide </ref/contrib/comments/upgrade>`
-    for instructions.
 
 Quick start guide
 =================
@@ -25,7 +31,7 @@ To get started using the ``comments`` app, follow these steps:
 #. Install the comments framework by adding ``'django.contrib.comments'`` to
    :setting:`INSTALLED_APPS`.
 
-#. Run ``manage.py syncdb`` so that Django will create the comment tables.
+#. Run ``manage.py migrate`` so that Django will create the comment tables.
 
 #. Add the comment app's URLs to your project's ``urls.py``:
 
@@ -40,7 +46,8 @@ To get started using the ``comments`` app, follow these steps:
 #. Use the `comment template tags`_ below to embed comments in your
    templates.
 
-You might also want to examine :doc:`/ref/contrib/comments/settings`.
+You might also want to examine :ref:`the available settings
+<settings-comments>`.
 
 Comment template tags
 =====================
@@ -341,6 +348,13 @@ output the CSRF token and cookie.
 
 .. _honeypot: http://en.wikipedia.org/wiki/Honeypot_(computing)
 
+
+Configuration
+=============
+
+See :ref:`comment settings <settings-comments>`.
+
+
 More information
 ================
 
@@ -348,9 +362,7 @@ More information
    :maxdepth: 1
 
    models
-   settings
    signals
-   upgrade
    custom
    forms
    moderation

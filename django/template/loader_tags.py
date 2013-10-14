@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
@@ -15,19 +17,16 @@ class ExtendsError(Exception):
 class BlockContext(object):
     def __init__(self):
         # Dictionary of FIFO queues.
-        self.blocks = {}
+        self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
         for name, block in six.iteritems(blocks):
-            if name in self.blocks:
-                self.blocks[name].insert(0, block)
-            else:
-                self.blocks[name] = [block]
+            self.blocks[name].insert(0, block)
 
     def pop(self, name):
         try:
             return self.blocks[name].pop()
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
     def push(self, name, block):
@@ -36,7 +35,7 @@ class BlockContext(object):
     def get_block(self, name):
         try:
             return self.blocks[name][-1]
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
 class BlockNode(Node):
@@ -48,22 +47,21 @@ class BlockNode(Node):
 
     def render(self, context):
         block_context = context.render_context.get(BLOCK_CONTEXT_KEY)
-        context.push()
-        if block_context is None:
-            context['block'] = self
-            result = self.nodelist.render(context)
-        else:
-            push = block = block_context.pop(self.name)
-            if block is None:
-                block = self
-            # Create new block so we can store context without thread-safety issues.
-            block = BlockNode(block.name, block.nodelist)
-            block.context = context
-            context['block'] = block
-            result = block.nodelist.render(context)
-            if push is not None:
-                block_context.push(self.name, push)
-        context.pop()
+        with context.push():
+            if block_context is None:
+                context['block'] = self
+                result = self.nodelist.render(context)
+            else:
+                push = block = block_context.pop(self.name)
+                if block is None:
+                    block = self
+                # Create new block so we can store context without thread-safety issues.
+                block = BlockNode(block.name, block.nodelist)
+                block.context = context
+                context['block'] = block
+                result = block.nodelist.render(context)
+                if push is not None:
+                    block_context.push(self.name, push)
         return result
 
     def super(self):
@@ -80,7 +78,7 @@ class ExtendsNode(Node):
         self.nodelist = nodelist
         self.parent_name = parent_name
         self.template_dirs = template_dirs
-        self.blocks = dict([(n.name, n) for n in nodelist.get_nodes_by_type(BlockNode)])
+        self.blocks = dict((n.name, n) for n in nodelist.get_nodes_by_type(BlockNode))
 
     def __repr__(self):
         return '<ExtendsNode: extends %s>' % self.parent_name.token
@@ -114,8 +112,8 @@ class ExtendsNode(Node):
             # The ExtendsNode has to be the first non-text node.
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
-                    blocks = dict([(n.name, n) for n in
-                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
+                    blocks = dict((n.name, n) for n in
+                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode))
                     block_context.add_blocks(blocks)
                 break
 
@@ -123,58 +121,40 @@ class ExtendsNode(Node):
         # the same.
         return compiled_parent._render(context)
 
-class BaseIncludeNode(Node):
-    def __init__(self, *args, **kwargs):
+class IncludeNode(Node):
+    def __init__(self, template, *args, **kwargs):
+        self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
         self.isolated_context = kwargs.pop('isolated_context', False)
-        super(BaseIncludeNode, self).__init__(*args, **kwargs)
-
-    def render_template(self, template, context):
-        values = dict([(name, var.resolve(context)) for name, var
-                       in six.iteritems(self.extra_context)])
-        if self.isolated_context:
-            return template.render(context.new(values))
-        context.update(values)
-        output = template.render(context)
-        context.pop()
-        return output
-
-class ConstantIncludeNode(BaseIncludeNode):
-    def __init__(self, template_path, *args, **kwargs):
-        super(ConstantIncludeNode, self).__init__(*args, **kwargs)
-        try:
-            t = get_template(template_path)
-            self.template = t
-        except:
-            if settings.TEMPLATE_DEBUG:
-                raise
-            self.template = None
-
-    def render(self, context):
-        if not self.template:
-            return ''
-        return self.render_template(self.template, context)
-
-class IncludeNode(BaseIncludeNode):
-    def __init__(self, template_name, *args, **kwargs):
         super(IncludeNode, self).__init__(*args, **kwargs)
-        self.template_name = template_name
 
     def render(self, context):
         try:
-            template_name = self.template_name.resolve(context)
-            template = get_template(template_name)
-            return self.render_template(template, context)
-        except:
+            template = self.template.resolve(context)
+            # Does this quack like a Template?
+            if not callable(getattr(template, 'render', None)):
+                # If not, we'll try get_template
+                template = get_template(template)
+            values = {
+                name: var.resolve(context)
+                for name, var in six.iteritems(self.extra_context)
+            }
+            if self.isolated_context:
+                return template.render(context.new(values))
+            with context.push(**values):
+                return template.render(context)
+        except Exception:
             if settings.TEMPLATE_DEBUG:
                 raise
             return ''
+
 
 @register.tag('block')
 def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' tag takes only one argument" % bits[0])
@@ -206,7 +186,7 @@ def do_extends(parser, token):
     uses the literal value "base" as the name of the parent template to extend,
     or ``{% extends variable %}`` uses the value of ``variable`` as either the
     name of the parent template to extend (if it evaluates to a string) or as
-    the parent tempate itelf (if it evaluates to a Template object).
+    the parent template itself (if it evaluates to a Template object).
     """
     bits = token.split_contents()
     if len(bits) != 2:
@@ -257,9 +237,5 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
-    path = bits[1]
-    if path[0] in ('"', "'") and path[-1] == path[0]:
-        return ConstantIncludeNode(path[1:-1], extra_context=namemap,
-                                   isolated_context=isolated_context)
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)

@@ -32,11 +32,13 @@ Aggregate support
 It's now possible to run SQL aggregate queries (i.e. ``COUNT()``, ``MAX()``,
 ``MIN()``, etc.) from within Django's ORM. You can choose to either return the
 results of the aggregate directly, or else annotate the objects in a
-:class:`QuerySet` with the results of the aggregate query.
+:class:`~django.db.models.query.QuerySet` with the results of the aggregate
+query.
 
-This feature is available as new :meth:`QuerySet.aggregate()`` and
-:meth:`QuerySet.annotate()`` methods, and is covered in detail in :doc:`the ORM
-aggregation documentation </topics/db/aggregation>`
+This feature is available as new
+:meth:`~django.db.models.query.QuerySet.aggregate` and
+:meth:`~django.db.models.query.QuerySet.annotate` methods, and is covered in
+detail in :doc:`the ORM aggregation documentation </topics/db/aggregation>`.
 
 Query expressions
 ~~~~~~~~~~~~~~~~~
@@ -44,15 +46,15 @@ Query expressions
 Queries can now refer to a another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`F` object; for full details, including examples, consult the
-:ref:`documentation for F expressions <query-expressions>`.
+:class:`F expressions documentation <django.db.models.F>`.
 
 Performance improvements
 ------------------------
 
 .. currentmodule:: django.test
 
-Tests written using Django's :doc:`testing framework </topics/testing>` now run
-dramatically faster (as much as 10 times faster in many cases).
+Tests written using Django's :doc:`testing framework </topics/testing/index>`
+now run dramatically faster (as much as 10 times faster in many cases).
 
 This was accomplished through the introduction of transaction-based tests: when
 using :class:`django.test.TestCase`, your tests will now be run in a transaction

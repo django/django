@@ -9,7 +9,7 @@ required for projects, in which case there are Mixins and Generic class-based
 views.
 
 Many of Django's built-in class-based views inherit from other class-based
-views or various mixins. Because this inheritence chain is very important, the
+views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 
@@ -49,9 +49,13 @@ View
 
     **Attributes**
 
-    .. attribute:: http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options', 'trace']
+    .. attribute:: http_method_names
 
-        The default list of HTTP method names that this view will accept.
+        The list of HTTP method names that this view will accept.
+
+        Default::
+
+            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
     **Methods**
 
@@ -68,17 +72,12 @@ View
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
-        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
-        and so on.
+        delegated to ``get()``, a ``POST`` to ``post()``, and so on.
 
-        By default, a ``HEAD`` request will be delegated to :meth:`~View.get()`.
+        By default, a ``HEAD`` request will be delegated to ``get()``.
         If you need to handle ``HEAD`` requests in a different way than ``GET``,
-        you can override the :meth:`~View.head()` method. See
+        you can override the ``head()`` method. See
         :ref:`supporting-other-http-methods` for an example.
-
-        The default implementation also sets ``request``, ``args`` and
-        ``kwargs`` as instance variables, so any method on the view can know
-        the full details of the request that was made to invoke the view.
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 
@@ -98,22 +97,21 @@ TemplateView
 
 .. class:: django.views.generic.base.TemplateView
 
-    Renders a given template, passing it a ``{{ params }}`` template variable,
-    which is a dictionary of the parameters captured in the URL.
+    Renders a given template, with the context containing parameters captured
+    in the URL.
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`get_context_data()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
 
     **Example views.py**::
 
@@ -169,8 +167,8 @@ RedirectView
 
     **Method Flowchart**
 
-    1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
+    1. :meth:`~django.views.generic.base.View.dispatch()`
+    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
     3. :meth:`get_redirect_url()`
 
     **Example views.py**::
@@ -184,22 +182,24 @@ RedirectView
 
             permanent = False
             query_string = True
+            pattern_name = 'article-detail'
 
-            def get_redirect_url(self, pk):
+            def get_redirect_url(self, *args, **kwargs):
                 article = get_object_or_404(Article, pk=pk)
                 article.update_counter()
-                return reverse('product_detail', args=(pk,))
+                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView
+        from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = patterns('',
 
-            url(r'r^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
@@ -209,6 +209,13 @@ RedirectView
 
         The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
         HTTP error.
+
+    .. attribute:: pattern_name
+
+        .. versionadded:: 1.6
+
+        The name of the URL pattern to redirect to. Reversing will be done
+        using the same args and kwargs as are passed in for this view.
 
     .. attribute:: permanent
 
@@ -230,9 +237,8 @@ RedirectView
 
         Constructs the target URL for redirection.
 
-        The default implementation uses :attr:`~RedirectView.url` as a starting
+        The default implementation uses :attr:`url` as a starting
         string, performs expansion of ``%`` parameters in that string, as well
-        as the appending of query string if requested by
-        :attr:`~RedirectView.query_string`. Subclasses may implement any
-        behavior they wish, as long as the method returns a redirect-ready URL
-        string.
+        as the appending of query string if requested by :attr:`query_string`.
+        Subclasses may implement any behavior they wish, as long as the method
+        returns a redirect-ready URL string.

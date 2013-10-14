@@ -49,6 +49,13 @@ files containing doctests.  There are also many ways to override parts
 of doctest's default behaviors.  See the Library Reference Manual for
 details.
 """
+import warnings
+
+warnings.warn(
+    "The django.test._doctest module is deprecated; "
+    "use the doctest module from the Python standard library instead.",
+    DeprecationWarning)
+
 
 __docformat__ = 'reStructuredText en'
 
@@ -105,7 +112,7 @@ import unittest, difflib, pdb, tempfile
 import warnings
 
 from django.utils import six
-from django.utils.six.moves import StringIO, xrange
+from django.utils.six.moves import StringIO
 
 if sys.platform.startswith('java'):
     # On Jython, isclass() reports some modules as classes. Patch it.
@@ -591,7 +598,7 @@ class DocTestParser:
         # If all lines begin with the same indentation, then strip it.
         min_indent = self._min_indent(string)
         if min_indent > 0:
-            string = '\n'.join([l[min_indent:] for l in string.split('\n')])
+            string = '\n'.join(l[min_indent:] for l in string.split('\n'))
 
         output = []
         charno, lineno = 0, 0
@@ -663,7 +670,7 @@ class DocTestParser:
         source_lines = m.group('source').split('\n')
         self._check_prompt_blank(source_lines, indent, name, lineno)
         self._check_prefix(source_lines[1:], ' '*indent + '.', name, lineno)
-        source = '\n'.join([sl[indent+4:] for sl in source_lines])
+        source = '\n'.join(sl[indent+4:] for sl in source_lines)
 
         # Divide want into lines; check that it's properly indented; and
         # then strip the indentation.  Spaces before the last newline should
@@ -674,7 +681,7 @@ class DocTestParser:
             del want_lines[-1]  # forget final newline & spaces after it
         self._check_prefix(want_lines, ' '*indent, name,
                            lineno + len(source_lines))
-        want = '\n'.join([wl[indent:] for wl in want_lines])
+        want = '\n'.join(wl[indent:] for wl in want_lines)
 
         # If `want` contains a traceback message, then extract it.
         m = self._EXCEPTION_RE.match(want)
@@ -883,7 +890,7 @@ class DocTestFinder:
         if module is None:
             return True
         elif inspect.isfunction(object):
-            return module.__dict__ is object.__globals__
+            return module.__dict__ is six.get_function_globals(object)
         elif inspect.isclass(object):
             return module.__name__ == object.__module__
         elif inspect.getmodule(object) is not None:
@@ -1021,7 +1028,7 @@ class DocTestFinder:
 
         # Find the line number for functions & methods.
         if inspect.ismethod(obj): obj = obj.__func__
-        if inspect.isfunction(obj): obj = obj.__code__
+        if inspect.isfunction(obj): obj = six.get_function_code(obj)
         if inspect.istraceback(obj): obj = obj.tb_frame
         if inspect.isframe(obj): obj = obj.f_code
         if inspect.iscode(obj):
@@ -1338,7 +1345,7 @@ class DocTestRunner:
                     # exception message will be in group(2)
                     m = re.match(r'(.*)\.(\w+:.+\s)', exc_msg)
                     # make sure there's a match
-                    if m != None:
+                    if m is not None:
                         f_name = m.group(1)
                         # check to see if m.group(1) contains the module name
                         if f_name == exception[0].__module__:

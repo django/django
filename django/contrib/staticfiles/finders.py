@@ -1,17 +1,18 @@
+from collections import OrderedDict
 import os
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage, Storage, FileSystemStorage
-from django.utils.datastructures import SortedDict
 from django.utils.functional import empty, memoize, LazyObject
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 from django.utils._os import safe_join
 from django.utils import six
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.storage import AppStaticStorage
 
-_finders = SortedDict()
+_finders = OrderedDict()
 
 
 class BaseFinder(object):
@@ -27,7 +28,7 @@ class BaseFinder(object):
         the first found file path will be returned; if set
         to ``True`` a list of all found files paths is returned.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseFinder must provide a find() method')
 
     def list(self, ignore_patterns):
         """
@@ -35,7 +36,7 @@ class BaseFinder(object):
         a two item iterable consisting of the relative path and storage
         instance.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseFinder must provide a list() method')
 
 
 class FileSystemFinder(BaseFinder):
@@ -47,7 +48,7 @@ class FileSystemFinder(BaseFinder):
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
-        self.storages = SortedDict()
+        self.storages = OrderedDict()
         if not isinstance(settings.STATICFILES_DIRS, (list, tuple)):
             raise ImproperlyConfigured(
                 "Your STATICFILES_DIRS setting is not a tuple or list; "
@@ -118,7 +119,7 @@ class AppDirectoriesFinder(BaseFinder):
         # The list of apps that are handled
         self.apps = []
         # Mapping of app module paths to storage instances
-        self.storages = SortedDict()
+        self.storages = OrderedDict()
         if apps is None:
             apps = settings.INSTALLED_APPS
         for app in apps:
@@ -245,7 +246,7 @@ def find(path, all=False):
     if matches:
         return matches
     # No match.
-    return all and [] or None
+    return [] if all else None
 
 
 def get_finders():
@@ -258,17 +259,7 @@ def _get_finder(import_path):
     Imports the staticfiles finder class described by import_path, where
     import_path is the full Python path to the class.
     """
-    module, attr = import_path.rsplit('.', 1)
-    try:
-        mod = import_module(module)
-    except ImportError as e:
-        raise ImproperlyConfigured('Error importing module %s: "%s"' %
-                                   (module, e))
-    try:
-        Finder = getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured('Module "%s" does not define a "%s" '
-                                   'class.' % (module, attr))
+    Finder = import_by_path(import_path)
     if not issubclass(Finder, BaseFinder):
         raise ImproperlyConfigured('Finder "%s" is not a subclass of "%s"' %
                                    (Finder, BaseFinder))

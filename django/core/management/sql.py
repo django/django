@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import codecs
 import os
 import re
+import warnings
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -27,7 +28,7 @@ def sql_create(app, style, connection):
     app_models = models.get_models(app, include_auto_created=True)
     final_output = []
     tables = connection.introspection.table_names()
-    known_models = set([model for model in connection.introspection.installed_models(tables) if model not in app_models])
+    known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
     pending_references = {}
 
     for model in app_models:
@@ -62,7 +63,7 @@ def sql_delete(app, style, connection):
     # This should work even if a connection isn't available
     try:
         cursor = connection.cursor()
-    except:
+    except Exception:
         cursor = None
 
     # Figure out which tables already exist
@@ -101,7 +102,7 @@ def sql_delete(app, style, connection):
     return output[::-1]  # Reverse it, to deal with table dependencies.
 
 
-def sql_flush(style, connection, only_django=False, reset_sequences=True):
+def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_cascade=False):
     """
     Returns a list of the SQL statements used to flush the database.
 
@@ -113,7 +114,7 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True):
     else:
         tables = connection.introspection.table_names()
     seqs = connection.introspection.sequence_list() if reset_sequences else ()
-    statements = connection.ops.sql_flush(style, tables, seqs)
+    statements = connection.ops.sql_flush(style, tables, seqs, allow_cascade)
     return statements
 
 
@@ -132,8 +133,16 @@ def sql_custom(app, style, connection):
 def sql_indexes(app, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
-    for model in models.get_models(app):
+    for model in models.get_models(app, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
+    return output
+
+
+def sql_destroy_indexes(app, style, connection):
+    "Returns a list of the DROP INDEX SQL statements for all models in the given app."
+    output = []
+    for model in models.get_models(app, include_auto_created=True):
+        output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
     return output
 
 
@@ -145,21 +154,32 @@ def sql_all(app, style, connection):
 def _split_statements(content):
     comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
     statements = []
-    statement = ""
+    statement = []
     for line in content.split("\n"):
         cleaned_line = comment_re.sub(r"\1", line).strip()
         if not cleaned_line:
             continue
-        statement += cleaned_line
-        if statement.endswith(";"):
-            statements.append(statement)
-            statement = ""
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
     return statements
 
 
 def custom_sql_for_model(model, style, connection):
     opts = model._meta
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
+    app_dirs = []
+    app_dir = models.get_app_path(model._meta.app_label)
+    app_dirs.append(os.path.normpath(os.path.join(app_dir, 'sql')))
+
+    # Deprecated location -- remove in Django 1.9
+    old_app_dir = os.path.normpath(os.path.join(app_dir, 'models/sql'))
+    if os.path.exists(old_app_dir):
+        warnings.warn("Custom SQL location '<app_label>/models/sql' is "
+                      "deprecated, use '<app_label>/sql' instead.",
+                      PendingDeprecationWarning)
+        app_dirs.append(old_app_dir)
+
     output = []
 
     # Post-creation SQL should come before any initial SQL data is loaded.
@@ -172,8 +192,10 @@ def custom_sql_for_model(model, style, connection):
 
     # Find custom SQL, if it's available.
     backend_name = connection.settings_dict['ENGINE'].split('.')[-1]
-    sql_files = [os.path.join(app_dir, "%s.%s.sql" % (opts.object_name.lower(), backend_name)),
-                 os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
+    sql_files = []
+    for app_dir in app_dirs:
+        sql_files.append(os.path.join(app_dir, "%s.%s.sql" % (opts.model_name, backend_name)))
+        sql_files.append(os.path.join(app_dir, "%s.sql" % opts.model_name))
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'U', encoding=settings.FILE_CHARSET) as fp:
@@ -183,12 +205,25 @@ def custom_sql_for_model(model, style, connection):
     return output
 
 
-def emit_post_sync_signal(created_models, verbosity, interactive, db):
-    # Emit the post_sync signal for every application.
+def emit_pre_migrate_signal(create_models, verbosity, interactive, db):
+    # Emit the pre_migrate signal for every application.
     for app in models.get_apps():
         app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
-            print("Running post-sync handlers for application %s" % app_name)
-        models.signals.post_syncdb.send(sender=app, app=app,
+            print("Running pre-migrate handlers for application %s" % app_name)
+        models.signals.pre_migrate.send(sender=app, app=app,
+                                       create_models=create_models,
+                                       verbosity=verbosity,
+                                       interactive=interactive,
+                                       db=db)
+
+
+def emit_post_migrate_signal(created_models, verbosity, interactive, db):
+    # Emit the post_migrate signal for every application.
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if verbosity >= 2:
+            print("Running post-migrate handlers for application %s" % app_name)
+        models.signals.post_migrate.send(sender=app, app=app,
             created_models=created_models, verbosity=verbosity,
             interactive=interactive, db=db)

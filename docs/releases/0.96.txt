@@ -34,8 +34,7 @@ exceptions if you attempt to use an older version.
 If you're currently unable to upgrade your copy of ``MySQLdb`` to meet
 this requirement, a separate, backwards-compatible backend, called
 "mysql_old", has been added to Django. To use this backend, change
-the :setting:`DATABASE_ENGINE` setting in your Django settings file from
-this::
+the ``DATABASE_ENGINE`` setting in your Django settings file from this::
 
     DATABASE_ENGINE = "mysql"
 
@@ -49,7 +48,7 @@ provided only to ease this transition, and is considered deprecated;
 aside from any necessary security fixes, it will not be actively
 maintained, and it will be removed in a future release of Django.
 
-Also, note that some features, like the new :setting:`DATABASE_OPTIONS`
+Also, note that some features, like the new ``DATABASE_OPTIONS``
 setting (see the :doc:`databases documentation </ref/databases>` for details),
 are only available on the "mysql" backend, and will not be made available for
 "mysql_old".
@@ -220,7 +219,7 @@ supported :doc:`serialization formats </topics/serialization>`, that will be
 loaded into your database at the start of your tests. This makes testing with
 real data much easier.
 
-See :doc:`the testing documentation </topics/testing>` for the full details.
+See :doc:`the testing documentation </topics/testing/index>` for the full details.
 
 Improvements to the admin interface
 -----------------------------------

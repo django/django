@@ -1,3 +1,5 @@
+from unittest import skipIf
+
 from django import http
 from django.conf import settings, global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
@@ -5,10 +7,8 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy
-from django.utils.unittest import skipIf
 
 
 def skipUnlessAuthIsInstalled(func):
@@ -31,19 +31,20 @@ def add_level_messages(storage):
 
 
 class override_settings_tags(override_settings):
-     def enable(self):
+    def enable(self):
         super(override_settings_tags, self).enable()
         # LEVEL_TAGS is a constant defined in the
         # django.contrib.messages.storage.base module, so after changing
         # settings.MESSAGE_TAGS, we need to update that constant too.
         self.old_level_tags = base.LEVEL_TAGS
         base.LEVEL_TAGS = utils.get_level_tags()
-     def disable(self):
+
+    def disable(self):
         super(override_settings_tags, self).disable()
         base.LEVEL_TAGS = self.old_level_tags
 
 
-class BaseTest(TestCase):
+class BaseTests(object):
     storage_class = default_storage
     urls = 'django.contrib.messages.tests.urls'
     levels = {
@@ -61,6 +62,7 @@ class BaseTest(TestCase):
             MESSAGE_TAGS    = '',
             MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                          self.storage_class.__name__),
+            SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
 
@@ -228,7 +230,7 @@ class BaseTest(TestCase):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        reverse('django.contrib.messages.tests.urls.show')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))

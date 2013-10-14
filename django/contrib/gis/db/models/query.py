@@ -15,8 +15,8 @@ class GeoQuerySet(QuerySet):
     "The Geographic QuerySet."
 
     ### Methods overloaded from QuerySet ###
-    def __init__(self, model=None, query=None, using=None):
-        super(GeoQuerySet, self).__init__(model=model, query=query, using=using)
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        super(GeoQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
         self.query = query or GeoQuery(self.model)
 
     def values(self, *fields):
@@ -140,7 +140,7 @@ class GeoQuerySet(QuerySet):
         Returns a GeoJSON representation of the geomtry field in a `geojson`
         attribute on each element of the GeoQuerySet.
 
-        The `crs` and `bbox` keywords may be set to True if the users wants
+        The `crs` and `bbox` keywords may be set to True if the user wants
         the coordinate reference system and the bounding box to be included
         in the GeoJSON representation of the geometry.
         """

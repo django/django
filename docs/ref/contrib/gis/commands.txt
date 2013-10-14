@@ -47,7 +47,8 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
    The key for specifying which layer in the OGR
    :class:`~django.contrib.gis.gdal.DataSource` source to use.
    Defaults to 0 (the first layer). May be an integer or a string identifier
-   for the :class:`~django.contrib.gis.gdal.Layer`.
+   for the :class:`~django.contrib.gis.gdal.Layer`. When inspecting databases,
+   ``layer`` is generally the table name you want to inspect.
 
 .. django-admin-option:: --mapping
 
@@ -64,8 +65,8 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --name-field <name_field>
 
-   Generates a ``__unicode__`` routine on the model that will return the
-   the given field name.
+   Generates a ``__unicode__`` routine (``__str__`` on Python 3) on the model
+   that will return the the given field name.
 
 .. django-admin-option:: --no-imports
 

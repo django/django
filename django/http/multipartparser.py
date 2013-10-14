@@ -7,10 +7,12 @@ file upload handlers for processing.
 from __future__ import unicode_literals
 
 import base64
+import binascii
 import cgi
+import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
@@ -32,6 +34,8 @@ RAW = "raw"
 FILE = "file"
 FIELD = "field"
 
+_BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
+
 class MultiPartParser(object):
     """
     A rfc2388 multipart/form-data parser.
@@ -47,8 +51,8 @@ class MultiPartParser(object):
             The standard ``META`` dictionary in Django request objects.
         :input_data:
             The raw post data, as a file-like object.
-        :upload_handler:
-            An UploadHandler instance that performs operations on the uploaded
+        :upload_handlers:
+            A list of UploadHandler instances that perform operations on the uploaded
             data.
         :encoding:
             The encoding with which to treat the incoming data.
@@ -112,14 +116,15 @@ class MultiPartParser(object):
         if self._content_length == 0:
             return QueryDict('', encoding=self._encoding), MultiValueDict()
 
-        # See if the handler will want to take care of the parsing.
-        # This allows overriding everything if somebody wants it.
+        # See if any of the handlers take care of the parsing.
+        # This allows overriding everything if need be.
         for handler in handlers:
             result = handler.handle_raw_input(self._input_data,
                                               self._meta,
                                               self._content_length,
                                               self._boundary,
                                               encoding)
+            #Check to see if it was handled
             if result is not None:
                 return result[0], result[1]
 
@@ -159,8 +164,8 @@ class MultiPartParser(object):
                     if transfer_encoding == 'base64':
                         raw_data = field_stream.read()
                         try:
-                            data = str(raw_data).decode('base64')
-                        except:
+                            data = base64.b64decode(raw_data)
+                        except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
                         data = field_stream.read()
@@ -175,11 +180,9 @@ class MultiPartParser(object):
                     file_name = force_text(file_name, encoding, errors='replace')
                     file_name = self.IE_sanitize(unescape_entities(file_name))
 
-                    content_type = meta_data.get('content-type', ('',))[0].strip()
-                    try:
-                        charset = meta_data.get('content-type', (0, {}))[1].get('charset', None)
-                    except:
-                        charset = None
+                    content_type, content_type_extra = meta_data.get('content-type', ('', {}))
+                    content_type = content_type.strip()
+                    charset = content_type_extra.get('charset')
 
                     try:
                         content_length = int(meta_data.get('content-length')[0])
@@ -192,18 +195,25 @@ class MultiPartParser(object):
                             try:
                                 handler.new_file(field_name, file_name,
                                                  content_type, content_length,
-                                                 charset)
+                                                 charset, content_type_extra)
                             except StopFutureHandlers:
                                 break
 
                         for chunk in field_stream:
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
+                                # We should always read base64 streams by multiple of 4
+                                over_bytes = len(chunk) % 4
+                                if over_bytes:
+                                    over_chunk = field_stream.read(4 - over_bytes)
+                                    chunk += over_chunk
+
                                 try:
                                     chunk = base64.b64decode(chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
-                                    raise MultiPartParserError("Could not decode base64 data: %r" % e)
+                                    msg = "Could not decode base64 data: %r" % e
+                                    six.reraise(MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2])
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)
@@ -284,7 +294,7 @@ class LazyStream(six.Iterator):
 
     def read(self, size=None):
         def parts():
-            remaining = (size is not None and [size] or [self._remaining])[0]
+            remaining = self._remaining if size is None else size
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
                 yield b''.join(self)
@@ -361,7 +371,7 @@ class LazyStream(six.Iterator):
                             if current_number == num_bytes])
 
         if number_equal > 40:
-            raise SuspiciousOperation(
+            raise SuspiciousMultipartForm(
                 "The multipart parser got stuck, which shouldn't happen with"
                 " normal uploaded files. Check for malicious upload activity;"
                 " if there is none, report this to the Django developers."
@@ -433,11 +443,6 @@ class BoundaryIter(six.Iterator):
         if not unused_char:
             raise InputStreamExhausted()
         self._stream.unget(unused_char)
-        try:
-            from mx.TextTools import FS
-            self._fs = FS(boundary).find
-        except ImportError:
-            self._fs = lambda data: data.find(boundary)
 
     def __iter__(self):
         return self
@@ -493,7 +498,7 @@ class BoundaryIter(six.Iterator):
          * the end of current encapsulation
          * the start of the next encapsulation
         """
-        index = self._fs(data)
+        index = data.find(self._boundary)
         if index < 0:
             return None
         else:
@@ -544,7 +549,7 @@ def parse_boundary_stream(stream, max_header_size):
         main_value_pair, params = parse_header(line)
         try:
             name, value = main_value_pair.split(':', 1)
-        except:
+        except ValueError:
             raise ValueError("Invalid header: %r" % line)
         return name, (value, params)
 
@@ -569,7 +574,7 @@ def parse_boundary_stream(stream, max_header_size):
         # parameters") is from the Python docs.
         try:
             name, (value, params) = _parse_header(line)
-        except:
+        except ValueError:
             continue
 
         if name == 'content-disposition':

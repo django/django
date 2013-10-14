@@ -9,6 +9,14 @@ container server coded in pure C.
 
 .. _uWSGI: http://projects.unbit.it/uwsgi/
 
+.. seealso::
+
+    The uWSGI docs offer a `tutorial`_ covering Django, nginx, and uWSGI (one
+    possible deployment setup of many). The docs below are focused on how to
+    integrate Django with uWSGI.
+
+    .. _tutorial: https://uwsgi.readthedocs.org/en/latest/tutorials/Django_and_nginx.html
+
 Prerequisite: uWSGI
 ===================
 
@@ -25,6 +33,15 @@ command. For example:
     $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
 .. _installation procedures: http://projects.unbit.it/uwsgi/wiki/Install
+
+.. warning::
+
+    Some distributions, including Debian and Ubuntu, ship an outdated version
+    of uWSGI that does not conform to the WSGI specification. Versions prior to
+    1.2.6 do not call ``close`` on the response object after handling a
+    request. In those cases the :data:`~django.core.signals.request_finished`
+    signal isn't sent. This can result in idle connections to database and
+    memcache servers.
 
 uWSGI model
 -----------
@@ -54,7 +71,6 @@ Here's an example command to start a uWSGI server::
         --processes=5 \                 # number of worker processes
         --uid=1000 --gid=2000 \         # if root, uwsgi can drop privileges
         --harakiri=20 \                 # respawn processes taking more than 20 seconds
-        --limit-as=128 \                # limit the project to 128 MB
         --max-requests=5000 \           # respawn processes after serving 5000 requests
         --vacuum \                      # clear environment on exit
         --home=/path/to/virtual/env \   # optional path to a virtualenv
@@ -93,6 +109,6 @@ Example ini configuration file usage::
     uwsgi --ini uwsgi.ini
 
 See the uWSGI docs on `managing the uWSGI process`_ for information on
-starting, stoping and reloading the uWSGI workers.
+starting, stopping and reloading the uWSGI workers.
 
 .. _managing the uWSGI process: http://projects.unbit.it/uwsgi/wiki/Management

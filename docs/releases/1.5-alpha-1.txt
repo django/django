@@ -1,6 +1,6 @@
-============================================
-Django 1.5 release notes - UNDER DEVELOPMENT
-============================================
+==============================
+Django 1.5 alpha release notes
+==============================
 
 October 25, 2012.
 
@@ -51,8 +51,8 @@ Other notable new features in Django 1.5 include:
 * `Support for saving a subset of model's fields`_ -
   :meth:`Model.save() <django.db.models.Model.save()>` now accepts an
   ``update_fields`` argument, letting you specify which fields are
-  written back to the databse when you call ``save()``. This can help
-  in high-concurrancy operations, and can improve performance.
+  written back to the database when you call ``save()``. This can help
+  in high-concurrency operations, and can improve performance.
 
 * Better `support for streaming responses <#explicit-streaming-responses>`_ via
   the new  :class:`~django.http.StreamingHttpResponse` response class.
@@ -83,7 +83,7 @@ Python compatibility
 ====================
 
 Django 1.5 requires Python 2.6.5 or above, though we **highly recommended**
-Python 2.7.3 or above. Support for Python 2.5 and below as been dropped.
+Python 2.7.3 or above. Support for Python 2.5 and below has been dropped.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
@@ -106,17 +106,17 @@ need to install a different version of Django on Python 3. This means that
 you can write application targeted for just Python 2, just Python 3, or single
 applications that support both platforms.
 
-However, we're labling this support "experimental" for now: although it's
-receved extensive testing via our automated test suite, it's recieved very
+However, we're labeling this support "experimental" for now: although it's
+received extensive testing via our automated test suite, it's received very
 little real-world testing. We've done our best to eliminate bugs, but we can't
 be sure we covered all possible uses of Django. Further, Django's more than a
 web framework; it's an ecosystem of pluggable components. At this point, very
-few third-party applications have been ported to Python 3, so it's unliukely
-that a real-world application will have all its dependecies satisfied under
+few third-party applications have been ported to Python 3, so it's unlikely
+that a real-world application will have all its dependencies satisfied under
 Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
-3. Instead, use this oportunity to begin :doc:`porting applications to Python 3
+3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
 </topics/python3>`. If you're an author of a pluggable component, we encourage you
 to start porting now.
 
@@ -207,7 +207,7 @@ Retrieval of ``ContentType`` instances associated with proxy models
 The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>`
 and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>`
 have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``.
-By passing ``False`` using this argument it is now possible to retreive the
+By passing ``False`` using this argument it is now possible to retrieve the
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>`
 associated with proxy models.
 
@@ -227,7 +227,9 @@ GeoDjango
   :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
   (so-called linear referencing).
 
-* The wkb and hex properties of `GEOSGeometry` objects preserve the Z dimension.
+* The ``wkb`` and ``hex`` properties of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects preserve the Z
+  dimension.
 
 * Support for PostGIS 2.0 has been added and support for GDAL < 1.5 has been
   dropped.
@@ -283,8 +285,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 * An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
   the request as ``resolver_match``.
 
-* By default, all logging messages reaching the `django` logger when
-  :setting:`DEBUG` is `True` are sent to the console (unless you redefine the
+* By default, all logging messages reaching the ``django`` logger when
+  :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the
   logger in your :setting:`LOGGING` setting).
 
 * When using :class:`~django.template.RequestContext`, it is now possible to
@@ -301,8 +303,9 @@ Django 1.5 also includes several smaller improvements worth noting:
   whenever a user fails to login successfully. See
   :data:`~django.contrib.auth.signals.user_login_failed`
 
-* The loaddata management command now supports an `ignorenonexistent` option to
-  ignore data for fields that no longer exist.
+* The loaddata management command now supports an
+  :djadminopt:`--ignorenonexistent` option to ignore data for fields that no
+  longer exist.
 
 * :meth:`~django.test.SimpleTestCase.assertXMLEqual` and
   :meth:`~django.test.SimpleTestCase.assertXMLNotEqual` new assertions allow
@@ -391,12 +394,12 @@ System version of :mod:`simplejson` no longer used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As explained below, Django 1.5 deprecates
-:mod:`django.utils.simplejson` in favor of Python 2.6's built-in :mod:`json`
+``django.utils.simplejson`` in favor of Python 2.6's built-in :mod:`json`
 module. In theory, this change is harmless. Unfortunately, because of
 incompatibilities between versions of :mod:`simplejson`, it may trigger errors
 in some circumstances.
 
-JSON-related features in Django 1.4 always used :mod:`django.utils.simplejson`.
+JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
 - A system version of :mod:`simplejson`, if one was available (ie. ``import
@@ -423,7 +426,7 @@ More information on these incompatibilities is available in `ticket #18023`_.
 
 The net result is that, if you have installed :mod:`simplejson` and your code
 uses Django's serialization internals directly -- for instance
-:class:`django.core.serializers.json.DjangoJSONEncoder`, the switch from
+``django.core.serializers.json.DjangoJSONEncoder``, the switch from
 :mod:`simplejson` to :mod:`json` could break your code. (In general, changes to
 internals aren't documented; we're making an exception here.)
 
@@ -449,8 +452,8 @@ When using :doc:`object pagination </topics/pagination>`,
 the ``previous_page_number()`` and ``next_page_number()`` methods of the
 :class:`~django.core.paginator.Page` object did not check if the returned
 number was inside the existing page range.
-It does check it now and raises an :exc:`InvalidPage` exception when the number
-is either too low or too high.
+It does check it now and raises an :exc:`~django.core.paginator.InvalidPage`
+exception when the number is either too low or too high.
 
 Behavior of autocommit database option on PostgreSQL changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -495,8 +498,8 @@ In order to be able to run unit tests in any order and to make sure they are
 always isolated from each other, :class:`~django.test.TransactionTestCase` will
 now reset the database *after* each test run instead.
 
-No more implict DB sequences reset
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+No more implicit DB sequences reset
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :class:`~django.test.TransactionTestCase` tests used to reset primary key
 sequences automatically together with the database flushing actions described
@@ -546,23 +549,25 @@ Miscellaneous
 * :class:`django.forms.ModelMultipleChoiceField` now returns an empty
   ``QuerySet`` as the empty value instead of an empty list.
 
-* :func:`~django.utils.http.int_to_base36` properly raises a :exc:`TypeError`
-  instead of :exc:`ValueError` for non-integer inputs.
+* :func:`~django.utils.http.int_to_base36` properly raises a
+  :exc:`~exceptions.TypeError` instead of :exc:`~exceptions.ValueError` for
+  non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
   available at :func:`django.utils.html.remove_tags`.
 
 * Uploaded files are no longer created as executable by default. If you need
-  them to be executeable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is `0666` (octal) and the current umask value
+  them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
+  needs. The new default value is ``0666`` (octal) and the current umask value
   is first masked out.
 
-* The :ref:`F() expressions <query-expressions>` supported bitwise operators by
-  ``&`` and ``|``. These operators are now available using ``.bitand()`` and
-  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be consistent with
-  :ref:`Q() expressions <complex-lookups-with-q>` and ``QuerySet`` combining where
-  the operators are used as boolean AND and OR operators.
+* The :class:`F expressions <django.db.models.F>` supported bitwise operators
+  by ``&`` and ``|``. These operators are now available using ``.bitand()`` and
+  ``.bitor()`` instead. The removal of ``&`` and ``|`` was done to be
+  consistent with :ref:`Q() expressions <complex-lookups-with-q>` and
+  ``QuerySet`` combining where the operators are used as boolean AND and OR
+  operators.
 
 * The :ttag:`csrf_token` template tag is no longer enclosed in a div. If you need
   HTML validation against pre-HTML5 Strict DTDs, you should add a div around it
@@ -571,8 +576,8 @@ Miscellaneous
 Features deprecated in 1.5
 ==========================
 
-:setting:`AUTH_PROFILE_MODULE`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``AUTH_PROFILE_MODULE`` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With the introduction of :ref:`custom User models <auth-custom-user>`, there is
 no longer any need for a built-in mechanism to store user profile data.
@@ -580,12 +585,12 @@ no longer any need for a built-in mechanism to store user profile data.
 You can still define user profiles models that have a one-to-one relation with
 the User model - in fact, for many applications needing to associate data with
 a User account, this will be an appropriate design pattern to follow. However,
-the :setting:`AUTH_PROFILE_MODULE` setting, and the
-:meth:`~django.contrib.auth.models.User.get_profile()` method for accessing
+the ``AUTH_PROFILE_MODULE`` setting, and the
+``django.contrib.auth.models.User.get_profile()`` method for accessing
 the user profile model, should not be used any longer.
 
-Streaming behavior of :class:`HttpResponse`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Streaming behavior of :class:`~django.http.HttpResponse`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.5 deprecates the ability to stream a response by passing an iterator
 to :class:`~django.http.HttpResponse`. If you rely on this behavior, switch to
@@ -600,7 +605,7 @@ In Django 1.7 and above, the iterator will be consumed immediately by
 Since Django 1.5 drops support for Python 2.5, we can now rely on the
 :mod:`json` module being available in Python's standard library, so we've
 removed our own copy of :mod:`simplejson`. You should now import :mod:`json`
-instead :mod:`django.utils.simplejson`.
+instead of ``django.utils.simplejson``.
 
 Unfortunately, this change might have unwanted side-effects, because of
 incompatibilities between versions of :mod:`simplejson` -- see the backwards-
@@ -611,16 +616,15 @@ explicitly.
 ``django.utils.encoding.StrAndUnicode``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~django.utils.encoding.StrAndUnicode` mix-in has been deprecated.
+The ``django.utils.encoding.StrAndUnicode`` mix-in has been deprecated.
 Define a ``__str__`` method and apply the
 :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
 ``django.utils.itercompat.product``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+The ``django.utils.itercompat.product`` function has been deprecated. Use
 the built-in :func:`itertools.product` instead.
-
 
 ``django.utils.markup``
 ~~~~~~~~~~~~~~~~~~~~~~~

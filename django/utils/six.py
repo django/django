@@ -1,14 +1,35 @@
 """Utilities for writing code that runs on Python 2 and 3"""
 
+# Copyright (c) 2010-2013 Benjamin Peterson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import operator
 import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.2.0"
+__version__ = "1.4.1"
 
 
-# True if we are running on Python 3.
+# Useful for very coarse version differentiation.
+PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
 if PY3:
@@ -26,7 +47,7 @@ else:
     text_type = unicode
     binary_type = str
 
-    if sys.platform == "java":
+    if sys.platform.startswith("java"):
         # Jython always uses 32 bits.
         MAXSIZE = int((1 << 31) - 1)
     else:
@@ -42,7 +63,7 @@ else:
         else:
             # 64-bit
             MAXSIZE = int((1 << 63) - 1)
-            del X
+        del X
 
 
 def _add_doc(func, doc):
@@ -117,13 +138,17 @@ class _MovedItems(types.ModuleType):
 _moved_attributes = [
     MovedAttribute("cStringIO", "cStringIO", "io", "StringIO"),
     MovedAttribute("filter", "itertools", "builtins", "ifilter", "filter"),
+    MovedAttribute("filterfalse", "itertools", "itertools", "ifilterfalse", "filterfalse"),
     MovedAttribute("input", "__builtin__", "builtins", "raw_input", "input"),
     MovedAttribute("map", "itertools", "builtins", "imap", "map"),
+    MovedAttribute("range", "__builtin__", "builtins", "xrange", "range"),
     MovedAttribute("reload_module", "__builtin__", "imp", "reload"),
     MovedAttribute("reduce", "__builtin__", "functools"),
     MovedAttribute("StringIO", "StringIO", "io"),
+    MovedAttribute("UserString", "UserString", "collections"),
     MovedAttribute("xrange", "__builtin__", "builtins", "xrange", "range"),
     MovedAttribute("zip", "itertools", "builtins", "izip", "zip"),
+    MovedAttribute("zip_longest", "itertools", "itertools", "izip_longest", "zip_longest"),
 
     MovedModule("builtins", "__builtin__"),
     MovedModule("configparser", "ConfigParser"),
@@ -133,6 +158,9 @@ _moved_attributes = [
     MovedModule("html_entities", "htmlentitydefs", "html.entities"),
     MovedModule("html_parser", "HTMLParser", "html.parser"),
     MovedModule("http_client", "httplib", "http.client"),
+    MovedModule("email_mime_multipart", "email.MIMEMultipart", "email.mime.multipart"),
+    MovedModule("email_mime_text", "email.MIMEText", "email.mime.text"),
+    MovedModule("email_mime_base", "email.MIMEBase", "email.mime.base"),
     MovedModule("BaseHTTPServer", "BaseHTTPServer", "http.server"),
     MovedModule("CGIHTTPServer", "CGIHTTPServer", "http.server"),
     MovedModule("SimpleHTTPServer", "SimpleHTTPServer", "http.server"),
@@ -157,6 +185,9 @@ _moved_attributes = [
     MovedModule("tkinter_messagebox", "tkMessageBox", "tkinter.messagebox"),
     MovedModule("tkinter_tksimpledialog", "tkSimpleDialog",
                 "tkinter.simpledialog"),
+    MovedModule("urllib_parse", __name__ + ".moves.urllib_parse", "urllib.parse"),
+    MovedModule("urllib_error", __name__ + ".moves.urllib_error", "urllib.error"),
+    MovedModule("urllib", __name__ + ".moves.urllib", __name__ + ".moves.urllib"),
     MovedModule("urllib_robotparser", "robotparser", "urllib.robotparser"),
     MovedModule("winreg", "_winreg"),
 ]
@@ -164,7 +195,144 @@ for attr in _moved_attributes:
     setattr(_MovedItems, attr.name, attr)
 del attr
 
-moves = sys.modules["django.utils.six.moves"] = _MovedItems("moves")
+moves = sys.modules[__name__ + ".moves"] = _MovedItems(__name__ + ".moves")
+
+
+
+class Module_six_moves_urllib_parse(types.ModuleType):
+    """Lazy loading of moved objects in six.moves.urllib_parse"""
+
+
+_urllib_parse_moved_attributes = [
+    MovedAttribute("ParseResult", "urlparse", "urllib.parse"),
+    MovedAttribute("parse_qs", "urlparse", "urllib.parse"),
+    MovedAttribute("parse_qsl", "urlparse", "urllib.parse"),
+    MovedAttribute("urldefrag", "urlparse", "urllib.parse"),
+    MovedAttribute("urljoin", "urlparse", "urllib.parse"),
+    MovedAttribute("urlparse", "urlparse", "urllib.parse"),
+    MovedAttribute("urlsplit", "urlparse", "urllib.parse"),
+    MovedAttribute("urlunparse", "urlparse", "urllib.parse"),
+    MovedAttribute("urlunsplit", "urlparse", "urllib.parse"),
+    MovedAttribute("quote", "urllib", "urllib.parse"),
+    MovedAttribute("quote_plus", "urllib", "urllib.parse"),
+    MovedAttribute("unquote", "urllib", "urllib.parse"),
+    MovedAttribute("unquote_plus", "urllib", "urllib.parse"),
+    MovedAttribute("urlencode", "urllib", "urllib.parse"),
+]
+for attr in _urllib_parse_moved_attributes:
+    setattr(Module_six_moves_urllib_parse, attr.name, attr)
+del attr
+
+sys.modules[__name__ + ".moves.urllib_parse"] = Module_six_moves_urllib_parse(__name__ + ".moves.urllib_parse")
+sys.modules[__name__ + ".moves.urllib.parse"] = Module_six_moves_urllib_parse(__name__ + ".moves.urllib.parse")
+
+
+class Module_six_moves_urllib_error(types.ModuleType):
+    """Lazy loading of moved objects in six.moves.urllib_error"""
+
+
+_urllib_error_moved_attributes = [
+    MovedAttribute("URLError", "urllib2", "urllib.error"),
+    MovedAttribute("HTTPError", "urllib2", "urllib.error"),
+    MovedAttribute("ContentTooShortError", "urllib", "urllib.error"),
+]
+for attr in _urllib_error_moved_attributes:
+    setattr(Module_six_moves_urllib_error, attr.name, attr)
+del attr
+
+sys.modules[__name__ + ".moves.urllib_error"] = Module_six_moves_urllib_error(__name__ + ".moves.urllib_error")
+sys.modules[__name__ + ".moves.urllib.error"] = Module_six_moves_urllib_error(__name__ + ".moves.urllib.error")
+
+
+class Module_six_moves_urllib_request(types.ModuleType):
+    """Lazy loading of moved objects in six.moves.urllib_request"""
+
+
+_urllib_request_moved_attributes = [
+    MovedAttribute("urlopen", "urllib2", "urllib.request"),
+    MovedAttribute("install_opener", "urllib2", "urllib.request"),
+    MovedAttribute("build_opener", "urllib2", "urllib.request"),
+    MovedAttribute("pathname2url", "urllib", "urllib.request"),
+    MovedAttribute("url2pathname", "urllib", "urllib.request"),
+    MovedAttribute("getproxies", "urllib", "urllib.request"),
+    MovedAttribute("Request", "urllib2", "urllib.request"),
+    MovedAttribute("OpenerDirector", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPDefaultErrorHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPRedirectHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPCookieProcessor", "urllib2", "urllib.request"),
+    MovedAttribute("ProxyHandler", "urllib2", "urllib.request"),
+    MovedAttribute("BaseHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPPasswordMgr", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPPasswordMgrWithDefaultRealm", "urllib2", "urllib.request"),
+    MovedAttribute("AbstractBasicAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPBasicAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("ProxyBasicAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("AbstractDigestAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPDigestAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("ProxyDigestAuthHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPSHandler", "urllib2", "urllib.request"),
+    MovedAttribute("FileHandler", "urllib2", "urllib.request"),
+    MovedAttribute("FTPHandler", "urllib2", "urllib.request"),
+    MovedAttribute("CacheFTPHandler", "urllib2", "urllib.request"),
+    MovedAttribute("UnknownHandler", "urllib2", "urllib.request"),
+    MovedAttribute("HTTPErrorProcessor", "urllib2", "urllib.request"),
+    MovedAttribute("urlretrieve", "urllib", "urllib.request"),
+    MovedAttribute("urlcleanup", "urllib", "urllib.request"),
+    MovedAttribute("URLopener", "urllib", "urllib.request"),
+    MovedAttribute("FancyURLopener", "urllib", "urllib.request"),
+]
+for attr in _urllib_request_moved_attributes:
+    setattr(Module_six_moves_urllib_request, attr.name, attr)
+del attr
+
+sys.modules[__name__ + ".moves.urllib_request"] = Module_six_moves_urllib_request(__name__ + ".moves.urllib_request")
+sys.modules[__name__ + ".moves.urllib.request"] = Module_six_moves_urllib_request(__name__ + ".moves.urllib.request")
+
+
+class Module_six_moves_urllib_response(types.ModuleType):
+    """Lazy loading of moved objects in six.moves.urllib_response"""
+
+
+_urllib_response_moved_attributes = [
+    MovedAttribute("addbase", "urllib", "urllib.response"),
+    MovedAttribute("addclosehook", "urllib", "urllib.response"),
+    MovedAttribute("addinfo", "urllib", "urllib.response"),
+    MovedAttribute("addinfourl", "urllib", "urllib.response"),
+]
+for attr in _urllib_response_moved_attributes:
+    setattr(Module_six_moves_urllib_response, attr.name, attr)
+del attr
+
+sys.modules[__name__ + ".moves.urllib_response"] = Module_six_moves_urllib_response(__name__ + ".moves.urllib_response")
+sys.modules[__name__ + ".moves.urllib.response"] = Module_six_moves_urllib_response(__name__ + ".moves.urllib.response")
+
+
+class Module_six_moves_urllib_robotparser(types.ModuleType):
+    """Lazy loading of moved objects in six.moves.urllib_robotparser"""
+
+
+_urllib_robotparser_moved_attributes = [
+    MovedAttribute("RobotFileParser", "robotparser", "urllib.robotparser"),
+]
+for attr in _urllib_robotparser_moved_attributes:
+    setattr(Module_six_moves_urllib_robotparser, attr.name, attr)
+del attr
+
+sys.modules[__name__ + ".moves.urllib_robotparser"] = Module_six_moves_urllib_robotparser(__name__ + ".moves.urllib_robotparser")
+sys.modules[__name__ + ".moves.urllib.robotparser"] = Module_six_moves_urllib_robotparser(__name__ + ".moves.urllib.robotparser")
+
+
+class Module_six_moves_urllib(types.ModuleType):
+    """Create a six.moves.urllib namespace that resembles the Python 3 namespace"""
+    parse = sys.modules[__name__ + ".moves.urllib_parse"]
+    error = sys.modules[__name__ + ".moves.urllib_error"]
+    request = sys.modules[__name__ + ".moves.urllib_request"]
+    response = sys.modules[__name__ + ".moves.urllib_response"]
+    robotparser = sys.modules[__name__ + ".moves.urllib_robotparser"]
+
+
+sys.modules[__name__ + ".moves.urllib"] = Module_six_moves_urllib(__name__ + ".moves.urllib")
 
 
 def add_move(move):
@@ -187,22 +355,28 @@ if PY3:
     _meth_func = "__func__"
     _meth_self = "__self__"
 
+    _func_closure = "__closure__"
     _func_code = "__code__"
     _func_defaults = "__defaults__"
+    _func_globals = "__globals__"
 
     _iterkeys = "keys"
     _itervalues = "values"
     _iteritems = "items"
+    _iterlists = "lists"
 else:
     _meth_func = "im_func"
     _meth_self = "im_self"
 
+    _func_closure = "func_closure"
     _func_code = "func_code"
     _func_defaults = "func_defaults"
+    _func_globals = "func_globals"
 
     _iterkeys = "iterkeys"
     _itervalues = "itervalues"
     _iteritems = "iteritems"
+    _iterlists = "iterlists"
 
 
 try:
@@ -213,17 +387,26 @@ except NameError:
 next = advance_iterator
 
 
+try:
+    callable = callable
+except NameError:
+    def callable(obj):
+        return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
+
+
 if PY3:
     def get_unbound_function(unbound):
         return unbound
 
-    Iterator = object
+    create_bound_method = types.MethodType
 
-    def callable(obj):
-        return any("__call__" in klass.__dict__ for klass in type(obj).__mro__)
+    Iterator = object
 else:
     def get_unbound_function(unbound):
         return unbound.im_func
+
+    def create_bound_method(func, obj):
+        return types.MethodType(func, obj, obj.__class__)
 
     class Iterator(object):
 
@@ -237,21 +420,27 @@ _add_doc(get_unbound_function,
 
 get_method_function = operator.attrgetter(_meth_func)
 get_method_self = operator.attrgetter(_meth_self)
+get_function_closure = operator.attrgetter(_func_closure)
 get_function_code = operator.attrgetter(_func_code)
 get_function_defaults = operator.attrgetter(_func_defaults)
+get_function_globals = operator.attrgetter(_func_globals)
 
 
-def iterkeys(d):
+def iterkeys(d, **kw):
     """Return an iterator over the keys of a dictionary."""
-    return iter(getattr(d, _iterkeys)())
+    return iter(getattr(d, _iterkeys)(**kw))
 
-def itervalues(d):
+def itervalues(d, **kw):
     """Return an iterator over the values of a dictionary."""
-    return iter(getattr(d, _itervalues)())
+    return iter(getattr(d, _itervalues)(**kw))
 
-def iteritems(d):
+def iteritems(d, **kw):
     """Return an iterator over the (key, value) pairs of a dictionary."""
-    return iter(getattr(d, _iteritems)())
+    return iter(getattr(d, _iteritems)(**kw))
+
+def iterlists(d, **kw):
+    """Return an iterator over the (key, [values]) pairs of a dictionary."""
+    return iter(getattr(d, _iterlists)(**kw))
 
 
 if PY3:
@@ -259,12 +448,16 @@ if PY3:
         return s.encode("latin-1")
     def u(s):
         return s
+    unichr = chr
     if sys.version_info[1] <= 1:
         def int2byte(i):
             return bytes((i,))
     else:
         # This is about 2x faster than the implementation above on 3.2+
         int2byte = operator.methodcaller("to_bytes", 1, "big")
+    byte2int = operator.itemgetter(0)
+    indexbytes = operator.getitem
+    iterbytes = iter
     import io
     StringIO = io.StringIO
     BytesIO = io.BytesIO
@@ -273,7 +466,14 @@ else:
         return s
     def u(s):
         return unicode(s, "unicode_escape")
+    unichr = unichr
     int2byte = chr
+    def byte2int(bs):
+        return ord(bs[0])
+    def indexbytes(buf, i):
+        return ord(buf[i])
+    def iterbytes(buf):
+        return (ord(byte) for byte in buf)
     import StringIO
     StringIO = BytesIO = StringIO.StringIO
 _add_doc(b, """Byte literal""")
@@ -295,17 +495,17 @@ if PY3:
     del builtins
 
 else:
-    def exec_(code, globs=None, locs=None):
+    def exec_(_code_, _globs_=None, _locs_=None):
         """Execute code in a namespace."""
-        if globs is None:
+        if _globs_ is None:
             frame = sys._getframe(1)
-            globs = frame.f_globals
-            if locs is None:
-                locs = frame.f_locals
+            _globs_ = frame.f_globals
+            if _locs_ is None:
+                _locs_ = frame.f_locals
             del frame
-        elif locs is None:
-            locs = globs
-        exec("""exec code in globs, locs""")
+        elif _locs_ is None:
+            _locs_ = _globs_
+        exec("""exec _code_ in _globs_, _locs_""")
 
 
     exec_("""def reraise(tp, value, tb=None):
@@ -361,28 +561,46 @@ else:
 _add_doc(reraise, """Reraise an exception.""")
 
 
-def with_metaclass(meta, base=object):
+def with_metaclass(meta, *bases):
     """Create a base class with a metaclass."""
-    return meta("NewBase", (base,), {})
+    return meta("NewBase", bases, {})
+
+def add_metaclass(metaclass):
+    """Class decorator for creating a class with a metaclass."""
+    def wrapper(cls):
+        orig_vars = cls.__dict__.copy()
+        orig_vars.pop('__dict__', None)
+        orig_vars.pop('__weakref__', None)
+        for slots_var in orig_vars.get('__slots__', ()):
+            orig_vars.pop(slots_var)
+        return metaclass(cls.__name__, cls.__bases__, orig_vars)
+    return wrapper
 
 
 ### Additional customizations for Django ###
 
 if PY3:
-    _iterlists = "lists"
     _assertRaisesRegex = "assertRaisesRegex"
+    _assertRegex = "assertRegex"
+    memoryview = memoryview
 else:
-    _iterlists = "iterlists"
     _assertRaisesRegex = "assertRaisesRegexp"
-
-
-def iterlists(d):
-    """Return an iterator over the values of a MultiValueDict."""
-    return getattr(d, _iterlists)()
+    _assertRegex = "assertRegexpMatches"
+    # memoryview and buffer are not stricly equivalent, but should be fine for
+    # django core usage (mainly BinaryField). However, Jython doesn't support
+    # buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
+    if sys.platform.startswith('java'):
+        memoryview = memoryview
+    else:
+        memoryview = buffer
 
 
 def assertRaisesRegex(self, *args, **kwargs):
     return getattr(self, _assertRaisesRegex)(*args, **kwargs)
+
+
+def assertRegex(self, *args, **kwargs):
+    return getattr(self, _assertRegex)(*args, **kwargs)
 
 
 add_move(MovedModule("_dummy_thread", "dummy_thread"))

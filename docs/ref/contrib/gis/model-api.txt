@@ -195,7 +195,7 @@ details.
 Geography Type
 ^^^^^^^^^^^^^^
 
-In PostGIS 1.5, the geography type was introduced -- it provides 
+In PostGIS 1.5, the geography type was introduced -- it provides
 native support for spatial features represented with geographic
 coordinates (e.g., WGS84 longitude/latitude). [#fngeography]_
 Unlike the plane used by a geometry type, the geography type uses a spherical
@@ -236,13 +236,12 @@ if we had an ``Address`` model with a ``ForeignKey`` to our ``Zipcode``
 model::
 
     from django.contrib.gis.db import models
-    from django.contrib.localflavor.us.models import USStateField
 
     class Address(models.Model):
         num = models.IntegerField()
         street = models.CharField(max_length=100)
         city = models.CharField(max_length=100)
-        state = USStateField()
+        state = models.CharField(max_length=2)
         zipcode = models.ForeignKey(Zipcode)
         objects = models.GeoManager()
 

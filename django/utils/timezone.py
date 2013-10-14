@@ -1,10 +1,12 @@
-"""Timezone helper functions.
+"""
+Timezone-related classes and functions.
 
 This module uses pytz when it's available and fallbacks when it isn't.
 """
 
 from datetime import datetime, timedelta, tzinfo
 from threading import local
+import sys
 import time as _time
 
 try:
@@ -16,7 +18,8 @@ from django.conf import settings
 from django.utils import six
 
 __all__ = [
-    'utc', 'get_default_timezone', 'get_current_timezone',
+    'utc', 'get_fixed_timezone',
+    'get_default_timezone', 'get_current_timezone',
     'activate', 'deactivate', 'override',
     'is_naive', 'is_aware', 'make_aware', 'make_naive',
 ]
@@ -45,17 +48,45 @@ class UTC(tzinfo):
     def dst(self, dt):
         return ZERO
 
-class LocalTimezone(tzinfo):
+class FixedOffset(tzinfo):
     """
-    Local time implementation taken from Python's docs.
+    Fixed offset in minutes east from UTC. Taken from Python's docs.
+
+    Kept as close as possible to the reference version. __init__ was changed
+    to make its arguments optional, according to Python's requirement that
+    tzinfo subclasses can be instantiated without arguments.
+    """
+
+    def __init__(self, offset=None, name=None):
+        if offset is not None:
+            self.__offset = timedelta(minutes=offset)
+        if name is not None:
+            self.__name = name
+
+    def utcoffset(self, dt):
+        return self.__offset
+
+    def tzname(self, dt):
+        return self.__name
+
+    def dst(self, dt):
+        return ZERO
+
+class ReferenceLocalTimezone(tzinfo):
+    """
+    Local time. Taken from Python's docs.
 
     Used only when pytz isn't available, and most likely inaccurate. If you're
     having trouble with this class, don't waste your time, just install pytz.
+
+    Kept as close as possible to the reference version. __init__ was added to
+    delay the computation of STDOFFSET, DSTOFFSET and DSTDIFF which is
+    performed at import time in the example.
+
+    Subclasses contain further improvements.
     """
 
     def __init__(self):
-        # This code is moved in __init__ to execute it as late as possible
-        # See get_default_timezone().
         self.STDOFFSET = timedelta(seconds=-_time.timezone)
         if _time.daylight:
             self.DSTOFFSET = timedelta(seconds=-_time.altzone)
@@ -63,9 +94,6 @@ class LocalTimezone(tzinfo):
             self.DSTOFFSET = self.STDOFFSET
         self.DSTDIFF = self.DSTOFFSET - self.STDOFFSET
         tzinfo.__init__(self)
-
-    def __repr__(self):
-        return "<LocalTimezone>"
 
     def utcoffset(self, dt):
         if self._isdst(dt):
@@ -90,9 +118,41 @@ class LocalTimezone(tzinfo):
         tt = _time.localtime(stamp)
         return tt.tm_isdst > 0
 
+class LocalTimezone(ReferenceLocalTimezone):
+    """
+    Slightly improved local time implementation focusing on correctness.
+
+    It still crashes on dates before 1970 or after 2038, but at least the
+    error message is helpful.
+    """
+
+    def tzname(self, dt):
+        is_dst = False if dt is None else self._isdst(dt)
+        return _time.tzname[is_dst]
+
+    def _isdst(self, dt):
+        try:
+            return super(LocalTimezone, self)._isdst(dt)
+        except (OverflowError, ValueError) as exc:
+            exc_type = type(exc)
+            exc_value = exc_type(
+                    "Unsupported value: %r. You should install pytz." % dt)
+            exc_value.__cause__ = exc
+            six.reraise(exc_type, exc_value, sys.exc_info()[2])
 
 utc = pytz.utc if pytz else UTC()
 """UTC time zone as a tzinfo instance."""
+
+def get_fixed_timezone(offset):
+    """
+    Returns a tzinfo instance with a fixed offset from UTC.
+    """
+    if isinstance(offset, timedelta):
+        offset = offset.seconds // 60
+    sign = '-' if offset < 0 else '+'
+    hhmm = '%02d%02d' % divmod(abs(offset), 60)
+    name = sign + hhmm
+    return FixedOffset(offset, name)
 
 # In order to avoid accessing the settings at compile time,
 # wrap the expression in a function and cache the result.
@@ -103,14 +163,13 @@ def get_default_timezone():
     Returns the default time zone as a tzinfo instance.
 
     This is the time zone defined by settings.TIME_ZONE.
-
-    See also :func:`get_current_timezone`.
     """
     global _localtime
     if _localtime is None:
         if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
             _localtime = pytz.timezone(settings.TIME_ZONE)
         else:
+            # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
             _localtime = LocalTimezone()
     return _localtime
 
@@ -144,8 +203,7 @@ def _get_timezone_name(timezone):
         return timezone.zone
     except AttributeError:
         # for regular tzinfo objects
-        local_now = datetime.now(timezone)
-        return timezone.tzname(local_now)
+        return timezone.tzname(None)
 
 # Timezone selection functions.
 
@@ -198,10 +256,10 @@ class override(object):
             activate(self.timezone)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.old_timezone is not None:
-            _active.value = self.old_timezone
+        if self.old_timezone is None:
+            deactivate()
         else:
-            del _active.value
+            _active.value = self.old_timezone
 
 
 # Templates

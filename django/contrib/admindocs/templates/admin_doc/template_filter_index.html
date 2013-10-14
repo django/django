@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n %}
+{% load i18n %}{% load firstof from future %}
 
 {% block coltype %}colSM{% endblock %}
 {% block breadcrumbs %}
@@ -9,20 +9,20 @@
 &rsaquo; {% trans 'Filters' %}
 </div>
 {% endblock %}
-{% block title %}Template filters{% endblock %}
+{% block title %}{% trans 'Template filters' %}{% endblock %}
 
 {% block content %}
 
-<h1>Template filter documentation</h1>
+<h1>{% trans 'Template filter documentation' %}</h1>
 
 <div id="content-main">
 {% regroup filters|dictsort:"library" by library as filter_libraries %}
 {% for library in filter_libraries %}
 <div class="module">
-    <h2>{% firstof library.grouper "Built-in filters" %}</h2>
-    {% if library.grouper %}<p class="small quiet">To use these filters, put <code>{% templatetag openblock %} load {{ library.grouper }} {% templatetag closeblock %}</code> in your template before using the filter.</p><hr />{% endif %}
+    <h2>{% firstof library.grouper _("Built-in filters") %}</h2>
+    {% if library.grouper %}<p class="small quiet">{% blocktrans with code="{"|add:"% load "|add:library.grouper|add:" %"|add:"}" %}To use these filters, put <code>{{ code }}</code> in your template before using the filter.{% endblocktrans %}</p><hr />{% endif %}
     {% for filter in library.list|dictsort:"name" %}
-    <h3 id="{{ library.grouper|default_if_none:"built_in" }}-{{ filter.name }}">{{ filter.name }}</h3>
+    <h3 id="{{ library.grouper|default:"built_in" }}-{{ filter.name }}">{{ filter.name }}</h3>
     {{ filter.title }}
     {{ filter.body }}
     {% if not forloop.last %}<hr />{% endif %}
@@ -40,10 +40,10 @@
 {% regroup filters|dictsort:"library" by library as filter_libraries %}
 {% for library in filter_libraries %}
 <div class="module">
-    <h2>{% firstof library.grouper "Built-in filters" %}</h2>
+    <h2>{% firstof library.grouper _("Built-in filters") %}</h2>
     <ul>
     {% for filter in library.list|dictsort:"name" %}
-        <li><a href="#{{ library.grouper|default_if_none:"built_in" }}-{{ filter.name }}">{{ filter.name }}</a></li>
+        <li><a href="#{{ library.grouper|default:"built_in" }}-{{ filter.name }}">{{ filter.name }}</a></li>
     {% endfor %}
     </ul>
 </div>

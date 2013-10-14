@@ -21,7 +21,7 @@ def render_to_kml(*args, **kwargs):
 
 def render_to_kmz(*args, **kwargs):
     """
-    Compresses the KML content and returns as KMZ (using the correct 
+    Compresses the KML content and returns as KMZ (using the correct
     MIME type).
     """
     return HttpResponse(compress_kml(loader.render_to_string(*args, **kwargs)),

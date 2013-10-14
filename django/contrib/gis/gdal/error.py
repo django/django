@@ -32,7 +32,7 @@ OGRERR_NONE = 0
 
 def check_err(code):
     "Checks the given OGRERR, and raises an exception where appropriate."
-    
+
     if code == OGRERR_NONE:
         return
     elif code in OGRERR_DICT:

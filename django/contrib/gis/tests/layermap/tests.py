@@ -1,25 +1,30 @@
 # coding: utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import unicode_literals
 
-import os
 from copy import copy
 from decimal import Decimal
+import os
+import unittest
+from unittest import skipUnless
 
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.tests.utils import mysql
-from django.contrib.gis.utils.layermapping import (LayerMapping, LayerMapError,
-    InvalidDecimal, MissingForeignKey)
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
 from django.db import router
 from django.conf import settings
 from django.test import TestCase
-from django.utils import unittest
+from django.utils._os import upath
 
-from .models import (
-    City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-    city_mapping, co_mapping, cofeat_mapping, inter_mapping)
+if HAS_GDAL:
+    from django.contrib.gis.utils.layermapping import (LayerMapping,
+        LayerMapError, InvalidDecimal, MissingForeignKey)
+    from django.contrib.gis.gdal import DataSource
+
+    from .models import (
+        City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
+        city_mapping, co_mapping, cofeat_mapping, inter_mapping)
 
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
@@ -31,6 +36,7 @@ NUMS   = [1, 2, 1, 19, 1] # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -52,11 +58,11 @@ class LayerMapTest(TestCase):
         # ensuring that a LayerMapError is raised.
         for bad_map in (bad1, bad2, bad3):
             with self.assertRaises(LayerMapError):
-                lm = LayerMapping(City, city_shp, bad_map)
+                LayerMapping(City, city_shp, bad_map)
 
         # A LookupError should be thrown for bogus encodings.
         with self.assertRaises(LookupError):
-            lm = LayerMapping(City, city_shp, city_mapping, encoding='foobar')
+            LayerMapping(City, city_shp, city_mapping, encoding='foobar')
 
     def test_simple_layermap(self):
         "Test LayerMapping import of a simple point shapefile."
@@ -157,8 +163,10 @@ class LayerMapTest(TestCase):
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
         # mapping for the model the ForeignKey points to.
-        bad_fk_map1 = copy(co_mapping); bad_fk_map1['state'] = 'name'
-        bad_fk_map2 = copy(co_mapping); bad_fk_map2['state'] = {'nombre' : 'State'}
+        bad_fk_map1 = copy(co_mapping)
+        bad_fk_map1['state'] = 'name'
+        bad_fk_map2 = copy(co_mapping)
+        bad_fk_map2['state'] = {'nombre' : 'State'}
         self.assertRaises(TypeError, LayerMapping, County, co_shp, bad_fk_map1, transform=False)
         self.assertRaises(LayerMapError, LayerMapping, County, co_shp, bad_fk_map2, transform=False)
 
@@ -305,10 +313,11 @@ class OtherRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return True
 
 
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
 class LayerMapRouterTest(TestCase):
 
     def setUp(self):

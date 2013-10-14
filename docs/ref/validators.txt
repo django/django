@@ -96,7 +96,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ------------------
 .. data:: validate_email
 
-    A :class:`RegexValidator` instance that ensures a value looks like an
+    An ``EmailValidator`` instance that ensures a value looks like an
     email address.
 
 ``validate_slug``
@@ -115,15 +115,13 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_ipv6_address``
 -------------------------
-.. versionadded:: 1.4
 
 .. data:: validate_ipv6_address
 
-    Uses :mod:`django.utils.ipv6` to check the validity of an IPv6 address.
+    Uses ``django.utils.ipv6`` to check the validity of an IPv6 address.
 
 ``validate_ipv46_address``
 --------------------------
-.. versionadded:: 1.4
 
 .. data:: validate_ipv46_address
 

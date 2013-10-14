@@ -1,3 +1,5 @@
+.. _internals-security:
+
 ==========================
 Django's security policies
 ==========================
@@ -19,7 +21,7 @@ security@djangoproject.com**.
 
 Most normal bugs in Django are reported to `our public Trac
 instance`_, but due to the sensitive nature of security issues, we ask
-that they *not* be publicly reported in this fashion.
+that they **not** be publicly reported in this fashion.
 
 Instead, if you believe you've found something in Django which has
 security implications, please send a description of the issue via
@@ -28,14 +30,16 @@ reaches a subset of the core development team, who can forward
 security issues into the private committers' mailing list for broader
 discussion if needed.
 
-You can send encrypted email to this address; the public key ID for
-``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this
-public key is available from most commonly-used keyservers.
-
 Once you've submitted an issue via email, you should receive an
 acknowledgment from a member of the Django development team within 48
 hours, and depending on the action to be taken, you may receive
 further followup emails.
+
+.. note::
+
+    If you want to send an encrypted email (*optional*), the public key ID for
+    ``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this public
+    key is available from most commonly-used keyservers.
 
 .. _our public Trac instance: https://code.djangoproject.com/query
 
@@ -106,6 +110,9 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
+4. Post a notice to the |django-announce| mailing list that links to the blog
+   post.
+
 .. _the Python Package Index: http://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
@@ -119,6 +126,10 @@ us affects other frameworks or tools in the Python/web ecosystem, we
 may privately contact and discuss those issues with the appropriate
 maintainers, and coordinate our own disclosure and resolution with
 theirs.
+
+The Django team also maintains an :doc:`archive of security issues
+disclosed in Django</releases/security>`.
+
 
 .. _security-notifications:
 

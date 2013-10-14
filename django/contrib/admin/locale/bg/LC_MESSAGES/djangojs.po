@@ -2,21 +2,21 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Todor Lubenov <tlubenov@gmail.com>, 2011.
+# Todor Lubenov <tlubenov@gmail.com>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"PO-Revision-Date: 2012-08-30 15:03+0000\n"
 "Last-Translator: Todor Lubenov <tlubenov@gmail.com>\n"
-"Language-Team: Bulgarian (http://www.transifex.net/projects/p/django/"
+"Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
-"Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -29,11 +29,14 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Това е списък на наличните %s . Можете да изберете някои, като ги изберете в "
+"полето по-долу и след това кликнете върху \"Избор\" стрелка между двете "
+"кутии."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Въведете в това поле, за да филтрирате списъка на наличните %s."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -46,11 +49,11 @@ msgstr "Избери всички"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Кликнете, за да изберете всички %s наведнъж."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Избирам"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -67,6 +70,9 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Това е списък на избрания %s. Можете да премахнете някои, като ги изберете в "
+"полето по-долу и след това щракнете върху \"Премахни\" стрелка между двете "
+"кутии."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
@@ -75,7 +81,7 @@ msgstr "Премахване на всички"
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Кликнете, за да премахнете всички избрани %s наведнъж."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

@@ -124,26 +124,32 @@ Model style
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
 
+* If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
+  was supported), decorate the model class with
+  :func:`~django.utils.encoding.python_2_unicode_compatible`.
+
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
 
   * All database fields
   * Custom manager attributes
   * ``class Meta``
-  * ``def __unicode__()``
   * ``def __str__()``
   * ``def save()``
   * ``def get_absolute_url()``
   * Any custom methods
 
-* If ``choices`` is defined for a given model field, define the choices as
-  a tuple of tuples, with an all-uppercase name, either near the top of
-  the model module or just above the model class. Example::
+* If ``choices`` is defined for a given model field, define each choice as
+  a tuple of tuples, with an all-uppercase name as a class attribute on the
+  model. Example::
 
-      DIRECTION_CHOICES = (
-          ('U', 'Up'),
-          ('D', 'Down'),
-      )
+    class MyModel(models.Model):
+        DIRECTION_UP = 'U'
+        DIRECTION_DOWN = 'D'
+        DIRECTION_CHOICES = (
+            (DIRECTION_UP, 'Up'),
+            (DIRECTION_DOWN, 'Down'),
+        )
 
 Use of ``django.conf.settings``
 -------------------------------
@@ -177,9 +183,9 @@ That means that the ability for third parties to import the module at the top
 level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
-Instead of the above code, a level of laziness or indirection must be used, such
-as :class:`django.utils.functional.LazyObject`,
-:func:`django.utils.functional.lazy` or ``lambda``.
+Instead of the above code, a level of laziness or indirection must be used,
+such as ``django.utils.functional.LazyObject``,
+``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
 -------------

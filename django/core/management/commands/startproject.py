@@ -1,7 +1,8 @@
+from importlib import import_module
+
 from django.core.management.base import CommandError
 from django.core.management.templates import TemplateCommand
 from django.utils.crypto import get_random_string
-from django.utils.importlib import import_module
 
 
 class Command(TemplateCommand):
@@ -10,8 +11,7 @@ class Command(TemplateCommand):
             "given directory.")
 
     def handle(self, project_name=None, target=None, *args, **options):
-        if project_name is None:
-            raise CommandError("you must provide a project name")
+        self.validate_name(project_name, "project")
 
         # Check that the project_name cannot be imported.
         try:

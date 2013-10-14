@@ -1,16 +1,19 @@
 from __future__ import unicode_literals
 import re
 from datetime import date, datetime
+from decimal import Decimal
 
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
 from django.utils.encoding import force_text
 from django.utils.formats import number_format
+from django.utils.safestring import mark_safe
 from django.utils.translation import pgettext, ungettext, ugettext as _
 from django.utils.timezone import is_aware, utc
 
 register = template.Library()
+
 
 @register.filter(is_safe=True)
 def ordinal(value):
@@ -23,9 +26,11 @@ def ordinal(value):
     except (TypeError, ValueError):
         return value
     suffixes = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
-    if value % 100 in (11, 12, 13): # special case
-        return "%d%s" % (value, suffixes[0])
-    return "%d%s" % (value, suffixes[value % 10])
+    if value % 100 in (11, 12, 13):  # special case
+        return mark_safe("%d%s" % (value, suffixes[0]))
+    # Mark value safe so i18n does not break with <sup> or <sub> see #19988
+    return mark_safe("%d%s" % (value, suffixes[value % 10]))
+
 
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
@@ -35,7 +40,7 @@ def intcomma(value, use_l10n=True):
     """
     if settings.USE_L10N and use_l10n:
         try:
-            if not isinstance(value, float):
+            if not isinstance(value, (float, Decimal)):
                 value = int(value)
         except (TypeError, ValueError):
             return intcomma(value, False)
@@ -96,6 +101,7 @@ intword_converters = (
     )),
 )
 
+
 @register.filter(is_safe=False)
 def intword(value):
     """
@@ -129,6 +135,7 @@ def intword(value):
             return _check_for_i18n(new_value, *converters(new_value))
     return value
 
+
 @register.filter(is_safe=True)
 def apnumber(value):
     """
@@ -142,6 +149,7 @@ def apnumber(value):
     if not 0 < value < 10:
         return value
     return (_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine'))[value-1]
+
 
 # Perform the comparison in the default time zone when USE_TZ = True
 # (unless a specific time zone has been applied with the |timezone filter).
@@ -171,6 +179,7 @@ def naturalday(value, arg=None):
         return _('yesterday')
     return defaultfilters.date(value, arg)
 
+
 # This filter doesn't require expects_localtime=True because it deals properly
 # with both naive and aware datetimes. Therefore avoid the cost of conversion.
 @register.filter
@@ -179,7 +188,7 @@ def naturaltime(value):
     For date and time values shows how many seconds, minutes or hours ago
     compared to current timestamp returns representing string.
     """
-    if not isinstance(value, date): # datetime is a subclass of date
+    if not isinstance(value, date):  # datetime is a subclass of date
         return value
 
     now = datetime.now(utc if is_aware(value) else None)
@@ -193,17 +202,20 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                'a second ago', '%(count)s seconds ago', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second ago', '%(count)s\u00a0seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute ago', '%(count)s minutes ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute ago', '%(count)s\u00a0minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour ago', '%(count)s hours ago', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour ago', '%(count)s\u00a0hours ago', count
             ) % {'count': count}
     else:
         delta = value - now
@@ -215,15 +227,18 @@ def naturaltime(value):
             return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                'a second from now', '%(count)s seconds from now', delta.seconds
+                # Translators: \\u00a0 is non-breaking space
+                'a second from now', '%(count)s\u00a0seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                'a minute from now', '%(count)s minutes from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'a minute from now', '%(count)s\u00a0minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                'an hour from now', '%(count)s hours from now', count
+                # Translators: \\u00a0 is non-breaking space
+                'an hour from now', '%(count)s\u00a0hours from now', count
             ) % {'count': count}

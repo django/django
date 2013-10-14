@@ -1,14 +1,24 @@
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import get_apps, get_models, signals
+from django.db import DEFAULT_DB_ALIAS, router
+from django.db.models import get_apps, get_model, get_models, signals, UnavailableApp
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
 
-def update_contenttypes(app, created_models, verbosity=2, **kwargs):
+
+def update_contenttypes(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    try:
+        get_model('contenttypes', 'ContentType')
+    except UnavailableApp:
+        return
+
+    if not router.allow_migrate(db, ContentType):
+        return
+
     ContentType.objects.clear_cache()
     app_models = get_models(app)
     if not app_models:
@@ -16,13 +26,14 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     # They all have the same app_label, get the first one.
     app_label = app_models[0]._meta.app_label
     app_models = dict(
-        (model._meta.object_name.lower(), model)
+        (model._meta.model_name, model)
         for model in app_models
     )
+
     # Get all the content types
     content_types = dict(
         (ct.model, ct)
-        for ct in ContentType.objects.filter(app_label=app_label)
+        for ct in ContentType.objects.using(db).filter(app_label=app_label)
     )
     to_remove = [
         ct
@@ -30,7 +41,7 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
         if model_name not in app_models
     ]
 
-    cts = ContentType.objects.bulk_create([
+    cts = [
         ContentType(
             name=smart_text(model._meta.verbose_name_raw),
             app_label=app_label,
@@ -38,7 +49,8 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
         )
         for (model_name, model) in six.iteritems(app_models)
         if model_name not in content_types
-    ])
+    ]
+    ContentType.objects.using(db).bulk_create(cts)
     if verbosity >= 2:
         for ct in cts:
             print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
@@ -46,10 +58,10 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     # Confirm that the content type is stale before deletion.
     if to_remove:
         if kwargs.get('interactive', False):
-            content_type_display = '\n'.join([
+            content_type_display = '\n'.join(
                 '    %s | %s' % (ct.app_label, ct.model)
                 for ct in to_remove
-            ])
+            )
             ok_to_delete = input("""The following content types are stale and need to be deleted:
 
 %s
@@ -71,11 +83,12 @@ If you're unsure, answer 'no'.
             if verbosity >= 2:
                 print("Stale content types remain.")
 
+
 def update_all_contenttypes(verbosity=2, **kwargs):
     for app in get_apps():
         update_contenttypes(app, None, verbosity, **kwargs)
 
-signals.post_syncdb.connect(update_contenttypes)
+signals.post_migrate.connect(update_contenttypes)
 
 if __name__ == "__main__":
     update_all_contenttypes()

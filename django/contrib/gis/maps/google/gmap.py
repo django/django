@@ -81,7 +81,7 @@ class GoogleMap(object):
         # level and a center coordinate are provided with polygons/polylines,
         # no automatic determination will occur.
         self.calc_zoom = False
-        if self.polygons or self.polylines  or self.markers:
+        if self.polygons or self.polylines or self.markers:
             if center is None or zoom is None:
                 self.calc_zoom = True
 
@@ -134,7 +134,8 @@ class GoogleMap(object):
     @property
     def scripts(self):
         "Returns all <script></script> tags required with Google Maps JavaScript."
-        return format_html('%s\n  <script type="text/javascript">\n//<![CDATA[\n%s//]]>\n  </script>', self.api_script, mark_safe(self.js))
+        return format_html('{0}\n  <script type="text/javascript">\n//<![CDATA[\n{1}//]]>\n  </script>',
+                           self.api_script, mark_safe(self.js))
 
     @property
     def style(self):
@@ -149,7 +150,7 @@ class GoogleMap(object):
     @property
     def icons(self):
         "Returns a sequence of GIcon objects in this map."
-        return set([marker.icon for marker in self.markers if marker.icon])
+        return set(marker.icon for marker in self.markers if marker.icon)
 
 class GoogleMapSet(GoogleMap):
 

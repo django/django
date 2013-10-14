@@ -4,10 +4,12 @@ Serialize data to/from JSON
 
 # Avoid shadowing the standard library json module
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import decimal
 import json
+import sys
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -29,6 +31,9 @@ class Serializer(PythonSerializer):
         self.json_kwargs = self.options.copy()
         self.json_kwargs.pop('stream', None)
         self.json_kwargs.pop('fields', None)
+        if self.options.get('indent'):
+            # Prevent trailing spaces
+            self.json_kwargs['separators'] = (',', ': ')
         self.stream.write("[")
 
     def end_serialization(self):
@@ -72,7 +77,7 @@ def Deserializer(stream_or_string, **options):
         raise
     except Exception as e:
         # Map to deserializer error
-        raise DeserializationError(e)
+        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
 
 
 class DjangoJSONEncoder(json.JSONEncoder):
@@ -104,4 +109,3 @@ class DjangoJSONEncoder(json.JSONEncoder):
 
 # Older, deprecated class name (for backwards compatibility purposes).
 DateTimeAwareJSONEncoder = DjangoJSONEncoder
-

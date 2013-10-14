@@ -9,6 +9,14 @@ class PostGISIntrospection(DatabaseIntrospection):
     # introspection is actually performed.
     postgis_types_reverse = {}
 
+    ignored_tables = DatabaseIntrospection.ignored_tables + [
+        'geography_columns',
+        'geometry_columns',
+        'raster_columns',
+        'spatial_ref_sys',
+        'raster_overviews',
+    ]
+
     def get_postgis_types(self):
         """
         Returns a dictionary with keys that are the PostgreSQL object

@@ -1,4 +1,6 @@
 (function($) {
+	var _actions_icnt, lastChecked;
+
 	$.fn.actions = function(opts) {
 		var options = $.extend({}, $.fn.actions.defaults, opts);
 		var actionCheckboxes = $(this);
@@ -9,7 +11,7 @@
 			} else {
 				reset();
 			}
-			$(actionCheckboxes).attr("checked", checked)
+			$(actionCheckboxes).prop("checked", checked)
 				.parent().parent().toggleClass(options.selectedClass, checked);
 		},
 		updateCounter = function() {
@@ -19,7 +21,8 @@
 				sel: sel,
 				cnt: _actions_icnt
 			}, true));
-			$(options.allToggle).attr("checked", function() {
+			$(options.allToggle).prop("checked", function() {
+				var value;
 				if (sel == actionCheckboxes.length) {
 					value = true;
 					showQuestion();
@@ -64,17 +67,17 @@
 			}
 		});
 		$(options.allToggle).show().click(function() {
-			checker($(this).attr("checked"));
+			checker($(this).prop("checked"));
 			updateCounter();
 		});
-		$("div.actions span.question a").click(function(event) {
+		$("a", options.acrossQuestions).click(function(event) {
 			event.preventDefault();
 			$(options.acrossInput).val(1);
 			showClear();
 		});
-		$("div.actions span.clear a").click(function(event) {
+		$("a", options.acrossClears).click(function(event) {
 			event.preventDefault();
-			$(options.allToggle).attr("checked", false);
+			$(options.allToggle).prop("checked", false);
 			clearAcross();
 			checker(0);
 			updateCounter();
@@ -85,14 +88,14 @@
 			var target = event.target ? event.target : event.srcElement;
 			if (lastChecked && $.data(lastChecked) != $.data(target) && event.shiftKey === true) {
 				var inrange = false;
-				$(lastChecked).attr("checked", target.checked)
+				$(lastChecked).prop("checked", target.checked)
 					.parent().parent().toggleClass(options.selectedClass, target.checked);
 				$(actionCheckboxes).each(function() {
 					if ($.data(this) == $.data(lastChecked) || $.data(this) == $.data(target)) {
 						inrange = (inrange) ? false : true;
 					}
 					if (inrange) {
-						$(this).attr("checked", target.checked)
+						$(this).prop("checked", target.checked)
 							.parent().parent().toggleClass(options.selectedClass, target.checked);
 					}
 				});
@@ -111,7 +114,7 @@
 		});
 		$('form#changelist-form input[name="_save"]').click(function(event) {
 			var action_changed = false;
-			$('div.actions select option:selected').each(function() {
+			$('select option:selected', options.actionContainer).each(function() {
 				if ($(this).val()) {
 					action_changed = true;
 				}

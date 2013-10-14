@@ -3,6 +3,7 @@ Wrapper for loading templates from "templates" directories in INSTALLED_APPS
 packages.
 """
 
+from importlib import import_module
 import os
 import sys
 
@@ -11,11 +12,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils._os import safe_join
-from django.utils.importlib import import_module
 from django.utils import six
 
 # At compile time, cache the directories to search.
-if not six.PY3:
+if six.PY2:
     fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
 app_template_dirs = []
 for app in settings.INSTALLED_APPS:
@@ -25,7 +25,7 @@ for app in settings.INSTALLED_APPS:
         raise ImproperlyConfigured('ImportError %s: %s' % (app, e.args[0]))
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
     if os.path.isdir(template_dir):
-        if not six.PY3:
+        if six.PY2:
             template_dir = template_dir.decode(fs_encoding)
         app_template_dirs.append(template_dir)
 
@@ -61,5 +61,3 @@ class Loader(BaseLoader):
             except IOError:
                 pass
         raise TemplateDoesNotExist(template_name)
-
-_loader = Loader()

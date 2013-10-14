@@ -8,28 +8,42 @@ ImproperlyConfigured.
 """
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends import *
+from django.db.backends import (BaseDatabaseOperations, BaseDatabaseClient,
+    BaseDatabaseIntrospection, BaseDatabaseWrapper, BaseDatabaseFeatures,
+    BaseDatabaseValidation)
 from django.db.backends.creation import BaseDatabaseCreation
+
 
 def complain(*args, **kwargs):
     raise ImproperlyConfigured("settings.DATABASES is improperly configured. "
                                "Please supply the ENGINE value. Check "
                                "settings documentation for more details.")
 
+
 def ignore(*args, **kwargs):
     pass
+
 
 class DatabaseError(Exception):
     pass
 
+
 class IntegrityError(DatabaseError):
     pass
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     quote_name = complain
 
+
 class DatabaseClient(BaseDatabaseClient):
     runshell = complain
+
+
+class DatabaseCreation(BaseDatabaseCreation):
+    create_test_db = ignore
+    destroy_test_db = ignore
+
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_table_list = complain
@@ -38,25 +52,23 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     get_indexes = complain
     get_key_columns = complain
 
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     operators = {}
     # Override the base class implementations with null
     # implementations. Anything that tries to actually
     # do something raises complain; anything that tries
     # to rollback or undo something raises ignore.
+    _cursor = complain
     _commit = complain
     _rollback = ignore
-    enter_transaction_management = complain
-    leave_transaction_management = ignore
+    _close = ignore
+    _savepoint = ignore
+    _savepoint_commit = complain
+    _savepoint_rollback = ignore
+    _set_autocommit = complain
     set_dirty = complain
     set_clean = complain
-    commit_unless_managed = complain
-    rollback_unless_managed = ignore
-    savepoint = ignore
-    savepoint_commit = complain
-    savepoint_rollback = ignore
-    close = ignore
-    cursor = complain
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -64,6 +76,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = BaseDatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
-        self.creation = BaseDatabaseCreation(self)
+        self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
+
+    def is_usable(self):
+        return True

@@ -56,7 +56,7 @@ Split ``CacheMiddleware``
    into and reading from the cache) separately, offering additional
    flexibility for situations where combining these functions into a
    single middleware posed problems. Full details, including updated
-   notes on appropriate use, are in 
+   notes on appropriate use, are in
    :doc:`the caching documentation </topics/cache>`.
 
 Removal of deprecated features

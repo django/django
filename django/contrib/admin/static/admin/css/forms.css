@@ -18,6 +18,10 @@ form .form-row p {
     font-size: 11px;
 }
 
+.hidden {
+    display: none;
+}
+
 /* FORM LABELS */
 
 form h4 {
@@ -65,6 +69,7 @@ form ul.inline li {
     padding: 3px 10px 0 0;
     float: left;
     width: 8em;
+    word-wrap: break-word;
 }
 
 .aligned ul label {
@@ -200,6 +205,14 @@ body.popup .submit-row {
 
 .vDateField, .vTimeField {
     margin-right: 2px;
+}
+
+.vDateField {
+    min-width: 6.85em;
+}
+
+.vTimeField {
+    min-width: 4.7em;
 }
 
 .vURLField {

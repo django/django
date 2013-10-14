@@ -30,6 +30,8 @@ exception or returns the clean value::
     ...
     ValidationError: [u'Enter a valid email address.']
 
+.. _core-field-arguments:
+
 Core field arguments
 --------------------
 
@@ -46,6 +48,7 @@ By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
 ``clean()`` will raise a ``ValidationError`` exception::
 
+    >>> from django import forms
     >>> f = forms.CharField()
     >>> f.clean('foo')
     u'foo'
@@ -105,6 +108,7 @@ behavior doesn't result in an adequate label.
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
     ...     url = forms.URLField(label='Your Web site', required=False)
@@ -112,7 +116,7 @@ We've specified ``auto_id=False`` to simplify the output::
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Your Web site:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``initial``
@@ -128,6 +132,7 @@ To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 The use-case for this is when you want to display an "empty" form in which a
 field is initialized to a particular value. For example::
 
+    >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
     ...     url = forms.URLField(initial='http://')
@@ -135,7 +140,7 @@ field is initialized to a particular value. For example::
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
-    <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 You may be thinking, why not just pass a dictionary of the initial values as
@@ -150,7 +155,7 @@ and the HTML output will include any validation errors::
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
-    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="url" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
 
 This is why ``initial`` values are only displayed for unbound forms. For bound
@@ -203,6 +208,7 @@ methods (e.g., ``as_ul()``).
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
+    >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
@@ -212,17 +218,17 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
-    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid email address, please.</td></tr>
+    <tr><th>Sender:</th><td><input type="email" name="sender" /><br />A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print(f.as_ul()))
     <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="text" name="sender" /> A valid email address, please.</li>
+    <li>Sender: <input type="email" name="sender" /> A valid email address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print(f.as_p())
     <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
-    <p>Sender: <input type="text" name="sender" /> A valid email address, please.</p>
+    <p>Sender: <input type="email" name="sender" /> A valid email address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 ``error_messages``
@@ -234,6 +240,7 @@ The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override. For example, here is the default error message::
 
+    >>> from django import forms
     >>> generic = forms.CharField()
     >>> generic.clean('')
     Traceback (most recent call last):
@@ -289,7 +296,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: BooleanField(**kwargs)
 
-    * Default widget: ``CheckboxInput``
+    * Default widget: :class:`CheckboxInput`
     * Empty value: ``False``
     * Normalizes to: A Python ``True`` or ``False`` value.
     * Validates that the value is ``True`` (e.g. the check box is checked) if
@@ -309,7 +316,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: CharField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates ``max_length`` or ``min_length``, if they are provided.
@@ -329,7 +336,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: ChoiceField(**kwargs)
 
-    * Default widget: ``Select``
+    * Default widget: :class:`Select`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value exists in the list of choices.
@@ -355,7 +362,7 @@ For each field, we describe the default widget used if you don't specify
     Just like a :class:`ChoiceField`, except :class:`TypedChoiceField` takes two
     extra arguments, ``coerce`` and ``empty_value``.
 
-    * Default widget: ``Select``
+    * Default widget: :class:`Select`
     * Empty value: Whatever you've given as ``empty_value``
     * Normalizes to: A value of the type provided by the ``coerce`` argument.
     * Validates that the given value exists in the list of choices and can be
@@ -382,7 +389,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: DateField(**kwargs)
 
-    * Default widget: ``DateInput``
+    * Default widget: :class:`DateInput`
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.date`` object.
     * Validates that the given value is either a ``datetime.date``,
@@ -398,21 +405,21 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d',       # '2006-10-25'
+        ['%Y-%m-%d',       # '2006-10-25'
         '%m/%d/%Y',       # '10/25/2006'
-        '%m/%d/%y',       # '10/25/06'
+        '%m/%d/%y']       # '10/25/06'
 
     Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
     following will also be included in the default input formats::
 
-        '%b %d %Y',       # 'Oct 25 2006'
+        ['%b %d %Y',      # 'Oct 25 2006'
         '%b %d, %Y',      # 'Oct 25, 2006'
         '%d %b %Y',       # '25 Oct 2006'
         '%d %b, %Y',      # '25 Oct, 2006'
         '%B %d %Y',       # 'October 25 2006'
         '%B %d, %Y',      # 'October 25, 2006'
         '%d %B %Y',       # '25 October 2006'
-        '%d %B, %Y',      # '25 October, 2006'
+        '%d %B, %Y']      # '25 October, 2006'
 
     See also :ref:`format localization <format-localization>`.
 
@@ -421,7 +428,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: DateTimeField(**kwargs)
 
-    * Default widget: ``DateTimeInput``
+    * Default widget: :class:`DateTimeInput`
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.datetime`` object.
     * Validates that the given value is either a ``datetime.datetime``,
@@ -437,7 +444,7 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+        ['%Y-%m-%d %H:%M:%S',    # '2006-10-25 14:30:59'
         '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
         '%Y-%m-%d',              # '2006-10-25'
         '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
@@ -445,7 +452,7 @@ For each field, we describe the default widget used if you don't specify
         '%m/%d/%Y',              # '10/25/2006'
         '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-        '%m/%d/%y',              # '10/25/06'
+        '%m/%d/%y']              # '10/25/06'
 
     See also :ref:`format localization <format-localization>`.
 
@@ -454,7 +461,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: DecimalField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python ``decimal``.
     * Validates that the given value is a decimal. Leading and trailing
@@ -465,6 +473,11 @@ For each field, we describe the default widget used if you don't specify
 
     The ``max_value`` and ``min_value`` error messages may contain
     ``%(limit_value)s``, which will be substituted by the appropriate limit.
+
+    .. versionchanged:: 1.6
+
+        Similarly, the ``max_digits``, ``max_decimal_places`` and
+        ``max_whole_digits`` error messages may contain ``%(max)s``.
 
     Takes four optional arguments:
 
@@ -489,7 +502,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: EmailField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`EmailInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid email address, using a
@@ -505,7 +518,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: FileField(**kwargs)
 
-    * Default widget: ``ClearableFileInput``
+    * Default widget: :class:`ClearableFileInput`
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
@@ -533,7 +546,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: FilePathField(**kwargs)
 
-    * Default widget: ``Select``
+    * Default widget: :class:`Select`
     * Empty value: ``None``
     * Normalizes to: A unicode object
     * Validates that the selected choice exists in the list of choices.
@@ -560,15 +573,11 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: allow_files
 
-        .. versionadded:: 1.5
-
         Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
         whether files in the specified location should be included.  Either this or
         :attr:`allow_folders` must be ``True``.
 
     .. attribute:: allow_folders
-
-        .. versionadded:: 1.5
 
         Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
         whether folders in the specified location should be included.  Either this or
@@ -580,7 +589,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: FloatField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python float.
     * Validates that the given value is an float. Leading and trailing
@@ -596,24 +606,26 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: ImageField(**kwargs)
 
-    * Default widget: ``ClearableFileInput``
+    * Default widget: :class:`ClearableFileInput`
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that file data has been bound to the form, and that the
-      file is of an image format understood by PIL.
+      file is of an image format understood by Pillow/PIL.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``invalid_image``
 
-    Using an ``ImageField`` requires that the `Python Imaging Library`_ (PIL)
-    is installed and supports the image formats you use. If you encounter a
-    ``corrupt image`` error when you upload an image, it usually means PIL
+    Using an ``ImageField`` requires that either `Pillow`_ (recommended) or the
+    `Python Imaging Library`_ (PIL) are installed and supports the image
+    formats you use. If you encounter a ``corrupt image`` error when you
+    upload an image, it usually means either Pillow or PIL
     doesn't understand its format. To fix this, install the appropriate
-    library and reinstall PIL.
+    library and reinstall Pillow or PIL.
 
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+.. _Pillow: http://python-imaging.github.io/Pillow/
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
@@ -621,7 +633,8 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: IntegerField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`NumberInput` when :attr:`Field.localize` is
+      ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing
@@ -644,7 +657,11 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: IPAddressField(**kwargs)
 
-    * Default widget: ``TextInput``
+    .. deprecated:: 1.7
+        This field has been deprecated in favour of
+        :class:`~django.forms.GenericIPAddressField`.
+
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid IPv4 address, using a regular
@@ -654,13 +671,11 @@ For each field, we describe the default widget used if you don't specify
 ``GenericIPAddressField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.4
-
 .. class:: GenericIPAddressField(**kwargs)
 
     A field containing either an IPv4 or an IPv6 address.
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object. IPv6 addresses are
       normalized as described below.
@@ -693,7 +708,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: MultipleChoiceField(**kwargs)
 
-    * Default widget: ``SelectMultiple``
+    * Default widget: :class:`SelectMultiple`
     * Empty value: ``[]`` (an empty list)
     * Normalizes to: A list of Unicode objects.
     * Validates that every value in the given list of values exists in the list
@@ -713,7 +728,7 @@ For each field, we describe the default widget used if you don't specify
     Just like a :class:`MultipleChoiceField`, except :class:`TypedMultipleChoiceField`
     takes two extra arguments, ``coerce`` and ``empty_value``.
 
-    * Default widget: ``SelectMultiple``
+    * Default widget: :class:`SelectMultiple`
     * Empty value: Whatever you've given as ``empty_value``
     * Normalizes to: A list of values of the type provided by the ``coerce``
       argument.
@@ -731,7 +746,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: NullBooleanField(**kwargs)
 
-    * Default widget: ``NullBooleanSelect``
+    * Default widget: :class:`NullBooleanSelect`
     * Empty value: ``None``
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
@@ -741,7 +756,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: RegexField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value matches against a certain regular
@@ -768,7 +783,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: SlugField(**kwargs)
 
-   * Default widget: ``TextInput``
+   * Default widget: :class:`TextInput`
    * Empty value: ``''`` (an empty string)
    * Normalizes to: A Unicode object.
    * Validates that the given value contains only letters, numbers,
@@ -783,7 +798,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: TimeField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.time`` object.
     * Validates that the given value is either a ``datetime.time`` or string
@@ -807,7 +822,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: URLField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`URLInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid URL.
@@ -829,7 +844,7 @@ Slightly complex built-in ``Field`` classes
 
 .. class:: ComboField(**kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value against each of the fields specified
@@ -843,6 +858,7 @@ Slightly complex built-in ``Field`` classes
         The list of fields that should be used to validate the field's value (in
         the order in which they are provided).
 
+            >>> from django.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
             >>> f.clean('test@example.com')
             u'test@example.com'
@@ -856,12 +872,12 @@ Slightly complex built-in ``Field`` classes
 
 .. class:: MultiValueField(fields=(), **kwargs)
 
-    * Default widget: ``TextInput``
+    * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: the type returned by the ``compress`` method of the subclass.
     * Validates that the given value against each of the fields specified
       as an argument to the ``MultiValueField``.
-    * Error message keys: ``required``, ``invalid``
+    * Error message keys: ``required``, ``invalid``, ``incomplete``
 
     Aggregates the logic of multiple fields that together produce a single
     value.
@@ -882,10 +898,49 @@ Slightly complex built-in ``Field`` classes
         Once all fields are cleaned, the list of clean values is combined into
         a single value by :meth:`~MultiValueField.compress`.
 
+    Also takes one extra optional argument:
+
+    .. attribute:: require_all_fields
+
+        .. versionadded:: 1.7
+
+        Defaults to ``True``, in which case a ``required`` validation error
+        will be raised if no value is supplied for any field.
+
+        When set to ``False``, the :attr:`Field.required` attribute can be set
+        to ``False`` for individual fields to make them optional. If no value
+        is supplied for a required field, an ``incomplete`` validation error
+        will be raised.
+
+        A default ``incomplete`` error message can be defined on the
+        :class:`MultiValueField` subclass, or different messages can be defined
+        on each individual field. For example::
+
+            from django.core.validators import RegexValidator
+
+            class PhoneField(MultiValueField):
+                def __init__(self, *args, **kwargs):
+                    # Define one message for all fields.
+                    error_messages = {
+                        'incomplete': 'Enter a country code and phone number.',
+                    }
+                    # Or define a different message for each field.
+                    fields = (
+                        CharField(error_messages={'incomplete': 'Enter a country code.'},
+                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid country code.')]),
+                        CharField(error_messages={'incomplete': 'Enter a phone number.'},
+                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid phone number.')]),
+                        CharField(validators=[RegexValidator(r'^\d+$', 'Enter a valid extension.')],
+                                  required=False),
+                    )
+                    super(PhoneField, self).__init__(
+                        self, error_messages=error_messages, fields=fields,
+                        require_all_fields=False, *args, **kwargs)
+
     .. attribute:: MultiValueField.widget
 
         Must be a subclass of :class:`django.forms.MultiWidget`.
-        Default value is :class:`~django.forms.widgets.TextInput`, which
+        Default value is :class:`~django.forms.TextInput`, which
         probably is not very useful in this case.
 
     .. method:: compress(data_list)
@@ -902,7 +957,7 @@ Slightly complex built-in ``Field`` classes
 
 .. class:: SplitDateTimeField(**kwargs)
 
-    * Default widget: ``SplitDateTimeWidget``
+    * Default widget: :class:`SplitDateTimeWidget`
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.datetime`` object.
     * Validates that the given value is a ``datetime.datetime`` or string
@@ -945,7 +1000,7 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 
 .. class:: ModelChoiceField(**kwargs)
 
-    * Default widget: ``Select``
+    * Default widget: :class:`Select`
     * Empty value: ``None``
     * Normalizes to: A model instance.
     * Validates that the given id exists in the queryset.
@@ -984,12 +1039,14 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
         initial value, no empty choice is created (regardless of the value
         of ``empty_label``).
 
-    The ``__unicode__`` method of the model will be called to generate
-    string representations of the objects for use in the field's choices;
-    to provide customized representations, subclass ``ModelChoiceField``
-    and override ``label_from_instance``. This method will receive a model
-    object, and should return a string suitable for representing it. For
-    example::
+    The ``__unicode__`` (``__str__`` on Python 3) method of the model will be
+    called to generate string representations of the objects for use in the
+    field's choices; to provide customized representations, subclass
+    ``ModelChoiceField`` and override ``label_from_instance``. This method will
+    receive a model object, and should return a string suitable for representing
+    it. For example::
+
+        from django.forms import ModelChoiceField
 
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):
@@ -1000,7 +1057,7 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 
 .. class:: ModelMultipleChoiceField(**kwargs)
 
-    * Default widget: ``SelectMultiple``
+    * Default widget: :class:`SelectMultiple`
     * Empty value: An empty ``QuerySet`` (self.queryset.none())
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
@@ -1008,9 +1065,11 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     * Error message keys: ``required``, ``list``, ``invalid_choice``,
       ``invalid_pk_value``
 
-    .. versionchanged:: 1.5
-        The empty and normalized values were changed to be consistently
-        ``QuerySets`` instead of ``[]`` and ``QuerySet`` respectively.
+    .. versionchanged:: 1.6
+
+        The ``invalid_choice`` message may contain ``%(value)s`` and the
+        ``invalid_pk_value`` message may contain ``%(pk)s``, which will be
+        substituted by the appropriate values.
 
     Allows the selection of one or more model objects, suitable for
     representing a many-to-many relation. As with :class:`ModelChoiceField`,

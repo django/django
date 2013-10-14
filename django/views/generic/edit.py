@@ -1,6 +1,9 @@
+import warnings
+
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
+from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
@@ -14,12 +17,19 @@ class FormMixin(ContextMixin):
     initial = {}
     form_class = None
     success_url = None
+    prefix = None
 
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
         return self.initial.copy()
+
+    def get_prefix(self):
+        """
+        Returns the prefix to use for forms on this view
+        """
+        return self.prefix
 
     def get_form_class(self):
         """
@@ -37,7 +47,11 @@ class FormMixin(ContextMixin):
         """
         Returns the keyword arguments for instantiating the form.
         """
-        kwargs = {'initial': self.get_initial()}
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
@@ -50,7 +64,8 @@ class FormMixin(ContextMixin):
         Returns the supplied success URL.
         """
         if self.success_url:
-            url = self.success_url
+            # Forcing possible reverse_lazy evaluation
+            url = force_text(self.success_url)
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
@@ -74,6 +89,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
     """
     A mixin that provides a way to show and handle a modelform in a request.
     """
+    fields = None
 
     def get_form_class(self):
         """
@@ -93,7 +109,13 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 # Try to get a queryset and extract the model class
                 # from that
                 model = self.get_queryset().model
-            return model_forms.modelform_factory(model)
+
+            if self.fields is None:
+                warnings.warn("Using ModelFormMixin (base class of %s) without "
+                              "the 'fields' attribute is deprecated." % self.__class__.__name__,
+                              DeprecationWarning)
+
+            return model_forms.modelform_factory(model, fields=self.fields)
 
     def get_form_kwargs(self):
         """
@@ -124,20 +146,6 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         """
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        """
-        If an object has been supplied, inject it into the context with the
-        supplied context_object_name name.
-        """
-        context = {}
-        if self.object:
-            context['object'] = self.object
-            context_object_name = self.get_context_object_name(self.object)
-            if context_object_name:
-                context[context_object_name] = self.object
-        context.update(kwargs)
-        return super(ModelFormMixin, self).get_context_data(**context)
 
 
 class ProcessFormView(View):
@@ -240,16 +248,17 @@ class DeletionMixin(object):
         redirects to the success URL.
         """
         self.object = self.get_object()
+        success_url = self.get_success_url()
         self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(success_url)
 
     # Add support for browsers which only accept GET and POST for now.
-    def post(self, *args, **kwargs):
-        return self.delete(*args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
 
     def get_success_url(self):
         if self.success_url:
-            return self.success_url
+            return self.success_url % self.object.__dict__
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")

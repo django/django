@@ -10,6 +10,13 @@ First steps
 
 Start with these easy tasks to discover Django's development process.
 
+* **Sign the Contributor License Agreement**
+
+  The code that you write belongs to you or your employer. If your
+  contribution is more than one or two lines of code, you need to sign the
+  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
+  explanation.
+
 * **Triage tickets**
 
   If an `unreviewed ticket`_ reports a bug, try and reproduce it. If you
@@ -51,6 +58,8 @@ Start with these easy tasks to discover Django's development process.
 
       .. _reports page: https://code.djangoproject.com/wiki/Reports
 
+.. _CLA: https://www.djangoproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
 .. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
 
 
@@ -130,7 +139,7 @@ FAQ
 
    First off, it's not personal. Django is entirely developed by volunteers
    (even the core developers), and sometimes folks just don't have time. The
-   best thing to do is to send a gentle reminder to the django-developers
+   best thing to do is to send a gentle reminder to the |django-developers|
    mailing list asking for review on the ticket, or to bring it up in the
    #django-dev IRC channel.
 
@@ -140,12 +149,3 @@ FAQ
    Short answer: No. It's always better to get another set of eyes on a
    ticket. If you're having trouble getting that second set of eyes, see
    question 1, above.
-
-3. **My ticket has been in DDN forever! What should I do?**
-
-   Design Decision Needed requires consensus about the right solution.  At the
-   very least it needs consensus among the core developers, and ideally it has
-   consensus from the community as well. The best way to accomplish this is to
-   start a thread on the django-developers mailing list, and for very complex
-   issues to start a wiki page summarizing the problem and the possible
-   solutions.

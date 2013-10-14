@@ -2,20 +2,21 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.admin.util import (lookup_field, display_for_field,
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.utils import (lookup_field, display_for_field,
     display_for_value, label_for_field)
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.utils import formats
-from django.utils.html import format_html
+from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
-from django.utils import six
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text
 from django.template import Library
 from django.template.loader import get_template
 from django.template.context import Context
@@ -63,7 +64,7 @@ def pagination(cl):
             # ON_EACH_SIDE links at either end of the "current page" link.
             page_range = []
             if page_num > (ON_EACH_SIDE + ON_ENDS):
-                page_range.extend(range(0, ON_EACH_SIDE - 1))
+                page_range.extend(range(0, ON_ENDS))
                 page_range.append(DOT)
                 page_range.extend(range(page_num - ON_EACH_SIDE, page_num + 1))
             else:
@@ -112,12 +113,13 @@ def result_headers(cl):
                 # Not sortable
                 yield {
                     "text": text,
+                    "class_attrib": format_html(' class="column-{0}"', field_name),
                     "sortable": False,
                 }
                 continue
 
         # OK, it is sortable if we got this far
-        th_classes = ['sortable']
+        th_classes = ['sortable', 'column-{0}'.format(field_name)]
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0
@@ -176,10 +178,18 @@ def items_for_result(cl, result, form):
     """
     Generates the actual list of data.
     """
+
+    def link_in_col(is_first, field_name, cl):
+        if cl.list_display_links is None:
+            return False
+        if is_first and not cl.list_display_links:
+            return True
+        return field_name in cl.list_display_links
+
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
-        row_class = ''
+        row_classes = ['field-%s' % field_name]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -187,7 +197,7 @@ def items_for_result(cl, result, form):
         else:
             if f is None:
                 if field_name == 'action_checkbox':
-                    row_class = mark_safe(' class="action-checkbox"')
+                    row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 if boolean:
@@ -198,7 +208,7 @@ def items_for_result(cl, result, form):
                 if allow_tags:
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
@@ -209,29 +219,42 @@ def items_for_result(cl, result, form):
                 else:
                     result_repr = display_for_field(value, f)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
-                    row_class = mark_safe(' class="nowrap"')
+                    row_classes.append('nowrap')
         if force_text(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
+        row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.list_display_links) or field_name in cl.list_display_links:
-            table_tag = {True:'th', False:'td'}[first]
+        if link_in_col(first, field_name, cl):
+            table_tag = 'th' if first else 'td'
             first = False
-            url = cl.url_for_result(result)
-            # Convert the pk to something that can be used in Javascript.
-            # Problem cases are long ints (23L) and non-ASCII strings.
-            if cl.to_field:
-                attr = str(cl.to_field)
+
+            # Display link to the result's change_view if the url exists, else
+            # display just the result's representation.
+            try:
+                url = cl.url_for_result(result)
+            except NoReverseMatch:
+                link_or_text = result_repr
             else:
-                attr = pk
-            value = result.serializable_value(attr)
-            result_id = repr(force_text(value))[1:]
-            yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
+                url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
+                # Convert the pk to something that can be used in Javascript.
+                # Problem cases are long ints (23L) and non-ASCII strings.
+                if cl.to_field:
+                    attr = str(cl.to_field)
+                else:
+                    attr = pk
+                value = result.serializable_value(attr)
+                result_id = escapejs(value)
+                link_or_text = format_html(
+                    '<a href="{0}"{1}>{2}</a>',
+                    url,
+                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id)
+                        if cl.is_popup else '',
+                    result_repr)
+
+            yield format_html('<{0}{1}>{2}</{3}>',
                               table_tag,
                               row_class,
-                              url,
-                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, {0}); return false;"', result_id)
-                                if cl.is_popup else '',
-                              result_repr,
+                              link_or_text,
                               table_tag)
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull
@@ -292,6 +315,8 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
+        field = cl.opts.get_field_by_name(field_name)[0]
+        dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -304,8 +329,8 @@ def date_hierarchy(cl):
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
-            date_range = cl.query_set.aggregate(first=models.Min(field_name),
-                                                last=models.Max(field_name))
+            date_range = cl.queryset.aggregate(first=models.Min(field_name),
+                                               last=models.Max(field_name))
             if date_range['first'] and date_range['last']:
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
@@ -323,7 +348,8 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.query_set.filter(**{year_field: year_lookup, month_field: month_lookup}).dates(field_name, 'day')
+            days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
+            days = getattr(days, dates_or_datetimes)(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -336,11 +362,12 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.query_set.filter(**{year_field: year_lookup}).dates(field_name, 'month')
+            months = cl.queryset.filter(**{year_field: year_lookup})
+            months = getattr(months, dates_or_datetimes)(field_name, 'month')
             return {
-                'show' : True,
+                'show': True,
                 'back': {
-                    'link' : link({}),
+                    'link': link({}),
                     'title': _('All dates')
                 },
                 'choices': [{
@@ -349,7 +376,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = cl.query_set.dates(field_name, 'year')
+            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{

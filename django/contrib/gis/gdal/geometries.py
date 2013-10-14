@@ -76,7 +76,7 @@ class OGRGeometry(GDALBase):
 
         str_instance = isinstance(geom_input, six.string_types)
 
-        # If HEX, unpack input to to a binary buffer.
+        # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
             geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
@@ -101,7 +101,7 @@ class OGRGeometry(GDALBase):
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
-                ogr_t = OGRGeomType(geom_input)
+                OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, memoryview):
             # WKB was passed in
@@ -151,7 +151,7 @@ class OGRGeometry(GDALBase):
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return OGRGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
+        return OGRGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
                 x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
 
     ### Geometry set-like operations ###
@@ -198,14 +198,6 @@ class OGRGeometry(GDALBase):
 
     def _get_coord_dim(self):
         "Returns the coordinate dimension of the Geometry."
-        if isinstance(self, GeometryCollection) and GDAL_VERSION < (1, 5, 2):
-            # On GDAL versions prior to 1.5.2, there exists a bug in which
-            # the coordinate dimension of geometry collections is always 2:
-            #   http://trac.osgeo.org/gdal/ticket/2334
-            # Here we workaround by returning the coordinate dimension of the
-            # first geometry in the collection instead.
-            if len(self):
-                return capi.get_coord_dim(capi.get_geom_ref(self.ptr, 0))
         return capi.get_coord_dim(self.ptr)
 
     def _set_coord_dim(self, dim):
@@ -349,7 +341,7 @@ class OGRGeometry(GDALBase):
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
-        wkb = capi.to_wkb(self.ptr, byteorder, byref(buf))
+        capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
         return memoryview(string_at(buf, sz))
 
@@ -583,7 +575,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple([self[i] for i in xrange(len(self))])
+        return tuple(self[i] for i in xrange(len(self)))
     coords = tuple
 
     def _listarr(self, func):
@@ -640,14 +632,14 @@ class Polygon(OGRGeometry):
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
     @property
     def point_count(self):
         "The number of Points in this Polygon."
         # Summing up the number of points in each ring of the Polygon.
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def centroid(self):
@@ -694,12 +686,12 @@ class GeometryCollection(OGRGeometry):
     def point_count(self):
         "The number of Points in this Geometry Collection."
         # Summing up the number of points in each geometry in this collection
-        return sum([self[i].point_count for i in xrange(self.geom_count)])
+        return sum(self[i].point_count for i in xrange(self.geom_count))
 
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+        return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
 # Multiple Geometry types.

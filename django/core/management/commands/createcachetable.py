@@ -24,7 +24,7 @@ class Command(LabelCommand):
     def handle_label(self, tablename, **options):
         db = options.get('database')
         cache = BaseDatabaseCache(tablename, {})
-        if not router.allow_syncdb(db, cache.cache_model_class):
+        if not router.allow_migrate(db, cache.cache_model_class):
             return
         connection = connections[db]
         fields = (
@@ -38,29 +38,28 @@ class Command(LabelCommand):
         qn = connection.ops.quote_name
         for f in fields:
             field_output = [qn(f.name), f.db_type(connection=connection)]
-            field_output.append("%sNULL" % (not f.null and "NOT " or ""))
+            field_output.append("%sNULL" % ("NOT " if not f.null else ""))
             if f.primary_key:
                 field_output.append("PRIMARY KEY")
             elif f.unique:
                 field_output.append("UNIQUE")
             if f.db_index:
-                unique = f.unique and "UNIQUE " or ""
+                unique = "UNIQUE " if f.unique else ""
                 index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
                     (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
                     qn(f.name)))
             table_output.append(" ".join(field_output))
         full_statement = ["CREATE TABLE %s (" % qn(tablename)]
         for i, line in enumerate(table_output):
-            full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
+            full_statement.append('    %s%s' % (line, ',' if i < len(table_output)-1 else ''))
         full_statement.append(');')
-        curs = connection.cursor()
-        try:
-            curs.execute("\n".join(full_statement))
-        except DatabaseError as e:
-            transaction.rollback_unless_managed(using=db)
-            raise CommandError(
-                "Cache table '%s' could not be created.\nThe error was: %s." %
-                    (tablename, force_text(e)))
-        for statement in index_output:
-            curs.execute(statement)
-        transaction.commit_unless_managed(using=db)
+        with transaction.commit_on_success_unless_managed():
+            curs = connection.cursor()
+            try:
+                curs.execute("\n".join(full_statement))
+            except DatabaseError as e:
+                raise CommandError(
+                    "Cache table '%s' could not be created.\nThe error was: %s." %
+                        (tablename, force_text(e)))
+            for statement in index_output:
+                curs.execute(statement)

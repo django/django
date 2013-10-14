@@ -10,12 +10,13 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
 .. code-block:: python
 
-    from django.db import models, transaction, IntegrityError
+    from django.db import models
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s the place" % self.name
 
@@ -24,6 +25,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
         serves_hot_dogs = models.BooleanField()
         serves_pizza = models.BooleanField()
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s the restaurant" % self.place.name
 
@@ -31,6 +33,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
         restaurant = models.ForeignKey(Restaurant)
         name = models.CharField(max_length=50)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s the waiter at %s" % (self.name, self.restaurant)
 

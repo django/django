@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.admin.util import (flatten_fieldsets, lookup_field,
+from django.contrib.admin.utils import (flatten_fieldsets, lookup_field,
     display_for_field, label_for_field, help_text_for_field)
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
@@ -45,20 +45,6 @@ class AdminForm(object):
                 model_admin=self.model_admin,
                 **options
             )
-
-    def first_field(self):
-        try:
-            fieldset_name, fieldset_options = self.fieldsets[0]
-            field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, six.string_types):
-                field_name = field_name[0]
-            return self.form[field_name]
-        except (KeyError, IndexError):
-            pass
-        try:
-            return next(iter(self.form))
-        except StopIteration:
-            return None
 
     def _media(self):
         media = self.form.media
@@ -98,6 +84,9 @@ class Fieldline(object):
             self.fields = [field]
         else:
             self.fields = field
+        self.has_visible_field = not all(field in self.form.fields and
+                                         self.form.fields[field].widget.is_hidden
+                                         for field in self.fields)
         self.model_admin = model_admin
         if readonly_fields is None:
             readonly_fields = ()
@@ -112,7 +101,7 @@ class Fieldline(object):
                 yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return mark_safe('\n'.join([self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields]).strip('\n'))
+        return mark_safe('\n'.join(self.form[f].errors.as_ul() for f in self.fields if f not in self.readonly_fields).strip('\n'))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):
@@ -125,14 +114,16 @@ class AdminField(object):
         contents = conditional_escape(force_text(self.field.label))
         if self.is_checkbox:
             classes.append('vCheckboxLabel')
-        else:
-            contents += ':'
+
         if self.field.field.required:
             classes.append('required')
         if not self.is_first:
             classes.append('inline')
-        attrs = classes and {'class': ' '.join(classes)} or {}
-        return self.field.label_tag(contents=mark_safe(contents), attrs=attrs)
+        attrs = {'class': ' '.join(classes)} if classes else {}
+        # checkboxes should not have a label suffix as the checkbox appears
+        # to the left of the label.
+        return self.field.label_tag(contents=mark_safe(contents), attrs=attrs,
+                                    label_suffix='' if self.is_checkbox else None)
 
     def errors(self):
         return mark_safe(self.field.errors.as_ul())
@@ -144,7 +135,7 @@ class AdminReadonlyField(object):
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
         if callable(field):
-            class_name = field.__name__ != '<lambda>' and field.__name__ or ''
+            class_name = field.__name__ if field.__name__ != '<lambda>' else ''
         else:
             class_name = field
         self.field = {
@@ -186,9 +177,7 @@ class AdminReadonlyField(object):
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:
-                if value is None:
-                    result_repr = EMPTY_CHANGELIST_VALUE
-                elif isinstance(f.rel, ManyToManyRel):
+                if isinstance(f.rel, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
@@ -226,19 +215,20 @@ class InlineAdminFormSet(object):
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
-        for i, field in enumerate(flatten_fieldsets(self.fieldsets)):
-            if fk and fk.name == field:
+        for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
+            if fk and fk.name == field_name:
                 continue
-            if field in self.readonly_fields:
+            if field_name in self.readonly_fields:
                 yield {
-                    'label': label_for_field(field, self.opts.model, self.opts),
+                    'label': label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {
                         'is_hidden': False
                     },
-                    'required': False
+                    'required': False,
+                    'help_text': help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                yield self.formset.form.base_fields[field]
+                yield self.formset.form.base_fields[field_name]
 
     def _media(self):
         media = self.opts.media + self.formset.media
@@ -267,10 +257,12 @@ class InlineAdminForm(AdminForm):
             yield InlineFieldset(self.formset, self.form, name,
                 self.readonly_fields, model_admin=self.model_admin, **options)
 
-    def has_auto_field(self):
-        if self.form._meta.model._meta.has_auto_field:
+    def needs_explicit_pk_field(self):
+        # Auto fields are editable (oddly), so need to check for auto or non-editable pk
+        if self.form._meta.model._meta.has_auto_field or not self.form._meta.model._meta.pk.editable:
             return True
-        # Also search any parents for an auto field.
+        # Also search any parents for an auto field. (The pk info is propagated to child
+        # models so that does not need to be checked in parents.)
         for parent in self.form._meta.model._meta.get_parent_list():
             if parent._meta.has_auto_field:
                 return True
@@ -319,7 +311,7 @@ class InlineFieldset(Fieldset):
             yield Fieldline(self.form, field, self.readonly_fields,
                 model_admin=self.model_admin)
 
-class AdminErrorList(forms.util.ErrorList):
+class AdminErrorList(forms.utils.ErrorList):
     """
     Stores all errors for the form/formsets in an add/change stage view.
     """

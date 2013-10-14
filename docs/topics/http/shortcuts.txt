@@ -15,13 +15,13 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app])
+.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app][, dirs])
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
 
    :func:`render()` is the same as a call to
-   :func:`render_to_response()` with a `context_instance` argument that
+   :func:`render_to_response()` with a ``context_instance`` argument that
    forces the use of a :class:`~django.template.RequestContext`.
 
 Required arguments
@@ -58,6 +58,13 @@ Optional arguments
     :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
     for more information.
 
+``dirs``
+    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
+
+.. versionchanged:: 1.7
+
+   The ``dirs`` parameter was added.
+
 Example
 -------
 
@@ -83,11 +90,19 @@ This example is equivalent to::
         return HttpResponse(t.render(c),
             content_type="application/xhtml+xml")
 
+If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
+``dirs`` parameter::
+
+    from django.shortcuts import render
+
+    def my_view(request):
+        # View code here...
+        return render(request, 'index.html', dirs=('custom_templates',))
 
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name[, dictionary][, context_instance][, mimetype])
+.. function:: render_to_response(template_name[, dictionary][, context_instance][, content_type][, dirs])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -121,9 +136,16 @@ Optional arguments
                                   my_data_dictionary,
                                   context_instance=RequestContext(request))
 
-``mimetype``
+``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
     the :setting:`DEFAULT_CONTENT_TYPE` setting.
+
+``dirs``
+    A tuple or list of values to override the :setting:`TEMPLATE_DIRS` setting.
+
+.. versionchanged:: 1.7
+
+   The ``dirs`` parameter was added.
 
 Example
 -------
@@ -148,7 +170,16 @@ This example is equivalent to::
         t = loader.get_template('myapp/template.html')
         c = Context({'foo': 'bar'})
         return HttpResponse(t.render(c),
-            mimetype="application/xhtml+xml")
+            content_type="application/xhtml+xml")
+
+If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
+``dirs`` parameter::
+
+    from django.shortcuts import render_to_response
+
+    def my_view(request):
+        # View code here...
+        return render_to_response('index.html', dirs=('custom_templates',))
 
 ``redirect``
 ============
@@ -160,10 +191,12 @@ This example is equivalent to::
 
    The arguments could be:
 
-   * A model: the model's `get_absolute_url()` function will be called.
+   * A model: the model's `:meth:`~django.db.models.Model.get_absolute_url()`
+     function will be called.
 
-   * A view name, possibly with arguments: `urlresolvers.reverse()` will
-     be used to reverse-resolve the name.
+   * A view name, possibly with arguments: :func:`urlresolvers.reverse
+     <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
+     name.
 
    * A URL, which will be used as-is for the redirect location.
 
@@ -267,8 +300,8 @@ will be raised if more than one object is found.
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
-   given model manager, raising :class:`~django.http.Http404` if the resulting
-   list is empty.
+   given model manager cast to a list, raising :class:`~django.http.Http404` if
+   the resulting list is empty.
 
 Required arguments
 ------------------

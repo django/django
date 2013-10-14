@@ -12,18 +12,21 @@ Introductions to all the key parts of Django you'll need to know:
    forms/index
    templates
    class-based-views/index
+   migrations
    files
-   testing
-   auth
+   testing/index
+   auth/index
    cache
    conditional-view-processing
    signing
    email
    i18n/index
+   localflavor
    logging
    pagination
    python3
    security
+   performance
    serialization
    settings
    signals

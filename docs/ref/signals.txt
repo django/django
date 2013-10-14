@@ -12,7 +12,7 @@ A list of all the signals that Django sends.
     The :doc:`comment framework </ref/contrib/comments/index>` sends a :doc:`set
     of comment-related signals </ref/contrib/comments/signals>`.
 
-    The :doc:`authentication framework </topics/auth>` sends :ref:`signals when
+    The :doc:`authentication framework </topics/auth/index>` sends :ref:`signals when
     a user is logged in / out <topics-auth-signals>`.
 
 Model signals
@@ -27,9 +27,8 @@ module system.
 .. warning::
 
     Many of these signals are sent by various model methods like
-    :meth:`~django.db.models.Model.__init__` or
-    :meth:`~django.db.models.Model.save` that you can overwrite in your own
-    code.
+    ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
+    override in your own code.
 
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
@@ -47,7 +46,7 @@ pre_init
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
 Whenever you instantiate a Django model, this signal is sent at the beginning
-of the model's :meth:`~django.db.models.Model.__init__` method.
+of the model's ``__init__()`` method.
 
 Arguments sent with this signal:
 
@@ -55,12 +54,10 @@ Arguments sent with this signal:
     The model class that just had an instance created.
 
 ``args``
-    A list of positional arguments passed to
-    :meth:`~django.db.models.Model.__init__`:
+    A list of positional arguments passed to ``__init__()``:
 
 ``kwargs``
-    A dictionary of keyword arguments passed to
-    :meth:`~django.db.models.Model.__init__`:.
+    A dictionary of keyword arguments passed to ``__init__()``:
 
 For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
@@ -74,7 +71,7 @@ Argument    Value
 ``sender``  ``Poll`` (the class itself)
 
 ``args``    ``[]`` (an empty list because there were no positional
-            arguments passed to ``__init__``.)
+            arguments passed to ``__init__()``.)
 
 ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
 ==========  ===============================================================
@@ -85,7 +82,7 @@ post_init
 .. data:: django.db.models.signals.post_init
    :module:
 
-Like pre_init, but this one is sent when the :meth:`~django.db.models.Model.__init__`: method finishes.
+Like pre_init, but this one is sent when the ``__init__()`` method finishes.
 
 Arguments sent with this signal:
 
@@ -121,8 +118,6 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-.. versionadded:: 1.5
-
 ``update_fields``
     The set of fields to update explicitly specified in the ``save()`` method.
     ``None`` if this argument was not used in the ``save()`` call.
@@ -155,8 +150,6 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
-
-.. versionadded:: 1.5
 
 ``update_fields``
     The set of fields to update explicitly specified in the ``save()`` method.
@@ -212,24 +205,24 @@ m2m_changed
 .. data:: django.db.models.signals.m2m_changed
    :module:
 
-Sent when a :class:`ManyToManyField` is changed on a model instance.
-Strictly speaking, this is not a model signal since it is sent by the
-:class:`ManyToManyField`, but since it complements the
+Sent when a :class:`~django.db.models.ManyToManyField` is changed on a model
+instance. Strictly speaking, this is not a model signal since it is sent by the
+:class:`~django.db.models.ManyToManyField`, but since it complements the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
 Arguments sent with this signal:
 
 ``sender``
-    The intermediate model class describing the :class:`ManyToManyField`.
-    This class is automatically created when a many-to-many field is
-    defined; you can access it using the ``through`` attribute on the
-    many-to-many field.
+    The intermediate model class describing the
+    :class:`~django.db.models.ManyToManyField`. This class is automatically
+    created when a many-to-many field is defined; you can access it using the
+    ``through`` attribute on the many-to-many field.
 
 ``instance``
     The instance whose many-to-many relation is updated. This can be an
-    instance of the ``sender``, or of the class the :class:`ManyToManyField`
-    is related to.
+    instance of the ``sender``, or of the class the
+    :class:`~django.db.models.ManyToManyField` is related to.
 
 ``action``
     A string indicating the type of update that is done on the relation.
@@ -258,7 +251,7 @@ Arguments sent with this signal:
 
 ``pk_set``
     For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-    actions, this is a list of primary key values that have been added to
+    actions, this is a set of primary key values that have been added to
     or removed from the relation.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
@@ -287,11 +280,11 @@ If we connected a handler like this::
 
 and then did something like this::
 
-    >>> p = Pizza.object.create(...)
+    >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
-the arguments sent to a :data:`m2m_changed` handler (``topppings_changed`` in
+the arguments sent to a :data:`m2m_changed` handler (``toppings_changed`` in
 the example above) would be:
 
 ==============  ============================================================
@@ -303,13 +296,14 @@ Argument        Value
 
 ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
-``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the forward relation)
+``reverse``     ``False`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the forward relation)
 
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
 
-``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``set([t.id])`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
@@ -329,13 +323,14 @@ Argument        Value
 
 ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
-``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
-                so this call modifies the reverse relation)
+``reverse``     ``True`` (``Pizza`` contains the
+                :class:`~django.db.models.ManyToManyField`, so this call
+                modifies the reverse relation)
 
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)
 
-``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+``pk_set``      ``set([p.id])`` (since only ``Pizza p`` was removed from the
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
@@ -361,42 +356,36 @@ Management signals
 
 Signals sent by :doc:`django-admin </ref/django-admin>`.
 
-post_syncdb
+pre_migrate
 -----------
 
-.. data:: django.db.models.signals.post_syncdb
+.. data:: django.db.models.signals.pre_migrate
    :module:
 
-Sent by the :djadmin:`syncdb` command after it installs an application, and the
-:djadmin:`flush` command.
+Sent by the :djadmin:`migrate` command before it starts to install an
+application.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
 handlers are registered anywhere else they may not be loaded by
-:djadmin:`syncdb`. It is important that handlers of this signal perform
-idempotent changes (e.g. no database alterations) as this may cause the
-:djadmin:`flush` management command to fail if it also ran during the
-:djadmin:`syncdb` command.
+:djadmin:`migrate`.
 
 Arguments sent with this signal:
 
 ``sender``
-    The ``models`` module that was just installed. That is, if
-    :djadmin:`syncdb` just installed an app called ``"foo.bar.myapp"``,
-    ``sender`` will be the ``foo.bar.myapp.models`` module.
+    The ``models`` module of the app about to be migrated/synced.
+    For example, if :djadmin:`migrate` is about to install
+    an app called ``"foo.bar.myapp"``, ``sender`` will be the
+    ``foo.bar.myapp.models`` module.
 
 ``app``
     Same as ``sender``.
-
-``created_models``
-    A list of the model classes from any app which :djadmin:`syncdb` has
-    created so far.
 
 ``verbosity``
     Indicates how much information manage.py is printing on screen. See
     the :djadminopt:`--verbosity` flag for details.
 
-    Functions which listen for :data:`post_syncdb` should adjust what they
+    Functions which listen for :data:`pre_migrate` should adjust what they
     output to the screen based on the value of this argument.
 
 ``interactive``
@@ -407,16 +396,99 @@ Arguments sent with this signal:
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
+``db``
+    The alias of database on which a command will operate.
+
+pre_syncdb
+----------
+
+.. data:: django.db.models.signals.pre_syncdb
+   :module:
+
+.. deprecated:: 1.7
+
+    This signal has been renamed to :data:`~django.db.models.signals.pre_migrate`.
+
+Alias of :data:`django.db.models.signals.pre_migrate`. As long as this alias
+is present, for backwards-compatability this signal has an extra argument it sends:
+
+``create_models``
+    A list of the model classes from any app which :djadmin:`migrate` is
+    going to create, **only if the app has no migrations**.
+
+post_migrate
+------------
+
+.. data:: django.db.models.signals.post_migrate
+   :module:
+
+Sent by the :djadmin:`migrate` command after it installs an application, and the
+:djadmin:`flush` command.
+
+Any handlers that listen to this signal need to be written in a particular
+place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
+handlers are registered anywhere else they may not be loaded by
+:djadmin:`migrate`. It is important that handlers of this signal perform
+idempotent changes (e.g. no database alterations) as this may cause the
+:djadmin:`flush` management command to fail if it also ran during the
+:djadmin:`migrate` command.
+
+Arguments sent with this signal:
+
+``sender``
+    The ``models`` module that was just installed. That is, if
+    :djadmin:`migrate` just installed an app called ``"foo.bar.myapp"``,
+    ``sender`` will be the ``foo.bar.myapp.models`` module.
+
+``app``
+    Same as ``sender``.
+
+``verbosity``
+    Indicates how much information manage.py is printing on screen. See
+    the :djadminopt:`--verbosity` flag for details.
+
+    Functions which listen for :data:`post_migrate` should adjust what they
+    output to the screen based on the value of this argument.
+
+``interactive``
+    If ``interactive`` is ``True``, it's safe to prompt the user to input
+    things on the command line. If ``interactive`` is ``False``, functions
+    which listen for this signal should not try to prompt for anything.
+
+    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    superuser when ``interactive`` is ``True``.
+
+``db``
+    The database alias used for synchronization. Defaults to the ``default``
+    database.
+
 For example, ``yourapp/management/__init__.py`` could be written like::
 
-    from django.db.models.signals import post_syncdb
+    from django.db.models.signals import post_migrate
     import yourapp.models
 
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
 
-    post_syncdb.connect(my_callback, sender=yourapp.models)
+    post_migrate.connect(my_callback, sender=yourapp.models)
+
+post_syncdb
+-----------
+
+.. data:: django.db.models.signals.post_syncdb
+   :module:
+
+.. deprecated:: 1.7
+
+    This signal has been renamed to :data:`~django.db.models.signals.post_migrate`.
+
+Alias of :data:`django.db.models.signals.post_migrate`. As long as this alias
+is present, for backwards-compatability this signal has an extra argument it sends:
+
+``created_models``
+    A list of the model classes from any app which :djadmin:`migrate` has
+    created, **only if the app has no migrations**.
 
 Request/response signals
 ========================
@@ -437,9 +509,8 @@ Sent when Django begins processing an HTTP request.
 Arguments sent with this signal:
 
 ``sender``
-    The handler class -- e.g.
-    :class:`django.core.handlers.wsgi.WsgiHandler` -- that handled
-    the request.
+    The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
+    handled the request.
 
 request_finished
 ----------------
@@ -447,7 +518,15 @@ request_finished
 .. data:: django.core.signals.request_finished
    :module:
 
-Sent when Django finishes processing an HTTP request.
+Sent when Django finishes delvering an HTTP response to the client.
+
+.. note::
+
+    Some WSGI servers and middleware do not always call ``close`` on the
+    response object after handling a request, most notably uWSGI prior to 1.2.6
+    and Sentry's error reporting middleware up to 2.0.7. In those cases this
+    signal isn't sent at all. This can result in idle connections to database
+    and memcache servers.
 
 Arguments sent with this signal:
 
@@ -476,22 +555,21 @@ Test signals
 .. module:: django.test.signals
    :synopsis: Signals sent during testing.
 
-Signals only sent when :doc:`running tests </topics/testing>`.
+Signals only sent when :ref:`running tests <running-tests>`.
 
 setting_changed
 ---------------
-
-.. versionadded:: 1.4
 
 .. data:: django.test.signals.setting_changed
    :module:
 
 This signal is sent when the value of a setting is changed through the
-:meth:`django.test.TestCase.setting` context manager or the
-:func:`django.test.utils.override_settings` decorator/context manager.
+``django.test.TestCase.settings()`` context manager or the
+:func:`django.test.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
-original value is restored ("teardown").
+original value is restored ("teardown"). Use the ``enter`` argument to
+distinguish between the two.
 
 Arguments sent with this signal:
 
@@ -504,6 +582,11 @@ Arguments sent with this signal:
 ``value``
     The value of the setting after the change. For settings that initially
     don't exist, in the "teardown" phase, ``value`` is ``None``.
+
+``enter``
+    .. versionadded:: 1.7
+
+        A boolean; ``True`` if the setting is applied, ``False`` if restored.
 
 template_rendered
 -----------------
@@ -549,8 +632,8 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    :class:`django.db.backends.postgresql_psycopg2.DatabaseWrapper` or
-    :class:`django.db.backends.mysql.DatabaseWrapper`, etc.
+    ``django.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
+    ``django.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``
     The database connection that was opened. This can be used in a

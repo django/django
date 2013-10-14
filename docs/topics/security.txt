@@ -38,7 +38,7 @@ in unauthorized JavaScript execution, depending on how the browser renders
 imperfect HTML.
 
 It is also important to be particularly careful when using ``is_safe`` with
-custom template tags, the :ttag:`safe` template tag, :mod:`mark_safe
+custom template tags, the :tfilter:`safe` template tag, :mod:`mark_safe
 <django.utils.safestring>`, and when autoescape is turned off.
 
 In addition, if you are using the template system to output something other
@@ -48,13 +48,6 @@ escaping.
 You should also be very careful when storing HTML in the database, especially
 when that HTML is retrieved and displayed.
 
-Markup library
---------------
-
-If you use :mod:`django.contrib.markup`, you need to ensure that the filters are
-only used on trusted input, or that you have correctly configured them to ensure
-they do not allow raw HTML output. See the documentation of that module for more
-information.
 
 Cross site request forgery (CSRF) protection
 ============================================
@@ -76,8 +69,8 @@ POST to your Web site and have another logged in user unwittingly submit that
 form. The malicious user would have to know the nonce, which is user specific
 (using a cookie).
 
-When deployed with :ref:`HTTPS <security-recommendation-ssl>`, 
-``CsrfViewMiddleware`` will check that the HTTP referer header is set to a 
+When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
+``CsrfViewMiddleware`` will check that the HTTP referer header is set to a
 URL on the same origin (including subdomain and port). Because HTTPS
 provides additional security, it is imperative to ensure connections use HTTPS
 where it is available by forwarding insecure connection requests and using
@@ -167,23 +160,41 @@ server, there are some additional steps you may need:
 
 .. _host-headers-virtual-hosting:
 
-Host headers and virtual hosting
-================================
+Host header validation
+======================
 
-Django uses the ``Host`` header provided by the client to construct URLs
-in certain cases. While these values are sanitized to prevent Cross
-Site Scripting attacks, they can be used for Cross-Site Request
-Forgery and cache poisoning attacks in some circumstances. We
-recommend you ensure your Web server is configured such that:
+Django uses the ``Host`` header provided by the client to construct URLs in
+certain cases. While these values are sanitized to prevent Cross Site Scripting
+attacks, a fake ``Host`` value can be used for Cross-Site Request Forgery,
+cache poisoning attacks, and poisoning links in emails.
 
-* It always validates incoming HTTP ``Host`` headers against the expected
-  host name.
-* Disallows requests with no ``Host`` header.
-* Is *not* configured with a catch-all virtual host that forwards requests
-  to a Django application.
+Because even seemingly-secure web server configurations are susceptible to fake
+``Host`` headers, Django validates ``Host`` headers against the
+:setting:`ALLOWED_HOSTS` setting in the
+:meth:`django.http.HttpRequest.get_host()` method.
+
+This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+if your code accesses the ``Host`` header directly from ``request.META`` you
+are bypassing this security protection.
+
+For more details see the full :setting:`ALLOWED_HOSTS` documentation.
+
+.. warning::
+
+   Previous versions of this document recommended configuring your web server to
+   ensure it validates incoming HTTP ``Host`` headers. While this is still
+   recommended, in many common web servers a configuration that seems to
+   validate the ``Host`` header may not in fact do so. For instance, even if
+   Apache is configured such that your Django site is served from a non-default
+   virtual host with the ``ServerName`` set, it is still possible for an HTTP
+   request to match this virtual host and supply a fake ``Host`` header. Thus,
+   Django now requires that you set :setting:`ALLOWED_HOSTS` explicitly rather
+   than relying on web server configuration.
 
 Additionally, as of 1.3.1, Django requires you to explicitly enable support for
-the ``X-Forwarded-Host`` header if your configuration requires it.
+the ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST`
+setting) if your configuration requires it.
+
 
 .. _additional-security-topics:
 

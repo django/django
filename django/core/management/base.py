@@ -7,11 +7,10 @@ import os
 import sys
 
 from optparse import make_option, OptionParser
-import traceback
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.utils.encoding import force_str
 from django.utils.six import StringIO
 
@@ -60,7 +59,7 @@ class OutputWrapper(object):
         return getattr(self._out, name)
 
     def write(self, msg, style_func=None, ending=None):
-        ending = ending is None and self.ending or ending
+        ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = [f for f in (style_func, self.style_func, lambda x:x)
@@ -143,6 +142,23 @@ class BaseCommand(object):
         ``self.validate(app)`` from ``handle()``, where ``app`` is the
         application's Python module.
 
+    ``leave_locale_alone``
+        A boolean indicating whether the locale set in settings should be
+        preserved during the execution of the command instead of being
+        forcibly set to 'en-us'.
+
+        Default value is ``False``.
+
+        Make sure you know what you are doing if you decide to change the value
+        of this option in your custom command if it creates database content
+        that is locale-sensitive and such content shouldn't contain any
+        translations (like it happens e.g. with django.contrim.auth
+        permissions) as making the locale differ from the de facto default
+        'en-us' might cause unintended effects.
+
+        This option can't be False when the can_import_settings option is set
+        to False too because attempting to set the locale needs access to
+        settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     option_list = (
@@ -154,7 +170,9 @@ class BaseCommand(object):
         make_option('--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
         make_option('--traceback', action='store_true',
-            help='Print traceback on exception'),
+            help='Raise on exception'),
+        make_option('--no-color', action='store_true', dest='no_color', default=False,
+            help="Don't colorize the command output."),
     )
     help = ''
     args = ''
@@ -163,6 +181,7 @@ class BaseCommand(object):
     can_import_settings = True
     requires_model_validation = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
+    leave_locale_alone = False
 
     def __init__(self):
         self.style = color_style()
@@ -213,7 +232,8 @@ class BaseCommand(object):
         Set up any environment changes requested (e.g., Python path
         and Django settings), then run this command. If the
         command raises a ``CommandError``, intercept it and print it sensibly
-        to stderr.
+        to stderr. If the ``--traceback`` option is present or the raised
+        ``Exception`` is not ``CommandError``, raise it.
         """
         parser = self.create_parser(argv[0], argv[1])
         options, args = parser.parse_args(argv[2:])
@@ -221,9 +241,12 @@ class BaseCommand(object):
         try:
             self.execute(*args, **options.__dict__)
         except Exception as e:
-            if options.traceback:
-                self.stderr.write(traceback.format_exc())
-            self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            if options.traceback or not isinstance(e, CommandError):
+                raise
+
+            # self.stderr is not guaranteed to be set here
+            stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
+            stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
 
     def execute(self, *args, **options):
@@ -232,18 +255,32 @@ class BaseCommand(object):
         needed (as controlled by the attribute
         ``self.requires_model_validation``, except if force-skipped).
         """
-
-        # Switch to English, because django-admin.py creates database content
-        # like permissions, and those shouldn't contain any translations.
-        # But only do this if we can assume we have a working settings file,
-        # because django.utils.translation requires settings.
-        saved_lang = None
         self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
-        self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+        if options.get('no_color'):
+            self.style = no_style()
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
+        else:
+            self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
+            from django.conf import settings
+
+        saved_locale = None
+        if not self.leave_locale_alone:
+            # Only mess with locales if we can assume we have a working
+            # settings file, because django.utils.translation requires settings
+            # (The final saying about whether the i18n machinery is active will be
+            # found in the value of the USE_I18N setting)
+            if not self.can_import_settings:
+                raise CommandError("Incompatible values of 'leave_locale_alone' "
+                                   "(%s) and 'can_import_settings' (%s) command "
+                                   "options." % (self.leave_locale_alone,
+                                                 self.can_import_settings))
+            # Switch to US English, because django-admin.py creates database
+            # content like permissions, and those shouldn't contain any
+            # translations.
             from django.utils import translation
-            saved_lang = translation.get_language()
+            saved_locale = translation.get_language()
             translation.activate('en-us')
 
         try:
@@ -262,8 +299,8 @@ class BaseCommand(object):
                 if self.output_transaction:
                     self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;"))
         finally:
-            if saved_lang is not None:
-                translation.activate(saved_lang)
+            if saved_locale is not None:
+                translation.activate(saved_locale)
 
     def validate(self, app=None, display_num_errors=False):
         """
@@ -280,7 +317,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            self.stdout.write("%s error%s found" % (num_errors, num_errors != 1 and 's' or ''))
+            self.stdout.write("%s error%s found" % (num_errors, '' if num_errors == 1 else 's'))
 
     def handle(self, *args, **options):
         """
@@ -288,7 +325,7 @@ class BaseCommand(object):
         this method.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of BaseCommand must provide a handle() method')
 
 
 class AppCommand(BaseCommand):
@@ -324,7 +361,7 @@ class AppCommand(BaseCommand):
         the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of AppCommand must provide a handle_app() method')
 
 
 class LabelCommand(BaseCommand):
@@ -360,7 +397,7 @@ class LabelCommand(BaseCommand):
         string as given on the command line.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
 
 
 class NoArgsCommand(BaseCommand):
@@ -386,4 +423,4 @@ class NoArgsCommand(BaseCommand):
         Perform this command's actions.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of NoArgsCommand must provide a handle_noargs() method')

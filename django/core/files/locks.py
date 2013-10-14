@@ -41,7 +41,7 @@ except (ImportError, AttributeError):
 
 def fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
-    return hasattr(f, 'fileno') and f.fileno() or f
+    return f.fileno() if hasattr(f, 'fileno') else f
 
 if system_type == 'nt':
     def lock(file, flags):

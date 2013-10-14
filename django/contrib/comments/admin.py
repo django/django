@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.comments.models import Comment
-from django.utils.translation import ugettext_lazy as _, ungettext
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.contrib.comments import get_model
 from django.contrib.comments.views.moderation import perform_flag, perform_approve, perform_delete
 
@@ -52,17 +52,20 @@ class CommentsAdmin(admin.ModelAdmin):
 
     def flag_comments(self, request, queryset):
         self._bulk_flag(request, queryset, perform_flag,
-                        lambda n: ungettext('flagged', 'flagged', n))
+                        ungettext_lazy('%d comment was successfully flagged',
+                                       '%d comments were successfully flagged'))
     flag_comments.short_description = _("Flag selected comments")
 
     def approve_comments(self, request, queryset):
         self._bulk_flag(request, queryset, perform_approve,
-                        lambda n: ungettext('approved', 'approved', n))
+                        ungettext_lazy('%d comment was successfully approved',
+                                       '%d comments were successfully approved'))
     approve_comments.short_description = _("Approve selected comments")
 
     def remove_comments(self, request, queryset):
         self._bulk_flag(request, queryset, perform_delete,
-                        lambda n: ungettext('removed', 'removed', n))
+                        ungettext_lazy('%d comment was successfully removed',
+                                       '%d comments were successfully removed'))
     remove_comments.short_description = _("Remove selected comments")
 
     def _bulk_flag(self, request, queryset, action, done_message):
@@ -75,10 +78,7 @@ class CommentsAdmin(admin.ModelAdmin):
             action(request, comment)
             n_comments += 1
 
-        msg = ungettext('1 comment was successfully %(action)s.',
-                        '%(count)s comments were successfully %(action)s.',
-                        n_comments)
-        self.message_user(request, msg % {'count': n_comments, 'action': done_message(n_comments)})
+        self.message_user(request, done_message % n_comments)
 
 # Only register the default admin if the model is the built-in comment model
 # (this won't be true if there's a custom comment app).

@@ -15,6 +15,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return u"%s %s" % (self.first_name, self.last_name)
 
@@ -23,6 +24,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
         pub_date = models.DateField()
         reporter = models.ForeignKey(Reporter)
 
+        # On Python 3: def __str__(self):
         def __unicode__(self):
             return self.headline
 
@@ -56,9 +58,9 @@ Article objects have access to their related Reporter objects::
 
     >>> r = a.reporter
 
-These are strings instead of unicode strings because that's what was used in
-the creation of this reporter (and we haven't refreshed the data from the
-database, which always returns unicode strings)::
+On Python 2, these are strings of type ``str`` instead of unicode strings
+because that's what was used in the creation of this reporter (and we haven't
+refreshed the data from the database, which always returns unicode strings)::
 
     >>> r.first_name, r.last_name
     ('John', 'Smith')

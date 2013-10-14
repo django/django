@@ -3,31 +3,29 @@ A few bits of helper functions for comment views.
 """
 
 import textwrap
-try:
-    from urllib.parse import urlencode
-except ImportError:     # Python 2
-    from urllib import urlencode
 
 from django.http import HttpResponseRedirect
-from django.core import urlresolvers
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, resolve_url
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import comments
+from django.utils.http import is_safe_url
+from django.utils.six.moves.urllib.parse import urlencode
 
-def next_redirect(data, default, default_view, **get_kwargs):
+def next_redirect(request, fallback, **get_kwargs):
     """
     Handle the "where should I go next?" part of comment views.
 
-    The next value could be a kwarg to the function (``default``), or a
-    ``?next=...`` GET arg, or the URL of a given view (``default_view``). See
+    The next value could be a
+    ``?next=...`` GET arg or the URL of a given view (``fallback``). See
     the view modules for examples.
 
     Returns an ``HttpResponseRedirect``.
     """
-    next = data.get("next", default)
-    if next is None:
-        next = urlresolvers.reverse(default_view)
+    next = request.POST.get('next')
+    if not is_safe_url(url=next, host=request.get_host()):
+        next = resolve_url(fallback)
+
     if get_kwargs:
         if '#' in next:
             tmp = next.rsplit('#', 1)
@@ -36,7 +34,7 @@ def next_redirect(data, default, default_view, **get_kwargs):
         else:
             anchor = ''
 
-        joiner = ('?' in next) and '&' or '?'
+        joiner = '&' if '?' in next else '?'
         next += joiner + urlencode(get_kwargs) + anchor
     return HttpResponseRedirect(next)
 

@@ -9,6 +9,7 @@ import re
 from django.forms.widgets import Widget, Select
 from django.utils import datetime_safe
 from django.utils.dates import MONTHS
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
 from django.utils import six
@@ -50,15 +51,22 @@ class SelectDateWidget(Widget):
     day_field = '%s_day'
     year_field = '%s_year'
 
-    def __init__(self, attrs=None, years=None, required=True):
-        # years is an optional list/tuple of years to use in the "year" select box.
+    def __init__(self, attrs=None, years=None, required=True, months=None):
         self.attrs = attrs or {}
         self.required = required
+
+        # Optional list or tuple of years to use in the "year" select box.
         if years:
             self.years = years
         else:
             this_year = datetime.date.today().year
             self.years = range(this_year, this_year+10)
+
+        # Optional dict of months to use in the "month" select box.
+        if months:
+            self.months = months
+        else:
+            self.months = MONTHS
 
     def render(self, name, value, attrs=None):
         try:
@@ -69,7 +77,7 @@ class SelectDateWidget(Widget):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]
-                        v = datetime.datetime.strptime(value, input_format)
+                        v = datetime.datetime.strptime(force_str(value), input_format)
                         year_val, month_val, day_val = v.year, v.month, v.day
                     except ValueError:
                         pass
@@ -79,7 +87,7 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
         choices = [(i, i) for i in self.years]
         year_html = self.create_select(name, self.year_field, value, year_val, choices)
-        choices = list(six.iteritems(MONTHS))
+        choices = list(six.iteritems(self.months))
         month_html = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
         day_html = self.create_select(name, self.day_field, value, day_val,  choices)
@@ -135,11 +143,3 @@ class SelectDateWidget(Widget):
         s = Select(choices=choices)
         select_html = s.render(field % name, val, local_attrs)
         return select_html
-
-    def _has_changed(self, initial, data):
-        try:
-            input_format = get_format('DATE_INPUT_FORMATS')[0]
-            data = datetime_safe.datetime.strptime(data, input_format).date()
-        except (TypeError, ValueError):
-            pass
-        return super(SelectDateWidget, self)._has_changed(initial, data)

@@ -1,17 +1,31 @@
 from copy import copy
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 
 # Cache of actual callables.
 _standard_context_processors = None
 # We need the CSRF processor no matter what the user has in their settings,
 # because otherwise it is a security vulnerability, and we can't afford to leave
 # this to human error or failure to read migration instructions.
-_builtin_context_processors =  ('django.core.context_processors.csrf',)
+_builtin_context_processors = ('django.core.context_processors.csrf',)
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
     pass
+
+
+class ContextDict(dict):
+    def __init__(self, context, *args, **kwargs):
+        super(ContextDict, self).__init__(*args, **kwargs)
+
+        context.dicts.append(self)
+        self.context = context
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.context.pop()
+
 
 class BaseContext(object):
     def __init__(self, dict_=None):
@@ -35,10 +49,8 @@ class BaseContext(object):
         for d in reversed(self.dicts):
             yield d
 
-    def push(self):
-        d = {}
-        self.dicts.append(d)
-        return d
+    def push(self, *args, **kwargs):
+        return ContextDict(self, *args, **kwargs)
 
     def pop(self):
         if len(self.dicts) == 1:
@@ -84,6 +96,7 @@ class BaseContext(object):
         new_context._reset_dicts(values)
         return new_context
 
+
 class Context(BaseContext):
     "A stack container for variable context"
     def __init__(self, dict_=None, autoescape=True, current_app=None,
@@ -106,6 +119,7 @@ class Context(BaseContext):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         self.dicts.append(other_dict)
         return other_dict
+
 
 class RenderContext(BaseContext):
     """
@@ -146,16 +160,7 @@ def get_standard_processors():
         collect.extend(_builtin_context_processors)
         collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
         for path in collect:
-            i = path.rfind('.')
-            module, attr = path[:i], path[i+1:]
-            try:
-                mod = import_module(module)
-            except ImportError as e:
-                raise ImproperlyConfigured('Error importing request processor module %s: "%s"' % (module, e))
-            try:
-                func = getattr(mod, attr)
-            except AttributeError:
-                raise ImproperlyConfigured('Module "%s" does not define a "%s" callable request processor' % (module, attr))
+            func = import_by_path(path)
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
@@ -175,5 +180,7 @@ class RequestContext(Context):
             processors = ()
         else:
             processors = tuple(processors)
+        updates = dict()
         for processor in get_standard_processors() + processors:
-            self.update(processor(request))
+            updates.update(processor(request))
+        self.update(updates)

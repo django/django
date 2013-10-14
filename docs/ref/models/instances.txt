@@ -34,6 +34,8 @@ that, you need to :meth:`~Model.save()`.
 
     1. Add a classmethod on the model class::
 
+        from django.db import models
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
@@ -82,12 +84,18 @@ need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
-.. method:: Model.full_clean(exclude=None)
+.. method:: Model.full_clean(exclude=None, validate_unique=True)
+
+.. versionchanged:: 1.6
+
+  The ``validate_unique`` parameter was added to allow skipping
+  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
+  was always called by ``full_clean``.
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()`, in that order and raises a
-:exc:`~django.core.exceptions.ValidationError` that has a ``message_dict``
-attribute containing errors from all three stages.
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
+``message_dict`` attribute containing errors from all three stages.
 
 The optional ``exclude`` argument can be used to provide a list of field names
 that can be excluded from validation and cleaning.
@@ -96,20 +104,16 @@ aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
-your model's :meth:`~Model.save()` method, nor as a result of
-:class:`~django.forms.ModelForm` validation. In the case of
-:class:`~django.forms.ModelForm` validation, :meth:`Model.clean_fields()`,
-:meth:`Model.clean()`, and :meth:`Model.validate_unique()` are all called
-individually.
+your model's :meth:`~Model.save()` method. You'll need to call it manually
+when you want to run one-step model validation for your own manually created
+models. For example::
 
-You'll need to call ``full_clean`` manually when you want to run one-step model
-validation for your own manually created models. For example::
-
+    from django.core.exceptions import ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
         # Do something based on the errors contained in e.message_dict.
-        # Display them to a user, or handle them programatically.
+        # Display them to a user, or handle them programmatically.
         pass
 
 The first step ``full_clean()`` performs is to clean each individual field.
@@ -131,14 +135,19 @@ attributes on your model if desired. For instance, you could use it to
 automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        # Don't allow draft entries to have a pub_date.
-        if self.status == 'draft' and self.pub_date is not None:
-            raise ValidationError('Draft entries may not have a publication date.')
-        # Set the pub_date for published items if it hasn't been set already.
-        if self.status == 'published' and self.pub_date is None:
-            self.pub_date = datetime.date.today()
+    import datetime
+    from django.core.exceptions import ValidationError
+    from django.db import models
+
+    class Article(models.Model):
+        ...
+        def clean(self):
+            # Don't allow draft entries to have a pub_date.
+            if self.status == 'draft' and self.pub_date is not None:
+                raise ValidationError('Draft entries may not have a publication date.')
+            # Set the pub_date for published items if it hasn't been set already.
+            if self.status == 'published' and self.pub_date is None:
+                self.pub_date = datetime.date.today()
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
@@ -292,17 +301,26 @@ follows this algorithm:
 
 * If the object's primary key attribute is set to a value that evaluates to
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
-  executes a ``SELECT`` query to determine whether a record with the given
-  primary key already exists.
-* If the record with the given primary key does already exist, Django
-  executes an ``UPDATE`` query.
-* If the object's primary key attribute is *not* set, or if it's set but a
-  record doesn't exist, Django executes an ``INSERT``.
+  executes an ``UPDATE``.
+* If the object's primary key attribute is *not* set or if the ``UPDATE``
+  didn't update anything, Django executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
+
+.. versionchanged:: 1.6
+
+    Previously Django did a ``SELECT`` when the primary key attribute was set.
+    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
+    did an ``INSERT``. The old algorithm results in one more query in the
+    ``UPDATE`` case. There are some rare cases where the database doesn't
+    report that a row was updated even if the database contains a row for the
+    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
+    trigger which returns ``NULL``. In such cases it is possible to revert to the
+    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+    option to ``True``.
 
 .. _ref-models-force-insert:
 
@@ -324,6 +342,8 @@ only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
 
+.. _ref-models-field-updates-using-f-expressions:
+
 Updating attributes based on existing fields
 --------------------------------------------
 
@@ -338,47 +358,31 @@ achieve this is to do something like::
 If the old ``number_sold`` value retrieved from the database was 10, then
 the value of 11 will be written back to the database.
 
-This sequence has a standard update problem in that it contains a race
-condition. If another thread of execution has already saved an updated value
-after the current thread retrieved the old value, the current thread will only
-save the old value plus one, rather than the new (current) value plus one.
-
-The process can be made robust and slightly faster by expressing the update
-relative to the original field value, rather than as an explicit assignment of
-a new value. Django provides :ref:`F() expressions <query-expressions>` for
-performing this kind of relative update. Using ``F()`` expressions, the
-previous example is expressed as::
+The process can be made robust, :ref:`avoiding a race condition
+<avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
+the update relative to the original field value, rather than as an explicit
+assignment of a new value. Django provides :class:`F expressions
+<django.db.models.F>` for performing this kind of relative update. Using
+:class:`F expressions <django.db.models.F>`, the previous example is expressed
+as::
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold = F('number_sold') + 1
     >>> product.save()
 
-This approach doesn't use the initial value from the database. Instead, it
-makes the database do the update based on whatever value is current at the time
-that the :meth:`~Model.save()` is executed.
-
-Once the object has been saved, you must reload the object in order to access
-the actual value that was applied to the updated field::
-
-    >>> product = Products.objects.get(pk=product.pk)
-    >>> print(product.number_sold)
-    42
-
-For more details, see the documentation on :ref:`F() expressions
-<query-expressions>` and their :ref:`use in update queries
+For more details, see the documentation on :class:`F expressions
+<django.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
 Specifying which fields to save
 -------------------------------
 
-.. versionadded:: 1.5
-
 If ``save()`` is passed a list of field names in keyword argument
 ``update_fields``, only the fields named in that list will be updated.
 This may be desirable if you want to update just one or a few fields on
 an object. There will be a slight performance benefit from preventing
-all of the model fields from being updated in the database. For example:
+all of the model fields from being updated in the database. For example::
 
     product.name = 'Name changed again'
     product.save(update_fields=['name'])
@@ -401,7 +405,7 @@ Deleting objects
 
 .. method:: Model.delete([using=DEFAULT_DB_ALIAS])
 
-Issues a SQL ``DELETE`` for the object. This only deletes the object in the
+Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
 its fields.
 
@@ -418,6 +422,12 @@ Other model instance methods
 
 A few object methods have special purposes.
 
+.. note::
+    On Python 3, as all strings are natively considered Unicode, only use the
+    ``__str__()`` method (the ``__unicode__()`` method is obsolete).
+    If you'd like compatibility with Python 2, you can decorate your model class
+    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
+
 ``__unicode__``
 ---------------
 
@@ -431,6 +441,8 @@ displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__unicode__()`` method.
 
 For example::
+
+    from django.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -458,6 +470,9 @@ Thus, you should return a nice, human-readable string for the object's
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::
 
+    from django.db import models
+    from django.utils.encoding import force_bytes
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -466,6 +481,59 @@ using ``__str__()`` like this::
             # Note use of django.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
             return force_bytes('%s %s' % (self.first_name, self.last_name))
+
+``__eq__``
+----------
+
+.. method:: Model.__eq__()
+
+The equality method is defined such that instances with the same primary
+key value and the same concrete class are considered equal. For proxy
+models, concrete class is defined as the model's first non-proxy parent;
+for all other models it is simply the model's class.
+
+For example::
+
+    form django.db import models
+
+    class MyModel(models.Model):
+        id = models.AutoField(primary_key=True)
+
+    class MyProxyModel(MyModel):
+        class Meta:
+            proxy = True
+
+    class MultitableInherited(MyModel):
+        pass
+
+    MyModel(id=1) == MyModel(id=1)
+    MyModel(id=1) == MyProxyModel(id=1)
+    MyModel(id=1) != MultitableInherited(id=1)
+    MyModel(id=1) != MyModel(id=2)
+
+.. versionchanged:: 1.7
+
+  In previous versions only instances of the exact same class and same
+  primary key value were considered equal.
+
+``__hash__``
+------------
+
+.. method:: Model.__hash__()
+
+The ``__hash__`` method is based on the instance's primary key value. It
+is effectively hash(obj.pk). If the instance doesn't have a primary key
+value then a ``TypeError`` will be raised (otherwise the ``__hash__``
+method would return different values before and after the instance is
+saved, but changing the ``__hash__`` value of an instance `is forbidden
+in Python`_).
+
+.. versionchanged:: 1.7
+
+  In previous versions instance's without primary key value were
+  hashable.
+
+.. _is forbidden in Python: http://docs.python.org/reference/datamodel.html#object.__hash__
 
 ``get_absolute_url``
 --------------------
@@ -482,9 +550,14 @@ For example::
         return "/people/%i/" % self.id
 
 (Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`permalink() decorator <permalink>`,
-documented below, is usually the best approach and you should read that section
-before diving into code implementation.)
+write this kind of method. The :func:`~django.core.urlresolvers.reverse`
+function is usually the best approach.)
+
+For example::
+
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -529,11 +602,19 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The way we wrote ``get_absolute_url()`` above is a slightly violation of the
-DRY principle: the URL for this object is defined both in the URLconf file and
-in the model.
+.. warning::
 
-You can decouple your models from the URLconf using the ``permalink`` decorator:
+    The ``permalink`` decorator is no longer recommended. You should use
+    :func:`~django.core.urlresolvers.reverse` in the body of your
+    ``get_absolute_url`` method instead.
+
+In early versions of Django, there wasn't an easy way to use URLs defined in
+URLconf file inside :meth:`~django.db.models.Model.get_absolute_url`. That
+meant you would need to define the URL both in URLConf and
+:meth:`~django.db.models.Model.get_absolute_url`. The ``permalink`` decorator
+was added to overcome this DRY principle violation. However, since the
+introduction of :func:`~django.core.urlresolvers.reverse` there is no
+reason to use ``permalink`` any more.
 
 .. function:: permalink()
 
@@ -544,14 +625,14 @@ correct URL, with all parameters substituted in the correct positions.
 
 The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
 template tag and a high-level wrapper for the
-:func:`django.core.urlresolvers.reverse()` function.
+:func:`~django.core.urlresolvers.reverse` function.
 
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-...your model could have a :meth:`~django.db.models.Model.get_absolute_url()`
+...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
 method that looked like this::
 
     from django.db import models
@@ -589,7 +670,7 @@ pattern, it's possible to give a name to a pattern, and then reference the name
 rather than the view function. A named URL pattern is defined by replacing the
 pattern tuple by a call to the ``url`` function)::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url
 
     url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 
@@ -647,10 +728,13 @@ For every :class:`~django.db.models.DateField` and
 <django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-a :exc:`~django.db.DoesNotExist` exception when appropriate.
+a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
 
-Both methods accept optional keyword arguments, which should be in the format
-described in :ref:`Field lookups <field-lookups>`.
+Both of these methods will perform their queries using the default
+manager for the model. If you need to emulate filtering used by a
+custom manager, or want to perform one-off custom filtering, both
+methods also accept optional keyword arguments, which should be in the
+format described in :ref:`Field lookups <field-lookups>`.
 
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
