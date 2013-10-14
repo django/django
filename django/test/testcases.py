@@ -16,6 +16,7 @@ from unittest import skipIf         # NOQA: Imported here for backward compatibi
 from unittest.util import safe_repr
 
 from django.apps import apps
+from django import get_version
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -35,8 +36,11 @@ from django.test.utils import (CaptureQueriesContext, ContextList,
     override_settings, modify_settings, compare_xml)
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils.six.moves import html_parser
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit, urlparse, unquote
-from django.utils.six.moves.urllib.request import url2pathname
+from django.utils.six.moves.urllib.request import (url2pathname, Request,
+                                                   HTTPErrorProcessor,
+                                                   build_opener)
 from django.views.static import serve
 
 
@@ -310,6 +314,154 @@ class SimpleTestCase(unittest.TestCase):
         self.assertEqual(url, expected_url,
             msg_prefix + "Response redirected to '%s', expected '%s'" %
                 (url, expected_url))
+
+    class _AnchorParser(html_parser.HTMLParser):
+        external_href_re = re.compile(r'^https?://', re.IGNORECASE)
+        ignore_href_re = re.compile(r'^(mailto|ftp):', re.IGNORECASE)
+        internal_id_href_re = re.compile(r'^#(.*)')
+
+        def __init__(self):
+            self.hrefs_internal = []
+            self.hrefs_external = []
+            self.interal_page_link_ids = []
+            self.element_ids = []
+            self.reset()
+            html_parser.HTMLParser.__init__(self)
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "a":
+                for k, v in attrs:
+                    if k == "href":
+                        # For each href that we're not ignoring, save the
+                        # value and position
+                        if self.ignore_href_re.match(v):
+                            pass
+                        elif self.external_href_re.match(v):
+                            self.hrefs_external.append((v, self.getpos()))
+                        elif self.internal_id_href_re.match(v):
+                            # If this is of the form href="#content" then
+                            # remember the actual id "content".
+                            self.interal_page_link_ids.append(
+                                (
+                                    self.internal_id_href_re.match(v).groups()[0],
+                                    self.getpos()
+                                )
+                            )
+                        else:
+                            self.hrefs_internal.append((v, self.getpos()))
+                    elif k == "id":
+                        # An anchor link can have an id and be linked to
+                        # via an internal page link too.
+                        self.element_ids.append(v)
+            else:
+            # Go through the attributes of all the other tags so we know all
+            # the element id's within the page for internal page links.
+                for k, v in attrs:
+                    if k == "id":
+                        self.element_ids.append(v)
+
+    class _NoRedirectHandler(HTTPErrorProcessor):
+        """
+        HTTP handler for ``urllib`` that doesn't follow any redirections.
+        """
+        def http_response(self, request, response):
+            return response
+        https_response = http_response
+
+    def assertNoBrokenLinks(self, response, internal_only=True, follow=False):
+        """
+        Asserts that all the links within the response, when followed, return
+        a valid page (a 200) or a redirect (302). Optionally, rediretions can
+        also be followed to check for the final response.
+
+        Blank links are also identified (such as <a href="">) as this is helpful
+        to identify when the url tag in <a href="{% url my-url-name arg1 %}">
+        fails.
+
+        Internal page links (such as <a href="#content">Skip to content</a> are
+        also checked to ensure they are not broken (ie. that an element with the
+        id exists on the page).
+        """
+        non_broken_status_codes = (200,)
+        if not follow:
+            non_broken_status_codes += (301, 302, 304)
+
+        p = self._AnchorParser()
+        p.feed(response.content.decode())
+        p.close()
+
+        # Check the internal links first:
+        for link, (lineno, offset) in p.hrefs_internal:
+            self.assertNotEqual(link, '',
+                ("The page contains a link with an empty href on line %(lineno)d.") % {
+                    'lineno': lineno,
+                }
+            )
+            link_response = response.client.get(link,follow=follow)
+            self.assertIn(link_response.status_code, non_broken_status_codes,
+                ("The link '%(link)s' on line %(lineno)d appears to be broken (status is %(status)s)") % {
+                    'link': link,
+                    'lineno': lineno,
+                    'status': link_response.status_code
+                }
+            )
+
+        # Next, check the internal page links:
+        for id, (lineno, offset) in p.interal_page_link_ids:
+            # If the id wasn't blank (ie. <a href="#"> then make sure that there
+            # was an element with the same id on the page somewhere.
+            if id:
+                self.assertIn(id, p.element_ids,
+                    (
+                        "The internal link to #%(id)s on line %(lineno)d does"
+                        " not link to a corresponding element with an "
+                        "id=\"%(id)s\"." % {
+                            'id': id,
+                            'lineno': lineno
+                        }
+                    )
+                )
+
+        # Then check the external links
+        if not internal_only:
+            headers = {
+                "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+                "Accept-Language": "en-us,en;q=0.5",
+                "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+                "Connection": "close",
+                "User-Agent": "Django/%(version)s" % {'version': get_version()},
+            }
+
+            # Get the global urllib.request opener of the moment
+            try:
+                from urllib.request import _opener
+            except ImportError:
+                from urllib2 import _opener
+            default_handlers = [] if _opener is None else _opener.handlers
+
+            if follow:
+                opener = build_opener(*default_handlers)
+            else:
+                # Add the NoRedirectHandler to the opener
+                opener = build_opener(self._NoRedirectHandler, *default_handlers)
+
+            for link, (lineno, offset) in p.hrefs_external:
+                try:
+                    req = Request(link, None, headers)
+                    resp = opener.open(req)
+                except ValueError:
+                    self.fail(
+                        "The link '%(link)s' on line %(lineno)d appears to be invalid." % {
+                            'link': link,
+                            'lineno': lineno,
+                        }
+                    )
+                except: # urllib2.URLError, httplib.InvalidURL, etc.
+                    self.fail("The link '%(link)s' on line %(lineno)d appears to be broken." % {
+                            'link': link,
+                            'lineno': lineno
+                        }
+                    )
 
     def _assert_contains(self, response, text, status_code, msg_prefix, html):
         # If the response supports deferred rendering and hasn't been rendered

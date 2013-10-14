@@ -1591,6 +1591,34 @@ your test suite.
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
+.. method:: SimpleTestCase.assertNoBrokenLinks(response, internal_only=True, follow=False)
+
+    .. versionadded:: 1.7
+
+    Asserts that all the anchor links within the response are not broken (i.e.
+    result in a status of 200 or a redirect). By default only links internal to
+    the site will be checked (ie. those not beginning with http:// or https://)
+    and redirections will not be followed.
+
+    Internal page links such as <a href="#content"> are checked to ensure
+    that they are not broken (ie. that an element with the id="content" exists
+    on the page).
+
+    Blank links, such as <a href=""> are also identified, which is helpful
+    to check when the url tag in <a href="{% url my-url-name arg1 %}"> fails.
+
+    .. note::
+
+        As this assertion effectively clicks on all the links within the 
+        response, care needs to be taken if any link has a side effect (such as 
+        modifying your database).
+
+    .. note::
+
+        This test will slow down your test suite considerably. They will slow 
+        down even more if ``follow`` is set to ``True`` and become extremely
+        slow and even unreliable if ``internal_only`` is set to ``False``.
+
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
     Asserts that a ``Response`` instance produced the given ``status_code`` and
