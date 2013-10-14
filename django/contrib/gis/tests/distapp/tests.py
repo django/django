@@ -140,7 +140,7 @@ class DistanceTest(TestCase):
 
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
-        ls = LineString( ( (150.902, -34.4245), (150.87, -34.5789) ) )
+        ls = LineString(((150.902, -34.4245), (150.87, -34.5789)))
         if oracle or connection.ops.geography:
             # Reference query:
             #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;

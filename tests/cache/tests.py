@@ -353,7 +353,7 @@ class BaseCacheTests(object):
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
             'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
-            'ascii2': {'x' : 1 }
+            'ascii2': {'x' : 1}
             }
         # Test `set`
         for (key, value) in stuff.items():

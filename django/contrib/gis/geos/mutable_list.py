@@ -96,9 +96,9 @@ class ListMixin(object):
             indexRange  = range(*index.indices(origLen))
 
         newLen      = origLen - len(indexRange)
-        newItems    = ( self._get_single_internal(i)
+        newItems    = (self._get_single_internal(i)
                         for i in xrange(origLen)
-                        if i not in indexRange )
+                        if i not in indexRange)
 
         self._rebuild(newLen, newItems)
 
