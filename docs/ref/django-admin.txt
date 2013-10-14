@@ -791,6 +791,8 @@ Django.)
 
 The development server automatically reloads Python code for each request, as
 needed. You don't need to restart the server for code changes to take effect.
+However adding files or compiling translation files don't trigger a restart, so
+you would have to restart the development server manually.
 
 When you start the server, and each time you change Python code while the
 server is running, the server will validate all of your installed models. (See
