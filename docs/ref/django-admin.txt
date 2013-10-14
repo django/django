@@ -131,11 +131,18 @@ createcachetable
 
 .. django-admin:: createcachetable
 
-Creates a cache table named ``tablename`` for use with the database cache
-backend. See :doc:`/topics/cache` for more information.
+Creates the cache tables for use with the database cache backend. See
+:doc:`/topics/cache` for more information.
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which the cachetable will be installed.
+
+.. versionchanged:: 1.7
+
+    It is no longer necessary to provide the cache table name or the
+    :djadminopt:`--database` option. Django takes this information from your
+    settings file. If you have configured multiple caches or multiple databases,
+    all cache tables are created.
 
 dbshell
 -------
