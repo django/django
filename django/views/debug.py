@@ -343,7 +343,7 @@ class ExceptionReporter(object):
                 before = escape(template_source[upto:start])
                 during = escape(template_source[start:end])
                 after = escape(template_source[end:next])
-            source_lines.append( (num, escape(template_source[upto:next])) )
+            source_lines.append((num, escape(template_source[upto:next])))
             upto = next
         total = len(source_lines)
 
@@ -450,7 +450,7 @@ class ExceptionReporter(object):
         """
         import traceback
         frames = self.get_traceback_frames()
-        tb = [ (f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames ]
+        tb = [(f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames]
         list = ['Traceback (most recent call last):\n']
         list += traceback.format_list(tb)
         list += traceback.format_exception_only(self.exc_type, self.exc_value)

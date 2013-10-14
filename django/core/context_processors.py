@@ -31,7 +31,7 @@ def csrf(request):
             return smart_text(token)
     _get_val = lazy(_get_val, six.text_type)
 
-    return {'csrf_token': _get_val() }
+    return {'csrf_token': _get_val()}
 
 def debug(request):
     "Returns context variables helpful for debugging."

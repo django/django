@@ -205,7 +205,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
         # Testing `from_bbox` class method
         bbox = (-180, -90, 180, 90)
-        p = OGRGeometry.from_bbox( bbox )
+        p = OGRGeometry.from_bbox(bbox)
         self.assertEqual(bbox, p.extent)
 
         prev = OGRGeometry('POINT(0 0)')

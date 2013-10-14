@@ -36,7 +36,7 @@ class TestUtilsHttp(unittest.TestCase):
         self.assertEqual(result, 'a=1&b=2&c=3')
 
         # A dictionary
-        result = http.urlencode({ 'a': 1, 'b': 2, 'c': 3})
+        result = http.urlencode({'a': 1, 'b': 2, 'c': 3})
         acceptable_results = [
             # Need to allow all of these as dictionaries have to be treated as
             # unordered

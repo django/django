@@ -315,9 +315,9 @@ class DefaultFiltersTests(TestCase):
 
         # Check urlize handles brackets properly (#19070)
         self.assertEqual(urlize('[see www.example.com]'),
-            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]' )
+            '[see <a href="http://www.example.com" rel="nofollow">www.example.com</a>]')
         self.assertEqual(urlize('see test[at[example.com'),
-            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>' )
+            'see <a href="http://test[at[example.com" rel="nofollow">test[at[example.com</a>')
         self.assertEqual(urlize('[http://168.192.0.1](http://168.192.0.1)'),
             '[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">http://168.192.0.1](http://168.192.0.1)</a>')
 

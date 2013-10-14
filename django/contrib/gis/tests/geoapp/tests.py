@@ -459,12 +459,14 @@ class GeoQuerySetTest(TestCase):
     @no_spatialite
     def test_force_rhr(self):
         "Testing GeoQuerySet.force_rhr()."
-        rings = ( ( (0, 0), (5, 0), (0, 5), (0, 0) ),
-                  ( (1, 1), (1, 3), (3, 1), (1, 1) ),
-                  )
-        rhr_rings = ( ( (0, 0), (0, 5), (5, 0), (0, 0) ),
-                      ( (1, 1), (3, 1), (1, 3), (1, 1) ),
-                      )
+        rings = (
+            ((0, 0), (5, 0), (0, 5), (0, 0)),
+            ((1, 1), (1, 3), (3, 1), (1, 1)),
+        )
+        rhr_rings = (
+            ((0, 0), (0, 5), (5, 0), (0, 0)),
+            ((1, 1), (3, 1), (1, 3), (1, 1)),
+        )
         State.objects.create(name='Foo', poly=Polygon(*rings))
         s = State.objects.force_rhr().get(name='Foo')
         self.assertEqual(rhr_rings, s.force_rhr.coords)
@@ -648,7 +650,7 @@ class GeoQuerySetTest(TestCase):
     @no_spatialite
     def test_reverse_geom(self):
         "Testing GeoQuerySet.reverse_geom()."
-        coords = [ (-95.363151, 29.763374), (-95.448601, 29.713803) ]
+        coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
         Track.objects.create(name='Foo', line=LineString(coords))
         t = Track.objects.reverse_geom().get(name='Foo')
         coords.reverse()

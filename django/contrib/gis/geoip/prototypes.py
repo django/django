@@ -22,9 +22,10 @@ class GeoIPRecord(Structure):
                 ('continent_code', c_char_p),
                 ]
 geoip_char_fields = [name for name, ctype in GeoIPRecord._fields_ if ctype is c_char_p]
-geoip_encodings = { 0: 'iso-8859-1',
-                    1: 'utf8',
-                    }
+geoip_encodings = {
+    0: 'iso-8859-1',
+    1: 'utf8',
+}
 
 class GeoIPTag(Structure): pass
 

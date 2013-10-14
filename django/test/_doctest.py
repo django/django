@@ -613,10 +613,10 @@ class DocTestParser:
                      self._parse_example(m, name, lineno)
             # Create an Example, and add it to the list.
             if not self._IS_BLANK_OR_COMMENT(source):
-                output.append( Example(source, want, exc_msg,
+                output.append(Example(source, want, exc_msg,
                                     lineno=lineno,
                                     indent=min_indent+len(m.group('indent')),
-                                    options=options) )
+                                    options=options))
             # Update lineno (lines inside this example)
             lineno += string.count('\n', m.start(), m.end())
             # Update charno.
@@ -1498,7 +1498,7 @@ class DocTestRunner:
             if t == 0:
                 notests.append(name)
             elif f == 0:
-                passed.append( (name, t) )
+                passed.append((name, t))
             else:
                 failed.append(x)
         if verbose:

@@ -238,8 +238,8 @@ class CommentModerator(object):
             return
         recipient_list = [manager_tuple[1] for manager_tuple in settings.MANAGERS]
         t = loader.get_template('comments/comment_notification_email.txt')
-        c = Context({ 'comment': comment,
-                      'content_object': content_object })
+        c = Context({'comment': comment,
+                     'content_object': content_object})
         subject = '[%s] New comment posted on "%s"' % (get_current_site(request).name,
                                                           content_object)
         message = t.render(c)

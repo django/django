@@ -19,15 +19,16 @@ class OGRIndexError(OGRException, KeyError):
 #### OGR error checking codes and routine ####
 
 # OGR Error Codes
-OGRERR_DICT = { 1 : (OGRException, 'Not enough data.'),
-                2 : (OGRException, 'Not enough memory.'),
-                3 : (OGRException, 'Unsupported geometry type.'),
-                4 : (OGRException, 'Unsupported operation.'),
-                5 : (OGRException, 'Corrupt data.'),
-                6 : (OGRException, 'OGR failure.'),
-                7 : (SRSException, 'Unsupported SRS.'),
-                8 : (OGRException, 'Invalid handle.'),
-                }
+OGRERR_DICT = {
+    1: (OGRException, 'Not enough data.'),
+    2: (OGRException, 'Not enough memory.'),
+    3: (OGRException, 'Unsupported geometry type.'),
+    4: (OGRException, 'Unsupported operation.'),
+    5: (OGRException, 'Corrupt data.'),
+    6: (OGRException, 'OGR failure.'),
+    7: (SRSException, 'Unsupported SRS.'),
+    8: (OGRException, 'Invalid handle.'),
+}
 OGRERR_NONE = 0
 
 def check_err(code):

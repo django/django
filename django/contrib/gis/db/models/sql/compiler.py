@@ -226,8 +226,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             # transformed geometries have an SRID different than that of the
             # field -- this is only used by `transform` for Oracle and
             # SpatiaLite backends.
-            if self.query.transformed_srid and ( self.connection.ops.oracle or
-                                                 self.connection.ops.spatialite ):
+            if self.query.transformed_srid and (self.connection.ops.oracle or
+                                                self.connection.ops.spatialite):
                 sel_fmt = "'SRID=%d;'||%s" % (self.query.transformed_srid, sel_fmt)
         else:
             sel_fmt = '%s'

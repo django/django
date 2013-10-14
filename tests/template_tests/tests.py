@@ -1102,19 +1102,19 @@ class TemplateTests(TransRealMixin, TestCase):
             'ifchanged08': ('{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'), (1, 'a'), (0, 'b'), (1, 'c')], [(0, 'a'), (1, 'c'), (1, 'd'), (1, 'd'), (0, 'e')]]}, 'accd'),
 
             # Test one parameter given to ifchanged.
-            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),
-            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': (1,2,3), 'numx': (5,6,7) }, '..567..567..567'),
+            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', {'num': (1,2,3)}, '..1..2..3'),
+            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', {'num': (1,2,3), 'numx': (5,6,7)}, '..567..567..567'),
 
             # Test multiple parameters to ifchanged.
-            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1,1,2), 'numx': (5,6,6) }, '156156256'),
+            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': (1,1,2), 'numx': (5,6,6)}, '156156256'),
 
             # Test a date+hour like construct, where the hour of the last day
             # is the same but the date had changed, so print the hour anyway.
-            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
 
             # Logically the same as above, just written with explicit
             # ifchanged for the day.
-            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            'ifchanged-param05': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},]}, '112323'),
 
             # Test the else clause of ifchanged.
             'ifchanged-else01': ('{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'),
@@ -1512,11 +1512,11 @@ class TemplateTests(TransRealMixin, TestCase):
                           '{{ item.foo }}'
                           '{% endfor %},'
                           '{% endfor %}',
-                          {'data': [ {'foo':'c', 'bar':1},
+                          {'data': [{'foo':'c', 'bar':1},
                                      {'foo':'d', 'bar':1},
                                      {'foo':'a', 'bar':2},
                                      {'foo':'b', 'bar':2},
-                                     {'foo':'x', 'bar':3}  ]},
+                                     {'foo':'x', 'bar':3}]},
                           '1:cd,2:ab,3:x,'),
 
             # Test for silent failure when target variable isn't found
@@ -1640,8 +1640,8 @@ class TemplateTests(TransRealMixin, TestCase):
             'widthratio16': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':50,'b':100}, '-50-'),
             'widthratio17': ('{% widthratio a b 100 as variable %}-{{ variable }}-', {'a':100,'b':100}, '-100-'),
 
-            'widthratio18': ('{% widthratio a b 100 as %}', { }, template.TemplateSyntaxError),
-            'widthratio19': ('{% widthratio a b 100 not_as variable %}', { }, template.TemplateSyntaxError),
+            'widthratio18': ('{% widthratio a b 100 as %}', {}, template.TemplateSyntaxError),
+            'widthratio19': ('{% widthratio a b 100 not_as variable %}', {}, template.TemplateSyntaxError),
 
             ### WITH TAG ########################################################
             'with01': ('{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'),
@@ -1778,11 +1778,11 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
 
             # ifqeual compares unescaped vales.
-            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', { "var": "this & that" }, "yes"),
+            'autoescape-ifequal01': ('{% ifequal var "this & that" %}yes{% endifequal %}', {"var": "this & that"}, "yes"),
 
             # Arguments to filters are 'safe' and manipulate their input unescaped.
-            'autoescape-filters01': ('{{ var|cut:"&" }}', { "var": "this & that" }, "this  that" ),
-            'autoescape-filters02': ('{{ var|join:" & \" }}', { "var": ("Tom", "Dick", "Harry") }, "Tom & Dick & Harry"),
+            'autoescape-filters01': ('{{ var|cut:"&" }}', {"var": "this & that"}, "this  that"),
+            'autoescape-filters02': ('{{ var|join:" & \" }}', {"var": ("Tom", "Dick", "Harry")}, "Tom & Dick & Harry"),
 
             # Literal strings are safe.
             'autoescape-literals01': ('{{ "this & that" }}',{}, "this & that"),
@@ -1791,7 +1791,7 @@ class TemplateTests(TransRealMixin, TestCase):
             'autoescape-stringiterations01': ('{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R,"),
 
             # Escape requirement survives lookup.
-            'autoescape-lookup01': ('{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that"),
+            'autoescape-lookup01': ('{{ var.key }}', {"var": {"key": "this & that"}}, "this &amp; that"),
 
             # Static template tags
             'static-prefixtag01': ('{% load static %}{% get_static_prefix %}', {}, settings.STATIC_URL),

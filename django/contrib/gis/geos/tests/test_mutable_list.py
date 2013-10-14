@@ -116,7 +116,7 @@ class ListMixinTest(unittest.TestCase):
                     self.assertEqual(pl, ul[:], 'set slice [%d:%d]' % (i, j))
 
                     for k in self.step_range():
-                        ssl = nextRange( len(ul[i:j:k]) )
+                        ssl = nextRange(len(ul[i:j:k]))
                         ul[i:j:k] = ssl
                         pl[i:j:k] = ssl
                         self.assertEqual(pl, ul[:], 'set slice [%d:%d:%d]' % (i, j, k))
@@ -127,12 +127,12 @@ class ListMixinTest(unittest.TestCase):
                             self.assertRaises(ValueError, setfcn, ul, i, j, k, sliceLen - 1)
 
                 for k in self.step_range():
-                    ssl = nextRange( len(ul[i::k]) )
+                    ssl = nextRange(len(ul[i::k]))
                     ul[i::k] = ssl
                     pl[i::k] = ssl
                     self.assertEqual(pl, ul[:], 'set slice [%d::%d]' % (i, k))
 
-                    ssl = nextRange( len(ul[:i:k]) )
+                    ssl = nextRange(len(ul[:i:k]))
                     ul[:i:k] = ssl
                     pl[:i:k] = ssl
                     self.assertEqual(pl, ul[:], 'set slice [:%d:%d]' % (i, k))
