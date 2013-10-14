@@ -65,6 +65,7 @@ class FileStorageTests(TestCase):
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
         self.assertEqual(obj2.normal.size, 12)
+        obj2.normal.close()
 
         # Push the objects into the cache to make sure they pickle properly
         cache.set("obj1", obj1)
@@ -75,6 +76,7 @@ class FileStorageTests(TestCase):
         obj2.delete()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
         self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
+        obj2.normal.close()
 
         # Multiple files with the same name get _N appended to them.
         objs = [Storage() for i in range(3)]
@@ -105,12 +107,14 @@ class FileStorageTests(TestCase):
         obj4 = Storage()
         obj4.random.save("random_file", ContentFile("random content"))
         self.assertTrue(obj4.random.name.endswith("/random_file"))
+        obj4.random.close()
 
         # upload_to can be empty, meaning it does not use subdirectory.
         obj5 = Storage()
         obj5.empty.save('django_test.txt', ContentFile('more content'))
         self.assertEqual(obj5.empty.name, "./django_test.txt")
         self.assertEqual(obj5.empty.read(), b"more content")
+        obj5.empty.close()
 
     def test_file_object(self):
         # Create sample file
