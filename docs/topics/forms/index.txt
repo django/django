@@ -319,6 +319,12 @@ attributes, which can be useful in your templates:
     The field's label wrapped in the appropriate HTML ``<label>`` tag,
     e.g. ``<label for="id_email">Email address</label>``
 
+``{{ field.id_for_label }}``
+    The ID that will be used for this field (``id_email`` in the example
+    above). You may want to use this in lieu of ``label_tag`` if you are
+    constructing the label manually. It's also useful, for example, if you have
+    some inline JavaScript and want to avoid hardcoding the field's ID.
+
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``
 
