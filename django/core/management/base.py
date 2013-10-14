@@ -3,6 +3,8 @@ Base classes for writing management commands (named commands which can
 be executed through ``django-admin.py`` or ``manage.py``).
 
 """
+from __future__ import unicode_literals
+
 import os
 import sys
 
