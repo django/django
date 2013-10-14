@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (Group, User, SiteProfileNotAvailable,
     UserManager)
+from django.contrib.auth.tests.custom_user import IsActiveTestUser1
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.db.models.signals import post_save
 from django.test import TestCase
