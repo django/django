@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, override_settings
 from django.utils import six
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -540,9 +540,7 @@ class ModelAdminTests(TestCase):
 class ValidationTests(unittest.TestCase):
     def test_validation_only_runs_in_debug(self):
         # Ensure validation only runs when DEBUG = True
-        try:
-            settings.DEBUG = True
-
+        with override_settings(DEBUG=True):
             class ValidationTestModelAdmin(ModelAdmin):
                 raw_id_fields = 10
 
@@ -555,11 +553,10 @@ class ValidationTests(unittest.TestCase):
                 ValidationTestModel,
                 ValidationTestModelAdmin,
             )
-        finally:
-            settings.DEBUG = False
 
-        site = AdminSite()
-        site.register(ValidationTestModel, ValidationTestModelAdmin)
+        with override_settings(DEBUG=False):
+            site = AdminSite()
+            site.register(ValidationTestModel, ValidationTestModelAdmin)
 
     def test_raw_id_fields_validation(self):
 
