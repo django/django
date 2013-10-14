@@ -478,8 +478,12 @@ Notes:
 
 * The ``render()`` method is where the work actually happens.
 
-* ``render()`` should never raise ``TemplateSyntaxError`` or any other
-  exception. It should fail silently, just as template filters should.
+* ``render()`` should generally fail silently, particularly in a production
+  environment where :setting:`DEBUG` and :setting:`TEMPLATE_DEBUG` are
+  ``False``. In some cases however, particularly if :setting:`TEMPLATE_DEBUG` is
+  ``True``, this method may raise an exception to make debugging easier. For
+  example, several core tags raise ``django.template.TemplateSyntaxError``
+  if they receive the wrong number or type of arguments.
 
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
