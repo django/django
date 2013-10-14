@@ -305,6 +305,11 @@ Management Commands
   ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
   the use of natural primary keys when serializing.
 
+* It is no longer necessary to provide the cache table name or the
+  :djadminopt:`--database` option for the :djadmin:`createcachetable` command.
+  Django takes this information from your settings file. If you have configured
+  multiple caches or multiple databases, all cache tables are created.
+
 Models
 ^^^^^^
 

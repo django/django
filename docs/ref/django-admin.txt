@@ -139,10 +139,10 @@ onto which the cachetable will be installed.
 
 .. versionchanged:: 1.7
 
-    It is no longer necessary to provide the cache table name in argument or the
+    It is no longer necessary to provide the cache table name or the
     :djadminopt:`--database` option. Django takes this information from your
     settings file. If you have configured multiple caches or multiple databases,
-    all the cache tables are created.
+    all cache tables are created.
 
 dbshell
 -------

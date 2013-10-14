@@ -203,10 +203,9 @@ table. It will only create missing tables.
 .. versionchanged:: 1.7
 
     Before Django 1.7, :djadmin:`createcachetable` created one table at a time.
-    You had to pass the name of the table you wanted to create in argument,
-    and if you were using multiple databases, you had to use the
-    :djadminopt:`--database` option. For backwards compatibility,
-    this is still possible.
+    You had to pass the name of the table you wanted to create, and if you were
+    using multiple databases, you had to use the :djadminopt:`--database`
+    option. For backwards compatibility, this is still possible.
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~

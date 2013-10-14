@@ -20,7 +20,7 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
-from django.db import router, transaction
+from django.db import connection, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
@@ -853,7 +853,6 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.custom_key_cache2 = get_cache(self.backend_name, LOCATION=self._table_name, KEY_FUNCTION='cache.tests.custom_key_func')
 
     def tearDown(self):
-        from django.db import connection
         cursor = connection.cursor()
         cursor.execute('DROP TABLE %s' % connection.ops.quote_name(self._table_name))
         connection.commit()
@@ -866,17 +865,18 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
-        with six.assertRaisesRegex(self, management.CommandError,
-                "Cache table 'test cache table' could not be created"):
-            management.call_command(
-               'createcachetable',
-                verbosity=0,
-                interactive=False
-            )
+        stdout = six.StringIO()
+        management.call_command(
+           'createcachetable',
+            stdout=stdout
+        )
+        self.assertEqual(stdout.getvalue(),
+            "Cache table '%s' already exists.\n" % self._table_name)
+
 
     def test_createcachetable_with_table_argument(self):
         """
-        Delete and recreate cache table with legacy behavior (explicitely
+        Delete and recreate cache table with legacy behavior (explicitly
         specifying the table name).
         """
         self.tearDown()
@@ -940,8 +940,11 @@ class CreateCacheTableForDBCacheTests(TestCase):
                                         database='default',
                                         verbosity=0, interactive=False)
             # cache table should be created on 'other'
-            # one query is used to create the table and another one the index
-            with self.assertNumQueries(2, using='other'):
+            # Queries:
+            #   1: check table doesn't already exist
+            #   2: create the table
+            #   3: create the index
+            with self.assertNumQueries(3, using='other'):
                 management.call_command('createcachetable',
                                         database='other',
                                         verbosity=0, interactive=False)

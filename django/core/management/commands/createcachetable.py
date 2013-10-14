@@ -39,6 +39,12 @@ class Command(BaseCommand):
         if not router.allow_migrate(database, cache.cache_model_class):
             return
         connection = connections[database]
+
+        if tablename in connection.introspection.table_names():
+            if self.verbosity > 0:
+                self.stdout.write("Cache table '%s' already exists." % tablename)
+            return
+
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
             models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
