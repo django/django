@@ -302,7 +302,9 @@ loop::
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }} {{ field }}
+                {{ field.label_tag }} 
+                {{ field }}
+                {{ field.id_for_label }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -318,6 +320,9 @@ attributes, which can be useful in your templates:
 ``{{ field.label_tag }}``
     The field's label wrapped in the appropriate HTML ``<label>`` tag.
 
+``{{ field.id_for_label }}``
+    The id of the field that will be used in the input element's field.    
+    
     .. versionchanged:: 1.6
 
         This includes the form's :attr:`~django.forms.Form.label_suffix`. For
