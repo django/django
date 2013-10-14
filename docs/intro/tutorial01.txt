@@ -181,6 +181,13 @@ It worked!
     Full docs for the development server can be found in the
     :djadmin:`runserver` reference.
 
+.. admonition:: Automatically reloading
+
+    The development server automatically reloads Python code for each request,
+    as needed. You don't need to restart the server for code changes to take
+    effect. However adding files or compiling translation files don't trigger
+    a restart, so you would have to restart the development server manually.
+
 Database setup
 --------------
 
