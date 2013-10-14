@@ -50,10 +50,10 @@ def get_filter_tests():
         'filter-timesince06' : ('{{ a|timesince:b }}', {'a':now_tz - timedelta(hours=8), 'b':now_tz}, '8\xa0hours'),
 
         # Regression for #7443
-        'filter-timesince07': ('{{ earlier|timesince }}', { 'earlier': now - timedelta(days=7) }, '1\xa0week'),
-        'filter-timesince08': ('{{ earlier|timesince:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '1\xa0week'),
-        'filter-timesince09': ('{{ later|timesince }}', { 'later': now + timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timesince10': ('{{ later|timesince:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '0\xa0minutes'),
+        'filter-timesince07': ('{{ earlier|timesince }}', {'earlier': now - timedelta(days=7)}, '1\xa0week'),
+        'filter-timesince08': ('{{ earlier|timesince:now }}', {'now': now, 'earlier': now - timedelta(days=7)}, '1\xa0week'),
+        'filter-timesince09': ('{{ later|timesince }}', {'later': now + timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timesince10': ('{{ later|timesince:now }}', {'now': now, 'later': now + timedelta(days=7)}, '0\xa0minutes'),
 
         # Ensures that differing timezones are calculated correctly
         # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
@@ -78,10 +78,10 @@ def get_filter_tests():
         'filter-timeuntil05' : ('{{ a|timeuntil:b }}', {'a':now - timedelta(days=2), 'b':now - timedelta(days=2, minutes=1)}, '1\xa0minute'),
 
         # Regression for #7443
-        'filter-timeuntil06': ('{{ earlier|timeuntil }}', { 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', { 'now': now, 'earlier': now - timedelta(days=7) }, '0\xa0minutes'),
-        'filter-timeuntil08': ('{{ later|timeuntil }}', { 'later': now + timedelta(days=7, hours=1) }, '1\xa0week'),
-        'filter-timeuntil09': ('{{ later|timeuntil:now }}', { 'now': now, 'later': now + timedelta(days=7) }, '1\xa0week'),
+        'filter-timeuntil06': ('{{ earlier|timeuntil }}', {'earlier': now - timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timeuntil07': ('{{ earlier|timeuntil:now }}', {'now': now, 'earlier': now - timedelta(days=7)}, '0\xa0minutes'),
+        'filter-timeuntil08': ('{{ later|timeuntil }}', {'later': now + timedelta(days=7, hours=1)}, '1\xa0week'),
+        'filter-timeuntil09': ('{{ later|timeuntil:now }}', {'now': now, 'later': now + timedelta(days=7)}, '1\xa0week'),
 
         # Ensures that differing timezones are calculated correctly
         # Tests trying to compare a timezone-aware 'now' to now aren't supported on no-tz-support systems (e.g Windows).
@@ -267,8 +267,8 @@ def get_filter_tests():
         'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x<"),
         'filter-default_if_none02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": None}, "x<"),
 
-        'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
-        'filter-phone2numeric02': ('{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "<1-800-2255-63> <1-800-2255-63>"),
+        'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")}, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
+        'filter-phone2numeric02': ('{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>")}, "<1-800-2255-63> <1-800-2255-63>"),
         'filter-phone2numeric03': ('{{ a|phone2numeric }}', {"a": "How razorback-jumping frogs can level six piqued gymnasts!"}, "469 729672225-5867464 37647 226 53835 749 747833 49662787!"),
 
         # Ensure iriencode keeps safe strings:
@@ -347,7 +347,7 @@ def get_filter_tests():
         # Test that joining with unsafe joiners don't result in unsafe strings (#11377)
         'join05': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
         'join06': (r'{{ a|join:var }}', {'a': ['alpha', 'beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
-        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & ' }, 'alpha &amp; beta &amp; me'),
+        'join07': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': ' & '}, 'alpha &amp; beta &amp; me'),
         'join08': (r'{{ a|join:var|lower }}', {'a': ['Alpha', 'Beta & me'], 'var': mark_safe(' & ')}, 'alpha & beta &amp; me'),
 
         'date01': (r'{{ d|date:"m" }}', {'d': datetime(2008, 1, 1)}, '01'),

@@ -755,7 +755,7 @@ class FormattingTests(TransRealMixin, TestCase):
         """
         Tests the {% localize %} templatetag
         """
-        context = Context({'value': 3.14 })
+        context = Context({'value': 3.14})
         template1 = Template("{% load l10n %}{% localize %}{{ value }}{% endlocalize %};{% localize on %}{{ value }}{% endlocalize %}")
         template2 = Template("{% load l10n %}{{ value }};{% localize off %}{{ value }};{% endlocalize %}{{ value }}")
         template3 = Template('{% load l10n %}{{ value }};{{ value|unlocalize }}')
@@ -789,7 +789,7 @@ class FormattingTests(TransRealMixin, TestCase):
                 'cents_paid': decimal.Decimal('59.47'),
                 'products_delivered': 12000,
                 })
-            context = Context({'form': form })
+            context = Context({'form': form})
             self.assertTrue(form.is_valid())
 
             self.assertHTMLEqual(

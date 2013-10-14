@@ -76,11 +76,11 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<br/>The <hr />quick brown fox jumped over'
             ' the lazy dog.')
         self.assertEqual('<br/>The <hr />quick brown...',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
         truncator = text.Truncator('<br>The <hr/>quick <em>brown fox</em> '
             'jumped over the lazy dog.')
         self.assertEqual('<br>The <hr/>quick <em>brown...</em>',
-            truncator.words(3, '...', html=True ))
+            truncator.words(3, '...', html=True))
 
         # Test html entities
         truncator = text.Truncator('<i>Buenos d&iacute;as!'
