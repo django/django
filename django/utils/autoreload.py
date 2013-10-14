@@ -28,12 +28,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import datetime
 import os
 import signal
 import sys
 import time
 import traceback
 
+from django.core.signals import request_finished
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -51,6 +53,18 @@ try:
 except ImportError:
     termios = None
 
+USE_INOTIFY = False
+try:
+    # Test whether inotify is enabled and likely to work
+    import pyinotify
+
+    fd = pyinotify.INotifyWrapper.create().inotify_init()
+    if fd >= 0:
+        USE_INOTIFY = True
+        os.close(fd)
+except ImportError:
+    pass
+
 RUN_RELOADER = True
 
 _mtimes = {}
@@ -58,14 +72,13 @@ _win = (sys.platform == "win32")
 
 _error_files = []
 
-def code_changed():
-    global _mtimes, _win
-    filenames = []
-    for m in list(sys.modules.values()):
-        try:
-            filenames.append(m.__file__)
-        except AttributeError:
-            pass
+
+def gen_filenames():
+    """
+    Yields a generator over filenames referenced in sys.modules.
+    """
+    filenames = [filename.__file__ for filename in sys.modules.values()
+                if hasattr(filename, '__file__')]
     for filename in filenames + _error_files:
         if not filename:
             continue
@@ -73,8 +86,42 @@ def code_changed():
             filename = filename[:-1]
         if filename.endswith("$py.class"):
             filename = filename[:-9] + ".py"
-        if not os.path.exists(filename):
-            continue # File might be in an egg, so it can't be reloaded.
+        if os.path.exists(filename):
+            yield filename
+
+def inotify_code_changed():
+    """
+    Checks for changed code using inotify. After being called
+    it blocks until a change event has been fired.
+    """
+    wm = pyinotify.WatchManager()
+    notifier = pyinotify.Notifier(wm)
+
+    def update_watch(sender=None, **kwargs):
+        mask = (
+            pyinotify.IN_MODIFY |
+            pyinotify.IN_DELETE |
+            pyinotify.IN_ATTRIB |
+            pyinotify.IN_MOVED_FROM |
+            pyinotify.IN_MOVED_TO |
+            pyinotify.IN_CREATE
+        )
+        for path in gen_filenames():
+            wm.add_watch(path, mask)
+
+    request_finished.connect(update_watch)
+    update_watch()
+
+    # Block forever
+    notifier.check_events(timeout=None)
+    notifier.stop()
+
+    # If we are here the code must have changed.
+    return True
+
+def code_changed():
+    global _mtimes, _win
+    for filename in gen_filenames():
         stat = os.stat(filename)
         mtime = stat.st_mtime
         if _win:
@@ -129,10 +176,15 @@ def ensure_echo_on():
 
 def reloader_thread():
     ensure_echo_on()
+    if USE_INOTIFY:
+        fn = inotify_code_changed
+    else:
+        fn = code_changed
     while RUN_RELOADER:
-        if code_changed():
+        if fn():
             sys.exit(3) # force reload
         time.sleep(1)
+
 
 def restart_with_reloader():
     while True:

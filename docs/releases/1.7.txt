@@ -343,6 +343,9 @@ Management Commands
   Django takes this information from your settings file. If you have configured
   multiple caches or multiple databases, all cache tables are created.
 
+* The :djadmin:`runserver` command now uses ``inotify`` Linux kernel signals
+  for autoreloading if ``pyinotify`` is installed.
+
 Models
 ^^^^^^
 
