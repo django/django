@@ -99,6 +99,12 @@ def create_permissions(app, created_models, verbosity, db=DEFAULT_DB_ALIAS, **kw
         for ctype, (codename, name) in searched_perms
         if (ctype.pk, codename) not in all_perms
     ]
+    # Validate the permissions before bulk_creation to avoid cryptic
+    # database error when the verbose_name is longer than 50 characters
+    for perm in perms:
+        if len(perm.name) > 50:
+            raise exceptions.ValidationError(
+                "The verbose_name of %s is longer than 39 characters" % perm.content_type)
     auth_app.Permission.objects.using(db).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
