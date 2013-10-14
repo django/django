@@ -19,8 +19,8 @@ Testing operates at different levels. Some tests might apply to a tiny detail
 examine the overall operation of the software - *does a sequence of user inputs
 on the site produce the desired result?* That's no different from the kind of
 testing you did earlier in :doc:`Tutorial 1 </intro/tutorial01>`, using the
-shell to examine the behavior of a method, or running the application and
-entering data to check how it behaves.
+:djadmin:`shell` to examine the behavior of a method, or running the
+application and entering data to check how it behaves.
 
 What's different in *automated* tests is that the testing work is done for
 you by the system. You create a set of tests once, and then as you make changes
@@ -137,7 +137,7 @@ the ``Poll``'s ``pub_date`` field is in the future (which certainly isn't).
 You can see this in the Admin; create a poll whose date lies in the future;
 you'll see that the ``Poll`` change list claims it was published recently.
 
-You can also see this using the shell::
+You can also see this using the :djadmin:`shell`::
 
     >>> import datetime
     >>> from django.utils import timezone
@@ -153,8 +153,8 @@ Since things in the future are not 'recent', this is clearly wrong.
 Create a test to expose the bug
 -------------------------------
 
-What we've just done in the shell to test for the problem is exactly what we
-can do in an automated test, so let's turn that into an automated test.
+What we've just done in the :djadmin:`shell` to test for the problem is exactly
+what we can do in an automated test, so let's turn that into an automated test.
 
 The best place for an application's tests is in the application's ``tests.py``
 file - the testing system will look there for tests automatically.
@@ -318,11 +318,11 @@ The Django test client
 
 Django provides a test :class:`~django.test.client.Client` to simulate a user
 interacting with the code at the view level.  We can use it in ``tests.py``
-or even in the shell.
+or even in the :djadmin:`shell`.
 
-We will start again with the shell, where we need to do a couple of things that
-won't be necessary in ``tests.py``. The first is to set up the test environment
-in the shell::
+We will start again with the :djadmin:`shell`, where we need to do a couple of
+things that won't be necessary in ``tests.py``. The first is to set up the test
+environment in the :djadmin:`shell`::
 
     >>> from django.test.utils import setup_test_environment
     >>> setup_test_environment()
@@ -421,7 +421,7 @@ runserver, loading the site in your browser, creating ``Polls`` with dates in
 the past and future, and checking that only those that have been published are
 listed.  You don't want to have to do that *every single time you make any
 change that might affect this* - so let's also create a test, based on our
-shell session above.
+:djadmin:`shell` session above.
 
 Add the following to ``polls/tests.py``::
 
