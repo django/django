@@ -332,7 +332,8 @@ class BaseDatabaseWrapper(object):
         """
         self.validate_no_atomic_block()
         self.ensure_connection()
-        self._set_autocommit(autocommit)
+        with self.wrap_database_errors:
+            self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
     def get_rollback(self):
