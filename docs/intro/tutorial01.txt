@@ -344,7 +344,10 @@ the text of the choice and a vote tally. Each ``Choice`` is associated with a
 ``Question``.
 
 These concepts are represented by simple Python classes. Edit the
-:file:`polls/models.py` file so it looks like this::
+:file:`polls/models.py` file so it looks like this:
+
+.. snippet::
+    :filename: polls/models.py
 
     from django.db import models
 
@@ -415,7 +418,10 @@ But first we need to tell our project that the ``polls`` app is installed.
 
 Edit the :file:`mysite/settings.py` file again, and change the
 :setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
-look like this::
+look like this:
+
+.. snippet::
+    :filename: mysite/settings.py
 
     INSTALLED_APPS = (
         'django.contrib.admin',
@@ -589,7 +595,10 @@ of this object. Let's fix that by editing the ``Question`` model (in the
 ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__unicode__` method to both ``Question`` and
 ``Choice``. On Python 3, simply replace ``__unicode__`` by ``__str__`` in the
-following example::
+following example:
+
+.. snippet::
+    :filename: polls/models.py
 
     from django.db import models
 
@@ -633,7 +642,10 @@ admin.
     luck, things should Just Work for you.
 
 Note these are normal Python methods. Let's add a custom method, just for
-demonstration::
+demonstration:
+
+.. snippet::
+    :filename: polls/models.py
 
     import datetime
     from django.utils import timezone

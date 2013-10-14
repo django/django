@@ -79,7 +79,10 @@ But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: we need to tell the admin that ``Question``
 objects have an admin interface. To do this, open the :file:`polls/admin.py`
-file, and edit it to look like this::
+file, and edit it to look like this:
+
+.. snippet::
+    :filename: polls/admin.py
 
     from django.contrib import admin
     from polls.models import Question
@@ -156,7 +159,10 @@ to customize how the admin form looks and works. You'll do this by telling
 Django the options you want when you register the object.
 
 Let's see how this works by re-ordering the fields on the edit form. Replace
-the ``admin.site.register(Question)`` line with::
+the ``admin.site.register(Question)`` line with:
+
+.. snippet::
+    :filename: polls/admin.py
 
     from django.contrib import admin
     from polls.models import Question
@@ -181,7 +187,10 @@ This isn't impressive with only two fields, but for admin forms with dozens
 of fields, choosing an intuitive order is an important usability detail.
 
 And speaking of forms with dozens of fields, you might want to split the form
-up into fieldsets::
+up into fieldsets:
+
+.. snippet::
+    :filename: polls/admin.py
 
     from django.contrib import admin
     from polls.models import Question
@@ -204,7 +213,10 @@ Here's what our form looks like now:
 You can assign arbitrary HTML classes to each fieldset. Django provides a
 ``"collapse"`` class that displays a particular fieldset initially collapsed.
 This is useful when you have a long form that contains a number of fields that
-aren't commonly used::
+aren't commonly used:
+
+.. snippet::
+    :filename: polls/admin.py
 
         from django.contrib import admin
         from polls.models import Question
@@ -228,7 +240,10 @@ the admin page doesn't display choices.
 Yet.
 
 There are two ways to solve this problem. The first is to register ``Choice``
-with the admin just as we did with ``Question``. That's easy::
+with the admin just as we did with ``Question``. That's easy:
+
+.. snippet::
+    :filename: polls/admin.py
 
     from django.contrib import admin
     from polls.models import Choice
@@ -258,7 +273,10 @@ It'd be better if you could add a bunch of Choices directly when you create the
 ``Question`` object. Let's make that happen.
 
 Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
-registration code to read::
+registration code to read:
+
+.. snippet::
+    :filename: polls/admin.py
 
     from django.contrib import admin
     from polls.models import Choice, Question
@@ -302,7 +320,10 @@ that you can't remove the original three slots. This image shows an added slot:
 One small problem, though. It takes a lot of screen space to display all the
 fields for entering related ``Choice`` objects. For that reason, Django offers a
 tabular way of displaying inline related objects; you just need to change
-the ``ChoiceInline`` declaration to read::
+the ``ChoiceInline`` declaration to read:
+
+.. snippet::
+    :filename: polls/admin.py
 
     class ChoiceInline(admin.TabularInline):
         #...
@@ -330,14 +351,20 @@ Here's what it looks like at this point:
 By default, Django displays the ``str()`` of each object. But sometimes it'd be
 more helpful if we could display individual fields. To do that, use the
 ``list_display`` admin option, which is a tuple of field names to display, as
-columns, on the change list page for the object::
+columns, on the change list page for the object:
+
+.. snippet::
+    :filename: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
         list_display = ('question_text', 'pub_date')
 
 Just for good measure, let's also include the ``was_published_recently`` custom
-method from Tutorial 1::
+method from Tutorial 1:
+
+.. snippet::
+    :filename: polls/admin.py
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
@@ -356,7 +383,10 @@ underscores replaced with spaces), and that each line contains the string
 representation of the output.
 
 You can improve that by giving that method (in :file:`polls/models.py`) a few
-attributes, as follows::
+attributes, as follows:
+
+.. snippet::
+    :filename: polls/admin.py
 
     class Question(models.Model):
         # ...
@@ -417,7 +447,10 @@ whatever user your server runs.) However, keeping your templates within the
 project is a good convention to follow.
 
 Open your settings file (:file:`mysite/settings.py`, remember) and add a
-:setting:`TEMPLATE_DIRS` setting::
+:setting:`TEMPLATE_DIRS` setting:
+
+.. snippet::
+    :filename: mysite/settings.py
 
     TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
