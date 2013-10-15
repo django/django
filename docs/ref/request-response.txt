@@ -110,6 +110,9 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.REQUEST
 
+    .. deprecated:: 1.7
+        Use the more explicit ``GET`` and ``POST`` instead.
+
     For convenience, a dictionary-like object that searches ``POST`` first,
     then ``GET``. Inspired by PHP's ``$_REQUEST``.
 

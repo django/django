@@ -144,7 +144,8 @@ class UserAdmin(admin.ModelAdmin):
             'adminForm': adminForm,
             'form_url': form_url,
             'form': form,
-            'is_popup': IS_POPUP_VAR in request.REQUEST,
+            'is_popup': (IS_POPUP_VAR in request.POST or
+                         IS_POPUP_VAR in request.GET),
             'add': True,
             'change': False,
             'has_delete_permission': False,

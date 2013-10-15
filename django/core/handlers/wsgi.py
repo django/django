@@ -5,6 +5,7 @@ import logging
 import sys
 from io import BytesIO
 from threading import Lock
+import warnings
 
 from django import http
 from django.conf import settings
@@ -129,6 +130,8 @@ class WSGIRequest(http.HttpRequest):
         return content_type, content_params
 
     def _get_request(self):
+        warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
+                      '`request.POST` instead.', PendingDeprecationWarning, 2)
         if not hasattr(self, '_request'):
             self._request = datastructures.MergeDict(self.POST, self.GET)
         return self._request

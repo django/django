@@ -12,6 +12,8 @@ class MergeDict(object):
     first occurrence will be used.
     """
     def __init__(self, *dicts):
+        warnings.warn('`MergeDict` is deprecated, use `dict.update()` '
+                      'instead.', PendingDeprecationWarning, 2)
         self.dicts = dicts
 
     def __bool__(self):

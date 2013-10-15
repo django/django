@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
+import warnings
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
@@ -560,9 +561,12 @@ class FormsTestCase(TestCase):
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
-        data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
-        f = SongForm(data)
-        self.assertEqual(f.errors, {})
+        # MergeDict is deprecated, but is supported until removed.
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
+            f = SongForm(data)
+            self.assertEqual(f.errors, {})
 
     def test_multiple_hidden(self):
         class SongForm(Form):
