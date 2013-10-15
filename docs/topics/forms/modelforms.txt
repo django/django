@@ -941,7 +941,7 @@ class's ``clean`` method::
             # example custom validation across forms in the formset:
             for form in self.forms:
                 # your custom formset validation
-                pass
+                ...
 
 Using a custom queryset
 -----------------------
@@ -1068,12 +1068,34 @@ a particular author, you could do this::
 
     :ref:`Manually rendered can_delete and can_order <manually-rendered-can-delete-and-can-order>`.
 
-Overriding ``clean()`` on an ``InlineFormSet``
-----------------------------------------------
+Overriding methods on an ``InlineFormSet``
+------------------------------------------
 
-See :ref:`model-formsets-overriding-clean`, but subclass
+When overriding methods on ``InlineFormSet``, you should subclass
 :class:`~models.BaseInlineFormSet` rather than
 :class:`~models.BaseModelFormSet`.
+
+For example, If you want to override ``clean()``::
+
+    from django.forms.models import BaseInlineFormSet
+
+    class MyModelFormSet(BaseInlineFormSet):
+        def clean(self):
+            super(MyModelFormSet, self).clean()
+            # example custom validation across forms in the formset:
+            for form in self.forms:
+                # your custom formset validation
+                ...
+
+See also :ref:`model-formsets-overriding-clean`.
+
+Then when you create your inline formset, pass in the optional argument
+``formset``::
+
+    >>> from django.forms.models import inlineformset_factory
+    >>> BookFormSet = inlineformset_factory(Author, Book, formset=MyModelFormSet)
+    >>> author = Author.objects.get(name=u'Mike Royko')
+    >>> formset = BookFormSet(instance=author)
 
 More than one foreign key to the same model
 -------------------------------------------
