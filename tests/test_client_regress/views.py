@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -32,13 +33,20 @@ get_view = login_required(get_view)
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
+
+    # request.REQUEST is deprecated, but needs testing until removed.
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        request_foo = request.REQUEST.get('foo')
+        request_bar = request.REQUEST.get('bar')
+
     return render_to_response(template, {
-        'get-foo':request.GET.get('foo',None),
-        'get-bar':request.GET.get('bar',None),
-        'post-foo':request.POST.get('foo',None),
-        'post-bar':request.POST.get('bar',None),
-        'request-foo':request.REQUEST.get('foo',None),
-        'request-bar':request.REQUEST.get('bar',None),
+        'get-foo': request.GET.get('foo'),
+        'get-bar': request.GET.get('bar'),
+        'post-foo': request.POST.get('foo'),
+        'post-bar': request.POST.get('bar'),
+        'request-foo': request_foo,
+        'request-bar': request_bar,
         'data': data,
     })
 

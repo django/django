@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, RequestFactory
 from django.utils import six
+from django.utils.datastructures import MergeDict
 from django.utils.deprecation import RenameMethodsBase
 
 
@@ -155,4 +156,23 @@ class RenameMethodsTests(SimpleTestCase):
             self.assertEqual(msgs, [
                 '`DeprecatedMixin.old` is deprecated, use `new` instead.',
                 '`RenamedMixin.old` is deprecated, use `new` instead.',
+            ])
+
+
+class DeprecatingRequestMergeDictTest(SimpleTestCase):
+    def test_deprecated_request(self):
+        """
+        Ensure the correct warning is raised when WSGIRequest.REQUEST is
+        accessed.
+        """
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
+            request = RequestFactory().get('/')
+            _ = request.REQUEST
+
+            msgs = [str(warning.message) for warning in recorded]
+            self.assertEqual(msgs, [
+                '`request.REQUEST` is deprecated, use `request.GET` or '
+                '`request.POST` instead.',
+                '`MergeDict` is deprecated, use `dict.update()` instead.',
             ])

@@ -136,7 +136,7 @@ class SortedDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
         self.assertEqual(list(reversed(self.d2)), [7, 0, 9, 1])
 
 
-class MergeDictTests(SimpleTestCase):
+class MergeDictTests(IgnorePendingDeprecationWarningsMixin, SimpleTestCase):
 
     def test_simple_mergedict(self):
         d1 = {'chris':'cool', 'camri':'cute', 'cotton':'adorable',

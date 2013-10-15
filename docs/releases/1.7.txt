@@ -639,3 +639,18 @@ deprecated. Use :djadminopt:`--natural-foreign` instead.
 
 Similarly, the ``use_natural_keys`` argument for ``serializers.serialize()``
 has been deprecated. Use ``use_natural_foreign_keys`` instead.
+
+Merging of ``POST`` and ``GET`` arguments into ``WSGIRequest.REQUEST``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It was already strongly suggested that you use ``GET`` and ``POST`` instead of
+``REQUEST``, because the former are more explicit. The property ``REQUEST`` is
+deprecated and will be removed in Django 1.9.
+
+``django.utils.datastructures.MergeDict`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``MergeDict`` exists primarily to support merging ``POST`` and ``GET``
+arguments into a ``REQUEST`` property on ``WSGIRequest``. To merge
+dictionaries, use ``dict.update()`` instead. The class ``MergeDict`` is
+deprecated and will be removed in Django 1.9.

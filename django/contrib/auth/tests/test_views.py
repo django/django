@@ -526,7 +526,6 @@ class LoginTest(AuthViewsTestCase):
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
         req.method = "POST"
         req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
-        req.REQUEST = req.POST
 
         # Use POST request to log in
         SessionMiddleware().process_request(req)

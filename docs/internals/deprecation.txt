@@ -469,6 +469,10 @@ these changes.
 
 * ``django.forms.get_declared_fields`` will be removed.
 
+* The ``WSGIRequest.REQUEST`` property will be removed.
+
+* The class ``django.utils.datastructures.MergeDict`` will be removed.
+
 2.0
 ---
 
