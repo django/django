@@ -137,3 +137,10 @@ class ConcreteRelatedModel(models.Model):
 class ProxyRelatedModel(ConcreteRelatedModel):
     class Meta:
         proxy = True
+
+
+# To test fix for #7551
+class AllowsNullGFK(models.Model):
+    content_type = models.ForeignKey(ContentType, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = generic.GenericForeignKey()
