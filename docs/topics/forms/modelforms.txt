@@ -644,11 +644,24 @@ There are a couple of things to note, however.
   used. This means the child's ``Meta``, if it exists, otherwise the
   ``Meta`` of the first parent, etc.
 
-* For technical reasons, a subclass cannot inherit from both a ``ModelForm``
-  and a ``Form`` simultaneously.
+.. versionchanged:: 1.7
 
-Chances are these notes won't affect you unless you're trying to do something
-tricky with subclassing.
+* It's possible to inherit from both ``Form`` and ``ModelForm`` simultaneuosly,
+  however, you must ensure that ``ModelForm`` appears first in the MRO. This is
+  because these classes rely on different metaclasses and a class can only have
+  one metaclass.
+
+.. versionadded:: 1.7
+
+* It's possible to opt-out from a ``Field`` inherited from a parent class by
+  shadowing it. While any non-``Field`` value works for this purpose, it's
+  recommended to use ``None`` to make it explicit that a field is being
+  nullified.
+
+  You can only use this technique to opt out from a field defined declaratively
+  by a parent class; it won't prevent the ``ModelForm`` metaclass from generating
+  a default field. To opt-out from default fields, see
+  :ref:`controlling-fields-with-fields-and-exclude`.
 
 .. _modelforms-factory:
 
@@ -747,6 +760,8 @@ instances of the model, you can specify an empty QuerySet::
 
    >>> AuthorFormSet(queryset=Author.objects.none())
 
+
+.. _controlling-fields-with-fields-and-exclude:
 
 Controlling which fields are used with ``fields`` and ``exclude``
 -----------------------------------------------------------------

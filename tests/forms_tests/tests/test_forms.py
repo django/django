@@ -1302,10 +1302,10 @@ class FormsTestCase(TestCase):
             haircut_type = CharField()
 
         b = Beatle(auto_id=False)
-        self.assertHTMLEqual(b.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(b.as_ul(), """<li>Instrument: <input type="text" name="instrument" /></li>
+<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-<li>Instrument: <input type="text" name="instrument" /></li>
 <li>Haircut type: <input type="text" name="haircut_type" /></li>""")
 
     def test_forms_with_prefixes(self):

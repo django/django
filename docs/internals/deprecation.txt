@@ -467,6 +467,8 @@ these changes.
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
   removed. Use ``use_natural_foreign_keys`` instead.
 
+* ``django.forms.get_declared_fields`` will be removed.
+
 2.0
 ---
 
