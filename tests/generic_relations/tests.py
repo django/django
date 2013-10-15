@@ -4,11 +4,12 @@ from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.utils import six
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
                      Vegetable, Mineral, Gecko, Rock, ManualPK,
                      ForProxyModelModel, ForConcreteModelModel,
-                     ProxyRelatedModel, ConcreteRelatedModel)
+                     ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
 
 
 class GenericRelationsTests(TestCase):
@@ -440,3 +441,17 @@ class ProxyRelatedModelTest(TestCase):
         newrel.bases = [base]
         newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
         self.assertEqual(base, newrel.bases.get())
+
+
+class TestInitWithNoneArgument(TestCase):
+    def test_none_not_allowed(self):
+        # TaggedItem requires a content_type, initializing with None should
+        # raise a ValueError.
+        with six.assertRaisesRegex(self, ValueError,
+          'Cannot assign None: "TaggedItem.content_type" does not allow null values'):
+            TaggedItem(content_object=None)
+
+    def test_none_allowed(self):
+        # AllowsNullGFK doesn't require a content_type, so None argument should
+        # also be allowed.
+        AllowsNullGFK(content_object=None)

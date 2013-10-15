@@ -59,8 +59,12 @@ class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
         """
         if self.name in kwargs:
             value = kwargs.pop(self.name)
-            kwargs[self.ct_field] = self.get_content_type(obj=value)
-            kwargs[self.fk_field] = value._get_pk_val()
+            if value is not None:
+                kwargs[self.ct_field] = self.get_content_type(obj=value)
+                kwargs[self.fk_field] = value._get_pk_val()
+            else:
+                kwargs[self.ct_field] = None
+                kwargs[self.fk_field] = None
 
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
