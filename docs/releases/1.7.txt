@@ -533,6 +533,12 @@ Miscellaneous
   you relied on the default field ordering while having fields defined on both
   the current class *and* on a parent ``Form``.
 
+* :meth:`~django.db.models.query.QuerySet.select_related` now chains in the
+  same way as other similar calls like ``prefetch_related``. That is,
+  ``select_related('foo', 'bar')`` is equivalent to
+  ``select_related('foo').select_related('bar')``. Previously the latter would
+  have been equivalent to ``select_related('bar')``.
+
 Features deprecated in 1.7
 ==========================
 
