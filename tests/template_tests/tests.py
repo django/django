@@ -1817,17 +1817,15 @@ class TemplateTests(TransRealMixin, TestCase):
 
         return tests
 
-class TemplateTagLoading(unittest.TestCase):
+class TemplateTagLoading(TestCase):
 
     def setUp(self):
         self.old_path = sys.path[:]
-        self.old_apps = settings.INSTALLED_APPS
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         self.old_tag_modules = template_base.templatetags_modules
         template_base.templatetags_modules = []
 
     def tearDown(self):
-        settings.INSTALLED_APPS = self.old_apps
         sys.path = self.old_path
         template_base.templatetags_modules = self.old_tag_modules
 
@@ -1840,11 +1838,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_error_egg(self):
         ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
@@ -1852,11 +1850,11 @@ class TemplateTagLoading(unittest.TestCase):
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
+    @override_settings(INSTALLED_APPS=('tagsegg',))
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         sys.path.append(egg_name)
-        settings.INSTALLED_APPS = ('tagsegg',)
         t = template.Template(ttext)
 
 
