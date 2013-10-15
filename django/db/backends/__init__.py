@@ -1,8 +1,6 @@
 import datetime
 import time
 
-from django.db.utils import DatabaseError, ProgrammingError
-
 try:
     from django.utils.six.moves import _thread as thread
 except ImportError:
@@ -16,7 +14,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.signals import connection_created
 from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseErrorWrapper
+from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
