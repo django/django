@@ -30,7 +30,13 @@ else:
     EscapeUnicode = EscapeText
 
 class SafeData(object):
-    pass
+    def __html__(self):
+        """
+        Returns the html representation of a string.
+
+        Allows interoperability with other template engines.
+        """
+        return self
 
 class SafeBytes(bytes, SafeData):
     """

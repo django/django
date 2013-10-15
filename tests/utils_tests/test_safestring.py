@@ -4,7 +4,7 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.utils.encoding import force_text, force_bytes
 from django.utils.functional import lazy, Promise
-from django.utils.html import escape, conditional_escape
+from django.utils.html import escape
 from django.utils.safestring import mark_safe, mark_for_escaping
 from django.utils import six
 from django.utils import translation
@@ -50,3 +50,7 @@ class SafeStringTest(TestCase):
         s = mark_safe(translation.ugettext_lazy("username"))
         with translation.override('fr'):
             self.assertRenderEqual('{{ s }}', "nom d'utilisateur", s=s)
+
+    def test_html(self):
+        s = '<h1>interop</h1>'
+        self.assertEqual(s, mark_safe(s).__html__())
