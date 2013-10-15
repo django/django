@@ -267,6 +267,9 @@ Miscellaneous
 
 * ``django.contrib.gis`` dropped support for GEOS 3.1 and GDAL 1.6.
 
+* The :tfilter:`length` template filter now returns ``0`` for an undefined
+  variable, rather than an empty string.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8

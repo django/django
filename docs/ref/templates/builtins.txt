@@ -1688,6 +1688,11 @@ For example::
 If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
 
+.. versionchanged:: 1.8
+
+    The filter returns ``0`` for an undefined variable. Previously, it returned
+    an empty string.
+
 .. templatefilter:: length_is
 
 length_is

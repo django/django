@@ -578,7 +578,7 @@ def length(value):
     try:
         return len(value)
     except (ValueError, TypeError):
-        return ''
+        return 0
 
 
 @register.filter(is_safe=False)
