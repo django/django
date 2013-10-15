@@ -420,20 +420,13 @@ class WizardInlineFormSetTests(TestCase):
                 if self.instance is None:
                     poet = Poet.objects.create(name='test')
                     poem = poet.poem_set.create(name='test poem')
-                    poet.save()
-                    poem.save()
                     self.instance = poet
                 
                 return self.instance
                 
-            
         view = InlineFormSetWizard.as_view([PoemFormSet])
         response = view(self.rf.get('/'))
         formset = response.context_data['wizard']['form']
 
-        print(formset.queryset)
-        print(formset.instance)
         self.assertNotEqual(formset.instance, None)
-        self.assertEqual(formset.initial_form_count(), 1)
-            
-           
+
