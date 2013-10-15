@@ -938,7 +938,7 @@ class's ``clean`` method::
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
             super(MyModelFormSet, self).clean()
-            # example custom validation across forms in the formset:
+            # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
                 ...
@@ -1075,14 +1075,14 @@ When overriding methods on ``InlineFormSet``, you should subclass
 :class:`~models.BaseInlineFormSet` rather than
 :class:`~models.BaseModelFormSet`.
 
-For example, If you want to override ``clean()``::
+For example, if you want to override ``clean()``::
 
     from django.forms.models import BaseInlineFormSet
 
-    class MyModelFormSet(BaseInlineFormSet):
+    class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
-            # example custom validation across forms in the formset:
+            super(CustomInlineFormSet, self).clean()
+            # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
                 ...
@@ -1093,7 +1093,7 @@ Then when you create your inline formset, pass in the optional argument
 ``formset``::
 
     >>> from django.forms.models import inlineformset_factory
-    >>> BookFormSet = inlineformset_factory(Author, Book, formset=MyModelFormSet)
+    >>> BookFormSet = inlineformset_factory(Author, Book, formset=CustomInlineFormSet)
     >>> author = Author.objects.get(name=u'Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
