@@ -234,9 +234,11 @@ class FileSystemStorage(Storage):
                 break
 
         if self.permissions_mode is not None:
-            os.chmod(full_path, self.permissions_mode)
-        elif settings.FILE_UPLOAD_PERMISSIONS:
-            os.chmod(full_path, settings.FILE_UPLOAD_PERMISSIONS)
+            mode = self.permissions_mode
+        else:
+            mode = settings.FILE_UPLOAD_PERMISSIONS
+        if mode is not None:
+            os.chmod(full_path, mode)
 
         return name
 
