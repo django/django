@@ -15,7 +15,8 @@ class EmailBackend(BaseEmailBackend):
     A wrapper that manages the SMTP network connection.
     """
     def __init__(self, host=None, port=None, username=None, password=None,
-                 use_tls=None, fail_silently=False, use_ssl=None, **kwargs):
+                 use_tls=None, fail_silently=False, use_ssl=None, timeout=None,
+                 **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
@@ -23,6 +24,7 @@ class EmailBackend(BaseEmailBackend):
         self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
         self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+        self.timeout = timeout
         if self.use_ssl and self.use_tls:
             raise ValueError(
                 "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
@@ -38,24 +40,22 @@ class EmailBackend(BaseEmailBackend):
         if self.connection:
             # Nothing to do if the connection is already open.
             return False
+
+        connection_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+        # If local_hostname is not specified, socket.getfqdn() gets used.
+        # For performance, we use the cached FQDN for local_hostname.
+        connection_params = {'local_hostname': DNS_NAME.get_fqdn()}
+        if self.timeout is not None:
+            connection_params['timeout'] = self.timeout
         try:
-            # If local_hostname is not specified, socket.getfqdn() gets used.
-            # For performance, we use the cached FQDN for local_hostname.
-            if self.use_ssl:
-                self.connection = smtplib.SMTP_SSL(self.host, self.port,
-                                           local_hostname=DNS_NAME.get_fqdn())
-            else:
-                self.connection = smtplib.SMTP(self.host, self.port,
-                                           local_hostname=DNS_NAME.get_fqdn())
-                # TLS/SSL are mutually exclusive, so only attempt TLS over
-                # non-secure connections.
-                if self.use_tls:
-                    self.connection.ehlo()
-                    self.connection.starttls()
-                    self.connection.ehlo()
-            if self.username and self.password:
-                self.connection.login(self.username, self.password)
-            return True
+            self.connection = connection_class(self.host, self.port, **connection_params)
+
+            # TLS/SSL are mutually exclusive, so only attempt TLS over
+            # non-secure connections.
+            if not self.use_ssl and self.use_tls:
+                self.connection.ehlo()
+                self.connection.starttls()
+                self.connection.ehlo()
         except smtplib.SMTPException:
             if not self.fail_silently:
                 raise
