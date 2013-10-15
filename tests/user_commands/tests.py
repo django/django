@@ -1,5 +1,6 @@
 import sys
 
+from django import db
 from django.core import management
 from django.core.management import CommandError
 from django.core.management.utils import popen_wrapper
@@ -60,6 +61,10 @@ class CommandTests(SimpleTestCase):
             management.call_command('leave_locale_alone_true', stdout=out)
             self.assertEqual(out.getvalue(), "pl\n")
 
+    def test_close_connection(self):
+        management.call_command('enter_transaction')
+        for connection in db.connections.all():
+            self.assertEqual(connection.transaction_state, [])
 
 class UtilsTests(SimpleTestCase):
 

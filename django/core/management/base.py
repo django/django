@@ -303,6 +303,7 @@ class BaseCommand(object):
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
+            django.db.close_old_connections()
 
     def validate(self, app=None, display_num_errors=False):
         """
