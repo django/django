@@ -386,6 +386,12 @@ Templates
   <naive_vs_aware_datetimes>` ``datetime`` instances performing the expected
   rendering.
 
+Requests
+^^^^^^^^
+
+* The new :attr:`HttpRequest.scheme <django.http.HttpRequest.scheme>` attribute
+  specifies the scheme of the request (``http`` or ``https`` normally).
+
 Tests
 ^^^^^
 

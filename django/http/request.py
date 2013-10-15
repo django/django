@@ -129,15 +129,16 @@ class HttpRequest(object):
         if not location:
             location = self.get_full_path()
         if not absolute_http_url_re.match(location):
-            current_uri = '%s://%s%s' % ('https' if self.is_secure() else 'http',
+            current_uri = '%s://%s%s' % (self.scheme,
                                          self.get_host(), self.path)
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
 
-    def _is_secure(self):
-        return os.environ.get("HTTPS") == "on"
+    def _get_scheme(self):
+        return 'https' if os.environ.get("HTTPS") == "on" else 'http'
 
-    def is_secure(self):
+    @property
+    def scheme(self):
         # First, check the SECURE_PROXY_SSL_HEADER setting.
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
@@ -145,11 +146,13 @@ class HttpRequest(object):
             except ValueError:
                 raise ImproperlyConfigured('The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.')
             if self.META.get(header, None) == value:
-                return True
-
-        # Failing that, fall back to _is_secure(), which is a hook for
+                return 'https'
+        # Failing that, fall back to _get_scheme(), which is a hook for
         # subclasses to implement.
-        return self._is_secure()
+        return self._get_scheme()
+
+    def is_secure(self):
+        return self.scheme == 'https'
 
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
