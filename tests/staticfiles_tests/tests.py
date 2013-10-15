@@ -7,6 +7,7 @@ import posixpath
 import shutil
 import sys
 import tempfile
+import unittest
 
 from django.template import loader, Context
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.utils._os import rmtree_errorhandler, upath
 from django.utils import six
 
 from django.contrib.staticfiles import finders, storage
+from django.contrib.staticfiles.management.commands import collectstatic
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {
@@ -804,3 +806,37 @@ class TestAppStaticStorage(TestCase):
             st.path('bar')
         finally:
             sys.getfilesystemencoding = old_enc_func
+
+
+@unittest.skipIf(sys.platform.startswith('win'),
+    "Windows only partially supports chmod.")
+class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
+
+    @override_settings(STATIC_FILE_PERMISSIONS=0o654)
+    def test_collect_static_file_permissions(self):
+        command = collectstatic.Command()
+        command.execute(**self.defaults)
+        mode = os.stat(
+                settings.STATIC_ROOT + os.path.sep + "test.txt")[0] & 0o777
+        self.assertEqual(mode, 0o654)
+
+    @override_settings(STATIC_FILE_PERMISSIONS=None,
+                       FILE_UPLOAD_PERMISSIONS=0o655)
+    def test_collect_static_file_default_permissions(self):
+        command = collectstatic.Command()
+        command.execute(**self.defaults)
+        mode = os.stat(
+                settings.STATIC_ROOT + os.path.sep + "test.txt")[0] & 0o777
+        self.assertEqual(mode, 0o655)
+
+    # It is very hard to pass settings to external process, so we use instance
+    # of collectstatic command directly to collect static files.
+    def run_collectstatic(self, **kwargs):
+        self.defaults = {'interactive': False,
+                         'post_process': True,
+                         'verbosity': '0',
+                         'ignore_patterns': ['*.ignoreme'],
+                         'use_default_ignore_patterns': True,
+                         'clear': False,
+                         'link': False,
+                         'dry_run': False}

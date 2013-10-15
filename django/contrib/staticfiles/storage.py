@@ -28,6 +28,7 @@ class StaticFilesStorage(FileSystemStorage):
     ``STATIC_ROOT`` and ``STATIC_URL``.
     """
     def __init__(self, location=None, base_url=None, *args, **kwargs):
+        self.permissions_mode = settings.STATIC_FILE_PERMISSIONS
         if location is None:
             location = settings.STATIC_ROOT
         if base_url is None:

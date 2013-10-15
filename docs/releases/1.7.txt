@@ -337,6 +337,12 @@ Signals
 * The ``enter`` argument was added to the
   :data:`~django.test.signals.setting_changed` signal.
 
+Static File
+^^^^^^^^^^^
+
+* The new :setting:`STATIC_FILE_PERMISSIONS` controls the file system
+  permissions of newly-collected static files during deployment.
+
 Templates
 ^^^^^^^^^
 
