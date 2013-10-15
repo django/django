@@ -288,6 +288,14 @@ Forms
   :func:`~django.forms.formsets.formset_factory` to allow validating
   a minimum number of submitted forms.
 
+* The metaclasses used by ``Form`` and ``ModelForm`` have been reworked to
+  support more inheritance scenarios. The previous limitation that prevented
+  inheriting from both ``Form`` and ``ModelForm`` simultaneously have been
+  removed as long as ``ModelForm`` appears first in the MRO.
+
+* It's now possible to opt-out from a ``Form`` field declared in a parent class
+  by shadowing it with a non-``Field`` value.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -512,6 +520,12 @@ Miscellaneous
 * The old cache URI syntax (e.g. ``"locmem://"``) is no longer supported. It
   still worked, even though it was not documented or officially supported. If
   you're still using it, please update to the current :setting:`CACHES` syntax.
+
+* The default ordering of ``Form`` fields in case of inheritance has changed to
+  follow normal Python MRO. Fields are now discovered by iterating through the
+  MRO in reverse with the topmost class coming last. This only affects you if
+  you relied on the default field ordering while having fields defined on both
+  the current class *and* on a parent ``Form``.
 
 Features deprecated in 1.7
 ==========================

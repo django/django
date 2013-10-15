@@ -854,6 +854,13 @@ classes::
     <li>Instrument: <input type="text" name="instrument" /></li>
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
+.. versionadded:: 1.7
+
+* It's possible to opt-out from a ``Field`` inherited from a parent class by
+  shadowing it. While any non-``Field`` value works for this purpose, it's
+  recommended to use ``None`` to make it explicit that a field is being
+  nullified.
+
 .. _form-prefix:
 
 Prefixes for forms
