@@ -1712,7 +1712,10 @@ class Query(object):
         certain related models (as opposed to all models, when
         self.select_related=True).
         """
-        field_dict = {}
+        if isinstance(self.select_related, bool):
+            field_dict = {}
+        else:
+            field_dict = self.select_related
         for field in fields:
             d = field_dict
             for part in field.split(LOOKUP_SEP):

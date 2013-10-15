@@ -66,3 +66,12 @@ class Species(models.Model):
     genus = models.ForeignKey(Genus)
     def __str__(self):
         return self.name
+
+# and we'll invent a new thing so we have a model with two foreign keys
+@python_2_unicode_compatible
+class HybridSpecies(models.Model):
+    name = models.CharField(max_length=50)
+    parent_1 = models.ForeignKey(Species, related_name='child_1')
+    parent_2 = models.ForeignKey(Species, related_name='child_2')
+    def __str__(self):
+        return self.name

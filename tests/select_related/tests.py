@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies
 
 
 class SelectRelatedTests(TestCase):
@@ -144,3 +144,12 @@ class SelectRelatedTests(TestCase):
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)
         self.assertEqual(queryset.query.select_related, False)
+
+    def test_chaining(self):
+        parent_1, parent_2 = Species.objects.all()[:2]
+        HybridSpecies.objects.create(name='hybrid', parent_1=parent_1, parent_2=parent_2)
+        queryset = HybridSpecies.objects.select_related('parent_1').select_related('parent_2')
+        with self.assertNumQueries(1):
+            obj = queryset[0]
+            self.assertEquals(obj.parent_1, parent_1)
+            self.assertEquals(obj.parent_2, parent_2)
