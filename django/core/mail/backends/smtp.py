@@ -15,10 +15,12 @@ class EmailBackend(BaseEmailBackend):
     A wrapper that manages the SMTP network connection.
     """
     def __init__(self, host=None, port=None, username=None, password=None,
-                 use_tls=None, fail_silently=False, use_ssl=None, **kwargs):
+                 use_tls=None, fail_silently=False, use_ssl=None,
+                 timeout=None, **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
+        self.timeout = timeout or settings.EMAIL_TIMEOUT
         self.username = settings.EMAIL_HOST_USER if username is None else username
         self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
@@ -43,10 +45,12 @@ class EmailBackend(BaseEmailBackend):
             # For performance, we use the cached FQDN for local_hostname.
             if self.use_ssl:
                 self.connection = smtplib.SMTP_SSL(self.host, self.port,
-                                           local_hostname=DNS_NAME.get_fqdn())
+                                           local_hostname=DNS_NAME.get_fqdn(),
+                                           timeout=self.timeout)
             else:
                 self.connection = smtplib.SMTP(self.host, self.port,
-                                           local_hostname=DNS_NAME.get_fqdn())
+                                           local_hostname=DNS_NAME.get_fqdn(),
+                                           timeout=self.timeout)
                 # TLS/SSL are mutually exclusive, so only attempt TLS over
                 # non-secure connections.
                 if self.use_tls:
