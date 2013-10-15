@@ -65,8 +65,8 @@ def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
     """
-    if isinstance(text, SafeData):
-        return text
+    if hasattr(text, '__html__'):
+        return text.__html__()
     else:
         return escape(text)
 
