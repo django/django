@@ -1126,3 +1126,10 @@ fields performed by standard model or model form fields as described in
 Help text of these fields will need to be handled either by applications, custom
 form fields or widgets, just like happens with the rest of the model field
 types.
+
+Changes to :ttag:`for`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unpacking list or tuple in loop should unpack correct count of values.
+
+In Django 1.8, the old behavior will raise ValueError exception like Python behavior

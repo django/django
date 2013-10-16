@@ -158,8 +158,8 @@ class ForNode(Node):
             if self.is_reversed:
                 values = reversed(values)
             unpack = len(self.loopvars) > 1
-            # Create a forloop value in the context.  We'll update counters on each
-            # iteration just below.
+            # Create a forloop value in the context.  We'll update counters
+            # on each iteration just below.
             loop_dict = context['forloop'] = {'parentloop': parentloop}
             for i, item in enumerate(values):
                 # Shortcuts for current loop iteration number.
@@ -174,8 +174,19 @@ class ForNode(Node):
 
                 pop_context = False
                 if unpack:
-                    # If there are multiple loop variables, unpack the item into
-                    # them.
+                    # If there are multiple loop variables,
+                    # unpack the item into them.
+
+                    # Check loop variable count before unpacking
+                    if len(self.loopvars) > len(item):
+                        warnings.warn(
+                            "Need more than {0} values to unpack"
+                            .format(len(item)),
+                            PendingDeprecationWarning)
+                    elif len(self.loopvars) < len(item):
+                        warnings.warn(
+                            "Too many values to unpack",
+                            PendingDeprecationWarning)
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
