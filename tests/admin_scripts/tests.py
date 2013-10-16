@@ -930,21 +930,21 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
     def test_custom_command_with_environment(self):
         "alternate: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
-        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
     def test_custom_command_output_color(self):
         "alternate: manage.py output syntax color can be deactivated with the `--no-color` option"
         args = ['noargs_command', '--no-color', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
 
@@ -1340,13 +1340,13 @@ class CommandTypes(AdminScriptTestCase):
     def test_version_alternative(self):
         "--version is equivalent to version"
         args1, args2 = ['version'], ['--version']
-        self.assertEqual(self.run_manage(args1), self.run_manage(args2))
+        # It's possible one outputs on stderr and the other on stdout, hence the set
+        self.assertEqual(set(self.run_manage(args1)), set(self.run_manage(args2)))
 
     def test_help(self):
         "help is handled as a special case"
         args = ['help']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "Usage: manage.py subcommand [options] [args]")
         self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
         self.assertOutput(out, '[django]')
         self.assertOutput(out, 'startapp')
@@ -1356,7 +1356,7 @@ class CommandTypes(AdminScriptTestCase):
         "help --commands shows the list of all available commands"
         args = ['help', '--commands']
         out, err = self.run_manage(args)
-        self.assertNotInOutput(out, 'Usage:')
+        self.assertNotInOutput(out, 'usage:')
         self.assertNotInOutput(out, 'Options:')
         self.assertNotInOutput(out, '[django]')
         self.assertOutput(out, 'startapp')
@@ -1489,13 +1489,13 @@ class CommandTypes(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, str_prefix("EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"
         args = ['noargs_command', 'argument']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "Error: Command doesn't accept any arguments")
+        self.assertOutput(err, "Error: unrecognized arguments: argument")
 
     def test_app_command(self):
         "User AppCommands can execute when a single app name is provided"
@@ -1503,7 +1503,7 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
-        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
@@ -1517,9 +1517,9 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
-        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
-        self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
@@ -1538,7 +1538,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_label_command_no_label(self):
         "User LabelCommands raise an error if no label is provided"
@@ -1551,8 +1551,8 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel', 'anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
-        self.assertOutput(out, str_prefix("EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_requires_model_validation_and_requires_system_checks_both_defined(self):
         with warnings.catch_warnings(record=True):
@@ -1587,8 +1587,8 @@ class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
     django-admin command arguments are parsed in 2 parts; the core arguments
-    (--settings, --traceback and --pythonpath) are parsed using a Lax parser.
-    This Lax parser ignores any unknown options. Then the full settings are
+    (--settings, --traceback and --pythonpath) are parsed using a basic parser,
+    ignoring any unknown options. Then the full settings are
     passed to the command parser, which extracts commands of interest to the
     individual command.
     """

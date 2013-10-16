@@ -50,13 +50,11 @@ class Command(BaseCommand):
         super(Command, self).run_from_argv(argv)
 
     def create_parser(self, prog_name, subcommand):
+        parser = super(Command, self).create_parser(prog_name, subcommand)
         test_runner_class = get_runner(settings, self.test_runner)
-        options = self.option_list + getattr(
-            test_runner_class, 'option_list', ())
-        return OptionParser(prog=prog_name,
-                            usage=self.usage(subcommand),
-                            version=self.get_version(),
-                            option_list=options)
+        for opt in getattr(test_runner_class, 'option_list', ()):
+            parser.add_option(opt)
+        return parser
 
     def execute(self, *args, **options):
         if int(options['verbosity']) > 0:
