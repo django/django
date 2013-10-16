@@ -93,3 +93,65 @@ class OptimizerTests(TestCase):
             ],
             [],
         )
+
+    def test_optimize_through_create(self):
+        """
+        We should be able to optimize away create/delete through a create or delete
+        of a different model, but only if the create operation does not mention the model
+        at all.
+        """
+        # These should work
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())]),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Bar", [("size", models.IntegerField())]),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())]),
+                migrations.DeleteModel("Bar"),
+                migrations.DeleteModel("Foo"),
+            ],
+            [],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())]),
+                migrations.DeleteModel("Foo"),
+                migrations.DeleteModel("Bar"),
+            ],
+            [],
+        )
+        # This should not work - FK should block it
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.DeleteModel("Foo"),
+            ],
+        )
+        # This should not work - bases should block it
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.DeleteModel("Foo"),
+            ],
+        )
