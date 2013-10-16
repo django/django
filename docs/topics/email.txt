@@ -430,6 +430,16 @@ The server address and authentication credentials are set in the
 :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
 :setting:`EMAIL_USE_SSL` settings in your settings file.
 
+.. versionadded:: 1.7
+
+This backend contains a configurable `timeout` parameter, which can be overwritten
+with the following sample code::
+
+    class MyEmailBackend(smtp.EmailBackend):
+      def __init__(self, *args, **kwargs):
+      kwargs.setdefault('timeout', 42)
+      super(MyEmailBackend, self).__init__(self, *args, **kwargs)
+
 The SMTP backend is the default configuration inherited by Django. If you
 want to specify it explicitly, put the following in your settings::
 

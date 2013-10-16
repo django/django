@@ -278,6 +278,20 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         self.assertEqual(connection.send_messages([email, email, email]), 3)
 
+    def test_connection_timeout_value(self):
+        """ Test that the connection's timeout value is initially None. Test that timeout can be overwritten."""
+        connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(connection.timeout, None)
+
+        # Test a sample use case. Timeout value can get overwritten by using the __init__ attribute.
+        class MyEmailBackend(smtp.EmailBackend):
+            def __init__(self, *args, **kwargs):
+                kwargs.setdefault('timeout', 42)
+                super(MyEmailBackend, self).__init__(self, *args, **kwargs)
+
+        myemailbackend = MyEmailBackend()
+        self.assertEqual(myemailbackend.timeout, 42)
+
     def test_arbitrary_keyword(self):
         """
         Make sure that get_connection() accepts arbitrary keyword that might be

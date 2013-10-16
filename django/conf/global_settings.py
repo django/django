@@ -180,9 +180,6 @@ EMAIL_HOST = 'localhost'
 # Port for sending email.
 EMAIL_PORT = 25
 
-# Timeout while sending email.
-EMAIL_TIMEOUT = 60
-
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
