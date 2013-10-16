@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
     sql_destroy_indexes, sql_all)
-from django.db import connections, DEFAULT_DB_ALIAS, models
+from django.db import connections, DEFAULT_DB_ALIAS, models, router
 from django.test import TestCase
 from django.utils import six
 
@@ -52,3 +52,23 @@ class SQLCommandsTestCase(TestCase):
         self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 3)
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
+
+
+class TestRouter(object):
+    def allow_migrate(self, db, model):
+        return False
+
+class SQLCommandsRouterTestCase(TestCase):
+    def setUp(self):
+        self._old_routers = router.routers
+        router.routers = [TestRouter()]
+
+    def tearDown(self):
+        router.routers = self._old_routers
+
+    def test_router_honored(self):
+        app = models.get_app('commands_sql')
+        for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
+            output = sql_command(app, no_style(), connections[DEFAULT_DB_ALIAS])
+            self.assertEqual(len(output), 0,
+                "%s command is not honoring routers" % sql_command.__name__)
