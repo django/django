@@ -26,6 +26,7 @@ class MigrationWriter(object):
         """
         items = {
             "dependencies": repr(self.migration.dependencies),
+            "replaces_str": "",
         }
         imports = set()
         # Deconstruct operations
@@ -49,6 +50,9 @@ class MigrationWriter(object):
             items["imports"] = ""
         else:
             items["imports"] = "\n".join(imports) + "\n"
+        # If there's a replaces, make a string for it
+        if self.migration.replaces:
+            items['replaces_str'] = "\n    replaces = %s\n" % repr(self.migration.replaces)
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
     @property
@@ -186,7 +190,7 @@ from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
-
+    %(replaces_str)s
     dependencies = %(dependencies)s
 
     operations = %(operations)s

@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 except AmbiguityError:
                     raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
                 except KeyError:
-                    raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
+                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif len(args) == 1:
@@ -279,10 +279,15 @@ class Command(BaseCommand):
             for node in graph.leaf_nodes(app):
                 for plan_node in graph.forwards_plan(node):
                     if plan_node not in shown and plan_node[0] == app:
+                        # Give it a nice title if it's a squashed one
+                        title = plan_node[1]
+                        if graph.nodes[plan_node].replaces:
+                            title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                        # Mark it as applied/unapplied
                         if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % plan_node[1])
+                            self.stdout.write(" [X] %s" % title)
                         else:
-                            self.stdout.write(" [ ] %s" % plan_node[1])
+                            self.stdout.write(" [ ] %s" % title)
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:

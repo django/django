@@ -101,6 +101,10 @@ class MigrationLoader(object):
             if south_style_migrations:
                 self.unmigrated_apps.add(app_label)
 
+    def get_migration(self, app_label, name_prefix):
+        "Gets the migration exactly named, or raises KeyError"
+        return self.graph.nodes[app_label, name_prefix]
+
     def get_migration_by_prefix(self, app_label, name_prefix):
         "Returns the migration(s) which match the given app label and name _prefix_"
         # Make sure we have the disk data
@@ -160,6 +164,8 @@ class MigrationLoader(object):
             # and remove, repointing dependencies if needs be.
             for replaced in migration.replaces:
                 if replaced in normal:
+                    # We don't care if the replaced migration doesn't exist;
+                    # the usage pattern here is to delete things after a while.
                     del normal[replaced]
                 for child_key in reverse_dependencies.get(replaced, set()):
                     normal[child_key].dependencies.remove(replaced)
