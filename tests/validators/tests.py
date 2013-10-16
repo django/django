@@ -9,6 +9,7 @@ from unittest import TestCase
 from django.core.exceptions import ValidationError
 from django.core.validators import *
 from django.test.utils import str_prefix
+from django.utils.uri import IANA_URI_SCHEMES
 
 
 NOW = datetime.now()
@@ -158,6 +159,15 @@ TEST_DATA = (
     (URLValidator(), 'http://-invalid.com', ValidationError),
     (URLValidator(), 'http://inv-.alid-.com', ValidationError),
     (URLValidator(), 'http://inv-.-alid.com', ValidationError),
+    (URLValidator(), 'file://localhost/path', ValidationError),
+    (URLValidator(), 'git://example.com/', ValidationError),
+    (URLValidator(), 'rsync://example.com/', ValidationError),
+    (URLValidator(), 'ssh://example.com/', ValidationError),
+
+    (URLValidator(IANA_URI_SCHEMES), 'file://localhost/path/', None),
+    (URLValidator(IANA_URI_SCHEMES), 'git://example.com/', None),
+    (URLValidator(IANA_URI_SCHEMES), 'rsync://example.com/', None),
+    (URLValidator(IANA_URI_SCHEMES), 'ssh://example.com/', None),
 
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),

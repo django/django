@@ -49,6 +49,12 @@ class URLValidator(RegexValidator):
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     message = _('Enter a valid URL.')
+    schemes = None
+
+    def __init__(self, schemes=None):
+        super(URLValidator, self).__init__()
+        if schemes is not None:
+            self.schemes = schemes
 
     def __call__(self, value):
         try:
@@ -62,6 +68,12 @@ class URLValidator(RegexValidator):
                     netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
                     raise e
+                # Try for different URL schemes if configured to:
+                if self.schemes:
+                    if scheme in self.schemes:
+                        scheme = 'http'  # scheme is valid, use default to pass basic URL regex
+                    else:
+                        raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
                 super(URLValidator, self).__call__(url)
             else:

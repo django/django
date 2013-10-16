@@ -87,10 +87,20 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``URLValidator``
 ----------------
-.. class:: URLValidator()
+.. class:: URLValidator([schemes=None])
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
     an error code of ``'invalid'`` if it doesn't.
+
+    :param schemes: If not ``None``, overrides :attr:`schemes`.
+
+    .. attribute:: schemes
+
+        Additional URL / URI scheme list to validate against should the
+        validation fails against the default list (i.e. ftp(s) or http(s)). The
+        :mod:`django.utils.uri` module contains various IANA scheme lists which
+        can be used here. Defaults to ``None``.
+
 
 ``validate_email``
 ------------------
