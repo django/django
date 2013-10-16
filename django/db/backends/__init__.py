@@ -1272,10 +1272,8 @@ class BaseDatabaseIntrospection(object):
         from django.db import models, router
         tables = set()
         for app in models.get_apps():
-            for model in models.get_models(app):
+            for model in router.get_migratable_models(app, self.connection.alias):
                 if not model._meta.managed:
-                    continue
-                if not router.allow_migrate(self.connection.alias, model):
                     continue
                 tables.add(model._meta.db_table)
                 tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
@@ -1294,9 +1292,7 @@ class BaseDatabaseIntrospection(object):
         from django.db import models, router
         all_models = []
         for app in models.get_apps():
-            for model in models.get_models(app):
-                if router.allow_migrate(self.connection.alias, model):
-                    all_models.append(model)
+            all_models.extend(router.get_migratable_models(app, self.connection.alias))
         tables = list(map(self.table_name_converter, tables))
         return set([
             m for m in all_models
@@ -1311,12 +1307,10 @@ class BaseDatabaseIntrospection(object):
         sequence_list = []
 
         for app in apps:
-            for model in models.get_models(app):
+            for model in router.get_migratable_models(app, self.connection.alias):
                 if not model._meta.managed:
                     continue
                 if model._meta.swapped:
-                    continue
-                if not router.allow_migrate(self.connection.alias, model):
                     continue
                 for f in model._meta.local_fields:
                     if isinstance(f, models.AutoField):
