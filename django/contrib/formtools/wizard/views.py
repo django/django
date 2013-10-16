@@ -407,8 +407,7 @@ class WizardView(TemplateView):
             'initial': self.get_form_initial(step),
         })
         form_class = self.form_list[step]
-        if issubclass(form_class, forms.ModelForm) or \
-          issubclass(form_class, forms.models.BaseInlineFormSet):
+        if issubclass(form_class, (forms.ModelForm, forms.models.BaseInlineFormSet)):
             # If the form is based on ModelForm or InlineFormSet, 
             # add instance if available and not previously set.
             kwargs.setdefault('instance', self.get_form_instance(step))
