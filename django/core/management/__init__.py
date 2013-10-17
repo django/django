@@ -257,8 +257,10 @@ class ManagementUtility(object):
         appropriate command called from the command line (usually
         "django-admin.py" or "manage.py") if it can't be found.
         """
+        # Get commands outside of try block to prevent swallowing exceptions
+        commands = get_commands()
         try:
-            app_name = get_commands()[subcommand]
+            app_name = commands[subcommand]
         except KeyError:
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
                 (subcommand, self.prog_name))
