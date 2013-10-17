@@ -97,7 +97,8 @@ class SpatialReference(GDALBase):
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._ptr: capi.release_srs(self._ptr)
+        if self._ptr:
+            capi.release_srs(self._ptr)
 
     def __getitem__(self, target):
         """
@@ -176,10 +177,14 @@ class SpatialReference(GDALBase):
     @property
     def name(self):
         "Returns the name of this Spatial Reference."
-        if self.projected: return self.attr_value('PROJCS')
-        elif self.geographic: return self.attr_value('GEOGCS')
-        elif self.local: return self.attr_value('LOCAL_CS')
-        else: return None
+        if self.projected:
+            return self.attr_value('PROJCS')
+        elif self.geographic:
+            return self.attr_value('GEOGCS')
+        elif self.local:
+            return self.attr_value('LOCAL_CS')
+        else:
+            return None
 
     @property
     def srid(self):
@@ -336,7 +341,8 @@ class CoordTransform(GDALBase):
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ptr: capi.destroy_ct(self._ptr)
+        if self._ptr:
+            capi.destroy_ct(self._ptr)
 
     def __str__(self):
         return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)

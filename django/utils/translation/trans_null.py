@@ -7,7 +7,8 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe, SafeData
 
 def ngettext(singular, plural, number):
-    if number == 1: return singular
+    if number == 1:
+        return singular
     return plural
 ngettext_lazy = ngettext
 

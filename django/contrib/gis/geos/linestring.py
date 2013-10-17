@@ -24,25 +24,31 @@ class LineString(GEOSGeometry):
          ls = LineString(Point(1, 1), Point(2, 2))
         """
         # If only one argument provided, set the coords array appropriately
-        if len(args) == 1: coords = args[0]
-        else: coords = args
+        if len(args) == 1:
+            coords = args[0]
+        else:
+            coords = args
 
         if isinstance(coords, (tuple, list)):
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ncoords = len(coords)
-            if coords: ndim = len(coords[0])
-            else: raise TypeError('Cannot initialize on empty sequence.')
+            if coords:
+                ndim = len(coords[0])
+            else:
+                raise TypeError('Cannot initialize on empty sequence.')
             self._checkdim(ndim)
             # Incrementing through each of the coordinates and verifying
             for i in xrange(1, ncoords):
                 if not isinstance(coords[i], (tuple, list, Point)):
                     raise TypeError('each coordinate should be a sequence (list or tuple)')
-                if len(coords[i]) != ndim: raise TypeError('Dimension mismatch.')
+                if len(coords[i]) != ndim:
+                    raise TypeError('Dimension mismatch.')
             numpy_coords = False
         elif numpy and isinstance(coords, numpy.ndarray):
             shape = coords.shape # Using numpy's shape.
-            if len(shape) != 2: raise TypeError('Too many dimensions.')
+            if len(shape) != 2:
+                raise TypeError('Too many dimensions.')
             self._checkdim(shape[1])
             ncoords = shape[0]
             ndim = shape[1]
@@ -55,9 +61,12 @@ class LineString(GEOSGeometry):
         cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim==3))
 
         for i in xrange(ncoords):
-            if numpy_coords: cs[i] = coords[i,:]
-            elif isinstance(coords[i], Point): cs[i] = coords[i].tuple
-            else: cs[i] = coords[i]
+            if numpy_coords:
+                cs[i] = coords[i,:]
+            elif isinstance(coords[i], Point):
+                cs[i] = coords[i].tuple
+            else:
+                cs[i] = coords[i]
 
         # If SRID was passed in with the keyword arguments
         srid = kwargs.get('srid', None)
@@ -103,7 +112,8 @@ class LineString(GEOSGeometry):
         self._cs[index] = value
 
     def _checkdim(self, dim):
-        if dim not in (2, 3): raise TypeError('Dimension mismatch.')
+        if dim not in (2, 3):
+            raise TypeError('Dimension mismatch.')
 
     #### Sequence Properties ####
     @property
@@ -118,8 +128,10 @@ class LineString(GEOSGeometry):
         the given function.  Will return a numpy array if possible.
         """
         lst = [func(i) for i in xrange(len(self))]
-        if numpy: return numpy.array(lst) # ARRRR!
-        else: return lst
+        if numpy:
+            return numpy.array(lst) # ARRRR!
+        else:
+            return lst
 
     @property
     def array(self):
@@ -144,8 +156,10 @@ class LineString(GEOSGeometry):
     @property
     def z(self):
         "Returns a list or numpy array of the Z variable."
-        if not self.hasz: return None
-        else: return self._listarr(self._cs.getZ)
+        if not self.hasz:
+            return None
+        else:
+            return self._listarr(self._cs.getZ)
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):

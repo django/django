@@ -59,7 +59,8 @@ class Driver(GDALBase):
         "Attempts to register all the data source drivers."
         # Only register all if the driver count is 0 (or else all drivers
         # will be registered over and over again)
-        if not self.driver_count: capi.register_all()
+        if not self.driver_count:
+            capi.register_all()
 
     # Driver properties
     @property

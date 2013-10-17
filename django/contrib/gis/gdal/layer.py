@@ -47,7 +47,8 @@ class Layer(GDALBase):
             # An integer index was given -- we cannot do a check based on the
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.
-            if index < 0: raise OGRIndexError('Negative indices are not allowed on OGR Layers.')
+            if index < 0:
+                raise OGRIndexError('Negative indices are not allowed on OGR Layers.')
             return self._make_feature(index)
         elif isinstance(index, slice):
             # A slice was given
@@ -88,7 +89,8 @@ class Layer(GDALBase):
             # Random access isn't supported, have to increment through
             # each feature until the given feature ID is encountered.
             for feat in self:
-                if feat.fid == feat_id: return feat
+                if feat.fid == feat_id:
+                    return feat
         # Should have returned a Feature, raise an OGRIndexError.
         raise OGRIndexError('Invalid feature id: %s.' % feat_id)
 

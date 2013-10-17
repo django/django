@@ -94,8 +94,11 @@ class DecoratorsTest(TestCase):
         callback = user_passes_test(test1)(callback)
         callback = user_passes_test(test2)(callback)
 
-        class DummyUser(object): pass
-        class DummyRequest(object): pass
+        class DummyUser(object):
+            pass
+
+        class DummyRequest(object):
+            pass
 
         request = DummyRequest()
         request.user = DummyUser()

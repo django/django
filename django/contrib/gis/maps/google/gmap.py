@@ -87,9 +87,11 @@ class GoogleMap(object):
 
         # Defaults for the zoom level and center coordinates if the zoom
         # is not automatically calculated.
-        if zoom is None: zoom = 4
+        if zoom is None:
+            zoom = 4
         self.zoom = zoom
-        if center is None: center = (0, 0)
+        if center is None:
+            center = (0, 0)
         self.center = center
 
     def render(self):
@@ -229,5 +231,6 @@ class GoogleMapSet(GoogleMap):
     def icons(self):
         "Returns a sequence of all icons in each map of the set."
         icons = set()
-        for map in self.maps: icons |= map.icons
+        for map in self.maps:
+            icons |= map.icons
         return icons

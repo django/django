@@ -180,13 +180,15 @@ class ListMixin(object):
         "Standard list count method"
         count = 0
         for i in self:
-            if val == i: count += 1
+            if val == i:
+                count += 1
         return count
 
     def index(self, val):
         "Standard list index method"
         for i in xrange(0, len(self)):
-            if self[i] == val: return i
+            if self[i] == val:
+                return i
         raise ValueError('%s not found in object' % str(val))
 
     ## Mutating ##

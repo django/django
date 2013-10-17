@@ -166,7 +166,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         # doing pagination with Oracle.
         rn_offset = 0
         if self.connection.ops.oracle:
-            if self.query.high_mark is not None or self.query.low_mark: rn_offset = 1
+            if self.query.high_mark is not None or self.query.low_mark:
+                rn_offset = 1
         index_start = rn_offset + len(aliases)
 
         # Converting any extra selection values (e.g., geometries and
@@ -243,7 +244,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         used.  If `column` is specified, it will be used instead of the value
         in `field.column`.
         """
-        if table_alias is None: table_alias = self.query.get_meta().db_table
+        if table_alias is None:
+            table_alias = self.query.get_meta().db_table
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
 

@@ -12,26 +12,57 @@ if HAS_GEOS:
     from ..error import GEOSIndexError
 
 
-def getItem(o,i): return o[i]
-def delItem(o,i): del o[i]
-def setItem(o,i,v): o[i] = v
+def getItem(o,i):
+    return o[i]
+
+def delItem(o,i):
+    del o[i]
+
+def setItem(o,i,v):
+    o[i] = v
 
 if HAS_GEOS:
-    def api_get_distance(x): return x.distance(Point(-200,-200))
+    def api_get_distance(x):
+        return x.distance(Point(-200,-200))
 
-def api_get_buffer(x): return x.buffer(10)
-def api_get_geom_typeid(x): return x.geom_typeid
-def api_get_num_coords(x): return x.num_coords
-def api_get_centroid(x): return x.centroid
-def api_get_empty(x): return x.empty
-def api_get_valid(x): return x.valid
-def api_get_simple(x): return x.simple
-def api_get_ring(x): return x.ring
-def api_get_boundary(x): return x.boundary
-def api_get_convex_hull(x): return x.convex_hull
-def api_get_extent(x): return x.extent
-def api_get_area(x): return x.area
-def api_get_length(x): return x.length
+def api_get_buffer(x):
+    return x.buffer(10)
+
+def api_get_geom_typeid(x):
+    return x.geom_typeid
+
+def api_get_num_coords(x):
+    return x.num_coords
+
+def api_get_centroid(x):
+    return x.centroid
+
+def api_get_empty(x):
+    return x.empty
+
+def api_get_valid(x):
+    return x.valid
+
+def api_get_simple(x):
+    return x.simple
+
+def api_get_ring(x):
+    return x.ring
+
+def api_get_boundary(x):
+    return x.boundary
+
+def api_get_convex_hull(x):
+    return x.convex_hull
+
+def api_get_extent(x):
+    return x.extent
+
+def api_get_area(x):
+    return x.area
+
+def api_get_length(x):
+    return x.length
 
 geos_function_tests = [val for name, val in vars().items()
                        if hasattr(val, '__call__')
@@ -48,7 +79,8 @@ class GEOSMutationTest(unittest.TestCase):
     def test00_GEOSIndexException(self):
         'Testing Geometry GEOSIndexError'
         p = Point(1,2)
-        for i in range(-2,2): p._checkindex(i)
+        for i in range(-2,2):
+            p._checkindex(i)
         self.assertRaises(GEOSIndexError, p._checkindex, 2)
         self.assertRaises(GEOSIndexError, p._checkindex, -3)
 

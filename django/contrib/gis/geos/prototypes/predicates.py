@@ -11,7 +11,8 @@ from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 def binary_predicate(func, *args):
     "For GEOS binary predicate functions."
     argtypes = [GEOM_PTR, GEOM_PTR]
-    if args: argtypes += args
+    if args:
+        argtypes += args
     func.argtypes = argtypes
     func.restype = c_char
     func.errcheck = check_predicate

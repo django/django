@@ -89,7 +89,8 @@ class GeoIP(object):
         # Getting the GeoIP data path.
         if not path:
             path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
-            if not path: raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
+            if not path:
+                raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, six.string_types):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
@@ -129,8 +130,10 @@ class GeoIP(object):
         # Cleaning any GeoIP file handles lying around.
         if GeoIP_delete is None:
             return
-        if self._country: GeoIP_delete(self._country)
-        if self._city: GeoIP_delete(self._city)
+        if self._country:
+            GeoIP_delete(self._country)
+        if self._city:
+            GeoIP_delete(self._city)
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
@@ -199,8 +202,10 @@ class GeoIP(object):
     #### Coordinate retrieval routines ####
     def coords(self, query, ordering=('longitude', 'latitude')):
         cdict = self.city(query)
-        if cdict is None: return None
-        else: return tuple(cdict[o] for o in ordering)
+        if cdict is None:
+            return None
+        else:
+            return tuple(cdict[o] for o in ordering)
 
     def lon_lat(self, query):
         "Returns a tuple of the (longitude, latitude) for the given query."

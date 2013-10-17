@@ -72,7 +72,8 @@ class PostGISIntrospection(DatabaseIntrospection):
                                'WHERE "f_table_name"=%s AND "f_geometry_column"=%s',
                                (table_name, geo_col))
                 row = cursor.fetchone()
-                if not row: raise GeoIntrospectionError
+                if not row:
+                    raise GeoIntrospectionError
             except GeoIntrospectionError:
                 if self.connection.ops.geography:
                     cursor.execute('SELECT "coord_dimension", "srid", "type" '

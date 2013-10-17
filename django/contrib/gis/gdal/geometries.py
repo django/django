@@ -122,14 +122,16 @@ class OGRGeometry(GDALBase):
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
-        if bool(srs): self.srs = srs
+        if bool(srs):
+            self.srs = srs
 
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
 
     def __del__(self):
         "Deletes this Geometry."
-        if self._ptr: capi.destroy_geom(self._ptr)
+        if self._ptr:
+            capi.destroy_geom(self._ptr)
 
     # Pickle routines
     def __getstate__(self):
@@ -143,7 +145,8 @@ class OGRGeometry(GDALBase):
     def __setstate__(self, state):
         wkb, srs = state
         ptr = capi.from_wkb(wkb, None, byref(c_void_p()), len(wkb))
-        if not ptr: raise OGRException('Invalid OGRGeometry loaded from pickled state.')
+        if not ptr:
+            raise OGRException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
 
@@ -285,7 +288,8 @@ class OGRGeometry(GDALBase):
     # The SRID property
     def _get_srid(self):
         srs = self.srs
-        if srs: return srs.srid
+        if srs:
+            return srs.srid
         return None
 
     def _set_srid(self, srid):
@@ -602,7 +606,8 @@ class LineString(OGRGeometry):
             return self._listarr(capi.getz)
 
 # LinearRings are used in Polygons.
-class LinearRing(LineString): pass
+class LinearRing(LineString):
+    pass
 
 class Polygon(OGRGeometry):
 
@@ -673,7 +678,8 @@ class GeometryCollection(OGRGeometry):
         "Add the geometry to this Geometry Collection."
         if isinstance(geom, OGRGeometry):
             if isinstance(geom, self.__class__):
-                for g in geom: capi.add_geom(self.ptr, g.ptr)
+                for g in geom:
+                    capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
         elif isinstance(geom, six.string_types):
@@ -695,9 +701,14 @@ class GeometryCollection(OGRGeometry):
     coords = tuple
 
 # Multiple Geometry types.
-class MultiPoint(GeometryCollection): pass
-class MultiLineString(GeometryCollection): pass
-class MultiPolygon(GeometryCollection): pass
+class MultiPoint(GeometryCollection):
+    pass
+
+class MultiLineString(GeometryCollection):
+    pass
+
+class MultiPolygon(GeometryCollection):
+    pass
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {1 : Point,

@@ -198,8 +198,10 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
             six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
 
     def get_query_string(self, new_params=None, remove=None):
-        if new_params is None: new_params = {}
-        if remove is None: remove = []
+        if new_params is None:
+            new_params = {}
+        if remove is None:
+            remove = []
         p = self.params.copy()
         for r in remove:
             for k in list(p):

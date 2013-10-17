@@ -4,9 +4,15 @@
  OGR methods.
 """
 #### OGR & SRS Exceptions ####
-class GDALException(Exception): pass
-class OGRException(Exception): pass
-class SRSException(Exception): pass
+class GDALException(Exception):
+    pass
+
+class OGRException(Exception):
+    pass
+
+class SRSException(Exception):
+    pass
+
 class OGRIndexError(OGRException, KeyError):
     """
     This exception is raised when an invalid index is encountered, and has

@@ -190,7 +190,8 @@ class GeoModelTest(TestCase):
         qs = PennsylvaniaCity.objects.transform(32128)
 
         self.assertEqual(1, qs.count())
-        for pc in qs: self.assertEqual(32128, pc.point.srid)
+        for pc in qs:
+            self.assertEqual(32128, pc.point.srid)
 
     def test_raw_sql_query(self):
         "Testing raw SQL query."
@@ -229,7 +230,8 @@ class GeoLookupTest(TestCase):
             qs = City.objects.filter(point__contained=texas.mpoly)
             self.assertEqual(3, qs.count())
             cities = ['Houston', 'Dallas', 'Oklahoma City']
-            for c in qs: self.assertEqual(True, c.name in cities)
+            for c in qs:
+                self.assertEqual(True, c.name in cities)
 
         # Pulling out some cities.
         houston = City.objects.get(name='Houston')
@@ -284,13 +286,15 @@ class GeoLookupTest(TestCase):
                   'Lawrence', 'Chicago', 'Wellington']
         qs = City.objects.filter(point__right=co_border)
         self.assertEqual(6, len(qs))
-        for c in qs: self.assertEqual(True, c.name in cities)
+        for c in qs:
+            self.assertEqual(True, c.name in cities)
 
         # These cities should be strictly to the right of the KS border.
         cities = ['Chicago', 'Wellington']
         qs = City.objects.filter(point__right=ks_border)
         self.assertEqual(2, len(qs))
-        for c in qs: self.assertEqual(True, c.name in cities)
+        for c in qs:
+            self.assertEqual(True, c.name in cities)
 
         # Note: Wellington has an 'X' value of 174, so it will not be considered
         #  to the left of CO.
@@ -300,7 +304,8 @@ class GeoLookupTest(TestCase):
         cities = ['Pueblo', 'Victoria']
         qs = City.objects.filter(point__left=ks_border)
         self.assertEqual(2, len(qs))
-        for c in qs: self.assertEqual(True, c.name in cities)
+        for c in qs:
+            self.assertEqual(True, c.name in cities)
 
     # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
     # http://trac.osgeo.org/postgis/ticket/2035
@@ -313,7 +318,8 @@ class GeoLookupTest(TestCase):
         c1 = City.objects.get(point=pnt)
         c2 = City.objects.get(point__same_as=pnt)
         c3 = City.objects.get(point__equals=pnt)
-        for c in [c1, c2, c3]: self.assertEqual('Houston', c.name)
+        for c in [c1, c2, c3]:
+            self.assertEqual('Houston', c.name)
 
     @no_mysql
     def test_null_geometries(self):
@@ -476,7 +482,8 @@ class GeoQuerySetTest(TestCase):
     @no_spatialite
     def test_geohash(self):
         "Testing GeoQuerySet.geohash()."
-        if not connection.ops.geohash: return
+        if not connection.ops.geohash:
+            return
         # Reference query:
         # SELECT ST_GeoHash(point) FROM geoapp_city WHERE name='Houston';
         # SELECT ST_GeoHash(point, 5) FROM geoapp_city WHERE name='Houston';
@@ -619,7 +626,8 @@ class GeoQuerySetTest(TestCase):
 
         if not oracle:
             # Oracle cannot count vertices in Point geometries.
-            for c in City.objects.num_points(): self.assertEqual(1, c.num_points)
+            for c in City.objects.num_points():
+                self.assertEqual(1, c.num_points)
 
     @no_mysql
     def test_point_on_surface(self):

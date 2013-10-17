@@ -11,7 +11,8 @@ class GEOSContextHandle(object):
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
 
     def __del__(self):
-        if self.ptr: lgeos.finishGEOS_r(self.ptr)
+        if self.ptr:
+            lgeos.finishGEOS_r(self.ptr)
 
 # Defining a thread-local object and creating an instance
 # to hold a reference to GEOSContextHandle for this thread.

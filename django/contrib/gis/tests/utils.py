@@ -16,10 +16,17 @@ def no_backend(test_func, backend):
 
 # Decorators to disable entire test functions for specific
 # spatial backends.
-def no_oracle(func): return no_backend(func, 'oracle')
-def no_postgis(func): return no_backend(func, 'postgis')
-def no_mysql(func): return no_backend(func, 'mysql')
-def no_spatialite(func): return no_backend(func, 'spatialite')
+def no_oracle(func):
+    return no_backend(func, 'oracle')
+
+def no_postgis(func):
+    return no_backend(func, 'postgis')
+
+def no_mysql(func):
+    return no_backend(func, 'mysql')
+
+def no_spatialite(func):
+    return no_backend(func, 'spatialite')
 
 # Shortcut booleans to omit only portions of tests.
 _default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
