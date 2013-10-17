@@ -306,14 +306,14 @@ class ExtraRegressTests(TestCase):
 
         self.assertQuerysetEqual(
             TestObject.objects.filter(
-                 pk__in=TestObject.objects.values('pk').extra(select={'extra': 1})
+                pk__in=TestObject.objects.values('pk').extra(select={'extra': 1})
             ),
             ['<TestObject: TestObject: first,second,third>']
         )
 
         self.assertQuerysetEqual(
             TestObject.objects.filter(pk=obj.pk) |
-               TestObject.objects.extra(where=["id > %s"], params=[obj.pk]),
+                TestObject.objects.extra(where=["id > %s"], params=[obj.pk]),
             ['<TestObject: TestObject: first,second,third>']
         )
 

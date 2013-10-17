@@ -219,7 +219,7 @@ class BaseTests(object):
             lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
             lambda p:'context_processors.messages' not in p,
-                 settings.TEMPLATE_CONTEXT_PROCESSORS),
+            settings.TEMPLATE_CONTEXT_PROCESSORS),
         MESSAGE_LEVEL=constants.DEBUG
     )
     def test_middleware_disabled(self):
@@ -244,7 +244,7 @@ class BaseTests(object):
             lambda m:'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
         TEMPLATE_CONTEXT_PROCESSORS=filter(
             lambda p:'context_processors.messages' not in p,
-                 settings.TEMPLATE_CONTEXT_PROCESSORS),
+            settings.TEMPLATE_CONTEXT_PROCESSORS),
         MESSAGE_LEVEL=constants.DEBUG
     )
     def test_middleware_disabled_fail_silently(self):

@@ -45,9 +45,9 @@ class SignalsRegressTests(TestCase):
         # Save up the number of connected signals so that we can check at the end
         # that all the signals we register get properly unregistered (#9989)
         self.pre_signals = (len(models.signals.pre_save.receivers),
-                       len(models.signals.post_save.receivers),
-                       len(models.signals.pre_delete.receivers),
-                       len(models.signals.post_delete.receivers))
+                            len(models.signals.post_save.receivers),
+                            len(models.signals.pre_delete.receivers),
+                            len(models.signals.post_delete.receivers))
 
         models.signals.pre_save.connect(self.pre_save_test)
         models.signals.post_save.connect(self.post_save_test)

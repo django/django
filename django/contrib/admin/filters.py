@@ -168,7 +168,7 @@ class RelatedFieldListFilter(FieldListFilter):
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         self.lookup_val_isnull = request.GET.get(
-                                      self.lookup_kwarg_isnull, None)
+            self.lookup_kwarg_isnull, None)
         self.lookup_choices = field.get_choices(include_blank=False)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)

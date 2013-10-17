@@ -439,9 +439,9 @@ class BaseDatabaseCreation(object):
         settings_dict['NAME'] = old_database_name
         backend = load_backend(settings_dict['ENGINE'])
         new_connection = backend.DatabaseWrapper(
-                             settings_dict,
-                             alias='__destroy_test_db__',
-                             allow_thread_sharing=False)
+            settings_dict,
+            alias='__destroy_test_db__',
+            allow_thread_sharing=False)
         new_connection.creation._destroy_test_db(test_database_name, verbosity)
 
     def _destroy_test_db(self, test_database_name, verbosity):

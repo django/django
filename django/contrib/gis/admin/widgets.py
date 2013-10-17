@@ -36,7 +36,7 @@ class OpenLayersWidget(Textarea):
             except (GEOSException, ValueError) as err:
                 logger.error(
                     "Error creating geometry from value '%s' (%s)" % (
-                    value, err)
+                        value, err)
                 )
                 value = None
 
@@ -68,7 +68,7 @@ class OpenLayersWidget(Textarea):
                 except OGRException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                        value.srid, srid, err)
+                            value.srid, srid, err)
                     )
                     wkt = ''
             else:

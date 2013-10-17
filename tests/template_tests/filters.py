@@ -371,12 +371,12 @@ def get_filter_tests():
         'time05': (r'{{ d|time:"P:e:O:T:Z" }}', {'d': today}, ''),
         'time06': (r'{{ obj|time:"P:e:O:T:Z" }}', {'obj': 'non-datetime-value'}, ''),
 
-         # Tests for #11687 and #16676
-         'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
-         'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, ''),
-         'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''),
-         'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
-         'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
-         'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),
-         'add07': (r'{{ d|add:t }}', {'d': date(2000, 1, 1), 't': timedelta(10)}, 'Jan. 11, 2000'),
+        # Tests for #11687 and #16676
+        'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
+        'add02': (r'{{ i|add:"napis" }}', {'i': 2000}, ''),
+        'add03': (r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''),
+        'add04': (r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'),
+        'add05': (r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'),
+        'add06': (r'{{ t1|add:t2 }}', {'t1': (3, 4), 't2': (1, 2)}, '(3, 4, 1, 2)'),
+        'add07': (r'{{ d|add:t }}', {'d': date(2000, 1, 1), 't': timedelta(10)}, 'Jan. 11, 2000'),
     }

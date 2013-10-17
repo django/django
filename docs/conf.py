@@ -226,8 +226,8 @@ latex_elements = {
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('contents', 'django.tex', 'Django Documentation',
-   'Django Software Foundation', 'manual'),
+    ('contents', 'django.tex', 'Django Documentation',
+     'Django Software Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

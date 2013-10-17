@@ -217,7 +217,7 @@ class PermissionTestCase(TestCase):
         """
         # check duplicated default permission
         models.Permission._meta.permissions = [
-           ('change_permission', 'Can edit permission (duplicate)')]
+            ('change_permission', 'Can edit permission (duplicate)')]
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'change_permission' clashes with a "
             "builtin permission for model 'auth.Permission'.",

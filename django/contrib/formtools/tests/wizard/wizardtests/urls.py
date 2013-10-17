@@ -13,10 +13,10 @@ urlpatterns = patterns('',
          ('form2', Page2),
          ('form3', Page3),
          ('form4', Page4)])),
-     url(r'^wiz_other_template/$', CookieContactWizard.as_view(
-         [('form1', Page1),
-          ('form2', Page2),
-          ('form3', Page3),
-          ('form4', Page4)],
-          template_name='other_wizard_form.html')),
+    url(r'^wiz_other_template/$', CookieContactWizard.as_view(
+        [('form1', Page1),
+         ('form2', Page2),
+         ('form3', Page3),
+         ('form4', Page4)],
+        template_name='other_wizard_form.html')),
 )

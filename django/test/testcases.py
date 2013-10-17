@@ -282,8 +282,7 @@ class SimpleTestCase(unittest.TestCase):
                     " response code was %d (expected %d)" %
                         (path, redirect_response.status_code, target_status_code))
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', host or 'testserver', e_path,
                 e_query, e_fragment))
@@ -850,10 +849,10 @@ class TestCase(TransactionTestCase):
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
-                                    'commit': False,
-                                    'database': db_name,
-                                    'skip_validation': True,
+                                     'verbosity': 0,
+                                     'commit': False,
+                                     'database': db_name,
+                                     'skip_validation': True,
                                  })
                 except Exception:
                     self._fixture_teardown()

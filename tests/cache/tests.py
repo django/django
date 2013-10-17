@@ -867,7 +867,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def test_second_call_doesnt_crash(self):
         stdout = six.StringIO()
         management.call_command(
-           'createcachetable',
+            'createcachetable',
             stdout=stdout
         )
         self.assertEqual(stdout.getvalue(),
