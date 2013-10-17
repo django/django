@@ -392,7 +392,6 @@ class LoginTest(AuthViewsTestCase):
         CsrfViewMiddleware().process_view(req, login_view, (), {})
         req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
         req.META["SERVER_PORT"] = 80
-        req.META["CSRF_COOKIE_USED"] = True
         resp = login_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
