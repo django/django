@@ -191,8 +191,20 @@ class BaseHandler(object):
 
         except: # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            exc_info = sys.exc_info()
+            signal_responses = signals.got_request_exception.send_robust(sender=self.__class__, request=request)
+            for signal_response in signal_responses:
+                if isinstance(signal_response[1], Exception):
+                    message = 'Base Handler Error %s: ' % signal_response[1] 
+                    logger.error(message+'%s', request.path,
+                        exc_info=exc_info,
+                        extra={
+                            'status_code': 500,
+                            'request': request,
+                            'error': signal_response[1]
+                        }
+                    )
+            response = self.handle_uncaught_exception(request, resolver, exc_info)
 
         try:
             # Apply response middleware, regardless of the response
@@ -201,7 +213,7 @@ class BaseHandler(object):
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, resolver, exc_info())
 
         return response
 

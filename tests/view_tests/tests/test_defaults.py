@@ -1,9 +1,16 @@
 from __future__ import unicode_literals
 
+import logging
+
+from django.utils.six import StringIO
+
+from django.core.signals import got_request_exception
+from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
+
 from django.test import TestCase
 from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings)
+    restore_template_loaders, override_settings, patch_logger)
 
 from ..models import Author, Article, UrlArticle
 
@@ -33,8 +40,27 @@ class DefaultsTests(TestCase):
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
-        response = self.client.get('/views/server_error/')
-        self.assertEqual(response.status_code, 500)
+        with self.settings(DEBUG=True):
+            with patch_logger('django.request', 'error') as calls:
+                response = self.client.get('/views/server_error/')
+                self.assertEqual(response.status_code, 500)
+                self.assertEqual(len(calls), 1)        
+
+    def test_server_error_with_handler_error(self):
+        """
+        The server_error view raises a 500 status and while handling
+        the error, the next error is raised.
+        """
+
+        @receiver(got_request_exception)
+        def handler(sender, **kwargs):
+            raise Exception('I am a Handler Error')
+
+        with self.settings(DEBUG=True):
+            with patch_logger('django.request', 'error') as calls:
+                response = self.client.get('/views/server_error/')
+                self.assertEqual(response.status_code, 500)
+                self.assertEqual(len(calls), 2)
 
     def test_custom_templates(self):
         """
