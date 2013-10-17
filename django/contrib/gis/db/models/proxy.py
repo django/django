@@ -54,7 +54,8 @@ class GeometryProxy(object):
         # general GeometryField is used.
         if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
             # Assigning the SRID to the geometry.
-            if value.srid is None: value.srid = self._field.srid
+            if value.srid is None:
+                value.srid = self._field.srid
         elif value is None or isinstance(value, six.string_types + (memoryview,)):
             # Set with None, WKT, HEX, or WKB
             pass

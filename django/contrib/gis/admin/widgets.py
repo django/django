@@ -20,7 +20,8 @@ class OpenLayersWidget(Textarea):
     """
     def render(self, name, value, attrs=None):
         # Update the template parameters with any attributes passed in.
-        if attrs: self.params.update(attrs)
+        if attrs:
+            self.params.update(attrs)
 
         # Defaulting the WKT value to a blank string -- this
         # will be tested in the JavaScript and the appropriate

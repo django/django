@@ -179,7 +179,8 @@ class MeasureBase(object):
         val = 0.0
         default_unit = self.STANDARD_UNIT
         for unit, value in six.iteritems(kwargs):
-            if not isinstance(value, float): value = float(value)
+            if not isinstance(value, float):
+                value = float(value)
             if unit in self.UNITS:
                 val += self.UNITS[unit] * value
                 default_unit = unit

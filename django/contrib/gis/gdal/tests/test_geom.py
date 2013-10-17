@@ -418,7 +418,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 mp1.add(poly) # Adding a geometry at a time
                 mp2.add(poly.wkt) # Adding WKT
             mp3.add(mpoly) # Adding a MultiPolygon's entire contents at once.
-            for tmp in (mp1, mp2, mp3): self.assertEqual(mpoly, tmp)
+            for tmp in (mp1, mp2, mp3):
+                self.assertEqual(mpoly, tmp)
 
     def test15_extent(self):
         "Testing `extent` property."

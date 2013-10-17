@@ -43,7 +43,8 @@ else:
 if lib_names:
     for lib_name in lib_names:
         lib_path = find_library(lib_name)
-        if not lib_path is None: break
+        if not lib_path is None:
+            break
 
 # No GEOS library could be found.
 if lib_path is None:
@@ -83,10 +84,17 @@ error_h = ERRORFUNC(error_h)
 #### GEOS Geometry C data structures, and utility functions. ####
 
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR
-class GEOSGeom_t(Structure): pass
-class GEOSPrepGeom_t(Structure): pass
-class GEOSCoordSeq_t(Structure): pass
-class GEOSContextHandle_t(Structure): pass
+class GEOSGeom_t(Structure):
+    pass
+
+class GEOSPrepGeom_t(Structure):
+    pass
+
+class GEOSCoordSeq_t(Structure):
+    pass
+
+class GEOSContextHandle_t(Structure):
+    pass
 
 # Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)

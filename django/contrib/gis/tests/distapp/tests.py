@@ -66,8 +66,10 @@ class DistanceTest(TestCase):
         # Performing distance queries on two projected coordinate systems one
         # with units in meters and the other in units of U.S. survey feet.
         for dist in tx_dists:
-            if isinstance(dist, tuple): dist1, dist2 = dist
-            else: dist1 = dist2 = dist
+            if isinstance(dist, tuple):
+                dist1, dist2 = dist
+            else:
+                dist1 = dist2 = dist
             qs1 = SouthTexasCity.objects.filter(point__dwithin=(self.stx_pnt, dist1))
             qs2 = SouthTexasCityFt.objects.filter(point__dwithin=(self.stx_pnt, dist2))
             for qs in qs1, qs2:
@@ -75,12 +77,16 @@ class DistanceTest(TestCase):
 
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
-            if isinstance(dist, D) and not oracle: type_error = True
-            else: type_error = False
+            if isinstance(dist, D) and not oracle:
+                type_error = True
+            else:
+                type_error = False
 
             if isinstance(dist, tuple):
-                if oracle: dist = dist[1]
-                else: dist = dist[0]
+                if oracle:
+                    dist = dist[1]
+                else:
+                    dist = dist[0]
 
             # Creating the query set.
             qs = AustraliaCity.objects.order_by('name')

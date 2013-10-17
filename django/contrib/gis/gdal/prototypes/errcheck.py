@@ -19,8 +19,10 @@ def ptr_byref(args, offset=-1):
 
 def check_bool(result, func, cargs):
     "Returns the boolean evaluation of the value."
-    if bool(result): return True
-    else: return False
+    if bool(result):
+        return True
+    else:
+        return False
 
 ### String checking Routines ###
 def check_const_string(result, func, cargs, offset=None):
@@ -46,8 +48,10 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
     if str_result:
         # For routines that return a string.
         ptr = result
-        if not ptr: s = None
-        else: s = string_at(result)
+        if not ptr:
+            s = None
+        else:
+            s = string_at(result)
     else:
         # Error-code return specified.
         check_err(result)
@@ -56,7 +60,8 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
         s = ptr.value
     # Correctly freeing the allocated memory beind GDAL pointer
     # w/the VSIFree routine.
-    if ptr: lgdal.VSIFree(ptr)
+    if ptr:
+        lgdal.VSIFree(ptr)
     return s
 
 ### DataSource, Layer error-checking ###

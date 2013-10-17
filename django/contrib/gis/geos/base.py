@@ -34,8 +34,10 @@ class GEOSBase(object):
         # Raise an exception if the pointer isn't valid don't
         # want to be passing NULL pointers to routines --
         # that's very bad.
-        if self._ptr: return self._ptr
-        else: raise GEOSException('NULL GEOS %s pointer encountered.' % self.__class__.__name__)
+        if self._ptr:
+            return self._ptr
+        else:
+            raise GEOSException('NULL GEOS %s pointer encountered.' % self.__class__.__name__)
 
     def _set_ptr(self, ptr):
         # Only allow the pointer to be set with pointers of the

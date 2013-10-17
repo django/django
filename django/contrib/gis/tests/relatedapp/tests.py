@@ -79,7 +79,8 @@ class RelatedGeoModelTest(TestCase):
         # between the Oracle and PostGIS spatial backends on the extent calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
-            for ref_val, e_val in zip(ref, e): self.assertAlmostEqual(ref_val, e_val, tol)
+            for ref_val, e_val in zip(ref, e):
+                self.assertAlmostEqual(ref_val, e_val, tol)
 
     @no_mysql
     def test04b_related_union_aggregate(self):

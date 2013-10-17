@@ -66,7 +66,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handling WKT input.
-                if wkt_m.group('srid'): srid = int(wkt_m.group('srid'))
+                if wkt_m.group('srid'):
+                    srid = int(wkt_m.group('srid'))
                 g = wkt_r().read(force_bytes(wkt_m.group('wkt')))
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
@@ -100,7 +101,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def _post_init(self, srid):
         "Helper routine for performing post-initialization setup."
         # Setting the SRID, if given.
-        if srid and isinstance(srid, int): self.srid = srid
+        if srid and isinstance(srid, int):
+            self.srid = srid
 
         # Setting the class type (e.g., Point, Polygon, etc.)
         self.__class__ = GEOS_CLASSES[self.geom_typeid]
@@ -114,7 +116,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Destroys this Geometry; in other words, frees the memory used by the
         GEOS C++ object.
         """
-        if self._ptr: capi.destroy_geom(self._ptr)
+        if self._ptr:
+            capi.destroy_geom(self._ptr)
 
     def __copy__(self):
         """
@@ -149,7 +152,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
         ptr = wkb_r().read(memoryview(wkb))
-        if not ptr: raise GEOSException('Invalid Geometry loaded from pickled state.')
+        if not ptr:
+            raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
         self._post_init(srid)
 
@@ -361,8 +365,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = capi.geos_get_srid(self.ptr)
-        if s == 0: return None
-        else: return s
+        if s == 0:
+            return None
+        else:
+            return s
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
@@ -377,8 +383,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
         are *not* included in this representation because GEOS does not yet
         support serializing them.
         """
-        if self.get_srid(): return 'SRID=%s;%s' % (self.srid, self.wkt)
-        else: return self.wkt
+        if self.get_srid():
+            return 'SRID=%s;%s' % (self.srid, self.wkt)
+        else:
+            return self.wkt
 
     @property
     def wkt(self):

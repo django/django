@@ -70,8 +70,10 @@ class GeoModelAdmin(ModelAdmin):
         """
         is_collection = db_field.geom_type in ('MULTIPOINT', 'MULTILINESTRING', 'MULTIPOLYGON', 'GEOMETRYCOLLECTION')
         if is_collection:
-            if db_field.geom_type == 'GEOMETRYCOLLECTION': collection_type = 'Any'
-            else: collection_type = OGRGeomType(db_field.geom_type.replace('MULTI', ''))
+            if db_field.geom_type == 'GEOMETRYCOLLECTION':
+                collection_type = 'Any'
+            else:
+                collection_type = OGRGeomType(db_field.geom_type.replace('MULTI', ''))
         else:
             collection_type = 'None'
 

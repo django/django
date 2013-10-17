@@ -99,7 +99,8 @@ class Polygon(GEOSGeometry):
 
     def _construct_ring(self, param, msg='Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'):
         "Helper routine for trying to construct a ring from the given parameter."
-        if isinstance(param, LinearRing): return param
+        if isinstance(param, LinearRing):
+            return param
         try:
             ring = LinearRing(param)
             return ring
@@ -112,7 +113,8 @@ class Polygon(GEOSGeometry):
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_polygon(length, items)
-        if srid: self.srid = srid
+        if srid:
+            self.srid = srid
         capi.destroy_geom(prev_ptr)
 
     def _get_single_internal(self, index):

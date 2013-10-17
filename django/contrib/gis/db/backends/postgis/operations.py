@@ -453,8 +453,10 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         Helper routine that returns a boolean indicating whether the number of
         parameters is correct for the lookup type.
         """
-        def exactly_two(np): return np == 2
-        def two_to_three(np): return np >= 2 and np <=3
+        def exactly_two(np):
+            return np == 2
+        def two_to_three(np):
+            return np >= 2 and np <=3
         if (lookup_type in self.distance_functions and
             lookup_type != 'dwithin'):
             return two_to_three(num_param)

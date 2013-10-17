@@ -35,7 +35,8 @@ def bin_output(func):
 
 def geom_output(func, argtypes):
     "For GEOS routines that return a geometry."
-    if argtypes: func.argtypes = argtypes
+    if argtypes:
+        func.argtypes = argtypes
     func.restype = GEOM_PTR
     func.errcheck = check_geom
     return func
