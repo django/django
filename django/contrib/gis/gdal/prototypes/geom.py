@@ -1,7 +1,7 @@
 from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
+from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
 from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
     double_output, geom_output, int_output, srs_output, string_output, void_output)
 
@@ -20,7 +20,7 @@ def pnt_func(f):
 def topology_func(f):
     f.argtypes = [c_void_p, c_void_p]
     f.restype = c_int
-    f.errchck = check_bool
+    f.errchck = bool
     return f
 
 ### OGR_G ctypes function prototypes ###

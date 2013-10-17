@@ -12,15 +12,6 @@ if HAS_GEOS:
     from ..error import GEOSIndexError
 
 
-def getItem(o,i):
-    return o[i]
-
-def delItem(o,i):
-    del o[i]
-
-def setItem(o,i,v):
-    o[i] = v
-
 if HAS_GEOS:
     def api_get_distance(x):
         return x.distance(Point(-200,-200))
