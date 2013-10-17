@@ -40,11 +40,35 @@ class DefaultsTests(TestCase):
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
-        with self.settings(DEBUG=True):
+        response = self.client.get('/views/server_error/')
+        self.assertEqual(response.status_code, 500)
+
+
+    def test_server_error_without_handler_error(self):
+        """
+        The server_error view raises a 500 status and while handling
+        the error, the next error is raised.
+        """
+
+        @receiver(got_request_exception)
+        def handler(sender, **kwargs):
+            pass
+
+        try:
             with patch_logger('django.request', 'error') as calls:
-                response = self.client.get('/views/server_error/')
-                self.assertEqual(response.status_code, 500)
-                self.assertEqual(len(calls), 1)        
+                try:
+                    response = self.client.get('/views/raises_unhandled_exception/')
+                except Exception, e:
+                    # We need to catch the exceptions and check, if it is a 'Bad 
+                    # Request' or 'Bad Handler', since the Test Client will reraise
+                    # these.
+                    if str(e) not in ('Bad Request','Bad Handler'):
+                        raise
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0][0], 'Internal Server Error: %s')
+
+        finally:
+            got_request_exception.disconnect(handler)
 
     def test_server_error_with_handler_error(self):
         """
@@ -54,13 +78,23 @@ class DefaultsTests(TestCase):
 
         @receiver(got_request_exception)
         def handler(sender, **kwargs):
-            raise Exception('I am a Handler Error')
+            raise Exception('Bad Handler')
 
-        with self.settings(DEBUG=True):
+        try:
             with patch_logger('django.request', 'error') as calls:
-                response = self.client.get('/views/server_error/')
-                self.assertEqual(response.status_code, 500)
+                try:
+                    response = self.client.get('/views/raises_unhandled_exception/')
+                except Exception, e:
+                    # We need to catch the exceptions and check, if it is a 'Bad 
+                    # Request' or 'Bad Handler', since the Test Client will reraise
+                    # these.
+                    if str(e) not in ('Bad Request','Bad Handler'):
+                        raise
                 self.assertEqual(len(calls), 2)
+                self.assertEqual(calls[0][0], 'Internal Server Error: %s')
+                self.assertTrue(calls[1][0], 'Request Signal Handler Error: %s')
+        finally:
+            got_request_exception.disconnect(handler)
 
     def test_custom_templates(self):
         """

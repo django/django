@@ -404,8 +404,15 @@ def patch_logger(logger_name, log_level):
     and provides a simple mock-like list of messages received
     """
     calls = []
-    def replacement(msg):
-        calls.append(msg)
+    def replacement(msg, path='', exc_info='', extra=''):
+        # we need to check here, if a full log should be inserted, or  if
+        # it is just a simple test with one "naive" message. This is 
+        # necessary, since numerous test just submit a simple message and
+        # do not expect a list/tuple in the log.
+        if path or exc_info or extra:
+            calls.append((msg, path, exc_info, extra))
+        else:
+            calls.append(msg)
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)

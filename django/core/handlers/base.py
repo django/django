@@ -100,13 +100,11 @@ class BaseHandler(object):
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
                 request.resolver_match = resolver_match
-
                 # Apply view middleware
                 for middleware_method in self._view_middleware:
                     response = middleware_method(request, callback, callback_args, callback_kwargs)
                     if response:
                         break
-
             if response is None:
                 wrapped_callback = self.make_view_atomic(callback)
                 try:
@@ -150,8 +148,13 @@ class BaseHandler(object):
                     callback, param_dict = resolver.resolve404()
                     response = callback(request, **param_dict)
                 except:
-                    signals.got_request_exception.send(sender=self.__class__, request=request)
-                    response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                    # Get the exception info now and handle the current exception.
+                    # Only then manage the got_request_excpetion. 
+                    # Just in case another exception is thrown later.
+                    response = self.handle_uncaught_exception(request, resolver,
+                        sys.exc_info())
+                    self.handle_got_request_exception_signal(
+                        sender=self.__class__, request=request)
 
         except PermissionDenied:
             logger.warning(
@@ -164,10 +167,13 @@ class BaseHandler(object):
                 callback, param_dict = resolver.resolve403()
                 response = callback(request, **param_dict)
             except:
-                signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                # Get the exception info now and handle the current exception.
+                # Only then manage the got_request_excpetion. 
+                # Just in case another exception is thrown later.
+                response = self.handle_uncaught_exception(request, resolver,
+                    sys.exc_info())
+                self.handle_got_request_exception_signal(sender=self.__class__,
+                    request=request)
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -180,42 +186,52 @@ class BaseHandler(object):
                 callback, param_dict = resolver.resolve400()
                 response = callback(request, **param_dict)
             except:
-                signals.got_request_exception.send(
-                        sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                        resolver, sys.exc_info())
+                # Get the exception info now and handle the current exception.
+                # Only then manage the got_request_excpetion. 
+                # Just in case another exception is thrown later.
+                response = self.handle_uncaught_exception(request, resolver,
+                    sys.exc_info())
+                self.handle_got_request_exception_signal(sender=self.__class__,
+                    request=request)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
         except: # Handle everything else.
-            # Get the exception info now, in case another exception is thrown later.
-            exc_info = sys.exc_info()
-            signal_responses = signals.got_request_exception.send_robust(sender=self.__class__, request=request)
-            for signal_response in signal_responses:
-                if isinstance(signal_response[1], Exception):
-                    message = 'Base Handler Error %s: ' % signal_response[1] 
-                    logger.error(message+'%s', request.path,
-                        exc_info=exc_info,
-                        extra={
-                            'status_code': 500,
-                            'request': request,
-                            'error': signal_response[1]
-                        }
-                    )
-            response = self.handle_uncaught_exception(request, resolver, exc_info)
-
+            # Get the exception info now and handle the current exception.
+            # Only then manage the got_request_excpetion. 
+            # Just in case another exception is thrown later.
+            response = self.handle_uncaught_exception(request, resolver,
+                sys.exc_info())
+            self.handle_got_request_exception_signal(sender=self.__class__,
+                request=request)
         try:
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-
+            signals.got_request_exception.send(sender=self.__class__,
+                request=request)
+            response = self.handle_uncaught_exception(request, resolver,
+                sys.exc_info())
         return response
+
+    def handle_got_request_exception_signal(self, sender, request):
+        signal_responses = signals.got_request_exception.send_robust(
+            sender=sender, request=request)
+        for signal_response in signal_responses:
+            if isinstance(signal_response[1], Exception):                
+                logger.error('Request Signal Handler Error: %s', request.path,
+                    #TODO: should we add the exc_info of the original error here?
+                    exc_info='',  
+                    extra={
+                        'status_code': 500,
+                        'request': request,
+                        'error': signal_response[1]
+                    }
+                )        
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """
