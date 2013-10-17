@@ -16,4 +16,5 @@ from django.contrib.formtools.tests.wizard.wizardtests.tests import (
     WizardTestKwargs,
     WizardTestGenericViewInterface,
     WizardFormKwargsOverrideTests,
+    WizardInlineFormSetTests,
 )
