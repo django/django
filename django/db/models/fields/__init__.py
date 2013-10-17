@@ -704,7 +704,7 @@ class AutoField(Field):
 
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, \
-               "%ss must have primary_key=True." % self.__class__.__name__
+            "%ss must have primary_key=True." % self.__class__.__name__
         kwargs['blank'] = True
         Field.__init__(self, *args, **kwargs)
 
@@ -746,7 +746,7 @@ class AutoField(Field):
 
     def contribute_to_class(self, cls, name):
         assert not cls._meta.has_auto_field, \
-               "A model can't have more than one AutoField."
+            "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
         cls._meta.auto_field = self

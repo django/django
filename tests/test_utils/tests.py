@@ -397,13 +397,13 @@ class HTMLEqualTests(TestCase):
 
     def test_complex_examples(self):
         self.assertHTMLEqual(
-        """<tr><th><label for="id_first_name">First name:</label></th>
+            """<tr><th><label for="id_first_name">First name:</label></th>
 <td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th>
 <td><input type="text" id="id_last_name" name="last_name" value="Lennon" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th>
 <td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
-        """
+            """
         <tr><th>
             <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
         </td></tr>
@@ -416,7 +416,7 @@ class HTMLEqualTests(TestCase):
         """)
 
         self.assertHTMLEqual(
-        """<!DOCTYPE html>
+            """<!DOCTYPE html>
         <html>
         <head>
             <link rel="stylesheet">

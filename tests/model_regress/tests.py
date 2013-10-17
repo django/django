@@ -131,7 +131,7 @@ class ModelTests(TestCase):
                         datetime.date(1, 3, 3),
                     ],
                 attrgetter("when")
-       )
+        )
 
     if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':
         # In Python < 3.3, datetime.strftime raises an exception for years

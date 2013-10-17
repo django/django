@@ -49,9 +49,9 @@ def _is_changelist_popup(request):
     IS_LEGACY_POPUP_VAR = 'pop'
     if IS_LEGACY_POPUP_VAR in request.GET:
         warnings.warn(
-        "The `%s` GET parameter has been renamed to `%s`." %
-        (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
-        DeprecationWarning, 2)
+            "The `%s` GET parameter has been renamed to `%s`." %
+            (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
+            DeprecationWarning, 2)
         return True
 
     return False

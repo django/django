@@ -1247,8 +1247,8 @@ class ForeignKey(ForeignObject):
 
         using = router.db_for_read(model_instance.__class__, instance=model_instance)
         qs = self.rel.to._default_manager.using(using).filter(
-          **{self.rel.field_name: value}
-         )
+            **{self.rel.field_name: value}
+        )
         qs = qs.complex_filter(self.rel.limit_choices_to)
         if not qs.exists():
             raise exceptions.ValidationError(
