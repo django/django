@@ -145,12 +145,12 @@ class JsLexer(Lexer):
     states = {
         'div': # slash will mean division
             both_before + [
-            Tok("punct", literals("/= /"), next='reg'),
+                Tok("punct", literals("/= /"), next='reg'),
             ] + both_after,
 
         'reg':  # slash will mean regex
             both_before + [
-            Tok("regex",
+                Tok("regex",
                 r"""
                     /                       # opening slash
                     # First character is..

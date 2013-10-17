@@ -246,9 +246,9 @@ class SerializersTestBase(object):
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
-        author = self.jane,
-        headline = "Nobody remembers the early years",
-        pub_date = datetime(1, 2, 3, 4, 5, 6))
+            author = self.jane,
+            headline = "Nobody remembers the early years",
+            pub_date = datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")

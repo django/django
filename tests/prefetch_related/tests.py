@@ -440,9 +440,9 @@ class ForeignKeyToFieldTest(TestCase):
         with self.assertNumQueries(3):
             qs = Author.objects.all().prefetch_related('favorite_authors', 'favors_me')
             favorites = [(
-                 [six.text_type(i_like) for i_like in author.favorite_authors.all()],
-                 [six.text_type(likes_me) for likes_me in author.favors_me.all()]
-                ) for author in qs]
+                [six.text_type(i_like) for i_like in author.favorite_authors.all()],
+                [six.text_type(likes_me) for likes_me in author.favors_me.all()]
+            ) for author in qs]
             self.assertEqual(
                 favorites,
                 [

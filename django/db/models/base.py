@@ -566,8 +566,8 @@ class Model(six.with_metaclass(ModelBase)):
             deferred_fields = [
                 f.attname for f in self._meta.fields
                 if f.attname not in self.__dict__
-                   and isinstance(self.__class__.__dict__[f.attname],
-                                  DeferredAttribute)]
+                    and isinstance(self.__class__.__dict__[f.attname],
+                                   DeferredAttribute)]
 
             loaded_fields = field_names.difference(deferred_fields)
             if loaded_fields:

@@ -23,7 +23,7 @@ class FormsMediaTestCase(TestCase):
 
         class Foo:
             css = {
-               'all': ('path/to/css1','/path/to/css2')
+                'all': ('path/to/css1','/path/to/css2')
             }
             js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -52,7 +52,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -77,21 +77,21 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -158,7 +158,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -185,7 +185,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -203,7 +203,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget8(MyWidget1):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -222,7 +222,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -249,7 +249,7 @@ class FormsMediaTestCase(TestCase):
             class Media:
                 extend = False
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -264,7 +264,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -272,7 +272,7 @@ class FormsMediaTestCase(TestCase):
             class Media:
                 extend = True
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -290,7 +290,7 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -298,7 +298,7 @@ class FormsMediaTestCase(TestCase):
             class Media:
                 extend = ('css',)
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -318,9 +318,9 @@ class FormsMediaTestCase(TestCase):
         class MultimediaWidget(TextInput):
             class Media:
                 css = {
-                   'screen, print': ('/file1','/file2'),
-                   'screen': ('/file3',),
-                   'print': ('/file4',)
+                    'screen, print': ('/file1','/file2'),
+                    'screen': ('/file3',),
+                    'print': ('/file4',)
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -340,21 +340,21 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -382,21 +382,21 @@ class FormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -474,7 +474,7 @@ class StaticFormsMediaTestCase(TestCase):
 
         class Foo:
             css = {
-               'all': ('path/to/css1','/path/to/css2')
+                'all': ('path/to/css1','/path/to/css2')
             }
             js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -503,7 +503,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -528,21 +528,21 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -609,7 +609,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -636,7 +636,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -654,7 +654,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget8(MyWidget1):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -673,7 +673,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -700,7 +700,7 @@ class StaticFormsMediaTestCase(TestCase):
             class Media:
                 extend = False
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -715,7 +715,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -723,7 +723,7 @@ class StaticFormsMediaTestCase(TestCase):
             class Media:
                 extend = True
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -741,7 +741,7 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
@@ -749,7 +749,7 @@ class StaticFormsMediaTestCase(TestCase):
             class Media:
                 extend = ('css',)
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -769,9 +769,9 @@ class StaticFormsMediaTestCase(TestCase):
         class MultimediaWidget(TextInput):
             class Media:
                 css = {
-                   'screen, print': ('/file1','/file2'),
-                   'screen': ('/file3',),
-                   'print': ('/file4',)
+                    'screen, print': ('/file1','/file2'),
+                    'screen': ('/file3',),
+                    'print': ('/file4',)
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -791,21 +791,21 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
@@ -833,21 +833,21 @@ class StaticFormsMediaTestCase(TestCase):
         class MyWidget1(TextInput):
             class Media:
                 css = {
-                   'all': ('path/to/css1','/path/to/css2')
+                    'all': ('path/to/css1','/path/to/css2')
                 }
                 js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
         class MyWidget2(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css2','/path/to/css3')
+                    'all': ('/path/to/css2','/path/to/css3')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                   'all': ('/path/to/css3','path/to/css1')
+                    'all': ('/path/to/css3','path/to/css1')
                 }
                 js = ('/path/to/js1','/path/to/js4')
 

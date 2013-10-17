@@ -34,7 +34,7 @@ class Message(object):
 
     def __eq__(self, other):
         return isinstance(other, Message) and self.level == other.level and \
-                                              self.message == other.message
+            self.message == other.message
 
     def __str__(self):
         return force_text(self.message)

@@ -251,9 +251,9 @@ def get_validation_errors(outfile, app=None):
                                     "than one foreign key to %s, which is "
                                     "ambiguous and is not permitted." % (
                                         f.rel.through._meta.object_name,
-                                         from_model._meta.object_name
-                                     )
-                                 )
+                                        from_model._meta.object_name
+                                    )
+                                )
                             else:
                                 seen_from = True
                         elif rel_to == to_model:

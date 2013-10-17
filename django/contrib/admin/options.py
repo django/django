@@ -1198,9 +1198,9 @@ class ModelAdmin(BaseModelAdmin):
 
         self.message_user(request, _(
             'The %(name)s "%(obj)s" was deleted successfully.') % {
-                                   'name': force_text(opts.verbose_name),
-                                   'obj': force_text(obj_display)},
-                          messages.SUCCESS)
+                'name': force_text(opts.verbose_name),
+                'obj': force_text(obj_display)
+            }, messages.SUCCESS)
 
         if self.has_change_permission(request, None):
             post_url = reverse('admin:%s_%s_changelist' %
@@ -1221,10 +1221,10 @@ class ModelAdmin(BaseModelAdmin):
 
         return TemplateResponse(request,
             self.delete_confirmation_template or [
-            "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
-            "admin/{}/delete_confirmation.html".format(app_label),
-            "admin/delete_confirmation.html"
-       ], context, current_app=self.admin_site.name)
+                "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
+                "admin/{}/delete_confirmation.html".format(app_label),
+                "admin/delete_confirmation.html"
+            ], context, current_app=self.admin_site.name)
 
     @csrf_protect_m
     @transaction.atomic

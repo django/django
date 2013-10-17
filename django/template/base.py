@@ -515,7 +515,7 @@ filter_raw_string = r"""
     'var_chars': "\w\.",
     'filter_sep': re.escape(FILTER_SEPARATOR),
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
-  }
+}
 
 filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
 

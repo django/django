@@ -166,9 +166,8 @@ class RelatedFieldListFilter(FieldListFilter):
             rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_val_isnull = request.GET.get(
-                                      self.lookup_kwarg_isnull, None)
+        self.lookup_val = request.GET.get(self.lookup_kwarg)
+        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
         self.lookup_choices = field.get_choices(include_blank=False)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
