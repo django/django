@@ -1810,7 +1810,6 @@ class FormsTestCase(TestCase):
                           CharField(label='Name', max_length=10))
                 super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
 
-
         field = ChoicesField()
         field2 = copy.deepcopy(field)
         self.assertTrue(isinstance(field2, ChoicesField))

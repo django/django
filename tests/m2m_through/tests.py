@@ -66,8 +66,6 @@ class M2mThroughTests(TestCase):
             []
         )
 
-
-
     def test_forward_descriptors(self):
         # Due to complications with adding via an intermediary model,
         # the add method is not provided.

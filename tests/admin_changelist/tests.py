@@ -73,7 +73,6 @@ class ChangeListTests(TestCase):
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, False)
 
-
     def test_result_list_empty_changelist_value(self):
         """
         Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored

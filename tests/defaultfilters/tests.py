@@ -82,7 +82,6 @@ class DefaultFiltersTests(TestCase):
         finally:
             decimal_ctx.prec = old_prec
 
-
     def test_floatformat_py2_fail(self):
         self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
 
@@ -91,7 +90,6 @@ class DefaultFiltersTests(TestCase):
     # such as unicode or Decimal.
     if six.PY2:
         test_floatformat_py2_fail = unittest.expectedFailure(test_floatformat_py2_fail)
-
 
     def test_addslashes(self):
         self.assertEqual(addslashes('"double quotes" and \'single quotes\''),

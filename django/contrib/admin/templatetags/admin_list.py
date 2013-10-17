@@ -155,7 +155,6 @@ def result_headers(cl):
         if i not in ordering_field_columns:
             o_list_primary.insert(0, make_qs_param(new_order_type, i))
 
-
         yield {
             "text": text,
             "sortable": True,

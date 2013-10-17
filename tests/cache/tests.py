@@ -794,7 +794,6 @@ class BaseCacheTests(object):
         self.assertEqual(self.custom_key_cache.get('answer2'), 42)
         self.assertEqual(self.custom_key_cache2.get('answer2'), 42)
 
-
     def test_cache_write_unpickable_object(self):
         update_middleware = UpdateCacheMiddleware()
         update_middleware.cache = self.cache
@@ -1495,7 +1494,6 @@ class CacheI18nTest(TestCase):
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
-
 
     @override_settings(
             CACHE_MIDDLEWARE_KEY_PREFIX="test",

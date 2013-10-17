@@ -146,7 +146,6 @@ class SimpleTemplateResponseTest(TestCase):
         self.assertEqual(response.content, b'First template\n')
         self.assertEqual(post, ['post1','post2'])
 
-
     def test_pickling(self):
         # Create a template response. The context is
         # known to be unpickleable (e.g., a function).

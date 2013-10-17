@@ -139,7 +139,6 @@ class PreviewTests(TestCase):
         response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string_encoded)
 
-
     def test_form_submit_bad_hash(self):
         """
         Test contrib.formtools.preview form submittal does not proceed

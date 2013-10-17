@@ -372,7 +372,6 @@ class TestFixtures(TestCase):
         self.maxDiff = 1024
         self.assertEqual(data, animals_data)
 
-
     def test_proxy_model_included(self):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata

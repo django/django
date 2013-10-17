@@ -611,7 +611,6 @@ class HostValidationTests(SimpleTestCase):
                 }
                 request.get_host()
 
-
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_disabled_in_debug_mode(self):
         """If ALLOWED_HOSTS is empty and DEBUG is True, all hosts pass."""

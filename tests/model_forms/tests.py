@@ -31,7 +31,6 @@ if test_images:
             model = ImageFile
             fields = '__all__'
 
-
     class OptionalImageFileForm(forms.ModelForm):
         class Meta:
             model = OptionalImageFile
@@ -60,7 +59,6 @@ class DerivedBookForm(forms.ModelForm):
     class Meta:
         model = DerivedBook
         fields = '__all__'
-
 
 
 class ExplicitPKForm(forms.ModelForm):
@@ -607,8 +605,6 @@ class ValidationTest(TestCase):
     def test_notrequired_overrides_notblank(self):
         form = CustomWriterForm({})
         assert form.is_valid()
-
-
 
 
 # unique/unique_together validation

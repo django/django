@@ -1527,7 +1527,6 @@ class Queries5Tests(TestCase):
             ['<Ranking: 1: a3>', '<Ranking: 2: a2>', '<Ranking: 3: a1>']
         )
 
-
         # Ordering of extra() pieces is possible, too and you can mix extra
         # fields and model fields in the ordering.
         self.assertQuerysetEqual(

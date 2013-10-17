@@ -490,7 +490,6 @@ class TransactionTests(IgnoreDeprecationWarningsMixin, TransactionTestCase):
         r = Reporter.objects.get()
         self.assertEqual(r.first_name, "Robert")
 
-
     @skipUnlessDBFeature('supports_transactions')
     def test_manually_managed(self):
         """

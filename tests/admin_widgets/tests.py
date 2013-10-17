@@ -860,7 +860,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
 
-
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name

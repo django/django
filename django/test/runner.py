@@ -89,7 +89,6 @@ class DiscoverRunner(object):
                     break
                 kwargs['top_level_dir'] = top_level
 
-
             if not (tests and tests.countTestCases()):
                 # if no tests found, it's probably a package; try discovery
                 tests = self.test_loader.discover(start_dir=label, **kwargs)

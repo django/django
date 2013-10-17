@@ -509,7 +509,6 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
             ['some text', ['J','P'], ['2009-04-25','11:44:00']]))
 
-
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
 

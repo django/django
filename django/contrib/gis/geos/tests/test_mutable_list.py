@@ -145,7 +145,6 @@ class ListMixinTest(unittest.TestCase):
                 pl[::k] = ssl
                 self.assertEqual(pl, ul[:], 'set slice [::%d]' % (k))
 
-
     def test03_delslice(self):
         'Delete slice'
         for Len in range(self.limit):

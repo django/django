@@ -198,7 +198,6 @@ class PasswordResetTest(AuthViewsTestCase):
             self.assertEqual(len(mail.outbox), 0)
             self.assertEqual(len(logger_calls), 1)
 
-
     def _test_confirm_start(self):
         # Start by creating the email
         self.client.post('/password_reset/', {'email': 'staffmember@example.com'})

@@ -29,7 +29,6 @@ class NestedForeignKeysTests(TestCase):
         self.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
         self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
 
-
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
     def testInheritance(self):
@@ -51,7 +50,6 @@ class NestedForeignKeysTests(TestCase):
         # Simple filter/exclude queries for good measure.
         self.assertEqual(Event.objects.filter(screening__movie=self.movie).count(), 1)
         self.assertEqual(Event.objects.exclude(screening__movie=self.movie).count(), 1)
-
 
     # These all work because the second foreign key in the chain has null=True.
     def testInheritanceNullFK(self):
@@ -100,7 +98,6 @@ class NestedForeignKeysTests(TestCase):
         self.assertEqual(Package.objects.filter(screening__movie=self.movie).count(), 1)
         self.assertEqual(Package.objects.exclude(screening__movie=self.movie).count(), 1)
 
-
     # These all work because the second foreign key in the chain has null=True.
     def testExplicitForeignKeyNullFK(self):
         package = PackageNullFK.objects.create()
@@ -131,7 +128,6 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
         self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
 
-
     def testInheritance(self):
         some_event = Event.objects.create()
         screening = Screening.objects.create(movie=self.movie)
@@ -150,7 +146,6 @@ class DeeplyNestedForeignKeysTests(TestCase):
 
         self.assertEqual(Event.objects.filter(screening__movie__director=self.director).count(), 1)
         self.assertEqual(Event.objects.exclude(screening__movie__director=self.director).count(), 1)
-
 
     def testExplicitForeignKey(self):
         package = Package.objects.create()

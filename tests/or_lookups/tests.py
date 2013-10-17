@@ -59,7 +59,6 @@ class OrLookupsTests(TestCase):
             attrgetter("headline")
         )
 
-
     def test_stages(self):
         # You can shorten this syntax with code like the following,  which is
         # especially useful if building the query in stages:
