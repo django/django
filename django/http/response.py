@@ -123,8 +123,11 @@ class HttpResponseBase(six.Iterator):
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
+        def to_bytes(val, encoding):
+            return val if isinstance(val, bytes) else val.encode(encoding)
+
         headers = [
-            ('%s: %s' % (key, value)).encode('us-ascii')
+            (b': '.join([to_bytes(key, 'ascii'), to_bytes(value, 'latin-1')]))
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers)
@@ -135,7 +138,7 @@ class HttpResponseBase(six.Iterator):
         __str__ = serialize_headers
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
-        """Converts headers key/value to ascii/latin1 native strings.
+        """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
         `value` value can't be represented in the given charset, MIME-encoding
@@ -171,7 +174,7 @@ class HttpResponseBase(six.Iterator):
 
     def __setitem__(self, header, value):
         header = self._convert_to_charset(header, 'ascii')
-        value = self._convert_to_charset(value, 'latin1', mime_encode=True)
+        value = self._convert_to_charset(value, 'latin-1', mime_encode=True)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
