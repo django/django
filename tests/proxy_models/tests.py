@@ -150,6 +150,7 @@ class ProxyModelTests(TestCase):
                     proxy = True
         self.assertRaises(FieldError, build_new_fields)
 
+    @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
     def test_swappable(self):
         try:
             # This test adds dummy applications to the app cache. These
@@ -157,8 +158,6 @@ class ProxyModelTests(TestCase):
             # with the flush operation in other tests.
             old_app_models = copy.deepcopy(cache.app_models)
             old_app_store = copy.deepcopy(cache.app_store)
-
-            settings.TEST_SWAPPABLE_MODEL = 'proxy_models.AlternateModel'
 
             class SwappableModel(models.Model):
 
@@ -175,7 +174,6 @@ class ProxyModelTests(TestCase):
                     class Meta:
                         proxy = True
         finally:
-            del settings.TEST_SWAPPABLE_MODEL
             cache.app_models = old_app_models
             cache.app_store = old_app_store
 

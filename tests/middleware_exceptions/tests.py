@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.template import Template
 from django.test import TestCase
+from django.test.utils import override_settings
 
 class TestException(Exception):
     pass
@@ -772,15 +773,11 @@ _missing = object()
 class RootUrlconfTests(TestCase):
     urls = 'middleware_exceptions.urls'
 
+    @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):
-        try:
-            original_ROOT_URLCONF = settings.ROOT_URLCONF
-            del settings.ROOT_URLCONF
-        except AttributeError:
-            original_ROOT_URLCONF = _missing
+        # Removing ROOT_URLCONF is safe, as override_settings will restore
+        # the previously defined settings.
+        del settings.ROOT_URLCONF
         self.assertRaises(AttributeError,
             self.client.get, "/middleware_exceptions/view/"
         )
-
-        if original_ROOT_URLCONF is not _missing:
-            settings.ROOT_URLCONF = original_ROOT_URLCONF

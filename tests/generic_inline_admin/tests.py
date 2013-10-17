@@ -18,7 +18,8 @@ from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
     EpisodePermanent, Category)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   TEMPLATE_DEBUG=True)
 class GenericAdminViewTest(TestCase):
     urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
@@ -27,8 +28,7 @@ class GenericAdminViewTest(TestCase):
         # set TEMPLATE_DEBUG to True to ensure {% include %} will raise
         # exceptions since that is how inlines are rendered and #9498 will
         # bubble up if it is an issue.
-        self.original_template_debug = settings.TEMPLATE_DEBUG
-        settings.TEMPLATE_DEBUG = True
+
         self.client.login(username='super', password='secret')
 
         # Can't load content via a fixture (since the GenericForeignKey
@@ -46,7 +46,6 @@ class GenericAdminViewTest(TestCase):
 
     def tearDown(self):
         self.client.logout()
-        settings.TEMPLATE_DEBUG = self.original_template_debug
 
     def testBasicAddGet(self):
         """
